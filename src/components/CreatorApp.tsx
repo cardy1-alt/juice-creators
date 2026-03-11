@@ -480,7 +480,7 @@ export default function CreatorApp() {
 
                         {/* Top Section: Business info */}
                         <div className="flex items-start gap-3 pl-5 pr-4 pt-4 pb-3">
-                          <div className="text-[52px] leading-none flex-shrink-0">
+                          <div className="text-[38px] leading-none flex-shrink-0">
                             {emoji}
                           </div>
                           <div className="flex-1 min-w-0">
