@@ -429,7 +429,7 @@ export default function CreatorApp() {
                     </button>
                   ))}
                 </div>
-                <div className="absolute right-3 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none" />
               </div>
 
               {offers.filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory).length === 0 && (
@@ -468,73 +468,64 @@ export default function CreatorApp() {
                       badgeColor = 'bg-amber-500 text-white';
                     }
 
+                    const categoryColorClass = getCategoryColor(offer.businesses.category).replace('bg-', '');
+
                     return (
-                      <button
+                      <div
                         key={offer.id}
-                        onClick={() => setExpandedOffer(isExpanded ? null : offer.id)}
-                        className={`w-full bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left relative overflow-hidden ${
-                          isExpanded ? 'border-[#5b3df5]' : ''
-                        }`}
+                        className="w-full bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all text-left relative overflow-hidden"
                       >
+                        {/* Category accent bar */}
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
-                        <div className="flex items-start gap-2 mb-2 pl-2">
-                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-lg flex-shrink-0">
+
+                        {/* Top Section: Business info */}
+                        <div className="flex items-start gap-3 p-4 pb-3">
+                          <div className="w-12 h-12 flex items-center justify-center text-3xl flex-shrink-0">
                             {emoji}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-xs text-[#1a1025] leading-tight">{offer.businesses.name}</h3>
-                            <div className={`mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold inline-block ${badgeColor}`}>
-                              {badgeText}
-                            </div>
+                            <h3 className="font-bold text-lg text-gray-900 leading-tight">{offer.businesses.name}</h3>
+                            <p className="text-xs text-gray-400 mt-0.5">{offer.businesses.category}</p>
                           </div>
                         </div>
 
-                        {!isExpanded ? (
-                          <p className="text-[11px] text-gray-500 leading-[1.4] pl-2" style={{
+                        {/* Middle Section: Offer description */}
+                        <div className="px-4 pb-3">
+                          <p className="text-sm text-gray-600 leading-relaxed" style={{
                             display: '-webkit-box',
-                            WebkitLineClamp: 2,
+                            WebkitLineClamp: 3,
                             WebkitBoxOrient: 'vertical',
                             overflow: 'hidden',
                             wordBreak: 'break-word'
                           }}>
                             {offer.description}
                           </p>
-                        ) : (
-                          <div className="space-y-3 mt-3 pl-2">
-                            <p className="text-xs text-gray-600 leading-relaxed">{offer.description}</p>
+                        </div>
 
-                            <div className="bg-gray-50 rounded-lg p-2">
-                              <div className="flex items-center justify-between text-[10px] mb-1">
-                                <span className="text-gray-500 font-medium">Availability</span>
-                                <span className="text-gray-700 font-bold">{slotsUsed}/{offer.monthly_cap}</span>
-                              </div>
-                              <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full rounded-full transition-all ${
-                                    full ? 'bg-rose-400' : pct >= 50 ? 'bg-amber-400' : 'bg-emerald-400'
-                                  }`}
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                            </div>
-
+                        {/* Bottom Section: Slots and action */}
+                        <div className="border-t border-gray-100 px-4 py-3 flex items-center justify-between">
+                          <span className="text-xs text-gray-500">
+                            {slotsLeft} of {offer.monthly_cap} slots left
+                          </span>
+                          {full ? (
+                            <span className="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
+                              Full
+                            </span>
+                          ) : alreadyClaimed ? (
+                            <span className="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
+                              Claimed
+                            </span>
+                          ) : (
                             <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleClaim(offer);
-                              }}
-                              disabled={loading || full || alreadyClaimed || hasActiveBusiness}
-                              className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${
-                                alreadyClaimed || full
-                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                  : 'bg-[#5b3df5] text-white hover:bg-[#4a2fcc] disabled:opacity-40'
-                              }`}
+                              onClick={() => handleClaim(offer)}
+                              disabled={loading || hasActiveBusiness}
+                              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${getCategoryColor(offer.businesses.category)} text-white hover:opacity-90 disabled:opacity-40`}
                             >
-                              {alreadyClaimed ? 'Already Claimed' : full ? 'Full' : 'Claim Offer'}
+                              Claim
                             </button>
-                          </div>
-                        )}
-                      </button>
+                          )}
+                        </div>
+                      </div>
                     );
                   })}
               </div>
