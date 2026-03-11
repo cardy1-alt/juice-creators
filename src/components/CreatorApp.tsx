@@ -520,7 +520,7 @@ export default function CreatorApp() {
                                   <button
                                     onClick={() => handleClaim(offer)}
                                     disabled={loading || hasActiveBusiness}
-                                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${getCategoryColor(offer.businesses.category)} text-white hover:opacity-90 disabled:opacity-40`}
+                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-[#5b3df5] text-white hover:opacity-90 disabled:opacity-40"
                                   >
                                     Claim
                                   </button>
