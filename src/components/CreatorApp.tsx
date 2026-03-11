@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag } from 'lucide-react';
+import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag, Map } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
+import DiscoveryMap from './DiscoveryMap';
 import { getCategoryEmoji } from '../lib/categories';
 
 function useCountdown(targetDate: string | null) {
@@ -91,7 +92,8 @@ export default function CreatorApp() {
   const [activeClaims, setActiveClaims] = useState<Claim[]>([]);
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [view, setView] = useState<'offers' | 'active' | 'history' | 'notifications'>('offers');
+  const [view, setView] = useState<'offers' | 'map' | 'active' | 'history' | 'notifications'>('offers');
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [reelUrl, setReelUrl] = useState('');
   const [loading, setLoading] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -277,6 +279,7 @@ export default function CreatorApp() {
 
   const tabs = [
     { key: 'offers' as const, label: 'Offers', icon: Gift },
+    { key: 'map' as const, label: 'Map', icon: Map },
     { key: 'active' as const, label: 'Active', icon: Sparkles, badge: activeClaims.length || undefined },
     { key: 'history' as const, label: 'History', icon: History },
     { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount || undefined },
@@ -452,6 +455,51 @@ export default function CreatorApp() {
             </>
           )}
 
+          {/* ── MAP ── */}
+          {view === 'map' && (
+            <DiscoveryMap
+              businesses={offers.map(offer => ({
+                id: offer.business_id,
+                name: offer.businesses.name,
+                category: offer.businesses.category,
+                latitude: offer.businesses.latitude || 0,
+                longitude: offer.businesses.longitude || 0,
+                address: offer.businesses.address || '',
+                offers: [{
+                  id: offer.id,
+                  description: offer.description,
+                  reward_value: offer.reward_value,
+                  monthly_cap: offer.monthly_cap,
+                  slotsUsed: offer.slotsUsed
+                }]
+              })).reduce((acc, curr) => {
+                const existing = acc.find(b => b.id === curr.id);
+                if (existing) {
+                  existing.offers.push(...curr.offers);
+                } else {
+                  acc.push(curr);
+                }
+                return acc;
+              }, [] as Array<{
+                id: string;
+                name: string;
+                category: string;
+                latitude: number;
+                longitude: number;
+                address: string;
+                offers: Array<{
+                  id: string;
+                  description: string;
+                  reward_value: string;
+                  monthly_cap: number;
+                  slotsUsed?: number;
+                }>;
+              }>)}
+              onClaimOffer={handleClaimOffer}
+              userLocation={userLocation}
+            />
+          )}
+
           {/* ── ACTIVE PASSES ── */}
           {view === 'active' && (
             <>
@@ -522,28 +570,29 @@ export default function CreatorApp() {
 
                         {/* Status Rail */}
                         <div className="mb-5 bg-gray-50/80 rounded-xl p-4">
-                          <div className="flex items-center justify-between mb-2">
+                          <div className="relative flex items-start justify-between">
                             {stages.map((stage, idx) => (
-                              <div key={stage.key} className="flex items-center flex-1">
-                                <div className="flex flex-col items-center flex-1">
-                                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                                    stage.active
-                                      ? 'bg-[#5b3df5] text-white'
-                                      : stages.findIndex(s => s.active) > idx
-                                      ? 'bg-emerald-400 text-white'
-                                      : 'bg-gray-200 text-gray-400'
-                                  }`}>
-                                    {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
-                                  </div>
-                                  <p className={`text-[9px] font-semibold mt-1 ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
-                                    {stage.label}
-                                  </p>
+                              <div key={stage.key} className="flex flex-col items-center" style={{ flex: idx === stages.length - 1 ? '0 0 auto' : '1' }}>
+                                <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                  stage.active
+                                    ? 'bg-[#5b3df5] text-white'
+                                    : stages.findIndex(s => s.active) > idx
+                                    ? 'bg-emerald-400 text-white'
+                                    : 'bg-gray-200 text-gray-400'
+                                }`}>
+                                  {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
                                 </div>
                                 {idx < stages.length - 1 && (
-                                  <div className={`h-0.5 flex-1 mx-1 ${
+                                  <div className={`absolute top-[13px] h-0.5 ${
                                     stages.findIndex(s => s.active) > idx ? 'bg-emerald-400' : 'bg-gray-200'
-                                  }`} />
+                                  }`} style={{
+                                    left: `calc(${(100 / (stages.length - 1)) * idx}% + 14px)`,
+                                    right: `calc(${100 - (100 / (stages.length - 1)) * (idx + 1)}% + 14px)`
+                                  }} />
                                 )}
+                                <p className={`text-[9px] font-semibold mt-1.5 text-center whitespace-nowrap ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
+                                  {stage.label}
+                                </p>
                               </div>
                             ))}
                           </div>
