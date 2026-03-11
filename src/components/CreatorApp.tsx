@@ -159,10 +159,15 @@ export default function CreatorApp() {
   };
 
   const fetchOffers = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('offers')
       .select('*, businesses(name, category)')
       .eq('is_live', true);
+
+    if (error) {
+      console.error('Error fetching offers:', error);
+      return;
+    }
 
     if (data) {
       const currentMonth = new Date().toISOString().slice(0, 7);
@@ -181,11 +186,16 @@ export default function CreatorApp() {
   };
 
   const fetchClaims = async () => {
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('claims')
       .select('*, offers(description), businesses(name, category)')
       .eq('creator_id', userProfile.id)
       .order('claimed_at', { ascending: false });
+
+    if (error) {
+      console.error('Error fetching claims:', error);
+      return;
+    }
 
     if (data) {
       setClaims(data as Claim[]);
