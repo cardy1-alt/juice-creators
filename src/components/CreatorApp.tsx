@@ -99,6 +99,8 @@ export default function CreatorApp() {
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [collabsCompleted, setCollabsCompleted] = useState(0);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -368,97 +370,135 @@ export default function CreatorApp() {
           {/* ── OFFERS ── */}
           {view === 'offers' && (
             <>
-              {offers.length === 0 && (
+              {/* Category Filter */}
+              <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm mb-3">
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                      selectedCategory === 'all'
+                        ? 'bg-[#5b3df5] text-white'
+                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {Array.from(new Set(offers.map(o => o.businesses.category))).map(category => (
+                    <button
+                      key={category}
+                      onClick={() => setSelectedCategory(category)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                        selectedCategory === category
+                          ? 'bg-[#5b3df5] text-white'
+                          : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{getCategoryEmoji(category)}</span>
+                      <span>{category}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {offers.filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory).length === 0 && (
                 <div className="text-center py-16">
-                  <div className="text-4xl mb-3">🍊</div>
-                  <p className="text-gray-400 text-sm">No offers available right now</p>
-                  <p className="text-gray-300 text-xs mt-1">Check back soon!</p>
+                  <div className="text-4xl mb-3">🔍</div>
+                  <p className="text-gray-400 text-sm">No offers in this category</p>
+                  <button
+                    onClick={() => setSelectedCategory('all')}
+                    className="mt-2 text-[#5b3df5] text-xs font-semibold hover:underline"
+                  >
+                    View all offers
+                  </button>
                 </div>
               )}
-              {offers.map((offer) => {
-                const emoji = getCategoryEmoji(offer.businesses.category);
-                const slotsUsed = offer.slotsUsed || 0;
-                const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
-                const pct = Math.min((slotsUsed / offer.monthly_cap) * 100, 100);
-                const full = pct >= 100;
-                const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
-                const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
 
-                let barColor = 'bg-emerald-400';
-                let badgeColor = 'bg-emerald-500 text-white';
-                let badgeText = `${slotsLeft} left`;
+              <div className="grid grid-cols-2 gap-3">
+                {offers
+                  .filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory)
+                  .map((offer) => {
+                    const emoji = getCategoryEmoji(offer.businesses.category);
+                    const slotsUsed = offer.slotsUsed || 0;
+                    const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
+                    const pct = Math.min((slotsUsed / offer.monthly_cap) * 100, 100);
+                    const full = pct >= 100;
+                    const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
+                    const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
+                    const isExpanded = expandedOffer === offer.id;
 
-                if (full) {
-                  barColor = 'bg-rose-400';
-                  badgeColor = 'bg-rose-500 text-white';
-                  badgeText = 'Full';
-                } else if (pct >= 50) {
-                  barColor = 'bg-amber-400';
-                  badgeColor = 'bg-amber-500 text-white';
-                  badgeText = `${slotsLeft} left`;
-                } else if (slotsUsed === 0) {
-                  barColor = 'bg-gray-200';
-                }
+                    let badgeColor = 'bg-emerald-500 text-white';
+                    let badgeText = `${slotsLeft} left`;
 
-                return (
-                  <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03] relative">
-                    {slotsLeft > 0 && (
-                      <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeColor}`}>
-                        {badgeText}
-                      </div>
-                    )}
-                    {full && (
-                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500 text-white">
-                        Full
-                      </div>
-                    )}
-                    <div className="flex items-start gap-3.5 mb-4 pr-16">
-                      <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
-                        {emoji}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-[15px] text-[#1a1025]">{offer.businesses.name}</h3>
-                        <p className="text-gray-500 text-[13px] mt-0.5 leading-snug">{offer.description}</p>
-                        {slotsUsed > 0 && (
-                          <p className="text-[10px] text-gray-400 mt-1">
-                            {slotsUsed} creator{slotsUsed !== 1 ? 's' : ''} claimed this
-                          </p>
-                        )}
-                      </div>
-                    </div>
+                    if (full) {
+                      badgeColor = 'bg-rose-500 text-white';
+                      badgeText = 'Full';
+                    } else if (pct >= 50) {
+                      badgeColor = 'bg-amber-500 text-white';
+                    }
 
-                    <div className="space-y-3">
-                      <div className="space-y-1.5">
-                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full transition-all ${barColor}`}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                        <div className="flex items-center justify-end">
-                          <span className="text-[11px] font-semibold text-gray-400">
-                            {slotsUsed}/{offer.monthly_cap} claimed
-                          </span>
-                        </div>
-                      </div>
-
+                    return (
                       <button
-                        onClick={() => handleClaim(offer)}
-                        disabled={loading || full || alreadyClaimed || hasActiveBusiness}
-                        className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
-                          alreadyClaimed
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : full
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                            : 'bg-[#1a1025] text-white hover:bg-[#2d1f45] disabled:opacity-40 disabled:cursor-not-allowed'
+                        key={offer.id}
+                        onClick={() => setExpandedOffer(isExpanded ? null : offer.id)}
+                        className={`bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left ${
+                          isExpanded ? 'col-span-2 border-[#5b3df5]' : ''
                         }`}
                       >
-                        {alreadyClaimed ? 'Claimed' : full ? 'Full' : 'Claim'}
+                        <div className="flex items-start gap-2 mb-2">
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-lg flex-shrink-0">
+                            {emoji}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-xs text-[#1a1025] leading-tight">{offer.businesses.name}</h3>
+                            <div className={`mt-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold inline-block ${badgeColor}`}>
+                              {badgeText}
+                            </div>
+                          </div>
+                        </div>
+
+                        {!isExpanded ? (
+                          <p className="text-[11px] text-gray-500 line-clamp-2 leading-snug">
+                            {offer.description}
+                          </p>
+                        ) : (
+                          <div className="space-y-3 mt-3">
+                            <p className="text-xs text-gray-600 leading-relaxed">{offer.description}</p>
+
+                            <div className="bg-gray-50 rounded-lg p-2">
+                              <div className="flex items-center justify-between text-[10px] mb-1">
+                                <span className="text-gray-500 font-medium">Availability</span>
+                                <span className="text-gray-700 font-bold">{slotsUsed}/{offer.monthly_cap}</span>
+                              </div>
+                              <div className="h-1.5 w-full bg-gray-200 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full rounded-full transition-all ${
+                                    full ? 'bg-rose-400' : pct >= 50 ? 'bg-amber-400' : 'bg-emerald-400'
+                                  }`}
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            </div>
+
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleClaim(offer);
+                              }}
+                              disabled={loading || full || alreadyClaimed || hasActiveBusiness}
+                              className={`w-full py-2 rounded-lg text-xs font-semibold transition-all ${
+                                alreadyClaimed || full
+                                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                  : 'bg-[#5b3df5] text-white hover:bg-[#4a2fcc] disabled:opacity-40'
+                              }`}
+                            >
+                              {alreadyClaimed ? 'Already Claimed' : full ? 'Full' : 'Claim Offer'}
+                            </button>
+                          </div>
+                        )}
                       </button>
-                    </div>
-                  </div>
-                );
-              })}
+                    );
+                  })}
+              </div>
             </>
           )}
 

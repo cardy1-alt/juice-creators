@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { MapPin, Navigation, X } from 'lucide-react';
+import { MapPin, Navigation, X, Search } from 'lucide-react';
 import { getCategoryEmoji } from '../lib/categories';
 
 interface Business {
@@ -28,6 +28,9 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
   const [mapCenter, setMapCenter] = useState(userLocation || { lat: 40.7128, lng: -74.0060 });
   const [isLocating, setIsLocating] = useState(false);
+  const [showLocationInput, setShowLocationInput] = useState(false);
+  const [locationInput, setLocationInput] = useState('');
+  const [geocoding, setGeocoding] = useState(false);
 
   useEffect(() => {
     if (userLocation) {
@@ -54,6 +57,33 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
     }
   };
 
+  const geocodeLocation = async () => {
+    if (!locationInput.trim()) return;
+
+    setGeocoding(true);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}&limit=1`
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        setMapCenter({
+          lat: parseFloat(data[0].lat),
+          lng: parseFloat(data[0].lon)
+        });
+        setShowLocationInput(false);
+        setLocationInput('');
+      } else {
+        alert('Location not found. Try a different search term.');
+      }
+    } catch (error) {
+      alert('Failed to find location. Please try again.');
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
     const R = 3959;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -76,19 +106,54 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
   return (
     <div className="flex flex-col h-full">
+      <div className="mb-3 flex gap-2">
+        <button
+          onClick={requestLocation}
+          disabled={isLocating}
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#5b3df5] text-white rounded-xl text-sm font-semibold hover:bg-[#4a2fcc] transition-colors disabled:opacity-50"
+        >
+          <Navigation className="w-4 h-4" />
+          {isLocating ? 'Finding...' : 'My Location'}
+        </button>
+        <button
+          onClick={() => setShowLocationInput(!showLocationInput)}
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:border-[#5b3df5] hover:text-[#5b3df5] transition-colors"
+        >
+          <Search className="w-4 h-4" />
+          Enter Location
+        </button>
+      </div>
+
+      {showLocationInput && (
+        <div className="mb-3 bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+          <label className="block text-xs font-semibold text-gray-700 mb-2">
+            Enter address or postcode
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={locationInput}
+              onChange={(e) => setLocationInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && geocodeLocation()}
+              placeholder="e.g., London SW1A 1AA"
+              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5] focus:border-transparent"
+            />
+            <button
+              onClick={geocodeLocation}
+              disabled={geocoding || !locationInput.trim()}
+              className="px-4 py-2 bg-[#5b3df5] text-white rounded-lg text-sm font-semibold hover:bg-[#4a2fcc] transition-colors disabled:opacity-40"
+            >
+              {geocoding ? 'Searching...' : 'Go'}
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden" style={{ height: '400px' }}>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center p-8">
-            <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-500 text-sm mb-4">Interactive map view</p>
-            <button
-              onClick={requestLocation}
-              disabled={isLocating}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-[#5b3df5] text-white rounded-lg text-sm font-semibold hover:bg-[#4a2fcc] transition-colors disabled:opacity-50"
-            >
-              <Navigation className="w-4 h-4" />
-              {isLocating ? 'Finding you...' : 'Use My Location'}
-            </button>
+            <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+            <p className="text-gray-500 text-sm">Interactive map view</p>
           </div>
         </div>
 
