@@ -470,6 +470,14 @@ export default function CreatorApp() {
 
                     const categoryColorClass = getCategoryColor(offer.businesses.category).replace('bg-', '');
 
+                    // Progress bar color logic
+                    let barColor = 'bg-emerald-500';
+                    if (pct >= 76) {
+                      barColor = 'bg-red-500';
+                    } else if (pct >= 51) {
+                      barColor = 'bg-amber-500';
+                    }
+
                     return (
                       <div
                         key={offer.id}
@@ -477,6 +485,19 @@ export default function CreatorApp() {
                       >
                         {/* Category accent bar */}
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
+
+                        {/* Badge top right */}
+                        <div className="absolute top-3 right-3">
+                          {full ? (
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white">
+                              Full
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
+                              {slotsLeft} left
+                            </span>
+                          )}
+                        </div>
 
                         {/* Main content */}
                         <div className="p-4">
@@ -487,7 +508,7 @@ export default function CreatorApp() {
                             </div>
 
                             {/* Content */}
-                            <div className="flex-1 min-w-0">
+                            <div className="flex-1 min-w-0 pr-12">
                               {/* Business name */}
                               <h3 className="font-semibold text-[13px] text-[#1a1025]">{offer.businesses.name}</h3>
 
@@ -495,41 +516,48 @@ export default function CreatorApp() {
                               <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]">
                                 {offer.description}
                               </p>
+                            </div>
+                          </div>
 
-                              {/* Bottom row: slots left and button */}
-                              <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
-                                <span className="text-[11px] text-gray-400">
-                                  {full ? (
-                                    <span className="text-red-500 font-medium">Full</span>
-                                  ) : slotsUsed > 0 ? (
-                                    `${slotsLeft} of ${offer.monthly_cap} slots left`
-                                  ) : (
-                                    `${offer.monthly_cap} slots available`
-                                  )}
-                                </span>
-
-                                {full ? (
-                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
-                                    Full
-                                  </span>
-                                ) : alreadyClaimed ? (
-                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
-                                    Claimed
-                                  </span>
-                                ) : hasActiveBusiness ? (
-                                  <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                    Complete active first
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={() => handleClaim(offer)}
-                                    disabled={loading}
-                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
-                                  >
-                                    Claim
-                                  </button>
-                                )}
+                          {/* Progress bar section */}
+                          <div className="mt-3 pt-3 border-t border-gray-50">
+                            {/* Progress bar */}
+                            <div className="mb-2">
+                              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full ${barColor} transition-all duration-300`}
+                                  style={{ width: `${pct}%` }}
+                                />
                               </div>
+                            </div>
+
+                            {/* Bottom row: count and button */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] text-gray-400 font-medium">
+                                {slotsUsed}/{offer.monthly_cap} claimed
+                              </span>
+
+                              {full ? (
+                                <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
+                                  Full
+                                </span>
+                              ) : alreadyClaimed ? (
+                                <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
+                                  Claimed
+                                </span>
+                              ) : hasActiveBusiness ? (
+                                <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                  Complete active first
+                                </div>
+                              ) : (
+                                <button
+                                  onClick={() => handleClaim(offer)}
+                                  disabled={loading}
+                                  className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+                                >
+                                  Claim
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>
