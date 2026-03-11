@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryEmoji } from '../lib/categories';
+import { getInitials, getAvatarGradient } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
 
 function StatusPill({ status }: { status: string }) {
@@ -562,8 +563,8 @@ export default function BusinessPortal() {
                     {claims.filter(c => c.reel_url).map((claim) => (
                       <div key={claim.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-9 h-9 rounded-full bg-gradient-to-br from-[#5b3df5] to-[#8b6cf7] flex items-center justify-center text-white font-bold text-xs">
-                            {claim.creators.name.charAt(0)}
+                          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(claim.creators.name)} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
+                            {getInitials(claim.creators.name)}
                           </div>
                           <div>
                             <p className="font-semibold text-sm text-[#1a1025]">{claim.creators.name}</p>

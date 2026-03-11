@@ -1,6 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapPin, Navigation, X, Search } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
 import { getCategoryEmoji } from '../lib/categories';
+
+const DEFAULT_CENTER: [number, number] = [52.2465, 0.7135];
 
 interface Business {
   id: string;
@@ -24,9 +29,40 @@ interface DiscoveryMapProps {
   userLocation: { lat: number; lng: number } | null;
 }
 
+function createEmojiIcon(emoji: string) {
+  return L.divIcon({
+    html: `<div style="
+      font-size: 24px;
+      background: white;
+      border: 3px solid #5b3df5;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    ">${emoji}</div>`,
+    className: 'emoji-marker',
+    iconSize: [40, 40],
+    iconAnchor: [20, 20],
+    popupAnchor: [0, -20],
+  });
+}
+
+function MapUpdater({ center }: { center: [number, number] }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+}
+
 export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }: DiscoveryMapProps) {
   const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
-  const [mapCenter, setMapCenter] = useState(userLocation || { lat: 40.7128, lng: -74.0060 });
+  const [mapCenter, setMapCenter] = useState<[number, number]>(
+    userLocation ? [userLocation.lat, userLocation.lng] : DEFAULT_CENTER
+  );
   const [isLocating, setIsLocating] = useState(false);
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [locationInput, setLocationInput] = useState('');
@@ -34,7 +70,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
   useEffect(() => {
     if (userLocation) {
-      setMapCenter(userLocation);
+      setMapCenter([userLocation.lat, userLocation.lng]);
     }
   }, [userLocation]);
 
@@ -43,11 +79,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
     if ('geolocation' in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          const newCenter = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          setMapCenter(newCenter);
+          setMapCenter([position.coords.latitude, position.coords.longitude]);
           setIsLocating(false);
         },
         () => {
@@ -68,10 +100,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       const data = await response.json();
 
       if (data && data.length > 0) {
-        setMapCenter({
-          lat: parseFloat(data[0].lat),
-          lng: parseFloat(data[0].lon)
-        });
+        setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
         setShowLocationInput(false);
         setLocationInput('');
       } else {
@@ -96,11 +125,11 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
     return R * c;
   };
 
-  const businessesWithDistance = businesses
-    .filter(b => b.latitude && b.longitude)
+  const businessesWithCoords = businesses.filter(b => b.latitude && b.longitude);
+  const businessesWithDistance = businessesWithCoords
     .map(b => ({
       ...b,
-      distance: calculateDistance(mapCenter.lat, mapCenter.lng, b.latitude, b.longitude)
+      distance: calculateDistance(mapCenter[0], mapCenter[1], b.latitude, b.longitude)
     }))
     .sort((a, b) => a.distance - b.distance);
 
@@ -149,31 +178,52 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </div>
       )}
 
-      <div className="relative bg-gradient-to-br from-gray-100 to-gray-200 rounded-2xl overflow-hidden" style={{ height: '400px' }}>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="text-center p-8">
-            <MapPin className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">Interactive map view</p>
+      <div className="relative bg-gray-100 rounded-2xl overflow-hidden" style={{ height: '400px' }}>
+        {businessesWithCoords.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <div className="text-center bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200">
+              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+              <p className="text-gray-600 text-sm font-semibold">No businesses near you yet</p>
+              <p className="text-gray-400 text-xs mt-1">Check back soon!</p>
+            </div>
           </div>
-        </div>
+        )}
 
-        {businessesWithDistance.map((business) => {
-          const x = 50 + (business.longitude - mapCenter.lng) * 100;
-          const y = 50 - (business.latitude - mapCenter.lat) * 100;
+        <MapContainer
+          center={mapCenter}
+          zoom={13}
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapUpdater center={mapCenter} />
 
-          if (x < 0 || x > 100 || y < 0 || y > 100) return null;
-
-          return (
-            <button
+          {businessesWithCoords.map((business) => (
+            <Marker
               key={business.id}
-              onClick={() => setSelectedBusiness(business)}
-              className="absolute transform -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-lg border-2 border-[#5b3df5] flex items-center justify-center text-xl hover:scale-110 transition-transform z-10"
-              style={{ left: `${x}%`, top: `${y}%` }}
+              position={[business.latitude, business.longitude]}
+              icon={createEmojiIcon(getCategoryEmoji(business.category))}
+              eventHandlers={{
+                click: () => setSelectedBusiness(business),
+              }}
             >
-              {getCategoryEmoji(business.category)}
-            </button>
-          );
-        })}
+              <Popup>
+                <div className="text-sm">
+                  <h4 className="font-bold text-gray-900">{business.name}</h4>
+                  <p className="text-xs text-gray-500 mt-0.5">{business.category}</p>
+                  {business.offers.length > 0 && (
+                    <p className="text-xs text-[#5b3df5] font-semibold mt-1">
+                      {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
+                    </p>
+                  )}
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
       </div>
 
       <div className="mt-4 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>

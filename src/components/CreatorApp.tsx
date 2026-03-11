@@ -6,7 +6,8 @@ import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import DiscoveryMap from './DiscoveryMap';
-import { getCategoryEmoji } from '../lib/categories';
+import { getCategoryEmoji, getCategoryColor } from '../lib/categories';
+import { getInitials, getAvatarGradient } from '../lib/avatar';
 
 function useCountdown(targetDate: string | null) {
   const [timeLeft, setTimeLeft] = useState('');
@@ -286,10 +287,38 @@ export default function CreatorApp() {
     );
   }
 
+  const getActiveUrgency = () => {
+    if (activeClaims.length === 0) return 'none';
+
+    const now = new Date().getTime();
+    const hasOverdue = activeClaims.some(claim => {
+      if (!claim.reel_due_at || claim.reel_submitted_at) return false;
+      return new Date(claim.reel_due_at).getTime() < now;
+    });
+
+    if (hasOverdue) return 'overdue';
+
+    const hasSoon = activeClaims.some(claim => {
+      if (!claim.reel_due_at || claim.reel_submitted_at) return false;
+      const hoursLeft = (new Date(claim.reel_due_at).getTime() - now) / (1000 * 60 * 60);
+      return hoursLeft <= 12;
+    });
+
+    if (hasSoon) return 'soon';
+    return 'normal';
+  };
+
+  const activeUrgency = getActiveUrgency();
+  const activeBadgeColor = activeUrgency === 'overdue'
+    ? 'bg-rose-500'
+    : activeUrgency === 'soon'
+    ? 'bg-amber-500'
+    : 'bg-[#5b3df5]';
+
   const tabs = [
     { key: 'offers' as const, label: 'Offers', icon: Gift },
     { key: 'map' as const, label: 'Map', icon: Map },
-    { key: 'active' as const, label: 'Active', icon: Sparkles, badge: activeClaims.length || undefined },
+    { key: 'active' as const, label: 'Active', icon: Sparkles, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
     { key: 'history' as const, label: 'History', icon: History },
     { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount || undefined },
   ];
@@ -314,8 +343,8 @@ export default function CreatorApp() {
         <div className="bg-white border-b border-gray-100 px-5 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#5b3df5] to-[#8b6cf7] flex items-center justify-center text-white font-bold text-sm">
-                {userProfile.name.charAt(0)}
+              <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarGradient(userProfile.name)} flex items-center justify-center text-white font-bold text-sm shadow-sm`}>
+                {getInitials(userProfile.name)}
               </div>
               <div>
                 <h1 className="text-[15px] font-bold text-[#1a1025]">{userProfile.name}</h1>
@@ -351,7 +380,9 @@ export default function CreatorApp() {
               <div className="relative">
                 <tab.icon className="w-[18px] h-[18px]" />
                 {tab.badge ? (
-                  <span className="absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-[#5b3df5] text-white text-[9px] font-bold flex items-center justify-center">
+                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[9px] font-bold flex items-center justify-center ${
+                    tab.badgeColor || 'bg-[#5b3df5]'
+                  }`}>
                     {tab.badge}
                   </span>
                 ) : null}
@@ -371,7 +402,7 @@ export default function CreatorApp() {
           {view === 'offers' && (
             <>
               {/* Category Filter */}
-              <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm mb-3">
+              <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm mb-3 relative">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                   <button
                     onClick={() => setSelectedCategory('all')}
@@ -398,6 +429,7 @@ export default function CreatorApp() {
                     </button>
                   ))}
                 </div>
+                <div className="absolute right-3 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
               </div>
 
               {offers.filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory).length === 0 && (
@@ -440,11 +472,12 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(isExpanded ? null : offer.id)}
-                        className={`bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left ${
+                        className={`bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left relative overflow-hidden ${
                           isExpanded ? 'col-span-2 border-[#5b3df5]' : ''
                         }`}
                       >
-                        <div className="flex items-start gap-2 mb-2">
+                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
+                        <div className="flex items-start gap-2 mb-2 pl-2">
                           <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-lg flex-shrink-0">
                             {emoji}
                           </div>
@@ -457,11 +490,17 @@ export default function CreatorApp() {
                         </div>
 
                         {!isExpanded ? (
-                          <p className="text-[11px] text-gray-500 line-clamp-2 leading-snug">
+                          <p className="text-[11px] text-gray-500 leading-[1.4] pl-2" style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            wordBreak: 'break-word'
+                          }}>
                             {offer.description}
                           </p>
                         ) : (
-                          <div className="space-y-3 mt-3">
+                          <div className="space-y-3 mt-3 pl-2">
                             <p className="text-xs text-gray-600 leading-relaxed">{offer.description}</p>
 
                             <div className="bg-gray-50 rounded-lg p-2">
@@ -565,25 +604,28 @@ export default function CreatorApp() {
                 <>
                   {/* Pass selector (when multiple active) */}
                   {activeClaims.length > 1 && (
-                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                      {activeClaims.map(claim => {
-                        const emoji = getCategoryEmoji(claim.businesses.category);
-                        const isSelected = selectedClaim?.id === claim.id;
-                        return (
-                          <button
-                            key={claim.id}
-                            onClick={() => setSelectedClaim(claim)}
-                            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
-                              isSelected
-                                ? 'bg-[#1a1025] text-white border-[#1a1025]'
-                                : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
-                            }`}
-                          >
-                            <span className="text-base">{emoji}</span>
-                            {claim.businesses.name}
-                          </button>
-                        );
-                      })}
+                    <div className="relative">
+                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
+                        {activeClaims.map(claim => {
+                          const emoji = getCategoryEmoji(claim.businesses.category);
+                          const isSelected = selectedClaim?.id === claim.id;
+                          return (
+                            <button
+                              key={claim.id}
+                              onClick={() => setSelectedClaim(claim)}
+                              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                                isSelected
+                                  ? 'bg-[#1a1025] text-white border-[#1a1025]'
+                                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <span className="text-base">{emoji}</span>
+                              <span className="max-w-[140px] truncate">{claim.businesses.name}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
                     </div>
                   )}
 
@@ -736,9 +778,15 @@ export default function CreatorApp() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <h3 className="font-semibold text-[13px] text-[#1a1025]">{claim.businesses.name}</h3>
-                          <p className="text-xs text-gray-400 mt-0.5 truncate">{claim.offers.description}</p>
+                          <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]" style={{
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical',
+                            overflow: 'hidden',
+                            wordBreak: 'break-word'
+                          }}>{claim.offers.description}</p>
                         </div>
                         <StatusPill status={claim.status} />
                       </div>
