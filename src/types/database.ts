@@ -158,6 +158,32 @@ export type Database = {
           created_at?: string;
         };
       };
+      disputes: {
+        Row: {
+          id: string;
+          claim_id: string;
+          reporter_role: 'creator' | 'business';
+          message: string;
+          resolved: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          claim_id: string;
+          reporter_role: 'creator' | 'business';
+          message: string;
+          resolved?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          claim_id?: string;
+          reporter_role?: 'creator' | 'business';
+          message?: string;
+          resolved?: boolean;
+          created_at?: string;
+        };
+      };
     };
   };
 };
