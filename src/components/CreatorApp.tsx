@@ -98,6 +98,8 @@ export default function CreatorApp() {
   const [collabsCompleted, setCollabsCompleted] = useState(0);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
 
+  const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
+
   useEffect(() => {
     if (userProfile?.approved && !userProfile.onboarding_complete) {
       setShowOnboarding(true);
@@ -490,22 +492,23 @@ export default function CreatorApp() {
                     </div>
                   )}
 
-                  {selectedClaim && (() => {
-                    const { timeLeft, isOverdue } = useCountdown(selectedClaim.reel_due_at);
-                    const currentStage = selectedClaim.reel_url
-                      ? 'submitted'
-                      : selectedClaim.redeemed_at
-                      ? 'reel_due'
-                      : 'claimed';
+                  {selectedClaim && (
+                    <>
+                      {(() => {
+                        const currentStage = selectedClaim.reel_url
+                          ? 'submitted'
+                          : selectedClaim.redeemed_at
+                          ? 'reel_due'
+                          : 'claimed';
 
-                    const stages = [
-                      { key: 'claimed', label: 'Claimed', active: currentStage === 'claimed' },
-                      { key: 'visited', label: 'Visited', active: currentStage === 'reel_due' || currentStage === 'submitted' },
-                      { key: 'reel_due', label: 'Reel Due', active: currentStage === 'reel_due' },
-                      { key: 'submitted', label: 'Submitted', active: currentStage === 'submitted' }
-                    ];
+                        const stages = [
+                          { key: 'claimed', label: 'Claimed', active: currentStage === 'claimed' },
+                          { key: 'visited', label: 'Visited', active: currentStage === 'reel_due' || currentStage === 'submitted' },
+                          { key: 'reel_due', label: 'Reel Due', active: currentStage === 'reel_due' },
+                          { key: 'submitted', label: 'Submitted', active: currentStage === 'submitted' }
+                        ];
 
-                    return (
+                        return (
                       <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
                         <div className="flex items-center gap-3 mb-5">
                           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
@@ -611,8 +614,10 @@ export default function CreatorApp() {
                           <Flag className="w-3 h-3" /> Report an issue
                         </button>
                       </div>
-                    );
-                  })()}
+                        );
+                      })()}
+                    </>
+                  )}
                 </>
               )}
             </>
