@@ -87,6 +87,7 @@ function AddressAutocomplete({ value, onChange }: {
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
   const [role, setRole] = useState<UserRole>('creator');
+  const [signupStep, setSignupStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -151,7 +152,7 @@ export default function Auth() {
           {/* Sign In / Sign Up toggle */}
           <div className="flex gap-1 mb-6 p-1 bg-gray-100 rounded-xl">
             <button
-              onClick={() => { setMode('signin'); setError(''); }}
+              onClick={() => { setMode('signin'); setError(''); setSignupStep(1); }}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 mode === 'signin'
                   ? 'bg-white text-[#1a1025] shadow-sm'
@@ -161,7 +162,7 @@ export default function Auth() {
               Sign In
             </button>
             <button
-              onClick={() => { setMode('signup'); setError(''); }}
+              onClick={() => { setMode('signup'); setError(''); setSignupStep(1); }}
               className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all ${
                 mode === 'signup'
                   ? 'bg-white text-[#1a1025] shadow-sm'
@@ -176,7 +177,7 @@ export default function Auth() {
           {mode === 'signup' && (
             <div className="flex gap-3 mb-6">
               <button
-                onClick={() => setRole('creator')}
+                onClick={() => { setRole('creator'); setSignupStep(1); }}
                 className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
                   role === 'creator'
                     ? 'border-[#5b3df5] bg-[#f8f5ff]'
@@ -189,7 +190,7 @@ export default function Auth() {
                 </span>
               </button>
               <button
-                onClick={() => setRole('business')}
+                onClick={() => { setRole('business'); setSignupStep(1); }}
                 className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all ${
                   role === 'business'
                     ? 'border-[#5b3df5] bg-[#f8f5ff]'
@@ -204,28 +205,44 @@ export default function Auth() {
             </div>
           )}
 
+          {/* Multi-step progress for business signup */}
+          {mode === 'signup' && role === 'business' && (
+            <div className="flex items-center justify-center gap-2 mb-6">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center">
+                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                    signupStep === step
+                      ? 'bg-[#5b3df5] text-white'
+                      : signupStep > step
+                      ? 'bg-emerald-400 text-white'
+                      : 'bg-gray-200 text-gray-400'
+                  }`}>
+                    {signupStep > step ? '✓' : step}
+                  </div>
+                  {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-emerald-400' : 'bg-gray-200'}`} />}
+                </div>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             {mode === 'signup' && (
               <>
-                <div>
-                  <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                    {role === 'creator' ? 'Full Name' : 'Business Name'}
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder={role === 'creator' ? 'Sophie Taylor' : 'Juice Bar Co'}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
-                    required
-                  />
-                </div>
                 {role === 'creator' && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                        Instagram Handle
-                      </label>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Full Name</label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Sophie Taylor"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Instagram Handle</label>
                       <input
                         type="text"
                         value={instagramHandle}
@@ -236,9 +253,7 @@ export default function Auth() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                        Follower Count
-                      </label>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Follower Count</label>
                       <select
                         value={followerCount}
                         onChange={(e) => setFollowerCount(e.target.value)}
@@ -253,12 +268,22 @@ export default function Auth() {
                     </div>
                   </>
                 )}
-                {role === 'business' && (
+
+                {role === 'business' && signupStep === 1 && (
                   <>
                     <div>
-                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                        Category
-                      </label>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Business Name</label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="Juice Bar Co"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Category</label>
                       <div className="grid grid-cols-2 gap-2">
                         {CATEGORY_LIST.map((cat) => (
                           <button
@@ -277,10 +302,20 @@ export default function Auth() {
                         ))}
                       </div>
                     </div>
+                  </>
+                )}
+
+                {role === 'business' && signupStep === 2 && (
+                  <>
                     <AddressAutocomplete
                       value={address}
                       onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
+                    {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
+                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
+                        <strong>Note:</strong> Address autocomplete requires VITE_GOOGLE_MAPS_API_KEY to be set. The plain text input works fine.
+                      </div>
+                    )}
                     <div>
                       <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
                         Bio <span className="text-gray-400 font-normal">(optional)</span>
@@ -297,42 +332,82 @@ export default function Auth() {
                     </div>
                   </>
                 )}
+
+                {role === 'business' && signupStep === 3 && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Email</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Password</label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
+                          required
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+                  </>
+                )}
               </>
             )}
 
-            <div>
-              <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Min 6 characters"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
-                  required
-                  minLength={6}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
+            {mode === 'signin' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Email</label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Password</label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="Min 6 characters"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
+                      required
+                      minLength={6}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+              </>
+            )}
 
             {error && (
               <div className="bg-red-50 text-red-600 px-4 py-3 rounded-xl text-sm border border-red-100">
@@ -340,18 +415,69 @@ export default function Auth() {
               </div>
             )}
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-3 rounded-xl text-white font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] active:bg-[#4430b8] transition-all disabled:opacity-50 shadow-lg shadow-[#5b3df5]/25"
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Processing...
-                </span>
-              ) : mode === 'signin' ? 'Sign In' : 'Create Account'}
-            </button>
+            {/* Navigation buttons */}
+            {mode === 'signup' && role === 'business' && signupStep < 3 ? (
+              <div className="flex gap-3">
+                {signupStep > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setSignupStep(signupStep - 1)}
+                    className="px-6 py-3 rounded-xl text-gray-600 font-semibold bg-gray-100 hover:bg-gray-200 transition-all"
+                  >
+                    Back
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (signupStep === 1 && !name) {
+                      setError('Please enter your business name');
+                      return;
+                    }
+                    setError('');
+                    setSignupStep(signupStep + 1);
+                  }}
+                  className="flex-1 py-3 rounded-xl text-white font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] transition-all shadow-lg shadow-[#5b3df5]/25"
+                >
+                  Next
+                </button>
+              </div>
+            ) : mode === 'signup' && role === 'business' && signupStep === 3 ? (
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setSignupStep(signupStep - 1)}
+                  className="px-6 py-3 rounded-xl text-gray-600 font-semibold bg-gray-100 hover:bg-gray-200 transition-all"
+                >
+                  Back
+                </button>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 py-3 rounded-xl text-white font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] active:bg-[#4430b8] transition-all disabled:opacity-50 shadow-lg shadow-[#5b3df5]/25"
+                >
+                  {loading ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Processing...
+                    </span>
+                  ) : 'Create Account'}
+                </button>
+              </div>
+            ) : (
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-3 rounded-xl text-white font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] active:bg-[#4430b8] transition-all disabled:opacity-50 shadow-lg shadow-[#5b3df5]/25"
+              >
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </span>
+                ) : mode === 'signin' ? 'Sign In' : 'Create Account'}
+              </button>
+            )}
           </form>
 
           {mode === 'signup' && (

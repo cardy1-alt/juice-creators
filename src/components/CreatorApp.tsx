@@ -1,9 +1,43 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2 } from 'lucide-react';
+import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
+import CreatorOnboarding from './CreatorOnboarding';
+import DisputeModal from './DisputeModal';
 import { getCategoryEmoji } from '../lib/categories';
+
+function useCountdown(targetDate: string | null) {
+  const [timeLeft, setTimeLeft] = useState('');
+  const [isOverdue, setIsOverdue] = useState(false);
+
+  useEffect(() => {
+    if (!targetDate) return;
+
+    const updateCountdown = () => {
+      const now = new Date().getTime();
+      const target = new Date(targetDate).getTime();
+      const diff = target - now;
+
+      if (diff < 0) {
+        setIsOverdue(true);
+        setTimeLeft('Overdue');
+        return;
+      }
+
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      setTimeLeft(`${hours}h ${minutes}m`);
+      setIsOverdue(false);
+    };
+
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 60000);
+    return () => clearInterval(interval);
+  }, [targetDate]);
+
+  return { timeLeft, isOverdue };
+}
 
 interface Offer {
   id: string;
@@ -60,14 +94,33 @@ export default function CreatorApp() {
   const [view, setView] = useState<'offers' | 'active' | 'history' | 'notifications'>('offers');
   const [reelUrl, setReelUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [collabsCompleted, setCollabsCompleted] = useState(0);
+  const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userProfile?.approved && !userProfile.onboarding_complete) {
+      setShowOnboarding(true);
+    }
+  }, [userProfile]);
 
   useEffect(() => {
     if (userProfile?.approved) {
       fetchOffers();
       fetchClaims();
       fetchNotifications();
+      fetchCollabsCompleted();
     }
   }, [userProfile]);
+
+  const fetchCollabsCompleted = async () => {
+    const { count } = await supabase
+      .from('claims')
+      .select('*', { count: 'exact', head: true })
+      .eq('creator_id', userProfile.id)
+      .not('reel_url', 'is', null);
+    setCollabsCompleted(count || 0);
+  };
 
   // Realtime subscriptions for claims and notifications
   useEffect(() => {
@@ -219,6 +272,19 @@ export default function CreatorApp() {
 
   return (
     <div className="min-h-screen bg-[#faf8ff]">
+      {showOnboarding && (
+        <CreatorOnboarding
+          creatorId={userProfile.id}
+          onComplete={() => setShowOnboarding(false)}
+        />
+      )}
+      {disputeClaimId && (
+        <DisputeModal
+          claimId={disputeClaimId}
+          reporterRole="creator"
+          onClose={() => setDisputeClaimId(null)}
+        />
+      )}
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="bg-white border-b border-gray-100 px-5 py-4">
@@ -234,6 +300,11 @@ export default function CreatorApp() {
                   <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#1a1025] text-white">
                     {userProfile.code}
                   </span>
+                  {collabsCompleted > 0 && (
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white">
+                      {collabsCompleted} collab{collabsCompleted !== 1 ? 's' : ''}
+                    </span>
+                  )}
                 </div>
               </div>
             </div>
@@ -284,44 +355,83 @@ export default function CreatorApp() {
               )}
               {offers.map((offer) => {
                 const emoji = getCategoryEmoji(offer.businesses.category);
-                const pct = Math.min(((offer.slotsUsed || 0) / offer.monthly_cap) * 100, 100);
+                const slotsUsed = offer.slotsUsed || 0;
+                const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
+                const pct = Math.min((slotsUsed / offer.monthly_cap) * 100, 100);
                 const full = pct >= 100;
                 const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
                 const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
 
+                let barColor = 'bg-emerald-400';
+                let badgeColor = 'bg-emerald-500 text-white';
+                let badgeText = `${slotsLeft} left`;
+
+                if (full) {
+                  barColor = 'bg-rose-400';
+                  badgeColor = 'bg-rose-500 text-white';
+                  badgeText = 'Full';
+                } else if (pct >= 50) {
+                  barColor = 'bg-amber-400';
+                  badgeColor = 'bg-amber-500 text-white';
+                  badgeText = `${slotsLeft} left`;
+                } else if (slotsUsed === 0) {
+                  barColor = 'bg-gray-200';
+                }
+
                 return (
-                  <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
-                    <div className="flex items-start gap-3.5 mb-4">
+                  <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03] relative">
+                    {slotsLeft > 0 && (
+                      <div className={`absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold ${badgeColor}`}>
+                        {badgeText}
+                      </div>
+                    )}
+                    {full && (
+                      <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-500 text-white">
+                        Full
+                      </div>
+                    )}
+                    <div className="flex items-start gap-3.5 mb-4 pr-16">
                       <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
                         {emoji}
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-bold text-[15px] text-[#1a1025]">{offer.businesses.name}</h3>
                         <p className="text-gray-500 text-[13px] mt-0.5 leading-snug">{offer.description}</p>
+                        {slotsUsed > 0 && (
+                          <p className="text-[10px] text-gray-400 mt-1">
+                            {slotsUsed} creator{slotsUsed !== 1 ? 's' : ''} claimed this
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <div className="h-1.5 w-16 bg-gray-100 rounded-full overflow-hidden">
+
+                    <div className="space-y-3">
+                      <div className="space-y-1.5">
+                        <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
                           <div
-                            className={`h-full rounded-full transition-all ${full ? 'bg-rose-400' : 'bg-emerald-400'}`}
+                            className={`h-full rounded-full transition-all ${barColor}`}
                             style={{ width: `${pct}%` }}
                           />
                         </div>
-                        <span className={`text-[11px] font-medium ${full ? 'text-rose-400' : 'text-gray-400'}`}>
-                          {offer.slotsUsed}/{offer.monthly_cap}
-                        </span>
+                        <div className="flex items-center justify-end">
+                          <span className="text-[11px] font-semibold text-gray-400">
+                            {slotsUsed}/{offer.monthly_cap} claimed
+                          </span>
+                        </div>
                       </div>
+
                       <button
                         onClick={() => handleClaim(offer)}
                         disabled={loading || full || alreadyClaimed || hasActiveBusiness}
-                        className={`px-5 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm ${
+                        className={`w-full py-2.5 rounded-xl text-sm font-semibold transition-all ${
                           alreadyClaimed
-                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed shadow-none'
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                            : full
+                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                             : 'bg-[#1a1025] text-white hover:bg-[#2d1f45] disabled:opacity-40 disabled:cursor-not-allowed'
                         }`}
                       >
-                        {alreadyClaimed ? 'Claimed' : 'Claim'}
+                        {alreadyClaimed ? 'Claimed' : full ? 'Full' : 'Claim'}
                       </button>
                     </div>
                   </div>
@@ -370,81 +480,129 @@ export default function CreatorApp() {
                     </div>
                   )}
 
-                  {selectedClaim && (
-                    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
-                      <div className="flex items-center gap-3 mb-5">
-                        <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
-                          {getCategoryEmoji(selectedClaim.businesses.category)}
-                        </div>
-                        <div className="flex-1">
-                          <h3 className="font-bold text-[15px] text-[#1a1025]">{selectedClaim.businesses.name}</h3>
-                          <p className="text-gray-500 text-[13px] mt-0.5">{selectedClaim.offers.description}</p>
-                        </div>
-                        <StatusPill status={selectedClaim.status} />
-                      </div>
+                  {selectedClaim && (() => {
+                    const { timeLeft, isOverdue } = useCountdown(selectedClaim.reel_due_at);
+                    const currentStage = selectedClaim.reel_url
+                      ? 'submitted'
+                      : selectedClaim.redeemed_at
+                      ? 'reel_due'
+                      : 'claimed';
 
-                      {selectedClaim.status === 'active' && (
-                        <QRCodeDisplay
-                          token={selectedClaim.qr_token}
-                          claimId={selectedClaim.id}
-                          creatorCode={userProfile.code}
-                        />
-                      )}
+                    const stages = [
+                      { key: 'claimed', label: 'Claimed', active: currentStage === 'claimed' },
+                      { key: 'visited', label: 'Visited', active: currentStage === 'reel_due' || currentStage === 'submitted' },
+                      { key: 'reel_due', label: 'Reel Due', active: currentStage === 'reel_due' },
+                      { key: 'submitted', label: 'Submitted', active: currentStage === 'submitted' }
+                    ];
 
-                      <div className="mt-5 grid grid-cols-2 gap-2">
-                        {selectedClaim.status === 'active' && (
-                          <div className="p-3 rounded-xl bg-sky-50/60 border border-sky-100/50 text-center">
-                            <p className="text-[11px] text-sky-500 font-medium">Show QR at</p>
-                            <p className="text-sm font-bold text-[#1a1025]">the venue</p>
+                    return (
+                      <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
+                        <div className="flex items-center gap-3 mb-5">
+                          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
+                            {getCategoryEmoji(selectedClaim.businesses.category)}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-bold text-[15px] text-[#1a1025]">{selectedClaim.businesses.name}</h3>
+                            <p className="text-gray-500 text-[13px] mt-0.5">{selectedClaim.offers.description}</p>
+                          </div>
+                        </div>
+
+                        {/* Status Rail */}
+                        <div className="mb-5 bg-gray-50/80 rounded-xl p-4">
+                          <div className="flex items-center justify-between mb-2">
+                            {stages.map((stage, idx) => (
+                              <div key={stage.key} className="flex items-center flex-1">
+                                <div className="flex flex-col items-center flex-1">
+                                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                    stage.active
+                                      ? 'bg-[#5b3df5] text-white'
+                                      : stages.findIndex(s => s.active) > idx
+                                      ? 'bg-emerald-400 text-white'
+                                      : 'bg-gray-200 text-gray-400'
+                                  }`}>
+                                    {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
+                                  </div>
+                                  <p className={`text-[9px] font-semibold mt-1 ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
+                                    {stage.label}
+                                  </p>
+                                </div>
+                                {idx < stages.length - 1 && (
+                                  <div className={`h-0.5 flex-1 mx-1 ${
+                                    stages.findIndex(s => s.active) > idx ? 'bg-emerald-400' : 'bg-gray-200'
+                                  }`} />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Reel Countdown/Prompt */}
+                        {selectedClaim.redeemed_at && !selectedClaim.reel_url && (
+                          <div className={`mb-5 p-4 rounded-xl border ${
+                            isOverdue
+                              ? 'bg-rose-50/60 border-rose-200'
+                              : 'bg-amber-50/60 border-amber-200'
+                          }`}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <Clock className={`w-4 h-4 ${isOverdue ? 'text-rose-500' : 'text-amber-500'}`} />
+                              <p className={`text-sm font-bold ${isOverdue ? 'text-rose-700' : 'text-amber-700'}`}>
+                                {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
+                              </p>
+                            </div>
+                            <p className="text-xs text-gray-600">
+                              You have 48 hours to post your reel — it must genuinely feature the business.
+                            </p>
                           </div>
                         )}
-                        <div className={`p-3 rounded-xl text-center ${selectedClaim.status === 'active' ? 'bg-amber-50/60 border border-amber-100/50' : 'bg-amber-50/60 border border-amber-100/50 col-span-2'}`}>
-                          <p className="text-[11px] text-amber-500 font-medium">
-                            {selectedClaim.reel_due_at ? 'Reel due by' : 'Post within'}
-                          </p>
-                          <p className="text-sm font-bold text-[#1a1025]">
-                            {selectedClaim.reel_due_at
-                              ? new Date(selectedClaim.reel_due_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
-                              : '48 hours after redeem'}
-                          </p>
-                        </div>
-                      </div>
 
-                      {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
-                        <div className="mt-5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
-                          <p className="text-sm font-semibold text-emerald-700 mb-3">
-                            Pass redeemed! Now submit your reel to complete the deal.
-                          </p>
-                          <label className="block text-sm font-semibold text-[#1a1025] mb-2">
-                            🎬 Submit Your Reel
-                          </label>
-                          <div className="flex gap-2">
-                            <input
-                              type="url"
-                              value={reelUrl}
-                              onChange={(e) => setReelUrl(e.target.value)}
-                              placeholder="https://instagram.com/reel/..."
-                              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300"
-                            />
-                            <button
-                              onClick={handleSubmitReel}
-                              disabled={loading || !reelUrl}
-                              className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 transition-all"
-                            >
-                              Submit
-                            </button>
+                        {selectedClaim.status === 'active' && (
+                          <QRCodeDisplay
+                            token={selectedClaim.qr_token}
+                            claimId={selectedClaim.id}
+                            creatorCode={userProfile.code}
+                          />
+                        )}
+
+                        {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
+                          <div className="mt-5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
+                            <label className="block text-sm font-semibold text-[#1a1025] mb-2">
+                              🎬 Submit Your Reel
+                            </label>
+                            <div className="flex gap-2">
+                              <input
+                                type="url"
+                                value={reelUrl}
+                                onChange={(e) => setReelUrl(e.target.value)}
+                                placeholder="https://instagram.com/reel/..."
+                                className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300"
+                              />
+                              <button
+                                onClick={handleSubmitReel}
+                                disabled={loading || !reelUrl}
+                                className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 transition-all"
+                              >
+                                Submit
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
 
-                      {selectedClaim.reel_url && (
-                        <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                          <span className="text-sm text-emerald-700 font-medium">Reel submitted!</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                        {selectedClaim.reel_url && (
+                          <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                            <span className="text-sm text-emerald-700 font-medium">Reel submitted!</span>
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => setDisputeClaimId(selectedClaim.id)}
+                          className="mt-3 w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-amber-600 transition-colors"
+                        >
+                          <Flag className="w-3 h-3" /> Report an issue
+                        </button>
+                      </div>
+                    );
+                  })()}
                 </>
               )}
             </>

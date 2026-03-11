@@ -77,6 +77,7 @@ export type Database = {
           code: string;
           email: string;
           approved: boolean;
+          onboarding_complete: boolean;
           created_at: string;
         };
         Insert: {
@@ -87,6 +88,7 @@ export type Database = {
           code: string;
           email: string;
           approved?: boolean;
+          onboarding_complete?: boolean;
           created_at?: string;
         };
         Update: {
@@ -97,6 +99,7 @@ export type Database = {
           code?: string;
           email?: string;
           approved?: boolean;
+          onboarding_complete?: boolean;
           created_at?: string;
         };
       };

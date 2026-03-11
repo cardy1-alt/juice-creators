@@ -131,14 +131,47 @@ export default function AdminDashboard() {
         <div className="p-6">
           {/* STATS */}
           {view === 'stats' && (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {statCards.map((stat, i) => (
-                <div key={i} className={`bg-gradient-to-br ${stat.accent} rounded-2xl p-5 border`}>
-                  <div className="text-2xl mb-3">{stat.emoji}</div>
-                  <p className="text-3xl font-bold text-[#1a1025]">{stat.value}</p>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+            <div className="space-y-4">
+              {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-100">
+                  <h3 className="text-sm font-bold text-[#1a1025] mb-3">⏳ Pending Approvals</h3>
+                  <div className="flex gap-4">
+                    {stats.pendingCreators > 0 && (
+                      <button
+                        onClick={() => setView('creators')}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-amber-200 hover:border-amber-300 transition-all"
+                      >
+                        <span className="text-2xl">👥</span>
+                        <div className="text-left">
+                          <p className="text-lg font-bold text-[#1a1025]">{stats.pendingCreators}</p>
+                          <p className="text-[10px] text-gray-500 font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
+                        </div>
+                      </button>
+                    )}
+                    {stats.pendingBusinesses > 0 && (
+                      <button
+                        onClick={() => setView('businesses')}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-amber-200 hover:border-amber-300 transition-all"
+                      >
+                        <span className="text-2xl">🏪</span>
+                        <div className="text-left">
+                          <p className="text-lg font-bold text-[#1a1025]">{stats.pendingBusinesses}</p>
+                          <p className="text-[10px] text-gray-500 font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
+                        </div>
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ))}
+              )}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {statCards.map((stat, i) => (
+                  <div key={i} className={`bg-gradient-to-br ${stat.accent} rounded-2xl p-5 border`}>
+                    <div className="text-2xl mb-3">{stat.emoji}</div>
+                    <p className="text-3xl font-bold text-[#1a1025]">{stat.value}</p>
+                    <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
@@ -162,8 +195,8 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {creators.map((creator) => (
-                        <tr key={creator.id} className="hover:bg-gray-50/50 transition-colors">
+                      {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
+                        <tr key={creator.id} className={`hover:bg-gray-50/50 transition-colors ${!creator.approved ? 'bg-amber-50/20' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#1a1025]">{creator.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-500">{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
@@ -214,8 +247,8 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
-                      {businesses.map((business) => (
-                        <tr key={business.id} className="hover:bg-gray-50/50 transition-colors">
+                      {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
+                        <tr key={business.id} className={`hover:bg-gray-50/50 transition-colors ${!business.approved ? 'bg-amber-50/20' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
                               <span className="text-base">{getCategoryEmoji(business.category)}</span>

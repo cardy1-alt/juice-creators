@@ -1,0 +1,185 @@
+import { useState, useEffect } from 'react';
+import { supabase } from '../lib/supabase';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
+
+interface CreatorOnboardingProps {
+  creatorId: string;
+  onComplete: () => void;
+}
+
+export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnboardingProps) {
+  const [step, setStep] = useState(1);
+  const [businessCount, setBusinessCount] = useState(0);
+  const [offerCount, setOfferCount] = useState(0);
+
+  useEffect(() => {
+    fetchStats();
+  }, []);
+
+  const fetchStats = async () => {
+    const { count: bCount } = await supabase
+      .from('businesses')
+      .select('*', { count: 'exact', head: true })
+      .eq('approved', true);
+
+    const { count: oCount } = await supabase
+      .from('offers')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_live', true);
+
+    setBusinessCount(bCount || 0);
+    setOfferCount(oCount || 0);
+  };
+
+  const handleComplete = async () => {
+    await supabase
+      .from('creators')
+      .update({ onboarding_complete: true })
+      .eq('id', creatorId);
+    onComplete();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+        {/* Progress dots */}
+        <div className="flex items-center justify-center gap-2 mb-6">
+          {[1, 2, 3].map((s) => (
+            <div
+              key={s}
+              className={`h-1.5 rounded-full transition-all ${
+                s === step ? 'w-8 bg-[#5b3df5]' : 'w-1.5 bg-gray-200'
+              }`}
+            />
+          ))}
+        </div>
+
+        {/* Step 1: How it works */}
+        {step === 1 && (
+          <div className="text-center">
+            <div className="text-5xl mb-4">✨</div>
+            <h2 className="text-2xl font-bold text-[#1a1025] mb-3">Welcome to Juice Creators!</h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Discover amazing local businesses, claim exclusive offers, and create authentic content
+              that showcases what makes them special.
+            </p>
+            <div className="space-y-3 text-left bg-gradient-to-br from-[#faf8ff] to-[#f0eaff] rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#5b3df5] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-[#1a1025]">Browse & Claim</p>
+                  <p className="text-xs text-gray-600">Find offers that match your vibe</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#5b3df5] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-[#1a1025]">Visit & Experience</p>
+                  <p className="text-xs text-gray-600">Show your QR code at the business</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-[#5b3df5] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <p className="font-semibold text-sm text-[#1a1025]">Create & Post</p>
+                  <p className="text-xs text-gray-600">Share your authentic experience</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 2: What's expected */}
+        {step === 2 && (
+          <div className="text-center">
+            <div className="text-5xl mb-4">🎬</div>
+            <h2 className="text-2xl font-bold text-[#1a1025] mb-3">What We Expect</h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Creating authentic content is key to building trust with businesses and your audience.
+            </p>
+            <div className="space-y-3 text-left">
+              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
+                <p className="font-semibold text-sm text-emerald-700 mb-1">✓ Genuine Feature</p>
+                <p className="text-xs text-gray-600">
+                  Your reel must genuinely showcase the business, product, or experience
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
+                <p className="font-semibold text-sm text-amber-700 mb-1">⏱ 48-Hour Window</p>
+                <p className="text-xs text-gray-600">
+                  Post your reel within 48 hours of redeeming your pass
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-sky-50 border border-sky-100">
+                <p className="font-semibold text-sm text-sky-700 mb-1">🤝 Authentic Voice</p>
+                <p className="text-xs text-gray-600">
+                  Keep it real — your honest perspective is what makes it valuable
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 3: Platform stats */}
+        {step === 3 && (
+          <div className="text-center">
+            <div className="text-5xl mb-4">🚀</div>
+            <h2 className="text-2xl font-bold text-[#1a1025] mb-3">You're Ready!</h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              Join a growing community of creators and businesses making authentic connections.
+            </p>
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <div className="p-4 rounded-xl bg-gradient-to-br from-[#5b3df5] to-[#8b6cf7] text-white">
+                <p className="text-3xl font-bold mb-1">{businessCount}</p>
+                <p className="text-xs font-medium opacity-90">Active Businesses</p>
+              </div>
+              <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
+                <p className="text-3xl font-bold mb-1">{offerCount}</p>
+                <p className="text-xs font-medium opacity-90">Live Offers</p>
+              </div>
+            </div>
+            <p className="text-xs text-gray-500">
+              Start exploring and claim your first offer to get the ball rolling!
+            </p>
+          </div>
+        )}
+
+        {/* Navigation */}
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-100">
+          {step > 1 ? (
+            <button
+              onClick={() => setStep(step - 1)}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" /> Back
+            </button>
+          ) : (
+            <div />
+          )}
+
+          {step < 3 ? (
+            <button
+              onClick={() => setStep(step + 1)}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#5b3df5] text-white hover:bg-[#4e35d4] transition-colors ml-auto"
+            >
+              Next <ArrowRight className="w-4 h-4" />
+            </button>
+          ) : (
+            <button
+              onClick={handleComplete}
+              className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-[#5b3df5] text-white hover:bg-[#4e35d4] transition-colors ml-auto"
+            >
+              Got it!
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
