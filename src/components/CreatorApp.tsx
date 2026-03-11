@@ -509,18 +509,18 @@ export default function CreatorApp() {
                                 </span>
 
                                 {full ? (
-                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-100 text-red-600">
+                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
                                     Full
                                   </span>
                                 ) : alreadyClaimed ? (
-                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-500">
+                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
                                     Claimed
                                   </span>
                                 ) : (
                                   <button
                                     onClick={() => handleClaim(offer)}
                                     disabled={loading || hasActiveBusiness}
-                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-[#5b3df5] text-white hover:opacity-90 disabled:opacity-40"
+                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
                                   >
                                     Claim
                                   </button>
