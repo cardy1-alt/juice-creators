@@ -51,6 +51,18 @@ const testUsers: TestUser[] = [
     }
   },
   {
+    email: 'alex@example.com',
+    password: 'password123',
+    type: 'creator',
+    data: {
+      name: 'Alex Rivera',
+      instagram_handle: '@alexrivera',
+      code: 'ALEX01',
+      follower_count: '5k–10k',
+      approved: true
+    }
+  },
+  {
     email: 'midgar@example.com',
     password: 'password123',
     type: 'business',
