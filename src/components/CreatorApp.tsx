@@ -469,107 +469,102 @@ export default function CreatorApp() {
                     return (
                       <div
                         key={offer.id}
-                        className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm shadow-black/[0.03] hover:shadow-md hover:border-gray-200 transition-all text-left relative overflow-hidden"
+                        className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all text-left relative overflow-hidden group"
                       >
-                        {/* Category accent bar */}
-                        <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
+                        {/* Gradient accent */}
+                        <div className={`absolute inset-0 opacity-[0.02] ${getCategoryColor(offer.businesses.category)}`} />
 
-                        {/* Badge top right */}
-                        <div className="absolute top-3 right-3">
-                          {isUnlimited ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500 text-white">
-                              Open
-                            </span>
-                          ) : full ? (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white">
-                              Full
-                            </span>
-                          ) : (
-                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-500 text-white">
-                              {slotsLeft} left
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Main content */}
-                        <div className="p-4">
-                          <div className="flex items-start gap-3">
-                            {/* Icon box */}
-                            <div className={`w-9 h-9 rounded-lg ${getCategoryIconBg(offer.businesses.category)} border ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-base flex-shrink-0`}>
-                              {emoji}
+                        <div className="relative p-5">
+                          {/* Header */}
+                          <div className="flex items-start justify-between gap-3 mb-4">
+                            <div className="flex items-center gap-3 flex-1 min-w-0">
+                              <div className={`w-12 h-12 rounded-xl ${getCategoryIconBg(offer.businesses.category)} border-2 ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-xl flex-shrink-0 shadow-sm`}>
+                                {emoji}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-bold text-base text-[#1a1025] mb-0.5">{offer.businesses.name}</h3>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${getCategoryColor(offer.businesses.category).replace('bg-', 'bg-opacity-10 bg-')} ${getCategoryColor(offer.businesses.category).replace('bg-', 'text-')}`}>
+                                  {offer.businesses.category}
+                                </span>
+                              </div>
                             </div>
 
-                            {/* Content */}
-                            <div className="flex-1 min-w-0 pr-12">
-                              <h3 className="font-semibold text-[13px] text-[#1a1025]">{offer.businesses.name}</h3>
-                              <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]">
-                                {offer.description}
-                              </p>
+                            {/* Status badge */}
+                            <div className="flex-shrink-0">
+                              {isUnlimited ? (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500 text-white shadow-sm">
+                                  Open
+                                </span>
+                              ) : full ? (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500 text-white shadow-sm">
+                                  Full
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm">
+                                  {slotsLeft} left
+                                </span>
+                              )}
                             </div>
                           </div>
 
-                          {/* Progress / slots section */}
-                          <div className="mt-3 pt-3 border-t border-gray-50">
-                            {isUnlimited ? (
-                              <div className="flex items-center justify-between">
-                                <span className="text-[10px] text-gray-400 font-medium">Unlimited slots</span>
-                                {alreadyClaimed ? (
-                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
-                                    Claimed
-                                  </span>
-                                ) : hasActiveBusiness ? (
-                                  <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                    Complete active first
-                                  </div>
-                                ) : (
-                                  <button
-                                    onClick={() => handleClaim(offer)}
-                                    disabled={loading}
-                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
-                                  >
-                                    Claim
-                                  </button>
-                                )}
-                              </div>
-                            ) : (
-                              <>
-                                <div className="mb-2">
-                                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                    <div
-                                      className={`h-full ${barColor} transition-all duration-300`}
-                                      style={{ width: `${pct}%` }}
-                                    />
-                                  </div>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <span className="text-[10px] text-gray-400 font-medium">
-                                    {slotsUsed}/{offer.monthly_cap} claimed
-                                  </span>
+                          {/* Offer description */}
+                          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                            {offer.description}
+                          </p>
 
-                                  {full ? (
-                                    <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
-                                      Full
-                                    </span>
-                                  ) : alreadyClaimed ? (
-                                    <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
-                                      Claimed
-                                    </span>
-                                  ) : hasActiveBusiness ? (
-                                    <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                      Complete active first
-                                    </div>
-                                  ) : (
-                                    <button
-                                      onClick={() => handleClaim(offer)}
-                                      disabled={loading}
-                                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
-                                    >
-                                      Claim
-                                    </button>
-                                  )}
+                          {/* Availability section */}
+                          <div className="space-y-3">
+                            {!isUnlimited && (
+                              <div>
+                                <div className="flex items-center justify-between mb-1.5">
+                                  <span className="text-xs font-medium text-gray-500">Availability</span>
+                                  <span className="text-xs font-bold text-gray-700">
+                                    {slotsUsed}/{offer.monthly_cap}
+                                  </span>
                                 </div>
-                              </>
+                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                                  <div
+                                    className={`h-full ${barColor} transition-all duration-500 rounded-full`}
+                                    style={{ width: `${pct}%` }}
+                                  />
+                                </div>
+                              </div>
                             )}
+
+                            {/* Action button */}
+                            <div className="pt-1">
+                              {full ? (
+                                <button
+                                  disabled
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-gray-400 cursor-not-allowed"
+                                >
+                                  Sold Out
+                                </button>
+                              ) : alreadyClaimed ? (
+                                <button
+                                  disabled
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+                                >
+                                  <CheckCircle2 className="w-4 h-4" />
+                                  Already Claimed
+                                </button>
+                              ) : hasActiveBusiness ? (
+                                <button
+                                  disabled
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-semibold bg-amber-50 text-amber-700 border-2 border-amber-200 cursor-not-allowed"
+                                >
+                                  Complete Active Pass First
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleClaim(offer)}
+                                  disabled={loading}
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 disabled:opacity-40 shadow-sm hover:shadow-md active:scale-[0.98]"
+                                >
+                                  {isUnlimited ? 'Claim Offer' : 'Claim Now'}
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
