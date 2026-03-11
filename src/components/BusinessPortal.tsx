@@ -1,11 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import {
   LogOut, Plus, ExternalLink, Camera, Bell,
   Package, Users, Film, ToggleLeft, ToggleRight,
-  CheckCircle2, XCircle
+  CheckCircle2, XCircle, VideoOff
 } from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
 
 const BUSINESS_EMOJIS = ['🍊', '🥤', '🧃', '🍋', '🫐', '🥑', '🍇', '🍓', '🥭', '🍍', '🥝', '🍉', '🫒', '🌶️', '🍑', '🥥'];
 function getBusinessEmoji(name: string): string {
@@ -50,6 +51,97 @@ interface Notification {
   message: string;
   read: boolean;
   created_at: string;
+}
+
+function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+
+  const startScanner = async () => {
+    setCameraError(null);
+    try {
+      const scanner = new Html5Qrcode('qr-scanner-region');
+      scannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          // Extract the redeem token from URL or use raw value
+          let token = decodedText;
+          try {
+            const url = new URL(decodedText);
+            const redeemParam = url.searchParams.get('redeem');
+            if (redeemParam) token = redeemParam;
+          } catch {
+            // Not a URL — use the raw scanned value
+          }
+          onScan(token);
+          scanner.stop().catch(() => {});
+          setScanning(false);
+        },
+        () => {} // ignore scan failures (no QR found in frame)
+      );
+      setScanning(true);
+    } catch (err: any) {
+      const msg = String(err?.message || err);
+      if (msg.includes('NotAllowedError') || msg.includes('Permission')) {
+        setCameraError('Camera permission denied. Please allow camera access in your browser settings.');
+      } else if (msg.includes('NotFoundError')) {
+        setCameraError('No camera found on this device.');
+      } else {
+        setCameraError('Could not start camera. Use the token field below instead.');
+      }
+    }
+  };
+
+  const stopScanner = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop().catch(() => {});
+      scannerRef.current = null;
+    }
+    setScanning(false);
+  };
+
+  useEffect(() => {
+    return () => { stopScanner(); };
+  }, []);
+
+  useEffect(() => {
+    if (!active && scanning) stopScanner();
+  }, [active]);
+
+  if (cameraError) {
+    return (
+      <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-center">
+        <VideoOff className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+        <p className="text-sm text-amber-700">{cameraError}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div id="qr-scanner-region" className="rounded-xl overflow-hidden" style={{ display: scanning ? 'block' : 'none' }} />
+      {!scanning && (
+        <button
+          onClick={startScanner}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm bg-[#5b3df5] text-white hover:bg-[#4e35d4] transition-all"
+        >
+          <Camera className="w-4 h-4" /> Open Camera Scanner
+        </button>
+      )}
+      {scanning && (
+        <button
+          onClick={stopScanner}
+          className="w-full mt-2 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+        >
+          Stop Scanner
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function BusinessPortal() {
@@ -334,8 +426,19 @@ export default function BusinessPortal() {
               <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-sm text-center">
                 <div className="text-5xl mb-4">📸</div>
                 <h2 className="text-xl font-bold mb-1 text-[#1a1025]">Redeem Pass</h2>
-                <p className="text-gray-500 text-sm mb-6">Enter the QR token to redeem a creator's pass</p>
-                <form onSubmit={handleScanCode} className="space-y-3">
+                <p className="text-gray-500 text-sm mb-6">Scan the creator's QR code or paste the token</p>
+
+                <QRScanner
+                  onScan={(token) => { setScanCode(token); }}
+                  active={view === 'scan' && !scanResult}
+                />
+
+                <div className="mt-4 relative">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-gray-100" /></div>
+                  <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">or paste token</span></div>
+                </div>
+
+                <form onSubmit={handleScanCode} className="space-y-3 mt-4">
                   <input
                     type="text"
                     value={scanCode}
