@@ -144,6 +144,12 @@ export default function BusinessPortal() {
       if (new Date(claim.qr_expires_at) < new Date()) { setScanResult({ type: 'error', message: 'QR code expired. Ask the creator to refresh it.' }); setScanCode(''); return; }
       const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: new Date().toISOString() }).eq('id', claim.id);
       if (error) throw error;
+      // Notify the creator their pass was redeemed
+      await supabase.from('notifications').insert({
+        user_id: claim.creator_id,
+        user_type: 'creator',
+        message: `Your pass at ${userProfile.name} has been redeemed! Don't forget to post your reel.`
+      });
       setScanResult({ type: 'success', message: `✅ Pass redeemed for ${claim.creators.name}!` });
       setScanCode('');
       fetchClaims();

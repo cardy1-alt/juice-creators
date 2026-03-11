@@ -120,7 +120,7 @@ export default function CreatorApp() {
 
     if (data) {
       setClaims(data as Claim[]);
-      const active = (data as Claim[]).filter(c => c.status === 'active');
+      const active = (data as Claim[]).filter(c => c.status === 'active' || (c.status === 'redeemed' && !c.reel_url));
       setActiveClaims(active);
       if (selectedClaim && !active.find(c => c.id === selectedClaim.id)) {
         setSelectedClaim(active[0] || null);
@@ -388,14 +388,16 @@ export default function CreatorApp() {
                           <h3 className="font-bold text-[15px] text-[#1a1025]">{selectedClaim.businesses.name}</h3>
                           <p className="text-gray-500 text-[13px] mt-0.5">{selectedClaim.offers.description}</p>
                         </div>
-                        <StatusPill status="active" />
+                        <StatusPill status={selectedClaim.status} />
                       </div>
 
-                      <QRCodeDisplay
-                        token={selectedClaim.qr_token}
-                        claimId={selectedClaim.id}
-                        creatorCode={userProfile.code}
-                      />
+                      {selectedClaim.status === 'active' && (
+                        <QRCodeDisplay
+                          token={selectedClaim.qr_token}
+                          claimId={selectedClaim.id}
+                          creatorCode={userProfile.code}
+                        />
+                      )}
 
                       <div className="mt-5 grid grid-cols-2 gap-2">
                         <div className="p-3 rounded-xl bg-sky-50/60 border border-sky-100/50 text-center">
@@ -408,8 +410,11 @@ export default function CreatorApp() {
                         </div>
                       </div>
 
-                      {selectedClaim.redeemed_at && !selectedClaim.reel_url && (
+                      {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
                         <div className="mt-5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
+                          <p className="text-sm font-semibold text-emerald-700 mb-3">
+                            Pass redeemed! Now submit your reel to complete the deal.
+                          </p>
                           <label className="block text-sm font-semibold text-[#1a1025] mb-2">
                             🎬 Submit Your Reel
                           </label>
