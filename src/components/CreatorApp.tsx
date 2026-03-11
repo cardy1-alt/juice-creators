@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag, Map } from 'lucide-react';
+import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag, Map, Search, SlidersHorizontal, LayoutGrid, List } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -102,6 +102,9 @@ export default function CreatorApp() {
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
+  const [viewMode, setViewMode] = useState<'card' | 'compact'>('card');
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -401,6 +404,58 @@ export default function CreatorApp() {
           {/* ── OFFERS ── */}
           {view === 'offers' && (
             <>
+              {/* Search and Controls */}
+              <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm mb-3 space-y-3">
+                {/* Search bar */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search businesses..."
+                    className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5]"
+                  />
+                </div>
+
+                {/* Controls row */}
+                <div className="flex items-center justify-between gap-2">
+                  {/* Sort dropdown */}
+                  <div className="flex items-center gap-2">
+                    <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400" />
+                    <select
+                      value={sortBy}
+                      onChange={(e) => setSortBy(e.target.value as 'newest' | 'slots' | 'name')}
+                      className="text-xs font-semibold text-gray-600 bg-transparent border-none focus:outline-none cursor-pointer"
+                    >
+                      <option value="newest">Newest</option>
+                      <option value="slots">Most Available</option>
+                      <option value="name">A-Z</option>
+                    </select>
+                  </div>
+
+                  {/* View toggle */}
+                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+                    <button
+                      onClick={() => setViewMode('card')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'card' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <LayoutGrid className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      onClick={() => setViewMode('compact')}
+                      className={`p-1.5 rounded transition-colors ${
+                        viewMode === 'compact' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                      }`}
+                    >
+                      <List className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Category Filter */}
               <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm mb-3 relative">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -432,22 +487,55 @@ export default function CreatorApp() {
                 <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none" />
               </div>
 
-              {offers.filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory).length === 0 && (
-                <div className="text-center py-16">
-                  <div className="text-4xl mb-3">🔍</div>
-                  <p className="text-gray-400 text-sm">No offers in this category</p>
-                  <button
-                    onClick={() => setSelectedCategory('all')}
-                    className="mt-2 text-[#5b3df5] text-xs font-semibold hover:underline"
-                  >
-                    View all offers
-                  </button>
-                </div>
-              )}
+              {(() => {
+                const filteredOffers = offers
+                  .filter(o => {
+                    const matchesCategory = selectedCategory === 'all' || o.businesses.category === selectedCategory;
+                    const matchesSearch = searchQuery === '' ||
+                      o.businesses.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                      o.description.toLowerCase().includes(searchQuery.toLowerCase());
+                    return matchesCategory && matchesSearch;
+                  })
+                  .sort((a, b) => {
+                    if (sortBy === 'name') {
+                      return a.businesses.name.localeCompare(b.businesses.name);
+                    } else if (sortBy === 'slots') {
+                      const aSlots = a.monthly_cap === null ? Infinity : (a.monthly_cap - (a.slotsUsed || 0));
+                      const bSlots = b.monthly_cap === null ? Infinity : (b.monthly_cap - (b.slotsUsed || 0));
+                      return bSlots - aSlots;
+                    }
+                    return 0;
+                  });
 
-              <div className="space-y-3">
-                {offers
-                  .filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory)
+                if (filteredOffers.length === 0) {
+                  return (
+                    <div className="text-center py-16">
+                      <div className="text-4xl mb-3">🔍</div>
+                      <p className="text-gray-400 text-sm">No offers found</p>
+                      <button
+                        onClick={() => {
+                          setSelectedCategory('all');
+                          setSearchQuery('');
+                        }}
+                        className="mt-2 text-[#5b3df5] text-xs font-semibold hover:underline"
+                      >
+                        Clear filters
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <>
+                    {/* Results count */}
+                    <div className="flex items-center justify-between mb-3 px-1">
+                      <p className="text-xs font-semibold text-gray-500">
+                        {filteredOffers.length} offer{filteredOffers.length !== 1 ? 's' : ''} available
+                      </p>
+                    </div>
+
+                    <div className={viewMode === 'card' ? 'space-y-3' : 'space-y-2'}>
+                      {filteredOffers
                   .map((offer) => {
                     const emoji = getCategoryEmoji(offer.businesses.category);
                     const isUnlimited = offer.monthly_cap === null;
@@ -464,6 +552,72 @@ export default function CreatorApp() {
                       barColor = 'bg-red-500';
                     } else if (pct >= 51) {
                       barColor = 'bg-amber-500';
+                    }
+
+                    if (viewMode === 'compact') {
+                      return (
+                        <div
+                          key={offer.id}
+                          className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all p-3"
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className={`w-10 h-10 rounded-lg ${getCategoryIconBg(offer.businesses.category)} border ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-lg flex-shrink-0`}>
+                              {emoji}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-0.5">
+                                <h3 className="font-bold text-sm text-[#1a1025] truncate">{offer.businesses.name}</h3>
+                                {isUnlimited ? (
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white flex-shrink-0">
+                                    Open
+                                  </span>
+                                ) : full ? (
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500 text-white flex-shrink-0">
+                                    Full
+                                  </span>
+                                ) : (
+                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white flex-shrink-0">
+                                    {slotsLeft} left
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 truncate">{offer.description}</p>
+                            </div>
+                            <div className="flex-shrink-0">
+                              {full ? (
+                                <button
+                                  disabled
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed"
+                                >
+                                  Full
+                                </button>
+                              ) : alreadyClaimed ? (
+                                <button
+                                  disabled
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-500 cursor-not-allowed"
+                                >
+                                  Claimed
+                                </button>
+                              ) : hasActiveBusiness ? (
+                                <button
+                                  disabled
+                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
+                                >
+                                  Active
+                                </button>
+                              ) : (
+                                <button
+                                  onClick={() => handleClaim(offer)}
+                                  disabled={loading}
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 disabled:opacity-40"
+                                >
+                                  Claim
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
                     }
 
                     return (
@@ -570,7 +724,10 @@ export default function CreatorApp() {
                       </div>
                     );
                   })}
-              </div>
+                    </div>
+                  </>
+                );
+              })()}
             </>
           )}
 
