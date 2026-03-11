@@ -4,9 +4,6 @@ import type { UserRole } from '../types/database';
 import { Sparkles, Building2, Eye, EyeOff, MapPin } from 'lucide-react';
 import { BUSINESS_CATEGORIES, CATEGORY_LIST } from '../lib/categories';
 
-// TODO: Set VITE_GOOGLE_MAPS_API_KEY in your environment variables with a valid Google Maps API key
-// that has the Places API enabled. The script loads from:
-// https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&libraries=places
 declare global {
   interface Window {
     google?: any;
@@ -70,7 +67,7 @@ function AddressAutocomplete({ value, onChange }: {
     <div>
       <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
         <MapPin className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />
-        Address <span className="text-gray-400 font-normal">(optional)</span>
+        Address
       </label>
       <input
         ref={inputRef}
@@ -79,6 +76,7 @@ function AddressAutocomplete({ value, onChange }: {
         onChange={(e) => onChange(e.target.value, null, null)}
         placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+        required
       />
     </div>
   );
@@ -266,6 +264,38 @@ export default function Auth() {
                         <option value="10k+">10k+</option>
                       </select>
                     </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Email</label>
+                      <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="you@example.com"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">Password</label>
+                      <div className="relative">
+                        <input
+                          type={showPassword ? 'text' : 'password'}
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
+                          required
+                          minLength={6}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
                   </>
                 )}
 
@@ -311,14 +341,9 @@ export default function Auth() {
                       value={address}
                       onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
-                    {!import.meta.env.VITE_GOOGLE_MAPS_API_KEY && (
-                      <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-700">
-                        <strong>Note:</strong> Address autocomplete requires VITE_GOOGLE_MAPS_API_KEY to be set. The plain text input works fine.
-                      </div>
-                    )}
                     <div>
                       <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                        Bio <span className="text-gray-400 font-normal">(optional)</span>
+                        Bio
                       </label>
                       <textarea
                         value={bio}
@@ -327,6 +352,7 @@ export default function Auth() {
                         maxLength={150}
                         rows={2}
                         className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm resize-none"
+                        required
                       />
                       <p className="text-xs text-gray-400 mt-1 text-right">{bio.length}/150</p>
                     </div>
@@ -432,6 +458,10 @@ export default function Auth() {
                   onClick={() => {
                     if (signupStep === 1 && !name) {
                       setError('Please enter your business name');
+                      return;
+                    }
+                    if (signupStep === 2 && (!address || !bio)) {
+                      setError('Please enter your business address and bio');
                       return;
                     }
                     setError('');
