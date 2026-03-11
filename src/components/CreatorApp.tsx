@@ -154,43 +154,19 @@ export default function CreatorApp() {
   };
 
   const handleClaim = async (offer: Offer) => {
-    // Block: same business already has an active claim
-    const existingForBusiness = activeClaims.find(c => c.business_id === offer.business_id);
-    if (existingForBusiness) {
-      alert('You already have an active claim with this business.');
-      return;
-    }
-
-    // Block: same offer already claimed (non-expired)
-    const existingClaim = claims.find(c => c.offer_id === offer.id && c.status !== 'expired');
-    if (existingClaim) {
-      alert('You already have a claim on this offer.');
-      return;
-    }
-
     setLoading(true);
     try {
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      const qrToken = crypto.randomUUID() + '-' + crypto.randomUUID();
-      const qrExpiresAt = new Date(Date.now() + 30000).toISOString();
-
-      const { data, error } = await supabase
-        .from('claims')
-        .insert({
-          creator_id: userProfile.id,
-          offer_id: offer.id,
-          business_id: offer.business_id,
-          status: 'active',
-          qr_token: qrToken,
-          qr_expires_at: qrExpiresAt,
-          month: currentMonth
-        })
-        .select('*, offers(description), businesses(name)')
-        .single();
+      const { data, error } = await supabase.rpc('claim_offer', {
+        p_offer_id: offer.id,
+        p_creator_id: userProfile.id,
+      });
 
       if (error) throw error;
+      if (data?.error) {
+        alert(data.error);
+        return;
+      }
 
-      setSelectedClaim(data as Claim);
       setView('active');
       fetchOffers();
       fetchClaims();
