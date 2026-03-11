@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '../lib/supabase';
+import QRCode from 'qrcode';
 import { RefreshCw, Shield } from 'lucide-react';
 
 interface QRCodeDisplayProps {
@@ -12,81 +13,24 @@ function generateSecureToken(): string {
   return crypto.randomUUID() + '-' + crypto.randomUUID();
 }
 
-/**
- * Generates a QR code as an SVG data URI using a simple but effective
- * alphanumeric encoding. This avoids leaking tokens to third-party APIs.
- */
-function generateQRCodeSVG(data: string, size: number = 250): string {
-  // Simple QR-like matrix generation for display purposes.
-  // In production, use a proper QR library — but this is self-contained
-  // and avoids the third-party API leak.
-  const moduleCount = 21;
-  const cellSize = size / moduleCount;
-  const modules: boolean[][] = [];
-
-  // Seed from data hash
-  let hash = 0;
-  for (let i = 0; i < data.length; i++) {
-    hash = ((hash << 5) - hash + data.charCodeAt(i)) | 0;
-  }
-
-  // Generate deterministic pattern from token
-  const rng = (seed: number) => {
-    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
-    return seed;
-  };
-
-  let seed = Math.abs(hash);
-  for (let row = 0; row < moduleCount; row++) {
-    modules[row] = [];
-    for (let col = 0; col < moduleCount; col++) {
-      // Fixed finder patterns (top-left, top-right, bottom-left)
-      const isFinderPattern =
-        (row < 7 && col < 7) ||
-        (row < 7 && col >= moduleCount - 7) ||
-        (row >= moduleCount - 7 && col < 7);
-
-      if (isFinderPattern) {
-        const r = row < 7 ? row : row - (moduleCount - 7);
-        const c = col < 7 ? col : col - (moduleCount - 7);
-        modules[row][col] =
-          r === 0 || r === 6 || c === 0 || c === 6 ||
-          (r >= 2 && r <= 4 && c >= 2 && c <= 4);
-      } else {
-        seed = rng(seed);
-        modules[row][col] = (seed % 3) !== 0;
-      }
-    }
-  }
-
-  // Build SVG
-  let rects = '';
-  for (let row = 0; row < moduleCount; row++) {
-    for (let col = 0; col < moduleCount; col++) {
-      if (modules[row][col]) {
-        const x = col * cellSize;
-        const y = row * cellSize;
-        rects += `<rect x="${x}" y="${y}" width="${cellSize}" height="${cellSize}" rx="1" fill="#1a1025"/>`;
-      }
-    }
-  }
-
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${size} ${size}" width="${size}" height="${size}">
-    <rect width="${size}" height="${size}" fill="white"/>
-    ${rects}
-  </svg>`;
-
-  return `data:image/svg+xml;base64,${btoa(svg)}`;
-}
-
 export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDisplayProps) {
   const [currentToken, setCurrentToken] = useState(token);
+  const [qrDataUrl, setQrDataUrl] = useState<string>('');
   const [timeLeft, setTimeLeft] = useState(30);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const claimIdRef = useRef(claimId);
 
-  // Keep ref in sync
   claimIdRef.current = claimId;
+
+  // Generate real QR code whenever token changes
+  useEffect(() => {
+    QRCode.toDataURL(currentToken, {
+      width: 280,
+      margin: 2,
+      color: { dark: '#1a1025', light: '#ffffff' },
+      errorCorrectionLevel: 'M',
+    }).then(setQrDataUrl).catch(() => {});
+  }, [currentToken]);
 
   const refreshToken = useCallback(async () => {
     setIsRefreshing(true);
@@ -95,10 +39,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
     const { error } = await supabase
       .from('claims')
-      .update({
-        qr_token: newToken,
-        qr_expires_at: qrExpiresAt
-      })
+      .update({ qr_token: newToken, qr_expires_at: qrExpiresAt })
       .eq('id', claimIdRef.current);
 
     if (!error) {
@@ -121,53 +62,53 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
     return () => clearInterval(interval);
   }, [refreshToken]);
 
-  const qrCodeSrc = generateQRCodeSVG(currentToken);
   const progressPercent = (timeLeft / 30) * 100;
+  const isUrgent = timeLeft <= 5;
 
   return (
     <div className="text-center">
-      {/* QR code with animated ring */}
-      <div className="relative inline-block">
-        <svg className="absolute -inset-2 w-[calc(100%+16px)] h-[calc(100%+16px)]" viewBox="0 0 100 100">
-          <circle
-            cx="50" cy="50" r="48"
-            fill="none"
-            stroke="#e8e0f5"
-            strokeWidth="2"
-          />
-          <circle
-            cx="50" cy="50" r="48"
-            fill="none"
-            stroke={timeLeft <= 5 ? '#ef4444' : '#5b3df5'}
-            strokeWidth="2.5"
-            strokeLinecap="round"
-            strokeDasharray={`${progressPercent * 3.02} 302`}
-            transform="rotate(-90 50 50)"
-            className="transition-all duration-1000 ease-linear"
-          />
-        </svg>
-        <div className="bg-white p-5 rounded-2xl shadow-lg">
+      {/* QR code — clean, no overlapping elements */}
+      <div className="inline-block bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+        {qrDataUrl ? (
           <img
-            src={qrCodeSrc}
+            src={qrDataUrl}
             alt="QR Code"
             className="w-56 h-56 mx-auto"
           />
-        </div>
+        ) : (
+          <div className="w-56 h-56 flex items-center justify-center">
+            <div className="w-8 h-8 border-2 border-gray-200 border-t-[#5b3df5] rounded-full animate-spin" />
+          </div>
+        )}
       </div>
 
-      {/* Token & timer info */}
-      <div className="mt-5 space-y-2">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#f0eaff]">
+      {/* Creator code badge */}
+      <div className="mt-4">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 border border-gray-100">
           <Shield className="w-4 h-4 text-[#5b3df5]" />
           <span className="font-mono font-bold text-lg tracking-wider text-[#1a1025]">
             {creatorCode}
           </span>
         </div>
-        <div className="flex items-center justify-center gap-2">
-          <RefreshCw className={`w-3.5 h-3.5 text-gray-400 ${isRefreshing ? 'animate-spin' : ''}`} />
-          <p className={`text-sm font-medium ${timeLeft <= 5 ? 'text-red-500' : 'text-gray-500'}`}>
-            Refreshes in {timeLeft}s
-          </p>
+      </div>
+
+      {/* Countdown progress bar — below the QR, never overlapping */}
+      <div className="mt-3 max-w-[280px] mx-auto">
+        <div className="flex items-center justify-between mb-1.5">
+          <div className="flex items-center gap-1.5">
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#5b3df5]' : 'text-gray-400'}`} />
+            <span className={`text-xs font-medium ${isUrgent ? 'text-rose-500' : 'text-gray-500'}`}>
+              Refreshes in {timeLeft}s
+            </span>
+          </div>
+        </div>
+        <div className="h-1.5 w-full bg-gray-100 rounded-full overflow-hidden">
+          <div
+            className={`h-full rounded-full transition-all duration-1000 ease-linear ${
+              isUrgent ? 'bg-rose-400' : 'bg-[#5b3df5]'
+            }`}
+            style={{ width: `${progressPercent}%` }}
+          />
         </div>
       </div>
     </div>
