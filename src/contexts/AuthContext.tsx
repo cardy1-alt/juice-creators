@@ -110,6 +110,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         approved: false
       });
       if (insertError) throw insertError;
+
+      // Notify admin of new creator signup
+      // Use a placeholder user_id for admin notifications — the RLS policy allows any authenticated insert
+      await supabase.from('notifications').insert({
+        user_id: '00000000-0000-0000-0000-000000000000',
+        user_type: 'admin',
+        message: `New creator signup: ${additionalData.name} (${email}) — pending approval.`,
+      });
     } else if (role === 'business') {
       const { error: insertError } = await supabase.from('businesses').insert({
         owner_email: email,
@@ -118,6 +126,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         approved: false
       });
       if (insertError) throw insertError;
+
+      // Notify admin of new business signup
+      await supabase.from('notifications').insert({
+        user_id: '00000000-0000-0000-0000-000000000000',
+        user_type: 'admin',
+        message: `New business signup: ${additionalData.name} (${email}) — pending approval.`,
+      });
     }
 
     // Re-fetch profile after insert so user doesn't land on "Account Not Found"

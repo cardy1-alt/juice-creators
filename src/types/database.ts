@@ -130,6 +130,7 @@ export type Database = {
           user_type: string;
           message: string;
           read: boolean;
+          email_sent: boolean;
           created_at: string;
         };
         Insert: {
@@ -138,6 +139,7 @@ export type Database = {
           user_type: string;
           message: string;
           read?: boolean;
+          email_sent?: boolean;
           created_at?: string;
         };
         Update: {
@@ -146,6 +148,7 @@ export type Database = {
           user_type?: string;
           message?: string;
           read?: boolean;
+          email_sent?: boolean;
           created_at?: string;
         };
       };
