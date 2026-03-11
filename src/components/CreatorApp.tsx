@@ -74,6 +74,27 @@ export default function CreatorApp() {
     }
   }, [userProfile]);
 
+  // Realtime subscriptions for claims and notifications
+  useEffect(() => {
+    if (!userProfile?.approved) return;
+
+    const channel = supabase
+      .channel('creator-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'claims', filter: `creator_id=eq.${userProfile.id}` },
+        () => { fetchClaims(); fetchOffers(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userProfile.id}` },
+        () => { fetchNotifications(); }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userProfile]);
+
   const fetchNotifications = async () => {
     const { data } = await supabase
       .from('notifications')

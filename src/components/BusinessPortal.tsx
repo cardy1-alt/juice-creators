@@ -87,6 +87,27 @@ export default function BusinessPortal() {
     }
   }, [userProfile]);
 
+  // Realtime subscriptions for claims and notifications
+  useEffect(() => {
+    if (!userProfile?.approved) return;
+
+    const channel = supabase
+      .channel('business-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'claims', filter: `business_id=eq.${userProfile.id}` },
+        () => { fetchClaims(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userProfile.id}` },
+        () => { fetchNotifications(); }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userProfile]);
+
   const fetchOffers = async () => {
     const { data } = await supabase.from('offers').select('*').eq('business_id', userProfile.id).order('created_at', { ascending: false });
     if (data) setOffers(data);
