@@ -218,7 +218,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           />
           <MapUpdater center={mapCenter} />
 
-          {businessesWithCoords.map((business) => (
+          {businessesWithDistance.map((business) => (
             <Marker
               key={business.id}
               position={[business.latitude, business.longitude]}
@@ -311,7 +311,8 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
               <div className="space-y-3">
                 <h4 className="font-semibold text-sm text-gray-700">Available Offers</h4>
-                {selectedBusiness.offers.map((offer) => {
+                {selectedBusiness.offers && selectedBusiness.offers.length > 0 ? (
+                  selectedBusiness.offers.map((offer) => {
                   const slotsUsed = offer.slotsUsed || 0;
                   const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
                   const full = slotsLeft === 0;
@@ -339,7 +340,10 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                       )}
                     </div>
                   );
-                })}
+                })
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">No offers available</p>
+                )}
               </div>
             </div>
           </div>
