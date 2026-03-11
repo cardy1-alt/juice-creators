@@ -7,13 +7,7 @@ import {
   CheckCircle2, XCircle, VideoOff
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
-
-const BUSINESS_EMOJIS = ['🍊', '🥤', '🧃', '🍋', '🫐', '🥑', '🍇', '🍓', '🥭', '🍍', '🥝', '🍉', '🫒', '🌶️', '🍑', '🥥'];
-function getBusinessEmoji(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
-  return BUSINESS_EMOJIS[Math.abs(hash) % BUSINESS_EMOJIS.length];
-}
+import { getCategoryEmoji } from '../lib/categories';
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
@@ -276,7 +270,7 @@ export default function BusinessPortal() {
   };
 
   const unreadCount = notifications.filter(n => !n.read).length;
-  const emoji = getBusinessEmoji(userProfile.name);
+  const emoji = getCategoryEmoji(userProfile.category);
 
   if (!userProfile?.approved) {
     return (

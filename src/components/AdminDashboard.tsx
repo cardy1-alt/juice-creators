@@ -5,13 +5,7 @@ import {
   LogOut, Users, Store,
   CheckCircle2, XCircle, BarChart3, Package, ClipboardList
 } from 'lucide-react';
-
-const BUSINESS_EMOJIS = ['🍊', '🥤', '🧃', '🍋', '🫐', '🥑', '🍇', '🍓', '🥭', '🍍', '🥝', '🍉', '🫒', '🌶️', '🍑', '🥥'];
-function getBusinessEmoji(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
-  return BUSINESS_EMOJIS[Math.abs(hash) % BUSINESS_EMOJIS.length];
-}
+import { getCategoryEmoji } from '../lib/categories';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
@@ -33,9 +27,9 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; email: string; code: string; approved: boolean; created_at: string; }
-interface Business { id: string; name: string; slug: string; owner_email: string; approved: boolean; created_at: string; }
-interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string }; }
-interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string }; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
+interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
+interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
 export default function AdminDashboard() {
   const { signOut } = useAuth();
@@ -53,8 +47,8 @@ export default function AdminDashboard() {
     const [creatorsData, businessesData, offersData, claimsData] = await Promise.all([
       supabase.from('creators').select('*').order('created_at', { ascending: false }),
       supabase.from('businesses').select('*').order('created_at', { ascending: false }),
-      supabase.from('offers').select('*, businesses(name)').order('created_at', { ascending: false }),
-      supabase.from('claims').select('*, creators(name), businesses(name)').order('claimed_at', { ascending: false })
+      supabase.from('offers').select('*, businesses(name, category)').order('created_at', { ascending: false }),
+      supabase.from('claims').select('*, creators(name), businesses(name, category)').order('claimed_at', { ascending: false })
     ]);
     if (creatorsData.data) setCreators(creatorsData.data);
     if (businessesData.data) setBusinesses(businessesData.data);
@@ -216,7 +210,7 @@ export default function AdminDashboard() {
                         <tr key={business.id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
-                              <span className="text-base">{getBusinessEmoji(business.name)}</span>
+                              <span className="text-base">{getCategoryEmoji(business.category)}</span>
                               <span className="text-sm font-medium text-[#1a1025]">{business.name}</span>
                             </div>
                           </td>
@@ -253,7 +247,7 @@ export default function AdminDashboard() {
                   {offers.map((offer) => (
                     <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
                       <div className="flex items-start gap-3 mb-2">
-                        <span className="text-xl flex-shrink-0">{getBusinessEmoji(offer.businesses.name)}</span>
+                        <span className="text-xl flex-shrink-0">{getCategoryEmoji(offer.businesses.category)}</span>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="font-bold text-sm text-[#1a1025]">{offer.businesses.name}</h3>
@@ -293,7 +287,7 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#1a1025]">{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm">{getBusinessEmoji(claim.businesses.name)}</span>
+                              <span className="text-sm">{getCategoryEmoji(claim.businesses.category)}</span>
                               <span className="text-sm text-gray-500">{claim.businesses.name}</span>
                             </div>
                           </td>

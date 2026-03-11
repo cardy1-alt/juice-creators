@@ -7,6 +7,7 @@ export type Database = {
           name: string;
           slug: string;
           owner_email: string;
+          category: string;
           approved: boolean;
           created_at: string;
         };
@@ -15,6 +16,7 @@ export type Database = {
           name: string;
           slug: string;
           owner_email: string;
+          category: string;
           approved?: boolean;
           created_at?: string;
         };
@@ -23,6 +25,7 @@ export type Database = {
           name?: string;
           slug?: string;
           owner_email?: string;
+          category?: string;
           approved?: boolean;
           created_at?: string;
         };

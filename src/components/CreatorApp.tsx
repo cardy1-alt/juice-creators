@@ -3,14 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2 } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
-
-// Deterministic emoji avatar from business name
-const BUSINESS_EMOJIS = ['🍊', '🥤', '🧃', '🍋', '🫐', '🥑', '🍇', '🍓', '🥭', '🍍', '🥝', '🍉', '🫒', '🌶️', '🍑', '🥥'];
-function getBusinessEmoji(name: string): string {
-  let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = ((hash << 5) - hash + name.charCodeAt(i)) | 0;
-  return BUSINESS_EMOJIS[Math.abs(hash) % BUSINESS_EMOJIS.length];
-}
+import { getCategoryEmoji } from '../lib/categories';
 
 interface Offer {
   id: string;
@@ -18,7 +11,7 @@ interface Offer {
   description: string;
   monthly_cap: number;
   slotsUsed?: number;
-  businesses: { name: string };
+  businesses: { name: string; category: string };
 }
 
 interface Claim {
@@ -33,7 +26,7 @@ interface Claim {
   offer_id: string;
   business_id: string;
   offers: { description: string };
-  businesses: { name: string };
+  businesses: { name: string; category: string };
 }
 
 interface Notification {
@@ -115,7 +108,7 @@ export default function CreatorApp() {
   const fetchOffers = async () => {
     const { data } = await supabase
       .from('offers')
-      .select('*, businesses(name)')
+      .select('*, businesses(name, category)')
       .eq('is_live', true);
 
     if (data) {
@@ -137,7 +130,7 @@ export default function CreatorApp() {
   const fetchClaims = async () => {
     const { data } = await supabase
       .from('claims')
-      .select('*, offers(description), businesses(name)')
+      .select('*, offers(description), businesses(name, category)')
       .eq('creator_id', userProfile.id)
       .order('claimed_at', { ascending: false });
 
@@ -290,7 +283,7 @@ export default function CreatorApp() {
                 </div>
               )}
               {offers.map((offer) => {
-                const emoji = getBusinessEmoji(offer.businesses.name);
+                const emoji = getCategoryEmoji(offer.businesses.category);
                 const pct = Math.min(((offer.slotsUsed || 0) / offer.monthly_cap) * 100, 100);
                 const full = pct >= 100;
                 const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
@@ -357,7 +350,7 @@ export default function CreatorApp() {
                   {activeClaims.length > 1 && (
                     <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
                       {activeClaims.map(claim => {
-                        const emoji = getBusinessEmoji(claim.businesses.name);
+                        const emoji = getCategoryEmoji(claim.businesses.category);
                         const isSelected = selectedClaim?.id === claim.id;
                         return (
                           <button
@@ -381,7 +374,7 @@ export default function CreatorApp() {
                     <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
                       <div className="flex items-center gap-3 mb-5">
                         <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
-                          {getBusinessEmoji(selectedClaim.businesses.name)}
+                          {getCategoryEmoji(selectedClaim.businesses.category)}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-bold text-[15px] text-[#1a1025]">{selectedClaim.businesses.name}</h3>
@@ -470,7 +463,7 @@ export default function CreatorApp() {
                 <div key={claim.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm shadow-black/[0.03]">
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-base flex-shrink-0">
-                      {getBusinessEmoji(claim.businesses.name)}
+                      {getCategoryEmoji(claim.businesses.category)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">

@@ -123,6 +123,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         owner_email: email,
         name: additionalData.name,
         slug: additionalData.slug,
+        category: additionalData.category || 'Food & Drink',
         approved: false
       });
       if (insertError) throw insertError;

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../types/database';
 import { Sparkles, Building2, Eye, EyeOff } from 'lucide-react';
+import { BUSINESS_CATEGORIES, CATEGORY_LIST } from '../lib/categories';
 
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -10,6 +11,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
+  const [category, setCategory] = useState(CATEGORY_LIST[0]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -37,7 +39,7 @@ export default function Auth() {
       } else {
         const additionalData = role === 'creator'
           ? { name, instagramHandle, code: generateCreatorCode(name) }
-          : { name, slug: generateSlug(name) };
+          : { name, slug: generateSlug(name), category };
         await signUp(email, password, role, additionalData);
       }
     } catch (err: any) {
@@ -146,6 +148,30 @@ export default function Auth() {
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
                       required
                     />
+                  </div>
+                )}
+                {role === 'business' && (
+                  <div>
+                    <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+                      Category
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {CATEGORY_LIST.map((cat) => (
+                        <button
+                          key={cat}
+                          type="button"
+                          onClick={() => setCategory(cat)}
+                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-left text-sm transition-all ${
+                            category === cat
+                              ? 'border-[#5b3df5] bg-[#f8f5ff] font-semibold text-[#5b3df5]'
+                              : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                          }`}
+                        >
+                          <span>{BUSINESS_CATEGORIES[cat]}</span>
+                          <span className="truncate">{cat}</span>
+                        </button>
+                      ))}
+                    </div>
                   </div>
                 )}
               </>
