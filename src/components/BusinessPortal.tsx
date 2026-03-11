@@ -27,9 +27,10 @@ function StatusPill({ status }: { status: string }) {
 interface Offer {
   id: string;
   description: string;
-  monthly_cap: number;
+  monthly_cap: number | null;
   is_live: boolean;
   created_at: string;
+  slotsUsed?: number;
 }
 
 interface ClaimWithDetails {
@@ -150,7 +151,8 @@ export default function BusinessPortal() {
   );
   const [showNewOffer, setShowNewOffer] = useState(false);
   const [newOfferDescription, setNewOfferDescription] = useState('');
-  const [newOfferCap, setNewOfferCap] = useState(4);
+  const [newOfferCap, setNewOfferCap] = useState<number | null>(null);
+  const [limitClaims, setLimitClaims] = useState(false);
   const [scanCode, setScanCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get('redeem') || '';
@@ -199,7 +201,20 @@ export default function BusinessPortal() {
 
   const fetchOffers = async () => {
     const { data } = await supabase.from('offers').select('*').eq('business_id', userProfile.id).order('created_at', { ascending: false });
-    if (data) setOffers(data);
+    if (data) {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const offersWithSlots = await Promise.all(
+        data.map(async (offer) => {
+          const { count } = await supabase
+            .from('claims')
+            .select('*', { count: 'exact', head: true })
+            .eq('offer_id', offer.id)
+            .eq('month', currentMonth);
+          return { ...offer, slotsUsed: count || 0 };
+        })
+      );
+      setOffers(offersWithSlots as Offer[]);
+    }
   };
 
   const fetchClaims = async () => {
@@ -221,10 +236,16 @@ export default function BusinessPortal() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { error } = await supabase.from('offers').insert({ business_id: userProfile.id, description: newOfferDescription, monthly_cap: newOfferCap, is_live: true });
+      const { error } = await supabase.from('offers').insert({
+        business_id: userProfile.id,
+        description: newOfferDescription,
+        monthly_cap: limitClaims ? newOfferCap : null,
+        is_live: true,
+      });
       if (error) throw error;
       setNewOfferDescription('');
-      setNewOfferCap(4);
+      setNewOfferCap(null);
+      setLimitClaims(false);
       setShowNewOffer(false);
       fetchOffers();
     } catch (error: any) {
@@ -358,8 +379,11 @@ export default function BusinessPortal() {
                 <div className="bg-gradient-to-br from-[#5b3df5] to-[#8b6cf7] rounded-2xl p-6 text-white text-center shadow-lg">
                   <div className="text-4xl mb-3">🎉</div>
                   <h3 className="text-xl font-bold mb-2">You're All Set!</h3>
-                  <p className="text-white/90 text-sm mb-4">
+                  <p className="text-white/90 text-sm mb-2">
                     Create your first offer to start receiving creators and building your content library.
+                  </p>
+                  <p className="text-white/70 text-xs mb-4">
+                    Start with unlimited claims and adjust later once you know your capacity.
                   </p>
                   <button
                     onClick={() => setShowNewOffer(true)}
@@ -393,15 +417,37 @@ export default function BusinessPortal() {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-[#1a1025] mb-1.5">Monthly Cap</label>
-                    <input
-                      type="number"
-                      value={newOfferCap}
-                      onChange={(e) => setNewOfferCap(parseInt(e.target.value))}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5]"
-                      min={1}
-                      required
-                    />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-sm font-semibold text-[#1a1025]">Limit monthly claims?</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLimitClaims(!limitClaims);
+                          if (!limitClaims) setNewOfferCap(4);
+                          else setNewOfferCap(null);
+                        }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          limitClaims ? 'bg-[#5b3df5]' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                          limitClaims ? 'translate-x-6' : 'translate-x-1'
+                        }`} />
+                      </button>
+                    </div>
+                    {limitClaims ? (
+                      <input
+                        type="number"
+                        value={newOfferCap || ''}
+                        onChange={(e) => setNewOfferCap(parseInt(e.target.value) || 1)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5]"
+                        min={1}
+                        placeholder="Max claims per month"
+                        required
+                      />
+                    ) : (
+                      <p className="text-xs text-gray-400">Creators can claim this offer any time — no slot limit</p>
+                    )}
                   </div>
                   <div className="flex gap-2">
                     <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl text-white font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-sm transition-all">
@@ -415,31 +461,62 @@ export default function BusinessPortal() {
               )}
 
               <div className="grid gap-3 sm:grid-cols-2">
-                {offers.map((offer) => (
-                  <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
-                    <div className="flex items-start justify-between mb-3">
-                      <p className="text-gray-700 text-sm flex-1">{offer.description}</p>
-                      <span className={`ml-2 flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
-                        offer.is_live
-                          ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                          : 'bg-gray-50 text-gray-500 border-gray-100'
-                      }`}>
-                        {offer.is_live ? '● Live' : 'Paused'}
-                      </span>
+                {offers.map((offer) => {
+                  const isUnlimited = offer.monthly_cap === null;
+                  const slotsUsed = offer.slotsUsed || 0;
+                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                  const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
+
+                  return (
+                    <div key={offer.id} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
+                      <div className="flex items-start justify-between mb-3">
+                        <p className="text-gray-700 text-sm flex-1">{offer.description}</p>
+                        <span className={`ml-2 flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                          offer.is_live
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                            : 'bg-gray-50 text-gray-500 border-gray-100'
+                        }`}>
+                          {offer.is_live ? '● Live' : 'Paused'}
+                        </span>
+                      </div>
+                      {isUnlimited ? (
+                        <div className="mb-3">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                            Unlimited
+                          </span>
+                          <span className="text-xs text-gray-400 ml-2">{slotsUsed} claims</span>
+                        </div>
+                      ) : (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs text-gray-400">{slotsUsed}/{offer.monthly_cap} claimed</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              slotsLeft === 0 ? 'bg-rose-500 text-white' : 'bg-amber-500 text-white'
+                            }`}>
+                              {slotsLeft} left
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-300 ${pct >= 76 ? 'bg-rose-500' : pct >= 51 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleToggleOffer(offer.id, offer.is_live)}
+                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-semibold text-sm transition-all ${
+                          offer.is_live
+                            ? 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
+                            : 'bg-emerald-500 text-white hover:bg-emerald-600'
+                        }`}
+                      >
+                        {offer.is_live ? <><ToggleRight className="w-4 h-4" /> Pause</> : <><ToggleLeft className="w-4 h-4" /> Activate</>}
+                      </button>
                     </div>
-                    <p className="text-xs text-gray-400 mb-3">Cap: {offer.monthly_cap}/month</p>
-                    <button
-                      onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                      className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-semibold text-sm transition-all ${
-                        offer.is_live
-                          ? 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-gray-200'
-                          : 'bg-emerald-500 text-white hover:bg-emerald-600'
-                      }`}
-                    >
-                      {offer.is_live ? <><ToggleRight className="w-4 h-4" /> Pause</> : <><ToggleLeft className="w-4 h-4" /> Activate</>}
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

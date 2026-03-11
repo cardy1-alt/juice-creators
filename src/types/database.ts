@@ -47,7 +47,7 @@ export type Database = {
           id: string;
           business_id: string;
           description: string;
-          monthly_cap: number;
+          monthly_cap: number | null;
           is_live: boolean;
           created_at: string;
         };
@@ -55,7 +55,7 @@ export type Database = {
           id?: string;
           business_id: string;
           description: string;
-          monthly_cap?: number;
+          monthly_cap?: number | null;
           is_live?: boolean;
           created_at?: string;
         };
@@ -63,7 +63,7 @@ export type Database = {
           id?: string;
           business_id?: string;
           description?: string;
-          monthly_cap?: number;
+          monthly_cap?: number | null;
           is_live?: boolean;
           created_at?: string;
         };

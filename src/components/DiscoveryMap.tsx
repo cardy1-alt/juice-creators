@@ -18,7 +18,7 @@ interface Business {
     id: string;
     description: string;
     reward_value: string;
-    monthly_cap: number;
+    monthly_cap: number | null;
     slotsUsed?: number;
   }>;
 }
@@ -339,9 +339,10 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                 <h4 className="font-semibold text-sm text-gray-700">Available Offers</h4>
                 {selectedBusiness.offers && selectedBusiness.offers.length > 0 ? (
                   selectedBusiness.offers.map((offer) => {
+                  const isUnlimited = offer.monthly_cap === null;
                   const slotsUsed = offer.slotsUsed || 0;
-                  const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
-                  const full = slotsLeft === 0;
+                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                  const full = !isUnlimited && slotsLeft === 0;
 
                   return (
                     <div key={offer.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
@@ -359,7 +360,9 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                           {full ? 'Full' : 'Claim'}
                         </button>
                       </div>
-                      {!full && (
+                      {isUnlimited ? (
+                        <p className="text-[10px] text-gray-400 mt-2">Unlimited slots</p>
+                      ) : !full && (
                         <p className="text-[10px] text-gray-400 mt-2">
                           {slotsLeft} slot{slotsLeft !== 1 ? 's' : ''} left this month
                         </p>

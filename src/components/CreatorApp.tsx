@@ -45,7 +45,7 @@ interface Offer {
   id: string;
   business_id: string;
   description: string;
-  monthly_cap: number;
+  monthly_cap: number | null;
   slotsUsed?: number;
   businesses: { name: string; category: string };
 }
@@ -450,25 +450,13 @@ export default function CreatorApp() {
                   .filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory)
                   .map((offer) => {
                     const emoji = getCategoryEmoji(offer.businesses.category);
+                    const isUnlimited = offer.monthly_cap === null;
                     const slotsUsed = offer.slotsUsed || 0;
-                    const slotsLeft = Math.max(0, offer.monthly_cap - slotsUsed);
-                    const pct = Math.min((slotsUsed / offer.monthly_cap) * 100, 100);
-                    const full = pct >= 100;
+                    const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                    const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
+                    const full = !isUnlimited && pct >= 100;
                     const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
                     const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
-                    const isExpanded = expandedOffer === offer.id;
-
-                    let badgeColor = 'bg-emerald-500 text-white';
-                    let badgeText = `${slotsLeft} left`;
-
-                    if (full) {
-                      badgeColor = 'bg-rose-500 text-white';
-                      badgeText = 'Full';
-                    } else if (pct >= 50) {
-                      badgeColor = 'bg-amber-500 text-white';
-                    }
-
-                    const categoryColorClass = getCategoryColor(offer.businesses.category).replace('bg-', '');
 
                     // Progress bar color logic
                     let barColor = 'bg-emerald-500';
@@ -488,7 +476,11 @@ export default function CreatorApp() {
 
                         {/* Badge top right */}
                         <div className="absolute top-3 right-3">
-                          {full ? (
+                          {isUnlimited ? (
+                            <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-500 text-white">
+                              Open
+                            </span>
+                          ) : full ? (
                             <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white">
                               Full
                             </span>
@@ -509,56 +501,75 @@ export default function CreatorApp() {
 
                             {/* Content */}
                             <div className="flex-1 min-w-0 pr-12">
-                              {/* Business name */}
                               <h3 className="font-semibold text-[13px] text-[#1a1025]">{offer.businesses.name}</h3>
-
-                              {/* Description */}
                               <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]">
                                 {offer.description}
                               </p>
                             </div>
                           </div>
 
-                          {/* Progress bar section */}
+                          {/* Progress / slots section */}
                           <div className="mt-3 pt-3 border-t border-gray-50">
-                            {/* Progress bar */}
-                            <div className="mb-2">
-                              <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                                <div
-                                  className={`h-full ${barColor} transition-all duration-300`}
-                                  style={{ width: `${pct}%` }}
-                                />
+                            {isUnlimited ? (
+                              <div className="flex items-center justify-between">
+                                <span className="text-[10px] text-gray-400 font-medium">Unlimited slots</span>
+                                {alreadyClaimed ? (
+                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
+                                    Claimed
+                                  </span>
+                                ) : hasActiveBusiness ? (
+                                  <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                    Complete active first
+                                  </div>
+                                ) : (
+                                  <button
+                                    onClick={() => handleClaim(offer)}
+                                    disabled={loading}
+                                    className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+                                  >
+                                    Claim
+                                  </button>
+                                )}
                               </div>
-                            </div>
-
-                            {/* Bottom row: count and button */}
-                            <div className="flex items-center justify-between">
-                              <span className="text-[10px] text-gray-400 font-medium">
-                                {slotsUsed}/{offer.monthly_cap} claimed
-                              </span>
-
-                              {full ? (
-                                <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
-                                  Full
-                                </span>
-                              ) : alreadyClaimed ? (
-                                <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
-                                  Claimed
-                                </span>
-                              ) : hasActiveBusiness ? (
-                                <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
-                                  Complete active first
+                            ) : (
+                              <>
+                                <div className="mb-2">
+                                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                                    <div
+                                      className={`h-full ${barColor} transition-all duration-300`}
+                                      style={{ width: `${pct}%` }}
+                                    />
+                                  </div>
                                 </div>
-                              ) : (
-                                <button
-                                  onClick={() => handleClaim(offer)}
-                                  disabled={loading}
-                                  className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
-                                >
-                                  Claim
-                                </button>
-                              )}
-                            </div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-[10px] text-gray-400 font-medium">
+                                    {slotsUsed}/{offer.monthly_cap} claimed
+                                  </span>
+
+                                  {full ? (
+                                    <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-500 text-white">
+                                      Full
+                                    </span>
+                                  ) : alreadyClaimed ? (
+                                    <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
+                                      Claimed
+                                    </span>
+                                  ) : hasActiveBusiness ? (
+                                    <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                      Complete active first
+                                    </div>
+                                  ) : (
+                                    <button
+                                      onClick={() => handleClaim(offer)}
+                                      disabled={loading}
+                                      className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
+                                    >
+                                      Claim
+                                    </button>
+                                  )}
+                                </div>
+                              </>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -604,7 +615,7 @@ export default function CreatorApp() {
                   id: string;
                   description: string;
                   reward_value: string;
-                  monthly_cap: number;
+                  monthly_cap: number | null;
                   slotsUsed?: number;
                 }>;
               }>)}
