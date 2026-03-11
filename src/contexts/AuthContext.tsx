@@ -109,49 +109,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (error) throw error;
     if (!data.user) throw new Error('Sign up failed');
 
-    try {
-      if (role === 'creator') {
-        const { error: insertError } = await supabase.from('creators').insert({
-          email,
-          name: additionalData.name,
-          instagram_handle: additionalData.instagramHandle,
-          follower_count: additionalData.followerCount || null,
-          code: additionalData.code,
-          approved: false
-        });
-        if (insertError) throw insertError;
+    if (role === 'creator') {
+      const { error: insertError } = await supabase.from('creators').insert({
+        email,
+        name: additionalData.name,
+        instagram_handle: additionalData.instagramHandle,
+        follower_count: additionalData.followerCount || null,
+        code: additionalData.code,
+        approved: false
+      });
+      if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
 
-        await supabase.from('notifications').insert({
-          user_id: '00000000-0000-0000-0000-000000000000',
-          user_type: 'admin',
-          message: `New creator signup: ${additionalData.name} (${email}) — pending approval.`,
-        });
-      } else if (role === 'business') {
-        const { error: insertError } = await supabase.from('businesses').insert({
-          owner_email: email,
-          name: additionalData.name,
-          slug: additionalData.slug,
-          category: additionalData.category || 'Food & Drink',
-          address: additionalData.address,
-          latitude: additionalData.latitude,
-          longitude: additionalData.longitude,
-          bio: additionalData.bio,
-          approved: false
-        });
-        if (insertError) throw insertError;
+      await supabase.from('notifications').insert({
+        user_id: '00000000-0000-0000-0000-000000000000',
+        user_type: 'admin',
+        message: `New creator signup: ${additionalData.name} (${email}) — pending approval.`,
+      });
+    } else if (role === 'business') {
+      const { error: insertError } = await supabase.from('businesses').insert({
+        owner_email: email,
+        name: additionalData.name,
+        slug: additionalData.slug,
+        category: additionalData.category || 'Food & Drink',
+        address: additionalData.address,
+        latitude: additionalData.latitude,
+        longitude: additionalData.longitude,
+        bio: additionalData.bio,
+        approved: false
+      });
+      if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
 
-        await supabase.from('notifications').insert({
-          user_id: '00000000-0000-0000-0000-000000000000',
-          user_type: 'admin',
-          message: `New business signup: ${additionalData.name} (${email}) — pending approval.`,
-        });
-      }
-
-      await fetchUserProfile(data.user);
-    } catch (err) {
-      await supabase.auth.admin.deleteUser(data.user.id);
-      throw err;
+      await supabase.from('notifications').insert({
+        user_id: '00000000-0000-0000-0000-000000000000',
+        user_type: 'admin',
+        message: `New business signup: ${additionalData.name} (${email}) — pending approval.`,
+      });
     }
+
+    await fetchUserProfile(data.user);
   };
 
   const signOut = async () => {
