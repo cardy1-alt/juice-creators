@@ -50,11 +50,25 @@ function createEmojiIcon(emoji: string) {
   });
 }
 
-function MapUpdater({ center }: { center: [number, number] }) {
+function MapUpdater({ center, onMapClick }: { center: [number, number]; onMapClick: () => void }) {
   const map = useMap();
+
   useEffect(() => {
     map.setView(center, map.getZoom());
   }, [center, map]);
+
+  useEffect(() => {
+    const handleClick = () => {
+      onMapClick();
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map, onMapClick]);
+
   return null;
 }
 
@@ -216,7 +230,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          <MapUpdater center={mapCenter} />
+          <MapUpdater center={mapCenter} onMapClick={() => setSelectedBusiness(null)} />
 
           {businessesWithDistance.map((business) => (
             <Marker
@@ -288,8 +302,14 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       </div>
 
       {selectedBusiness && (
-        <div className="fixed inset-0 bg-black/40 flex items-end justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up">
+        <div
+          className="fixed inset-0 bg-black/40 flex items-end justify-center z-50 p-4"
+          onClick={() => setSelectedBusiness(null)}
+        >
+          <div
+            className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-3">
