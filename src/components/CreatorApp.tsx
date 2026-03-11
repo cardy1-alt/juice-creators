@@ -6,7 +6,7 @@ import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import DiscoveryMap from './DiscoveryMap';
-import { getCategoryEmoji, getCategoryColor } from '../lib/categories';
+import { getCategoryEmoji, getCategoryColor, getCategoryIconBg, getCategoryBorderColor } from '../lib/categories';
 import { getInitials, getAvatarGradient } from '../lib/avatar';
 
 function useCountdown(targetDate: string | null) {
@@ -473,62 +473,61 @@ export default function CreatorApp() {
                     return (
                       <div
                         key={offer.id}
-                        className="w-full bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md hover:border-gray-200 transition-all text-left relative overflow-hidden"
+                        className="w-full bg-white rounded-2xl border border-gray-100 shadow-sm shadow-black/[0.03] hover:shadow-md hover:border-gray-200 transition-all text-left relative overflow-hidden"
                       >
                         {/* Category accent bar */}
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
 
-                        {/* Top Section: Business info */}
-                        <div className="flex items-start gap-3 pl-5 pr-4 pt-4 pb-3">
-                          <div className="text-[38px] leading-none flex-shrink-0">
-                            {emoji}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-bold text-lg text-gray-900 leading-tight">{offer.businesses.name}</h3>
-                          </div>
-                        </div>
+                        {/* Main content */}
+                        <div className="p-4">
+                          <div className="flex items-start gap-3">
+                            {/* Icon box */}
+                            <div className={`w-9 h-9 rounded-lg ${getCategoryIconBg(offer.businesses.category)} border ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-base flex-shrink-0`}>
+                              {emoji}
+                            </div>
 
-                        {/* Middle Section: Offer description */}
-                        <div className="pl-5 pr-4 pb-3">
-                          <p className="text-sm text-gray-600 leading-relaxed" style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 3,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            wordBreak: 'break-word'
-                          }}>
-                            {offer.description}
-                          </p>
-                        </div>
+                            {/* Content */}
+                            <div className="flex-1 min-w-0">
+                              {/* Business name */}
+                              <h3 className="font-semibold text-[13px] text-[#1a1025]">{offer.businesses.name}</h3>
 
-                        {/* Bottom Section: Slots and action */}
-                        <div className="border-t border-gray-100 pl-5 pr-4 py-3 flex items-center justify-between">
-                          {full ? (
-                            <span className="text-xs text-red-500 font-medium">Full</span>
-                          ) : slotsUsed > 0 ? (
-                            <span className="text-xs text-gray-500">
-                              {slotsLeft} of {offer.monthly_cap} slots left
-                            </span>
-                          ) : (
-                            <span className="text-xs text-gray-400">Be the first to claim</span>
-                          )}
-                          {full ? (
-                            <span className="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
-                              Full
-                            </span>
-                          ) : alreadyClaimed ? (
-                            <span className="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
-                              Claimed
-                            </span>
-                          ) : (
-                            <button
-                              onClick={() => handleClaim(offer)}
-                              disabled={loading || hasActiveBusiness}
-                              className={`px-4 py-2 rounded-lg text-xs font-semibold transition-all ${getCategoryColor(offer.businesses.category)} text-white hover:opacity-90 disabled:opacity-40`}
-                            >
-                              Claim
-                            </button>
-                          )}
+                              {/* Description */}
+                              <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]">
+                                {offer.description}
+                              </p>
+
+                              {/* Bottom row: slots left and button */}
+                              <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
+                                <span className="text-[11px] text-gray-400">
+                                  {full ? (
+                                    <span className="text-red-500 font-medium">Full</span>
+                                  ) : slotsUsed > 0 ? (
+                                    `${slotsLeft} of ${offer.monthly_cap} slots left`
+                                  ) : (
+                                    `${offer.monthly_cap} slots available`
+                                  )}
+                                </span>
+
+                                {full ? (
+                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-red-100 text-red-600">
+                                    Full
+                                  </span>
+                                ) : alreadyClaimed ? (
+                                  <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-500">
+                                    Claimed
+                                  </span>
+                                ) : (
+                                  <button
+                                    onClick={() => handleClaim(offer)}
+                                    disabled={loading || hasActiveBusiness}
+                                    className={`px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all ${getCategoryColor(offer.businesses.category)} text-white hover:opacity-90 disabled:opacity-40`}
+                                  >
+                                    Claim
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     );
