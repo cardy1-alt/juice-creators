@@ -409,7 +409,7 @@ export default function CreatorApp() {
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                       selectedCategory === 'all'
                         ? 'bg-[#5b3df5] text-white'
-                        : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                        : 'border border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                     }`}
                   >
                     All
@@ -421,7 +421,7 @@ export default function CreatorApp() {
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                         selectedCategory === category
                           ? 'bg-[#5b3df5] text-white'
-                          : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                          : 'border border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
                       }`}
                     >
                       <span>{getCategoryEmoji(category)}</span>
@@ -479,18 +479,17 @@ export default function CreatorApp() {
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
 
                         {/* Top Section: Business info */}
-                        <div className="flex items-start gap-3 p-4 pb-3">
-                          <div className="w-12 h-12 flex items-center justify-center text-3xl flex-shrink-0">
+                        <div className="flex items-start gap-3 pl-5 pr-4 pt-4 pb-3">
+                          <div className="text-[52px] leading-none flex-shrink-0">
                             {emoji}
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-lg text-gray-900 leading-tight">{offer.businesses.name}</h3>
-                            <p className="text-xs text-gray-400 mt-0.5">{offer.businesses.category}</p>
                           </div>
                         </div>
 
                         {/* Middle Section: Offer description */}
-                        <div className="px-4 pb-3">
+                        <div className="pl-5 pr-4 pb-3">
                           <p className="text-sm text-gray-600 leading-relaxed" style={{
                             display: '-webkit-box',
                             WebkitLineClamp: 3,
@@ -503,10 +502,16 @@ export default function CreatorApp() {
                         </div>
 
                         {/* Bottom Section: Slots and action */}
-                        <div className="border-t border-gray-100 px-4 py-3 flex items-center justify-between">
-                          <span className="text-xs text-gray-500">
-                            {slotsLeft} of {offer.monthly_cap} slots left
-                          </span>
+                        <div className="border-t border-gray-100 pl-5 pr-4 py-3 flex items-center justify-between">
+                          {full ? (
+                            <span className="text-xs text-red-500 font-medium">Full</span>
+                          ) : slotsUsed > 0 ? (
+                            <span className="text-xs text-gray-500">
+                              {slotsLeft} of {offer.monthly_cap} slots left
+                            </span>
+                          ) : (
+                            <span className="text-xs text-gray-400">Be the first to claim</span>
+                          )}
                           {full ? (
                             <span className="px-4 py-2 rounded-lg text-xs font-semibold bg-gray-100 text-gray-400">
                               Full
