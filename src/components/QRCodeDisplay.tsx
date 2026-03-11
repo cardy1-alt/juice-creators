@@ -316,7 +316,8 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
   claimIdRef.current = claimId;
 
-  const qrDataUrl = useMemo(() => generateQRDataUrl(currentToken), [currentToken]);
+  const redeemUrl = `${window.location.origin}?redeem=${currentToken}`;
+  const qrDataUrl = useMemo(() => generateQRDataUrl(redeemUrl), [redeemUrl]);
 
   const refreshToken = useCallback(async () => {
     setIsRefreshing(true);

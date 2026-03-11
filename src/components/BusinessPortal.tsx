@@ -57,13 +57,27 @@ export default function BusinessPortal() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [view, setView] = useState<'offers' | 'claims' | 'content' | 'scan' | 'notifications'>('offers');
+  const [view, setView] = useState<'offers' | 'claims' | 'content' | 'scan' | 'notifications'>(
+    new URLSearchParams(window.location.search).get('redeem') ? 'scan' : 'offers'
+  );
   const [showNewOffer, setShowNewOffer] = useState(false);
   const [newOfferDescription, setNewOfferDescription] = useState('');
   const [newOfferCap, setNewOfferCap] = useState(4);
-  const [scanCode, setScanCode] = useState('');
+  const [scanCode, setScanCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('redeem') || '';
+  });
   const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+
+
+  // Clean redeem param from URL after reading it
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('redeem')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     if (userProfile?.approved) {
