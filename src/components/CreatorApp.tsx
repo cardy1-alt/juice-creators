@@ -29,6 +29,7 @@ interface Claim {
   claimed_at: string;
   redeemed_at: string | null;
   reel_url: string | null;
+  reel_due_at: string | null;
   offer_id: string;
   business_id: string;
   offers: { description: string };
@@ -47,6 +48,7 @@ function StatusPill({ status }: { status: string }) {
     active: 'bg-sky-50 text-sky-600 border border-sky-100',
     redeemed: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
     expired: 'bg-rose-50 text-rose-500 border border-rose-100',
+    overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
   };
   return (
     <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-gray-50 text-gray-500 border border-gray-100'}`}>
@@ -421,13 +423,21 @@ export default function CreatorApp() {
                       )}
 
                       <div className="mt-5 grid grid-cols-2 gap-2">
-                        <div className="p-3 rounded-xl bg-sky-50/60 border border-sky-100/50 text-center">
-                          <p className="text-[11px] text-sky-500 font-medium">Visit within</p>
-                          <p className="text-sm font-bold text-[#1a1025]">7 days</p>
-                        </div>
-                        <div className="p-3 rounded-xl bg-amber-50/60 border border-amber-100/50 text-center">
-                          <p className="text-[11px] text-amber-500 font-medium">Post within</p>
-                          <p className="text-sm font-bold text-[#1a1025]">48 hours</p>
+                        {selectedClaim.status === 'active' && (
+                          <div className="p-3 rounded-xl bg-sky-50/60 border border-sky-100/50 text-center">
+                            <p className="text-[11px] text-sky-500 font-medium">Show QR at</p>
+                            <p className="text-sm font-bold text-[#1a1025]">the venue</p>
+                          </div>
+                        )}
+                        <div className={`p-3 rounded-xl text-center ${selectedClaim.status === 'active' ? 'bg-amber-50/60 border border-amber-100/50' : 'bg-amber-50/60 border border-amber-100/50 col-span-2'}`}>
+                          <p className="text-[11px] text-amber-500 font-medium">
+                            {selectedClaim.reel_due_at ? 'Reel due by' : 'Post within'}
+                          </p>
+                          <p className="text-sm font-bold text-[#1a1025]">
+                            {selectedClaim.reel_due_at
+                              ? new Date(selectedClaim.reel_due_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                              : '48 hours after redeem'}
+                          </p>
                         </div>
                       </div>
 

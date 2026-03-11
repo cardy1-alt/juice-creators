@@ -94,6 +94,7 @@ export type Database = {
           claimed_at: string;
           redeemed_at: string | null;
           reel_url: string | null;
+          reel_due_at: string | null;
           month: string;
         };
         Insert: {
@@ -107,6 +108,7 @@ export type Database = {
           claimed_at?: string;
           redeemed_at?: string | null;
           reel_url?: string | null;
+          reel_due_at?: string | null;
           month: string;
         };
         Update: {
@@ -120,6 +122,7 @@ export type Database = {
           claimed_at?: string;
           redeemed_at?: string | null;
           reel_url?: string | null;
+          reel_due_at?: string | null;
           month?: string;
         };
       };

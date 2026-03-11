@@ -255,7 +255,9 @@ export default function BusinessPortal() {
         return;
       }
       if (new Date(claim.qr_expires_at) < new Date()) { setScanResult({ type: 'error', message: 'QR code expired. Ask the creator to refresh it.' }); setScanCode(''); return; }
-      const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: new Date().toISOString() }).eq('id', claim.id);
+      const redeemedAt = new Date();
+      const reelDueAt = new Date(redeemedAt.getTime() + 48 * 60 * 60 * 1000);
+      const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: redeemedAt.toISOString(), reel_due_at: reelDueAt.toISOString() }).eq('id', claim.id);
       if (error) throw error;
       // Notify the creator their pass was redeemed
       await supabase.from('notifications').insert({
