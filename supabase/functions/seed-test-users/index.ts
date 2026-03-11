@@ -22,6 +22,7 @@ const testUsers: TestUser[] = [
       name: 'Sophie Carter',
       instagram_handle: '@sophiecreates',
       code: 'SOPHIE01',
+      follower_count: '5k–10k',
       approved: true
     }
   },
@@ -33,6 +34,7 @@ const testUsers: TestUser[] = [
       name: 'Jamie Mills',
       instagram_handle: '@jamiemills_',
       code: 'JAMIE01',
+      follower_count: '1k–5k',
       approved: true
     }
   },
@@ -44,6 +46,7 @@ const testUsers: TestUser[] = [
       name: 'Lucy Thomas',
       instagram_handle: '@lucythomas',
       code: 'LUCY01',
+      follower_count: '10k+',
       approved: true
     }
   },
@@ -54,6 +57,11 @@ const testUsers: TestUser[] = [
     data: {
       name: 'Midgar Coffee',
       slug: 'midgar-coffee',
+      category: 'Food & Drink',
+      address: '12 High Street, Bury St Edmunds, IP33 1TZ',
+      latitude: 52.2462,
+      longitude: 0.7142,
+      bio: 'Specialty coffee & fresh pastries in the heart of town',
       approved: true
     }
   },
@@ -64,6 +72,11 @@ const testUsers: TestUser[] = [
     data: {
       name: 'Loyal Wolf Barbershop',
       slug: 'loyal-wolf',
+      category: 'Beauty & Wellness',
+      address: '8 Abbeygate Street, Bury St Edmunds, IP33 1UN',
+      latitude: 52.2458,
+      longitude: 0.7138,
+      bio: 'Premium cuts & grooming for the modern gentleman',
       approved: true
     }
   },
@@ -74,6 +87,11 @@ const testUsers: TestUser[] = [
     data: {
       name: 'Yes You Can Fitness',
       slug: 'yes-you-can',
+      category: 'Fitness',
+      address: '45 Out Risbygate, Bury St Edmunds, IP33 3RN',
+      latitude: 52.2470,
+      longitude: 0.7155,
+      bio: 'Transform your body with expert personal training',
       approved: true
     }
   },
@@ -135,6 +153,7 @@ Deno.serve(async (req: Request) => {
             name: user.data.name,
             instagram_handle: user.data.instagram_handle,
             code: user.data.code,
+            follower_count: user.data.follower_count || null,
             approved: user.data.approved
           });
         } else if (user.type === 'business') {
@@ -143,6 +162,11 @@ Deno.serve(async (req: Request) => {
             name: user.data.name,
             slug: user.data.slug,
             owner_email: user.email,
+            category: user.data.category || 'Food & Drink',
+            address: user.data.address || null,
+            latitude: user.data.latitude || null,
+            longitude: user.data.longitude || null,
+            bio: user.data.bio || null,
             approved: user.data.approved
           });
 
@@ -153,20 +177,53 @@ Deno.serve(async (req: Request) => {
             .single();
 
           if (business) {
-            const offers = [
-              {
-                business_id: business.id,
-                description: user.data.name === 'Midgar Coffee'
-                  ? 'Free Coffee & Pastry - Enjoy a complimentary coffee and pastry of your choice'
-                  : user.data.name === 'Loyal Wolf Barbershop'
-                  ? 'Complimentary Haircut - Get a free premium haircut or beard trim'
-                  : 'Free Week Pass - 7-day unlimited gym access plus one personal training session',
-                monthly_cap: 4,
-                is_live: true
-              }
-            ];
+            // Seed offers — mix of unlimited (null cap) and capped
+            let offers: Array<{ business_id: string; description: string; monthly_cap: number | null; is_live: boolean }> = [];
 
-            await supabaseAdmin.from('offers').insert(offers);
+            if (user.data.name === 'Midgar Coffee') {
+              offers = [
+                {
+                  business_id: business.id,
+                  description: 'Free Coffee & Pastry — Enjoy any coffee and pastry of your choice',
+                  monthly_cap: null, // unlimited
+                  is_live: true
+                },
+                {
+                  business_id: business.id,
+                  description: 'Brunch for Two — Full brunch spread with fresh juice',
+                  monthly_cap: 3,
+                  is_live: true
+                }
+              ];
+            } else if (user.data.name === 'Loyal Wolf Barbershop') {
+              offers = [
+                {
+                  business_id: business.id,
+                  description: 'Complimentary Haircut — Premium cut or beard trim',
+                  monthly_cap: 4,
+                  is_live: true
+                },
+                {
+                  business_id: business.id,
+                  description: 'Full Grooming Package — Cut, beard, and hot towel',
+                  monthly_cap: null, // unlimited
+                  is_live: true
+                }
+              ];
+            } else if (user.data.name === 'Yes You Can Fitness') {
+              offers = [
+                {
+                  business_id: business.id,
+                  description: 'Free Week Pass — 7-day unlimited gym access plus one PT session',
+                  monthly_cap: null, // unlimited
+                  is_live: true
+                }
+              ];
+            }
+
+            if (offers.length > 0) {
+              await supabaseAdmin.from('offers').insert(offers);
+            }
           }
         }
 
