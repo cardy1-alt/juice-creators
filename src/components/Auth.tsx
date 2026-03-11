@@ -91,6 +91,7 @@ export default function Auth() {
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
+  const [followerCount, setFollowerCount] = useState('Under 1k');
   const [category, setCategory] = useState(CATEGORY_LIST[0]);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -122,7 +123,7 @@ export default function Auth() {
         await signIn(email, password);
       } else {
         const additionalData = role === 'creator'
-          ? { name, instagramHandle, code: generateCreatorCode(name) }
+          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name) }
           : { name, slug: generateSlug(name), category, address: address || null, latitude, longitude, bio: bio || null };
         await signUp(email, password, role, additionalData);
       }
@@ -220,19 +221,37 @@ export default function Auth() {
                   />
                 </div>
                 {role === 'creator' && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                      Instagram Handle
-                    </label>
-                    <input
-                      type="text"
-                      value={instagramHandle}
-                      onChange={(e) => setInstagramHandle(e.target.value)}
-                      placeholder="@yourusername"
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
-                      required
-                    />
-                  </div>
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+                        Instagram Handle
+                      </label>
+                      <input
+                        type="text"
+                        value={instagramHandle}
+                        onChange={(e) => setInstagramHandle(e.target.value)}
+                        placeholder="@yourusername"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+                        required
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+                        Follower Count
+                      </label>
+                      <select
+                        value={followerCount}
+                        onChange={(e) => setFollowerCount(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm bg-white"
+                        required
+                      >
+                        <option value="Under 1k">Under 1k</option>
+                        <option value="1k–5k">1k–5k</option>
+                        <option value="5k–10k">5k–10k</option>
+                        <option value="10k+">10k+</option>
+                      </select>
+                    </div>
+                  </>
                 )}
                 {role === 'business' && (
                   <>

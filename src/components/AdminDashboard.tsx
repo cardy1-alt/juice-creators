@@ -26,7 +26,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-gray-50 text-gray-500 border border-gray-100'}`}>{status}</span>;
 }
 
-interface Creator { id: string; name: string; instagram_handle: string; email: string; code: string; approved: boolean; created_at: string; }
+interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
 interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
 interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
@@ -154,6 +154,7 @@ export default function AdminDashboard() {
                       <tr className="bg-gray-50/80 border-b border-gray-100">
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Name</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Handle</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Followers</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Code</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Email</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-gray-500 uppercase tracking-wider">Status</th>
@@ -165,6 +166,13 @@ export default function AdminDashboard() {
                         <tr key={creator.id} className="hover:bg-gray-50/50 transition-colors">
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#1a1025]">{creator.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-500">{creator.instagram_handle}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            {creator.follower_count ? (
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-violet-50 text-violet-600 border border-violet-100">{creator.follower_count}</span>
+                            ) : (
+                              <span className="text-xs text-gray-300">—</span>
+                            )}
+                          </td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#1a1025] text-white">{creator.code}</span></td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-gray-500">{creator.email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>

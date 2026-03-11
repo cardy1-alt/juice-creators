@@ -106,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         email,
         name: additionalData.name,
         instagram_handle: additionalData.instagramHandle,
+        follower_count: additionalData.followerCount || null,
         code: additionalData.code,
         approved: false
       });

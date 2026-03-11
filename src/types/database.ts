@@ -73,6 +73,7 @@ export type Database = {
           id: string;
           name: string;
           instagram_handle: string;
+          follower_count: string | null;
           code: string;
           email: string;
           approved: boolean;
@@ -82,6 +83,7 @@ export type Database = {
           id?: string;
           name: string;
           instagram_handle: string;
+          follower_count?: string | null;
           code: string;
           email: string;
           approved?: boolean;
@@ -91,6 +93,7 @@ export type Database = {
           id?: string;
           name?: string;
           instagram_handle?: string;
+          follower_count?: string | null;
           code?: string;
           email?: string;
           approved?: boolean;
