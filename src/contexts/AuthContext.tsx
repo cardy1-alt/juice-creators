@@ -13,6 +13,8 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
+const ADMIN_EMAIL = 'admin@juicecreators.com';
+
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -21,16 +23,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchUserProfile = async (user: User) => {
-    const email = user.email;
+  const fetchUserProfile = async (authUser: User) => {
+    const email = authUser.email;
     if (!email) return;
 
-    if (email === 'admin@juicecreators.com') {
+    if (email === ADMIN_EMAIL) {
       setUserRole('admin');
       setUserProfile({ email, name: 'Admin' });
       return;
     }
 
+    // Check creators table
     const { data: creator } = await supabase
       .from('creators')
       .select('*')
@@ -43,6 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    // Check businesses table
     const { data: business } = await supabase
       .from('businesses')
       .select('*')
@@ -54,6 +58,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUserProfile(business);
       return;
     }
+
+    // No profile found — clear role so fallback screen shows
+    setUserRole(null);
+    setUserProfile(null);
   };
 
   useEffect(() => {
@@ -94,21 +102,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!data.user) throw new Error('Sign up failed');
 
     if (role === 'creator') {
-      await supabase.from('creators').insert({
+      const { error: insertError } = await supabase.from('creators').insert({
         email,
         name: additionalData.name,
         instagram_handle: additionalData.instagramHandle,
         code: additionalData.code,
         approved: false
       });
+      if (insertError) throw insertError;
     } else if (role === 'business') {
-      await supabase.from('businesses').insert({
+      const { error: insertError } = await supabase.from('businesses').insert({
         owner_email: email,
         name: additionalData.name,
         slug: additionalData.slug,
         approved: false
       });
+      if (insertError) throw insertError;
     }
+
+    // Re-fetch profile after insert so user doesn't land on "Account Not Found"
+    await fetchUserProfile(data.user);
   };
 
   const signOut = async () => {
