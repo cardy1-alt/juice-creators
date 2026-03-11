@@ -105,6 +105,9 @@ export default function CreatorApp() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
   const [viewMode, setViewMode] = useState<'card' | 'compact'>('card');
+  const [releaseModalOpen, setReleaseModalOpen] = useState(false);
+  const [releaseError, setReleaseError] = useState<string | null>(null);
+  const [releasingClaim, setReleasingClaim] = useState(false);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -268,6 +271,43 @@ export default function CreatorApp() {
     }
   };
 
+  const handleReleaseOffer = async () => {
+    if (!selectedClaim) return;
+    setReleasingClaim(true);
+    setReleaseError(null);
+    try {
+      const { data, error } = await supabase.rpc('unclaim_offer', {
+        p_claim_id: selectedClaim.id,
+        p_creator_id: userProfile.id,
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        setReleaseError(data.error);
+        return;
+      }
+
+      setReleaseModalOpen(false);
+      fetchOffers();
+      fetchClaims();
+    } catch (error: any) {
+      setReleaseError(error.message || 'Failed to release offer');
+    } finally {
+      setReleasingClaim(false);
+    }
+  };
+
+  const canReleaseOffer = (claim: Claim) => {
+    if (claim.status !== 'active') return { allowed: false, reason: null };
+    const claimedTime = new Date(claim.claimed_at).getTime();
+    const now = new Date().getTime();
+    const hoursSinceClaim = (now - claimedTime) / (1000 * 60 * 60);
+    if (hoursSinceClaim > 24) {
+      return { allowed: false, reason: 'Release window expired' };
+    }
+    return { allowed: true, reason: null };
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   if (!userProfile?.approved) {
@@ -340,6 +380,40 @@ export default function CreatorApp() {
           reporterRole="creator"
           onClose={() => setDisputeClaimId(null)}
         />
+      )}
+      {releaseModalOpen && selectedClaim && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-[#1a1025] mb-2">Release this offer?</h3>
+            <p className="text-sm text-gray-600 mb-4">
+              The slot goes back to the pool. You won't be able to claim this offer again.
+            </p>
+            {releaseError && (
+              <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200">
+                <p className="text-sm text-rose-700">{releaseError}</p>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setReleaseModalOpen(false);
+                  setReleaseError(null);
+                }}
+                disabled={releasingClaim}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-40"
+              >
+                Keep it
+              </button>
+              <button
+                onClick={handleReleaseOffer}
+                disabled={releasingClaim}
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 transition-colors disabled:opacity-40"
+              >
+                {releasingClaim ? 'Releasing...' : 'Release'}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
       <div className="max-w-md mx-auto">
         {/* Header */}
@@ -668,7 +742,11 @@ export default function CreatorApp() {
 
                           {/* Availability section */}
                           <div className="space-y-3">
-                            {!isUnlimited && (
+                            {isUnlimited ? (
+                              <div className="pb-1">
+                                <span className="text-xs font-medium text-gray-400">Unlimited slots</span>
+                              </div>
+                            ) : (
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
                                   <span className="text-xs font-medium text-gray-500">Availability</span>
@@ -940,12 +1018,34 @@ export default function CreatorApp() {
                           </div>
                         )}
 
-                        <button
-                          onClick={() => setDisputeClaimId(selectedClaim.id)}
-                          className="mt-3 w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-amber-600 transition-colors"
-                        >
-                          <Flag className="w-3 h-3" /> Report an issue
-                        </button>
+                        <div className="mt-3 flex flex-col items-center gap-1">
+                          <button
+                            onClick={() => setDisputeClaimId(selectedClaim.id)}
+                            className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-amber-600 transition-colors"
+                          >
+                            <Flag className="w-3 h-3" /> Report an issue
+                          </button>
+                          {(() => {
+                            const releaseStatus = canReleaseOffer(selectedClaim);
+                            if (releaseStatus.allowed) {
+                              return (
+                                <button
+                                  onClick={() => setReleaseModalOpen(true)}
+                                  className="text-xs text-gray-400 hover:text-rose-500 transition-colors"
+                                >
+                                  Release offer
+                                </button>
+                              );
+                            } else if (releaseStatus.reason) {
+                              return (
+                                <span className="text-xs text-gray-300">
+                                  {releaseStatus.reason}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
                       </div>
                         );
                       })()}
