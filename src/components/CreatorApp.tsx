@@ -516,10 +516,14 @@ export default function CreatorApp() {
                                   <span className="px-3 py-1.5 rounded-lg text-[11px] font-semibold bg-gray-100 text-gray-400">
                                     Claimed
                                   </span>
+                                ) : hasActiveBusiness ? (
+                                  <div className="px-3 py-1.5 rounded-lg text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200">
+                                    Complete active first
+                                  </div>
                                 ) : (
                                   <button
                                     onClick={() => handleClaim(offer)}
-                                    disabled={loading || hasActiveBusiness}
+                                    disabled={loading}
                                     className="px-3 py-1.5 rounded-lg text-[11px] font-semibold transition-all bg-green-500 text-white hover:bg-green-600 disabled:opacity-40"
                                   >
                                     Claim
