@@ -124,6 +124,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         name: additionalData.name,
         slug: additionalData.slug,
         category: additionalData.category || 'Food & Drink',
+        address: additionalData.address || null,
+        latitude: additionalData.latitude || null,
+        longitude: additionalData.longitude || null,
+        bio: additionalData.bio || null,
         approved: false
       });
       if (insertError) throw insertError;

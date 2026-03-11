@@ -1,8 +1,88 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import type { UserRole } from '../types/database';
-import { Sparkles, Building2, Eye, EyeOff } from 'lucide-react';
+import { Sparkles, Building2, Eye, EyeOff, MapPin } from 'lucide-react';
 import { BUSINESS_CATEGORIES, CATEGORY_LIST } from '../lib/categories';
+
+// TODO: Set VITE_GOOGLE_MAPS_API_KEY in your environment variables with a valid Google Maps API key
+// that has the Places API enabled. The script loads from:
+// https://maps.googleapis.com/maps/api/js?key=YOUR_KEY&libraries=places
+declare global {
+  interface Window {
+    google?: any;
+    _gmapsLoaded?: boolean;
+    _gmapsCallbacks?: (() => void)[];
+  }
+}
+
+function loadGoogleMaps(): Promise<void> {
+  if (window._gmapsLoaded && window.google?.maps?.places) return Promise.resolve();
+  return new Promise((resolve) => {
+    if (!window._gmapsCallbacks) {
+      window._gmapsCallbacks = [];
+      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
+      if (!apiKey) {
+        // No API key — resolve silently, component will show a plain text input
+        resolve();
+        return;
+      }
+      const script = document.createElement('script');
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.async = true;
+      script.onload = () => {
+        window._gmapsLoaded = true;
+        window._gmapsCallbacks?.forEach(cb => cb());
+        window._gmapsCallbacks = [];
+      };
+      document.head.appendChild(script);
+    }
+    window._gmapsCallbacks!.push(resolve);
+  });
+}
+
+function AddressAutocomplete({ value, onChange }: {
+  value: string;
+  onChange: (address: string, lat: number | null, lng: number | null) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [mapsReady, setMapsReady] = useState(false);
+
+  useEffect(() => {
+    loadGoogleMaps().then(() => {
+      if (window.google?.maps?.places) setMapsReady(true);
+    });
+  }, []);
+
+  useEffect(() => {
+    if (!mapsReady || !inputRef.current) return;
+    const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
+      types: ['establishment', 'geocode'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      const lat = place.geometry?.location?.lat() ?? null;
+      const lng = place.geometry?.location?.lng() ?? null;
+      onChange(place.formatted_address || place.name || '', lat, lng);
+    });
+  }, [mapsReady]);
+
+  return (
+    <div>
+      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+        <MapPin className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />
+        Address <span className="text-gray-400 font-normal">(optional)</span>
+      </label>
+      <input
+        ref={inputRef}
+        type="text"
+        value={value}
+        onChange={(e) => onChange(e.target.value, null, null)}
+        placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
+        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm"
+      />
+    </div>
+  );
+}
 
 export default function Auth() {
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
@@ -12,6 +92,10 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [category, setCategory] = useState(CATEGORY_LIST[0]);
+  const [address, setAddress] = useState('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
+  const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +123,7 @@ export default function Auth() {
       } else {
         const additionalData = role === 'creator'
           ? { name, instagramHandle, code: generateCreatorCode(name) }
-          : { name, slug: generateSlug(name), category };
+          : { name, slug: generateSlug(name), category, address: address || null, latitude, longitude, bio: bio || null };
         await signUp(email, password, role, additionalData);
       }
     } catch (err: any) {
@@ -151,28 +235,48 @@ export default function Auth() {
                   </div>
                 )}
                 {role === 'business' && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
-                      Category
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {CATEGORY_LIST.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => setCategory(cat)}
-                          className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-left text-sm transition-all ${
-                            category === cat
-                              ? 'border-[#5b3df5] bg-[#f8f5ff] font-semibold text-[#5b3df5]'
-                              : 'border-gray-200 text-gray-600 hover:border-gray-300'
-                          }`}
-                        >
-                          <span>{BUSINESS_CATEGORIES[cat]}</span>
-                          <span className="truncate">{cat}</span>
-                        </button>
-                      ))}
+                  <>
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+                        Category
+                      </label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {CATEGORY_LIST.map((cat) => (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => setCategory(cat)}
+                            className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border-2 text-left text-sm transition-all ${
+                              category === cat
+                                ? 'border-[#5b3df5] bg-[#f8f5ff] font-semibold text-[#5b3df5]'
+                                : 'border-gray-200 text-gray-600 hover:border-gray-300'
+                            }`}
+                          >
+                            <span>{BUSINESS_CATEGORIES[cat]}</span>
+                            <span className="truncate">{cat}</span>
+                          </button>
+                        ))}
+                      </div>
                     </div>
-                  </div>
+                    <AddressAutocomplete
+                      value={address}
+                      onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
+                    />
+                    <div>
+                      <label className="block text-sm font-medium text-[#1a1025] mb-1.5">
+                        Bio <span className="text-gray-400 font-normal">(optional)</span>
+                      </label>
+                      <textarea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value.slice(0, 150))}
+                        placeholder="Tell creators a bit about your business"
+                        maxLength={150}
+                        rows={2}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm resize-none"
+                      />
+                      <p className="text-xs text-gray-400 mt-1 text-right">{bio.length}/150</p>
+                    </div>
+                  </>
                 )}
               </>
             )}

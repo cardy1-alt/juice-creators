@@ -8,6 +8,10 @@ export type Database = {
           slug: string;
           owner_email: string;
           category: string;
+          latitude: number | null;
+          longitude: number | null;
+          address: string | null;
+          bio: string | null;
           approved: boolean;
           created_at: string;
         };
@@ -17,6 +21,10 @@ export type Database = {
           slug: string;
           owner_email: string;
           category: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          address?: string | null;
+          bio?: string | null;
           approved?: boolean;
           created_at?: string;
         };
@@ -26,6 +34,10 @@ export type Database = {
           slug?: string;
           owner_email?: string;
           category?: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          address?: string | null;
+          bio?: string | null;
           approved?: boolean;
           created_at?: string;
         };
