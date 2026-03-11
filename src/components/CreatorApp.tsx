@@ -445,7 +445,7 @@ export default function CreatorApp() {
                 </div>
               )}
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-3">
                 {offers
                   .filter(o => selectedCategory === 'all' || o.businesses.category === selectedCategory)
                   .map((offer) => {
@@ -472,8 +472,8 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(isExpanded ? null : offer.id)}
-                        className={`bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left relative overflow-hidden ${
-                          isExpanded ? 'col-span-2 border-[#5b3df5]' : ''
+                        className={`w-full bg-white rounded-xl p-3 border border-gray-100 shadow-sm hover:shadow-md hover:border-[#5b3df5]/30 transition-all text-left relative overflow-hidden ${
+                          isExpanded ? 'border-[#5b3df5]' : ''
                         }`}
                       >
                         <div className={`absolute left-0 top-0 bottom-0 w-1 ${getCategoryColor(offer.businesses.category)}`} />
@@ -659,31 +659,36 @@ export default function CreatorApp() {
 
                         {/* Status Rail */}
                         <div className="mb-5 bg-gray-50/80 rounded-xl p-4">
-                          <div className="relative flex items-start justify-between">
-                            {stages.map((stage, idx) => (
-                              <div key={stage.key} className="flex flex-col items-center" style={{ flex: idx === stages.length - 1 ? '0 0 auto' : '1' }}>
-                                <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                                  stage.active
-                                    ? 'bg-[#5b3df5] text-white'
-                                    : stages.findIndex(s => s.active) > idx
-                                    ? 'bg-emerald-400 text-white'
-                                    : 'bg-gray-200 text-gray-400'
-                                }`}>
-                                  {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
+                          <div className="relative">
+                            <div className="grid grid-cols-4">
+                              {stages.map((stage, idx) => (
+                                <div key={stage.key} className="flex flex-col items-center">
+                                  <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
+                                    stage.active
+                                      ? 'bg-[#5b3df5] text-white'
+                                      : stages.findIndex(s => s.active) > idx
+                                      ? 'bg-emerald-400 text-white'
+                                      : 'bg-gray-200 text-gray-400'
+                                  }`}>
+                                    {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
+                                  </div>
+                                  <p className={`text-[9px] font-semibold mt-1.5 text-center px-1 ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
+                                    {stage.label}
+                                  </p>
                                 </div>
-                                {idx < stages.length - 1 && (
-                                  <div className={`absolute top-[13px] h-0.5 ${
+                              ))}
+                            </div>
+                            {/* Connecting lines */}
+                            <div className="absolute top-[13px] left-0 right-0 flex items-center px-[12.5%]">
+                              {[0, 1, 2].map((idx) => (
+                                <div
+                                  key={idx}
+                                  className={`h-0.5 flex-1 ${
                                     stages.findIndex(s => s.active) > idx ? 'bg-emerald-400' : 'bg-gray-200'
-                                  }`} style={{
-                                    left: `calc(${(100 / (stages.length - 1)) * idx}% + 14px)`,
-                                    right: `calc(${100 - (100 / (stages.length - 1)) * (idx + 1)}% + 14px)`
-                                  }} />
-                                )}
-                                <p className={`text-[9px] font-semibold mt-1.5 text-center whitespace-nowrap ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
-                                  {stage.label}
-                                </p>
-                              </div>
-                            ))}
+                                  }`}
+                                />
+                              ))}
+                            </div>
                           </div>
                         </div>
 

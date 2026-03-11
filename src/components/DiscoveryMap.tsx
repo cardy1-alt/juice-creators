@@ -125,7 +125,24 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
     return R * c;
   };
 
-  const businessesWithCoords = businesses.filter(b => b.latitude && b.longitude);
+  // TODO: Remove these fallback coordinates once businesses have real coordinates from address autocomplete
+  const FALLBACK_COORDS: Record<string, { lat: number; lng: number }> = {
+    'Midgar Coffee': { lat: 52.2462, lng: 0.7142 },
+    'Loyal Wolf Barbershop': { lat: 52.2458, lng: 0.7138 },
+    'Yes You Can Fitness': { lat: 52.2470, lng: 0.7155 },
+  };
+
+  const businessesWithCoords = businesses.map(b => {
+    if (b.latitude && b.longitude) {
+      return b;
+    }
+    const fallback = FALLBACK_COORDS[b.name];
+    if (fallback) {
+      return { ...b, latitude: fallback.lat, longitude: fallback.lng };
+    }
+    return b;
+  }).filter(b => b.latitude && b.longitude);
+
   const businessesWithDistance = businessesWithCoords
     .map(b => ({
       ...b,
