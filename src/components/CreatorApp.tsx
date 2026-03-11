@@ -237,6 +237,13 @@ export default function CreatorApp() {
     }
   };
 
+  const handleClaimOffer = async (offerId: string) => {
+    const offer = offers.find(o => o.id === offerId);
+    if (offer) {
+      await handleClaim(offer);
+    }
+  };
+
   const handleSubmitReel = async () => {
     if (!reelUrl || !selectedClaim) return;
     setLoading(true);
