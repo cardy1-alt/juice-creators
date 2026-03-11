@@ -227,15 +227,21 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                 click: () => setSelectedBusiness(business),
               }}
             >
-              <Popup>
-                <div className="text-sm">
-                  <h4 className="font-bold text-gray-900">{business.name}</h4>
-                  <p className="text-xs text-gray-500 mt-0.5">{business.category}</p>
+              <Popup closeButton={true}>
+                <div className="text-sm min-w-[180px]">
+                  <h4 className="font-bold text-gray-900 mb-1">{business.name}</h4>
+                  <p className="text-xs text-gray-500 mb-2">{business.category}</p>
                   {business.offers.length > 0 && (
-                    <p className="text-xs text-[#5b3df5] font-semibold mt-1">
+                    <p className="text-xs text-[#5b3df5] font-semibold mb-2">
                       {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
                     </p>
                   )}
+                  <button
+                    onClick={() => setSelectedBusiness(business)}
+                    className="w-full mt-2 px-3 py-1.5 bg-[#5b3df5] text-white text-xs font-semibold rounded-lg hover:bg-[#4a2fcc] transition-colors"
+                  >
+                    View Offers
+                  </button>
                 </div>
               </Popup>
             </Marker>
