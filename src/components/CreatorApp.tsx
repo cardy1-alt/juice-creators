@@ -28,6 +28,7 @@ interface Claim {
     description: string;
   };
   businesses: {
+    id: string;
     name: string;
   };
 }
@@ -97,12 +98,13 @@ export default function CreatorApp() {
   const fetchClaims = async () => {
     const { data } = await supabase
       .from('claims')
-      .select('*, offers(description), businesses(name)')
+      .select('*, offers(description), businesses(name, id)')
       .eq('creator_id', userProfile.id)
       .order('claimed_at', { ascending: false });
 
     if (data) {
       setClaims(data as Claim[]);
+      // Keep activeClaim for backward compatibility, but we'll show all active claims in the view
       const active = data.find((c: any) => c.status === 'active');
       if (active) {
         setActiveClaim(active as Claim);
@@ -113,18 +115,22 @@ export default function CreatorApp() {
   };
 
   const handleClaim = async (offer: Offer) => {
-    if (activeClaim) {
-      alert('You already have an active claim. Please redeem or wait for it to expire.');
+    // Count active claims for this specific business
+    const activeClaimsForBusiness = claims.filter(
+      c => c.status === 'active' && c.businesses.id === offer.business_id
+    );
+
+    if (activeClaimsForBusiness.length >= 2) {
+      alert('You already have 2 active claims with this business. Please redeem or wait for them to expire.');
       return;
     }
 
-    // Check for duplicate claim on same offer this month
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const existingClaim = claims.find(
-      c => c.offer_id === offer.id && c.status !== 'expired'
+    // Check for duplicate claim on same offer
+    const existingActiveClaim = claims.find(
+      c => c.offer_id === offer.id && c.status === 'active'
     );
-    if (existingClaim) {
-      alert('You already have a claim on this offer.');
+    if (existingActiveClaim) {
+      alert('You already have an active claim on this offer.');
       return;
     }
 
@@ -208,11 +214,13 @@ export default function CreatorApp() {
     );
   }
 
+  const activeClaimCount = claims.filter(c => c.status === 'active').length;
+
   const tabs = [
     { key: 'offers' as const, label: 'Offers', icon: Gift },
-    { key: 'active' as const, label: 'Active', icon: Sparkles },
+    { key: 'active' as const, label: 'Active', icon: Sparkles, badge: activeClaimCount > 0 ? activeClaimCount : undefined },
     { key: 'history' as const, label: 'History', icon: History },
-    { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount },
+    { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount > 0 ? unreadCount : undefined },
   ];
 
   return (
@@ -310,75 +318,93 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* Active Pass */}
+          {/* Active Passes */}
           {view === 'active' && (
             <>
-              {activeClaim ? (
-                <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-                  <div className="flex items-center justify-between mb-4">
-                    <div>
-                      <h3 className="font-bold text-[#1a1025]">{activeClaim.businesses.name}</h3>
-                      <p className="text-gray-500 text-sm mt-0.5">{activeClaim.offers.description}</p>
-                    </div>
-                    <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold">
-                      Active
-                    </span>
-                  </div>
-
-                  <QRCodeDisplay
-                    token={activeClaim.qr_token}
-                    claimId={activeClaim.id}
-                    creatorCode={userProfile.code}
-                  />
-
-                  <div className="mt-5 grid grid-cols-2 gap-2">
-                    <div className="p-3 rounded-xl bg-[#f8f5ff] text-center">
-                      <p className="text-[11px] text-gray-500">Visit within</p>
-                      <p className="text-sm font-bold text-[#1a1025]">7 days</p>
-                    </div>
-                    <div className="p-3 rounded-xl bg-[#f8f5ff] text-center">
-                      <p className="text-[11px] text-gray-500">Post within</p>
-                      <p className="text-sm font-bold text-[#1a1025]">48 hours</p>
-                    </div>
-                  </div>
-
-                  {activeClaim.redeemed_at && !activeClaim.reel_url && (
-                    <div className="mt-5 p-4 rounded-xl bg-[#f8f5ff] border border-[#e8e0f5]">
-                      <label className="block text-sm font-semibold text-[#1a1025] mb-2">
-                        Submit Your Reel
-                      </label>
-                      <div className="flex gap-2">
-                        <input
-                          type="url"
-                          value={reelUrl}
-                          onChange={(e) => setReelUrl(e.target.value)}
-                          placeholder="https://instagram.com/reel/..."
-                          className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5]"
-                        />
-                        <button
-                          onClick={handleSubmitReel}
-                          disabled={loading || !reelUrl}
-                          className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] disabled:opacity-40 transition-all"
-                        >
-                          Submit
-                        </button>
+              {claims.filter(c => c.status === 'active').length > 0 ? (
+                <>
+                  {claims.filter(c => c.status === 'active').map((claim) => (
+                    <div key={claim.id} className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="font-bold text-[#1a1025]">{claim.businesses.name}</h3>
+                          <p className="text-gray-500 text-sm mt-0.5">{claim.offers.description}</p>
+                        </div>
+                        <span className="px-2.5 py-1 rounded-full bg-green-50 text-green-600 text-[11px] font-semibold">
+                          Active
+                        </span>
                       </div>
-                    </div>
-                  )}
 
-                  {activeClaim.reel_url && (
-                    <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-100">
-                      <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
-                      <span className="text-sm text-green-700 font-medium">Reel submitted</span>
+                      <QRCodeDisplay
+                        token={claim.qr_token}
+                        claimId={claim.id}
+                        creatorCode={userProfile.code}
+                      />
+
+                      <div className="mt-5 grid grid-cols-2 gap-2">
+                        <div className="p-3 rounded-xl bg-[#f8f5ff] text-center">
+                          <p className="text-[11px] text-gray-500">Visit within</p>
+                          <p className="text-sm font-bold text-[#1a1025]">7 days</p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-[#f8f5ff] text-center">
+                          <p className="text-[11px] text-gray-500">Post within</p>
+                          <p className="text-sm font-bold text-[#1a1025]">48 hours</p>
+                        </div>
+                      </div>
+
+                      {claim.redeemed_at && !claim.reel_url && (
+                        <div className="mt-5 p-4 rounded-xl bg-[#f8f5ff] border border-[#e8e0f5]">
+                          <label className="block text-sm font-semibold text-[#1a1025] mb-2">
+                            Submit Your Reel
+                          </label>
+                          <div className="flex gap-2">
+                            <input
+                              type="url"
+                              value={reelUrl}
+                              onChange={(e) => setReelUrl(e.target.value)}
+                              placeholder="https://instagram.com/reel/..."
+                              className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5]"
+                            />
+                            <button
+                              onClick={() => {
+                                const claimId = claim.id;
+                                if (!reelUrl) return;
+                                setLoading(true);
+                                supabase
+                                  .from('claims')
+                                  .update({ reel_url: reelUrl })
+                                  .eq('id', claimId)
+                                  .then(() => {
+                                    setReelUrl('');
+                                    fetchClaims();
+                                  })
+                                  .catch((error: any) => alert(error.message))
+                                  .finally(() => setLoading(false));
+                              }}
+                              disabled={loading || !reelUrl}
+                              className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-[#5b3df5] hover:bg-[#4e35d4] disabled:opacity-40 transition-all"
+                            >
+                              Submit
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {claim.reel_url && (
+                        <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-green-50 border border-green-100">
+                          <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                          <span className="text-sm text-green-700 font-medium">Reel submitted</span>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </div>
+                  ))}
+                </>
               ) : (
                 <div className="text-center py-16">
                   <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[#f0eaff] mb-4">
                     <Sparkles className="w-7 h-7 text-[#5b3df5]" />
                   </div>
-                  <p className="text-gray-500 text-sm">No active pass right now.</p>
+                  <p className="text-gray-500 text-sm">No active passes right now.</p>
                   <button
                     onClick={() => setView('offers')}
                     className="mt-3 text-[#5b3df5] text-sm font-semibold hover:underline"
