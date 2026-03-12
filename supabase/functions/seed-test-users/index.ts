@@ -84,7 +84,7 @@ const testUsers: TestUser[] = [
     data: {
       name: 'Loyal Wolf Barbershop',
       slug: 'loyal-wolf',
-      category: 'Beauty & Wellness',
+      category: 'Hair & Beauty',
       address: '8 Abbeygate Street, Bury St Edmunds, IP33 1UN',
       latitude: 52.2458,
       longitude: 0.7138,
@@ -99,7 +99,7 @@ const testUsers: TestUser[] = [
     data: {
       name: 'Yes You Can Fitness',
       slug: 'yes-you-can',
-      category: 'Fitness',
+      category: 'Health & Fitness',
       address: '45 Out Risbygate, Bury St Edmunds, IP33 3RN',
       latitude: 52.2470,
       longitude: 0.7155,
