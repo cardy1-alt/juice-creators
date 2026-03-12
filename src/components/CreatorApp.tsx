@@ -108,6 +108,7 @@ export default function CreatorApp() {
   const [releaseModalOpen, setReleaseModalOpen] = useState(false);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [releasingClaim, setReleasingClaim] = useState(false);
+  const [reelError, setReelError] = useState<string | null>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -255,6 +256,14 @@ export default function CreatorApp() {
 
   const handleSubmitReel = async () => {
     if (!reelUrl || !selectedClaim) return;
+    setReelError(null);
+
+    const instagramPattern = /^https:\/\/(www\.)?instagram\.com\//i;
+    if (!instagramPattern.test(reelUrl)) {
+      setReelError('Please enter a valid Instagram reel URL (https://instagram.com/reel/...)');
+      return;
+    }
+
     setLoading(true);
     try {
       const { error } = await supabase
@@ -263,9 +272,10 @@ export default function CreatorApp() {
         .eq('id', selectedClaim.id);
       if (error) throw error;
       setReelUrl('');
+      setReelError(null);
       fetchClaims();
     } catch (error: any) {
-      alert(error.message);
+      setReelError(error.message || 'Failed to submit reel');
     } finally {
       setLoading(false);
     }
@@ -996,7 +1006,7 @@ export default function CreatorApp() {
                               <input
                                 type="url"
                                 value={reelUrl}
-                                onChange={(e) => setReelUrl(e.target.value)}
+                                onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                 placeholder="https://instagram.com/reel/..."
                                 className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300"
                               />
@@ -1008,6 +1018,9 @@ export default function CreatorApp() {
                                 Submit
                               </button>
                             </div>
+                            {reelError && (
+                              <p className="text-xs text-rose-600 mt-2">{reelError}</p>
+                            )}
                           </div>
                         )}
 
