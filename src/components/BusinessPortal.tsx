@@ -161,6 +161,7 @@ export default function BusinessPortal() {
   const [loading, setLoading] = useState(false);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
   const [offerError, setOfferError] = useState<string | null>(null);
+  const [offersLoaded, setOffersLoaded] = useState(false);
 
   // Clean redeem param from URL after reading it
   useEffect(() => {
@@ -215,6 +216,7 @@ export default function BusinessPortal() {
       );
       setOffers(offersWithSlots as Offer[]);
     }
+    setOffersLoaded(true);
   };
 
   const fetchClaims = async () => {
@@ -372,7 +374,7 @@ export default function BusinessPortal() {
           {/* OFFERS */}
           {view === 'offers' && (
             <div className="space-y-4">
-              {offers.length === 0 && (
+              {offersLoaded && offers.length === 0 && (
                 <div className="bg-gradient-to-br from-[#5b3df5] to-[#8b6cf7] rounded-2xl p-6 text-white text-center shadow-lg">
                   <div className="text-4xl mb-3">🎉</div>
                   <h3 className="text-xl font-bold mb-2">You're All Set!</h3>

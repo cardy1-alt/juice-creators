@@ -98,8 +98,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       (async () => {
         if (session?.user) {
+          // Keep loading true until profile is fetched — prevents
+          // "Account Not Found" flash while profile fetch is in-flight
+          setLoading(true);
           setUser(session.user);
           await fetchUserProfile(session.user);
+          setLoading(false);
         } else {
           setUser(null);
           setUserRole(null);
