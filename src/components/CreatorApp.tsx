@@ -175,7 +175,7 @@ export default function CreatorApp() {
   const fetchOffers = async () => {
     const { data, error } = await supabase
       .from('offers')
-      .select('*, businesses(name, category)')
+      .select('*, businesses(name, category, latitude, longitude, address)')
       .eq('is_live', true);
 
     if (error) {
