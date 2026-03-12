@@ -128,7 +128,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
-    const R = 3959;
+    const R = 6371; // Earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a =
@@ -284,8 +284,8 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                   <h4 className="font-semibold text-sm text-gray-900">{business.name}</h4>
                   <span className="text-xs text-gray-500 whitespace-nowrap">
                     {business.distance < 1
-                      ? `${(business.distance * 5280).toFixed(0)} ft`
-                      : `${business.distance.toFixed(1)} mi`
+                      ? `${(business.distance * 1000).toFixed(0)} m`
+                      : `${business.distance.toFixed(1)} km`
                     }
                   </span>
                 </div>
@@ -321,8 +321,8 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                     <p className="text-xs text-gray-500 mt-0.5">{selectedBusiness.address}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       {selectedBusiness.distance < 1
-                        ? `${(selectedBusiness.distance * 5280).toFixed(0)} feet away`
-                        : `${selectedBusiness.distance.toFixed(1)} miles away`
+                        ? `${(selectedBusiness.distance * 1000).toFixed(0)} metres away`
+                        : `${selectedBusiness.distance.toFixed(1)} km away`
                       }
                     </p>
                   </div>
