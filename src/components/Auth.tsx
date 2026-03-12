@@ -282,10 +282,10 @@ export default function Auth() {
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Min 6 characters"
+                          placeholder="Min 8 characters"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
                           required
-                          minLength={6}
+                          minLength={8}
                         />
                         <button
                           type="button"
@@ -379,10 +379,10 @@ export default function Auth() {
                           type={showPassword ? 'text' : 'password'}
                           value={password}
                           onChange={(e) => setPassword(e.target.value)}
-                          placeholder="Min 6 characters"
+                          placeholder="Min 8 characters"
                           className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
                           required
-                          minLength={6}
+                          minLength={8}
                         />
                         <button
                           type="button"
@@ -418,10 +418,10 @@ export default function Auth() {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Min 6 characters"
+                      placeholder="Min 8 characters"
                       className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/30 focus:border-[#5b3df5] transition-all text-sm pr-11"
                       required
-                      minLength={6}
+                      minLength={8}
                     />
                     <button
                       type="button"

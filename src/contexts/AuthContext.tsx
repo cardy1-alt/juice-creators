@@ -13,7 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const ADMIN_EMAIL = 'admin@juicecreators.com';
+const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.com';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -25,6 +25,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Guard: prevent onAuthStateChange from overwriting state during signup
   const signingUpRef = useRef(false);
+
+  // Login rate limiting
+  const loginAttemptsRef = useRef(0);
+  const lockoutUntilRef = useRef<number>(0);
 
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
@@ -44,7 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (creatorError) {
-      console.error('[AuthContext] Error fetching creator profile:', creatorError.message);
+      console.error('[AuthContext] Error fetching creator profile');
     }
 
     if (creator) {
@@ -61,7 +65,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (businessError) {
-      console.error('[AuthContext] Error fetching business profile:', businessError.message);
+      console.error('[AuthContext] Error fetching business profile');
     }
 
     if (business) {
@@ -71,7 +75,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // No profile found — clear role so fallback screen shows
-    console.warn('[AuthContext] No profile found for', email);
     setUserRole(null);
     setUserProfile(null);
   };
@@ -116,8 +119,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const signIn = async (email: string, password: string) => {
+    const now = Date.now();
+    if (now < lockoutUntilRef.current) {
+      const secsLeft = Math.ceil((lockoutUntilRef.current - now) / 1000);
+      throw new Error(`Too many attempts. Please wait ${secsLeft} seconds.`);
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) throw error;
+    if (error) {
+      loginAttemptsRef.current += 1;
+      if (loginAttemptsRef.current >= 5) {
+        // Lock out for 30 seconds after 5 failed attempts
+        lockoutUntilRef.current = Date.now() + 30_000;
+        loginAttemptsRef.current = 0;
+      }
+      throw error;
+    }
+    loginAttemptsRef.current = 0;
   };
 
   const signUp = async (email: string, password: string, role: UserRole, additionalData: any) => {
@@ -125,8 +143,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signingUpRef.current = true;
 
     try {
-      console.log('[AuthContext] Starting signup for', email, 'as', role);
-
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -137,25 +153,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       if (!data.user) throw new Error('Sign up failed — no user returned');
 
-      console.log('[AuthContext] Auth user created:', data.user.id);
-
       // Check if we have a session — if email confirmation is required, session is null
       // and the INSERT will fail because RLS requires an authenticated session.
       if (!data.session) {
-        console.log('[AuthContext] No session after signUp — attempting sign in to establish session');
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) {
           throw new Error(
-            'Account created but could not establish session. ' +
-            'If email confirmation is required, please confirm your email first, then sign in.'
+            'Account created. Please check your email to confirm, then sign in.'
           );
         }
-        console.log('[AuthContext] Session established via sign in');
       }
 
       // Now we have an authenticated session — INSERT the profile row
       if (role === 'creator') {
-        console.log('[AuthContext] Inserting creator profile');
         const { error: insertError } = await supabase.from('creators').insert({
           email,
           name: additionalData.name,
@@ -165,10 +175,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           approved: false
         });
         if (insertError) {
-          console.error('[AuthContext] Creator insert failed:', insertError.message);
-          throw new Error(`Failed to create creator profile: ${insertError.message}`);
+          throw new Error('Failed to create creator profile. Please try again.');
         }
-        console.log('[AuthContext] Creator profile inserted successfully');
 
         // Set state directly — no need to re-fetch, we know what we just inserted
         setUser(data.user);
@@ -182,7 +190,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           approved: false
         });
       } else if (role === 'business') {
-        console.log('[AuthContext] Inserting business profile');
         const { error: insertError } = await supabase.from('businesses').insert({
           owner_email: email,
           name: additionalData.name,
@@ -195,10 +202,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           approved: false
         });
         if (insertError) {
-          console.error('[AuthContext] Business insert failed:', insertError.message);
-          throw new Error(`Failed to create business profile: ${insertError.message}`);
+          throw new Error('Failed to create business profile. Please try again.');
         }
-        console.log('[AuthContext] Business profile inserted successfully');
 
         setUser(data.user);
         setUserRole('business');

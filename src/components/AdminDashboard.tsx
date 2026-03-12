@@ -44,16 +44,23 @@ export default function AdminDashboard() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   useEffect(() => { fetchAll(); }, []);
 
   const fetchAll = async () => {
+    setFetchError(null);
     const currentMonth = new Date().toISOString().slice(0, 7);
     const [creatorsData, businessesData, offersData, claimsData] = await Promise.all([
-      supabase.from('creators').select('*').order('created_at', { ascending: false }),
-      supabase.from('businesses').select('*').order('created_at', { ascending: false }),
-      supabase.from('offers').select('*, businesses(name, category)').order('created_at', { ascending: false }),
-      supabase.from('claims').select('*, creators(name), businesses(name, category)').order('claimed_at', { ascending: false })
+      supabase.from('creators').select('*').order('created_at', { ascending: false }).limit(500),
+      supabase.from('businesses').select('*').order('created_at', { ascending: false }).limit(500),
+      supabase.from('offers').select('*, businesses(name, category)').order('created_at', { ascending: false }).limit(500),
+      supabase.from('claims').select('*, creators(name), businesses(name, category)').order('claimed_at', { ascending: false }).limit(500)
     ]);
+    const errors = [creatorsData.error, businessesData.error, offersData.error, claimsData.error].filter(Boolean);
+    if (errors.length > 0) {
+      setFetchError('Failed to load some data. Pull to refresh.');
+    }
     if (creatorsData.data) setCreators(creatorsData.data);
     if (businessesData.data) setBusinesses(businessesData.data);
     if (offersData.data) setOffers(offersData.data as OfferWithBusiness[]);
@@ -85,6 +92,19 @@ export default function AdminDashboard() {
     if (newPassword !== confirmPassword) {
       setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
       return;
+    }
+
+    // Verify current password by re-authenticating
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (verifyError) {
+        setPasswordMessage({ type: 'error', text: 'Current password is incorrect' });
+        return;
+      }
     }
 
     const { error } = await supabase.auth.updateUser({ password: newPassword });
@@ -163,6 +183,11 @@ export default function AdminDashboard() {
         </div>
 
         <div className="p-6">
+          {fetchError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
+              {fetchError}
+            </div>
+          )}
           {/* STATS */}
           {view === 'stats' && (
             <div className="space-y-4">

@@ -200,8 +200,11 @@ export default function BusinessPortal() {
     return () => { supabase.removeChannel(channel); };
   }, [userProfile]);
 
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
   const fetchOffers = async () => {
-    const { data } = await supabase.from('offers').select('*').eq('business_id', userProfile.id).order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('offers').select('*').eq('business_id', userProfile.id).order('created_at', { ascending: false });
+    if (error) { setFetchError('Failed to load offers.'); return; }
     if (data) {
       const currentMonth = new Date().toISOString().slice(0, 7);
       const offersWithSlots = await Promise.all(
@@ -220,12 +223,14 @@ export default function BusinessPortal() {
   };
 
   const fetchClaims = async () => {
-    const { data } = await supabase.from('claims').select('*, creators(name, instagram_handle, code)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
+    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
+    if (error) { setFetchError('Failed to load claims.'); return; }
     if (data) setClaims(data as ClaimWithDetails[]);
   };
 
   const fetchNotifications = async () => {
-    const { data } = await supabase.from('notifications').select('*').eq('user_id', userProfile.id).order('created_at', { ascending: false }).limit(20);
+    const { data, error } = await supabase.from('notifications').select('*').eq('user_id', userProfile.id).order('created_at', { ascending: false }).limit(20);
+    if (error) return;
     if (data) setNotifications(data);
   };
 
@@ -371,6 +376,11 @@ export default function BusinessPortal() {
         </div>
 
         <div className="p-6">
+          {fetchError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
+              {fetchError}
+            </div>
+          )}
           {/* OFFERS */}
           {view === 'offers' && (
             <div className="space-y-4">
