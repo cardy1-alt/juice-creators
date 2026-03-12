@@ -1,3 +1,4 @@
+// SYNC TEST — if you see this in Bolt, the pipeline is working!
 import { useAuth } from './contexts/AuthContext';
 import Auth from './components/Auth';
 import CreatorApp from './components/CreatorApp';
