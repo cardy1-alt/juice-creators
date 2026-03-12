@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import {
   LogOut, Users, Store,
-  CheckCircle2, XCircle, BarChart3, Package, ClipboardList
+  CheckCircle2, XCircle, BarChart3, Package, ClipboardList, Settings
 } from 'lucide-react';
 import { getCategoryEmoji } from '../lib/categories';
 
@@ -33,12 +33,16 @@ interface ClaimWithDetails { id: string; status: string; claimed_at: string; ree
 
 export default function AdminDashboard() {
   const { signOut } = useAuth();
-  const [view, setView] = useState<'stats' | 'creators' | 'businesses' | 'offers' | 'claims'>('stats');
+  const [view, setView] = useState<'stats' | 'creators' | 'businesses' | 'offers' | 'claims' | 'settings'>('stats');
   const [creators, setCreators] = useState<Creator[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [offers, setOffers] = useState<OfferWithBusiness[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [stats, setStats] = useState({ totalCreators: 0, totalBusinesses: 0, totalClaims: 0, totalReels: 0, pendingCreators: 0, pendingBusinesses: 0 });
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -53,22 +57,51 @@ export default function AdminDashboard() {
     if (creatorsData.data) setCreators(creatorsData.data);
     if (businessesData.data) setBusinesses(businessesData.data);
     if (offersData.data) setOffers(offersData.data as OfferWithBusiness[]);
-    if (claimsData.data) {
-      setClaims(claimsData.data as ClaimWithDetails[]);
-      setStats({
-        totalCreators: creatorsData.data?.length || 0,
-        totalBusinesses: businessesData.data?.length || 0,
-        totalClaims: claimsData.data.filter((c: any) => c.claimed_at?.startsWith(currentMonth)).length,
-        totalReels: claimsData.data.filter((c: any) => c.reel_url).length,
-        pendingCreators: creatorsData.data?.filter(c => !c.approved).length || 0,
-        pendingBusinesses: businessesData.data?.filter(b => !b.approved).length || 0,
-      });
-    }
+    if (claimsData.data) setClaims(claimsData.data as ClaimWithDetails[]);
+
+    setStats({
+      totalCreators: creatorsData.data?.length || 0,
+      totalBusinesses: businessesData.data?.length || 0,
+      totalClaims: claimsData.data?.filter((c: any) => c.claimed_at?.startsWith(currentMonth)).length || 0,
+      totalReels: claimsData.data?.filter((c: any) => c.reel_url).length || 0,
+      pendingCreators: creatorsData.data?.filter(c => !c.approved).length || 0,
+      pendingBusinesses: businessesData.data?.filter(b => !b.approved).length || 0,
+    });
   };
 
   const handleApproveCreator = async (id: string, approved: boolean) => { await supabase.from('creators').update({ approved }).eq('id', id); fetchAll(); };
   const handleApproveBusiness = async (id: string, approved: boolean) => { await supabase.from('businesses').update({ approved }).eq('id', id); fetchAll(); };
   const handleUpdateClaimStatus = async (id: string, status: string) => { await supabase.from('claims').update({ status }).eq('id', id); fetchAll(); };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMessage(null);
+
+    if (newPassword.length < 8) {
+      setPasswordMessage({ type: 'error', text: 'New password must be at least 8 characters long' });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      if (error.message.includes('same')) {
+        setPasswordMessage({ type: 'error', text: 'New password must be different from current password' });
+      } else {
+        setPasswordMessage({ type: 'error', text: error.message || 'Failed to update password' });
+      }
+    } else {
+      setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+    }
+  };
 
   const statCards = [
     { emoji: '👥', value: stats.totalCreators, label: 'Total Creators', accent: 'from-violet-50 to-purple-50 border-violet-100' },
@@ -83,6 +116,7 @@ export default function AdminDashboard() {
     { key: 'businesses' as const, label: 'Businesses', icon: Store, badge: stats.pendingBusinesses },
     { key: 'offers' as const, label: 'Offers', icon: Package },
     { key: 'claims' as const, label: 'Claims', icon: ClipboardList },
+    { key: 'settings' as const, label: 'Settings', icon: Settings },
   ];
 
   return (
@@ -357,6 +391,78 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* SETTINGS */}
+          {view === 'settings' && (
+            <div className="max-w-2xl">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                <h2 className="text-lg font-bold text-[#1a1025] mb-5">Change Password</h2>
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div>
+                    <label htmlFor="currentPassword" className="block text-sm font-semibold text-[#1a1025] mb-2">
+                      Current Password
+                    </label>
+                    <input
+                      id="currentPassword"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5] text-sm"
+                      placeholder="Enter current password"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="newPassword" className="block text-sm font-semibold text-[#1a1025] mb-2">
+                      New Password
+                    </label>
+                    <input
+                      id="newPassword"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5] text-sm"
+                      placeholder="Enter new password (min 8 characters)"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#1a1025] mb-2">
+                      Confirm New Password
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5] text-sm"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                  {passwordMessage && (
+                    <div
+                      className={`p-3 rounded-xl text-sm font-medium ${
+                        passwordMessage.type === 'success'
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                          : 'bg-rose-50 text-rose-600 border border-rose-100'
+                      }`}
+                    >
+                      {passwordMessage.text}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2.5 bg-[#1a1025] text-white rounded-xl font-semibold text-sm hover:bg-[#2a1f35] transition-colors"
+                  >
+                    Update Password
+                  </button>
+                </form>
+              </div>
             </div>
           )}
         </div>
