@@ -13,6 +13,14 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 const FROM_EMAIL = 'Juice Creators <notifications@mail.juicecreators.co.uk>';
 const ADMIN_EMAIL = 'admin@juicecreators.com';
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
 interface NotificationPayload {
   type: 'INSERT';
   table: 'notifications';
@@ -101,7 +109,7 @@ Deno.serve(async (req: Request) => {
       body: JSON.stringify({
         from: FROM_EMAIL,
         to: [recipientEmail],
-        subject: `Juice Creators — ${notification.message.slice(0, 60)}`,
+        subject: `Juice Creators — ${escapeHtml(notification.message.slice(0, 60))}`,
         html: `
           <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 480px; margin: 0 auto; padding: 32px 24px;">
             <div style="text-align: center; margin-bottom: 24px;">
@@ -109,8 +117,8 @@ Deno.serve(async (req: Request) => {
               <h2 style="margin: 8px 0 0; color: #1a1025; font-size: 18px;">Juice Creators</h2>
             </div>
             <div style="background: #f8f5ff; border-radius: 12px; padding: 20px; border: 1px solid #e8e0f5;">
-              <p style="margin: 0 0 4px; color: #666; font-size: 13px;">Hi ${recipientName},</p>
-              <p style="margin: 0; color: #1a1025; font-size: 15px; font-weight: 600;">${notification.message}</p>
+              <p style="margin: 0 0 4px; color: #666; font-size: 13px;">Hi ${escapeHtml(recipientName)},</p>
+              <p style="margin: 0; color: #1a1025; font-size: 15px; font-weight: 600;">${escapeHtml(notification.message)}</p>
             </div>
             <p style="text-align: center; margin-top: 24px; color: #999; font-size: 12px;">
               — Juice Creators Platform
