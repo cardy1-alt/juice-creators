@@ -6,7 +6,7 @@ import AdminDashboard from './components/AdminDashboard';
 import { AlertCircle, LogOut } from 'lucide-react';
 
 function App() {
-  const { user, userRole, loading, retryingProfile, signOut } = useAuth();
+  const { user, userRole, loading, signOut } = useAuth();
 
   if (loading) {
     return (
@@ -35,19 +35,7 @@ function App() {
     return <BusinessPortal />;
   }
 
-  // Show loading spinner while retrying profile fetch
-  if (retryingProfile) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f0eaff] via-[#e8e0f5] to-[#f5f0ff]">
-        <div className="text-center">
-          <div className="w-12 h-12 border-[3px] border-[#5b3df5] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-gray-500 text-sm font-medium">Setting up your account...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Fallback — user authenticated but no profile found after all retries
+  // Fallback — user authenticated but no profile found
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#f0eaff] via-[#e8e0f5] to-[#f5f0ff]">
       <div className="bg-white rounded-2xl shadow-xl p-8 max-w-md text-center border border-gray-100">

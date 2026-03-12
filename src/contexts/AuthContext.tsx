@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, useRef, ReactNode } from 'react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
@@ -8,7 +8,6 @@ interface AuthContextType {
   userRole: UserRole | null;
   userProfile: any | null;
   loading: boolean;
-  retryingProfile: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, role: UserRole, additionalData: any) => Promise<void>;
   signOut: () => Promise<void>;
@@ -23,7 +22,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [retryingProfile, setRetryingProfile] = useState(false);
+
+  // Guard: prevent onAuthStateChange from overwriting state during signup
+  const signingUpRef = useRef(false);
 
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
@@ -36,11 +37,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Check creators table
-    const { data: creator } = await supabase
+    const { data: creator, error: creatorError } = await supabase
       .from('creators')
       .select('*')
       .eq('email', email)
       .maybeSingle();
+
+    if (creatorError) {
+      console.error('[AuthContext] Error fetching creator profile:', creatorError.message);
+    }
 
     if (creator) {
       setUserRole('creator');
@@ -49,11 +54,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // Check businesses table
-    const { data: business } = await supabase
+    const { data: business, error: businessError } = await supabase
       .from('businesses')
       .select('*')
       .eq('owner_email', email)
       .maybeSingle();
+
+    if (businessError) {
+      console.error('[AuthContext] Error fetching business profile:', businessError.message);
+    }
 
     if (business) {
       setUserRole('business');
@@ -62,61 +71,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     // No profile found — clear role so fallback screen shows
+    console.warn('[AuthContext] No profile found for', email);
     setUserRole(null);
     setUserProfile(null);
-  };
-
-  const fetchUserProfileWithRetry = async (authUser: User, maxAttempts = 5, delayMs = 1000) => {
-    const email = authUser.email;
-    if (!email) return;
-
-    if (email === ADMIN_EMAIL) {
-      setUserRole('admin');
-      setUserProfile({ email, name: 'Admin' });
-      return;
-    }
-
-    setRetryingProfile(true);
-
-    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-      // Check creators table
-      const { data: creator } = await supabase
-        .from('creators')
-        .select('*')
-        .eq('email', email)
-        .maybeSingle();
-
-      if (creator) {
-        setUserRole('creator');
-        setUserProfile(creator);
-        setRetryingProfile(false);
-        return;
-      }
-
-      // Check businesses table
-      const { data: business } = await supabase
-        .from('businesses')
-        .select('*')
-        .eq('owner_email', email)
-        .maybeSingle();
-
-      if (business) {
-        setUserRole('business');
-        setUserProfile(business);
-        setRetryingProfile(false);
-        return;
-      }
-
-      // If not the last attempt, wait before retrying
-      if (attempt < maxAttempts) {
-        await new Promise(resolve => setTimeout(resolve, delayMs));
-      }
-    }
-
-    // All retry attempts exhausted — no profile found
-    setUserRole(null);
-    setUserProfile(null);
-    setRetryingProfile(false);
   };
 
   useEffect(() => {
@@ -131,6 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      // Skip profile fetch during signup — signUp() manages state directly
+      if (signingUpRef.current) {
+        if (session?.user) {
+          setUser(session.user);
+        }
+        return;
+      }
+
       (async () => {
         if (session?.user) {
           setUser(session.user);
@@ -152,50 +117,102 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, role: UserRole, additionalData: any) => {
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          type: role
-        }
-      }
-    });
-    if (error) throw error;
-    if (!data.user) throw new Error('Sign up failed');
+    // Block onAuthStateChange from racing with us
+    signingUpRef.current = true;
 
-    if (role === 'creator') {
-      const { error: insertError } = await supabase.from('creators').insert({
+    try {
+      console.log('[AuthContext] Starting signup for', email, 'as', role);
+
+      const { data, error } = await supabase.auth.signUp({
         email,
-        name: additionalData.name,
-        instagram_handle: additionalData.instagramHandle,
-        follower_count: additionalData.followerCount || null,
-        code: additionalData.code,
-        approved: false
+        password,
+        options: {
+          data: { type: role }
+        }
       });
-      if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
+      if (error) throw error;
+      if (!data.user) throw new Error('Sign up failed — no user returned');
 
-      // Admin signup notification — will be handled server-side via DB trigger
-      // Client INSERT is blocked by RLS (service-role only)
-    } else if (role === 'business') {
-      const { error: insertError } = await supabase.from('businesses').insert({
-        owner_email: email,
-        name: additionalData.name,
-        slug: additionalData.slug,
-        category: additionalData.category || 'Food & Drink',
-        address: additionalData.address,
-        latitude: additionalData.latitude,
-        longitude: additionalData.longitude,
-        bio: additionalData.bio,
-        approved: false
-      });
-      if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
+      console.log('[AuthContext] Auth user created:', data.user.id);
 
-      // Admin signup notification — will be handled server-side via DB trigger
-      // Client INSERT is blocked by RLS (service-role only)
+      // Check if we have a session — if email confirmation is required, session is null
+      // and the INSERT will fail because RLS requires an authenticated session.
+      if (!data.session) {
+        console.log('[AuthContext] No session after signUp — attempting sign in to establish session');
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        if (signInError) {
+          throw new Error(
+            'Account created but could not establish session. ' +
+            'If email confirmation is required, please confirm your email first, then sign in.'
+          );
+        }
+        console.log('[AuthContext] Session established via sign in');
+      }
+
+      // Now we have an authenticated session — INSERT the profile row
+      if (role === 'creator') {
+        console.log('[AuthContext] Inserting creator profile');
+        const { error: insertError } = await supabase.from('creators').insert({
+          email,
+          name: additionalData.name,
+          instagram_handle: additionalData.instagramHandle,
+          follower_count: additionalData.followerCount || null,
+          code: additionalData.code,
+          approved: false
+        });
+        if (insertError) {
+          console.error('[AuthContext] Creator insert failed:', insertError.message);
+          throw new Error(`Failed to create creator profile: ${insertError.message}`);
+        }
+        console.log('[AuthContext] Creator profile inserted successfully');
+
+        // Set state directly — no need to re-fetch, we know what we just inserted
+        setUser(data.user);
+        setUserRole('creator');
+        setUserProfile({
+          email,
+          name: additionalData.name,
+          instagram_handle: additionalData.instagramHandle,
+          follower_count: additionalData.followerCount || null,
+          code: additionalData.code,
+          approved: false
+        });
+      } else if (role === 'business') {
+        console.log('[AuthContext] Inserting business profile');
+        const { error: insertError } = await supabase.from('businesses').insert({
+          owner_email: email,
+          name: additionalData.name,
+          slug: additionalData.slug,
+          category: additionalData.category || 'Food & Drink',
+          address: additionalData.address,
+          latitude: additionalData.latitude,
+          longitude: additionalData.longitude,
+          bio: additionalData.bio,
+          approved: false
+        });
+        if (insertError) {
+          console.error('[AuthContext] Business insert failed:', insertError.message);
+          throw new Error(`Failed to create business profile: ${insertError.message}`);
+        }
+        console.log('[AuthContext] Business profile inserted successfully');
+
+        setUser(data.user);
+        setUserRole('business');
+        setUserProfile({
+          owner_email: email,
+          name: additionalData.name,
+          slug: additionalData.slug,
+          category: additionalData.category || 'Food & Drink',
+          address: additionalData.address,
+          latitude: additionalData.latitude,
+          longitude: additionalData.longitude,
+          bio: additionalData.bio,
+          approved: false
+        });
+      }
+    } finally {
+      signingUpRef.current = false;
     }
-
-    await fetchUserProfileWithRetry(data.user);
   };
 
   const signOut = async () => {
@@ -203,7 +220,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userRole, userProfile, loading, retryingProfile, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, userRole, userProfile, loading, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
