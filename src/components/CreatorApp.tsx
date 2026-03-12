@@ -335,14 +335,14 @@ export default function CreatorApp() {
 
     const now = new Date().getTime();
     const hasOverdue = activeClaims.some(claim => {
-      if (!claim.reel_due_at || claim.reel_submitted_at) return false;
+      if (!claim.reel_due_at || claim.reel_url) return false;
       return new Date(claim.reel_due_at).getTime() < now;
     });
 
     if (hasOverdue) return 'overdue';
 
     const hasSoon = activeClaims.some(claim => {
-      if (!claim.reel_due_at || claim.reel_submitted_at) return false;
+      if (!claim.reel_due_at || claim.reel_url) return false;
       const hoursLeft = (new Date(claim.reel_due_at).getTime() - now) / (1000 * 60 * 60);
       return hoursLeft <= 12;
     });
