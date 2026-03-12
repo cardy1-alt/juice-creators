@@ -8,6 +8,7 @@ interface AuthContextType {
   userRole: UserRole | null;
   userProfile: any | null;
   loading: boolean;
+  retryingProfile: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, role: UserRole, additionalData: any) => Promise<void>;
   signOut: () => Promise<void>;
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole | null>(null);
   const [userProfile, setUserProfile] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
+  const [retryingProfile, setRetryingProfile] = useState(false);
 
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
@@ -62,6 +64,59 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // No profile found — clear role so fallback screen shows
     setUserRole(null);
     setUserProfile(null);
+  };
+
+  const fetchUserProfileWithRetry = async (authUser: User, maxAttempts = 5, delayMs = 1000) => {
+    const email = authUser.email;
+    if (!email) return;
+
+    if (email === ADMIN_EMAIL) {
+      setUserRole('admin');
+      setUserProfile({ email, name: 'Admin' });
+      return;
+    }
+
+    setRetryingProfile(true);
+
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      // Check creators table
+      const { data: creator } = await supabase
+        .from('creators')
+        .select('*')
+        .eq('email', email)
+        .maybeSingle();
+
+      if (creator) {
+        setUserRole('creator');
+        setUserProfile(creator);
+        setRetryingProfile(false);
+        return;
+      }
+
+      // Check businesses table
+      const { data: business } = await supabase
+        .from('businesses')
+        .select('*')
+        .eq('owner_email', email)
+        .maybeSingle();
+
+      if (business) {
+        setUserRole('business');
+        setUserProfile(business);
+        setRetryingProfile(false);
+        return;
+      }
+
+      // If not the last attempt, wait before retrying
+      if (attempt < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+      }
+    }
+
+    // All retry attempts exhausted — no profile found
+    setUserRole(null);
+    setUserProfile(null);
+    setRetryingProfile(false);
   };
 
   useEffect(() => {
@@ -140,7 +195,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Client INSERT is blocked by RLS (service-role only)
     }
 
-    await fetchUserProfile(data.user);
+    await fetchUserProfileWithRetry(data.user);
   };
 
   const signOut = async () => {
@@ -148,7 +203,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userRole, userProfile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, userRole, userProfile, loading, retryingProfile, signIn, signUp, signOut }}>
       {children}
     </AuthContext.Provider>
   );
