@@ -12,12 +12,14 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [disputeError, setDisputeError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
 
     setLoading(true);
+    setDisputeError(null);
     try {
       const { error } = await supabase
         .from('disputes')
@@ -31,7 +33,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
       setSubmitted(true);
       setTimeout(() => onClose(), 2000);
     } catch (err: any) {
-      alert(err.message || 'Failed to submit dispute');
+      setDisputeError(err.message || 'Failed to submit dispute');
     } finally {
       setLoading(false);
     }
@@ -82,6 +84,12 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   required
                 />
               </div>
+
+              {disputeError && (
+                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                  <p className="text-sm text-rose-700">{disputeError}</p>
+                </div>
+              )}
 
               <div className="flex gap-3">
                 <button

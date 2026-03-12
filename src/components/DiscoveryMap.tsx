@@ -81,6 +81,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
   const [showLocationInput, setShowLocationInput] = useState(false);
   const [locationInput, setLocationInput] = useState('');
   const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
 
   useEffect(() => {
     if (userLocation) {
@@ -107,6 +108,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
     if (!locationInput.trim()) return;
 
     setGeocoding(true);
+    setGeocodeError(null);
     try {
       const response = await fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}&limit=1`
@@ -117,11 +119,12 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
         setShowLocationInput(false);
         setLocationInput('');
+        setGeocodeError(null);
       } else {
-        alert('Location not found. Try a different search term.');
+        setGeocodeError('Location not found. Try a different search term.');
       }
     } catch (error) {
-      alert('Failed to find location. Please try again.');
+      setGeocodeError('Failed to find location. Please try again.');
     } finally {
       setGeocoding(false);
     }
@@ -206,6 +209,9 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
               {geocoding ? 'Searching...' : 'Go'}
             </button>
           </div>
+          {geocodeError && (
+            <p className="text-xs text-rose-600 mt-2">{geocodeError}</p>
+          )}
         </div>
       )}
 

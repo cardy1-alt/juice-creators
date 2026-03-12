@@ -160,7 +160,7 @@ export default function BusinessPortal() {
   const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
-
+  const [offerError, setOfferError] = useState<string | null>(null);
 
   // Clean redeem param from URL after reading it
   useEffect(() => {
@@ -235,6 +235,7 @@ export default function BusinessPortal() {
   const handleCreateOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setOfferError(null);
     try {
       const { error } = await supabase.from('offers').insert({
         business_id: userProfile.id,
@@ -249,7 +250,7 @@ export default function BusinessPortal() {
       setShowNewOffer(false);
       fetchOffers();
     } catch (error: any) {
-      alert(error.message);
+      setOfferError(error.message || 'Failed to create offer');
     } finally {
       setLoading(false);
     }
@@ -445,11 +446,16 @@ export default function BusinessPortal() {
                       <p className="text-xs text-gray-400">Creators can claim this offer any time — no slot limit</p>
                     )}
                   </div>
+                  {offerError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                      <p className="text-sm text-rose-700">{offerError}</p>
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl text-white font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-sm transition-all">
                       Create
                     </button>
-                    <button type="button" onClick={() => setShowNewOffer(false)} className="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition-all">
+                    <button type="button" onClick={() => { setShowNewOffer(false); setOfferError(null); }} className="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition-all">
                       Cancel
                     </button>
                   </div>

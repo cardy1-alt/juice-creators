@@ -109,6 +109,7 @@ export default function CreatorApp() {
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [releasingClaim, setReleasingClaim] = useState(false);
   const [reelError, setReelError] = useState<string | null>(null);
+  const [claimError, setClaimError] = useState<string | null>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -225,6 +226,7 @@ export default function CreatorApp() {
 
   const handleClaim = async (offer: Offer) => {
     setLoading(true);
+    setClaimError(null);
     try {
       const { data, error } = await supabase.rpc('claim_offer', {
         p_offer_id: offer.id,
@@ -233,7 +235,7 @@ export default function CreatorApp() {
 
       if (error) throw error;
       if (data?.error) {
-        alert(data.error);
+        setClaimError(data.error);
         return;
       }
 
@@ -241,7 +243,7 @@ export default function CreatorApp() {
       fetchOffers();
       fetchClaims();
     } catch (error: any) {
-      alert(error.message);
+      setClaimError(error.message || 'Failed to claim offer');
     } finally {
       setLoading(false);
     }
@@ -488,6 +490,12 @@ export default function CreatorApp() {
           {/* ── OFFERS ── */}
           {view === 'offers' && (
             <>
+              {claimError && (
+                <div className="mb-3 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between">
+                  <p className="text-sm text-rose-700">{claimError}</p>
+                  <button onClick={() => setClaimError(null)} className="text-rose-400 hover:text-rose-600 text-xs font-semibold ml-3">Dismiss</button>
+                </div>
+              )}
               {/* Search and Controls */}
               <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm mb-3 space-y-3">
                 {/* Search bar */}
