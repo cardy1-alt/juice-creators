@@ -13,7 +13,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const ADMIN_EMAIL = import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.com';
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.com').toLowerCase();
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -32,9 +32,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
-    if (!email) return;
+    if (!email) {
+      console.warn('[AuthContext] No email on auth user');
+      return;
+    }
 
-    if (email === ADMIN_EMAIL) {
+    if (email.toLowerCase() === ADMIN_EMAIL) {
+      console.log('[AuthContext] Admin detected');
       setUserRole('admin');
       setUserProfile({ email, name: 'Admin' });
       return;
@@ -48,10 +52,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (creatorError) {
-      console.error('[AuthContext] Error fetching creator profile');
+      console.error('[AuthContext] Error fetching creator profile:', creatorError.code, creatorError.message);
     }
 
     if (creator) {
+      console.log('[AuthContext] Creator profile found:', creator.id);
       setUserRole('creator');
       setUserProfile(creator);
       return;
@@ -65,16 +70,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (businessError) {
-      console.error('[AuthContext] Error fetching business profile');
+      console.error('[AuthContext] Error fetching business profile:', businessError.code, businessError.message);
     }
 
     if (business) {
+      console.log('[AuthContext] Business profile found:', business.id);
       setUserRole('business');
       setUserProfile(business);
       return;
     }
 
     // No profile found — clear role so fallback screen shows
+    console.warn('[AuthContext] No profile found for user:', authUser.id);
     setUserRole(null);
     setUserProfile(null);
   };
@@ -143,6 +150,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signingUpRef.current = true;
 
     try {
+      console.log('[AuthContext] Starting signup as', role);
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -153,30 +162,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       if (!data.user) throw new Error('Sign up failed — no user returned');
 
+      console.log('[AuthContext] Auth user created:', data.user.id, 'session:', !!data.session);
+
       // Check if we have a session — if email confirmation is required, session is null
       // and the INSERT will fail because RLS requires an authenticated session.
       if (!data.session) {
+        console.log('[AuthContext] No session — attempting sign in to establish session');
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         if (signInError) {
           throw new Error(
             'Account created. Please check your email to confirm, then sign in.'
           );
         }
+        console.log('[AuthContext] Session established via sign in');
       }
 
       // Now we have an authenticated session — INSERT the profile row
       if (role === 'creator') {
-        const { error: insertError } = await supabase.from('creators').insert({
+        console.log('[AuthContext] Inserting creator profile for:', data.user.id);
+        const insertPayload = {
           email,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
           follower_count: additionalData.followerCount || null,
           code: additionalData.code,
           approved: false
-        });
+        };
+        console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
+
+        const { error: insertError } = await supabase.from('creators').insert(insertPayload);
+
         if (insertError) {
-          throw new Error('Failed to create creator profile. Please try again.');
+          console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          if (insertError.code === '23505') {
+            throw new Error('An account with this email or Instagram handle already exists. Please sign in instead.');
+          }
+          throw new Error(`Failed to create creator profile: ${insertError.message}`);
         }
+        console.log('[AuthContext] Creator profile inserted successfully');
 
         // Set state directly — no need to re-fetch, we know what we just inserted
         setUser(data.user);
@@ -187,10 +210,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           instagram_handle: additionalData.instagramHandle,
           follower_count: additionalData.followerCount || null,
           code: additionalData.code,
-          approved: false
+          approved: false,
+          onboarding_complete: false
         });
       } else if (role === 'business') {
-        const { error: insertError } = await supabase.from('businesses').insert({
+        console.log('[AuthContext] Inserting business profile for:', data.user.id);
+        const insertPayload = {
           owner_email: email,
           name: additionalData.name,
           slug: additionalData.slug,
@@ -200,10 +225,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           longitude: additionalData.longitude,
           bio: additionalData.bio,
           approved: false
-        });
+        };
+        console.log('[AuthContext] Business INSERT payload:', JSON.stringify(insertPayload));
+
+        const { error: insertError } = await supabase.from('businesses').insert(insertPayload);
+
         if (insertError) {
-          throw new Error('Failed to create business profile. Please try again.');
+          console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          if (insertError.code === '23505') {
+            throw new Error('A business with this email or name already exists. Please sign in instead.');
+          }
+          throw new Error(`Failed to create business profile: ${insertError.message}`);
         }
+        console.log('[AuthContext] Business profile inserted successfully');
 
         setUser(data.user);
         setUserRole('business');
@@ -220,7 +254,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
     } finally {
-      signingUpRef.current = false;
+      // Delay releasing the guard so queued onAuthStateChange events
+      // (from signUp/signIn above) don't race with our state updates
+      setTimeout(() => {
+        signingUpRef.current = false;
+      }, 1000);
     }
   };
 

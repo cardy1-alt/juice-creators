@@ -48,6 +48,18 @@ export default function AdminDashboard() {
 
   useEffect(() => { fetchAll(); }, []);
 
+  // Realtime: auto-refresh when new creators or businesses sign up
+  useEffect(() => {
+    const channel = supabase
+      .channel('admin-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'creators' }, () => { fetchAll(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'businesses' }, () => { fetchAll(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => { fetchAll(); })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
+
   const fetchAll = async () => {
     setFetchError(null);
     const currentMonth = new Date().toISOString().slice(0, 7);
@@ -59,7 +71,8 @@ export default function AdminDashboard() {
     ]);
     const errors = [creatorsData.error, businessesData.error, offersData.error, claimsData.error].filter(Boolean);
     if (errors.length > 0) {
-      setFetchError('Failed to load some data. Pull to refresh.');
+      console.error('[AdminDashboard] Fetch errors:', errors.map(e => `${e!.code}: ${e!.message}`));
+      setFetchError('Failed to load some data. Check console for details.');
     }
     if (creatorsData.data) setCreators(creatorsData.data);
     if (businessesData.data) setBusinesses(businessesData.data);
