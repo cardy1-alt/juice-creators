@@ -277,12 +277,8 @@ export default function BusinessPortal() {
       const reelDueAt = new Date(redeemedAt.getTime() + 48 * 60 * 60 * 1000);
       const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: redeemedAt.toISOString(), reel_due_at: reelDueAt.toISOString() }).eq('id', claim.id);
       if (error) throw error;
-      // Notify the creator their pass was redeemed
-      await supabase.from('notifications').insert({
-        user_id: claim.creator_id,
-        user_type: 'creator',
-        message: `Your pass at ${userProfile.name} has been redeemed! Don't forget to post your reel.`
-      });
+      // Creator redemption notification — will be handled server-side via DB trigger
+      // Client INSERT is blocked by RLS (service-role only)
       setScanResult({ type: 'success', message: `✅ Pass redeemed for ${claim.creators.name}!` });
       setScanCode('');
       fetchClaims();

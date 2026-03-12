@@ -120,11 +120,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
 
-      await supabase.from('notifications').insert({
-        user_id: '00000000-0000-0000-0000-000000000000',
-        user_type: 'admin',
-        message: `New creator signup: ${additionalData.name} (${email}) — pending approval.`,
-      });
+      // Admin signup notification — will be handled server-side via DB trigger
+      // Client INSERT is blocked by RLS (service-role only)
     } else if (role === 'business') {
       const { error: insertError } = await supabase.from('businesses').insert({
         owner_email: email,
@@ -139,11 +136,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       if (insertError) throw new Error(`Failed to create profile: ${insertError.message}`);
 
-      await supabase.from('notifications').insert({
-        user_id: '00000000-0000-0000-0000-000000000000',
-        user_type: 'admin',
-        message: `New business signup: ${additionalData.name} (${email}) — pending approval.`,
-      });
+      // Admin signup notification — will be handled server-side via DB trigger
+      // Client INSERT is blocked by RLS (service-role only)
     }
 
     await fetchUserProfile(data.user);
