@@ -295,7 +295,7 @@ export default function AdminDashboard() {
                             <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
                           <p className="text-gray-500 text-sm mt-1">{offer.description}</p>
-                          <p className="text-xs text-gray-400 mt-1">Cap: {offer.monthly_cap}/month</p>
+                          <p className="text-xs text-gray-400 mt-1">Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
                         </div>
                       </div>
                     </div>
