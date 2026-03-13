@@ -583,6 +583,7 @@ ALTER TABLE offers ALTER COLUMN monthly_cap SET DEFAULT null;
   When monthly_cap is set, enforce it as before.
 */
 
+DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION claim_offer(
   p_offer_id uuid,
   p_creator_id uuid
@@ -1190,6 +1191,7 @@ $$;
   3. Re-add active business claim check (same creator, same business)
 */
 
+DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION claim_offer(
   p_offer_id uuid,
   p_creator_id uuid
