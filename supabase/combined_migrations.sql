@@ -19,6 +19,10 @@
   - INSERT policies allow sign-up profile creation
 */
 
+-- Drop existing functions to avoid return-type conflicts on re-runs
+DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
+DROP FUNCTION IF EXISTS unclaim_offer(uuid, uuid);
+
 -- Create businesses table
 CREATE TABLE IF NOT EXISTS businesses (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
