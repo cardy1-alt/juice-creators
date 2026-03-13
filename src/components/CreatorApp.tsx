@@ -8,6 +8,7 @@ import DisputeModal from './DisputeModal';
 import DiscoveryMap from './DiscoveryMap';
 import { getCategoryEmoji, getCategoryColor, getCategoryIconBg, getCategoryBorderColor } from '../lib/categories';
 import { getInitials, getAvatarGradient } from '../lib/avatar';
+import { Logo } from './Logo';
 
 function useCountdown(targetDate: string | null) {
   const [timeLeft, setTimeLeft] = useState('');
@@ -74,13 +75,17 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-sky-50 text-sky-600 border border-sky-100',
-    redeemed: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
+    active: 'bg-[#E8EDE8] text-[#2C2C2C]',
+    claimed: 'bg-[#E8EDE8] text-[#2C2C2C]',
+    redeemed: 'bg-[#E8EDE8] text-[#2C2C2C]',
+    visited: 'bg-[#E8EDE8] text-[#2C2C2C]',
+    reel_due: 'bg-[#C4674A] text-[#FAF8F2]',
+    submitted: 'bg-[#1A3C34] text-[#FAF8F2]',
     expired: 'bg-rose-50 text-rose-500 border border-rose-100',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-gray-50 text-gray-500 border border-gray-100'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-[#2C2C2C]'}`}>
       {status}
     </span>
   );
@@ -324,16 +329,16 @@ export default function CreatorApp() {
 
   if (!userProfile?.approved) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-gradient-to-br from-[#faf8ff] to-[#f0eaff]">
-        <div className="bg-white rounded-2xl shadow-xl shadow-black/5 p-8 max-w-sm text-center border border-gray-100">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAF8F2]">
+        <div className="bg-[#E8EDE8] rounded-2xl shadow-xl shadow-black/[0.04] p-8 max-w-sm text-center border border-[rgba(26,60,52,0.1)]">
           <div className="text-4xl mb-4">⏳</div>
-          <h2 className="text-xl font-bold mb-2 text-[#1a1025]">Pending Approval</h2>
+          <h2 className="text-xl font-bold mb-2 text-[#2C2C2C]">Pending Approval</h2>
           <p className="text-gray-500 text-sm mb-6">
             Your creator account is under review. You'll be notified once approved!
           </p>
           <button
             onClick={signOut}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white font-medium bg-[#1a1025] hover:bg-[#2d1f45] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-[#FAF8F2] font-medium bg-[#1A3C34] hover:bg-[#15332c] transition-colors"
           >
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
@@ -368,7 +373,7 @@ export default function CreatorApp() {
     ? 'bg-rose-500'
     : activeUrgency === 'soon'
     ? 'bg-amber-500'
-    : 'bg-[#5b3df5]';
+    : 'bg-[#C4674A]';
 
   const tabs = [
     { key: 'offers' as const, label: 'Offers', icon: Gift },
@@ -379,7 +384,7 @@ export default function CreatorApp() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#faf8ff]">
+    <div className="min-h-screen bg-[#FAF8F2]">
       {showOnboarding && (
         <CreatorOnboarding
           creatorId={userProfile.id}
@@ -395,8 +400,8 @@ export default function CreatorApp() {
       )}
       {releaseModalOpen && selectedClaim && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-xl">
-            <h3 className="text-lg font-bold text-[#1a1025] mb-2">Release this offer?</h3>
+          <div className="bg-[#FAF8F2] rounded-2xl p-6 max-w-sm w-full shadow-xl">
+            <h3 className="text-lg font-bold text-[#2C2C2C] mb-2">Release this offer?</h3>
             <p className="text-sm text-gray-600 mb-4">
               The slot goes back to the pool. You won't be able to claim this offer again.
             </p>
@@ -412,7 +417,7 @@ export default function CreatorApp() {
                   setReleaseError(null);
                 }}
                 disabled={releasingClaim}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-gray-200 text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-40"
+                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-[rgba(26,60,52,0.1)] text-gray-700 hover:bg-[#FAF8F2] transition-colors disabled:opacity-40"
               >
                 Keep it
               </button>
@@ -429,48 +434,49 @@ export default function CreatorApp() {
       )}
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-white border-b border-gray-100 px-5 py-4">
+        <div className="bg-[#1A3C34] px-5 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full bg-gradient-to-br ${getAvatarGradient(userProfile.name)} flex items-center justify-center text-white font-bold text-sm shadow-sm`}>
-                {getInitials(userProfile.name)}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Logo size={32} color="#FAF8F2" />
+                <span style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 600, fontSize: '22px', color: '#FAF8F2' }}>nayba</span>
               </div>
-              <div>
-                <h1 className="text-[15px] font-bold text-[#1a1025]">{userProfile.name}</h1>
+              <div className="ml-3">
+                <h1 className="text-[15px] font-bold text-[#FAF8F2]">{userProfile.name}</h1>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-gray-400">{userProfile.instagram_handle}</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#1a1025] text-white">
+                  <span className="text-xs text-[#FAF8F2]/60">{userProfile.instagram_handle}</span>
+                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FAF8F2]/20 text-[#FAF8F2]">
                     {userProfile.code}
                   </span>
                   {collabsCompleted > 0 && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-emerald-500 text-white">
+                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#C4674A] text-[#FAF8F2]">
                       {collabsCompleted} collab{collabsCompleted !== 1 ? 's' : ''}
                     </span>
                   )}
                 </div>
               </div>
             </div>
-            <button onClick={signOut} className="p-2 rounded-xl hover:bg-gray-50 transition-colors">
-              <LogOut className="w-5 h-5 text-gray-400" />
+            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#FAF8F2]/10 transition-colors">
+              <LogOut className="w-5 h-5 text-[#FAF8F2]/70" />
             </button>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-white border-b border-gray-100">
+        <div className="flex bg-[#FAF8F2] border-b border-[rgba(26,60,52,0.1)]">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => setView(tab.key)}
               className={`flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-semibold transition-all relative ${
-                view === tab.key ? 'text-[#1a1025]' : 'text-gray-400'
+                view === tab.key ? 'text-[#2C2C2C]' : 'text-[#2C2C2C]/40'
               }`}
             >
               <div className="relative">
                 <tab.icon className="w-[18px] h-[18px]" />
                 {tab.badge ? (
-                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[9px] font-bold flex items-center justify-center ${
-                    tab.badgeColor || 'bg-[#5b3df5]'
+                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[#FAF8F2] text-[9px] font-bold flex items-center justify-center ${
+                    tab.badgeColor || 'bg-[#C4674A]'
                   }`}>
                     {tab.badge}
                   </span>
@@ -478,7 +484,7 @@ export default function CreatorApp() {
               </div>
               {tab.label}
               {view === tab.key && (
-                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#1a1025] rounded-full" />
+                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#1A3C34] rounded-full" />
               )}
             </button>
           ))}
@@ -497,7 +503,7 @@ export default function CreatorApp() {
                 </div>
               )}
               {/* Search and Controls */}
-              <div className="bg-white rounded-xl p-3 border border-gray-200 shadow-sm mb-3 space-y-3">
+              <div className="bg-[#E8EDE8] rounded-xl p-3 border border-[rgba(26,60,52,0.1)] shadow-sm mb-3 space-y-3">
                 {/* Search bar */}
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -506,7 +512,7 @@ export default function CreatorApp() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search businesses..."
-                    className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5]/20 focus:border-[#5b3df5]"
+                    className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
                   />
                 </div>
 
@@ -518,7 +524,7 @@ export default function CreatorApp() {
                     <select
                       value={sortBy}
                       onChange={(e) => setSortBy(e.target.value as 'newest' | 'slots' | 'name')}
-                      className="text-xs font-semibold text-gray-600 bg-transparent border-none focus:outline-none cursor-pointer"
+                      className="text-xs font-semibold text-[#2C2C2C] bg-transparent border-none focus:outline-none cursor-pointer"
                     >
                       <option value="newest">Newest</option>
                       <option value="slots">Most Available</option>
@@ -527,11 +533,11 @@ export default function CreatorApp() {
                   </div>
 
                   {/* View toggle */}
-                  <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-0.5">
+                  <div className="flex items-center gap-1 bg-[#FAF8F2] rounded-lg p-0.5">
                     <button
                       onClick={() => setViewMode('card')}
                       className={`p-1.5 rounded transition-colors ${
-                        viewMode === 'card' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                        viewMode === 'card' ? 'bg-[#E8EDE8] shadow-sm' : 'text-gray-400 hover:text-gray-600'
                       }`}
                     >
                       <LayoutGrid className="w-3.5 h-3.5" />
@@ -539,7 +545,7 @@ export default function CreatorApp() {
                     <button
                       onClick={() => setViewMode('compact')}
                       className={`p-1.5 rounded transition-colors ${
-                        viewMode === 'compact' ? 'bg-white shadow-sm' : 'text-gray-400 hover:text-gray-600'
+                        viewMode === 'compact' ? 'bg-[#E8EDE8] shadow-sm' : 'text-gray-400 hover:text-gray-600'
                       }`}
                     >
                       <List className="w-3.5 h-3.5" />
@@ -549,14 +555,14 @@ export default function CreatorApp() {
               </div>
 
               {/* Category Filter */}
-              <div className="bg-white rounded-xl p-3 border border-gray-100 shadow-sm mb-3 relative">
+              <div className="bg-[#E8EDE8] rounded-xl p-3 border border-[rgba(26,60,52,0.1)] shadow-sm mb-3 relative">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                   <button
                     onClick={() => setSelectedCategory('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                       selectedCategory === 'all'
-                        ? 'bg-[#5b3df5] text-white'
-                        : 'border border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                        ? 'bg-[#1A3C34] text-white'
+                        : 'border border-[rgba(26,60,52,0.1)] text-gray-600 hover:border-[rgba(26,60,52,0.2)] hover:bg-[#FAF8F2]'
                     }`}
                   >
                     All
@@ -567,8 +573,8 @@ export default function CreatorApp() {
                       onClick={() => setSelectedCategory(category)}
                       className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                         selectedCategory === category
-                          ? 'bg-[#5b3df5] text-white'
-                          : 'border border-gray-200 text-gray-600 hover:border-gray-300 hover:bg-gray-50'
+                          ? 'bg-[#1A3C34] text-white'
+                          : 'border border-[rgba(26,60,52,0.1)] text-gray-600 hover:border-[rgba(26,60,52,0.2)] hover:bg-[#FAF8F2]'
                       }`}
                     >
                       <span>{getCategoryEmoji(category)}</span>
@@ -576,7 +582,7 @@ export default function CreatorApp() {
                     </button>
                   ))}
                 </div>
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white via-white/80 to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#E8EDE8] via-[#E8EDE8]/80 to-transparent pointer-events-none" />
               </div>
 
               {(() => {
@@ -609,7 +615,7 @@ export default function CreatorApp() {
                           setSelectedCategory('all');
                           setSearchQuery('');
                         }}
-                        className="mt-2 text-[#5b3df5] text-xs font-semibold hover:underline"
+                        className="mt-2 text-[#1A3C34] text-xs font-semibold hover:underline"
                       >
                         Clear filters
                       </button>
@@ -650,7 +656,7 @@ export default function CreatorApp() {
                       return (
                         <div
                           key={offer.id}
-                          className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all p-3"
+                          className="bg-[#E8EDE8] rounded-xl border border-[rgba(26,60,52,0.1)] shadow-sm hover:shadow-md hover:border-[rgba(26,60,52,0.2)] transition-all p-3"
                         >
                           <div className="flex items-center gap-3">
                             <div className={`w-10 h-10 rounded-lg ${getCategoryIconBg(offer.businesses.category)} border ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-lg flex-shrink-0`}>
@@ -658,7 +664,7 @@ export default function CreatorApp() {
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-0.5">
-                                <h3 className="font-bold text-sm text-[#1a1025] truncate">{offer.businesses.name}</h3>
+                                <h3 className="font-bold text-sm text-[#2C2C2C] truncate">{offer.businesses.name}</h3>
                                 {isUnlimited ? (
                                   <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white flex-shrink-0">
                                     Open
@@ -679,14 +685,14 @@ export default function CreatorApp() {
                               {full ? (
                                 <button
                                   disabled
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-400 cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E8EDE8] text-gray-400 cursor-not-allowed"
                                 >
                                   Full
                                 </button>
                               ) : alreadyClaimed ? (
                                 <button
                                   disabled
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-gray-100 text-gray-500 cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E8EDE8] text-gray-500 cursor-not-allowed"
                                 >
                                   Claimed
                                 </button>
@@ -715,7 +721,7 @@ export default function CreatorApp() {
                     return (
                       <div
                         key={offer.id}
-                        className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm hover:shadow-lg hover:border-gray-300 transition-all text-left relative overflow-hidden group"
+                        className="w-full bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] shadow-sm hover:shadow-lg hover:border-[rgba(26,60,52,0.2)] transition-all text-left relative overflow-hidden group"
                       >
                         {/* Gradient accent */}
                         <div className={`absolute inset-0 opacity-[0.02] ${getCategoryColor(offer.businesses.category)}`} />
@@ -728,7 +734,7 @@ export default function CreatorApp() {
                                 {emoji}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-base text-[#1a1025] mb-0.5">{offer.businesses.name}</h3>
+                                <h3 className="font-bold text-base text-[#2C2C2C] mb-0.5">{offer.businesses.name}</h3>
                                 <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${getCategoryColor(offer.businesses.category).replace('bg-', 'bg-opacity-10 bg-')} ${getCategoryColor(offer.businesses.category).replace('bg-', 'text-')}`}>
                                   {offer.businesses.category}
                                 </span>
@@ -772,7 +778,7 @@ export default function CreatorApp() {
                                     {slotsUsed}/{offer.monthly_cap}
                                   </span>
                                 </div>
-                                <div className="h-2 bg-gray-100 rounded-full overflow-hidden shadow-inner">
+                                <div className="h-2 bg-[#E8EDE8] rounded-full overflow-hidden shadow-inner">
                                   <div
                                     className={`h-full ${barColor} transition-all duration-500 rounded-full`}
                                     style={{ width: `${pct}%` }}
@@ -786,14 +792,14 @@ export default function CreatorApp() {
                               {full ? (
                                 <button
                                   disabled
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-gray-400 cursor-not-allowed"
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-[#E8EDE8] text-gray-400 cursor-not-allowed"
                                 >
                                   Sold Out
                                 </button>
                               ) : alreadyClaimed ? (
                                 <button
                                   disabled
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-gray-100 text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-[#E8EDE8] text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
                                 >
                                   <CheckCircle2 className="w-4 h-4" />
                                   Already Claimed
@@ -881,7 +887,7 @@ export default function CreatorApp() {
                   <p className="text-gray-500 text-sm font-medium">No active passes</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="mt-3 text-[#5b3df5] text-sm font-semibold hover:underline"
+                    className="mt-3 text-[#1A3C34] text-sm font-semibold hover:underline"
                   >
                     Browse offers →
                   </button>
@@ -901,8 +907,8 @@ export default function CreatorApp() {
                               onClick={() => setSelectedClaim(claim)}
                               className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
                                 isSelected
-                                  ? 'bg-[#1a1025] text-white border-[#1a1025]'
-                                  : 'bg-white text-gray-600 border-gray-200 hover:border-gray-300'
+                                  ? 'bg-[#1A3C34] text-white border-[#1A3C34]'
+                                  : 'bg-[#E8EDE8] text-gray-600 border-[rgba(26,60,52,0.1)] hover:border-[rgba(26,60,52,0.2)]'
                               }`}
                             >
                               <span className="text-base">{emoji}</span>
@@ -911,7 +917,7 @@ export default function CreatorApp() {
                           );
                         })}
                       </div>
-                      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-gray-50 to-transparent pointer-events-none" />
+                      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-[#FAF8F2] to-transparent pointer-events-none" />
                     </div>
                   )}
 
@@ -932,33 +938,33 @@ export default function CreatorApp() {
                         ];
 
                         return (
-                      <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm shadow-black/[0.03]">
+                      <div className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
                         <div className="flex items-center gap-3 mb-5">
                           <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
                             {getCategoryEmoji(selectedClaim.businesses.category)}
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-bold text-[15px] text-[#1a1025]">{selectedClaim.businesses.name}</h3>
+                            <h3 className="font-bold text-[15px] text-[#2C2C2C]">{selectedClaim.businesses.name}</h3>
                             <p className="text-gray-500 text-[13px] mt-0.5">{selectedClaim.offers.description}</p>
                           </div>
                         </div>
 
                         {/* Status Rail */}
-                        <div className="mb-5 bg-gray-50/80 rounded-xl p-4">
+                        <div className="mb-5 bg-[#FAF8F2]/80 rounded-xl p-4">
                           <div className="relative">
                             <div className="grid grid-cols-4">
                               {stages.map((stage, idx) => (
                                 <div key={stage.key} className="flex flex-col items-center">
                                   <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                                     stage.active
-                                      ? 'bg-[#5b3df5] text-white'
+                                      ? 'bg-[#1A3C34] text-white'
                                       : stages.findIndex(s => s.active) > idx
                                       ? 'bg-emerald-400 text-white'
                                       : 'bg-gray-200 text-gray-400'
                                   }`}>
                                     {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
                                   </div>
-                                  <p className={`text-[9px] font-semibold mt-1.5 text-center px-1 ${stage.active ? 'text-[#1a1025]' : 'text-gray-400'}`}>
+                                  <p className={`text-[9px] font-semibold mt-1.5 text-center px-1 ${stage.active ? 'text-[#2C2C2C]' : 'text-gray-400'}`}>
                                     {stage.label}
                                   </p>
                                 </div>
@@ -1007,7 +1013,7 @@ export default function CreatorApp() {
 
                         {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
                           <div className="mt-5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
-                            <label className="block text-sm font-semibold text-[#1a1025] mb-2">
+                            <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">
                               🎬 Submit Your Reel
                             </label>
                             <div className="flex gap-2">
@@ -1016,7 +1022,7 @@ export default function CreatorApp() {
                                 value={reelUrl}
                                 onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                 placeholder="https://instagram.com/reel/..."
-                                className="flex-1 px-3 py-2 rounded-lg border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-200 focus:border-emerald-300"
+                                className="flex-1 px-3 py-2 rounded-lg bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
                               />
                               <button
                                 onClick={handleSubmitReel}
@@ -1087,7 +1093,7 @@ export default function CreatorApp() {
                 </div>
               )}
               {claims.map((claim) => (
-                <div key={claim.id} className="bg-white rounded-2xl p-4 border border-gray-100 shadow-sm shadow-black/[0.03]">
+                <div key={claim.id} className="bg-[#E8EDE8] rounded-2xl p-4 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
                   <div className="flex items-start gap-3">
                     <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-base flex-shrink-0">
                       {getCategoryEmoji(claim.businesses.category)}
@@ -1095,7 +1101,7 @@ export default function CreatorApp() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-[13px] text-[#1a1025]">{claim.businesses.name}</h3>
+                          <h3 className="font-semibold text-[13px] text-[#2C2C2C]">{claim.businesses.name}</h3>
                           <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]" style={{
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
@@ -1106,7 +1112,7 @@ export default function CreatorApp() {
                         </div>
                         <StatusPill status={claim.status} />
                       </div>
-                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-gray-50">
+                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[rgba(26,60,52,0.1)]">
                         <span className="text-[11px] text-gray-400">
                           {new Date(claim.claimed_at).toLocaleDateString()}
                         </span>
@@ -1115,7 +1121,7 @@ export default function CreatorApp() {
                             href={claim.reel_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#5b3df5] hover:underline"
+                            className="flex items-center gap-1 text-[11px] font-semibold text-[#1A3C34] hover:underline"
                           >
                             View Reel <ExternalLink className="w-3 h-3" />
                           </a>
@@ -1141,16 +1147,16 @@ export default function CreatorApp() {
                 <button
                   key={notif.id}
                   onClick={() => !notif.read && markNotificationRead(notif.id)}
-                  className={`w-full text-left bg-white rounded-2xl p-4 border transition-all ${
+                  className={`w-full text-left bg-[#E8EDE8] rounded-2xl p-4 border transition-all ${
                     notif.read
-                      ? 'border-gray-100 opacity-50'
-                      : 'border-sky-200 bg-sky-50/30 shadow-sm'
+                      ? 'border-[rgba(26,60,52,0.1)] opacity-50'
+                      : 'border-[rgba(26,60,52,0.2)] bg-[#FAF8F2] shadow-sm'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-sky-500'}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-[#C4674A]'}`} />
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[#1a1025]">{notif.message}</p>
+                      <p className="text-sm text-[#2C2C2C]">{notif.message}</p>
                       <p className="text-[11px] text-gray-400 mt-1">
                         {new Date(notif.created_at).toLocaleDateString()}
                       </p>

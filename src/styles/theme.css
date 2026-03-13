@@ -1,0 +1,24 @@
+:root {
+  --background: #FAF8F2;
+  --foreground: #2C2C2C;
+  --primary: #1A3C34;
+  --primary-foreground: #FAF8F2;
+  --card: #E8EDE8;
+  --card-foreground: #2C2C2C;
+  --accent: #C4674A;
+  --accent-foreground: #FAF8F2;
+  --muted: #E8EDE8;
+  --muted-foreground: #2C2C2C;
+  --border: rgba(26, 60, 52, 0.15);
+}
+
+@layer base {
+  h1, h2, h3, h4, h5 {
+    font-family: 'Crimson Pro', serif;
+    font-weight: 600;
+  }
+
+  body, p, span, button, input, label {
+    font-family: 'Inter', sans-serif;
+  }
+}

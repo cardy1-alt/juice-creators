@@ -1,3 +1,6 @@
+@import './styles/fonts.css';
+@import './styles/theme.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,6 +9,8 @@
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: var(--background);
+    color: var(--foreground);
   }
 
   /* Custom scrollbar */
@@ -19,11 +24,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #d4cce8;
+    background: rgba(26, 60, 52, 0.2);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: #b8aed4;
+    background: rgba(26, 60, 52, 0.35);
   }
 }

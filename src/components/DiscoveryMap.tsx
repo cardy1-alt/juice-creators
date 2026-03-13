@@ -34,7 +34,7 @@ function createEmojiIcon(emoji: string) {
     html: `<div style="
       font-size: 24px;
       background: white;
-      border: 3px solid #5b3df5;
+      border: 3px solid #1A3C34;
       border-radius: 50%;
       width: 40px;
       height: 40px;
@@ -157,14 +157,14 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         <button
           onClick={requestLocation}
           disabled={isLocating}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#5b3df5] text-white rounded-xl text-sm font-semibold hover:bg-[#4a2fcc] transition-colors disabled:opacity-50"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#1A3C34] text-white rounded-lg text-sm font-semibold hover:bg-[#15332c] transition-colors disabled:opacity-50"
         >
           <Navigation className="w-4 h-4" />
           {isLocating ? 'Finding...' : 'My Location'}
         </button>
         <button
           onClick={() => setShowLocationInput(!showLocationInput)}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white border border-gray-200 text-gray-700 rounded-xl text-sm font-semibold hover:border-[#5b3df5] hover:text-[#5b3df5] transition-colors"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#FAF8F2] border border-[rgba(26,60,52,0.1)] text-gray-700 rounded-lg text-sm font-semibold hover:border-[#1A3C34] hover:text-[#1A3C34] transition-colors"
         >
           <Search className="w-4 h-4" />
           Enter Location
@@ -172,7 +172,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       </div>
 
       {showLocationInput && (
-        <div className="mb-3 bg-white rounded-xl p-4 border border-gray-200 shadow-sm">
+        <div className="mb-3 bg-[#FAF8F2] rounded-xl p-4 border border-[rgba(26,60,52,0.1)] shadow-sm">
           <label className="block text-xs font-semibold text-gray-700 mb-2">
             Enter address or postcode
           </label>
@@ -183,12 +183,12 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
               onChange={(e) => setLocationInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && geocodeLocation()}
               placeholder="e.g., London SW1A 1AA"
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#5b3df5] focus:border-transparent"
+              className="flex-1 px-3 py-2 border border-[rgba(26,60,52,0.1)] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3C34] focus:border-transparent"
             />
             <button
               onClick={geocodeLocation}
               disabled={geocoding || !locationInput.trim()}
-              className="px-4 py-2 bg-[#5b3df5] text-white rounded-lg text-sm font-semibold hover:bg-[#4a2fcc] transition-colors disabled:opacity-40"
+              className="px-4 py-2 bg-[#1A3C34] text-white rounded-lg text-sm font-semibold hover:bg-[#15332c] transition-colors disabled:opacity-40"
             >
               {geocoding ? 'Searching...' : 'Go'}
             </button>
@@ -199,10 +199,10 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </div>
       )}
 
-      <div className="relative bg-gray-100 rounded-2xl overflow-hidden" style={{ height: '400px' }}>
+      <div className="relative bg-[#E8EDE8] rounded-2xl overflow-hidden" style={{ height: '400px' }}>
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="text-center bg-white/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-gray-200">
+            <div className="text-center bg-[#FAF8F2]/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-[rgba(26,60,52,0.1)]">
               <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
               <p className="text-gray-600 text-sm font-semibold">No businesses near you yet</p>
               <p className="text-gray-400 text-xs mt-1">Check back soon!</p>
@@ -233,16 +233,16 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             >
               <Popup closeButton={true}>
                 <div className="text-sm min-w-[180px]">
-                  <h4 className="font-bold text-gray-900 mb-1">{business.name}</h4>
+                  <h4 className="font-bold text-[#2C2C2C] mb-1">{business.name}</h4>
                   <p className="text-xs text-gray-500 mb-2">{business.category}</p>
                   {business.offers.length > 0 && (
-                    <p className="text-xs text-[#5b3df5] font-semibold mb-2">
+                    <p className="text-xs text-[#1A3C34] font-semibold mb-2">
                       {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
                     </p>
                   )}
                   <button
                     onClick={() => setSelectedBusiness(business)}
-                    className="w-full mt-2 px-3 py-1.5 bg-[#5b3df5] text-white text-xs font-semibold rounded-lg hover:bg-[#4a2fcc] transition-colors"
+                    className="w-full mt-2 px-3 py-1.5 bg-[#1A3C34] text-white text-xs font-semibold rounded-lg hover:bg-[#15332c] transition-colors"
                   >
                     View Offers
                   </button>
@@ -255,14 +255,14 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       <div className="mt-4 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-bold text-sm text-gray-900">Nearby Businesses</h3>
+          <h3 className="font-bold text-sm text-[#2C2C2C]">Nearby Businesses</h3>
           <span className="text-xs text-gray-400">{businessesWithDistance.length} found</span>
         </div>
 
         {businessesWithDistance.map((business) => (
           <div
             key={business.id}
-            className="bg-white rounded-xl p-4 border border-gray-100 shadow-sm cursor-pointer hover:border-[#5b3df5]/30 hover:shadow-md transition-all"
+            className="bg-[#FAF8F2] rounded-xl p-4 border border-[rgba(26,60,52,0.1)] shadow-sm cursor-pointer hover:border-[#1A3C34]/30 hover:shadow-md transition-all"
             onClick={() => setSelectedBusiness(business)}
           >
             <div className="flex items-start gap-3">
@@ -271,7 +271,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-semibold text-sm text-gray-900">{business.name}</h4>
+                  <h4 className="font-semibold text-sm text-[#2C2C2C]">{business.name}</h4>
                   <span className="text-xs text-gray-500 whitespace-nowrap">
                     {business.distance < 1
                       ? `${(business.distance * 1000).toFixed(0)} m`
@@ -281,7 +281,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                 </div>
                 <p className="text-xs text-gray-500 mt-0.5">{business.address}</p>
                 {business.offers.length > 0 && (
-                  <p className="text-xs text-[#5b3df5] font-medium mt-1">
+                  <p className="text-xs text-[#1A3C34] font-medium mt-1">
                     {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
                   </p>
                 )}
@@ -297,7 +297,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           onClick={() => setSelectedBusiness(null)}
         >
           <div
-            className="bg-white rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up"
+            className="bg-[#FAF8F2] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5">
@@ -307,7 +307,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                     {getCategoryEmoji(selectedBusiness.category)}
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-gray-900">{selectedBusiness.name}</h3>
+                    <h3 className="font-bold text-base text-[#2C2C2C]">{selectedBusiness.name}</h3>
                     <p className="text-xs text-gray-500 mt-0.5">{selectedBusiness.address}</p>
                     <p className="text-xs text-gray-400 mt-1">
                       {selectedBusiness.distance < 1
@@ -335,7 +335,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                   const full = !isUnlimited && slotsLeft === 0;
 
                   return (
-                    <div key={offer.id} className="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    <div key={offer.id} className="bg-[#E8EDE8] rounded-xl p-3 border border-[rgba(26,60,52,0.1)]">
                       <p className="text-sm text-gray-700 mb-2">{offer.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-xs font-bold text-emerald-600">{offer.reward_value}</span>
@@ -345,7 +345,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                             setSelectedBusiness(null);
                           }}
                           disabled={full}
-                          className="px-3 py-1.5 bg-[#5b3df5] text-white text-xs font-semibold rounded-lg hover:bg-[#4a2fcc] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 bg-[#1A3C34] text-white text-xs font-semibold rounded-lg hover:bg-[#15332c] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                         >
                           {full ? 'Full' : 'Claim'}
                         </button>
