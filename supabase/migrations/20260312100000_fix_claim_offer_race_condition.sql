@@ -6,6 +6,7 @@
   3. Re-add active business claim check (same creator, same business)
 */
 
+DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION claim_offer(
   p_offer_id uuid,
   p_creator_id uuid

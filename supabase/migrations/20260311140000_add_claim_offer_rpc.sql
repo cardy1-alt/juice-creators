@@ -1,5 +1,6 @@
 -- Atomic claim_offer RPC function
 -- Checks monthly cap, duplicate claims, and active business claims before inserting
+DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION claim_offer(
   p_offer_id uuid,
   p_creator_id uuid
