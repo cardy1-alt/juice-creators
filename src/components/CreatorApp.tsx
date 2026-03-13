@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, ExternalLink, Sparkles, Gift, History, Bell, CheckCircle2, Clock, Flag, Map, Search, SlidersHorizontal, LayoutGrid, List } from 'lucide-react';
+import { Home, MapPin, Zap, Clock, Bell, Check, Search, LogOut, ExternalLink, Flag, LayoutGrid, List } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import DiscoveryMap from './DiscoveryMap';
-import { getCategoryEmoji, getCategoryColor, getCategoryIconBg, getCategoryBorderColor } from '../lib/categories';
+import { getCategoryIconName, getCategoryColor, getCategoryIconBg, getCategoryBorderColor, CategoryIcon } from '../lib/categories';
 import { getInitials, getAvatarGradient } from '../lib/avatar';
 import { Logo } from './Logo';
 
@@ -80,7 +80,7 @@ function StatusPill({ status }: { status: string }) {
     redeemed: 'bg-[#E8EDE8] text-[#2C2C2C]',
     visited: 'bg-[#E8EDE8] text-[#2C2C2C]',
     reel_due: 'bg-[#C4674A] text-[#FAF8F2]',
-    submitted: 'bg-[#1A3C34] text-[#FAF8F2]',
+    submitted: 'bg-[#C4674A] text-[#FAF8F2]',
     expired: 'bg-rose-50 text-rose-500 border border-rose-100',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
   };
@@ -330,15 +330,15 @@ export default function CreatorApp() {
   if (!userProfile?.approved) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAF8F2]">
-        <div className="bg-[#E8EDE8] rounded-2xl shadow-xl shadow-black/[0.04] p-8 max-w-sm text-center border border-[rgba(26,60,52,0.1)]">
-          <div className="text-4xl mb-4">⏳</div>
+        <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] p-8 max-w-sm text-center">
+          <Clock className="w-8 h-8 text-[rgba(44,44,44,0.25)] mx-auto mb-4" />
           <h2 className="text-xl font-bold mb-2 text-[#2C2C2C]">Pending Approval</h2>
-          <p className="text-gray-500 text-sm mb-6">
+          <p className="text-[rgba(44,44,44,0.45)] text-sm mb-6">
             Your creator account is under review. You'll be notified once approved!
           </p>
           <button
             onClick={signOut}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-[#FAF8F2] font-medium bg-[#1A3C34] hover:bg-[#15332c] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[12px] text-white font-medium bg-[#C4674A] hover:bg-[#b35a3f] transition-colors"
           >
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
@@ -376,10 +376,10 @@ export default function CreatorApp() {
     : 'bg-[#C4674A]';
 
   const tabs = [
-    { key: 'offers' as const, label: 'Offers', icon: Gift },
-    { key: 'map' as const, label: 'Map', icon: Map },
-    { key: 'active' as const, label: 'Active', icon: Sparkles, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
-    { key: 'history' as const, label: 'History', icon: History },
+    { key: 'offers' as const, label: 'Offers', icon: Home },
+    { key: 'map' as const, label: 'Map', icon: MapPin },
+    { key: 'active' as const, label: 'Active', icon: Zap, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
+    { key: 'history' as const, label: 'History', icon: Clock },
     { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount || undefined },
   ];
 
@@ -400,9 +400,9 @@ export default function CreatorApp() {
       )}
       {releaseModalOpen && selectedClaim && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#FAF8F2] rounded-2xl p-6 max-w-sm w-full shadow-xl">
+          <div className="bg-[#FAF8F2] rounded-[20px] p-6 max-w-sm w-full shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
             <h3 className="text-lg font-bold text-[#2C2C2C] mb-2">Release this offer?</h3>
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-[rgba(44,44,44,0.45)] mb-4">
               The slot goes back to the pool. You won't be able to claim this offer again.
             </p>
             {releaseError && (
@@ -417,14 +417,14 @@ export default function CreatorApp() {
                   setReleaseError(null);
                 }}
                 disabled={releasingClaim}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-semibold border-2 border-[rgba(26,60,52,0.1)] text-gray-700 hover:bg-[#FAF8F2] transition-colors disabled:opacity-40"
+                className="flex-1 px-4 py-2.5 rounded-[12px] text-sm font-semibold border-2 border-[rgba(44,44,44,0.1)] text-[#2C2C2C] hover:bg-[#FAF8F2] transition-colors disabled:opacity-40"
               >
                 Keep it
               </button>
               <button
                 onClick={handleReleaseOffer}
                 disabled={releasingClaim}
-                className="flex-1 px-4 py-2.5 rounded-xl text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 transition-colors disabled:opacity-40"
+                className="flex-1 px-4 py-2.5 rounded-[12px] text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 transition-colors disabled:opacity-40"
               >
                 {releasingClaim ? 'Releasing...' : 'Release'}
               </button>
@@ -434,66 +434,30 @@ export default function CreatorApp() {
       )}
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-[#1A3C34] px-5 py-4">
+        <div className="bg-[#FAF8F2] px-5 pt-5 pb-[14px] border-b border-[rgba(44,44,44,0.1)]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Logo size={32} color="#FAF8F2" />
-                <span style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 600, fontSize: '22px', color: '#FAF8F2' }}>nayba</span>
-              </div>
-              <div className="ml-3">
-                <h1 className="text-[15px] font-bold text-[#FAF8F2]">{userProfile.name}</h1>
-                <div className="flex items-center gap-1.5">
-                  <span className="text-xs text-[#FAF8F2]/60">{userProfile.instagram_handle}</span>
-                  <span className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-[#FAF8F2]/20 text-[#FAF8F2]">
-                    {userProfile.code}
-                  </span>
-                  {collabsCompleted > 0 && (
-                    <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#C4674A] text-[#FAF8F2]">
-                      {collabsCompleted} collab{collabsCompleted !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-              </div>
+            <div className="flex items-center gap-2.5">
+              <Logo size={24} />
+              <span className="text-[18px] font-bold text-[#1A3C34]">nayba</span>
             </div>
-            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#FAF8F2]/10 transition-colors">
-              <LogOut className="w-5 h-5 text-[#FAF8F2]/70" />
-            </button>
+            <div className="flex items-center gap-3">
+              <div className="text-right">
+                <p className="text-[12px] font-semibold text-[#2C2C2C]">{userProfile.name}</p>
+                <span className="inline-block bg-[#E8EDE8] text-[rgba(44,44,44,0.45)] text-[10px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
+                  {userProfile.code}
+                </span>
+              </div>
+              <button onClick={signOut} className="p-2 rounded-lg hover:bg-[rgba(44,44,44,0.05)] transition-colors">
+                <LogOut className="w-5 h-5 text-[rgba(44,44,44,0.25)]" />
+              </button>
+            </div>
           </div>
         </div>
 
-        {/* Tab bar */}
-        <div className="flex bg-[#FAF8F2] border-b border-[rgba(26,60,52,0.1)]">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setView(tab.key)}
-              className={`flex-1 flex flex-col items-center gap-1 py-3 text-[10px] font-semibold transition-all relative ${
-                view === tab.key ? 'text-[#2C2C2C]' : 'text-[#2C2C2C]/40'
-              }`}
-            >
-              <div className="relative">
-                <tab.icon className="w-[18px] h-[18px]" />
-                {tab.badge ? (
-                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-[#FAF8F2] text-[9px] font-bold flex items-center justify-center ${
-                    tab.badgeColor || 'bg-[#C4674A]'
-                  }`}>
-                    {tab.badge}
-                  </span>
-                ) : null}
-              </div>
-              {tab.label}
-              {view === tab.key && (
-                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#1A3C34] rounded-full" />
-              )}
-            </button>
-          ))}
-        </div>
-
         {/* Content */}
-        <div className="p-4 space-y-3 pb-8">
+        <div className="p-4 space-y-3 pb-28">
 
-          {/* ── OFFERS ── */}
+          {/* -- OFFERS -- */}
           {view === 'offers' && (
             <>
               {claimError && (
@@ -502,67 +466,63 @@ export default function CreatorApp() {
                   <button onClick={() => setClaimError(null)} className="text-rose-400 hover:text-rose-600 text-xs font-semibold ml-3">Dismiss</button>
                 </div>
               )}
-              {/* Search and Controls */}
-              <div className="bg-[#E8EDE8] rounded-xl p-3 border border-[rgba(26,60,52,0.1)] shadow-sm mb-3 space-y-3">
-                {/* Search bar */}
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search businesses..."
-                    className="w-full pl-9 pr-3 py-2.5 rounded-lg bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
-                  />
+              {/* Search bar */}
+              <div className="bg-[#E8EDE8] rounded-[14px] px-[14px] py-[12px] flex items-center gap-2.5 mb-3">
+                <Search className="w-[14px] h-[14px] text-[rgba(44,44,44,0.25)] flex-shrink-0" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search businesses..."
+                  className="w-full bg-transparent text-[13px] font-normal text-[#2C2C2C] placeholder:text-[rgba(44,44,44,0.25)] focus:outline-none"
+                />
+              </div>
+
+              {/* Controls row */}
+              <div className="flex items-center justify-between gap-2 mb-3 px-1">
+                {/* Sort dropdown */}
+                <div className="flex items-center gap-2">
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value as 'newest' | 'slots' | 'name')}
+                    className="text-xs font-semibold text-[#2C2C2C] bg-transparent border-none focus:outline-none cursor-pointer"
+                  >
+                    <option value="newest">Newest</option>
+                    <option value="slots">Most Available</option>
+                    <option value="name">A-Z</option>
+                  </select>
                 </div>
 
-                {/* Controls row */}
-                <div className="flex items-center justify-between gap-2">
-                  {/* Sort dropdown */}
-                  <div className="flex items-center gap-2">
-                    <SlidersHorizontal className="w-3.5 h-3.5 text-gray-400" />
-                    <select
-                      value={sortBy}
-                      onChange={(e) => setSortBy(e.target.value as 'newest' | 'slots' | 'name')}
-                      className="text-xs font-semibold text-[#2C2C2C] bg-transparent border-none focus:outline-none cursor-pointer"
-                    >
-                      <option value="newest">Newest</option>
-                      <option value="slots">Most Available</option>
-                      <option value="name">A-Z</option>
-                    </select>
-                  </div>
-
-                  {/* View toggle */}
-                  <div className="flex items-center gap-1 bg-[#FAF8F2] rounded-lg p-0.5">
-                    <button
-                      onClick={() => setViewMode('card')}
-                      className={`p-1.5 rounded transition-colors ${
-                        viewMode === 'card' ? 'bg-[#E8EDE8] shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                    >
-                      <LayoutGrid className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      onClick={() => setViewMode('compact')}
-                      className={`p-1.5 rounded transition-colors ${
-                        viewMode === 'compact' ? 'bg-[#E8EDE8] shadow-sm' : 'text-gray-400 hover:text-gray-600'
-                      }`}
-                    >
-                      <List className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
+                {/* View toggle */}
+                <div className="flex items-center gap-1 bg-[#E8EDE8] rounded-lg p-0.5">
+                  <button
+                    onClick={() => setViewMode('card')}
+                    className={`p-1.5 rounded transition-colors ${
+                      viewMode === 'card' ? 'bg-white shadow-sm' : 'text-[rgba(44,44,44,0.25)] hover:text-[rgba(44,44,44,0.45)]'
+                    }`}
+                  >
+                    <LayoutGrid className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setViewMode('compact')}
+                    className={`p-1.5 rounded transition-colors ${
+                      viewMode === 'compact' ? 'bg-white shadow-sm' : 'text-[rgba(44,44,44,0.25)] hover:text-[rgba(44,44,44,0.45)]'
+                    }`}
+                  >
+                    <List className="w-3.5 h-3.5" />
+                  </button>
                 </div>
               </div>
 
               {/* Category Filter */}
-              <div className="bg-[#E8EDE8] rounded-xl p-3 border border-[rgba(26,60,52,0.1)] shadow-sm mb-3 relative">
+              <div className="mb-3 relative">
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                   <button
                     onClick={() => setSelectedCategory('all')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
                       selectedCategory === 'all'
-                        ? 'bg-[#1A3C34] text-white'
-                        : 'border border-[rgba(26,60,52,0.1)] text-gray-600 hover:border-[rgba(26,60,52,0.2)] hover:bg-[#FAF8F2]'
+                        ? 'bg-[#2C2C2C] text-[#FAF8F2]'
+                        : 'bg-[#E8EDE8] text-[rgba(44,44,44,0.45)]'
                     }`}
                   >
                     All
@@ -571,18 +531,17 @@ export default function CreatorApp() {
                     <button
                       key={category}
                       onClick={() => setSelectedCategory(category)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                      className={`px-3 py-1.5 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all flex items-center gap-1.5 ${
                         selectedCategory === category
-                          ? 'bg-[#1A3C34] text-white'
-                          : 'border border-[rgba(26,60,52,0.1)] text-gray-600 hover:border-[rgba(26,60,52,0.2)] hover:bg-[#FAF8F2]'
+                          ? 'bg-[#2C2C2C] text-[#FAF8F2]'
+                          : 'bg-[#E8EDE8] text-[rgba(44,44,44,0.45)]'
                       }`}
                     >
-                      <span>{getCategoryEmoji(category)}</span>
+                      <CategoryIcon category={category} className="w-4 h-4" />
                       <span>{category}</span>
                     </button>
                   ))}
                 </div>
-                <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-[#E8EDE8] via-[#E8EDE8]/80 to-transparent pointer-events-none" />
               </div>
 
               {(() => {
@@ -608,14 +567,14 @@ export default function CreatorApp() {
                 if (filteredOffers.length === 0) {
                   return (
                     <div className="text-center py-16">
-                      <div className="text-4xl mb-3">🔍</div>
-                      <p className="text-gray-400 text-sm">No offers found</p>
+                      <Search className="w-8 h-8 text-[rgba(44,44,44,0.25)] mx-auto mb-3" />
+                      <p className="text-[rgba(44,44,44,0.25)] text-sm">No offers found</p>
                       <button
                         onClick={() => {
                           setSelectedCategory('all');
                           setSearchQuery('');
                         }}
-                        className="mt-2 text-[#1A3C34] text-xs font-semibold hover:underline"
+                        className="mt-2 text-[#C4674A] text-xs font-semibold hover:underline"
                       >
                         Clear filters
                       </button>
@@ -627,7 +586,7 @@ export default function CreatorApp() {
                   <>
                     {/* Results count */}
                     <div className="flex items-center justify-between mb-3 px-1">
-                      <p className="text-xs font-semibold text-gray-500">
+                      <p className="text-xs font-semibold text-[rgba(44,44,44,0.25)]">
                         {filteredOffers.length} offer{filteredOffers.length !== 1 ? 's' : ''} available
                       </p>
                     </div>
@@ -635,7 +594,6 @@ export default function CreatorApp() {
                     <div className={viewMode === 'card' ? 'space-y-3' : 'space-y-2'}>
                       {filteredOffers
                   .map((offer) => {
-                    const emoji = getCategoryEmoji(offer.businesses.category);
                     const isUnlimited = offer.monthly_cap === null;
                     const slotsUsed = offer.slotsUsed || 0;
                     const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
@@ -644,62 +602,55 @@ export default function CreatorApp() {
                     const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
                     const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
 
-                    // Progress bar color logic
-                    let barColor = 'bg-emerald-500';
-                    if (pct >= 76) {
-                      barColor = 'bg-red-500';
-                    } else if (pct >= 51) {
-                      barColor = 'bg-amber-500';
-                    }
-
                     if (viewMode === 'compact') {
                       return (
                         <div
                           key={offer.id}
-                          className="bg-[#E8EDE8] rounded-xl border border-[rgba(26,60,52,0.1)] shadow-sm hover:shadow-md hover:border-[rgba(26,60,52,0.2)] transition-all p-3"
+                          className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] hover:shadow-md transition-all p-3"
                         >
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg ${getCategoryIconBg(offer.businesses.category)} border ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-lg flex-shrink-0`}>
-                              {emoji}
+                            <div className="w-10 h-10 rounded-[11px] bg-gradient-to-br from-[#3a3a3a] to-[#2C2C2C] flex items-center justify-center flex-shrink-0">
+                              <span className="text-[rgba(250,248,242,0.9)] text-[14px] font-bold">{offer.businesses.name.charAt(0)}</span>
                             </div>
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center gap-2 mb-0.5">
                                 <h3 className="font-bold text-sm text-[#2C2C2C] truncate">{offer.businesses.name}</h3>
                                 {isUnlimited ? (
-                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500 text-white flex-shrink-0">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[#2C2C2C] flex-shrink-0">
                                     Open
                                   </span>
                                 ) : full ? (
-                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-rose-500 text-white flex-shrink-0">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)] flex-shrink-0">
                                     Full
                                   </span>
                                 ) : (
-                                  <span className="px-2 py-0.5 rounded text-[9px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white flex-shrink-0">
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[#2C2C2C] flex-shrink-0">
                                     {slotsLeft} left
                                   </span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-500 truncate">{offer.description}</p>
+                              <p className="text-[12px] text-[rgba(44,44,44,0.45)] truncate">{offer.description}</p>
                             </div>
                             <div className="flex-shrink-0">
                               {full ? (
                                 <button
                                   disabled
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E8EDE8] text-gray-400 cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-[12px] text-xs font-bold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)] cursor-not-allowed"
                                 >
                                   Full
                                 </button>
                               ) : alreadyClaimed ? (
                                 <button
                                   disabled
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#E8EDE8] text-gray-500 cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-[12px] text-xs font-bold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)] cursor-not-allowed flex items-center gap-1"
                                 >
+                                  <Check className="w-3 h-3" />
                                   Claimed
                                 </button>
                               ) : hasActiveBusiness ? (
                                 <button
                                   disabled
-                                  className="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
+                                  className="px-3 py-1.5 rounded-[12px] text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed"
                                 >
                                   Active
                                 </button>
@@ -707,7 +658,7 @@ export default function CreatorApp() {
                                 <button
                                   onClick={() => handleClaim(offer)}
                                   disabled={loading}
-                                  className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 disabled:opacity-40"
+                                  className="px-3 py-1.5 rounded-[12px] text-xs font-bold transition-all bg-[#C4674A] text-white hover:bg-[#b35a3f] disabled:opacity-40"
                                 >
                                   Claim
                                 </button>
@@ -721,38 +672,39 @@ export default function CreatorApp() {
                     return (
                       <div
                         key={offer.id}
-                        className="w-full bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] shadow-sm hover:shadow-lg hover:border-[rgba(26,60,52,0.2)] transition-all text-left relative overflow-hidden group"
+                        className="w-full bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] hover:shadow-md transition-all text-left relative overflow-hidden"
                       >
-                        {/* Gradient accent */}
-                        <div className={`absolute inset-0 opacity-[0.02] ${getCategoryColor(offer.businesses.category)}`} />
+                        {/* Image area */}
+                        <div className="h-[120px] bg-gradient-to-br from-[#3a3a3a] to-[#2C2C2C] flex flex-col items-center justify-center">
+                          <div className="w-[46px] h-[46px] bg-[rgba(250,248,242,0.15)] rounded-[12px] flex items-center justify-center mb-1.5">
+                            <span className="text-[rgba(250,248,242,0.9)] text-[20px] font-bold">{offer.businesses.name.charAt(0)}</span>
+                          </div>
+                          <span className="text-[rgba(250,248,242,0.45)] text-[11px]">{offer.businesses.name}</span>
+                        </div>
 
                         <div className="relative p-5">
                           {/* Header */}
-                          <div className="flex items-start justify-between gap-3 mb-4">
-                            <div className="flex items-center gap-3 flex-1 min-w-0">
-                              <div className={`w-12 h-12 rounded-xl ${getCategoryIconBg(offer.businesses.category)} border-2 ${getCategoryBorderColor(offer.businesses.category)} flex items-center justify-center text-xl flex-shrink-0 shadow-sm`}>
-                                {emoji}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-bold text-base text-[#2C2C2C] mb-0.5">{offer.businesses.name}</h3>
-                                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold ${getCategoryColor(offer.businesses.category).replace('bg-', 'bg-opacity-10 bg-')} ${getCategoryColor(offer.businesses.category).replace('bg-', 'text-')}`}>
-                                  {offer.businesses.category}
-                                </span>
-                              </div>
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-bold text-[15px] text-[#2C2C2C] mb-1">{offer.businesses.name}</h3>
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-[#F4F1EC] text-[rgba(44,44,44,0.45)]">
+                                <CategoryIcon category={offer.businesses.category} className="w-3 h-3" />
+                                {offer.businesses.category}
+                              </span>
                             </div>
 
-                            {/* Status badge */}
+                            {/* Slots badge */}
                             <div className="flex-shrink-0">
                               {isUnlimited ? (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-emerald-500 text-white shadow-sm">
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[#2C2C2C]">
                                   Open
                                 </span>
                               ) : full ? (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-rose-500 text-white shadow-sm">
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)]">
                                   Full
                                 </span>
                               ) : (
-                                <span className="inline-flex items-center px-3 py-1.5 rounded-lg text-[11px] font-bold bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-sm">
+                                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-[10px] font-bold bg-[#E8EDE8] text-[#2C2C2C]">
                                   {slotsLeft} left
                                 </span>
                               )}
@@ -760,7 +712,7 @@ export default function CreatorApp() {
                           </div>
 
                           {/* Offer description */}
-                          <p className="text-sm text-gray-600 leading-relaxed mb-4">
+                          <p className="text-[12px] font-normal text-[rgba(44,44,44,0.45)] leading-[1.6] mb-4">
                             {offer.description}
                           </p>
 
@@ -768,19 +720,19 @@ export default function CreatorApp() {
                           <div className="space-y-3">
                             {isUnlimited ? (
                               <div className="pb-1">
-                                <span className="text-xs font-medium text-gray-400">Unlimited slots</span>
+                                <span className="text-[10px] text-[rgba(44,44,44,0.25)]">Unlimited slots</span>
                               </div>
                             ) : (
                               <div>
                                 <div className="flex items-center justify-between mb-1.5">
-                                  <span className="text-xs font-medium text-gray-500">Availability</span>
-                                  <span className="text-xs font-bold text-gray-700">
+                                  <span className="text-[10px] text-[rgba(44,44,44,0.25)]">Availability</span>
+                                  <span className="text-[10px] font-bold text-[rgba(44,44,44,0.25)]">
                                     {slotsUsed}/{offer.monthly_cap}
                                   </span>
                                 </div>
-                                <div className="h-2 bg-[#E8EDE8] rounded-full overflow-hidden shadow-inner">
+                                <div className="h-[3px] bg-[rgba(196,103,74,0.1)] rounded-[3px] overflow-hidden">
                                   <div
-                                    className={`h-full ${barColor} transition-all duration-500 rounded-full`}
+                                    className="h-full bg-[#C4674A] transition-all duration-500 rounded-[3px]"
                                     style={{ width: `${pct}%` }}
                                   />
                                 </div>
@@ -792,22 +744,22 @@ export default function CreatorApp() {
                               {full ? (
                                 <button
                                   disabled
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-[#E8EDE8] text-gray-400 cursor-not-allowed"
+                                  className="w-full px-4 py-3 rounded-[12px] text-[13px] font-semibold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)] cursor-not-allowed"
                                 >
                                   Sold Out
                                 </button>
                               ) : alreadyClaimed ? (
                                 <button
                                   disabled
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold bg-[#E8EDE8] text-gray-500 cursor-not-allowed flex items-center justify-center gap-2"
+                                  className="w-full px-4 py-3 rounded-[12px] text-[13px] font-semibold bg-[#E8EDE8] text-[rgba(44,44,44,0.25)] cursor-not-allowed flex items-center justify-center gap-2"
                                 >
-                                  <CheckCircle2 className="w-4 h-4" />
+                                  <Check className="w-4 h-4" />
                                   Already Claimed
                                 </button>
                               ) : hasActiveBusiness ? (
                                 <button
                                   disabled
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-semibold bg-amber-50 text-amber-700 border-2 border-amber-200 cursor-not-allowed"
+                                  className="w-full px-4 py-3 rounded-[12px] text-[13px] font-semibold bg-amber-50 text-amber-700 border-2 border-amber-200 cursor-not-allowed"
                                 >
                                   Complete Active Pass First
                                 </button>
@@ -815,7 +767,7 @@ export default function CreatorApp() {
                                 <button
                                   onClick={() => handleClaim(offer)}
                                   disabled={loading}
-                                  className="w-full px-4 py-3 rounded-xl text-sm font-bold transition-all bg-gradient-to-r from-emerald-500 to-teal-500 text-white hover:from-emerald-600 hover:to-teal-600 disabled:opacity-40 shadow-sm hover:shadow-md active:scale-[0.98]"
+                                  className="w-full px-4 py-3 rounded-[12px] text-[13px] font-semibold transition-all bg-[#C4674A] text-white hover:bg-[#b35a3f] disabled:opacity-40 active:scale-[0.98]"
                                 >
                                   {isUnlimited ? 'Claim Offer' : 'Claim Now'}
                                 </button>
@@ -833,7 +785,7 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* ── MAP ── */}
+          {/* -- MAP -- */}
           {view === 'map' && (
             <DiscoveryMap
               businesses={offers.map(offer => ({
@@ -878,18 +830,18 @@ export default function CreatorApp() {
             />
           )}
 
-          {/* ── ACTIVE PASSES ── */}
+          {/* -- ACTIVE PASSES -- */}
           {view === 'active' && (
             <>
               {activeClaims.length === 0 ? (
                 <div className="text-center py-16">
-                  <div className="text-4xl mb-3">✨</div>
-                  <p className="text-gray-500 text-sm font-medium">No active passes</p>
+                  <Zap className="w-8 h-8 text-[rgba(44,44,44,0.25)] mx-auto mb-3" />
+                  <p className="text-[rgba(44,44,44,0.45)] text-sm font-medium">No active passes</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="mt-3 text-[#1A3C34] text-sm font-semibold hover:underline"
+                    className="mt-3 text-[#C4674A] text-sm font-semibold hover:underline"
                   >
-                    Browse offers →
+                    Browse offers
                   </button>
                 </div>
               ) : (
@@ -899,19 +851,20 @@ export default function CreatorApp() {
                     <div className="relative">
                       <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
                         {activeClaims.map(claim => {
-                          const emoji = getCategoryEmoji(claim.businesses.category);
                           const isSelected = selectedClaim?.id === claim.id;
                           return (
                             <button
                               key={claim.id}
                               onClick={() => setSelectedClaim(claim)}
-                              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold whitespace-nowrap transition-all border ${
+                              className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
                                 isSelected
-                                  ? 'bg-[#1A3C34] text-white border-[#1A3C34]'
-                                  : 'bg-[#E8EDE8] text-gray-600 border-[rgba(26,60,52,0.1)] hover:border-[rgba(26,60,52,0.2)]'
+                                  ? 'bg-[#2C2C2C] text-[#FAF8F2]'
+                                  : 'bg-[#E8EDE8] text-[rgba(44,44,44,0.45)]'
                               }`}
                             >
-                              <span className="text-base">{emoji}</span>
+                              <span className="w-5 h-5 rounded-[6px] bg-gradient-to-br from-[#3a3a3a] to-[#2C2C2C] flex items-center justify-center flex-shrink-0">
+                                <span className="text-[rgba(250,248,242,0.9)] text-[9px] font-bold">{claim.businesses.name.charAt(0)}</span>
+                              </span>
                               <span className="max-w-[140px] truncate">{claim.businesses.name}</span>
                             </button>
                           );
@@ -934,50 +887,54 @@ export default function CreatorApp() {
                           { key: 'claimed', label: 'Claimed', active: currentStage === 'claimed' },
                           { key: 'visited', label: 'Visited', active: currentStage === 'reel_due' || currentStage === 'submitted' },
                           { key: 'reel_due', label: 'Reel Due', active: currentStage === 'reel_due' },
-                          { key: 'submitted', label: 'Submitted', active: currentStage === 'submitted' }
+                          { key: 'submitted', label: 'Done', active: currentStage === 'submitted' }
                         ];
 
                         return (
-                      <div className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
+                      <div className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                        {/* Business row */}
                         <div className="flex items-center gap-3 mb-5">
-                          <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl flex-shrink-0">
-                            {getCategoryEmoji(selectedClaim.businesses.category)}
+                          <div className="w-[42px] h-[42px] rounded-[11px] bg-gradient-to-br from-[#3a3a3a] to-[#2C2C2C] flex items-center justify-center flex-shrink-0">
+                            <span className="text-[rgba(250,248,242,0.9)] text-[18px] font-bold">{selectedClaim.businesses.name.charAt(0)}</span>
                           </div>
                           <div className="flex-1">
-                            <h3 className="font-bold text-[15px] text-[#2C2C2C]">{selectedClaim.businesses.name}</h3>
-                            <p className="text-gray-500 text-[13px] mt-0.5">{selectedClaim.offers.description}</p>
+                            <h3 className="font-bold text-[14px] text-[#2C2C2C]">{selectedClaim.businesses.name}</h3>
+                            <p className="text-[11px] text-[rgba(44,44,44,0.45)] mt-0.5">{selectedClaim.offers.description}</p>
                           </div>
                         </div>
 
-                        {/* Status Rail */}
-                        <div className="mb-5 bg-[#FAF8F2]/80 rounded-xl p-4">
+                        {/* Stepper */}
+                        <div className="mb-5">
                           <div className="relative">
                             <div className="grid grid-cols-4">
-                              {stages.map((stage, idx) => (
+                              {stages.map((stage, idx) => {
+                                const activeIdx = stages.findIndex(s => s.active);
+                                const isCompleted = activeIdx > idx;
+                                const isCurrent = stage.active;
+                                return (
                                 <div key={stage.key} className="flex flex-col items-center">
-                                  <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                                    stage.active
-                                      ? 'bg-[#1A3C34] text-white'
-                                      : stages.findIndex(s => s.active) > idx
-                                      ? 'bg-emerald-400 text-white'
-                                      : 'bg-gray-200 text-gray-400'
+                                  <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
+                                    isCurrent || isCompleted
+                                      ? 'bg-[#C4674A] text-white'
+                                      : 'bg-[#E8EDE8] text-[rgba(44,44,44,0.25)]'
                                   }`}>
-                                    {stages.findIndex(s => s.active) > idx ? '✓' : idx + 1}
+                                    {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
                                   </div>
-                                  <p className={`text-[9px] font-semibold mt-1.5 text-center px-1 ${stage.active ? 'text-[#2C2C2C]' : 'text-gray-400'}`}>
+                                  <p className={`text-[9px] mt-1.5 text-center px-1 ${
+                                    isCurrent ? 'font-semibold text-[#C4674A]' : 'font-medium text-[rgba(44,44,44,0.25)]'
+                                  }`}>
                                     {stage.label}
                                   </p>
                                 </div>
-                              ))}
+                                );
+                              })}
                             </div>
                             {/* Connecting lines */}
                             <div className="absolute top-[13px] left-0 right-0 flex items-center px-[12.5%]">
                               {[0, 1, 2].map((idx) => (
                                 <div
                                   key={idx}
-                                  className={`h-0.5 flex-1 ${
-                                    stages.findIndex(s => s.active) > idx ? 'bg-emerald-400' : 'bg-gray-200'
-                                  }`}
+                                  className="h-[1.5px] flex-1 bg-[rgba(44,44,44,0.1)]"
                                 />
                               ))}
                             </div>
@@ -997,7 +954,7 @@ export default function CreatorApp() {
                                 {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                               </p>
                             </div>
-                            <p className="text-xs text-gray-600">
+                            <p className="text-xs text-[rgba(44,44,44,0.45)]">
                               You have 48 hours to post your reel — it must genuinely feature the business.
                             </p>
                           </div>
@@ -1012,9 +969,9 @@ export default function CreatorApp() {
                         )}
 
                         {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
-                          <div className="mt-5 p-4 rounded-xl bg-emerald-50/60 border border-emerald-100">
+                          <div className="mt-5 p-4 rounded-xl bg-[#FAF8F2] border border-[rgba(44,44,44,0.1)]">
                             <label className="block text-sm font-semibold text-[#2C2C2C] mb-2">
-                              🎬 Submit Your Reel
+                              Submit Your Reel
                             </label>
                             <div className="flex gap-2">
                               <input
@@ -1022,12 +979,12 @@ export default function CreatorApp() {
                                 value={reelUrl}
                                 onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                 placeholder="https://instagram.com/reel/..."
-                                className="flex-1 px-3 py-2 rounded-lg bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
+                                className="flex-1 px-3 py-2 rounded-[12px] bg-[#E8EDE8] border border-[rgba(44,44,44,0.1)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
                               />
                               <button
                                 onClick={handleSubmitReel}
                                 disabled={loading || !reelUrl}
-                                className="px-4 py-2 rounded-lg text-white text-sm font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-40 transition-all"
+                                className="px-4 py-2 rounded-[12px] text-white text-sm font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-40 transition-all"
                               >
                                 Submit
                               </button>
@@ -1039,16 +996,16 @@ export default function CreatorApp() {
                         )}
 
                         {selectedClaim.reel_url && (
-                          <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-emerald-50 border border-emerald-100">
-                            <CheckCircle2 className="w-4 h-4 text-emerald-500 flex-shrink-0" />
-                            <span className="text-sm text-emerald-700 font-medium">Reel submitted!</span>
+                          <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-[#FAF8F2] border border-[rgba(44,44,44,0.1)]">
+                            <Check className="w-4 h-4 text-[#C4674A] flex-shrink-0" />
+                            <span className="text-sm text-[#2C2C2C] font-medium">Reel submitted!</span>
                           </div>
                         )}
 
                         <div className="mt-3 flex flex-col items-center gap-1">
                           <button
                             onClick={() => setDisputeClaimId(selectedClaim.id)}
-                            className="w-full flex items-center justify-center gap-2 py-2 text-xs text-gray-500 hover:text-amber-600 transition-colors"
+                            className="w-full flex items-center justify-center gap-2 py-2 text-[11px] font-medium text-[rgba(44,44,44,0.25)] hover:text-amber-600 transition-colors"
                           >
                             <Flag className="w-3 h-3" /> Report an issue
                           </button>
@@ -1058,14 +1015,14 @@ export default function CreatorApp() {
                               return (
                                 <button
                                   onClick={() => setReleaseModalOpen(true)}
-                                  className="text-xs text-gray-400 hover:text-rose-500 transition-colors"
+                                  className="text-xs text-[rgba(44,44,44,0.25)] hover:text-rose-500 transition-colors"
                                 >
                                   Release offer
                                 </button>
                               );
                             } else if (releaseStatus.reason) {
                               return (
-                                <span className="text-xs text-gray-300">
+                                <span className="text-xs text-[rgba(44,44,44,0.25)]">
                                   {releaseStatus.reason}
                                 </span>
                               );
@@ -1083,26 +1040,26 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* ── HISTORY ── */}
+          {/* -- HISTORY -- */}
           {view === 'history' && (
             <>
               {claims.length === 0 && (
                 <div className="text-center py-16">
-                  <div className="text-4xl mb-3">📋</div>
-                  <p className="text-gray-400 text-sm">No claims yet. Grab an offer to get started!</p>
+                  <Clock className="w-8 h-8 text-[rgba(44,44,44,0.25)] mx-auto mb-3" />
+                  <p className="text-[rgba(44,44,44,0.25)] text-sm">No claims yet. Grab an offer to get started!</p>
                 </div>
               )}
               {claims.map((claim) => (
-                <div key={claim.id} className="bg-[#E8EDE8] rounded-2xl p-4 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
+                <div key={claim.id} className="bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
                   <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-base flex-shrink-0">
-                      {getCategoryEmoji(claim.businesses.category)}
+                    <div className="w-9 h-9 rounded-[11px] bg-gradient-to-br from-[#3a3a3a] to-[#2C2C2C] flex items-center justify-center text-[rgba(250,248,242,0.9)] text-[14px] font-bold flex-shrink-0">
+                      {claim.businesses.name.charAt(0)}
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div className="min-w-0 flex-1">
                           <h3 className="font-semibold text-[13px] text-[#2C2C2C]">{claim.businesses.name}</h3>
-                          <p className="text-xs text-gray-400 mt-0.5 leading-[1.4]" style={{
+                          <p className="text-xs text-[rgba(44,44,44,0.45)] mt-0.5 leading-[1.4]" style={{
                             display: '-webkit-box',
                             WebkitLineClamp: 2,
                             WebkitBoxOrient: 'vertical',
@@ -1112,8 +1069,8 @@ export default function CreatorApp() {
                         </div>
                         <StatusPill status={claim.status} />
                       </div>
-                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[rgba(26,60,52,0.1)]">
-                        <span className="text-[11px] text-gray-400">
+                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[rgba(44,44,44,0.1)]">
+                        <span className="text-[11px] text-[rgba(44,44,44,0.25)]">
                           {new Date(claim.claimed_at).toLocaleDateString()}
                         </span>
                         {claim.reel_url && (
@@ -1121,7 +1078,7 @@ export default function CreatorApp() {
                             href={claim.reel_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#1A3C34] hover:underline"
+                            className="flex items-center gap-1 text-[11px] font-semibold text-[#C4674A] hover:underline"
                           >
                             View Reel <ExternalLink className="w-3 h-3" />
                           </a>
@@ -1134,30 +1091,30 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* ── NOTIFICATIONS ── */}
+          {/* -- NOTIFICATIONS -- */}
           {view === 'notifications' && (
             <>
               {notifications.length === 0 && (
                 <div className="text-center py-16">
-                  <div className="text-4xl mb-3">🔔</div>
-                  <p className="text-gray-400 text-sm">No notifications yet</p>
+                  <Bell className="w-8 h-8 text-[rgba(44,44,44,0.25)] mx-auto mb-3" />
+                  <p className="text-[rgba(44,44,44,0.25)] text-sm">No notifications yet</p>
                 </div>
               )}
               {notifications.map((notif) => (
                 <button
                   key={notif.id}
                   onClick={() => !notif.read && markNotificationRead(notif.id)}
-                  className={`w-full text-left bg-[#E8EDE8] rounded-2xl p-4 border transition-all ${
+                  className={`w-full text-left bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] transition-all ${
                     notif.read
-                      ? 'border-[rgba(26,60,52,0.1)] opacity-50'
-                      : 'border-[rgba(26,60,52,0.2)] bg-[#FAF8F2] shadow-sm'
+                      ? 'opacity-50'
+                      : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-[#C4674A]'}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(44,44,44,0.1)]' : 'bg-[#C4674A]'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#2C2C2C]">{notif.message}</p>
-                      <p className="text-[11px] text-gray-400 mt-1">
+                      <p className="text-[11px] text-[rgba(44,44,44,0.25)] mt-1">
                         {new Date(notif.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -1166,6 +1123,36 @@ export default function CreatorApp() {
               ))}
             </>
           )}
+        </div>
+      </div>
+
+      {/* Bottom Navigation Bar */}
+      <div className="fixed bottom-0 left-0 right-0 bg-[#FAF8F2] border-t border-[rgba(44,44,44,0.1)] z-40">
+        <div className="max-w-md mx-auto flex pt-[10px] pb-[12px]">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setView(tab.key)}
+              className={`flex-1 flex flex-col items-center gap-1 text-[10px] font-medium transition-all relative ${
+                view === tab.key ? 'text-[#C4674A]' : 'text-[rgba(44,44,44,0.25)]'
+              }`}
+            >
+              <div className="relative">
+                <tab.icon className="w-5 h-5" />
+                {tab.badge ? (
+                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[9px] font-bold flex items-center justify-center ${
+                    tab.badgeColor || 'bg-[#C4674A]'
+                  }`}>
+                    {tab.badge}
+                  </span>
+                ) : null}
+              </div>
+              {tab.label}
+              {view === tab.key && (
+                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#C4674A] rounded-full" />
+              )}
+            </button>
+          ))}
         </div>
       </div>
     </div>

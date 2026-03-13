@@ -3,28 +3,29 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import {
   LogOut, Users, Store,
-  CheckCircle2, XCircle, BarChart3, Package, ClipboardList, Settings
+  CheckCircle2, XCircle, BarChart3, Package, ClipboardList, Settings,
+  Film, AlertTriangle
 } from 'lucide-react';
-import { getCategoryEmoji } from '../lib/categories';
+import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#1A3C34]/10 text-[#1A3C34] border border-[#1A3C34]/20">✓ Approved</span>
-      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20">● Pending</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
+      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
-      ? <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#1A3C34]/10 text-[#1A3C34] border border-[#1A3C34]/20">● Live</span>
-      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(26,60,52,0.1)]">Paused</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]"><CheckCircle2 className="w-3 h-3" /> Live</span>
+      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(44,44,44,0.1)]">Paused</span>;
   }
   const styles: Record<string, string> = {
-    active: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(26,60,52,0.1)]',
-    redeemed: 'bg-[#1A3C34]/10 text-[#1A3C34] border border-[#1A3C34]/20',
+    active: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]',
+    redeemed: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]',
     expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
   };
-  return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(26,60,52,0.1)]'}`}>{status}</span>;
+  return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(44,44,44,0.1)]'}`}>{status}</span>;
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
@@ -138,10 +139,10 @@ export default function AdminDashboard() {
   };
 
   const statCards = [
-    { emoji: '👥', value: stats.totalCreators, label: 'Total Creators' },
-    { emoji: '🏪', value: stats.totalBusinesses, label: 'Total Businesses' },
-    { emoji: '📋', value: stats.totalClaims, label: 'Claims This Month' },
-    { emoji: '🎬', value: stats.totalReels, label: 'Reels Posted' },
+    { icon: Users, value: stats.totalCreators, label: 'Total Creators' },
+    { icon: Store, value: stats.totalBusinesses, label: 'Total Businesses' },
+    { icon: ClipboardList, value: stats.totalClaims, label: 'Claims This Month' },
+    { icon: Film, value: stats.totalReels, label: 'Reels Posted' },
   ];
 
   const tabs = [
@@ -157,25 +158,25 @@ export default function AdminDashboard() {
     <div className="min-h-screen bg-[#FAF8F2]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-[#1A3C34] px-6 py-4">
+        <div className="bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Logo size={32} color="#FAF8F2" />
-                <span style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 600, fontSize: '22px', color: '#FAF8F2' }}>nayba</span>
+                <Logo size={24} />
+                <span className="font-bold text-[#1A3C34]" style={{ fontSize: '18px' }}>nayba</span>
               </div>
               <div>
-                <p className="text-xs text-[#FAF8F2]/60">Admin Dashboard</p>
+                <p className="text-xs text-[rgba(44,44,44,0.45)]">Admin Dashboard</p>
               </div>
             </div>
-            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#15332c] transition-colors">
-              <LogOut className="w-4.5 h-4.5 text-[#FAF8F2]/60" />
+            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#E8EDE8] transition-colors">
+              <LogOut className="w-4.5 h-4.5 text-[rgba(44,44,44,0.25)]" />
             </button>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-[#FAF8F2] border-b border-[rgba(26,60,52,0.1)] overflow-x-auto">
+        <div className="flex bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)] overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.key}
@@ -193,7 +194,7 @@ export default function AdminDashboard() {
                 ) : null}
               </div>
               {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#1A3C34] rounded-full" />}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#C4674A] rounded-full" />}
             </button>
           ))}
         </div>
@@ -209,14 +210,14 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[#C4674A]/10 rounded-2xl p-5 border border-[#C4674A]/20">
-                  <h3 className="text-sm font-bold text-[#2C2C2C] mb-3">⏳ Pending Approvals</h3>
+                  <h3 className="text-sm font-bold text-[#2C2C2C] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[#C4674A]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF8F2] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
                       >
-                        <span className="text-2xl">👥</span>
+                        <Users className="w-6 h-6" />
                         <div className="text-left">
                           <p className="text-lg font-bold text-[#2C2C2C]">{stats.pendingCreators}</p>
                           <p className="text-[10px] text-[#2C2C2C]/60 font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
@@ -228,7 +229,7 @@ export default function AdminDashboard() {
                         onClick={() => setView('businesses')}
                         className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF8F2] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
                       >
-                        <span className="text-2xl">🏪</span>
+                        <Store className="w-6 h-6" />
                         <div className="text-left">
                           <p className="text-lg font-bold text-[#2C2C2C]">{stats.pendingBusinesses}</p>
                           <p className="text-[10px] text-[#2C2C2C]/60 font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
@@ -240,10 +241,10 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, i) => (
-                  <div key={i} className="bg-[#E8EDE8] border border-[rgba(26,60,52,0.1)] rounded-2xl p-6">
-                    <div className="text-2xl mb-3">{stat.emoji}</div>
-                    <p className="text-3xl font-bold text-[#1A3C34]">{stat.value}</p>
-                    <p className="text-xs text-[#2C2C2C]/60 mt-1 font-medium">{stat.label}</p>
+                  <div key={i} className="bg-white rounded-[20px] p-6 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                    <div className="mb-3"><stat.icon className="w-6 h-6 text-[rgba(44,44,44,0.45)]" /></div>
+                    <p className="text-3xl font-bold text-[#2C2C2C]">{stat.value}</p>
+                    <p className="text-xs text-[rgba(44,44,44,0.45)] mt-1 font-medium">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -252,14 +253,14 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] overflow-hidden">
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
               {creators.length === 0 ? (
-                <div className="text-center py-16"><div className="text-4xl mb-3">👥</div><p className="text-[#2C2C2C]/60 text-sm">No creators yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No creators yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-[#E8EDE8]/80 border-b border-[rgba(26,60,52,0.1)]">
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Name</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Handle</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Followers</th>
@@ -269,24 +270,24 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,60,52,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[#E8EDE8]/50 transition-colors ${!creator.approved ? 'bg-[#C4674A]/5' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#2C2C2C]">{creator.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {creator.follower_count ? (
-                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#1A3C34]/10 text-[#1A3C34] border border-[#1A3C34]/20">{creator.follower_count}</span>
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#E8EDE8] text-[#2C2C2C]">{creator.follower_count}</span>
                             ) : (
                               <span className="text-xs text-[#2C2C2C]/30">—</span>
                             )}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#1A3C34] text-[#FAF8F2]">{creator.code}</span></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#2C2C2C] text-[#FAF8F2]">{creator.code}</span></td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{creator.email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#1A3C34] hover:bg-[#15332c] transition-all">
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
@@ -306,14 +307,14 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] overflow-hidden">
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
               {businesses.length === 0 ? (
-                <div className="text-center py-16"><div className="text-4xl mb-3">🏪</div><p className="text-[#2C2C2C]/60 text-sm">No businesses yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No businesses yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-[#E8EDE8]/80 border-b border-[rgba(26,60,52,0.1)]">
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Business</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Slug</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Email</th>
@@ -321,12 +322,12 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,60,52,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
                       {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
                         <tr key={business.id} className={`hover:bg-[#E8EDE8]/50 transition-colors ${!business.approved ? 'bg-[#C4674A]/5' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
-                              <span className="text-base">{getCategoryEmoji(business.category)}</span>
+                              <CategoryIcon category={business.category} className="w-5 h-5" />
                               <span className="text-sm font-medium text-[#2C2C2C]">{business.name}</span>
                             </div>
                           </td>
@@ -335,7 +336,7 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#1A3C34] hover:bg-[#15332c] transition-all">
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
@@ -357,13 +358,13 @@ export default function AdminDashboard() {
           {view === 'offers' && (
             <>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="text-4xl mb-3">📦</div><p className="text-[#2C2C2C]/60 text-sm">No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Package className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)]">
+                    <div key={offer.id} className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
                       <div className="flex items-start gap-3 mb-2">
-                        <span className="text-xl flex-shrink-0">{getCategoryEmoji(offer.businesses.category)}</span>
+                        <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="font-bold text-sm text-[#2C2C2C]">{offer.businesses.name}</h3>
@@ -382,14 +383,14 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] overflow-hidden">
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
               {claims.length === 0 ? (
-                <div className="text-center py-16"><div className="text-4xl mb-3">📋</div><p className="text-[#2C2C2C]/60 text-sm">No claims yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No claims yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-[#E8EDE8]/80 border-b border-[rgba(26,60,52,0.1)]">
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Creator</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Business</th>
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Claimed</th>
@@ -397,13 +398,13 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,60,52,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[#E8EDE8]/50 transition-colors">
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#2C2C2C]">{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm">{getCategoryEmoji(claim.businesses.category)}</span>
+                              <CategoryIcon category={claim.businesses.category} className="w-4 h-4" />
                               <span className="text-sm text-[#2C2C2C]/60">{claim.businesses.name}</span>
                             </div>
                           </td>
@@ -412,7 +413,7 @@ export default function AdminDashboard() {
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-[rgba(26,60,52,0.15)] text-[#2C2C2C] bg-[#E8EDE8] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34]"
+                              className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-[rgba(44,44,44,0.15)] text-[#2C2C2C] bg-white focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
@@ -438,7 +439,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)] p-6">
+              <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] p-6">
                 <h2 className="text-lg font-bold text-[#2C2C2C] mb-5">Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -451,7 +452,7 @@ export default function AdminDashboard() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(26,60,52,0.15)] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34] text-sm bg-[#E8EDE8] text-[#2C2C2C]"
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
                       placeholder="Enter current password"
                     />
                   </div>
@@ -466,7 +467,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(26,60,52,0.15)] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34] text-sm bg-[#E8EDE8] text-[#2C2C2C]"
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
                       placeholder="Enter new password (min 8 characters)"
                     />
                   </div>
@@ -481,7 +482,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(26,60,52,0.15)] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34] text-sm bg-[#E8EDE8] text-[#2C2C2C]"
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
                       placeholder="Confirm new password"
                     />
                   </div>
@@ -498,7 +499,7 @@ export default function AdminDashboard() {
                   )}
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-[#1A3C34] text-[#FAF8F2] rounded-lg font-semibold text-sm hover:bg-[#15332c] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[#C4674A] text-[#FAF8F2] rounded-lg font-semibold text-sm hover:bg-[#b35a3f] transition-colors"
                   >
                     Update Password
                   </button>

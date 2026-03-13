@@ -24,11 +24,11 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: rgba(26, 60, 52, 0.2);
+    background: var(--soft);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: rgba(26, 60, 52, 0.35);
+    background: var(--mid);
   }
 }

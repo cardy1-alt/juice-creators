@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Sparkles, Film, Rocket, Check, Clock2, Heart } from 'lucide-react';
 
 interface CreatorOnboardingProps {
   creatorId: string;
@@ -41,14 +41,14 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-[#FAF8F2] rounded-2xl max-w-md w-full p-6 shadow-2xl">
+      <div className="bg-white rounded-[20px] max-w-md w-full p-6 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
         {/* Progress dots */}
         <div className="flex items-center justify-center gap-2 mb-6">
           {[1, 2, 3].map((s) => (
             <div
               key={s}
               className={`h-1.5 rounded-full transition-all ${
-                s === step ? 'w-8 bg-[#1A3C34]' : 'w-1.5 bg-[rgba(26,60,52,0.1)]'
+                s === step ? 'w-8 bg-[#C4674A]' : 'w-1.5 bg-[rgba(44,44,44,0.1)]'
               }`}
             />
           ))}
@@ -57,38 +57,38 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
         {/* Step 1: How it works */}
         {step === 1 && (
           <div className="text-center">
-            <div className="text-5xl mb-4">✨</div>
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: "'Crimson Pro', serif" }}>Welcome to Nayba!</h2>
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+            <Sparkles className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">Welcome to Nayba!</h2>
+            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
               Discover amazing local businesses, claim exclusive offers, and create authentic content
               that showcases what makes them special.
             </p>
-            <div className="space-y-3 text-left bg-[#E8EDE8] rounded-xl p-4">
+            <div className="space-y-3 text-left bg-[#E8EDE8] rounded-[16px] p-4">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1A3C34] text-[#FAF8F2] flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                   1
                 </div>
                 <div>
                   <p className="font-semibold text-sm text-[#2C2C2C]">Browse & Claim</p>
-                  <p className="text-xs text-gray-600">Find offers that match your vibe</p>
+                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Find offers that match your vibe</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1A3C34] text-[#FAF8F2] flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                   2
                 </div>
                 <div>
                   <p className="font-semibold text-sm text-[#2C2C2C]">Visit & Experience</p>
-                  <p className="text-xs text-gray-600">Show your QR code at the business</p>
+                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Show your QR code at the business</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-[#1A3C34] text-[#FAF8F2] flex items-center justify-center font-bold text-sm flex-shrink-0">
+                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
                   3
                 </div>
                 <div>
                   <p className="font-semibold text-sm text-[#2C2C2C]">Create & Post</p>
-                  <p className="text-xs text-gray-600">Share your authentic experience</p>
+                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Share your authentic experience</p>
                 </div>
               </div>
             </div>
@@ -98,27 +98,36 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
         {/* Step 2: What's expected */}
         {step === 2 && (
           <div className="text-center">
-            <div className="text-5xl mb-4">🎬</div>
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: "'Crimson Pro', serif" }}>What We Expect</h2>
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+            <Film className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">What We Expect</h2>
+            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
               Creating authentic content is key to building trust with businesses and your audience.
             </p>
             <div className="space-y-3 text-left">
-              <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-100">
-                <p className="font-semibold text-sm text-emerald-700 mb-1">✓ Genuine Feature</p>
-                <p className="text-xs text-gray-600">
+              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Check className="w-4 h-4 text-[#C4674A]" />
+                  <p className="font-semibold text-sm text-[#2C2C2C]">Genuine Feature</p>
+                </div>
+                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
                   Your reel must genuinely showcase the business, product, or experience
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-amber-50 border border-amber-100">
-                <p className="font-semibold text-sm text-amber-700 mb-1">⏱ 48-Hour Window</p>
-                <p className="text-xs text-gray-600">
+              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Clock2 className="w-4 h-4 text-[#C4674A]" />
+                  <p className="font-semibold text-sm text-[#2C2C2C]">48-Hour Window</p>
+                </div>
+                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
                   Post your reel within 48 hours of redeeming your pass
                 </p>
               </div>
-              <div className="p-4 rounded-xl bg-sky-50 border border-sky-100">
-                <p className="font-semibold text-sm text-sky-700 mb-1">🤝 Authentic Voice</p>
-                <p className="text-xs text-gray-600">
+              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
+                <div className="flex items-center gap-2 mb-1">
+                  <Heart className="w-4 h-4 text-[#C4674A]" />
+                  <p className="font-semibold text-sm text-[#2C2C2C]">Authentic Voice</p>
+                </div>
+                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
                   Keep it real — your honest perspective is what makes it valuable
                 </p>
               </div>
@@ -129,33 +138,33 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
         {/* Step 3: Platform stats */}
         {step === 3 && (
           <div className="text-center">
-            <div className="text-5xl mb-4">🚀</div>
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3" style={{ fontFamily: "'Crimson Pro', serif" }}>You're Ready!</h2>
-            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+            <Rocket className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
+            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">You're Ready!</h2>
+            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
               Join a growing community of creators and businesses making authentic connections.
             </p>
             <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="p-4 rounded-xl bg-gradient-to-br from-[#1A3C34] to-[#2a5c4f] text-white">
-                <p className="text-3xl font-bold mb-1">{businessCount}</p>
-                <p className="text-xs font-medium opacity-90">Active Businesses</p>
+              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
+                <p className="text-3xl font-bold mb-1 text-[#2C2C2C]">{businessCount}</p>
+                <p className="text-xs font-medium text-[rgba(44,44,44,0.45)]">Active Businesses</p>
               </div>
-              <div className="p-4 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 text-white">
-                <p className="text-3xl font-bold mb-1">{offerCount}</p>
-                <p className="text-xs font-medium opacity-90">Live Offers</p>
+              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
+                <p className="text-3xl font-bold mb-1 text-[#2C2C2C]">{offerCount}</p>
+                <p className="text-xs font-medium text-[rgba(44,44,44,0.45)]">Live Offers</p>
               </div>
             </div>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-[rgba(44,44,44,0.25)]">
               Start exploring and claim your first offer to get the ball rolling!
             </p>
           </div>
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-[rgba(26,60,52,0.1)]">
+        <div className="flex items-center justify-between mt-6 pt-6 border-t border-[rgba(44,44,44,0.1)]">
           {step > 1 ? (
             <button
               onClick={() => setStep(step - 1)}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-[#E8EDE8] transition-colors"
+              className="flex items-center gap-2 px-4 py-2 rounded-[12px] text-sm font-semibold text-[#2C2C2C] hover:bg-[#E8EDE8] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" /> Back
             </button>
@@ -166,14 +175,14 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
           {step < 3 ? (
             <button
               onClick={() => setStep(step + 1)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#1A3C34] text-[#FAF8F2] hover:bg-[#15332c] transition-colors ml-auto"
+              className="flex items-center gap-2 px-5 py-2.5 rounded-[13px] text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors ml-auto"
             >
               Next <ArrowRight className="w-4 h-4" />
             </button>
           ) : (
             <button
               onClick={handleComplete}
-              className="px-5 py-2.5 rounded-lg text-sm font-semibold bg-[#1A3C34] text-[#FAF8F2] hover:bg-[#15332c] transition-colors ml-auto"
+              className="px-5 py-2.5 rounded-[13px] text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors ml-auto"
             >
               Got it!
             </button>

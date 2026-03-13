@@ -29,7 +29,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   const margin = 4;
   const cellSize = size / (n + margin * 2);
 
-  ctx.fillStyle = '#1A3C34';
+  ctx.fillStyle = '#2C2C2C';
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       if (modules[r][c]) {
@@ -355,19 +355,19 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
   return (
     <div className="text-center">
       {/* QR code — clean, no overlapping elements */}
-      <div className="inline-block bg-[#FAF8F2] p-4 rounded-2xl shadow-sm border border-[rgba(26,60,52,0.1)]">
+      <div className="inline-block bg-[#E8EDE8] p-5 rounded-[16px]">
         <img
           src={qrDataUrl}
           alt="QR Code"
-          className="w-56 h-56 mx-auto"
+          className="w-[130px] h-[130px] mx-auto rounded-[12px]"
         />
       </div>
 
       {/* Creator code badge */}
       <div className="mt-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#E8EDE8] border border-[rgba(26,60,52,0.1)]">
-          <Shield className="w-4 h-4 text-[#1A3C34]" />
-          <span className="font-mono font-bold text-lg tracking-wider text-[#2C2C2C]">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white">
+          <Shield className="w-4 h-4 text-[#2C2C2C]" />
+          <span className="font-mono font-bold text-[13px] tracking-[0.5px] text-[#2C2C2C]">
             {creatorCode}
           </span>
         </div>
@@ -377,16 +377,16 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
       <div className="mt-3 max-w-[280px] mx-auto">
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#1A3C34]' : 'text-gray-400'}`} />
-            <span className={`text-xs font-medium ${isUrgent ? 'text-rose-500' : 'text-gray-500'}`}>
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#C4674A]' : 'text-[rgba(44,44,44,0.25)]'}`} />
+            <span className={`text-[10px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(44,44,44,0.25)]'}`}>
               Refreshes in {timeLeft}s
             </span>
           </div>
         </div>
-        <div className="h-1.5 w-full bg-[#E8EDE8] rounded-full overflow-hidden">
+        <div className="h-[3px] w-full bg-[rgba(196,103,74,0.15)] rounded-[3px] overflow-hidden">
           <div
-            className={`h-full rounded-full transition-all duration-1000 ease-linear ${
-              isUrgent ? 'bg-rose-400' : 'bg-[#1A3C34]'
+            className={`h-full rounded-[3px] transition-all duration-1000 ease-linear ${
+              isUrgent ? 'bg-rose-400' : 'bg-[#C4674A]'
             }`}
             style={{ width: `${progressPercent}%` }}
           />

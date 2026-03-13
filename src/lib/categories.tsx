@@ -1,14 +1,17 @@
-export const BUSINESS_CATEGORIES: Record<string, string> = {
-  'Food & Drink': '🍕',
-  'Hair & Beauty': '💇',
-  'Health & Fitness': '🏋️',
-  'Retail': '🛍️',
-  'Cafe & Coffee': '☕',
-  'Arts & Entertainment': '🎭',
-  'Wellness & Spa': '💆',
-  'Pets': '🐾',
-  'Education': '📚',
-  'Services': '🔧',
+import React from 'react';
+import { UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Coffee, Palette, Flower2, PawPrint, GraduationCap, Wrench, Store } from 'lucide-react';
+
+export const CATEGORY_ICONS: Record<string, string> = {
+  'Food & Drink': 'UtensilsCrossed',
+  'Hair & Beauty': 'Scissors',
+  'Health & Fitness': 'Dumbbell',
+  'Retail': 'ShoppingBag',
+  'Cafe & Coffee': 'Coffee',
+  'Arts & Entertainment': 'Palette',
+  'Wellness & Spa': 'Flower2',
+  'Pets': 'PawPrint',
+  'Education': 'GraduationCap',
+  'Services': 'Wrench',
 };
 
 export const CATEGORY_COLORS: Record<string, string> = {
@@ -24,10 +27,10 @@ export const CATEGORY_COLORS: Record<string, string> = {
   'Services': 'bg-gray-500',
 };
 
-export const CATEGORY_LIST = Object.keys(BUSINESS_CATEGORIES);
+export const CATEGORY_LIST = Object.keys(CATEGORY_ICONS);
 
-export function getCategoryEmoji(category: string | undefined | null): string {
-  return BUSINESS_CATEGORIES[category || ''] || '🏪';
+export function getCategoryIconName(category: string | undefined | null): string {
+  return CATEGORY_ICONS[category || ''] || 'Store';
 }
 
 export function getCategoryColor(category: string | undefined | null): string {
@@ -64,4 +67,14 @@ export function getCategoryBorderColor(category: string | undefined | null): str
     'Services': 'border-gray-100/50',
   };
   return borderMap[category || ''] || 'border-gray-100/50';
+}
+
+const ICON_COMPONENTS: Record<string, any> = {
+  UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Coffee, Palette, Flower2, PawPrint, GraduationCap, Wrench, Store
+};
+
+export function CategoryIcon({ category, className = "w-4 h-4" }: { category: string | undefined | null; className?: string }) {
+  const iconName = getCategoryIconName(category);
+  const IconComponent = ICON_COMPONENTS[iconName] || Store;
+  return <IconComponent className={className} />;
 }

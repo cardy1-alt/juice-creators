@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { X, AlertTriangle } from 'lucide-react';
+import { X, AlertTriangle, Check } from 'lucide-react';
 
 interface DisputeModalProps {
   claimId: string;
@@ -41,14 +41,14 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-[#FAF8F2] rounded-2xl max-w-md w-full p-6 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-[20px] max-w-md w-full p-6 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 flex items-center justify-center mx-auto mb-4">
-              <span className="text-3xl">✓</span>
+            <div className="w-16 h-16 rounded-full bg-[#E8EDE8] flex items-center justify-center mx-auto mb-4">
+              <Check className="w-8 h-8 text-[#C4674A]" />
             </div>
             <h3 className="text-xl font-bold text-[#2C2C2C] mb-2">Report Submitted</h3>
-            <p className="text-gray-600 text-sm">
+            <p className="text-[rgba(44,44,44,0.45)] text-sm">
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
           </div>
@@ -80,7 +80,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-4 py-3 rounded-xl bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34] transition-all text-sm text-[#2C2C2C] resize-none"
+                  className="w-full px-[14px] py-3 rounded-[11px] bg-[#E8EDE8] text-[13px] text-[#2C2C2C] placeholder:text-[rgba(44,44,44,0.25)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all resize-none"
                   required
                 />
               </div>
@@ -95,14 +95,14 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2.5 rounded-lg text-[#2C2C2C] font-semibold bg-[#E8EDE8] hover:bg-[#dce3dc] transition-all text-sm"
+                  className="flex-1 py-2.5 rounded-[12px] text-[#2C2C2C] font-semibold bg-[#E8EDE8] hover:bg-[#dce3dc] transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="flex-1 py-2.5 rounded-lg text-[#FAF8F2] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 transition-all text-sm"
+                  className="flex-1 py-2.5 rounded-[12px] text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 transition-all text-sm"
                 >
                   {loading ? 'Submitting...' : 'Submit Report'}
                 </button>
