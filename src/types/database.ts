@@ -7,6 +7,11 @@ export type Database = {
           name: string;
           slug: string;
           owner_email: string;
+          category: string;
+          latitude: number | null;
+          longitude: number | null;
+          address: string | null;
+          bio: string | null;
           approved: boolean;
           created_at: string;
         };
@@ -15,6 +20,11 @@ export type Database = {
           name: string;
           slug: string;
           owner_email: string;
+          category: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          address?: string | null;
+          bio?: string | null;
           approved?: boolean;
           created_at?: string;
         };
@@ -23,6 +33,11 @@ export type Database = {
           name?: string;
           slug?: string;
           owner_email?: string;
+          category?: string;
+          latitude?: number | null;
+          longitude?: number | null;
+          address?: string | null;
+          bio?: string | null;
           approved?: boolean;
           created_at?: string;
         };
@@ -32,7 +47,7 @@ export type Database = {
           id: string;
           business_id: string;
           description: string;
-          monthly_cap: number;
+          monthly_cap: number | null;
           is_live: boolean;
           created_at: string;
         };
@@ -40,7 +55,7 @@ export type Database = {
           id?: string;
           business_id: string;
           description: string;
-          monthly_cap?: number;
+          monthly_cap?: number | null;
           is_live?: boolean;
           created_at?: string;
         };
@@ -48,7 +63,7 @@ export type Database = {
           id?: string;
           business_id?: string;
           description?: string;
-          monthly_cap?: number;
+          monthly_cap?: number | null;
           is_live?: boolean;
           created_at?: string;
         };
@@ -58,27 +73,33 @@ export type Database = {
           id: string;
           name: string;
           instagram_handle: string;
+          follower_count: string | null;
           code: string;
           email: string;
           approved: boolean;
+          onboarding_complete: boolean;
           created_at: string;
         };
         Insert: {
           id?: string;
           name: string;
           instagram_handle: string;
+          follower_count?: string | null;
           code: string;
           email: string;
           approved?: boolean;
+          onboarding_complete?: boolean;
           created_at?: string;
         };
         Update: {
           id?: string;
           name?: string;
           instagram_handle?: string;
+          follower_count?: string | null;
           code?: string;
           email?: string;
           approved?: boolean;
+          onboarding_complete?: boolean;
           created_at?: string;
         };
       };
@@ -94,6 +115,7 @@ export type Database = {
           claimed_at: string;
           redeemed_at: string | null;
           reel_url: string | null;
+          reel_due_at: string | null;
           month: string;
         };
         Insert: {
@@ -107,6 +129,7 @@ export type Database = {
           claimed_at?: string;
           redeemed_at?: string | null;
           reel_url?: string | null;
+          reel_due_at?: string | null;
           month: string;
         };
         Update: {
@@ -120,6 +143,7 @@ export type Database = {
           claimed_at?: string;
           redeemed_at?: string | null;
           reel_url?: string | null;
+          reel_due_at?: string | null;
           month?: string;
         };
       };
@@ -130,6 +154,7 @@ export type Database = {
           user_type: string;
           message: string;
           read: boolean;
+          email_sent: boolean;
           created_at: string;
         };
         Insert: {
@@ -138,6 +163,7 @@ export type Database = {
           user_type: string;
           message: string;
           read?: boolean;
+          email_sent?: boolean;
           created_at?: string;
         };
         Update: {
@@ -146,6 +172,33 @@ export type Database = {
           user_type?: string;
           message?: string;
           read?: boolean;
+          email_sent?: boolean;
+          created_at?: string;
+        };
+      };
+      disputes: {
+        Row: {
+          id: string;
+          claim_id: string;
+          reporter_role: 'creator' | 'business';
+          message: string;
+          resolved: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          claim_id: string;
+          reporter_role: 'creator' | 'business';
+          message: string;
+          resolved?: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          claim_id?: string;
+          reporter_role?: 'creator' | 'business';
+          message?: string;
+          resolved?: boolean;
           created_at?: string;
         };
       };

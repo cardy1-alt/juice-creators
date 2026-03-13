@@ -6,6 +6,15 @@ export default {
       fontFamily: {
         sans: ['"Plus Jakarta Sans"', 'sans-serif'],
       },
+      colors: {
+        nayba: {
+          forest: '#1A3C34',
+          cream: '#FAF8F2',
+          terracotta: '#C4674A',
+          sage: '#E8EDE8',
+          charcoal: '#2C2C2C',
+        },
+      },
     },
   },
   plugins: [],

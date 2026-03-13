@@ -4,65 +4,19 @@
   ## Overview
   Creates the complete database schema for Juice Creators - a hyperlocal creator redemption platform.
 
-  ## New Tables
-
-  ### 1. businesses
-  Stores business accounts that create offers for creators
-  - `id` (uuid, primary key)
-  - `name` (text) - Business display name
-  - `slug` (text, unique) - URL-friendly identifier
-  - `owner_email` (text, unique) - Business owner contact email
-  - `approved` (boolean, default false) - Admin approval status
-  - `created_at` (timestamptz) - Account creation timestamp
-
-  ### 2. offers
-  Stores offers created by businesses for creators to claim
-  - `id` (uuid, primary key)
-  - `business_id` (uuid, foreign key) - Links to businesses table
-  - `description` (text) - Offer description shown to creators
-  - `monthly_cap` (integer) - Maximum claims per calendar month
-  - `is_live` (boolean, default false) - Whether offer is currently active
-  - `created_at` (timestamptz) - Offer creation timestamp
-
-  ### 3. creators
-  Stores creator accounts that can claim and redeem offers
-  - `id` (uuid, primary key)
-  - `name` (text) - Creator display name
-  - `instagram_handle` (text, unique) - Instagram username
-  - `code` (text, unique) - Unique creator code (e.g., SOPHIE01)
-  - `email` (text, unique) - Creator contact email
-  - `approved` (boolean, default false) - Admin approval status
-  - `created_at` (timestamptz) - Account creation timestamp
-
-  ### 4. claims
-  Stores creator claims on offers with redemption tracking
-  - `id` (uuid, primary key)
-  - `creator_id` (uuid, foreign key) - Links to creators table
-  - `offer_id` (uuid, foreign key) - Links to offers table
-  - `business_id` (uuid, foreign key) - Links to businesses table
-  - `status` (text) - Claim status: pending/active/redeemed/expired
-  - `qr_token` (text, unique) - Unique token for QR code generation
-  - `qr_expires_at` (timestamptz) - When current QR code expires (30 second intervals)
-  - `claimed_at` (timestamptz) - When creator claimed the offer
-  - `redeemed_at` (timestamptz, nullable) - When business redeemed the claim
-  - `reel_url` (text, nullable) - Link to creator's posted reel
-  - `month` (text) - Calendar month for cap tracking (format: YYYY-MM)
-
-  ### 5. notifications
-  Stores notifications for all user types
-  - `id` (uuid, primary key)
-  - `user_id` (uuid) - ID of the user receiving notification
-  - `user_type` (text) - Type: admin/creator/business
-  - `message` (text) - Notification message content
-  - `read` (boolean, default false) - Whether notification has been read
-  - `created_at` (timestamptz) - Notification creation timestamp
+  ## Tables
+  - businesses: Business accounts that create offers
+  - offers: Offers created by businesses for creators
+  - creators: Creator accounts that claim and redeem offers
+  - claims: Creator claims on offers with QR redemption tracking
+  - notifications: In-app notifications for all user types
 
   ## Security
   - All tables have Row Level Security (RLS) enabled
-  - Separate policies for each user role (admin, creator, business)
-  - Admins can access all data
+  - Admin identified by email gets full access via service-level policies
   - Creators can only access their own data
   - Businesses can only access their own data and related claims
+  - INSERT policies allow sign-up profile creation
 */
 
 -- Create businesses table
@@ -138,7 +92,44 @@ CREATE INDEX IF NOT EXISTS idx_claims_status ON claims(status);
 CREATE INDEX IF NOT EXISTS idx_claims_month ON claims(month);
 CREATE INDEX IF NOT EXISTS idx_notifications_user_id ON notifications(user_id);
 
--- RLS Policies for businesses table
+-- ============================================================
+-- ADMIN POLICIES (full access for admin@juicecreators.com)
+-- ============================================================
+
+CREATE POLICY "Admin full access to businesses"
+  ON businesses FOR ALL
+  TO authenticated
+  USING (auth.jwt()->>'email' = 'admin@juicecreators.com')
+  WITH CHECK (auth.jwt()->>'email' = 'admin@juicecreators.com');
+
+CREATE POLICY "Admin full access to offers"
+  ON offers FOR ALL
+  TO authenticated
+  USING (auth.jwt()->>'email' = 'admin@juicecreators.com')
+  WITH CHECK (auth.jwt()->>'email' = 'admin@juicecreators.com');
+
+CREATE POLICY "Admin full access to creators"
+  ON creators FOR ALL
+  TO authenticated
+  USING (auth.jwt()->>'email' = 'admin@juicecreators.com')
+  WITH CHECK (auth.jwt()->>'email' = 'admin@juicecreators.com');
+
+CREATE POLICY "Admin full access to claims"
+  ON claims FOR ALL
+  TO authenticated
+  USING (auth.jwt()->>'email' = 'admin@juicecreators.com')
+  WITH CHECK (auth.jwt()->>'email' = 'admin@juicecreators.com');
+
+CREATE POLICY "Admin full access to notifications"
+  ON notifications FOR ALL
+  TO authenticated
+  USING (auth.jwt()->>'email' = 'admin@juicecreators.com')
+  WITH CHECK (auth.jwt()->>'email' = 'admin@juicecreators.com');
+
+-- ============================================================
+-- BUSINESSES TABLE POLICIES
+-- ============================================================
+
 CREATE POLICY "Public can view approved businesses"
   ON businesses FOR SELECT
   TO authenticated
@@ -155,15 +146,24 @@ CREATE POLICY "Businesses can update their own data"
   USING (owner_email = auth.jwt()->>'email')
   WITH CHECK (owner_email = auth.jwt()->>'email');
 
--- RLS Policies for offers table
+-- Allow new business sign-up (user can only insert their own email)
+CREATE POLICY "Anyone can create a business profile on sign-up"
+  ON businesses FOR INSERT
+  TO authenticated
+  WITH CHECK (owner_email = auth.jwt()->>'email');
+
+-- ============================================================
+-- OFFERS TABLE POLICIES
+-- ============================================================
+
 CREATE POLICY "Approved creators can view live offers"
   ON offers FOR SELECT
   TO authenticated
   USING (
-    is_live = true AND 
+    is_live = true AND
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.email = auth.jwt()->>'email' 
+      SELECT 1 FROM creators
+      WHERE creators.email = auth.jwt()->>'email'
       AND creators.approved = true
     )
   );
@@ -173,8 +173,8 @@ CREATE POLICY "Businesses can view their own offers"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = offers.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = offers.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
@@ -184,8 +184,8 @@ CREATE POLICY "Businesses can create offers"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = business_id
       AND businesses.owner_email = auth.jwt()->>'email'
       AND businesses.approved = true
     )
@@ -196,20 +196,23 @@ CREATE POLICY "Businesses can update their own offers"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = offers.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = offers.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = offers.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = offers.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
 
--- RLS Policies for creators table
+-- ============================================================
+-- CREATORS TABLE POLICIES
+-- ============================================================
+
 CREATE POLICY "Creators can view their own profile"
   ON creators FOR SELECT
   TO authenticated
@@ -227,19 +230,28 @@ CREATE POLICY "Businesses can view approved creators"
   USING (
     approved = true AND
     EXISTS (
-      SELECT 1 FROM businesses 
+      SELECT 1 FROM businesses
       WHERE businesses.owner_email = auth.jwt()->>'email'
     )
   );
 
--- RLS Policies for claims table
+-- Allow new creator sign-up (user can only insert their own email)
+CREATE POLICY "Anyone can create a creator profile on sign-up"
+  ON creators FOR INSERT
+  TO authenticated
+  WITH CHECK (email = auth.jwt()->>'email');
+
+-- ============================================================
+-- CLAIMS TABLE POLICIES
+-- ============================================================
+
 CREATE POLICY "Creators can view their own claims"
   ON claims FOR SELECT
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = claims.creator_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = claims.creator_id
       AND creators.email = auth.jwt()->>'email'
     )
   );
@@ -249,8 +261,8 @@ CREATE POLICY "Creators can create claims"
   TO authenticated
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = creator_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = creator_id
       AND creators.email = auth.jwt()->>'email'
       AND creators.approved = true
     )
@@ -261,15 +273,15 @@ CREATE POLICY "Creators can update their own claims"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = claims.creator_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = claims.creator_id
       AND creators.email = auth.jwt()->>'email'
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = claims.creator_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = claims.creator_id
       AND creators.email = auth.jwt()->>'email'
     )
   );
@@ -279,8 +291,8 @@ CREATE POLICY "Businesses can view claims for their offers"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = claims.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = claims.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
@@ -290,33 +302,36 @@ CREATE POLICY "Businesses can update claims for their offers"
   TO authenticated
   USING (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = claims.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = claims.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   )
   WITH CHECK (
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = claims.business_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = claims.business_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
 
--- RLS Policies for notifications table
+-- ============================================================
+-- NOTIFICATIONS TABLE POLICIES
+-- ============================================================
+
 CREATE POLICY "Users can view their own notifications"
   ON notifications FOR SELECT
   TO authenticated
   USING (
     user_id::text = auth.jwt()->>'sub' OR
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = notifications.user_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = notifications.user_id
       AND creators.email = auth.jwt()->>'email'
     ) OR
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = notifications.user_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = notifications.user_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
@@ -327,26 +342,32 @@ CREATE POLICY "Users can update their own notifications"
   USING (
     user_id::text = auth.jwt()->>'sub' OR
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = notifications.user_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = notifications.user_id
       AND creators.email = auth.jwt()->>'email'
     ) OR
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = notifications.user_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = notifications.user_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   )
   WITH CHECK (
     user_id::text = auth.jwt()->>'sub' OR
     EXISTS (
-      SELECT 1 FROM creators 
-      WHERE creators.id = notifications.user_id 
+      SELECT 1 FROM creators
+      WHERE creators.id = notifications.user_id
       AND creators.email = auth.jwt()->>'email'
     ) OR
     EXISTS (
-      SELECT 1 FROM businesses 
-      WHERE businesses.id = notifications.user_id 
+      SELECT 1 FROM businesses
+      WHERE businesses.id = notifications.user_id
       AND businesses.owner_email = auth.jwt()->>'email'
     )
   );
+
+-- Allow inserting notifications (for system-generated notifications)
+CREATE POLICY "Authenticated users can create notifications"
+  ON notifications FOR INSERT
+  TO authenticated
+  WITH CHECK (true);

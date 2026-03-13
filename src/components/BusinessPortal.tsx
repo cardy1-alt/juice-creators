@@ -1,14 +1,38 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, Plus, QrCode, ExternalLink, Camera, Clock } from 'lucide-react';
+import {
+  LogOut, Plus, ExternalLink, Camera, Bell,
+  Package, Users, Film, ToggleLeft, ToggleRight,
+  CheckCircle2, XCircle, VideoOff, Flag,
+  Sparkles, ClipboardList, Clock
+} from 'lucide-react';
+import { Html5Qrcode } from 'html5-qrcode';
+import { CategoryIcon } from '../lib/categories';
+import { getInitials, getAvatarGradient } from '../lib/avatar';
+import DisputeModal from './DisputeModal';
+import { Logo } from './Logo';
+
+function StatusPill({ status }: { status: string }) {
+  const styles: Record<string, string> = {
+    active: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]',
+    redeemed: 'bg-[#2C2C2C]/10 text-[#2C2C2C] border border-[#2C2C2C]/20',
+    expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
+  };
+  return (
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-gray-500 border border-[rgba(44,44,44,0.1)]'}`}>
+      {status}
+    </span>
+  );
+}
 
 interface Offer {
   id: string;
   description: string;
-  monthly_cap: number;
+  monthly_cap: number | null;
   is_live: boolean;
   created_at: string;
+  slotsUsed?: number;
 }
 
 interface ClaimWithDetails {
@@ -18,412 +42,666 @@ interface ClaimWithDetails {
   redeemed_at: string | null;
   reel_url: string | null;
   qr_token: string;
-  creators: {
-    name: string;
-    instagram_handle: string;
-    code: string;
+  creators: { name: string; instagram_handle: string; code: string };
+}
+
+interface Notification {
+  id: string;
+  message: string;
+  read: boolean;
+  created_at: string;
+}
+
+function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
+  const scannerRef = useRef<Html5Qrcode | null>(null);
+  const [scanning, setScanning] = useState(false);
+  const [cameraError, setCameraError] = useState<string | null>(null);
+
+
+  const startScanner = async () => {
+    setCameraError(null);
+    try {
+      const scanner = new Html5Qrcode('qr-scanner-region');
+      scannerRef.current = scanner;
+      await scanner.start(
+        { facingMode: 'environment' },
+        { fps: 10, qrbox: { width: 220, height: 220 } },
+        (decodedText) => {
+          // Extract the redeem token from URL or use raw value
+          let token = decodedText;
+          try {
+            const url = new URL(decodedText);
+            const redeemParam = url.searchParams.get('redeem');
+            if (redeemParam) token = redeemParam;
+          } catch {
+            // Not a URL — use the raw scanned value
+          }
+          onScan(token);
+          scanner.stop().catch(() => {});
+          setScanning(false);
+        },
+        () => {} // ignore scan failures (no QR found in frame)
+      );
+      setScanning(true);
+    } catch (err: any) {
+      const msg = String(err?.message || err);
+      if (msg.includes('NotAllowedError') || msg.includes('Permission')) {
+        setCameraError('Camera permission denied. Please allow camera access in your browser settings.');
+      } else if (msg.includes('NotFoundError')) {
+        setCameraError('No camera found on this device.');
+      } else {
+        setCameraError('Could not start camera. Use the token field below instead.');
+      }
+    }
   };
+
+  const stopScanner = () => {
+    if (scannerRef.current) {
+      scannerRef.current.stop().catch(() => {});
+      scannerRef.current = null;
+    }
+    setScanning(false);
+  };
+
+  useEffect(() => {
+    return () => { stopScanner(); };
+  }, []);
+
+  useEffect(() => {
+    if (!active && scanning) stopScanner();
+  }, [active]);
+
+  if (cameraError) {
+    return (
+      <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-center">
+        <VideoOff className="w-6 h-6 text-amber-500 mx-auto mb-2" />
+        <p className="text-sm text-amber-700">{cameraError}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div id="qr-scanner-region" className="rounded-xl overflow-hidden" style={{ display: scanning ? 'block' : 'none' }} />
+      {!scanning && (
+        <button
+          onClick={startScanner}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-all"
+        >
+          <Camera className="w-4 h-4" /> Open Camera Scanner
+        </button>
+      )}
+      {scanning && (
+        <button
+          onClick={stopScanner}
+          className="w-full mt-2 py-2 rounded-lg font-semibold text-sm bg-[#E8EDE8] text-[#2C2C2C] hover:bg-[#dce3dc] transition-all"
+        >
+          Stop Scanner
+        </button>
+      )}
+    </div>
+  );
 }
 
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
-  const [view, setView] = useState<'offers' | 'claims' | 'content' | 'scan'>('offers');
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [view, setView] = useState<'offers' | 'claims' | 'content' | 'scan' | 'notifications'>(
+    new URLSearchParams(window.location.search).get('redeem') ? 'scan' : 'offers'
+  );
   const [showNewOffer, setShowNewOffer] = useState(false);
   const [newOfferDescription, setNewOfferDescription] = useState('');
-  const [newOfferCap, setNewOfferCap] = useState(4);
-  const [scanCode, setScanCode] = useState('');
+  const [newOfferCap, setNewOfferCap] = useState<number | null>(null);
+  const [limitClaims, setLimitClaims] = useState(false);
+  const [scanCode, setScanCode] = useState(() => {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('redeem') || '';
+  });
+  const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [loading, setLoading] = useState(false);
+  const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
+  const [offerError, setOfferError] = useState<string | null>(null);
+  const [offersLoaded, setOffersLoaded] = useState(false);
+
+  // Clean redeem param from URL after reading it
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('redeem')) {
+      window.history.replaceState({}, '', window.location.pathname);
+    }
+  }, []);
 
   useEffect(() => {
     if (userProfile?.approved) {
       fetchOffers();
       fetchClaims();
+      fetchNotifications();
     }
   }, [userProfile]);
 
-  const fetchOffers = async () => {
-    const { data } = await supabase
-      .from('offers')
-      .select('*')
-      .eq('business_id', userProfile.id)
-      .order('created_at', { ascending: false });
+  // Realtime subscriptions for claims and notifications
+  useEffect(() => {
+    if (!userProfile?.approved) return;
 
-    if (data) setOffers(data);
+    const channel = supabase
+      .channel('business-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'claims', filter: `business_id=eq.${userProfile.id}` },
+        () => { fetchClaims(); }
+      )
+      .on(
+        'postgres_changes',
+        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userProfile.id}` },
+        () => { fetchNotifications(); }
+      )
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, [userProfile]);
+
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  const fetchOffers = async () => {
+    const { data, error } = await supabase.from('offers').select('*').eq('business_id', userProfile.id).order('created_at', { ascending: false });
+    if (error) { setFetchError('Failed to load offers.'); return; }
+    if (data) {
+      const currentMonth = new Date().toISOString().slice(0, 7);
+      const offersWithSlots = await Promise.all(
+        data.map(async (offer) => {
+          const { count } = await supabase
+            .from('claims')
+            .select('*', { count: 'exact', head: true })
+            .eq('offer_id', offer.id)
+            .eq('month', currentMonth);
+          return { ...offer, slotsUsed: count || 0 };
+        })
+      );
+      setOffers(offersWithSlots as Offer[]);
+    }
+    setOffersLoaded(true);
   };
 
   const fetchClaims = async () => {
-    const { data } = await supabase
-      .from('claims')
-      .select('*, creators(name, instagram_handle, code)')
-      .eq('business_id', userProfile.id)
-      .order('claimed_at', { ascending: false });
+    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
+    if (error) { setFetchError('Failed to load claims.'); return; }
+    if (data) setClaims(data as ClaimWithDetails[]);
+  };
 
-    if (data) setClaims(data as any);
+  const fetchNotifications = async () => {
+    const { data, error } = await supabase.from('notifications').select('*').eq('user_id', userProfile.id).order('created_at', { ascending: false }).limit(20);
+    if (error) return;
+    if (data) setNotifications(data);
+  };
+
+  const markNotificationRead = async (id: string) => {
+    await supabase.from('notifications').update({ read: true }).eq('id', id);
+    fetchNotifications();
   };
 
   const handleCreateOffer = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    setOfferError(null);
     try {
-      await supabase.from('offers').insert({
+      const { error } = await supabase.from('offers').insert({
         business_id: userProfile.id,
         description: newOfferDescription,
-        monthly_cap: newOfferCap,
-        is_live: true
+        monthly_cap: limitClaims ? newOfferCap : null,
+        is_live: true,
       });
-
+      if (error) throw error;
       setNewOfferDescription('');
-      setNewOfferCap(4);
+      setNewOfferCap(null);
+      setLimitClaims(false);
       setShowNewOffer(false);
       fetchOffers();
     } catch (error: any) {
-      alert(error.message);
+      setOfferError(error.message || 'Failed to create offer');
     } finally {
       setLoading(false);
     }
   };
 
   const handleToggleOffer = async (offerId: string, currentStatus: boolean) => {
-    await supabase
-      .from('offers')
-      .update({ is_live: !currentStatus })
-      .eq('id', offerId);
+    await supabase.from('offers').update({ is_live: !currentStatus }).eq('id', offerId);
     fetchOffers();
   };
 
   const handleScanCode = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-
+    setScanResult(null);
     try {
-      const { data: claim } = await supabase
-        .from('claims')
-        .select('*, creators(name, code)')
-        .eq('qr_token', scanCode)
-        .eq('business_id', userProfile.id)
-        .maybeSingle();
-
-      if (!claim) {
-        alert('Invalid or expired QR code');
+      const { data: claim } = await supabase.from('claims').select('*, creators(name, code)').eq('qr_token', scanCode).eq('business_id', userProfile.id).maybeSingle();
+      if (!claim) { setScanResult({ type: 'error', message: 'Invalid QR code. Not found or not for this business.' }); setScanCode(''); return; }
+      if (claim.status !== 'active') {
+        setScanResult({ type: 'error', message: claim.status === 'redeemed' ? 'This pass has already been redeemed.' : `This pass is ${claim.status}. Cannot redeem.` });
         setScanCode('');
-        setLoading(false);
         return;
       }
-
-      if (claim.status === 'redeemed') {
-        alert('This pass has already been redeemed');
-        setScanCode('');
-        setLoading(false);
-        return;
-      }
-
-      const qrExpiresAt = new Date(claim.qr_expires_at);
-      if (qrExpiresAt < new Date()) {
-        alert('This QR code has expired. Please ask the creator to refresh it.');
-        setScanCode('');
-        setLoading(false);
-        return;
-      }
-
-      await supabase
-        .from('claims')
-        .update({
-          status: 'redeemed',
-          redeemed_at: new Date().toISOString()
-        })
-        .eq('id', claim.id);
-
-      alert(`Pass redeemed successfully for ${claim.creators.name}!`);
+      if (new Date(claim.qr_expires_at) < new Date()) { setScanResult({ type: 'error', message: 'QR code expired. Ask the creator to refresh it.' }); setScanCode(''); return; }
+      const redeemedAt = new Date();
+      const reelDueAt = new Date(redeemedAt.getTime() + 48 * 60 * 60 * 1000);
+      const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: redeemedAt.toISOString(), reel_due_at: reelDueAt.toISOString() }).eq('id', claim.id);
+      if (error) throw error;
+      // Creator redemption notification — will be handled server-side via DB trigger
+      // Client INSERT is blocked by RLS (service-role only)
+      setScanResult({ type: 'success', message: `Pass redeemed for ${claim.creators.name}!` });
       setScanCode('');
       fetchClaims();
     } catch (error: any) {
-      alert(error.message);
+      setScanResult({ type: 'error', message: error.message });
     } finally {
       setLoading(false);
     }
   };
 
+  const unreadCount = notifications.filter(n => !n.read).length;
   if (!userProfile?.approved) {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ backgroundColor: '#f0eaff' }}>
-        <div className="bg-white rounded-3xl shadow-xl p-8 max-w-md text-center">
-          <Clock className="w-16 h-16 mx-auto mb-4" style={{ color: '#5b3df5' }} />
-          <h2 className="text-2xl font-bold mb-2" style={{ color: '#1a1025' }}>
-            Pending Approval
-          </h2>
-          <p className="text-gray-600 mb-6">
-            Your business account is under review. You'll be notified once approved!
-          </p>
-          <button
-            onClick={signOut}
-            className="px-6 py-2 rounded-xl text-white font-medium"
-            style={{ backgroundColor: '#5b3df5' }}
-          >
-            Sign Out
+      <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAF8F2]">
+        <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] p-8 max-w-sm text-center border border-[rgba(44,44,44,0.1)]">
+          <div className="flex justify-center mb-4"><Clock className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div>
+          <h2 className="text-xl font-bold mb-2 text-[#2C2C2C]">Pending Approval</h2>
+          <p className="text-gray-500 text-sm mb-6">Your business account is under review.</p>
+          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium bg-[#C4674A] hover:bg-[#b35a3f] transition-colors">
+            <LogOut className="w-4 h-4" /> Sign Out
           </button>
         </div>
       </div>
     );
   }
 
+  const tabs = [
+    { key: 'offers' as const, label: 'Offers', icon: Package },
+    { key: 'scan' as const, label: 'Scan', icon: Camera },
+    { key: 'claims' as const, label: 'Claims', icon: Users },
+    { key: 'content' as const, label: 'Reels', icon: Film },
+    { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount },
+  ];
+
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f0eaff' }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="bg-white shadow-lg p-6">
+    <div className="min-h-screen bg-[#FAF8F2]">
+      {disputeClaimId && (
+        <DisputeModal
+          claimId={disputeClaimId}
+          reporterRole="business"
+          onClose={() => setDisputeClaimId(null)}
+        />
+      )}
+      <div className="max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: '#1a1025' }}>
-                {userProfile.name}
-              </h1>
-              <p className="text-sm text-gray-600">Business Portal</p>
+            <div className="flex items-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Logo size={24} />
+                <span style={{ fontWeight: 700, fontSize: '18px', color: '#1A3C34' }}>nayba</span>
+              </div>
+              <div>
+                <h1 className="text-[15px] font-bold text-[#2C2C2C]">{userProfile.name}</h1>
+                <p className="text-xs text-[rgba(44,44,44,0.45)]">Business Portal</p>
+              </div>
             </div>
-            <button
-              onClick={signOut}
-              className="p-2 rounded-xl hover:bg-gray-100"
-            >
-              <LogOut className="w-5 h-5" style={{ color: '#1a1025' }} />
+            <button onClick={signOut} className="p-2 rounded-xl hover:bg-[#E8EDE8] transition-colors">
+              <LogOut className="w-4.5 h-4.5 text-[rgba(44,44,44,0.25)]" />
             </button>
           </div>
         </div>
 
-        <div className="flex bg-white border-b overflow-x-auto">
-          <button
-            onClick={() => setView('offers')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'offers' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'offers' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            My Offers
-          </button>
-          <button
-            onClick={() => setView('scan')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'scan' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'scan' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            Scan QR
-          </button>
-          <button
-            onClick={() => setView('claims')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'claims' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'claims' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            All Claims
-          </button>
-          <button
-            onClick={() => setView('content')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'content' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'content' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            Content Wall
-          </button>
+        {/* Tab bar */}
+        <div className="flex bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)] overflow-x-auto">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => { setView(tab.key); setScanResult(null); }}
+              className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold whitespace-nowrap transition-all relative ${
+                view === tab.key ? 'text-[#2C2C2C]' : 'text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60'
+              }`}
+            >
+              <div className="relative">
+                <tab.icon className="w-4 h-4" />
+                {tab.badge ? (
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C4674A] text-white text-[8px] font-bold flex items-center justify-center">
+                    {tab.badge}
+                  </span>
+                ) : null}
+              </div>
+              {tab.label}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#C4674A] rounded-full" />}
+            </button>
+          ))}
         </div>
 
         <div className="p-6">
+          {fetchError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
+              {fetchError}
+            </div>
+          )}
+          {/* OFFERS */}
           {view === 'offers' && (
             <div className="space-y-4">
-              <button
-                onClick={() => setShowNewOffer(!showNewOffer)}
-                className="flex items-center gap-2 px-6 py-3 rounded-xl text-white font-medium"
-                style={{ backgroundColor: '#5b3df5' }}
-              >
-                <Plus className="w-5 h-5" /> Create New Offer
-              </button>
+              {offersLoaded && offers.length === 0 && (
+                <div className="bg-white rounded-[20px] p-6 text-center shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] border border-[rgba(44,44,44,0.1)]">
+                  <div className="flex justify-center mb-3"><Sparkles className="w-8 h-8 text-[#C4674A]" /></div>
+                  <h3 className="text-xl font-bold mb-2 text-[#2C2C2C]">You're All Set!</h3>
+                  <p className="text-[rgba(44,44,44,0.45)] text-sm mb-2">
+                    Create your first offer to start receiving creators and building your content library.
+                  </p>
+                  <p className="text-[rgba(44,44,44,0.45)] text-xs mb-4">
+                    Start with unlimited claims and adjust later once you know your capacity.
+                  </p>
+                  <button
+                    onClick={() => setShowNewOffer(true)}
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#C4674A] text-white font-bold text-sm hover:bg-[#b35a3f] transition-all"
+                  >
+                    <Plus className="w-4 h-4" /> Create First Offer
+                  </button>
+                </div>
+              )}
+
+              {offers.length > 0 && (
+                <button
+                  onClick={() => setShowNewOffer(!showNewOffer)}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all text-sm"
+                >
+                  <Plus className="w-4 h-4" /> New Offer
+                </button>
+              )}
 
               {showNewOffer && (
-                <form onSubmit={handleCreateOffer} className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+                <form onSubmit={handleCreateOffer} className="bg-white rounded-[20px] p-6 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] space-y-4">
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: '#1a1025' }}>
-                      Offer Description
-                    </label>
+                    <label className="block text-sm font-semibold text-[#2C2C2C] mb-1.5">Description</label>
                     <textarea
                       value={newOfferDescription}
                       onChange={(e) => setNewOfferDescription(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200 resize-none"
+                      placeholder="e.g. Free juice + acai bowl for a reel"
+                      className="w-full px-4 py-3 rounded-[11px] bg-[#E8EDE8] border border-[rgba(44,44,44,0.15)] resize-none text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
                       rows={3}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium mb-2" style={{ color: '#1a1025' }}>
-                      Monthly Cap
-                    </label>
-                    <input
-                      type="number"
-                      value={newOfferCap}
-                      onChange={(e) => setNewOfferCap(parseInt(e.target.value))}
-                      className="w-full px-4 py-3 rounded-xl border border-gray-200"
-                      min={1}
-                      required
-                    />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-sm font-semibold text-[#2C2C2C]">Limit monthly claims?</label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setLimitClaims(!limitClaims);
+                          if (!limitClaims) setNewOfferCap(4);
+                          else setNewOfferCap(null);
+                        }}
+                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                          limitClaims ? 'bg-[#C4674A]' : 'bg-gray-200'
+                        }`}
+                      >
+                        <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
+                          limitClaims ? 'translate-x-6' : 'translate-x-1'
+                        }`} />
+                      </button>
+                    </div>
+                    {limitClaims ? (
+                      <input
+                        type="number"
+                        value={newOfferCap || ''}
+                        onChange={(e) => setNewOfferCap(parseInt(e.target.value) || 1)}
+                        className="w-full px-4 py-3 rounded-[11px] bg-[#E8EDE8] border border-[rgba(44,44,44,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                        min={1}
+                        placeholder="Max claims per month"
+                        required
+                      />
+                    ) : (
+                      <p className="text-xs text-gray-400">Creators can claim this offer any time — no slot limit</p>
+                    )}
                   </div>
+                  {offerError && (
+                    <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
+                      <p className="text-sm text-rose-700">{offerError}</p>
+                    </div>
+                  )}
                   <div className="flex gap-2">
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="px-6 py-2 rounded-xl text-white font-medium"
-                      style={{ backgroundColor: '#5b3df5' }}
-                    >
-                      Create Offer
+                    <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-lg text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 text-sm transition-all">
+                      Create
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => setShowNewOffer(false)}
-                      className="px-6 py-2 rounded-xl bg-gray-200 text-gray-700 font-medium"
-                    >
+                    <button type="button" onClick={() => { setShowNewOffer(false); setOfferError(null); }} className="px-5 py-2.5 rounded-lg bg-[#E8EDE8] text-[#2C2C2C] font-semibold text-sm hover:bg-[#dce3dc] transition-all">
                       Cancel
                     </button>
                   </div>
                 </form>
               )}
 
-              <div className="grid gap-4 md:grid-cols-2">
-                {offers.map((offer) => (
-                  <div key={offer.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <p className="text-gray-600 mb-2">{offer.description}</p>
-                        <p className="text-sm text-gray-500">Cap: {offer.monthly_cap}/month</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {offers.map((offer) => {
+                  const isUnlimited = offer.monthly_cap === null;
+                  const slotsUsed = offer.slotsUsed || 0;
+                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                  const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
+
+                  return (
+                    <div key={offer.id} className="bg-white rounded-[20px] p-5 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                      <div className="flex items-start justify-between mb-3">
+                        <p className="text-gray-700 text-sm flex-1">{offer.description}</p>
+                        <span className={`ml-2 flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
+                          offer.is_live
+                            ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                            : 'bg-[#E8EDE8] text-gray-500 border-[rgba(44,44,44,0.1)]'
+                        }`}>
+                          {offer.is_live ? 'Live' : 'Paused'}
+                        </span>
                       </div>
-                      <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
-                          offer.is_live ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
+                      {isUnlimited ? (
+                        <div className="mb-3">
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
+                            Unlimited
+                          </span>
+                          <span className="text-xs text-gray-400 ml-2">{slotsUsed} claims</span>
+                        </div>
+                      ) : (
+                        <div className="mb-3">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <span className="text-xs text-gray-400">{slotsUsed}/{offer.monthly_cap} claimed</span>
+                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              slotsLeft === 0 ? 'bg-rose-500 text-white' : 'bg-amber-500 text-white'
+                            }`}>
+                              {slotsLeft} left
+                            </span>
+                          </div>
+                          <div className="h-1.5 bg-[#FAF8F2] rounded-full overflow-hidden">
+                            <div
+                              className={`h-full transition-all duration-300 ${pct >= 76 ? 'bg-rose-500' : pct >= 51 ? 'bg-amber-500' : 'bg-emerald-500'}`}
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+                      <button
+                        onClick={() => handleToggleOffer(offer.id, offer.is_live)}
+                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-semibold text-sm transition-all ${
+                          offer.is_live
+                            ? 'bg-[#FAF8F2] text-[#2C2C2C] hover:bg-[#E8EDE8] border border-[rgba(44,44,44,0.1)]'
+                            : 'bg-emerald-500 text-white hover:bg-emerald-600'
                         }`}
                       >
-                        {offer.is_live ? 'Live' : 'Paused'}
-                      </span>
+                        {offer.is_live ? <><ToggleRight className="w-4 h-4" /> Pause</> : <><ToggleLeft className="w-4 h-4" /> Activate</>}
+                      </button>
                     </div>
-                    <button
-                      onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                      className="w-full py-2 rounded-xl font-medium"
-                      style={{
-                        backgroundColor: offer.is_live ? '#e5e7eb' : '#5b3df5',
-                        color: offer.is_live ? '#374151' : '#ffffff'
-                      }}
-                    >
-                      {offer.is_live ? 'Pause Offer' : 'Activate Offer'}
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
 
+          {/* SCAN */}
           {view === 'scan' && (
-            <div className="max-w-md mx-auto">
-              <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
-                <Camera className="w-16 h-16 mx-auto mb-4" style={{ color: '#5b3df5' }} />
-                <h2 className="text-2xl font-bold mb-2" style={{ color: '#1a1025' }}>
-                  Scan Creator Pass
-                </h2>
-                <p className="text-gray-600 mb-6">
-                  Enter the QR code or creator code to redeem
-                </p>
-                <form onSubmit={handleScanCode} className="space-y-4">
+            <div className="max-w-sm mx-auto">
+              <div className="bg-white rounded-[20px] p-8 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] text-center">
+                <div className="flex justify-center mb-4"><Camera className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div>
+                <h2 className="text-xl font-bold mb-1 text-[#2C2C2C]">Redeem Pass</h2>
+                <p className="text-gray-500 text-sm mb-6">Scan the creator's QR code or paste the token</p>
+
+                <QRScanner
+                  onScan={(token) => { setScanCode(token); }}
+                  active={view === 'scan' && !scanResult}
+                />
+
+                <div className="mt-4 relative">
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[rgba(44,44,44,0.1)]" /></div>
+                  <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-gray-400">or paste token</span></div>
+                </div>
+
+                <form onSubmit={handleScanCode} className="space-y-3 mt-4">
                   <input
                     type="text"
                     value={scanCode}
-                    onChange={(e) => setScanCode(e.target.value)}
-                    placeholder="Enter code or scan QR"
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 text-center text-lg font-mono"
+                    onChange={(e) => { setScanCode(e.target.value); setScanResult(null); }}
+                    placeholder="Paste QR token here"
+                    className="w-full px-4 py-3 rounded-[11px] bg-[#E8EDE8] border border-[rgba(44,44,44,0.15)] text-center font-mono text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
                     required
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl text-white font-medium"
-                    style={{ backgroundColor: '#5b3df5' }}
+                    className="w-full py-3 rounded-lg text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 transition-all text-sm"
                   >
-                    Redeem Pass
+                    {loading ? 'Verifying...' : 'Redeem Pass'}
                   </button>
                 </form>
+
+                {scanResult && (
+                  <div className={`mt-4 flex items-center gap-2 p-3 rounded-xl text-sm font-medium ${
+                    scanResult.type === 'success'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                      : 'bg-rose-50 text-rose-600 border border-rose-100'
+                  }`}>
+                    {scanResult.type === 'success'
+                      ? <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                      : <XCircle className="w-4 h-4 flex-shrink-0" />
+                    }
+                    {scanResult.message}
+                  </div>
+                )}
               </div>
             </div>
           )}
 
+          {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Creator</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Handle</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Claimed</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {claims.map((claim) => (
-                      <tr key={claim.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#1a1025' }}>
-                          {claim.creators.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {claim.creators.instagram_handle}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono" style={{ color: '#5b3df5' }}>
-                          {claim.creators.code}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {new Date(claim.claimed_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              claim.status === 'redeemed'
-                                ? 'bg-green-100 text-green-700'
-                                : claim.status === 'expired'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-blue-100 text-blue-700'
-                            }`}
+            <div>
+              {claims.length === 0 ? (
+                <div className="text-center py-16 bg-white rounded-[20px] border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                  <div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div>
+                  <p className="text-gray-400 text-sm">No claims yet.</p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {claims.map((claim) => (
+                    <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] hover:shadow-md transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-[15px] font-bold text-[#2C2C2C] mb-1">{claim.creators.name}</h3>
+                          <p className="text-sm text-gray-500">{claim.creators.instagram_handle}</p>
+                          <div className="flex items-center gap-3 mt-3">
+                            <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-[#2C2C2C] text-white">{claim.creators.code}</span>
+                            <span className="text-xs text-gray-400">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                            <StatusPill status={claim.status} />
+                          </div>
+                        </div>
+                        <div className="ml-4 flex flex-col gap-2">
+                          <button
+                            onClick={() => { setScanCode(claim.qr_token); setView('scan'); }}
+                            className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors whitespace-nowrap"
                           >
-                            {claim.status}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {view === 'content' && (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {claims
-                .filter((claim) => claim.reel_url)
-                .map((claim) => (
-                  <div key={claim.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                    <div className="flex items-start justify-between mb-4">
-                      <div>
-                        <p className="font-bold" style={{ color: '#1a1025' }}>
-                          {claim.creators.name}
-                        </p>
-                        <p className="text-sm text-gray-600">{claim.creators.instagram_handle}</p>
+                            Scan Pass
+                          </button>
+                          <button
+                            onClick={() => setDisputeClaimId(claim.id)}
+                            className="flex items-center justify-center gap-1 px-3 py-1 text-xs text-gray-500 hover:text-amber-600 transition-colors"
+                          >
+                            <Flag className="w-3 h-3" /> Report
+                          </button>
+                        </div>
                       </div>
                     </div>
-                    <a
-                      href={claim.reel_url!}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 rounded-xl text-white font-medium"
-                      style={{ backgroundColor: '#5b3df5' }}
-                    >
-                      View Reel <ExternalLink className="w-4 h-4" />
-                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* CONTENT WALL */}
+          {view === 'content' && (
+            <>
+              {claims.filter(c => c.reel_url).length === 0 ? (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Film className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-gray-400 text-sm">No reels submitted yet.</p></div>
+              ) : (
+                <>
+                  <div className="bg-white rounded-[20px] p-5 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] mb-4">
+                    <h3 className="text-sm font-bold text-[#2C2C2C] mb-2">Content Library</h3>
+                    <p className="text-gray-600 text-sm">
+                      <span className="font-bold text-[#2C2C2C]">{claims.filter(c => c.reel_url).length}</span> reels received
+                      {claims.filter(c => c.reel_url).length > 0 && (
+                        <span className="text-gray-400 ml-2">
+                          · Latest on {new Date(claims.filter(c => c.reel_url)[0].claimed_at).toLocaleDateString()}
+                        </span>
+                      )}
+                    </p>
                   </div>
-                ))}
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    {claims.filter(c => c.reel_url).map((claim) => (
+                      <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(claim.creators.name)} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
+                            {getInitials(claim.creators.name)}
+                          </div>
+                          <div>
+                            <p className="font-semibold text-sm text-[#2C2C2C]">{claim.creators.name}</p>
+                            <p className="text-xs text-gray-400">{claim.creators.instagram_handle}</p>
+                          </div>
+                        </div>
+                        <a
+                          href={claim.reel_url!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-white font-semibold text-sm bg-[#C4674A] hover:bg-[#b35a3f] transition-all"
+                        >
+                          View Reel <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
+
+          {/* NOTIFICATIONS */}
+          {view === 'notifications' && (
+            <div className="max-w-lg mx-auto space-y-3">
+              {notifications.length === 0 && (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Bell className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-gray-400 text-sm">No notifications yet.</p></div>
+              )}
+              {notifications.map((notif) => (
+                <button
+                  key={notif.id}
+                  onClick={() => !notif.read && markNotificationRead(notif.id)}
+                  className={`w-full text-left bg-white rounded-[20px] p-4 border shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] transition-all ${
+                    notif.read ? 'border-[rgba(44,44,44,0.1)] opacity-50' : 'border-[#C4674A]/20 bg-[#C4674A]/5 shadow-sm'
+                  }`}
+                >
+                  <div className="flex items-start gap-3">
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-[#C4674A]'}`} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm text-[#2C2C2C]">{notif.message}</p>
+                      <p className="text-[11px] text-gray-400 mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>
+                    </div>
+                  </div>
+                </button>
+              ))}
             </div>
           )}
         </div>
