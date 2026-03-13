@@ -6,6 +6,7 @@
   was actually deleted.
 */
 
+DROP FUNCTION IF EXISTS unclaim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION unclaim_offer(
   p_claim_id uuid,
   p_creator_id uuid

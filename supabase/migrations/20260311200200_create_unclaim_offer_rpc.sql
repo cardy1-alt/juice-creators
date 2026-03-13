@@ -6,6 +6,7 @@
   Only the claim owner can unclaim.
 */
 
+DROP FUNCTION IF EXISTS unclaim_offer(uuid, uuid);
 CREATE OR REPLACE FUNCTION unclaim_offer(
   p_claim_id uuid,
   p_creator_id uuid
