@@ -6,8 +6,43 @@ import AdminDashboard from './components/AdminDashboard';
 import { AlertCircle, LogOut } from 'lucide-react';
 import { Logo } from './components/Logo';
 
+function DemoBanner() {
+  const params = new URLSearchParams(window.location.search);
+  const current = params.get('demo');
+  if (!current) return null;
+
+  const roles = ['creator', 'business', 'admin'] as const;
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[#2C2C2C] text-white px-4 py-2 flex items-center justify-between text-xs">
+      <span className="font-semibold">DEMO MODE</span>
+      <div className="flex gap-2">
+        {roles.map((r) => (
+          <a
+            key={r}
+            href={`?demo=${r}`}
+            className={`px-3 py-1 rounded-full font-medium transition-colors ${
+              current === r
+                ? 'bg-[#C4674A] text-white'
+                : 'bg-white/10 hover:bg-white/20'
+            }`}
+          >
+            {r}
+          </a>
+        ))}
+        <a
+          href="/"
+          className="px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 font-medium"
+        >
+          Exit
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const { user, userRole, loading, signOut } = useAuth();
+  const isDemo = new URLSearchParams(window.location.search).has('demo');
 
   if (loading) {
     return (
@@ -25,15 +60,15 @@ function App() {
   }
 
   if (userRole === 'admin') {
-    return <AdminDashboard />;
+    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><AdminDashboard /></div></>;
   }
 
   if (userRole === 'creator') {
-    return <CreatorApp />;
+    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><CreatorApp /></div></>;
   }
 
   if (userRole === 'business') {
-    return <BusinessPortal />;
+    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><BusinessPortal /></div></>;
   }
 
   // Fallback — user authenticated but no profile found

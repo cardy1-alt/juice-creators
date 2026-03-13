@@ -17,11 +17,61 @@ const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.co
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Demo mode profiles — activated via ?demo=creator|business|admin
+const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
+  creator: {
+    role: 'creator',
+    profile: {
+      id: 'demo-creator-1',
+      email: 'sophie@demo.com',
+      name: 'Sophie Carter',
+      instagram_handle: '@sophiecarter',
+      follower_count: '12.4k',
+      code: 'SOPHIE01',
+      approved: true,
+      onboarding_complete: true,
+      created_at: new Date().toISOString(),
+    },
+  },
+  business: {
+    role: 'business',
+    profile: {
+      id: 'demo-business-1',
+      owner_email: 'hello@midgarcoffee.com',
+      name: 'Midgar Coffee',
+      slug: 'midgar-coffee',
+      category: 'Cafe & Coffee',
+      address: '42 High Street, London',
+      latitude: 51.5074,
+      longitude: -0.1278,
+      bio: 'Specialty coffee & brunch spot',
+      approved: true,
+      created_at: new Date().toISOString(),
+    },
+  },
+  admin: {
+    role: 'admin',
+    profile: { email: 'admin@juicecreators.com', name: 'Admin' },
+  },
+};
+
+function getDemoRole(): string | null {
+  if (typeof window === 'undefined') return null;
+  const params = new URLSearchParams(window.location.search);
+  const demo = params.get('demo');
+  return demo && DEMO_PROFILES[demo] ? demo : null;
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [userProfile, setUserProfile] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+  const demoKey = getDemoRole();
+  const demo = demoKey ? DEMO_PROFILES[demoKey] : null;
+
+  const [user, setUser] = useState<User | null>(
+    demo ? ({ id: 'demo-user', email: demo.profile.email || demo.profile.owner_email } as unknown as User) : null
+  );
+  const [userRole, setUserRole] = useState<UserRole | null>(demo ? demo.role : null);
+  const [userProfile, setUserProfile] = useState<any | null>(demo ? demo.profile : null);
+  const [loading, setLoading] = useState(demo ? false : true);
 
   // Guard: prevent onAuthStateChange from overwriting state during signup
   const signingUpRef = useRef(false);
@@ -87,6 +137,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   useEffect(() => {
+    // Skip auth in demo mode
+    if (demo) return;
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       (async () => {
         if (session?.user) {
