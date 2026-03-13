@@ -10,15 +10,16 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryEmoji } from '../lib/categories';
 import { getInitials, getAvatarGradient } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
+import { Logo } from './Logo';
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-sky-50 text-sky-600 border border-sky-100',
-    redeemed: 'bg-emerald-50 text-emerald-600 border border-emerald-100',
-    expired: 'bg-rose-50 text-rose-500 border border-rose-100',
+    active: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(26,60,52,0.1)]',
+    redeemed: 'bg-[#1A3C34]/10 text-[#1A3C34] border border-[#1A3C34]/20',
+    expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-gray-50 text-gray-500 border border-[rgba(26,60,52,0.1)]'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-gray-500 border border-[rgba(26,60,52,0.1)]'}`}>
       {status}
     </span>
   );
@@ -124,7 +125,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {!scanning && (
         <button
           onClick={startScanner}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm bg-[#1A3C34] text-white hover:bg-[#15332c] transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm bg-[#1A3C34] text-[#FAF8F2] hover:bg-[#15332c] transition-all"
         >
           <Camera className="w-4 h-4" /> Open Camera Scanner
         </button>
@@ -132,7 +133,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {scanning && (
         <button
           onClick={stopScanner}
-          className="w-full mt-2 py-2 rounded-xl font-semibold text-sm bg-gray-100 text-gray-600 hover:bg-gray-200 transition-all"
+          className="w-full mt-2 py-2 rounded-lg font-semibold text-sm bg-[#E8EDE8] text-[#2C2C2C] hover:bg-[#dce3dc] transition-all"
         >
           Stop Scanner
         </button>
@@ -303,11 +304,11 @@ export default function BusinessPortal() {
   if (!userProfile?.approved) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#FAF8F2]">
-        <div className="bg-[#FAF8F2] rounded-2xl shadow-xl shadow-black/5 p-8 max-w-sm text-center border border-[rgba(26,60,52,0.1)]">
+        <div className="bg-[#E8EDE8] rounded-2xl shadow-xl shadow-black/5 p-8 max-w-sm text-center border border-[rgba(26,60,52,0.1)]">
           <div className="text-4xl mb-4">⏳</div>
           <h2 className="text-xl font-bold mb-2 text-[#2C2C2C]">Pending Approval</h2>
           <p className="text-gray-500 text-sm mb-6">Your business account is under review.</p>
-          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-white font-medium bg-[#2C2C2C] hover:bg-[#2d1f45] transition-colors">
+          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-[#FAF8F2] font-medium bg-[#1A3C34] hover:bg-[#15332c] transition-colors">
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
         </div>
@@ -334,19 +335,20 @@ export default function BusinessPortal() {
       )}
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="bg-[#FAF8F2] border-b border-[rgba(26,60,52,0.1)] px-6 py-4">
+        <div className="bg-[#1A3C34] border-b border-[rgba(26,60,52,0.1)] px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100/50 flex items-center justify-center text-xl">
-                {emoji}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Logo size={32} color="#FAF8F2" />
+                <span style={{ fontFamily: "'Crimson Pro', serif", fontWeight: 600, fontSize: '22px', color: '#FAF8F2' }}>nayba</span>
               </div>
               <div>
-                <h1 className="text-[15px] font-bold text-[#2C2C2C]">{userProfile.name}</h1>
-                <p className="text-xs text-gray-400">Business Portal</p>
+                <h1 className="text-[15px] font-bold text-[#FAF8F2]">{userProfile.name}</h1>
+                <p className="text-xs text-[#FAF8F2]/60">Business Portal</p>
               </div>
             </div>
-            <button onClick={signOut} className="p-2 rounded-xl hover:bg-gray-50 transition-colors">
-              <LogOut className="w-4.5 h-4.5 text-gray-400" />
+            <button onClick={signOut} className="p-2 rounded-xl hover:bg-[#15332c] transition-colors">
+              <LogOut className="w-4.5 h-4.5 text-[#FAF8F2]/60" />
             </button>
           </div>
         </div>
@@ -358,19 +360,19 @@ export default function BusinessPortal() {
               key={tab.key}
               onClick={() => { setView(tab.key); setScanResult(null); }}
               className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold whitespace-nowrap transition-all relative ${
-                view === tab.key ? 'text-[#2C2C2C]' : 'text-gray-400 hover:text-gray-600'
+                view === tab.key ? 'text-[#2C2C2C]' : 'text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60'
               }`}
             >
               <div className="relative">
                 <tab.icon className="w-4 h-4" />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#1A3C34] text-white text-[8px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C4674A] text-white text-[8px] font-bold flex items-center justify-center">
                     {tab.badge}
                   </span>
                 ) : null}
               </div>
               {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#2C2C2C] rounded-full" />}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#1A3C34] rounded-full" />}
             </button>
           ))}
         </div>
@@ -396,7 +398,7 @@ export default function BusinessPortal() {
                   </p>
                   <button
                     onClick={() => setShowNewOffer(true)}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[#FAF8F2] text-[#1A3C34] font-bold text-sm hover:bg-gray-50 transition-all shadow-lg"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-[#FAF8F2] text-[#1A3C34] font-bold text-sm hover:bg-[#E8EDE8] transition-all shadow-lg"
                   >
                     <Plus className="w-4 h-4" /> Create First Offer
                   </button>
@@ -406,21 +408,21 @@ export default function BusinessPortal() {
               {offers.length > 0 && (
                 <button
                   onClick={() => setShowNewOffer(!showNewOffer)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-white font-semibold bg-[#2C2C2C] hover:bg-[#2d1f45] transition-all text-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-[#FAF8F2] font-semibold bg-[#1A3C34] hover:bg-[#15332c] transition-all text-sm"
                 >
                   <Plus className="w-4 h-4" /> New Offer
                 </button>
               )}
 
               {showNewOffer && (
-                <form onSubmit={handleCreateOffer} className="bg-[#FAF8F2] rounded-2xl p-6 border border-[rgba(26,60,52,0.1)] shadow-sm space-y-4">
+                <form onSubmit={handleCreateOffer} className="bg-[#E8EDE8] rounded-2xl p-6 border border-[rgba(26,60,52,0.1)] shadow-sm space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-[#2C2C2C] mb-1.5">Description</label>
                     <textarea
                       value={newOfferDescription}
                       onChange={(e) => setNewOfferDescription(e.target.value)}
                       placeholder="e.g. Free juice + acai bowl for a reel"
-                      className="w-full px-4 py-3 rounded-xl border border-[rgba(26,60,52,0.15)] resize-none text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34]"
+                      className="w-full px-4 py-3 rounded-xl bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] resize-none text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
                       rows={3}
                       required
                     />
@@ -439,7 +441,7 @@ export default function BusinessPortal() {
                           limitClaims ? 'bg-[#1A3C34]' : 'bg-gray-200'
                         }`}
                       >
-                        <span className={`inline-block h-4 w-4 rounded-full bg-[#FAF8F2] transition-transform ${
+                        <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
                           limitClaims ? 'translate-x-6' : 'translate-x-1'
                         }`} />
                       </button>
@@ -449,7 +451,7 @@ export default function BusinessPortal() {
                         type="number"
                         value={newOfferCap || ''}
                         onChange={(e) => setNewOfferCap(parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-3 rounded-xl border border-[rgba(26,60,52,0.15)] text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34]"
+                        className="w-full px-4 py-3 rounded-xl bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
                         min={1}
                         placeholder="Max claims per month"
                         required
@@ -464,10 +466,10 @@ export default function BusinessPortal() {
                     </div>
                   )}
                   <div className="flex gap-2">
-                    <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-xl text-white font-semibold bg-emerald-500 hover:bg-emerald-600 disabled:opacity-50 text-sm transition-all">
+                    <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-lg text-[#FAF8F2] font-semibold bg-[#1A3C34] hover:bg-[#15332c] disabled:opacity-50 text-sm transition-all">
                       Create
                     </button>
-                    <button type="button" onClick={() => { setShowNewOffer(false); setOfferError(null); }} className="px-5 py-2.5 rounded-xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition-all">
+                    <button type="button" onClick={() => { setShowNewOffer(false); setOfferError(null); }} className="px-5 py-2.5 rounded-lg bg-[#E8EDE8] text-[#2C2C2C] font-semibold text-sm hover:bg-[#dce3dc] transition-all">
                       Cancel
                     </button>
                   </div>
@@ -482,13 +484,13 @@ export default function BusinessPortal() {
                   const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
 
                   return (
-                    <div key={offer.id} className="bg-[#FAF8F2] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
+                    <div key={offer.id} className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)]">
                       <div className="flex items-start justify-between mb-3">
                         <p className="text-gray-700 text-sm flex-1">{offer.description}</p>
                         <span className={`ml-2 flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
                           offer.is_live
                             ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                            : 'bg-gray-50 text-gray-500 border-[rgba(26,60,52,0.1)]'
+                            : 'bg-[#E8EDE8] text-gray-500 border-[rgba(26,60,52,0.1)]'
                         }`}>
                           {offer.is_live ? '● Live' : 'Paused'}
                         </span>
@@ -510,7 +512,7 @@ export default function BusinessPortal() {
                               {slotsLeft} left
                             </span>
                           </div>
-                          <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                          <div className="h-1.5 bg-[#FAF8F2] rounded-full overflow-hidden">
                             <div
                               className={`h-full transition-all duration-300 ${pct >= 76 ? 'bg-rose-500' : pct >= 51 ? 'bg-amber-500' : 'bg-emerald-500'}`}
                               style={{ width: `${pct}%` }}
@@ -520,9 +522,9 @@ export default function BusinessPortal() {
                       )}
                       <button
                         onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-xl font-semibold text-sm transition-all ${
+                        className={`w-full flex items-center justify-center gap-2 py-2 rounded-lg font-semibold text-sm transition-all ${
                           offer.is_live
-                            ? 'bg-gray-50 text-gray-600 hover:bg-gray-100 border border-[rgba(26,60,52,0.15)]'
+                            ? 'bg-[#FAF8F2] text-[#2C2C2C] hover:bg-[#E8EDE8] border border-[rgba(26,60,52,0.1)]'
                             : 'bg-emerald-500 text-white hover:bg-emerald-600'
                         }`}
                       >
@@ -538,7 +540,7 @@ export default function BusinessPortal() {
           {/* SCAN */}
           {view === 'scan' && (
             <div className="max-w-sm mx-auto">
-              <div className="bg-[#FAF8F2] rounded-2xl p-8 border border-[rgba(26,60,52,0.1)] shadow-sm text-center">
+              <div className="bg-[#E8EDE8] rounded-2xl p-8 border border-[rgba(26,60,52,0.1)] shadow-sm text-center">
                 <div className="text-5xl mb-4">📸</div>
                 <h2 className="text-xl font-bold mb-1 text-[#2C2C2C]">Redeem Pass</h2>
                 <p className="text-gray-500 text-sm mb-6">Scan the creator's QR code or paste the token</p>
@@ -550,7 +552,7 @@ export default function BusinessPortal() {
 
                 <div className="mt-4 relative">
                   <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[rgba(26,60,52,0.1)]" /></div>
-                  <div className="relative flex justify-center"><span className="bg-[#FAF8F2] px-3 text-xs text-gray-400">or paste token</span></div>
+                  <div className="relative flex justify-center"><span className="bg-[#E8EDE8] px-3 text-xs text-gray-400">or paste token</span></div>
                 </div>
 
                 <form onSubmit={handleScanCode} className="space-y-3 mt-4">
@@ -559,13 +561,13 @@ export default function BusinessPortal() {
                     value={scanCode}
                     onChange={(e) => { setScanCode(e.target.value); setScanResult(null); }}
                     placeholder="Paste QR token here"
-                    className="w-full px-4 py-3 rounded-xl border border-[rgba(26,60,52,0.15)] text-center font-mono text-sm focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/20 focus:border-[#1A3C34]"
+                    className="w-full px-4 py-3 rounded-xl bg-[#E8EDE8] border border-[rgba(26,60,52,0.15)] text-center font-mono text-sm text-[#2C2C2C] focus:outline-none focus:ring-2 focus:ring-[#1A3C34]/30 focus:border-[#1A3C34]"
                     required
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-xl text-white font-semibold bg-[#2C2C2C] hover:bg-[#2d1f45] disabled:opacity-50 transition-all text-sm"
+                    className="w-full py-3 rounded-lg text-[#FAF8F2] font-semibold bg-[#1A3C34] hover:bg-[#15332c] disabled:opacity-50 transition-all text-sm"
                   >
                     {loading ? 'Verifying...' : 'Redeem Pass'}
                   </button>
@@ -592,20 +594,20 @@ export default function BusinessPortal() {
           {view === 'claims' && (
             <div>
               {claims.length === 0 ? (
-                <div className="text-center py-16 bg-[#FAF8F2] rounded-2xl border border-[rgba(26,60,52,0.1)]">
+                <div className="text-center py-16 bg-[#E8EDE8] rounded-2xl border border-[rgba(26,60,52,0.1)]">
                   <div className="text-4xl mb-3">📋</div>
                   <p className="text-gray-400 text-sm">No claims yet.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {claims.map((claim) => (
-                    <div key={claim.id} className="bg-[#FAF8F2] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm hover:shadow-md transition-all">
+                    <div key={claim.id} className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] hover:shadow-md transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <h3 className="text-[15px] font-bold text-[#2C2C2C] mb-1">{claim.creators.name}</h3>
                           <p className="text-sm text-gray-500">{claim.creators.instagram_handle}</p>
                           <div className="flex items-center gap-3 mt-3">
-                            <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-[#2C2C2C] text-white">{claim.creators.code}</span>
+                            <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-[#1A3C34] text-[#FAF8F2]">{claim.creators.code}</span>
                             <span className="text-xs text-gray-400">{new Date(claim.claimed_at).toLocaleDateString()}</span>
                             <StatusPill status={claim.status} />
                           </div>
@@ -613,7 +615,7 @@ export default function BusinessPortal() {
                         <div className="ml-4 flex flex-col gap-2">
                           <button
                             onClick={() => { setScanCode(claim.qr_token); setView('scan'); }}
-                            className="px-4 py-2 rounded-xl text-sm font-semibold bg-[#1A3C34] text-white hover:bg-[#15332c] transition-colors whitespace-nowrap"
+                            className="px-4 py-2 rounded-lg text-sm font-semibold bg-[#1A3C34] text-[#FAF8F2] hover:bg-[#15332c] transition-colors whitespace-nowrap"
                           >
                             Scan Pass
                           </button>
@@ -639,7 +641,7 @@ export default function BusinessPortal() {
                 <div className="text-center py-16"><div className="text-4xl mb-3">🎬</div><p className="text-gray-400 text-sm">No reels submitted yet.</p></div>
               ) : (
                 <>
-                  <div className="bg-[#FAF8F2] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm mb-4">
+                  <div className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] mb-4">
                     <h3 className="text-sm font-bold text-[#2C2C2C] mb-2">Content Library</h3>
                     <p className="text-gray-600 text-sm">
                       <span className="font-bold text-[#2C2C2C]">{claims.filter(c => c.reel_url).length}</span> reels received
@@ -652,7 +654,7 @@ export default function BusinessPortal() {
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {claims.filter(c => c.reel_url).map((claim) => (
-                      <div key={claim.id} className="bg-[#FAF8F2] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)] shadow-sm shadow-black/[0.03]">
+                      <div key={claim.id} className="bg-[#E8EDE8] rounded-2xl p-5 border border-[rgba(26,60,52,0.1)]">
                         <div className="flex items-center gap-3 mb-4">
                           <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(claim.creators.name)} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
                             {getInitials(claim.creators.name)}
@@ -666,7 +668,7 @@ export default function BusinessPortal() {
                           href={claim.reel_url!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl text-white font-semibold text-sm bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 transition-all"
+                          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg text-white font-semibold text-sm bg-gradient-to-r from-rose-500 to-pink-500 hover:from-rose-600 hover:to-pink-600 transition-all"
                         >
                           View Reel <ExternalLink className="w-3.5 h-3.5" />
                         </a>
@@ -688,12 +690,12 @@ export default function BusinessPortal() {
                 <button
                   key={notif.id}
                   onClick={() => !notif.read && markNotificationRead(notif.id)}
-                  className={`w-full text-left bg-[#FAF8F2] rounded-2xl p-4 border transition-all ${
-                    notif.read ? 'border-[rgba(26,60,52,0.1)] opacity-50' : 'border-sky-200 bg-sky-50/30 shadow-sm'
+                  className={`w-full text-left bg-[#E8EDE8] rounded-2xl p-4 border transition-all ${
+                    notif.read ? 'border-[rgba(26,60,52,0.1)] opacity-50' : 'border-[#1A3C34]/20 bg-[#1A3C34]/5 shadow-sm'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-sky-500'}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-gray-300' : 'bg-[#1A3C34]'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#2C2C2C]">{notif.message}</p>
                       <p className="text-[11px] text-gray-400 mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>
