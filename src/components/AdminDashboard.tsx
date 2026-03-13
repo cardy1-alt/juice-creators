@@ -1,410 +1,509 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { LogOut, Users, Store, FileText, TrendingUp } from 'lucide-react';
+import {
+  LogOut, Users, Store,
+  CheckCircle2, XCircle, BarChart3, Package, ClipboardList, Settings,
+  Film, AlertTriangle
+} from 'lucide-react';
+import { CategoryIcon } from '../lib/categories';
+import { Logo } from './Logo';
 
-interface Creator {
-  id: string;
-  name: string;
-  instagram_handle: string;
-  email: string;
-  code: string;
-  approved: boolean;
-  created_at: string;
-}
-
-interface Business {
-  id: string;
-  name: string;
-  slug: string;
-  owner_email: string;
-  approved: boolean;
-  created_at: string;
-}
-
-interface OfferWithBusiness {
-  id: string;
-  description: string;
-  monthly_cap: number;
-  is_live: boolean;
-  businesses: {
-    name: string;
+function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
+  if (type === 'approval') {
+    return status === 'approved'
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
+      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20">Pending</span>;
+  }
+  if (type === 'offer') {
+    return status === 'live'
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]"><CheckCircle2 className="w-3 h-3" /> Live</span>
+      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(44,44,44,0.1)]">Paused</span>;
+  }
+  const styles: Record<string, string> = {
+    active: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]',
+    redeemed: 'bg-[#E8EDE8] text-[#2C2C2C] border border-[rgba(44,44,44,0.1)]',
+    expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
   };
+  return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#E8EDE8] text-[#2C2C2C]/60 border border-[rgba(44,44,44,0.1)]'}`}>{status}</span>;
 }
 
-interface ClaimWithDetails {
-  id: string;
-  status: string;
-  claimed_at: string;
-  creators: {
-    name: string;
-  };
-  businesses: {
-    name: string;
-  };
-}
+interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
+interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
+interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
 export default function AdminDashboard() {
   const { signOut } = useAuth();
-  const [view, setView] = useState<'stats' | 'creators' | 'businesses' | 'offers' | 'claims'>('stats');
+  const [view, setView] = useState<'stats' | 'creators' | 'businesses' | 'offers' | 'claims' | 'settings'>('stats');
   const [creators, setCreators] = useState<Creator[]>([]);
   const [businesses, setBusinesses] = useState<Business[]>([]);
   const [offers, setOffers] = useState<OfferWithBusiness[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
-  const [stats, setStats] = useState({
-    totalCreators: 0,
-    totalBusinesses: 0,
-    totalClaims: 0,
-    totalReels: 0
-  });
+  const [stats, setStats] = useState({ totalCreators: 0, totalBusinesses: 0, totalClaims: 0, totalReels: 0, pendingCreators: 0, pendingBusinesses: 0 });
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => { fetchAll(); }, []);
+
+  // Realtime: auto-refresh when new creators or businesses sign up
   useEffect(() => {
-    fetchAll();
+    const channel = supabase
+      .channel('admin-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'creators' }, () => { fetchAll(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'businesses' }, () => { fetchAll(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'claims' }, () => { fetchAll(); })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
   }, []);
 
   const fetchAll = async () => {
+    setFetchError(null);
     const currentMonth = new Date().toISOString().slice(0, 7);
-
     const [creatorsData, businessesData, offersData, claimsData] = await Promise.all([
-      supabase.from('creators').select('*').order('created_at', { ascending: false }),
-      supabase.from('businesses').select('*').order('created_at', { ascending: false }),
-      supabase.from('offers').select('*, businesses(name)').order('created_at', { ascending: false }),
-      supabase.from('claims').select('*, creators(name), businesses(name)').order('claimed_at', { ascending: false })
+      supabase.from('creators').select('*').order('created_at', { ascending: false }).limit(500),
+      supabase.from('businesses').select('*').order('created_at', { ascending: false }).limit(500),
+      supabase.from('offers').select('*, businesses(name, category)').order('created_at', { ascending: false }).limit(500),
+      supabase.from('claims').select('*, creators(name), businesses(name, category)').order('claimed_at', { ascending: false }).limit(500)
     ]);
-
+    const errors = [creatorsData.error, businessesData.error, offersData.error, claimsData.error].filter(Boolean);
+    if (errors.length > 0) {
+      console.error('[AdminDashboard] Fetch errors:', errors.map(e => `${e!.code}: ${e!.message}`));
+      setFetchError('Failed to load some data. Check console for details.');
+    }
     if (creatorsData.data) setCreators(creatorsData.data);
     if (businessesData.data) setBusinesses(businessesData.data);
-    if (offersData.data) setOffers(offersData.data as any);
-    if (claimsData.data) {
-      setClaims(claimsData.data as any);
-      const thisMonthClaims = claimsData.data.filter((c: any) => c.claimed_at.startsWith(currentMonth));
-      const reelsPosted = claimsData.data.filter((c: any) => c.reel_url).length;
-      setStats({
-        totalCreators: creatorsData.data?.length || 0,
-        totalBusinesses: businessesData.data?.length || 0,
-        totalClaims: thisMonthClaims.length,
-        totalReels: reelsPosted
+    if (offersData.data) setOffers(offersData.data as OfferWithBusiness[]);
+    if (claimsData.data) setClaims(claimsData.data as ClaimWithDetails[]);
+
+    setStats({
+      totalCreators: creatorsData.data?.length || 0,
+      totalBusinesses: businessesData.data?.length || 0,
+      totalClaims: claimsData.data?.filter((c: any) => c.claimed_at?.startsWith(currentMonth)).length || 0,
+      totalReels: claimsData.data?.filter((c: any) => c.reel_url).length || 0,
+      pendingCreators: creatorsData.data?.filter(c => !c.approved).length || 0,
+      pendingBusinesses: businessesData.data?.filter(b => !b.approved).length || 0,
+    });
+  };
+
+  const handleApproveCreator = async (id: string, approved: boolean) => { await supabase.from('creators').update({ approved }).eq('id', id); fetchAll(); };
+  const handleApproveBusiness = async (id: string, approved: boolean) => { await supabase.from('businesses').update({ approved }).eq('id', id); fetchAll(); };
+  const handleUpdateClaimStatus = async (id: string, status: string) => { await supabase.from('claims').update({ status }).eq('id', id); fetchAll(); };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordMessage(null);
+
+    if (newPassword.length < 8) {
+      setPasswordMessage({ type: 'error', text: 'New password must be at least 8 characters long' });
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'New passwords do not match' });
+      return;
+    }
+
+    // Verify current password by re-authenticating
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user?.email) {
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
       });
+      if (verifyError) {
+        setPasswordMessage({ type: 'error', text: 'Current password is incorrect' });
+        return;
+      }
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+    if (error) {
+      if (error.message.includes('same')) {
+        setPasswordMessage({ type: 'error', text: 'New password must be different from current password' });
+      } else {
+        setPasswordMessage({ type: 'error', text: error.message || 'Failed to update password' });
+      }
+    } else {
+      setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     }
   };
 
-  const handleApproveCreator = async (id: string, approved: boolean) => {
-    await supabase.from('creators').update({ approved }).eq('id', id);
-    fetchAll();
-  };
+  const statCards = [
+    { icon: Users, value: stats.totalCreators, label: 'Total Creators' },
+    { icon: Store, value: stats.totalBusinesses, label: 'Total Businesses' },
+    { icon: ClipboardList, value: stats.totalClaims, label: 'Claims This Month' },
+    { icon: Film, value: stats.totalReels, label: 'Reels Posted' },
+  ];
 
-  const handleApproveBusiness = async (id: string, approved: boolean) => {
-    await supabase.from('businesses').update({ approved }).eq('id', id);
-    fetchAll();
-  };
-
-  const handleUpdateClaimStatus = async (id: string, status: string) => {
-    await supabase.from('claims').update({ status }).eq('id', id);
-    fetchAll();
-  };
+  const tabs = [
+    { key: 'stats' as const, label: 'Overview', icon: BarChart3 },
+    { key: 'creators' as const, label: 'Creators', icon: Users, badge: stats.pendingCreators },
+    { key: 'businesses' as const, label: 'Businesses', icon: Store, badge: stats.pendingBusinesses },
+    { key: 'offers' as const, label: 'Offers', icon: Package },
+    { key: 'claims' as const, label: 'Claims', icon: ClipboardList },
+    { key: 'settings' as const, label: 'Settings', icon: Settings },
+  ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f0eaff' }}>
+    <div className="min-h-screen bg-[#FAF8F2]">
       <div className="max-w-7xl mx-auto">
-        <div className="bg-white shadow-lg p-6">
+        {/* Header */}
+        <div className="bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold" style={{ color: '#1a1025' }}>
-                Admin Dashboard
-              </h1>
-              <p className="text-sm text-gray-600">Juice Creators Platform</p>
+            <div className="flex items-center gap-3">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <Logo size={24} />
+                <span className="font-bold text-[#1A3C34]" style={{ fontSize: '18px' }}>nayba</span>
+              </div>
+              <div>
+                <p className="text-xs text-[rgba(44,44,44,0.45)]">Admin Dashboard</p>
+              </div>
             </div>
-            <button
-              onClick={signOut}
-              className="p-2 rounded-xl hover:bg-gray-100"
-            >
-              <LogOut className="w-5 h-5" style={{ color: '#1a1025' }} />
+            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#E8EDE8] transition-colors">
+              <LogOut className="w-4.5 h-4.5 text-[rgba(44,44,44,0.25)]" />
             </button>
           </div>
         </div>
 
-        <div className="flex bg-white border-b overflow-x-auto">
-          <button
-            onClick={() => setView('stats')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'stats' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'stats' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            Overview
-          </button>
-          <button
-            onClick={() => setView('creators')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'creators' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'creators' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            Creators
-          </button>
-          <button
-            onClick={() => setView('businesses')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'businesses' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'businesses' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            Businesses
-          </button>
-          <button
-            onClick={() => setView('offers')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'offers' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'offers' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            All Offers
-          </button>
-          <button
-            onClick={() => setView('claims')}
-            className={`px-6 py-4 text-sm font-medium whitespace-nowrap ${
-              view === 'claims' ? 'border-b-2' : 'text-gray-500'
-            }`}
-            style={view === 'claims' ? { borderColor: '#5b3df5', color: '#5b3df5' } : {}}
-          >
-            All Claims
-          </button>
+        {/* Tab bar */}
+        <div className="flex bg-[#FAF8F2] border-b border-[rgba(44,44,44,0.1)] overflow-x-auto">
+          {tabs.map(tab => (
+            <button
+              key={tab.key}
+              onClick={() => setView(tab.key)}
+              className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold whitespace-nowrap transition-all relative ${
+                view === tab.key ? 'text-[#2C2C2C]' : 'text-[#2C2C2C]/40 hover:text-[#2C2C2C]/60'
+              }`}
+            >
+              <div className="relative">
+                <tab.icon className="w-4 h-4" />
+                {tab.badge ? (
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C4674A] text-white text-[8px] font-bold flex items-center justify-center">
+                    {tab.badge}
+                  </span>
+                ) : null}
+              </div>
+              {tab.label}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#C4674A] rounded-full" />}
+            </button>
+          ))}
         </div>
 
         <div className="p-6">
+          {fetchError && (
+            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
+              {fetchError}
+            </div>
+          )}
+          {/* STATS */}
           {view === 'stats' && (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <Users className="w-10 h-10 mb-4" style={{ color: '#5b3df5' }} />
-                <p className="text-3xl font-bold mb-1" style={{ color: '#1a1025' }}>
-                  {stats.totalCreators}
-                </p>
-                <p className="text-sm text-gray-600">Total Creators</p>
-              </div>
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <Store className="w-10 h-10 mb-4" style={{ color: '#5b3df5' }} />
-                <p className="text-3xl font-bold mb-1" style={{ color: '#1a1025' }}>
-                  {stats.totalBusinesses}
-                </p>
-                <p className="text-sm text-gray-600">Total Businesses</p>
-              </div>
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <FileText className="w-10 h-10 mb-4" style={{ color: '#5b3df5' }} />
-                <p className="text-3xl font-bold mb-1" style={{ color: '#1a1025' }}>
-                  {stats.totalClaims}
-                </p>
-                <p className="text-sm text-gray-600">Claims This Month</p>
-              </div>
-              <div className="bg-white rounded-2xl p-6 shadow-sm">
-                <TrendingUp className="w-10 h-10 mb-4" style={{ color: '#5b3df5' }} />
-                <p className="text-3xl font-bold mb-1" style={{ color: '#1a1025' }}>
-                  {stats.totalReels}
-                </p>
-                <p className="text-sm text-gray-600">Total Reels Posted</p>
-              </div>
-            </div>
-          )}
-
-          {view === 'creators' && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Handle</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Code</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {creators.map((creator) => (
-                      <tr key={creator.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#1a1025' }}>
-                          {creator.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {creator.instagram_handle}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-mono" style={{ color: '#5b3df5' }}>
-                          {creator.code}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {creator.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              creator.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}
-                          >
-                            {creator.approved ? 'Approved' : 'Pending'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {!creator.approved && (
-                            <button
-                              onClick={() => handleApproveCreator(creator.id, true)}
-                              className="px-4 py-1 rounded-lg text-white font-medium text-xs"
-                              style={{ backgroundColor: '#5b3df5' }}
-                            >
-                              Approve
-                            </button>
-                          )}
-                          {creator.approved && (
-                            <button
-                              onClick={() => handleApproveCreator(creator.id, false)}
-                              className="px-4 py-1 rounded-lg bg-red-500 text-white font-medium text-xs"
-                            >
-                              Revoke
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {view === 'businesses' && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Name</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Slug</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {businesses.map((business) => (
-                      <tr key={business.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#1a1025' }}>
-                          {business.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {business.slug}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {business.owner_email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span
-                            className={`px-3 py-1 rounded-full text-xs font-medium ${
-                              business.approved ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}
-                          >
-                            {business.approved ? 'Approved' : 'Pending'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          {!business.approved && (
-                            <button
-                              onClick={() => handleApproveBusiness(business.id, true)}
-                              className="px-4 py-1 rounded-lg text-white font-medium text-xs"
-                              style={{ backgroundColor: '#5b3df5' }}
-                            >
-                              Approve
-                            </button>
-                          )}
-                          {business.approved && (
-                            <button
-                              onClick={() => handleApproveBusiness(business.id, false)}
-                              className="px-4 py-1 rounded-lg bg-red-500 text-white font-medium text-xs"
-                            >
-                              Revoke
-                            </button>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          )}
-
-          {view === 'offers' && (
-            <div className="grid gap-4 md:grid-cols-2">
-              {offers.map((offer) => (
-                <div key={offer.id} className="bg-white rounded-2xl p-6 shadow-sm">
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="font-bold text-lg mb-1" style={{ color: '#1a1025' }}>
-                        {offer.businesses.name}
-                      </h3>
-                      <p className="text-gray-600 text-sm mb-2">{offer.description}</p>
-                      <p className="text-xs text-gray-500">Cap: {offer.monthly_cap}/month</p>
-                    </div>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        offer.is_live ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-700'
-                      }`}
-                    >
-                      {offer.is_live ? 'Live' : 'Paused'}
-                    </span>
+            <div className="space-y-4">
+              {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
+                <div className="bg-[#C4674A]/10 rounded-2xl p-5 border border-[#C4674A]/20">
+                  <h3 className="text-sm font-bold text-[#2C2C2C] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[#C4674A]" /> Pending Approvals</h3>
+                  <div className="flex gap-4">
+                    {stats.pendingCreators > 0 && (
+                      <button
+                        onClick={() => setView('creators')}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF8F2] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
+                      >
+                        <Users className="w-6 h-6" />
+                        <div className="text-left">
+                          <p className="text-lg font-bold text-[#2C2C2C]">{stats.pendingCreators}</p>
+                          <p className="text-[10px] text-[#2C2C2C]/60 font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
+                        </div>
+                      </button>
+                    )}
+                    {stats.pendingBusinesses > 0 && (
+                      <button
+                        onClick={() => setView('businesses')}
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FAF8F2] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
+                      >
+                        <Store className="w-6 h-6" />
+                        <div className="text-left">
+                          <p className="text-lg font-bold text-[#2C2C2C]">{stats.pendingBusinesses}</p>
+                          <p className="text-[10px] text-[#2C2C2C]/60 font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
+                        </div>
+                      </button>
+                    )}
                   </div>
                 </div>
-              ))}
+              )}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                {statCards.map((stat, i) => (
+                  <div key={i} className="bg-white rounded-[20px] p-6 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                    <div className="mb-3"><stat.icon className="w-6 h-6 text-[rgba(44,44,44,0.45)]" /></div>
+                    <p className="text-3xl font-bold text-[#2C2C2C]">{stat.value}</p>
+                    <p className="text-xs text-[rgba(44,44,44,0.45)] mt-1 font-medium">{stat.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
-          {view === 'claims' && (
-            <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Creator</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Business</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Claimed</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {claims.map((claim) => (
-                      <tr key={claim.id}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium" style={{ color: '#1a1025' }}>
-                          {claim.creators.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {claim.businesses.name}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                          {new Date(claim.claimed_at).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <select
-                            value={claim.status}
-                            onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
-                            className="px-3 py-1 rounded-lg text-xs font-medium border"
-                            style={{ borderColor: '#5b3df5', color: '#5b3df5' }}
-                          >
-                            <option value="active">Active</option>
-                            <option value="redeemed">Redeemed</option>
-                            <option value="expired">Expired</option>
-                          </select>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm">
-                          <button
-                            onClick={() => handleUpdateClaimStatus(claim.id, 'expired')}
-                            className="px-4 py-1 rounded-lg bg-red-500 text-white font-medium text-xs"
-                          >
-                            Expire
-                          </button>
-                        </td>
+          {/* CREATORS */}
+          {view === 'creators' && (
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
+              {creators.length === 0 ? (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No creators yet.</p></div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Name</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Handle</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Followers</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Code</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
+                      {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
+                        <tr key={creator.id} className={`hover:bg-[#E8EDE8]/50 transition-colors ${!creator.approved ? 'bg-[#C4674A]/5' : ''}`}>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#2C2C2C]">{creator.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{creator.instagram_handle}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            {creator.follower_count ? (
+                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[#E8EDE8] text-[#2C2C2C]">{creator.follower_count}</span>
+                            ) : (
+                              <span className="text-xs text-[#2C2C2C]/30">—</span>
+                            )}
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[#2C2C2C] text-[#FAF8F2]">{creator.code}</span></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{creator.email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            {!creator.approved ? (
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                                <CheckCircle2 className="w-3 h-3" /> Approve
+                              </button>
+                            ) : (
+                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                                <XCircle className="w-3 h-3" /> Revoke
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* BUSINESSES */}
+          {view === 'businesses' && (
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
+              {businesses.length === 0 ? (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No businesses yet.</p></div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Business</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Slug</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
+                      {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
+                        <tr key={business.id} className={`hover:bg-[#E8EDE8]/50 transition-colors ${!business.approved ? 'bg-[#C4674A]/5' : ''}`}>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-2.5">
+                              <CategoryIcon category={business.category} className="w-5 h-5" />
+                              <span className="text-sm font-medium text-[#2C2C2C]">{business.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60 font-mono">{business.slug}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            {!business.approved ? (
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                                <CheckCircle2 className="w-3 h-3" /> Approve
+                              </button>
+                            ) : (
+                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                                <XCircle className="w-3 h-3" /> Revoke
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* OFFERS */}
+          {view === 'offers' && (
+            <>
+              {offers.length === 0 ? (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Package className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No offers yet.</p></div>
+              ) : (
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {offers.map((offer) => (
+                    <div key={offer.id} className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
+                      <div className="flex items-start gap-3 mb-2">
+                        <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <h3 className="font-bold text-sm text-[#2C2C2C]">{offer.businesses.name}</h3>
+                            <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
+                          </div>
+                          <p className="text-[#2C2C2C]/60 text-sm mt-1">{offer.description}</p>
+                          <p className="text-xs text-[#2C2C2C]/40 mt-1">Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+
+          {/* CLAIMS */}
+          {view === 'claims' && (
+            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] overflow-hidden">
+              {claims.length === 0 ? (
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[rgba(44,44,44,0.25)]" /></div><p className="text-[#2C2C2C]/60 text-sm">No claims yet.</p></div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="bg-white border-b border-[rgba(44,44,44,0.1)]">
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Creator</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Business</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Claimed</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[#2C2C2C]/60 uppercase tracking-wider">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-[rgba(44,44,44,0.05)]">
+                      {claims.map((claim) => (
+                        <tr key={claim.id} className="hover:bg-[#E8EDE8]/50 transition-colors">
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#2C2C2C]">{claim.creators.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <div className="flex items-center gap-2">
+                              <CategoryIcon category={claim.businesses.category} className="w-4 h-4" />
+                              <span className="text-sm text-[#2C2C2C]/60">{claim.businesses.name}</span>
+                            </div>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[#2C2C2C]/60">{new Date(claim.claimed_at).toLocaleDateString()}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <select
+                              value={claim.status}
+                              onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
+                              className="px-2.5 py-1 rounded-lg text-xs font-semibold border border-[rgba(44,44,44,0.15)] text-[#2C2C2C] bg-white focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                            >
+                              <option value="active">Active</option>
+                              <option value="redeemed">Redeemed</option>
+                              <option value="expired">Expired</option>
+                            </select>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            {claim.status === 'active' && (
+                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-[#FAF8F2] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                                <XCircle className="w-3 h-3" /> Expire
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SETTINGS */}
+          {view === 'settings' && (
+            <div className="max-w-2xl">
+              <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] p-6">
+                <h2 className="text-lg font-bold text-[#2C2C2C] mb-5">Change Password</h2>
+                <form onSubmit={handleChangePassword} className="space-y-4">
+                  <div>
+                    <label htmlFor="currentPassword" className="block text-sm font-semibold text-[#2C2C2C] mb-2">
+                      Current Password
+                    </label>
+                    <input
+                      id="currentPassword"
+                      type="password"
+                      value={currentPassword}
+                      onChange={(e) => setCurrentPassword(e.target.value)}
+                      required
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
+                      placeholder="Enter current password"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="newPassword" className="block text-sm font-semibold text-[#2C2C2C] mb-2">
+                      New Password
+                    </label>
+                    <input
+                      id="newPassword"
+                      type="password"
+                      value={newPassword}
+                      onChange={(e) => setNewPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
+                      placeholder="Enter new password (min 8 characters)"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[#2C2C2C] mb-2">
+                      Confirm New Password
+                    </label>
+                    <input
+                      id="confirmPassword"
+                      type="password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      required
+                      minLength={8}
+                      className="w-full px-4 py-2.5 rounded-lg border border-[rgba(44,44,44,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-white text-[#2C2C2C]"
+                      placeholder="Confirm new password"
+                    />
+                  </div>
+                  {passwordMessage && (
+                    <div
+                      className={`p-3 rounded-xl text-sm font-medium ${
+                        passwordMessage.type === 'success'
+                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
+                          : 'bg-rose-50 text-rose-600 border border-rose-100'
+                      }`}
+                    >
+                      {passwordMessage.text}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    className="w-full px-4 py-2.5 bg-[#C4674A] text-[#FAF8F2] rounded-lg font-semibold text-sm hover:bg-[#b35a3f] transition-colors"
+                  >
+                    Update Password
+                  </button>
+                </form>
               </div>
             </div>
           )}

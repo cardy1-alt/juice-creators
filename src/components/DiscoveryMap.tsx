@@ -1,0 +1,377 @@
+import { useState, useEffect, useRef } from 'react';
+import { MapPin, Navigation, X, Search } from 'lucide-react';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import { CategoryIcon } from '../lib/categories';
+import { getInitials } from '../lib/avatar';
+
+const DEFAULT_CENTER: [number, number] = [52.2465, 0.7135];
+
+interface Business {
+  id: string;
+  name: string;
+  category: string;
+  latitude: number;
+  longitude: number;
+  address: string;
+  offers: Array<{
+    id: string;
+    description: string;
+    reward_value: string;
+    monthly_cap: number | null;
+    slotsUsed?: number;
+  }>;
+}
+
+interface DiscoveryMapProps {
+  businesses: Business[];
+  onClaimOffer: (offerId: string) => void;
+  userLocation: { lat: number; lng: number } | null;
+}
+
+function createMarkerIcon(name: string) {
+  const initials = name ? name.charAt(0).toUpperCase() : '?';
+  return L.divIcon({
+    html: `<div style="
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      background: linear-gradient(135deg, #3a3a3a, #2C2C2C);
+      border: 2px solid white;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(44,44,44,0.15);
+    ">${initials}</div>`,
+    className: 'marker-icon',
+    iconSize: [36, 36],
+    iconAnchor: [18, 18],
+    popupAnchor: [0, -18],
+  });
+}
+
+function MapUpdater({ center, onMapClick }: { center: [number, number]; onMapClick: () => void }) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+
+  useEffect(() => {
+    const handleClick = () => {
+      onMapClick();
+    };
+
+    map.on('click', handleClick);
+
+    return () => {
+      map.off('click', handleClick);
+    };
+  }, [map, onMapClick]);
+
+  return null;
+}
+
+export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }: DiscoveryMapProps) {
+  const [selectedBusiness, setSelectedBusiness] = useState<Business | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>(
+    userLocation ? [userLocation.lat, userLocation.lng] : DEFAULT_CENTER
+  );
+  const [isLocating, setIsLocating] = useState(false);
+  const [showLocationInput, setShowLocationInput] = useState(false);
+  const [locationInput, setLocationInput] = useState('');
+  const [geocoding, setGeocoding] = useState(false);
+  const [geocodeError, setGeocodeError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (userLocation) {
+      setMapCenter([userLocation.lat, userLocation.lng]);
+    }
+  }, [userLocation]);
+
+  const requestLocation = () => {
+    setIsLocating(true);
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setMapCenter([position.coords.latitude, position.coords.longitude]);
+          setIsLocating(false);
+        },
+        () => {
+          setIsLocating(false);
+        }
+      );
+    }
+  };
+
+  const geocodeLocation = async () => {
+    if (!locationInput.trim()) return;
+
+    setGeocoding(true);
+    setGeocodeError(null);
+    try {
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(locationInput)}&limit=1`
+      );
+      const data = await response.json();
+
+      if (data && data.length > 0) {
+        setMapCenter([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
+        setShowLocationInput(false);
+        setLocationInput('');
+        setGeocodeError(null);
+      } else {
+        setGeocodeError('Location not found. Try a different search term.');
+      }
+    } catch (error) {
+      setGeocodeError('Failed to find location. Please try again.');
+    } finally {
+      setGeocoding(false);
+    }
+  };
+
+  const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 6371; // Earth radius in km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
+  };
+
+  const businessesWithCoords = businesses.filter(b => b.latitude && b.longitude);
+
+  const businessesWithDistance = businessesWithCoords
+    .map(b => ({
+      ...b,
+      distance: calculateDistance(mapCenter[0], mapCenter[1], b.latitude, b.longitude)
+    }))
+    .sort((a, b) => a.distance - b.distance);
+
+  return (
+    <div className="flex flex-col h-full">
+      <div className="mb-3 flex gap-2">
+        <button
+          onClick={requestLocation}
+          disabled={isLocating}
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#C4674A] text-white rounded-[12px] text-sm font-semibold hover:bg-[#b35a3f] transition-colors disabled:opacity-50"
+        >
+          <Navigation className="w-4 h-4" />
+          {isLocating ? 'Finding...' : 'My Location'}
+        </button>
+        <button
+          onClick={() => setShowLocationInput(!showLocationInput)}
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#E8EDE8] text-[#2C2C2C] rounded-[12px] text-sm font-semibold hover:bg-[#dce3dc] transition-colors"
+        >
+          <Search className="w-4 h-4" />
+          Enter Location
+        </button>
+      </div>
+
+      {showLocationInput && (
+        <div className="mb-3 bg-[#FAF8F2] rounded-xl p-4 border border-[rgba(44,44,44,0.1)] shadow-sm">
+          <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-2">
+            Enter address or postcode
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              value={locationInput}
+              onChange={(e) => setLocationInput(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && geocodeLocation()}
+              placeholder="e.g., London SW1A 1AA"
+              className="flex-1 px-[14px] py-2 rounded-[11px] bg-[#E8EDE8] text-[13px] text-[#2C2C2C] placeholder:text-[rgba(44,44,44,0.25)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30"
+            />
+            <button
+              onClick={geocodeLocation}
+              disabled={geocoding || !locationInput.trim()}
+              className="px-4 py-2 bg-[#C4674A] text-white rounded-[11px] text-sm font-semibold hover:bg-[#b35a3f] transition-colors disabled:opacity-40"
+            >
+              {geocoding ? 'Searching...' : 'Go'}
+            </button>
+          </div>
+          {geocodeError && (
+            <p className="text-xs text-rose-600 mt-2">{geocodeError}</p>
+          )}
+        </div>
+      )}
+
+      <div className="relative bg-[#E8EDE8] rounded-2xl overflow-hidden" style={{ height: '400px' }}>
+        {businessesWithCoords.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+            <div className="text-center bg-[#FAF8F2]/95 backdrop-blur-sm p-6 rounded-2xl shadow-lg border border-[rgba(44,44,44,0.1)]">
+              <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+              <p className="text-gray-600 text-sm font-semibold">No businesses near you yet</p>
+              <p className="text-gray-400 text-xs mt-1">Check back soon!</p>
+            </div>
+          </div>
+        )}
+
+        <MapContainer
+          center={mapCenter}
+          zoom={13}
+          style={{ height: '100%', width: '100%' }}
+          zoomControl={true}
+        >
+          <TileLayer
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <MapUpdater center={mapCenter} onMapClick={() => setSelectedBusiness(null)} />
+
+          {businessesWithDistance.map((business) => (
+            <Marker
+              key={business.id}
+              position={[business.latitude, business.longitude]}
+              icon={createMarkerIcon(business.name)}
+              eventHandlers={{
+                click: () => setSelectedBusiness(business),
+              }}
+            >
+              <Popup closeButton={true}>
+                <div className="text-sm min-w-[180px]">
+                  <h4 className="font-bold text-[#2C2C2C] mb-1">{business.name}</h4>
+                  <p className="text-xs text-gray-500 mb-2">{business.category}</p>
+                  {business.offers.length > 0 && (
+                    <p className="text-xs text-[#C4674A] font-semibold mb-2">
+                      {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
+                    </p>
+                  )}
+                  <button
+                    onClick={() => setSelectedBusiness(business)}
+                    className="w-full mt-2 px-3 py-1.5 bg-[#C4674A] text-white text-xs font-semibold rounded-[8px] hover:bg-[#b35a3f] transition-colors"
+                  >
+                    View Offers
+                  </button>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+
+      <div className="mt-4 space-y-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="font-bold text-sm text-[#2C2C2C]">Nearby Businesses</h3>
+          <span className="text-xs text-gray-400">{businessesWithDistance.length} found</span>
+        </div>
+
+        {businessesWithDistance.map((business) => (
+          <div
+            key={business.id}
+            className="bg-white rounded-[14px] p-4 border border-[rgba(44,44,44,0.1)] shadow-[0_1px_4px_rgba(44,44,44,0.06)] cursor-pointer hover:shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)] transition-all"
+            onClick={() => setSelectedBusiness(business)}
+          >
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-[10px] bg-[#E8EDE8] flex items-center justify-center flex-shrink-0">
+                <CategoryIcon category={business.category} className="w-5 h-5 text-[rgba(44,44,44,0.45)]" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-start justify-between gap-2">
+                  <h4 className="font-semibold text-sm text-[#2C2C2C]">{business.name}</h4>
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    {business.distance < 1
+                      ? `${(business.distance * 1000).toFixed(0)} m`
+                      : `${business.distance.toFixed(1)} km`
+                    }
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 mt-0.5">{business.address}</p>
+                {business.offers.length > 0 && (
+                  <p className="text-xs text-[#C4674A] font-medium mt-1">
+                    {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {selectedBusiness && (
+        <div
+          className="fixed inset-0 bg-black/40 flex items-end justify-center z-50 p-4"
+          onClick={() => setSelectedBusiness(null)}
+        >
+          <div
+            className="bg-[#FAF8F2] rounded-2xl w-full max-w-md shadow-2xl overflow-hidden animate-slide-up"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-5">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-12 h-12 rounded-[12px] bg-[#E8EDE8] flex items-center justify-center flex-shrink-0">
+                    <CategoryIcon category={selectedBusiness.category} className="w-6 h-6 text-[rgba(44,44,44,0.45)]" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-[#2C2C2C]">{selectedBusiness.name}</h3>
+                    <p className="text-xs text-gray-500 mt-0.5">{selectedBusiness.address}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {selectedBusiness.distance < 1
+                        ? `${(selectedBusiness.distance * 1000).toFixed(0)} metres away`
+                        : `${selectedBusiness.distance.toFixed(1)} km away`
+                      }
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedBusiness(null)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <h4 className="font-semibold text-sm text-gray-700">Available Offers</h4>
+                {selectedBusiness.offers && selectedBusiness.offers.length > 0 ? (
+                  selectedBusiness.offers.map((offer) => {
+                  const isUnlimited = offer.monthly_cap === null;
+                  const slotsUsed = offer.slotsUsed || 0;
+                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                  const full = !isUnlimited && slotsLeft === 0;
+
+                  return (
+                    <div key={offer.id} className="bg-[#E8EDE8] rounded-[12px] p-3">
+                      <p className="text-sm text-gray-700 mb-2">{offer.description}</p>
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-emerald-600">{offer.reward_value}</span>
+                        <button
+                          onClick={() => {
+                            onClaimOffer(offer.id);
+                            setSelectedBusiness(null);
+                          }}
+                          disabled={full}
+                          className="px-3 py-1.5 bg-[#C4674A] text-white text-xs font-semibold rounded-[8px] hover:bg-[#b35a3f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        >
+                          {full ? 'Full' : 'Claim'}
+                        </button>
+                      </div>
+                      {isUnlimited ? (
+                        <p className="text-[10px] text-gray-400 mt-2">Unlimited slots</p>
+                      ) : !full && (
+                        <p className="text-[10px] text-gray-400 mt-2">
+                          {slotsLeft} slot{slotsLeft !== 1 ? 's' : ''} left this month
+                        </p>
+                      )}
+                    </div>
+                  );
+                })
+                ) : (
+                  <p className="text-sm text-gray-500 text-center py-4">No offers available</p>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
