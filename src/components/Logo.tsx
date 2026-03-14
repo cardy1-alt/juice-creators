@@ -7,11 +7,11 @@ export function Logo({ size = 18, color = "#1A3C34" }: LogoProps) {
   return (
     <span
       style={{
-        fontSize: `${size}px`,
-        fontWeight: 800,
+        fontSize: `${size * 1.3}px`,
+        fontWeight: 700,
         color,
-        letterSpacing: '-0.5px',
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        letterSpacing: '-0.3px',
+        fontFamily: "'Libre Baskerville', serif",
         lineHeight: 1,
       }}
     >
