@@ -712,9 +712,17 @@ export default function CreatorApp() {
                         {firstActive.businesses.name} <ChevronRight className="w-[10px] h-[10px]" />
                       </button>
                     </div>
-                    <div className="w-[50px] h-[50px] rounded-xl bg-[#F5C4A0] flex flex-col items-center justify-center">
-                      <span className="text-[24px] font-extrabold text-[#222222] leading-none">{hoursLeft}</span>
-                      <span className="text-[9px] font-bold text-[rgba(34,34,34,0.28)] leading-none mt-0.5">HRS LEFT</span>
+                    <div className="relative w-[52px] h-[52px]">
+                      <svg className="w-full h-full -rotate-90" viewBox="0 0 52 52">
+                        <circle cx="26" cy="26" r="22" fill="none" stroke="var(--terra-10)" strokeWidth="4" />
+                        <circle cx="26" cy="26" r="22" fill="none" stroke="var(--terra)" strokeWidth="4"
+                          strokeLinecap="round"
+                          strokeDasharray={`${(hoursLeft / 48) * 138.2} 138.2`}
+                        />
+                      </svg>
+                      <div className="absolute inset-0 flex flex-col items-center justify-center">
+                        <span className="text-[16px] font-extrabold text-[#222222] leading-none">{hoursLeft}h</span>
+                      </div>
                     </div>
                   </div>
                 );
