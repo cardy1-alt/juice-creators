@@ -657,6 +657,7 @@ export default function CreatorApp() {
                   className="w-full rounded-full bg-white flex items-center gap-3 px-[16px] py-[14px]"
                   style={{
                     border: '1px solid rgba(34,34,34,0.12)',
+                    boxShadow: '0 2px 8px rgba(34,34,34,0.08)',
                   }}
                 >
                   <Search className="w-[15px] h-[15px] text-[rgba(34,34,34,0.28)] flex-shrink-0" />
@@ -725,18 +726,16 @@ export default function CreatorApp() {
                         {firstActive.businesses.name} <ChevronRight className="w-[10px] h-[10px]" />
                       </button>
                     </div>
-                    <div className="relative w-[52px] h-[52px]">
-                      <svg className="w-full h-full -rotate-90" viewBox="0 0 52 52">
-                        <circle cx="26" cy="26" r="22" fill="none" stroke="var(--terra-10)" strokeWidth="4" />
-                        <circle cx="26" cy="26" r="22" fill="none" stroke="var(--terra)" strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeDasharray={`${(hoursLeft / 48) * 138.2} 138.2`}
-                        />
-                      </svg>
-                      <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-[11px] font-extrabold leading-none" style={{ color: timerColor }}>{timerLabel}</span>
-                      </div>
-                    </div>
+                    <span
+                      className="text-[14px] font-bold rounded-[50px] whitespace-nowrap"
+                      style={{
+                        background: '#F5C4A0',
+                        color: hoursLeft < 10 ? 'var(--terra)' : '#222222',
+                        padding: '6px 14px',
+                      }}
+                    >
+                      {timerLabel}
+                    </span>
                   </div>
                 );
               })()}
@@ -848,7 +847,7 @@ export default function CreatorApp() {
                       {/* Below image info */}
                       <div className="mt-2">
                         <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                        <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.description ? `${offer.businesses.category} · ${offer.description.split(/\s+/).slice(0, 3).join(' ')}` : offer.businesses.category}</p>
+                        <p className="text-[13px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
                         <p className="text-[13px]">
                           <span className="font-semibold text-[#222222]">Free</span>
                           {isUnlimited ? null : full ? (
@@ -1399,7 +1398,7 @@ export default function CreatorApp() {
         className="fixed left-0 right-0 z-30 pointer-events-none"
         style={{
           bottom: 60,
-          height: 80,
+          height: 72,
           background: 'linear-gradient(to bottom, transparent 0%, #ffffff 100%)',
         }}
       />
