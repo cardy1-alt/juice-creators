@@ -47,7 +47,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ============================================================
 -- BUSINESSES
 -- ============================================================
-INSERT INTO businesses (id, name, slug, owner_email, category, address, latitude, longitude, bio, approved, region)
+INSERT INTO businesses (id, name, slug, owner_email, category, address, latitude, longitude, bio, approved, region, logo_url)
 VALUES
   (
     'b1111111-1111-1111-1111-111111111111',
@@ -60,7 +60,8 @@ VALUES
     0.7137,
     'Specialty coffee & brunch spot in the heart of town.',
     true,
-    'bury-st-edmunds'
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop'
   ),
   (
     'b2222222-2222-2222-2222-222222222222',
@@ -73,9 +74,80 @@ VALUES
     0.7155,
     'Facials, lashes & nails — your local glow-up destination.',
     true,
-    'bury-st-edmunds'
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=400&fit=crop'
+  ),
+  (
+    'b3333333-3333-3333-3333-333333333333',
+    'The Greenhaus',
+    'the-greenhaus',
+    'hello@greenhaus.test',
+    'Food & Drink',
+    '23 St Johns Street, Bury St Edmunds, IP33 1SJ',
+    52.2450,
+    0.7120,
+    'Plant-forward kitchen serving seasonal bowls, juices & smoothies.',
+    true,
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop'
+  ),
+  (
+    'b4444444-4444-4444-4444-444444444444',
+    'Iron & Oak Gym',
+    'iron-and-oak-gym',
+    'info@ironoak.test',
+    'Health & Fitness',
+    '5 Out Risbygate, Bury St Edmunds, IP33 3AA',
+    52.2420,
+    0.7100,
+    'Boutique strength & conditioning gym with personal training.',
+    true,
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop'
+  ),
+  (
+    'b5555555-5555-5555-5555-555555555555',
+    'Thread & Fold',
+    'thread-and-fold',
+    'hello@threadfold.test',
+    'Retail',
+    '15 The Traverse, Bury St Edmunds, IP33 1BJ',
+    52.2445,
+    0.7148,
+    'Independent clothing & lifestyle store. Curated everyday essentials.',
+    true,
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400&h=400&fit=crop'
+  ),
+  (
+    'b6666666-6666-6666-6666-666666666666',
+    'Paws & Claws',
+    'paws-and-claws',
+    'hello@pawsclaws.test',
+    'Pets',
+    '30 Whiting Street, Bury St Edmunds, IP33 1NX',
+    52.2460,
+    0.7165,
+    'Pet grooming, daycare & boutique treats for your furry friends.',
+    true,
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop'
+  ),
+  (
+    'b7777777-7777-7777-7777-777777777777',
+    'Frame & Canvas',
+    'frame-and-canvas',
+    'hello@framecanvas.test',
+    'Arts & Entertainment',
+    '9 Hatter Street, Bury St Edmunds, IP33 1NE',
+    52.2438,
+    0.7170,
+    'Art studio offering workshops, exhibitions & creative events.',
+    true,
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop'
   )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET logo_url = EXCLUDED.logo_url;
 
 -- ============================================================
 -- OFFERS
@@ -108,6 +180,41 @@ VALUES
     'b2222222-2222-2222-2222-222222222222',
     'Free gel manicure — share a before/after reel',
     null,
+    true
+  ),
+  (
+    'c5555555-5555-5555-5555-555555555555',
+    'b3333333-3333-3333-3333-333333333333',
+    'Free smoothie bowl + juice — film a 30s reel of your visit',
+    10,
+    true
+  ),
+  (
+    'c6666666-6666-6666-6666-666666666666',
+    'b4444444-4444-4444-4444-444444444444',
+    'Free day pass + PT session — post a workout reel tagging @ironoakgym',
+    4,
+    true
+  ),
+  (
+    'c7777777-7777-7777-7777-777777777777',
+    'b5555555-5555-5555-5555-555555555555',
+    'Free outfit styling session — share a try-on haul reel',
+    6,
+    true
+  ),
+  (
+    'c8888888-8888-8888-8888-888888888888',
+    'b6666666-6666-6666-6666-666666666666',
+    'Free dog grooming session — post a cute before/after reel',
+    null,
+    true
+  ),
+  (
+    'c9999999-9999-9999-9999-999999999999',
+    'b7777777-7777-7777-7777-777777777777',
+    'Free paint & sip evening for two — reel the experience',
+    5,
     true
   )
 ON CONFLICT (id) DO NOTHING;
