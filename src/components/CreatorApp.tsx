@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram, Video } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -48,6 +48,11 @@ interface Offer {
   description: string;
   monthly_cap: number | null;
   slotsUsed?: number;
+  offer_type?: string | null;
+  offer_item?: string | null;
+  content_type?: string | null;
+  specific_ask?: string | null;
+  generated_title?: string | null;
   businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
 }
 
@@ -62,7 +67,7 @@ interface Claim {
   reel_due_at: string | null;
   offer_id: string;
   business_id: string;
-  offers: { description: string };
+  offers: { description: string; generated_title?: string | null; offer_item?: string | null; specific_ask?: string | null; content_type?: string | null };
   businesses: { name: string; category: string; logo_url?: string | null };
 }
 
@@ -258,7 +263,7 @@ export default function CreatorApp() {
   const fetchClaims = async () => {
     const { data, error } = await supabase
       .from('claims')
-      .select('*, offers(description), businesses(name, category, logo_url)')
+      .select('*, offers(description, generated_title, offer_item, specific_ask, content_type), businesses(name, category, logo_url)')
       .eq('creator_id', userProfile.id)
       .order('claimed_at', { ascending: false });
 
@@ -553,26 +558,48 @@ export default function CreatorApp() {
                 {/* A) Business name + category */}
                 <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
                 <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
+
+                {/* Offer headline */}
+                <p className="text-[20px] font-extrabold text-[#222222] mt-3" style={{ letterSpacing: '-0.4px' }}>
+                  {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
+                </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
                 {/* B) What you get */}
-                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What you get</p>
-                <p className="text-[16px] font-medium text-[#222222] leading-[1.6] mb-5">{offer.description}</p>
+                <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT YOU GET</p>
+                <p className="text-[16px] font-semibold text-[#222222] leading-[1.5] mb-5">
+                  {offer.generated_title || offer.description}
+                </p>
 
-                {/* C) What we ask */}
-                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What we ask</p>
+                {/* C) What to post */}
+                <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT TO POST</p>
+                <div className="flex items-center gap-2 mb-2">
+                  <Video className="w-5 h-5 text-[var(--terra)]" />
+                  <span className="text-[15px] font-bold text-[#222222]">One Instagram Reel</span>
+                </div>
+                <p className="text-[13px] text-[var(--mid)] mb-3">Post within 48 hours of your visit</p>
                 <div className="flex flex-col gap-2.5 mb-5">
                   {[
-                    'Post an Instagram reel within 48 hours',
-                    'Tag us in your post',
-                    'Visit in person to redeem',
+                    'Post within 48 hours of your visit',
+                    'Tag the business in your reel',
+                    'Submit your reel link in the app',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
-                      <Check className="w-[14px] h-[14px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
-                      <span className="text-[14px] text-[#222222]">{item}</span>
+                      <Check className="w-[13px] h-[13px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
+                      <span className="text-[13px] text-[var(--mid)]">{item}</span>
                     </div>
                   ))}
                 </div>
+
+                {/* D) They'd love if you… (only if specific_ask exists) */}
+                {offer.specific_ask && (
+                  <div className="mb-5">
+                    <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">THEY'D LOVE IF YOU…</p>
+                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
+                      <p className="text-[14px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* D) Availability row */}
                 <div className="flex items-center justify-between rounded-[12px] bg-[#F7F7F7] px-[16px] py-[12px]">
@@ -833,10 +860,14 @@ export default function CreatorApp() {
                             Full
                           </span>
                         )}
-                        {/* Heart top-right */}
+                        {/* Reel badge top-right */}
+                        <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
+                          <Video className="w-[10px] h-[10px]" /> Reel
+                        </span>
+                        {/* Heart */}
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                          className="absolute top-[6px] right-[6px]"
+                          className="absolute bottom-[6px] right-[6px]"
                         >
                           <Heart
                             className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
@@ -847,15 +878,25 @@ export default function CreatorApp() {
                       {/* Below image info */}
                       <div className="mt-2">
                         <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                        <p className="text-[13px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
-                        <p className="text-[13px]">
-                          <span className="font-semibold text-[#222222]">Free</span>
-                          {isUnlimited ? null : full ? (
-                            <span className="text-[rgba(34,34,34,0.5)]"> · Full</span>
-                          ) : (
-                            <span className="text-[rgba(34,34,34,0.5)]"> · {slotsLeft} slots left</span>
-                          )}
+                        <p className="text-[13px] font-semibold text-[#222222] truncate">
+                          {offer.generated_title || offer.description.slice(0, 35)}
                         </p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
+                          <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
+                          {!isUnlimited && !full && (
+                            <>
+                              <span className="text-[11px] text-[var(--mid)]">·</span>
+                              <span className="text-[11px] text-[var(--mid)]">{slotsLeft} slots left</span>
+                            </>
+                          )}
+                          {full && (
+                            <>
+                              <span className="text-[11px] text-[var(--mid)]">·</span>
+                              <span className="text-[11px] text-[var(--mid)]">Full</span>
+                            </>
+                          )}
+                        </div>
                       </div>
                     </button>
                   );
@@ -1020,8 +1061,8 @@ export default function CreatorApp() {
                       const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
                       const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
 
-                      // Extract short offer title: cut at natural break points, no ellipsis on complete phrases
-                      const desc = claim.offers.description || '';
+                      // Use generated_title if available, fall back to description truncation
+                      const desc = claim.offers.generated_title || claim.offers.description || '';
                       const breakPoints = [' in exchange', ' for a', ' for an', ' when you', ' with your'];
                       let offerTitle = desc;
                       let foundBreak = false;
