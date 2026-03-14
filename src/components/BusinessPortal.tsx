@@ -16,12 +16,12 @@ import { Logo } from './Logo';
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[#F7F7F7] text-[#222222] border border-[rgba(34,34,34,0.1)]',
+    active: 'bg-[#F7F7F7] text-[#222222] border border-[var(--faint)]',
     redeemed: 'bg-[#222222]/10 text-[#222222] border border-[#222222]/20',
     expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] border border-[rgba(34,34,34,0.1)]'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[var(--mid)] border border-[var(--faint)]'}`}>
       {status}
     </span>
   );
@@ -334,10 +334,10 @@ export default function BusinessPortal() {
   if (!userProfile?.approved) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[#FFFFFF]">
-        <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[rgba(34,34,34,0.1)]">
-          <div className="flex justify-center mb-4"><Clock className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div>
+        <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
+          <div className="flex justify-center mb-4"><Clock className="w-8 h-8 text-[var(--soft)]" /></div>
           <h2 className="text-xl font-bold mb-2 text-[#222222]">Pending Approval</h2>
-          <p className="text-[rgba(34,34,34,0.5)] text-sm mb-6">Your business account is under review.</p>
+          <p className="text-[var(--mid)] text-sm mb-6">Your business account is under review.</p>
           <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-medium bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors">
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
@@ -365,7 +365,7 @@ export default function BusinessPortal() {
       )}
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="bg-[#FFFFFF] border-b border-[rgba(34,34,34,0.1)]" style={{ padding: '20px 20px 14px' }}>
+        <div className="bg-[#FFFFFF] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -373,23 +373,23 @@ export default function BusinessPortal() {
               </div>
               <div>
                 <h1 className="text-[15px] font-bold text-[#222222]">{userProfile.name}</h1>
-                <p className="text-xs text-[rgba(34,34,34,0.5)]">Business Portal</p>
+                <p className="text-xs text-[var(--mid)]">Business Portal</p>
               </div>
             </div>
             <button onClick={signOut} className="p-2 rounded-xl hover:bg-[#F7F7F7] transition-colors">
-              <LogOut className="w-4.5 h-4.5 text-[rgba(34,34,34,0.28)]" />
+              <LogOut className="w-4.5 h-4.5 text-[var(--soft)]" />
             </button>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-[#FFFFFF] border-b border-[rgba(34,34,34,0.1)] overflow-x-auto">
+        <div className="flex bg-[#FFFFFF] border-b border-[var(--faint)] overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.key}
               onClick={() => { setView(tab.key); setScanResult(null); }}
               className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold whitespace-nowrap transition-all relative ${
-                view === tab.key ? 'text-[#222222]' : 'text-[rgba(34,34,34,0.28)] hover:text-[rgba(34,34,34,0.5)]'
+                view === tab.key ? 'text-[#222222]' : 'text-[var(--soft)] hover:text-[var(--mid)]'
               }`}
             >
               <div className="relative">
@@ -416,13 +416,13 @@ export default function BusinessPortal() {
           {view === 'offers' && (
             <div className="space-y-4">
               {offersLoaded && offers.length === 0 && (
-                <div className="bg-white rounded-[20px] p-6 text-center shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] border border-[rgba(34,34,34,0.1)]">
+                <div className="bg-white rounded-[20px] p-6 text-center shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] border border-[var(--faint)]">
                   <div className="flex justify-center mb-3"><Sparkles className="w-8 h-8 text-[var(--terra)]" /></div>
                   <h3 className="text-xl font-bold mb-2 text-[#222222]">You're All Set!</h3>
-                  <p className="text-[rgba(34,34,34,0.5)] text-sm mb-2">
+                  <p className="text-[var(--mid)] text-sm mb-2">
                     Create your first offer to start receiving creators and building your content library.
                   </p>
-                  <p className="text-[rgba(34,34,34,0.5)] text-xs mb-4">
+                  <p className="text-[var(--mid)] text-xs mb-4">
                     Start with unlimited claims and adjust later once you know your capacity.
                   </p>
                   <button
@@ -444,14 +444,14 @@ export default function BusinessPortal() {
               )}
 
               {showNewOffer && (
-                <form onSubmit={handleCreateOffer} className="bg-white rounded-[20px] p-6 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] space-y-4">
+                <form onSubmit={handleCreateOffer} className="bg-white rounded-[20px] p-6 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] space-y-4">
                   <div>
                     <label className="block text-sm font-semibold text-[#222222] mb-1.5">Description</label>
                     <textarea
                       value={newOfferDescription}
                       onChange={(e) => setNewOfferDescription(e.target.value)}
                       placeholder="e.g. Free juice + acai bowl for a reel"
-                      className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] resize-none text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                      className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[var(--faint)] resize-none text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                       rows={3}
                       required
                     />
@@ -480,13 +480,13 @@ export default function BusinessPortal() {
                         type="number"
                         value={newOfferCap || ''}
                         onChange={(e) => setNewOfferCap(parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                        className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[var(--faint)] text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                         min={1}
                         placeholder="Max claims per month"
                         required
                       />
                     ) : (
-                      <p className="text-xs text-[rgba(34,34,34,0.28)]">Creators can claim this offer any time — no slot limit</p>
+                      <p className="text-xs text-[var(--soft)]">Creators can claim this offer any time — no slot limit</p>
                     )}
                   </div>
                   {offerError && (
@@ -513,13 +513,13 @@ export default function BusinessPortal() {
                   const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
 
                   return (
-                    <div key={offer.id} className="bg-white rounded-[20px] p-5 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                    <div key={offer.id} className="bg-white rounded-[20px] p-5 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
                       <div className="flex items-start justify-between mb-3">
-                        <p className="text-[rgba(34,34,34,0.5)] text-sm flex-1">{offer.description}</p>
+                        <p className="text-[var(--mid)] text-sm flex-1">{offer.description}</p>
                         <span className={`ml-2 flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
                           offer.is_live
                             ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
-                            : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] border-[rgba(34,34,34,0.1)]'
+                            : 'bg-[#F7F7F7] text-[var(--mid)] border-[var(--faint)]'
                         }`}>
                           {offer.is_live ? 'Live' : 'Paused'}
                         </span>
@@ -529,12 +529,12 @@ export default function BusinessPortal() {
                           <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-500 border border-slate-200">
                             Unlimited
                           </span>
-                          <span className="text-xs text-[rgba(34,34,34,0.28)] ml-2">{slotsUsed} claims</span>
+                          <span className="text-xs text-[var(--soft)] ml-2">{slotsUsed} claims</span>
                         </div>
                       ) : (
                         <div className="mb-3">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs text-[rgba(34,34,34,0.28)]">{slotsUsed}/{offer.monthly_cap} claimed</span>
+                            <span className="text-xs text-[var(--soft)]">{slotsUsed}/{offer.monthly_cap} claimed</span>
                             <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
                               slotsLeft === 0 ? 'bg-rose-500 text-white' : 'bg-amber-500 text-white'
                             }`}>
@@ -553,7 +553,7 @@ export default function BusinessPortal() {
                         onClick={() => handleToggleOffer(offer.id, offer.is_live)}
                         className={`w-full flex items-center justify-center gap-2 py-2 rounded-full font-semibold text-sm transition-all ${
                           offer.is_live
-                            ? 'bg-[#FFFFFF] text-[#222222] hover:bg-[#F7F7F7] border border-[rgba(34,34,34,0.1)]'
+                            ? 'bg-[#FFFFFF] text-[#222222] hover:bg-[#F7F7F7] border border-[var(--faint)]'
                             : 'bg-emerald-500 text-white hover:bg-emerald-600'
                         }`}
                       >
@@ -569,10 +569,10 @@ export default function BusinessPortal() {
           {/* SCAN */}
           {view === 'scan' && (
             <div className="max-w-sm mx-auto">
-              <div className="bg-white rounded-[20px] p-8 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] text-center">
-                <div className="flex justify-center mb-4"><Camera className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div>
+              <div className="bg-white rounded-[20px] p-8 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] text-center">
+                <div className="flex justify-center mb-4"><Camera className="w-8 h-8 text-[var(--soft)]" /></div>
                 <h2 className="text-xl font-bold mb-1 text-[#222222]">Redeem Pass</h2>
-                <p className="text-[rgba(34,34,34,0.5)] text-sm mb-6">Scan the creator's QR code or paste the token</p>
+                <p className="text-[var(--mid)] text-sm mb-6">Scan the creator's QR code or paste the token</p>
 
                 <QRScanner
                   onScan={(token) => { setScanCode(token); }}
@@ -580,8 +580,8 @@ export default function BusinessPortal() {
                 />
 
                 <div className="mt-4 relative">
-                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[rgba(34,34,34,0.1)]" /></div>
-                  <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-[rgba(34,34,34,0.28)]">or paste token</span></div>
+                  <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--faint)]" /></div>
+                  <div className="relative flex justify-center"><span className="bg-white px-3 text-xs text-[var(--soft)]">or paste token</span></div>
                 </div>
 
                 <form onSubmit={handleScanCode} className="space-y-3 mt-4">
@@ -590,7 +590,7 @@ export default function BusinessPortal() {
                     value={scanCode}
                     onChange={(e) => { setScanCode(e.target.value); setScanResult(null); }}
                     placeholder="Paste QR token here"
-                    className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-center font-mono text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                    className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[var(--faint)] text-center font-mono text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                     required
                   />
                   <button
@@ -623,21 +623,21 @@ export default function BusinessPortal() {
           {view === 'claims' && (
             <div>
               {claims.length === 0 ? (
-                <div className="text-center py-16 bg-white rounded-[20px] border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
-                  <div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div>
-                  <p className="text-[rgba(34,34,34,0.28)] text-sm">No claims yet.</p>
+                <div className="text-center py-16 bg-white rounded-[20px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                  <div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div>
+                  <p className="text-[var(--soft)] text-sm">No claims yet.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {claims.map((claim) => (
-                    <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] hover:shadow-md transition-all">
+                    <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] hover:shadow-md transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex-1 min-w-0">
                           <h3 className="text-[15px] font-bold text-[#222222] mb-1">{claim.creators.name}</h3>
-                          <p className="text-sm text-[rgba(34,34,34,0.5)]">{claim.creators.instagram_handle}</p>
+                          <p className="text-sm text-[var(--mid)]">{claim.creators.instagram_handle}</p>
                           <div className="flex items-center gap-3 mt-3">
                             <span className="text-xs font-mono font-bold px-2 py-1 rounded bg-[#222222] text-white">{claim.creators.code}</span>
-                            <span className="text-xs text-[rgba(34,34,34,0.28)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                            <span className="text-xs text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
                             <StatusPill status={claim.status} />
                           </div>
                         </div>
@@ -650,7 +650,7 @@ export default function BusinessPortal() {
                           </button>
                           <button
                             onClick={() => setDisputeClaimId(claim.id)}
-                            className="flex items-center justify-center gap-1 px-3 py-1 text-xs text-[rgba(34,34,34,0.5)] hover:text-amber-600 transition-colors"
+                            className="flex items-center justify-center gap-1 px-3 py-1 text-xs text-[var(--mid)] hover:text-amber-600 transition-colors"
                           >
                             <Flag className="w-3 h-3" /> Report
                           </button>
@@ -667,15 +667,15 @@ export default function BusinessPortal() {
           {view === 'content' && (
             <>
               {claims.filter(c => c.reel_url).length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Film className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div><p className="text-[rgba(34,34,34,0.28)] text-sm">No reels submitted yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Film className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--soft)] text-sm">No reels submitted yet.</p></div>
               ) : (
                 <>
-                  <div className="bg-white rounded-[20px] p-5 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] mb-4">
+                  <div className="bg-white rounded-[20px] p-5 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] mb-4">
                     <h3 className="text-sm font-bold text-[#222222] mb-2">Content Library</h3>
-                    <p className="text-[rgba(34,34,34,0.5)] text-sm">
+                    <p className="text-[var(--mid)] text-sm">
                       <span className="font-bold text-[#222222]">{claims.filter(c => c.reel_url).length}</span> reels received
                       {claims.filter(c => c.reel_url).length > 0 && (
-                        <span className="text-[rgba(34,34,34,0.28)] ml-2">
+                        <span className="text-[var(--soft)] ml-2">
                           · Latest on {new Date(claims.filter(c => c.reel_url)[0].claimed_at).toLocaleDateString()}
                         </span>
                       )}
@@ -683,14 +683,14 @@ export default function BusinessPortal() {
                   </div>
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {claims.filter(c => c.reel_url).map((claim) => (
-                      <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                      <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm" style={{ background: 'linear-gradient(135deg, #1A3C34, #2C4A3E)' }}>
                             {getInitials(claim.creators.name)}
                           </div>
                           <div>
                             <p className="font-semibold text-sm text-[#222222]">{claim.creators.name}</p>
-                            <p className="text-xs text-[rgba(34,34,34,0.28)]">{claim.creators.instagram_handle}</p>
+                            <p className="text-xs text-[var(--soft)]">{claim.creators.instagram_handle}</p>
                           </div>
                         </div>
                         <a
@@ -713,21 +713,21 @@ export default function BusinessPortal() {
           {view === 'notifications' && (
             <div className="max-w-lg mx-auto space-y-3">
               {notifications.length === 0 && (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Bell className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div><p className="text-[rgba(34,34,34,0.28)] text-sm">No notifications yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Bell className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--soft)] text-sm">No notifications yet.</p></div>
               )}
               {notifications.map((notif) => (
                 <button
                   key={notif.id}
                   onClick={() => !notif.read && markNotificationRead(notif.id)}
                   className={`w-full text-left bg-white rounded-[20px] p-4 border shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] transition-all ${
-                    notif.read ? 'border-[rgba(34,34,34,0.1)] opacity-50' : 'border-[var(--terra-20)] bg-[var(--terra-5)] shadow-sm'
+                    notif.read ? 'border-[var(--faint)] opacity-50' : 'border-[var(--terra-20)] bg-[var(--terra-5)] shadow-sm'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.28)]' : 'bg-[var(--terra)]'}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[var(--soft)]' : 'bg-[var(--terra)]'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#222222]">{notif.message}</p>
-                      <p className="text-[11px] text-[rgba(34,34,34,0.28)] mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>
+                      <p className="text-[11px] text-[var(--soft)] mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
                 </button>

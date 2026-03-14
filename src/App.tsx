@@ -49,7 +49,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
           <div className="w-12 h-12 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[rgba(34,34,34,0.5)] text-sm font-medium">Loading...</p>
+          <p className="text-[var(--mid)] text-sm font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -74,14 +74,14 @@ function App() {
   // Fallback — user authenticated but no profile found
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-white">
-      <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-md text-center border border-[rgba(34,34,34,0.1)]">
+      <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-md text-center border border-[var(--faint)]">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
         </div>
         <h2 className="text-xl font-bold mb-2 text-[#222222]">
           Account Not Found
         </h2>
-        <p className="text-[rgba(34,34,34,0.5)] text-sm mb-6">
+        <p className="text-[var(--mid)] text-sm mb-6">
           Your account profile could not be found. Please sign out and try again, or contact support.
         </p>
         <button

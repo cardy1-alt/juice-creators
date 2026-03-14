@@ -76,7 +76,7 @@ function AddressAutocomplete({ value, onChange }: {
         value={value}
         onChange={(e) => onChange(e.target.value, null, null)}
         placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
-        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all"
+        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all"
         required
       />
     </div>
@@ -157,7 +157,7 @@ export default function Auth() {
     }
   };
 
-  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all";
+  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all";
 
   return (
     <div className="min-h-screen flex flex-col items-center px-4 pt-[52px] bg-[#FFFFFF]">
@@ -165,7 +165,7 @@ export default function Auth() {
         {/* Logo / Branding */}
         <div className="text-center mb-10">
           <Logo size={26} />
-          <p className="text-[rgba(34,34,34,0.28)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
+          <p className="text-[var(--soft)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
         </div>
 
         {/* Sign In / Sign Up toggle */}
@@ -175,7 +175,7 @@ export default function Auth() {
             className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
               mode === 'signin'
                 ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
-                : 'text-[rgba(34,34,34,0.28)] hover:text-[#222222]/50'
+                : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
             Sign In
@@ -185,7 +185,7 @@ export default function Auth() {
             className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
               mode === 'signup'
                 ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
-                : 'text-[rgba(34,34,34,0.28)] hover:text-[#222222]/50'
+                : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
             Sign Up
@@ -200,11 +200,11 @@ export default function Auth() {
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'creator'
                   ? 'border-[var(--terra)] bg-[#FFFFFF]'
-                  : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
+                  : 'border-[var(--faint)] hover:border-[var(--soft)]'
               }`}
             >
-              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[#222222]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[#222222]/60'}`}>
+              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                 Creator
               </span>
             </button>
@@ -213,11 +213,11 @@ export default function Auth() {
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'business'
                   ? 'border-[var(--terra)] bg-[#FFFFFF]'
-                  : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
+                  : 'border-[var(--faint)] hover:border-[var(--soft)]'
               }`}
             >
-              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[var(--terra)]' : 'text-[#222222]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[#222222]/60'}`}>
+              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                 Business
               </span>
             </button>
@@ -234,7 +234,7 @@ export default function Auth() {
                     ? 'bg-[var(--terra)] text-white'
                     : signupStep > step
                     ? 'bg-[var(--terra)] text-white'
-                    : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]'
+                    : 'bg-[#F7F7F7] text-[var(--soft)]'
                 }`}>
                   {signupStep > step ? <Check className="w-3.5 h-3.5" /> : step}
                 </div>
@@ -274,7 +274,7 @@ export default function Auth() {
                     <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                     <div className="relative">
                       <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -299,7 +299,7 @@ export default function Auth() {
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-left text-sm transition-all ${
                             category === cat
                               ? 'border-[var(--terra)] bg-[#FFFFFF] font-semibold text-[var(--terra)]'
-                              : 'border-[rgba(34,34,34,0.1)] text-[rgba(34,34,34,0.5)] hover:border-[rgba(34,34,34,0.2)]'
+                              : 'border-[var(--faint)] text-[var(--mid)] hover:border-[var(--soft)]'
                           }`}
                         >
                           <CategoryIcon category={cat} className="w-4 h-4" />
@@ -328,7 +328,7 @@ export default function Auth() {
                       className={`${inputClass} resize-none`}
                       required
                     />
-                    <p className="text-xs text-[#222222]/40 mt-1 text-right">{bio.length}/150</p>
+                    <p className="text-xs text-[var(--soft)] mt-1 text-right">{bio.length}/150</p>
                   </div>
                 </>
               )}
@@ -343,7 +343,7 @@ export default function Auth() {
                     <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                     <div className="relative">
                       <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -363,7 +363,7 @@ export default function Auth() {
                 <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                 <div className="relative">
                   <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -450,7 +450,7 @@ export default function Auth() {
           <button
             type="button"
             onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-            className="block text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center mt-5 hover:text-[rgba(34,34,34,0.5)] transition-colors mx-auto"
+            className="block text-[11px] font-medium text-[var(--soft)] text-center mt-5 hover:text-[var(--mid)] transition-colors mx-auto"
           >
             Forgot password?
           </button>
@@ -461,7 +461,7 @@ export default function Auth() {
             {resetSent ? (
               <div className="text-center">
                 <p className="text-sm text-[#222222] font-semibold mb-1">Check your email</p>
-                <p className="text-xs text-[rgba(34,34,34,0.5)]">We sent a password reset link to {resetEmail}</p>
+                <p className="text-xs text-[var(--mid)]">We sent a password reset link to {resetEmail}</p>
                 <button
                   type="button"
                   onClick={() => { setForgotPassword(false); setResetSent(false); }}
@@ -472,7 +472,7 @@ export default function Auth() {
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-3">
-                <p className="text-xs text-[rgba(34,34,34,0.5)] text-center">Enter your email and we'll send a reset link.</p>
+                <p className="text-xs text-[var(--mid)] text-center">Enter your email and we'll send a reset link.</p>
                 <input
                   type="email"
                   value={resetEmail}
@@ -496,7 +496,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setForgotPassword(false)}
-                  className="block text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center hover:text-[rgba(34,34,34,0.5)] transition-colors mx-auto"
+                  className="block text-[11px] font-medium text-[var(--soft)] text-center hover:text-[var(--mid)] transition-colors mx-auto"
                 >
                   Back to sign in
                 </button>
@@ -506,7 +506,7 @@ export default function Auth() {
         )}
 
         {mode === 'signup' && (
-          <p className="text-xs text-[#222222]/40 text-center mt-5">
+          <p className="text-xs text-[var(--soft)] text-center mt-5">
             Your account will be reviewed and approved by our admin team
           </p>
         )}
