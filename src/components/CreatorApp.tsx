@@ -1032,20 +1032,31 @@ export default function CreatorApp() {
                             <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
                               {/* Compact progress bar */}
                               <div className="px-5 pt-4">
-                                <div className="h-[4px] bg-[#F0EFED] rounded-[4px] overflow-hidden">
+                                <div className="h-[4px] bg-[#F0EFED] rounded-[4px] overflow-hidden mb-[10px]">
                                   <div
                                     className="h-full bg-[var(--terra)] rounded-[4px] transition-all"
                                     style={{ width: `${progressPercent}%` }}
                                   />
                                 </div>
-                                <p className="text-[13px] font-semibold text-[#222222] mt-2">
-                                  Step {stageIndex + 1} of 4 · {stageLabels[stageIndex]}
-                                </p>
-                                <p className="text-[12px] text-[var(--mid)] mt-1">{nextHints[stageIndex]}</p>
+                                <div className="flex justify-between">
+                                  {stageLabels.map((label, idx) => {
+                                    const isActiveOrDone = idx <= stageIndex;
+                                    const isCurrent = idx === stageIndex;
+                                    return (
+                                      <div key={label} className="flex flex-col items-center" style={{ width: '25%' }}>
+                                        <div className={`w-1 h-1 rounded-full mb-1 ${isCurrent ? 'bg-[var(--terra)]' : 'bg-transparent'}`} />
+                                        <span className={`text-[11px] ${isActiveOrDone ? 'font-bold text-[#222222]' : 'font-medium text-[var(--soft)]'}`}>
+                                          {label}
+                                        </span>
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                                <p className="text-[13px] font-medium text-[var(--mid)] mt-[10px]">{nextHints[stageIndex]}</p>
                               </div>
 
                               {/* Offer description */}
-                              <p className="text-[14px] text-[var(--mid)] px-5 mt-3 line-clamp-2">{claim.offers.description}</p>
+                              <p className="text-[14px] font-medium px-5 mt-3 mb-5 line-clamp-2" style={{ color: 'rgba(26,26,26,0.75)', lineHeight: '1.6' }}>{claim.offers.description}</p>
 
                               {/* Reel Countdown/Prompt */}
                               {claim.redeemed_at && !claim.reel_url && (

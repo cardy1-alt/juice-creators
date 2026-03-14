@@ -323,48 +323,34 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
     return () => clearInterval(interval);
   }, [refreshToken]);
 
-  const progressPercent = (timeLeft / 30) * 100;
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="text-center">
+    <div className="flex flex-col items-center gap-[14px] rounded-[20px] p-6" style={{ background: '#F5F3F0' }}>
       {/* QR code — 240px */}
-      <div className="inline-block bg-[#F7F7F7] p-6 rounded-[16px]">
+      <div className="bg-white p-3 rounded-[12px]">
         <img
           src={qrDataUrl}
           alt="QR Code"
-          className="mx-auto rounded-[12px]"
+          className="rounded-[8px]"
           style={{ width: '240px', height: '240px' }}
         />
       </div>
 
-      {/* Creator code badge — no shield icon */}
-      <div className="mt-3">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[rgba(34,34,34,0.1)]">
-          <span className="font-mono font-bold text-[14px] tracking-[0.5px] text-[#222222]">
-            {creatorCode}
-          </span>
-        </div>
-      </div>
+      {/* Creator code badge */}
+      <span
+        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#1A1A1A] inline-block rounded-[50px] bg-white"
+        style={{ border: '1.5px solid rgba(26,26,26,0.12)', padding: '8px 20px' }}
+      >
+        {creatorCode}
+      </span>
 
-      {/* Countdown progress bar */}
-      <div className="mt-3 max-w-[280px] mx-auto">
-        <div className="flex items-center justify-between mb-1.5">
-          <div className="flex items-center gap-1.5">
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[rgba(34,34,34,0.28)]'}`} />
-            <span className={`text-[12px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(34,34,34,0.28)]'}`}>
-              Refreshes in {timeLeft}s
-            </span>
-          </div>
-        </div>
-        <div className="h-[3px] w-full bg-[var(--terra-15)] rounded-[3px] overflow-hidden">
-          <div
-            className={`h-full rounded-[3px] transition-all duration-1000 ease-linear ${
-              isUrgent ? 'bg-rose-400' : 'bg-[var(--terra)]'
-            }`}
-            style={{ width: `${progressPercent}%` }}
-          />
-        </div>
+      {/* Refresh timer */}
+      <div className="flex items-center gap-1.5">
+        <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+        <span className={`text-[12px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[var(--soft)]'}`}>
+          Refreshes in {timeLeft}s
+        </span>
       </div>
     </div>
   );
