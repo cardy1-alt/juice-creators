@@ -1,14 +1,15 @@
 :root {
-  --background: #FAF8F2;
-  --foreground: #2C2C2C;
-  --forest: #1A3C34;
-  --cream: #FAF8F2;
+  --white: #FFFFFF;
+  --bg: #F7F7F7;
   --terra: #C4674A;
-  --sage: #E8EDE8;
-  --charcoal: #2C2C2C;
-  --mid: rgba(44,44,44,0.45);
-  --soft: rgba(44,44,44,0.25);
-  --faint: rgba(44,44,44,0.1);
+  --forest: #1A3C34;
+  --near-black: #222222;
+  --mid: rgba(34,34,34,0.5);
+  --soft: rgba(34,34,34,0.28);
+  --faint: rgba(34,34,34,0.1);
+  --lavender: #C8B8F0;
+  --peach: #F5C4A0;
+  --pink: #F4A8C0;
 }
 
 @layer base {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { ArrowLeft, ArrowRight, Sparkles, Film, Rocket, Check, Clock2, Heart } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface CreatorOnboardingProps {
   creatorId: string;
@@ -39,155 +39,334 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
     onComplete();
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-[20px] max-w-md w-full p-6 shadow-[0_1px_4px_rgba(44,44,44,0.06),0_4px_16px_rgba(44,44,44,0.04)]">
-        {/* Progress dots */}
-        <div className="flex items-center justify-center gap-2 mb-6">
-          {[1, 2, 3].map((s) => (
-            <div
-              key={s}
-              className={`h-1.5 rounded-full transition-all ${
-                s === step ? 'w-8 bg-[#C4674A]' : 'w-1.5 bg-[rgba(44,44,44,0.1)]'
-              }`}
-            />
-          ))}
+  // Screen 1: Lavender
+  if (step === 1) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#C8B8F0' }}>
+        <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
+          {/* Wordmark */}
+          <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            nayba
+          </span>
+
+          {/* Squiggle top-right */}
+          <svg
+            style={{ position: 'absolute', top: 40, right: 20 }}
+            width="80" height="60" viewBox="0 0 80 60" fill="none"
+          >
+            <path d="M5 45 C20 10, 40 55, 60 20 S80 40, 75 15" stroke="#1A3C34" strokeWidth="4" strokeLinecap="round" fill="none" opacity="0.3" />
+          </svg>
+
+          {/* Tag pill */}
+          <div style={{ marginTop: 36 }}>
+            <span style={{
+              background: 'rgba(255,255,255,0.45)',
+              color: '#222222',
+              fontSize: '11px',
+              fontWeight: 700,
+              borderRadius: '50px',
+              padding: '6px 14px',
+              display: 'inline-block',
+            }}>
+              Local creators wanted
+            </span>
+          </div>
+
+          {/* Hero headline */}
+          <h1 style={{
+            fontSize: '40px',
+            fontWeight: 800,
+            color: '#222222',
+            letterSpacing: '-1.2px',
+            lineHeight: 1.05,
+            marginTop: 16,
+          }}>
+            Be a good<br />
+            <em style={{ fontStyle: 'italic' }}>nayba.</em>
+          </h1>
+
+          {/* Subtitle */}
+          <p style={{
+            fontSize: '13px',
+            fontWeight: 400,
+            color: 'rgba(34,34,34,0.55)',
+            lineHeight: 1.65,
+            maxWidth: '175px',
+            marginTop: 14,
+          }}>
+            Discover local businesses, claim offers, and create authentic content.
+          </p>
+
+          {/* CTA */}
+          <button
+            onClick={() => setStep(2)}
+            style={{
+              marginTop: 28,
+              background: '#222222',
+              color: '#FFFFFF',
+              fontSize: '14px',
+              fontWeight: 700,
+              borderRadius: '50px',
+              padding: '13px 26px',
+              border: 'none',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+            }}
+          >
+            Get started <ArrowRight size={16} />
+          </button>
+
+          {/* Photo blob bottom-right */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 20,
+            width: '185px',
+            height: '270px',
+            borderRadius: '110px 110px 0 0',
+            background: 'linear-gradient(180deg, #b5a3e0 0%, #9882d4 100%)',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'rgba(255,255,255,0.3)',
+              fontSize: '48px',
+              fontWeight: 800,
+            }}>
+              n
+            </div>
+          </div>
+
+          {/* Squiggle bottom-left */}
+          <svg
+            style={{ position: 'absolute', bottom: 60, left: 20 }}
+            width="100" height="80" viewBox="0 0 100 80" fill="none"
+          >
+            <path d="M10 70 C25 30, 50 70, 70 35 S90 55, 95 25" stroke="#F4A8C0" strokeWidth="6" strokeLinecap="round" fill="none" />
+          </svg>
         </div>
+      </div>
+    );
+  }
 
-        {/* Step 1: How it works */}
-        {step === 1 && (
-          <div className="text-center">
-            <Sparkles className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">Welcome to Nayba!</h2>
-            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
-              Discover amazing local businesses, claim exclusive offers, and create authentic content
-              that showcases what makes them special.
-            </p>
-            <div className="space-y-3 text-left bg-[#E8EDE8] rounded-[16px] p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                  1
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-[#2C2C2C]">Browse & Claim</p>
-                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Find offers that match your vibe</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                  2
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-[#2C2C2C]">Visit & Experience</p>
-                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Show your QR code at the business</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-[10px] bg-[#C4674A] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
-                  3
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-[#2C2C2C]">Create & Post</p>
-                  <p className="text-xs text-[rgba(44,44,44,0.45)]">Share your authentic experience</p>
-                </div>
-              </div>
-            </div>
+  // Screen 2: Peach
+  if (step === 2) {
+    return (
+      <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#F5C4A0' }}>
+        <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
+          {/* Wordmark */}
+          <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            nayba
+          </span>
+
+          {/* Step indicator */}
+          <div style={{ marginTop: 36 }}>
+            <span style={{
+              background: 'rgba(255,255,255,0.5)',
+              color: '#222222',
+              fontSize: '11px',
+              fontWeight: 700,
+              borderRadius: '50px',
+              padding: '6px 14px',
+              display: 'inline-block',
+            }}>
+              Step 2 of 3
+            </span>
           </div>
-        )}
 
-        {/* Step 2: What's expected */}
-        {step === 2 && (
-          <div className="text-center">
-            <Film className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">What We Expect</h2>
-            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
-              Creating authentic content is key to building trust with businesses and your audience.
-            </p>
-            <div className="space-y-3 text-left">
-              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Check className="w-4 h-4 text-[#C4674A]" />
-                  <p className="font-semibold text-sm text-[#2C2C2C]">Genuine Feature</p>
-                </div>
-                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
-                  Your reel must genuinely showcase the business, product, or experience
-                </p>
-              </div>
-              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Clock2 className="w-4 h-4 text-[#C4674A]" />
-                  <p className="font-semibold text-sm text-[#2C2C2C]">48-Hour Window</p>
-                </div>
-                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
-                  Post your reel within 48 hours of redeeming your pass
-                </p>
-              </div>
-              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
-                <div className="flex items-center gap-2 mb-1">
-                  <Heart className="w-4 h-4 text-[#C4674A]" />
-                  <p className="font-semibold text-sm text-[#2C2C2C]">Authentic Voice</p>
-                </div>
-                <p className="text-xs text-[rgba(44,44,44,0.45)] ml-6">
-                  Keep it real — your honest perspective is what makes it valuable
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
+          {/* Hero headline */}
+          <h1 style={{
+            fontSize: '40px',
+            fontWeight: 800,
+            color: '#222222',
+            letterSpacing: '-1.2px',
+            lineHeight: 1.05,
+            marginTop: 16,
+          }}>
+            Your<br />
+            <em style={{ fontStyle: 'italic' }}>local</em><br />
+            stage.
+          </h1>
 
-        {/* Step 3: Platform stats */}
-        {step === 3 && (
-          <div className="text-center">
-            <Rocket className="w-10 h-10 text-[#C4674A] mx-auto mb-4" />
-            <h2 className="text-2xl font-bold text-[#2C2C2C] mb-3">You're Ready!</h2>
-            <p className="text-[rgba(44,44,44,0.45)] text-sm leading-relaxed mb-6">
-              Join a growing community of creators and businesses making authentic connections.
-            </p>
-            <div className="grid grid-cols-2 gap-3 mb-6">
-              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
-                <p className="text-3xl font-bold mb-1 text-[#2C2C2C]">{businessCount}</p>
-                <p className="text-xs font-medium text-[rgba(44,44,44,0.45)]">Active Businesses</p>
-              </div>
-              <div className="p-4 rounded-[14px] bg-[#E8EDE8]">
-                <p className="text-3xl font-bold mb-1 text-[#2C2C2C]">{offerCount}</p>
-                <p className="text-xs font-medium text-[rgba(44,44,44,0.45)]">Live Offers</p>
-              </div>
-            </div>
-            <p className="text-xs text-[rgba(44,44,44,0.25)]">
-              Start exploring and claim your first offer to get the ball rolling!
-            </p>
-          </div>
-        )}
+          {/* Subtitle */}
+          <p style={{
+            fontSize: '13px',
+            fontWeight: 400,
+            color: 'rgba(34,34,34,0.5)',
+            lineHeight: 1.65,
+            maxWidth: '175px',
+            marginTop: 14,
+          }}>
+            {businessCount} businesses and {offerCount} offers waiting for you.
+          </p>
 
-        {/* Navigation */}
-        <div className="flex items-center justify-between mt-6 pt-6 border-t border-[rgba(44,44,44,0.1)]">
-          {step > 1 ? (
+          {/* CTA + Skip */}
+          <div style={{ marginTop: 28, display: 'flex', alignItems: 'center', gap: '16px' }}>
             <button
-              onClick={() => setStep(step - 1)}
-              className="flex items-center gap-2 px-4 py-2 rounded-[12px] text-sm font-semibold text-[#2C2C2C] hover:bg-[#E8EDE8] transition-colors"
+              onClick={() => setStep(3)}
+              style={{
+                background: '#222222',
+                color: '#FFFFFF',
+                fontSize: '14px',
+                fontWeight: 700,
+                borderRadius: '50px',
+                padding: '13px 26px',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
             >
-              <ArrowLeft className="w-4 h-4" /> Back
+              Continue <ArrowRight size={16} />
             </button>
-          ) : (
-            <div />
-          )}
-
-          {step < 3 ? (
-            <button
-              onClick={() => setStep(step + 1)}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-[13px] text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors ml-auto"
-            >
-              Next <ArrowRight className="w-4 h-4" />
-            </button>
-          ) : (
             <button
               onClick={handleComplete}
-              className="px-5 py-2.5 rounded-[13px] text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors ml-auto"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: 'rgba(34,34,34,0.5)',
+                fontSize: '13px',
+                fontWeight: 500,
+                cursor: 'pointer',
+              }}
             >
-              Got it!
+              Skip
             </button>
-          )}
+          </div>
+
+          {/* Photo blob bottom-right */}
+          <div style={{
+            position: 'absolute',
+            bottom: 0,
+            right: 20,
+            width: '185px',
+            height: '270px',
+            borderRadius: '110px 110px 0 0',
+            background: 'linear-gradient(180deg, #f0b088 0%, #e89e6e 100%)',
+            overflow: 'hidden',
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'rgba(255,255,255,0.3)',
+              fontSize: '48px',
+              fontWeight: 800,
+            }}>
+              n
+            </div>
+          </div>
+
+          {/* Squiggle + dots */}
+          <svg
+            style={{ position: 'absolute', bottom: 80, left: 20 }}
+            width="100" height="70" viewBox="0 0 100 70" fill="none"
+          >
+            <path d="M8 60 C20 25, 45 65, 65 30 S85 50, 92 20" stroke="#F4A8C0" strokeWidth="6" strokeLinecap="round" fill="none" />
+            <circle cx="15" cy="15" r="5" fill="#C4674A" opacity="0.6" />
+            <circle cx="80" cy="55" r="4" fill="#1A3C34" opacity="0.4" />
+          </svg>
         </div>
+      </div>
+    );
+  }
+
+  // Screen 3: Final (white, ready to go)
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#FFFFFF' }}>
+      <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ padding: '48px 28px' }}>
+        {/* Wordmark */}
+        <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 32 }}>
+          nayba
+        </span>
+
+        {/* Step indicator */}
+        <span style={{
+          background: 'var(--faint)',
+          color: '#222222',
+          fontSize: '11px',
+          fontWeight: 700,
+          borderRadius: '50px',
+          padding: '6px 14px',
+          display: 'inline-block',
+          marginBottom: 20,
+        }}>
+          Step 3 of 3
+        </span>
+
+        <h1 style={{
+          fontSize: '40px',
+          fontWeight: 800,
+          color: '#222222',
+          letterSpacing: '-1.2px',
+          lineHeight: 1.05,
+          textAlign: 'center',
+        }}>
+          You're<br />
+          <em style={{ fontStyle: 'italic' }}>ready.</em>
+        </h1>
+
+        <p style={{
+          fontSize: '13px',
+          fontWeight: 400,
+          color: 'rgba(34,34,34,0.5)',
+          lineHeight: 1.65,
+          textAlign: 'center',
+          maxWidth: '220px',
+          marginTop: 14,
+        }}>
+          {businessCount} businesses and {offerCount} live offers are waiting for you to explore.
+        </p>
+
+        {/* Stats */}
+        <div style={{ display: 'flex', gap: '12px', marginTop: 28 }}>
+          <div style={{
+            background: 'var(--bg)',
+            borderRadius: '14px',
+            padding: '16px 20px',
+            textAlign: 'center',
+            minWidth: '100px',
+          }}>
+            <p style={{ fontSize: '28px', fontWeight: 800, color: '#222222' }}>{businessCount}</p>
+            <p style={{ fontSize: '10px', fontWeight: 500, color: 'var(--mid)' }}>Businesses</p>
+          </div>
+          <div style={{
+            background: 'var(--bg)',
+            borderRadius: '14px',
+            padding: '16px 20px',
+            textAlign: 'center',
+            minWidth: '100px',
+          }}>
+            <p style={{ fontSize: '28px', fontWeight: 800, color: '#222222' }}>{offerCount}</p>
+            <p style={{ fontSize: '10px', fontWeight: 500, color: 'var(--mid)' }}>Live Offers</p>
+          </div>
+        </div>
+
+        <button
+          onClick={handleComplete}
+          style={{
+            marginTop: 32,
+            background: '#C4674A',
+            color: '#FFFFFF',
+            fontSize: '14px',
+            fontWeight: 700,
+            borderRadius: '50px',
+            padding: '13px 30px',
+            border: 'none',
+            cursor: 'pointer',
+          }}
+        >
+          Start exploring
+        </button>
       </div>
     </div>
   );
