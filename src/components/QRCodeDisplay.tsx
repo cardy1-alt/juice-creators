@@ -328,11 +328,11 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
   return (
     <div className="flex flex-col items-center gap-3 rounded-[20px]" style={{ background: '#F5F3F0', padding: '16px' }}>
       {/* QR code — 220px */}
-      <div className="bg-white rounded-[10px]" style={{ padding: '10px' }}>
+      <div className="inline-block rounded-[10px] overflow-hidden">
         <img
           src={qrDataUrl}
           alt="QR Code"
-          className="rounded-[8px]"
+          className="block"
           style={{ width: '220px', height: '220px' }}
         />
       </div>
