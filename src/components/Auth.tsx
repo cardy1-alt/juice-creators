@@ -140,8 +140,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         {/* Logo / Branding */}
         <div className="text-center mb-10">
-          <Logo size={20} />
-          <h1 className="text-[26px] font-extrabold text-[#222222] tracking-[-0.5px]">nayba</h1>
+          <Logo size={26} />
           <p className="text-[rgba(34,34,34,0.28)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
         </div>
 
