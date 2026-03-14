@@ -25,3 +25,5 @@
     font-size: 15px;
   }
 }
+
+#claims-slider::-webkit-scrollbar { display: none; }

@@ -954,222 +954,222 @@ export default function CreatorApp() {
           {view === 'active' && (
             <>
               {activeClaims.length === 0 ? (
-                <div className="text-center py-16">
-                  <Zap className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-3" />
-                  <p className="text-[rgba(34,34,34,0.5)] text-[15px] font-medium">No active passes</p>
+                <div className="flex flex-col items-center justify-center py-20 px-6">
+                  <Zap className="w-12 h-12 text-[var(--soft)] mb-4" />
+                  <p className="text-[18px] font-bold text-[#222222] mb-1">No active claims</p>
+                  <p className="text-[14px] text-[var(--mid)] mb-5">Claim an offer to get started</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="mt-3 text-[var(--terra)] text-[14px] font-semibold hover:underline"
+                    className="bg-[var(--terra)] text-white text-[14px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:bg-[var(--terra-hover)] transition-all"
                   >
                     Browse offers
                   </button>
                 </div>
               ) : (
-                <div className="p-4 space-y-3">
-                  {/* Pass selector (when multiple active) */}
-                  {activeClaims.length > 1 && (
-                    <div className="relative">
-                      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-                        {activeClaims.map(claim => {
-                          const isSelected = selectedClaim?.id === claim.id;
-                          return (
-                            <button
-                              key={claim.id}
-                              onClick={() => setSelectedClaim(claim)}
-                              className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all min-h-[44px] ${
-                                isSelected
-                                  ? 'bg-[#222222] text-white'
-                                  : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]'
-                              }`}
-                            >
-                              {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 20)}
-                              <span className="max-w-[140px] truncate">{claim.businesses.name}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+                <div>
+                  {/* Pill tab strip */}
+                  <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    {activeClaims.map(claim => {
+                      const isSelected = selectedClaim?.id === claim.id;
+                      return (
+                        <button
+                          key={claim.id}
+                          onClick={() => {
+                            setSelectedClaim(claim);
+                            const idx = activeClaims.findIndex(c => c.id === claim.id);
+                            const slider = document.getElementById('claims-slider');
+                            if (slider) slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
+                          }}
+                          className={`whitespace-nowrap text-[12px] font-semibold rounded-[50px] px-[14px] flex-shrink-0 transition-all ${
+                            isSelected
+                              ? 'bg-[#222222] text-white'
+                              : 'bg-[#F0EFED] text-[var(--mid)]'
+                          }`}
+                          style={{ height: '32px' }}
+                        >
+                          {claim.businesses.name}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                  {selectedClaim && (
-                    <>
-                      {(() => {
-                        const currentStage = selectedClaim.reel_url
-                          ? 'submitted'
-                          : selectedClaim.redeemed_at
-                          ? 'reel_due'
-                          : 'claimed';
+                  {/* Swipeable slider */}
+                  <div
+                    id="claims-slider"
+                    className="flex overflow-x-auto"
+                    style={{
+                      scrollSnapType: 'x mandatory',
+                      WebkitOverflowScrolling: 'touch',
+                      scrollbarWidth: 'none',
+                    }}
+                    onScroll={(e) => {
+                      const el = e.currentTarget;
+                      const idx = Math.round(el.scrollLeft / el.clientWidth);
+                      if (activeClaims[idx] && selectedClaim?.id !== activeClaims[idx].id) {
+                        setSelectedClaim(activeClaims[idx]);
+                      }
+                    }}
+                  >
+                    {activeClaims.map(claim => {
+                      const currentStage = claim.reel_url
+                        ? 'submitted'
+                        : claim.redeemed_at
+                        ? 'reel_due'
+                        : 'claimed';
 
-                        const stages = [
-                          { key: 'claimed', label: 'Claimed', active: currentStage === 'claimed' },
-                          { key: 'visited', label: 'Visited', active: currentStage === 'reel_due' || currentStage === 'submitted' },
-                          { key: 'reel_due', label: 'Reel Due', active: currentStage === 'reel_due' },
-                          { key: 'submitted', label: 'Done', active: currentStage === 'submitted' }
-                        ];
+                      const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
+                      const progressPercent = ((stageIndex + 1) / 4) * 100;
+                      const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
+                      const nextHints = ['Next: visit the business', 'Next: post your reel', 'Next: submit your reel link', 'All done!'];
 
-                        return (
-                      <div className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
-                        {/* Business row */}
-                        <div className="flex items-center gap-3 mb-5">
-                          {renderBusinessAvatar(selectedClaim.businesses.name, selectedClaim.businesses.category, selectedClaim.businesses.logo_url, 42)}
-                          <div className="flex-1">
-                            <h3 className="font-bold text-[15px] text-[#222222]">{selectedClaim.businesses.name}</h3>
-                            <p className="text-[13px] text-[rgba(34,34,34,0.5)] mt-0.5">{selectedClaim.offers.description}</p>
-                          </div>
-                        </div>
+                      return (
+                        <div
+                          key={claim.id}
+                          className="flex-shrink-0 w-full"
+                          style={{ scrollSnapAlign: 'start' }}
+                        >
+                          <div className="p-4">
+                            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                              {/* Compact progress bar */}
+                              <div className="px-5 pt-4">
+                                <div className="h-[4px] bg-[#F0EFED] rounded-[4px] overflow-hidden">
+                                  <div
+                                    className="h-full bg-[var(--terra)] rounded-[4px] transition-all"
+                                    style={{ width: `${progressPercent}%` }}
+                                  />
+                                </div>
+                                <p className="text-[13px] font-semibold text-[#222222] mt-2">
+                                  Step {stageIndex + 1} of 4 · {stageLabels[stageIndex]}
+                                </p>
+                                <p className="text-[12px] text-[var(--mid)] mt-1">{nextHints[stageIndex]}</p>
+                              </div>
 
-                        {/* Stepper */}
-                        <div className="mb-5">
-                          <div className="relative">
-                            <div className="grid grid-cols-4">
-                              {stages.map((stage, idx) => {
-                                const activeIdx = stages.findIndex(s => s.active);
-                                const isCompleted = activeIdx > idx;
-                                const isCurrent = stage.active;
-                                return (
-                                <div key={stage.key} className="flex flex-col items-center">
-                                  <div className={`relative z-10 w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold transition-all ${
-                                    isCurrent || isCompleted
-                                      ? 'bg-[var(--terra)] text-white'
-                                      : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]'
-                                  }`}>
-                                    {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
+                              {/* Offer description */}
+                              <p className="text-[14px] text-[var(--mid)] px-5 mt-3 line-clamp-2">{claim.offers.description}</p>
+
+                              {/* Reel Countdown/Prompt */}
+                              {claim.redeemed_at && !claim.reel_url && (
+                                <div className={`mx-5 mt-4 p-4 rounded-xl border ${
+                                  isOverdue
+                                    ? 'bg-rose-50/60 border-rose-200'
+                                    : 'bg-amber-50/60 border-amber-200'
+                                }`}>
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Clock className={`w-4 h-4 ${isOverdue ? 'text-rose-500' : 'text-amber-500'}`} />
+                                    <p className={`text-[14px] font-bold ${isOverdue ? 'text-rose-700' : 'text-amber-700'}`}>
+                                      {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
+                                    </p>
                                   </div>
-                                  <p className={`text-[9px] mt-1.5 text-center px-1 ${
-                                    isCurrent ? 'font-semibold text-[var(--terra)]' : 'font-medium text-[var(--soft)]'
-                                  }`}>
-                                    {stage.label}
+                                  <p className="text-[13px] text-[var(--mid)]">
+                                    You have 48 hours to post your reel — it must genuinely feature the business.
                                   </p>
                                 </div>
-                                );
-                              })}
-                            </div>
-                            <div className="absolute top-[13px] left-0 right-0 flex items-center px-[12.5%]">
-                              {[0, 1, 2].map((idx) => (
-                                <div key={idx} className="h-[1.5px] flex-1 bg-[rgba(34,34,34,0.1)]" />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
+                              )}
 
-                        {/* Reel Countdown/Prompt */}
-                        {selectedClaim.redeemed_at && !selectedClaim.reel_url && (
-                          <div className={`mb-5 p-4 rounded-xl border ${
-                            isOverdue
-                              ? 'bg-rose-50/60 border-rose-200'
-                              : 'bg-amber-50/60 border-amber-200'
-                          }`}>
-                            <div className="flex items-center gap-2 mb-2">
-                              <Clock className={`w-4 h-4 ${isOverdue ? 'text-rose-500' : 'text-amber-500'}`} />
-                              <p className={`text-[14px] font-bold ${isOverdue ? 'text-rose-700' : 'text-amber-700'}`}>
-                                {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
-                              </p>
-                            </div>
-                            <p className="text-[13px] text-[rgba(34,34,34,0.5)]">
-                              You have 48 hours to post your reel — it must genuinely feature the business.
-                            </p>
-                          </div>
-                        )}
-
-                        {selectedClaim.status === 'active' && (
-                          <div className="p-[24px]">
-                            <p className="text-[13px] font-medium text-[#222222] text-center mb-3">Show this at the door</p>
-                            <QRCodeDisplay
-                              token={selectedClaim.qr_token}
-                              claimId={selectedClaim.id}
-                              creatorCode={userProfile.code}
-                            />
-                          </div>
-                        )}
-
-                        {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
-                          <div className="mt-5 p-4 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
-                            <label className="block text-[14px] font-semibold text-[#222222] mb-2">
-                              Submit Your Reel
-                            </label>
-                            <div className="flex gap-2">
-                              <input
-                                type="url"
-                                value={reelUrl}
-                                onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
-                                placeholder="https://instagram.com/reel/..."
-                                className="flex-1 px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.1)] text-[15px] text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
-                              />
-                              <button
-                                onClick={handleSubmitReel}
-                                disabled={loading || !reelUrl}
-                                className="px-4 py-2 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
-                              >
-                                Submit
-                              </button>
-                            </div>
-                            {reelError && (
-                              <p className="text-[13px] text-rose-600 mt-2">{reelError}</p>
-                            )}
-                          </div>
-                        )}
-
-                        {selectedClaim.reel_url && (
-                          <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
-                            <Check className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
-                            <span className="text-[14px] text-[#222222] font-medium">Reel submitted!</span>
-                          </div>
-                        )}
-
-                        <div className="mt-3 flex flex-col items-center gap-2">
-                          <button
-                            onClick={() => setDisputeClaimId(selectedClaim.id)}
-                            className="flex items-center justify-center gap-2 py-2 text-[13px] font-medium text-[rgba(34,34,34,0.28)] hover:text-amber-600 transition-colors"
-                          >
-                            <Flag className="w-3.5 h-3.5" /> Report an issue
-                          </button>
-                          {(() => {
-                            const releaseStatus = canReleaseOffer(selectedClaim);
-                            if (releaseStatus.allowed) {
-                              return releaseConfirmId === selectedClaim.id ? (
-                                <div className="flex items-center gap-2 p-3 rounded-xl bg-[#F7F7F7] text-[13px]">
-                                  <span className="text-[rgba(34,34,34,0.5)]">Are you sure? This will release your slot.</span>
-                                  <button
-                                    onClick={() => handleReleaseOffer(selectedClaim.id)}
-                                    disabled={releasingClaim}
-                                    className="font-bold text-[var(--terra)]"
-                                  >
-                                    {releasingClaim ? '...' : 'Confirm'}
-                                  </button>
-                                  <button
-                                    onClick={() => setReleaseConfirmId(null)}
-                                    className="font-semibold text-[rgba(34,34,34,0.5)]"
-                                  >
-                                    Cancel
-                                  </button>
+                              {/* QR Code section */}
+                              {claim.status === 'active' && (
+                                <div className="px-5 py-5">
+                                  <p className="text-[14px] font-semibold text-[#222222] text-center mb-[14px]">Show this at the door</p>
+                                  <QRCodeDisplay
+                                    token={claim.qr_token}
+                                    claimId={claim.id}
+                                    creatorCode={userProfile.code}
+                                  />
                                 </div>
-                              ) : (
-                                <button
-                                  onClick={() => setReleaseConfirmId(selectedClaim.id)}
-                                  className="flex items-center gap-1.5 text-[13px] font-medium transition-colors"
-                                  style={{ color: 'rgba(196,103,74,0.6)' }}
-                                >
-                                  <X className="w-3.5 h-3.5" /> Release offer
-                                </button>
-                              );
-                            } else if (releaseStatus.reason) {
-                              return (
-                                <span className="text-[13px] text-[rgba(34,34,34,0.28)]">
-                                  {releaseStatus.reason}
-                                </span>
-                              );
-                            }
-                            return null;
-                          })()}
-                          {releaseError && (
-                            <p className="text-[13px] text-rose-600">{releaseError}</p>
-                          )}
+                              )}
+
+                              {/* Submit reel */}
+                              {claim.status === 'redeemed' && !claim.reel_url && (
+                                <div className="mx-5 mt-4 p-4 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
+                                  <label className="block text-[14px] font-semibold text-[#222222] mb-2">
+                                    Submit Your Reel
+                                  </label>
+                                  <div className="flex gap-2">
+                                    <input
+                                      type="url"
+                                      value={reelUrl}
+                                      onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
+                                      placeholder="https://instagram.com/reel/..."
+                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.1)] text-[15px] text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
+                                    />
+                                    <button
+                                      onClick={handleSubmitReel}
+                                      disabled={loading || !reelUrl}
+                                      className="px-4 py-2 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
+                                    >
+                                      Submit
+                                    </button>
+                                  </div>
+                                  {reelError && (
+                                    <p className="text-[13px] text-rose-600 mt-2">{reelError}</p>
+                                  )}
+                                </div>
+                              )}
+
+                              {claim.reel_url && (
+                                <div className="mx-5 mt-4 flex items-center gap-2 p-3 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
+                                  <Check className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
+                                  <span className="text-[14px] text-[#222222] font-medium">Reel submitted!</span>
+                                </div>
+                              )}
+
+                              {/* Action links */}
+                              <div className="flex items-center justify-center gap-1 py-4 text-[13px]">
+                                {releaseConfirmId === claim.id ? (
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-[var(--mid)]">Release this slot?</span>
+                                    <button
+                                      onClick={() => handleReleaseOffer(claim.id)}
+                                      disabled={releasingClaim}
+                                      className="font-bold text-[var(--terra)]"
+                                    >
+                                      {releasingClaim ? '...' : 'Confirm'}
+                                    </button>
+                                    <button
+                                      onClick={() => setReleaseConfirmId(null)}
+                                      className="font-semibold text-[var(--soft)]"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <button
+                                      onClick={() => setDisputeClaimId(claim.id)}
+                                      className="flex items-center gap-1.5 font-medium text-[var(--soft)] hover:text-amber-600 transition-colors"
+                                    >
+                                      <Flag className="w-3 h-3" /> Report an issue
+                                    </button>
+                                    {(() => {
+                                      const releaseStatus = canReleaseOffer(claim);
+                                      if (releaseStatus.allowed) {
+                                        return (
+                                          <>
+                                            <span className="text-[var(--soft)]">·</span>
+                                            <button
+                                              onClick={() => setReleaseConfirmId(claim.id)}
+                                              className="flex items-center gap-1.5 font-medium transition-colors"
+                                              style={{ color: 'rgba(196,103,74,0.7)' }}
+                                            >
+                                              <X className="w-3 h-3" /> Release offer
+                                            </button>
+                                          </>
+                                        );
+                                      }
+                                      return null;
+                                    })()}
+                                  </>
+                                )}
+                              </div>
+                              {releaseError && (
+                                <p className="text-[13px] text-rose-600 text-center pb-3">{releaseError}</p>
+                              )}
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                        );
-                      })()}
-                    </>
-                  )}
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </>
