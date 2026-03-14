@@ -32,11 +32,16 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
   };
 
   const handleComplete = async () => {
-    await supabase
-      .from('creators')
-      .update({ onboarding_complete: true })
-      .eq('id', creatorId);
-    onComplete();
+    try {
+      const { error } = await supabase
+        .from('creators')
+        .update({ onboarding_complete: true })
+        .eq('id', creatorId);
+      if (error) throw error;
+      onComplete();
+    } catch (err: any) {
+      console.error('Failed to complete onboarding:', err.message);
+    }
   };
 
   // Screen 1: Lavender

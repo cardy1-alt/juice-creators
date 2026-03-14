@@ -57,6 +57,7 @@ const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
 
 function getDemoRole(): string | null {
   if (typeof window === 'undefined') return null;
+  if (import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
   const params = new URLSearchParams(window.location.search);
   const demo = params.get('demo');
   return demo && DEMO_PROFILES[demo] ? demo : null;
@@ -76,9 +77,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Guard: prevent onAuthStateChange from overwriting state during signup
   const signingUpRef = useRef(false);
 
-  // Login rate limiting
-  const loginAttemptsRef = useRef(0);
-  const lockoutUntilRef = useRef<number>(0);
+  // Login rate limiting — persisted to localStorage so refreshing doesn't reset
+  const getLoginAttempts = (): number => {
+    try { return parseInt(localStorage.getItem('nayba_login_attempts') || '0', 10); } catch { return 0; }
+  };
+  const setLoginAttempts = (n: number) => {
+    try { localStorage.setItem('nayba_login_attempts', String(n)); } catch {}
+  };
+  const getLockoutUntil = (): number => {
+    try { return parseInt(localStorage.getItem('nayba_lockout_until') || '0', 10); } catch { return 0; }
+  };
+  const setLockoutUntil = (t: number) => {
+    try { localStorage.setItem('nayba_lockout_until', String(t)); } catch {}
+  };
 
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
@@ -180,22 +191,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     const now = Date.now();
-    if (now < lockoutUntilRef.current) {
-      const secsLeft = Math.ceil((lockoutUntilRef.current - now) / 1000);
+    const lockoutUntil = getLockoutUntil();
+    if (now < lockoutUntil) {
+      const secsLeft = Math.ceil((lockoutUntil - now) / 1000);
       throw new Error(`Too many attempts. Please wait ${secsLeft} seconds.`);
     }
 
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
-      loginAttemptsRef.current += 1;
-      if (loginAttemptsRef.current >= 5) {
+      const attempts = getLoginAttempts() + 1;
+      setLoginAttempts(attempts);
+      if (attempts >= 5) {
         // Lock out for 30 seconds after 5 failed attempts
-        lockoutUntilRef.current = Date.now() + 30_000;
-        loginAttemptsRef.current = 0;
+        setLockoutUntil(Date.now() + 30_000);
+        setLoginAttempts(0);
       }
       throw error;
     }
-    loginAttemptsRef.current = 0;
+    setLoginAttempts(0);
   };
 
   const signUp = async (email: string, password: string, role: UserRole, additionalData: any) => {

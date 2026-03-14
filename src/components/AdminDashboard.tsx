@@ -47,6 +47,7 @@ export default function AdminDashboard() {
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const [fetchError, setFetchError] = useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -91,9 +92,39 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleApproveCreator = async (id: string, approved: boolean) => { await supabase.from('creators').update({ approved }).eq('id', id); fetchAll(); };
-  const handleApproveBusiness = async (id: string, approved: boolean) => { await supabase.from('businesses').update({ approved }).eq('id', id); fetchAll(); };
-  const handleUpdateClaimStatus = async (id: string, status: string) => { await supabase.from('claims').update({ status }).eq('id', id); fetchAll(); };
+  const handleApproveCreator = async (id: string, approved: boolean) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: `Creator ${approved ? 'approved' : 'unapproved'} successfully.` });
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update creator.' });
+    }
+  };
+  const handleApproveBusiness = async (id: string, approved: boolean) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: `Business ${approved ? 'approved' : 'unapproved'} successfully.` });
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update business.' });
+    }
+  };
+  const handleUpdateClaimStatus = async (id: string, status: string) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('claims').update({ status }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: `Claim status updated to "${status}".` });
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update claim status.' });
+    }
+  };
 
   const handleChangePassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,6 +233,11 @@ export default function AdminDashboard() {
           {fetchError && (
             <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
               {fetchError}
+            </div>
+          )}
+          {actionFeedback && (
+            <div className={`mb-4 p-3 rounded-xl border text-sm font-medium ${actionFeedback.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+              {actionFeedback.text}
             </div>
           )}
           {/* STATS */}
