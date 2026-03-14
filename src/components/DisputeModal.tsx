@@ -48,7 +48,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
               <Check className="w-8 h-8 text-[var(--terra)]" />
             </div>
             <h3 className="text-xl font-bold text-[#222222] mb-2">Report Submitted</h3>
-            <p className="text-[rgba(34,34,34,0.5)] text-sm">
+            <p className="text-[var(--mid)] text-sm">
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
           </div>
@@ -62,11 +62,11 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <h3 className="text-lg font-bold text-[#222222]">Report an Issue</h3>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-[#F7F7F7] rounded-lg transition-colors">
-                <X className="w-5 h-5 text-[rgba(34,34,34,0.28)]" />
+                <X className="w-5 h-5 text-[var(--soft)]" />
               </button>
             </div>
 
-            <p className="text-sm text-[rgba(34,34,34,0.5)] mb-4">
+            <p className="text-sm text-[var(--mid)] mb-4">
               Let us know if something went wrong with this collaboration. We'll review and take appropriate action.
             </p>
 
@@ -80,7 +80,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
+                  className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
                   required
                 />
               </div>
