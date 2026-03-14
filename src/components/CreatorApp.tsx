@@ -174,8 +174,13 @@ export default function CreatorApp() {
   };
 
   const markNotificationRead = async (id: string) => {
-    await supabase.from('notifications').update({ read: true }).eq('id', id);
-    fetchNotifications();
+    try {
+      const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
+      if (error) throw error;
+      fetchNotifications();
+    } catch (err: any) {
+      console.error('Failed to mark notification read:', err.message);
+    }
   };
 
   const fetchOffers = async () => {

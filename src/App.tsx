@@ -6,6 +6,7 @@ import AdminDashboard from './components/AdminDashboard';
 import { AlertCircle, LogOut } from 'lucide-react';
 
 function DemoBanner() {
+  if (import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
   const params = new URLSearchParams(window.location.search);
   const current = params.get('demo');
   if (!current) return null;
@@ -41,7 +42,7 @@ function DemoBanner() {
 
 function App() {
   const { user, userRole, loading, signOut } = useAuth();
-  const isDemo = new URLSearchParams(window.location.search).has('demo');
+  const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
 
   if (loading) {
     return (

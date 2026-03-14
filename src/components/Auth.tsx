@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
 import { Building2, Eye, EyeOff, MapPin, Sparkles, Check } from 'lucide-react';
 import { CATEGORY_ICONS, CATEGORY_LIST, CategoryIcon } from '../lib/categories';
@@ -99,6 +100,11 @@ export default function Auth() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [forgotPassword, setForgotPassword] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetSent, setResetSent] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetError, setResetError] = useState('');
 
   const { signIn, signUp } = useAuth();
 
@@ -110,6 +116,24 @@ export default function Auth() {
 
   const generateSlug = (name: string) => {
     return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  };
+
+  const handleResetPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!resetEmail.trim()) return;
+    setResetLoading(true);
+    setResetError('');
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setResetSent(true);
+    } catch (err: any) {
+      setResetError(err.message || 'Failed to send reset email');
+    } finally {
+      setResetLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -140,8 +164,7 @@ export default function Auth() {
       <div className="w-full max-w-md">
         {/* Logo / Branding */}
         <div className="text-center mb-10">
-          <Logo size={20} />
-          <h1 className="text-[26px] font-extrabold text-[#222222] tracking-[-0.5px]">nayba</h1>
+          <Logo size={26} />
           <p className="text-[rgba(34,34,34,0.28)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
         </div>
 
@@ -423,10 +446,63 @@ export default function Auth() {
           )}
         </form>
 
-        {mode === 'signin' && (
-          <p className="text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center mt-5">
+        {mode === 'signin' && !forgotPassword && (
+          <button
+            type="button"
+            onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
+            className="block text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center mt-5 hover:text-[rgba(34,34,34,0.5)] transition-colors mx-auto"
+          >
             Forgot password?
-          </p>
+          </button>
+        )}
+
+        {forgotPassword && (
+          <div className="mt-5">
+            {resetSent ? (
+              <div className="text-center">
+                <p className="text-sm text-[#222222] font-semibold mb-1">Check your email</p>
+                <p className="text-xs text-[rgba(34,34,34,0.5)]">We sent a password reset link to {resetEmail}</p>
+                <button
+                  type="button"
+                  onClick={() => { setForgotPassword(false); setResetSent(false); }}
+                  className="text-[11px] font-medium text-[#C4674A] mt-3 hover:underline"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleResetPassword} className="space-y-3">
+                <p className="text-xs text-[rgba(34,34,34,0.5)] text-center">Enter your email and we'll send a reset link.</p>
+                <input
+                  type="email"
+                  value={resetEmail}
+                  onChange={(e) => setResetEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className={inputClass}
+                  required
+                />
+                {resetError && (
+                  <div className="bg-red-50 text-red-600 px-4 py-3 rounded-lg text-sm border border-red-100">
+                    {resetError}
+                  </div>
+                )}
+                <button
+                  type="submit"
+                  disabled={resetLoading}
+                  className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all disabled:opacity-50"
+                >
+                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setForgotPassword(false)}
+                  className="block text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center hover:text-[rgba(34,34,34,0.5)] transition-colors mx-auto"
+                >
+                  Back to sign in
+                </button>
+              </form>
+            )}
+          </div>
         )}
 
         {mode === 'signup' && (

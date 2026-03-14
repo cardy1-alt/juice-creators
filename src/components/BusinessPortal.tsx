@@ -237,18 +237,43 @@ export default function BusinessPortal() {
   };
 
   const markNotificationRead = async (id: string) => {
-    await supabase.from('notifications').update({ read: true }).eq('id', id);
-    fetchNotifications();
+    try {
+      const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
+      if (error) throw error;
+      fetchNotifications();
+    } catch (err: any) {
+      console.error('Failed to mark notification read:', err.message);
+    }
   };
 
   const handleCreateOffer = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
     setOfferError(null);
+
+    // Inline validation
+    const desc = newOfferDescription.trim();
+    if (!desc || desc.length < 10) {
+      setOfferError('Description must be at least 10 characters.');
+      return;
+    }
+    if (desc.length > 300) {
+      setOfferError('Description must be under 300 characters.');
+      return;
+    }
+    if (limitClaims && (!newOfferCap || newOfferCap < 1)) {
+      setOfferError('Monthly cap must be at least 1.');
+      return;
+    }
+    if (limitClaims && newOfferCap && newOfferCap > 1000) {
+      setOfferError('Monthly cap cannot exceed 1000.');
+      return;
+    }
+
+    setLoading(true);
     try {
       const { error } = await supabase.from('offers').insert({
         business_id: userProfile.id,
-        description: newOfferDescription,
+        description: desc,
         monthly_cap: limitClaims ? newOfferCap : null,
         is_live: true,
       });
@@ -266,8 +291,13 @@ export default function BusinessPortal() {
   };
 
   const handleToggleOffer = async (offerId: string, currentStatus: boolean) => {
-    await supabase.from('offers').update({ is_live: !currentStatus }).eq('id', offerId);
-    fetchOffers();
+    try {
+      const { error } = await supabase.from('offers').update({ is_live: !currentStatus }).eq('id', offerId);
+      if (error) throw error;
+      fetchOffers();
+    } catch (err: any) {
+      console.error('Failed to toggle offer:', err.message);
+    }
   };
 
   const handleScanCode = async (e: React.FormEvent) => {
