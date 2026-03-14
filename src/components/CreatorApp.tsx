@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Copy, Camera, Instagram } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -550,32 +550,42 @@ export default function CreatorApp() {
             {/* Body */}
             <div className="flex-1 overflow-y-auto bg-white">
               <div className="p-[20px]">
-                <h2 className="text-[20px] font-extrabold text-[#222222] mb-1">{offer.businesses.name}</h2>
-                <p className="text-[13px] text-[rgba(34,34,34,0.5)] mb-4">{offer.businesses.category}</p>
-                <div className="h-[1px] bg-[rgba(34,34,34,0.1)] mb-4" />
+                {/* A) Business name + category */}
+                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
+                <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
+                <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
-                {/* Offered by row */}
-                <div className="flex items-center gap-3 mb-4">
-                  {renderBusinessAvatar(offer.businesses.name, offer.businesses.category, offer.businesses.logo_url, 38)}
-                  <div>
-                    <p className="text-[14px] font-bold text-[#222222]">{offer.businesses.name}</p>
-                    <p className="text-[12px] text-[rgba(34,34,34,0.5)]">On nayba since 2024</p>
-                  </div>
+                {/* B) What you get */}
+                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What you get</p>
+                <p className="text-[16px] font-medium text-[#222222] leading-[1.6] mb-5">{offer.description}</p>
+
+                {/* C) What we ask */}
+                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What we ask</p>
+                <div className="flex flex-col gap-2.5 mb-5">
+                  {[
+                    'Post an Instagram reel within 48 hours',
+                    'Tag us in your post',
+                    'Visit in person to redeem',
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <Check className="w-[14px] h-[14px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
+                      <span className="text-[14px] text-[#222222]">{item}</span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Description */}
-                <p className="text-[15px] text-[rgba(34,34,34,0.5)] leading-[1.6] mb-4">{offer.description}</p>
-
-                {/* Pill row */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {isUnlimited ? (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">Open availability</span>
-                  ) : full ? (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]">Sold out</span>
-                  ) : (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">{slotsLeft} slots left</span>
-                  )}
-                  <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]">{offer.businesses.category}</span>
+                {/* D) Availability row */}
+                <div className="flex items-center justify-between rounded-[12px] bg-[#F7F7F7] px-[16px] py-[12px]">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    <span className="text-[14px] font-semibold text-[#222222]">
+                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} slots left`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    <span className="text-[14px] font-semibold text-[#222222]">48hrs to post</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -584,7 +594,7 @@ export default function CreatorApp() {
             <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px] flex items-center justify-between">
               <div>
                 <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
-                <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Post reel within 48hrs</p>
+                <p className="text-[12px] text-[var(--mid)]">Post reel within 48hrs</p>
               </div>
               {full ? (
                 <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed min-h-[48px]">
@@ -1027,7 +1037,7 @@ export default function CreatorApp() {
                                     {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
                                   </div>
                                   <p className={`text-[9px] mt-1.5 text-center px-1 ${
-                                    isCurrent ? 'font-semibold text-[var(--terra)]' : 'font-medium text-[rgba(34,34,34,0.28)]'
+                                    isCurrent ? 'font-semibold text-[var(--terra)]' : 'font-medium text-[var(--soft)]'
                                   }`}>
                                     {stage.label}
                                   </p>
@@ -1064,7 +1074,7 @@ export default function CreatorApp() {
 
                         {selectedClaim.status === 'active' && (
                           <div className="p-[24px]">
-                            <p className="text-[13px] font-medium text-[rgba(34,34,34,0.5)] text-center mb-3">Show this at the door</p>
+                            <p className="text-[13px] font-medium text-[#222222] text-center mb-3">Show this at the door</p>
                             <QRCodeDisplay
                               token={selectedClaim.qr_token}
                               claimId={selectedClaim.id}
