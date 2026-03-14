@@ -1018,9 +1018,14 @@ export default function CreatorApp() {
                         : 'claimed';
 
                       const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
-                      const progressPercent = ((stageIndex + 1) / 4) * 100;
                       const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
-                      const nextHints = ['Next: visit the business', 'Next: post your reel', 'Next: submit your reel link', 'All done!'];
+
+                      // Extract short offer title: cut before "in exchange" / "for a" or hard truncate at 35
+                      const desc = claim.offers.description || '';
+                      const cutIdx = Math.min(
+                        ...[desc.indexOf(' in exchange'), desc.indexOf(' for a')].filter(i => i > 0).concat([35])
+                      );
+                      const offerTitle = desc.length > cutIdx ? desc.slice(0, cutIdx) + '…' : desc;
 
                       return (
                         <div
@@ -1028,39 +1033,53 @@ export default function CreatorApp() {
                           className="flex-shrink-0 w-full"
                           style={{ scrollSnapAlign: 'start' }}
                         >
-                          <div className="p-4">
-                            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
-                              {/* Compact progress bar */}
-                              <div className="px-5 pt-4">
-                                <div className="h-[4px] bg-[#F0EFED] rounded-[4px] overflow-hidden mb-[10px]">
-                                  <div
-                                    className="h-full bg-[var(--terra)] rounded-[4px] transition-all"
-                                    style={{ width: `${progressPercent}%` }}
-                                  />
-                                </div>
-                                <div className="flex justify-between">
-                                  {stageLabels.map((label, idx) => {
-                                    const isActiveOrDone = idx <= stageIndex;
-                                    const isCurrent = idx === stageIndex;
-                                    return (
-                                      <div key={label} className="flex flex-col items-center" style={{ width: '25%' }}>
-                                        <div className={`w-1 h-1 rounded-full mb-1 ${isCurrent ? 'bg-[var(--terra)]' : 'bg-transparent'}`} />
-                                        <span className={`text-[11px] ${isActiveOrDone ? 'font-bold text-[#222222]' : 'font-medium text-[var(--soft)]'}`}>
-                                          {label}
-                                        </span>
-                                      </div>
-                                    );
-                                  })}
-                                </div>
-                                <p className="text-[13px] font-medium text-[var(--mid)] mt-[10px]">{nextHints[stageIndex]}</p>
+                          <div className="px-4 pt-3">
+                            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] px-5 pt-4 pb-2">
+
+                              {/* Offer title — one line */}
+                              <p className="text-[14px] font-semibold text-[#1A1A1A] truncate mb-[10px]">{offerTitle}</p>
+
+                              {/* Breadcrumb stepper — one line */}
+                              <div className="flex items-center flex-nowrap mb-4">
+                                {stageLabels.map((label, idx) => {
+                                  const isDone = idx < stageIndex;
+                                  const isCurrent = idx === stageIndex;
+                                  const isFuture = idx > stageIndex;
+                                  return (
+                                    <span key={label} className="flex items-center">
+                                      {idx === 0 && (
+                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--terra)] mr-1.5" />
+                                      )}
+                                      <span className={`text-[13px] ${
+                                        isCurrent ? 'font-bold text-[#1A1A1A]'
+                                        : isDone ? 'font-bold text-[#1A1A1A]'
+                                        : 'font-medium'
+                                      }`} style={isFuture ? { color: 'rgba(26,26,26,0.3)' } : undefined}>
+                                        {label}
+                                      </span>
+                                      {idx < stageLabels.length - 1 && (
+                                        <span className="text-[13px] mx-1" style={{ color: 'rgba(26,26,26,0.25)' }}>→</span>
+                                      )}
+                                    </span>
+                                  );
+                                })}
                               </div>
 
-                              {/* Offer description */}
-                              <p className="text-[14px] font-medium px-5 mt-3 mb-5 line-clamp-2" style={{ color: 'rgba(26,26,26,0.75)', lineHeight: '1.6' }}>{claim.offers.description}</p>
+                              {/* QR Code section */}
+                              {claim.status === 'active' && (
+                                <>
+                                  <p className="text-[13px] font-semibold text-[#1A1A1A] text-center mb-[10px]">Show this at the door</p>
+                                  <QRCodeDisplay
+                                    token={claim.qr_token}
+                                    claimId={claim.id}
+                                    creatorCode={userProfile.code}
+                                  />
+                                </>
+                              )}
 
                               {/* Reel Countdown/Prompt */}
                               {claim.redeemed_at && !claim.reel_url && (
-                                <div className={`mx-5 mt-4 p-4 rounded-xl border ${
+                                <div className={`p-4 rounded-xl border ${
                                   isOverdue
                                     ? 'bg-rose-50/60 border-rose-200'
                                     : 'bg-amber-50/60 border-amber-200'
@@ -1077,21 +1096,9 @@ export default function CreatorApp() {
                                 </div>
                               )}
 
-                              {/* QR Code section */}
-                              {claim.status === 'active' && (
-                                <div className="px-5 py-5">
-                                  <p className="text-[14px] font-semibold text-[#222222] text-center mb-[14px]">Show this at the door</p>
-                                  <QRCodeDisplay
-                                    token={claim.qr_token}
-                                    claimId={claim.id}
-                                    creatorCode={userProfile.code}
-                                  />
-                                </div>
-                              )}
-
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
-                                <div className="mx-5 mt-4 p-4 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
+                                <div className="p-4 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
                                   <label className="block text-[14px] font-semibold text-[#222222] mb-2">
                                     Submit Your Reel
                                   </label>
@@ -1118,14 +1125,14 @@ export default function CreatorApp() {
                               )}
 
                               {claim.reel_url && (
-                                <div className="mx-5 mt-4 flex items-center gap-2 p-3 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
+                                <div className="flex items-center gap-2 p-3 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
                                   <Check className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
                                   <span className="text-[14px] text-[#222222] font-medium">Reel submitted!</span>
                                 </div>
                               )}
 
-                              {/* Action links */}
-                              <div className="flex items-center justify-center gap-1 py-4 text-[13px]">
+                              {/* Report / Release links */}
+                              <div className="flex items-center justify-center py-[10px] text-[12px]">
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span className="text-[var(--mid)]">Release this slot?</span>
@@ -1147,22 +1154,23 @@ export default function CreatorApp() {
                                   <>
                                     <button
                                       onClick={() => setDisputeClaimId(claim.id)}
-                                      className="flex items-center gap-1.5 font-medium text-[var(--soft)] hover:text-amber-600 transition-colors"
+                                      className="flex items-center gap-1 font-medium transition-colors"
+                                      style={{ color: 'rgba(26,26,26,0.35)' }}
                                     >
-                                      <Flag className="w-3 h-3" /> Report an issue
+                                      <Flag className="w-[11px] h-[11px]" /> Report an issue
                                     </button>
                                     {(() => {
                                       const releaseStatus = canReleaseOffer(claim);
                                       if (releaseStatus.allowed) {
                                         return (
                                           <>
-                                            <span className="text-[var(--soft)]">·</span>
+                                            <span className="mx-2" style={{ color: 'rgba(26,26,26,0.2)' }}>·</span>
                                             <button
                                               onClick={() => setReleaseConfirmId(claim.id)}
-                                              className="flex items-center gap-1.5 font-medium transition-colors"
-                                              style={{ color: 'rgba(196,103,74,0.7)' }}
+                                              className="flex items-center gap-1 font-medium transition-colors"
+                                              style={{ color: 'rgba(196,103,74,0.65)' }}
                                             >
-                                              <X className="w-3 h-3" /> Release offer
+                                              <X className="w-[11px] h-[11px]" /> Release offer
                                             </button>
                                           </>
                                         );
@@ -1173,7 +1181,7 @@ export default function CreatorApp() {
                                 )}
                               </div>
                               {releaseError && (
-                                <p className="text-[13px] text-rose-600 text-center pb-3">{releaseError}</p>
+                                <p className="text-[13px] text-rose-600 text-center pb-2">{releaseError}</p>
                               )}
                             </div>
                           </div>
