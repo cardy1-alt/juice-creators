@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, Clock, Bell, Check, LogOut, ExternalLink, Flag, X, User, Copy, Camera, Instagram } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -462,7 +462,7 @@ export default function CreatorApp() {
     { key: 'offers' as const, label: 'Explore', icon: Search },
     { key: 'saved' as const, label: 'Saved', icon: Heart },
     { key: 'active' as const, label: 'Active', icon: Zap, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
-    { key: 'claims' as const, label: 'Claims', icon: Clock },
+    { key: 'claims' as const, label: 'Claims', icon: FileText },
     { key: 'profile' as const, label: 'Profile', icon: null as any },
   ];
 
@@ -550,32 +550,42 @@ export default function CreatorApp() {
             {/* Body */}
             <div className="flex-1 overflow-y-auto bg-white">
               <div className="p-[20px]">
-                <h2 className="text-[20px] font-extrabold text-[#222222] mb-1">{offer.businesses.name}</h2>
-                <p className="text-[13px] text-[rgba(34,34,34,0.5)] mb-4">{offer.businesses.category}</p>
-                <div className="h-[1px] bg-[rgba(34,34,34,0.1)] mb-4" />
+                {/* A) Business name + category */}
+                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
+                <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
+                <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
-                {/* Offered by row */}
-                <div className="flex items-center gap-3 mb-4">
-                  {renderBusinessAvatar(offer.businesses.name, offer.businesses.category, offer.businesses.logo_url, 38)}
-                  <div>
-                    <p className="text-[14px] font-bold text-[#222222]">{offer.businesses.name}</p>
-                    <p className="text-[12px] text-[rgba(34,34,34,0.5)]">On nayba since 2024 &middot; &#9733; 4.9</p>
-                  </div>
+                {/* B) What you get */}
+                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What you get</p>
+                <p className="text-[16px] font-medium text-[#222222] leading-[1.6] mb-5">{offer.description}</p>
+
+                {/* C) What we ask */}
+                <p className="text-[11px] font-semibold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">What we ask</p>
+                <div className="flex flex-col gap-2.5 mb-5">
+                  {[
+                    'Post an Instagram reel within 48 hours',
+                    'Tag us in your post',
+                    'Visit in person to redeem',
+                  ].map((item) => (
+                    <div key={item} className="flex items-start gap-2.5">
+                      <Check className="w-[14px] h-[14px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
+                      <span className="text-[14px] text-[#222222]">{item}</span>
+                    </div>
+                  ))}
                 </div>
 
-                {/* Description */}
-                <p className="text-[15px] text-[rgba(34,34,34,0.5)] leading-[1.6] mb-4">{offer.description}</p>
-
-                {/* Pill row */}
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {isUnlimited ? (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">Open availability</span>
-                  ) : full ? (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]">Sold out</span>
-                  ) : (
-                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">{slotsLeft} slots left</span>
-                  )}
-                  <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]">{offer.businesses.category}</span>
+                {/* D) Availability row */}
+                <div className="flex items-center justify-between rounded-[12px] bg-[#F7F7F7] px-[16px] py-[12px]">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    <span className="text-[14px] font-semibold text-[#222222]">
+                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} slots left`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    <span className="text-[14px] font-semibold text-[#222222]">48hrs to post</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -584,7 +594,7 @@ export default function CreatorApp() {
             <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px] flex items-center justify-between">
               <div>
                 <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
-                <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Post reel within 48hrs</p>
+                <p className="text-[12px] text-[var(--mid)]">Post reel within 48hrs</p>
               </div>
               {full ? (
                 <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed min-h-[48px]">
@@ -646,8 +656,7 @@ export default function CreatorApp() {
                 <div
                   className="w-full rounded-full bg-white flex items-center gap-3 px-[16px] py-[14px]"
                   style={{
-                    border: '1px solid rgba(34,34,34,0.15)',
-                    boxShadow: '0 2px 8px rgba(34,34,34,0.1)',
+                    border: '1px solid rgba(34,34,34,0.12)',
                   }}
                 >
                   <Search className="w-[15px] h-[15px] text-[rgba(34,34,34,0.28)] flex-shrink-0" />
@@ -697,7 +706,11 @@ export default function CreatorApp() {
                 const firstActive = activeClaims[0];
                 const claimedTime = new Date(firstActive.claimed_at).getTime();
                 const now = new Date().getTime();
-                const hoursLeft = Math.max(0, Math.floor(48 - (now - claimedTime) / (1000 * 60 * 60)));
+                const totalMinutesLeft = Math.max(0, Math.floor((48 * 60) - (now - claimedTime) / (1000 * 60)));
+                const hoursLeft = Math.floor(totalMinutesLeft / 60);
+                const minutesLeft = totalMinutesLeft % 60;
+                const timerLabel = hoursLeft >= 1 ? `${hoursLeft}h left` : `${minutesLeft}m left`;
+                const timerColor = hoursLeft < 10 ? 'var(--terra)' : '#222222';
                 return (
                   <div
                     className="mx-[20px] mt-[14px] bg-white rounded-2xl p-[16px] flex items-center justify-between"
@@ -721,7 +734,7 @@ export default function CreatorApp() {
                         />
                       </svg>
                       <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <span className="text-[16px] font-extrabold text-[#222222] leading-none">{hoursLeft}h</span>
+                        <span className="text-[11px] font-extrabold leading-none" style={{ color: timerColor }}>{timerLabel}</span>
                       </div>
                     </div>
                   </div>
@@ -806,7 +819,7 @@ export default function CreatorApp() {
                         )}
                         {/* Business logo overlay top-left */}
                         {offer.businesses.logo_url && (
-                          <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-full overflow-hidden" style={{ border: '1.5px solid white' }}>
+                          <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-[8px] overflow-hidden" style={{ border: '1.5px solid white' }}>
                             <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
                           </div>
                         )}
@@ -835,10 +848,14 @@ export default function CreatorApp() {
                       {/* Below image info */}
                       <div className="mt-2">
                         <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                        <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category} &middot; collab</p>
+                        <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.description ? `${offer.businesses.category} · ${offer.description.split(/\s+/).slice(0, 3).join(' ')}` : offer.businesses.category}</p>
                         <p className="text-[13px]">
                           <span className="font-semibold text-[#222222]">Free</span>
-                          <span className="text-[rgba(34,34,34,0.5)]"> &middot; &#9733; 4.9</span>
+                          {isUnlimited ? null : full ? (
+                            <span className="text-[rgba(34,34,34,0.5)]"> · Full</span>
+                          ) : (
+                            <span className="text-[rgba(34,34,34,0.5)]"> · {slotsLeft} slots left</span>
+                          )}
                         </p>
                       </div>
                     </button>
@@ -1020,7 +1037,7 @@ export default function CreatorApp() {
                                     {isCompleted ? <Check className="w-3 h-3" /> : idx + 1}
                                   </div>
                                   <p className={`text-[9px] mt-1.5 text-center px-1 ${
-                                    isCurrent ? 'font-semibold text-[var(--terra)]' : 'font-medium text-[rgba(34,34,34,0.28)]'
+                                    isCurrent ? 'font-semibold text-[var(--terra)]' : 'font-medium text-[var(--soft)]'
                                   }`}>
                                     {stage.label}
                                   </p>
@@ -1057,7 +1074,7 @@ export default function CreatorApp() {
 
                         {selectedClaim.status === 'active' && (
                           <div className="p-[24px]">
-                            <p className="text-[13px] font-medium text-[rgba(34,34,34,0.5)] text-center mb-3">Show this at the door</p>
+                            <p className="text-[13px] font-medium text-[#222222] text-center mb-3">Show this at the door</p>
                             <QRCodeDisplay
                               token={selectedClaim.qr_token}
                               claimId={selectedClaim.id}
@@ -1376,6 +1393,16 @@ export default function CreatorApp() {
           )}
         </div>
       </div>
+
+      {/* Bottom fade gradient */}
+      <div
+        className="fixed left-0 right-0 z-30 pointer-events-none"
+        style={{
+          bottom: 60,
+          height: 80,
+          background: 'linear-gradient(to bottom, transparent 0%, #ffffff 100%)',
+        }}
+      />
 
       {/* Bottom Navigation Bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-white z-40" style={{ borderTop: '1px solid rgba(34,34,34,0.1)' }}>
