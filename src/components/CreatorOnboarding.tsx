@@ -50,7 +50,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
       <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#C8B8F0' }}>
         <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
           {/* Wordmark */}
-          <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif" }}>
+          <span style={{ fontSize: '32px', fontWeight: 500, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif" }}>
             nayba
           </span>
 
@@ -166,7 +166,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
       <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#F5C4A0' }}>
         <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
           {/* Wordmark */}
-          <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif" }}>
+          <span style={{ fontSize: '32px', fontWeight: 500, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif" }}>
             nayba
           </span>
 
@@ -290,7 +290,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
     <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#FFFFFF' }}>
       <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ padding: '48px 28px' }}>
         {/* Wordmark */}
-        <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif", marginBottom: 32 }}>
+        <span style={{ fontSize: '32px', fontWeight: 500, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Crimson Pro', serif", marginBottom: 32 }}>
           nayba
         </span>
 
