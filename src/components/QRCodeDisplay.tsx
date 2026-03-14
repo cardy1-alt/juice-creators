@@ -351,16 +351,16 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
       <div className="mt-3 max-w-[280px] mx-auto">
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#C4674A]' : 'text-[rgba(34,34,34,0.28)]'}`} />
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[rgba(34,34,34,0.28)]'}`} />
             <span className={`text-[12px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(34,34,34,0.28)]'}`}>
               Refreshes in {timeLeft}s
             </span>
           </div>
         </div>
-        <div className="h-[3px] w-full bg-[rgba(196,103,74,0.15)] rounded-[3px] overflow-hidden">
+        <div className="h-[3px] w-full bg-[var(--terra-15)] rounded-[3px] overflow-hidden">
           <div
             className={`h-full rounded-[3px] transition-all duration-1000 ease-linear ${
-              isUrgent ? 'bg-rose-400' : 'bg-[#C4674A]'
+              isUrgent ? 'bg-rose-400' : 'bg-[var(--terra)]'
             }`}
             style={{ width: `${progressPercent}%` }}
           />

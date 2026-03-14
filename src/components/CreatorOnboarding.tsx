@@ -277,7 +277,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             width="100" height="70" viewBox="0 0 100 70" fill="none"
           >
             <path d="M8 60 C20 25, 45 65, 65 30 S85 50, 92 20" stroke="#F4A8C0" strokeWidth="6" strokeLinecap="round" fill="none" />
-            <circle cx="15" cy="15" r="5" fill="#C4674A" opacity="0.6" />
+            <circle cx="15" cy="15" r="5" fill="var(--terra)" opacity="0.6" />
             <circle cx="80" cy="55" r="4" fill="#1A3C34" opacity="0.4" />
           </svg>
         </div>
@@ -360,7 +360,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
           onClick={handleComplete}
           style={{
             marginTop: 32,
-            background: '#C4674A',
+            background: 'var(--terra)',
             color: '#FFFFFF',
             fontSize: '14px',
             fontWeight: 700,
