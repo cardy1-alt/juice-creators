@@ -11,7 +11,7 @@ export function Logo({ size = 18, color = "#1A3C34" }: LogoProps) {
         fontWeight: 700,
         color,
         letterSpacing: '-0.3px',
-        fontFamily: "'Libre Baskerville', serif",
+        fontFamily: "'Crimson Pro', serif",
         lineHeight: 1,
       }}
     >
