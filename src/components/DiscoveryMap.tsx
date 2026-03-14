@@ -36,7 +36,7 @@ function createMarkerIcon(name: string) {
       font-size: 14px;
       font-weight: 800;
       color: white;
-      background: #C4674A;
+      background: var(--terra);
       border: 2px solid white;
       border-radius: 50%;
       width: 40px;
@@ -204,7 +204,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             value={locationInput}
             onChange={(e) => handleLocationInputChange(e.target.value)}
             placeholder="e.g., London SW1A 1AA"
-            className="w-full px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] text-[15px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 min-h-[52px]"
+            className="w-full px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] text-[15px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] min-h-[52px]"
           />
           {/* Autocomplete dropdown */}
           {searchResults.length > 0 && (
@@ -260,13 +260,13 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                   <h4 className="font-bold text-[14px] text-[#222222] mb-1">{business.name}</h4>
                   <p className="text-[13px] text-[rgba(34,34,34,0.5)] mb-2">{business.category}</p>
                   {business.offers.length > 0 && (
-                    <p className="text-[13px] text-[#C4674A] font-semibold mb-2">
+                    <p className="text-[13px] text-[var(--terra)] font-semibold mb-2">
                       {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
                     </p>
                   )}
                   <button
                     onClick={() => setSelectedBusiness(business)}
-                    className="w-full mt-2 px-3 py-2 bg-[#C4674A] text-white text-[13px] font-semibold rounded-full hover:bg-[#b35a3f] transition-colors"
+                    className="w-full mt-2 px-3 py-2 bg-[var(--terra)] text-white text-[13px] font-semibold rounded-full hover:bg-[var(--terra-hover)] transition-colors"
                   >
                     View Offers
                   </button>
@@ -305,7 +305,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                 </div>
                 <p className="text-[13px] text-[rgba(34,34,34,0.5)] mt-0.5">{business.address}</p>
                 {business.offers.length > 0 && (
-                  <p className="text-[13px] text-[#C4674A] font-medium mt-1">
+                  <p className="text-[13px] text-[var(--terra)] font-medium mt-1">
                     {business.offers.length} offer{business.offers.length > 1 ? 's' : ''} available
                   </p>
                 )}
@@ -369,7 +369,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                             setSelectedBusiness(null);
                           }}
                           disabled={full}
-                          className="px-3 py-2 bg-[#C4674A] text-white text-[13px] font-semibold rounded-full hover:bg-[#b35a3f] transition-colors disabled:opacity-40 disabled:cursor-not-allowed min-h-[40px]"
+                          className="px-3 py-2 bg-[var(--terra)] text-white text-[13px] font-semibold rounded-full hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed min-h-[40px]"
                         >
                           {full ? 'Full' : 'Claim'}
                         </button>

@@ -18,7 +18,7 @@ function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
     active: 'bg-[#F7F7F7] text-[#222222] border border-[rgba(34,34,34,0.1)]',
     redeemed: 'bg-[#222222]/10 text-[#222222] border border-[#222222]/20',
-    expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
+    expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
   };
   return (
     <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] border border-[rgba(34,34,34,0.1)]'}`}>
@@ -127,7 +127,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {!scanning && (
         <button
           onClick={startScanner}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-full font-semibold text-sm bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all"
         >
           <Camera className="w-4 h-4" /> Open Camera Scanner
         </button>
@@ -338,7 +338,7 @@ export default function BusinessPortal() {
           <div className="flex justify-center mb-4"><Clock className="w-8 h-8 text-[rgba(34,34,34,0.28)]" /></div>
           <h2 className="text-xl font-bold mb-2 text-[#222222]">Pending Approval</h2>
           <p className="text-[rgba(34,34,34,0.5)] text-sm mb-6">Your business account is under review.</p>
-          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-medium bg-[#C4674A] hover:bg-[#b35a3f] transition-colors">
+          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-medium bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors">
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
         </div>
@@ -395,13 +395,13 @@ export default function BusinessPortal() {
               <div className="relative">
                 <tab.icon className="w-4 h-4" />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C4674A] text-white text-[8px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[8px] font-bold flex items-center justify-center">
                     {tab.badge}
                   </span>
                 ) : null}
               </div>
               {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#C4674A] rounded-full" />}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[var(--terra)] rounded-full" />}
             </button>
           ))}
         </div>
@@ -417,7 +417,7 @@ export default function BusinessPortal() {
             <div className="space-y-4">
               {offersLoaded && offers.length === 0 && (
                 <div className="bg-white rounded-[20px] p-6 text-center shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] border border-[rgba(34,34,34,0.1)]">
-                  <div className="flex justify-center mb-3"><Sparkles className="w-8 h-8 text-[#C4674A]" /></div>
+                  <div className="flex justify-center mb-3"><Sparkles className="w-8 h-8 text-[var(--terra)]" /></div>
                   <h3 className="text-xl font-bold mb-2 text-[#222222]">You're All Set!</h3>
                   <p className="text-[rgba(34,34,34,0.5)] text-sm mb-2">
                     Create your first offer to start receiving creators and building your content library.
@@ -427,7 +427,7 @@ export default function BusinessPortal() {
                   </p>
                   <button
                     onClick={() => setShowNewOffer(true)}
-                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#C4674A] text-white font-bold text-sm hover:bg-[#b35a3f] transition-all"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--terra)] text-white font-bold text-sm hover:bg-[var(--terra-hover)] transition-all"
                   >
                     <Plus className="w-4 h-4" /> Create First Offer
                   </button>
@@ -437,7 +437,7 @@ export default function BusinessPortal() {
               {offers.length > 0 && (
                 <button
                   onClick={() => setShowNewOffer(!showNewOffer)}
-                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all text-sm"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all text-sm"
                 >
                   <Plus className="w-4 h-4" /> New Offer
                 </button>
@@ -451,7 +451,7 @@ export default function BusinessPortal() {
                       value={newOfferDescription}
                       onChange={(e) => setNewOfferDescription(e.target.value)}
                       placeholder="e.g. Free juice + acai bowl for a reel"
-                      className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] resize-none text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                      className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] resize-none text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                       rows={3}
                       required
                     />
@@ -467,7 +467,7 @@ export default function BusinessPortal() {
                           else setNewOfferCap(null);
                         }}
                         className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                          limitClaims ? 'bg-[#C4674A]' : 'bg-[#F7F7F7]'
+                          limitClaims ? 'bg-[var(--terra)]' : 'bg-[#F7F7F7]'
                         }`}
                       >
                         <span className={`inline-block h-4 w-4 rounded-full bg-white transition-transform ${
@@ -480,7 +480,7 @@ export default function BusinessPortal() {
                         type="number"
                         value={newOfferCap || ''}
                         onChange={(e) => setNewOfferCap(parseInt(e.target.value) || 1)}
-                        className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                        className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                         min={1}
                         placeholder="Max claims per month"
                         required
@@ -495,7 +495,7 @@ export default function BusinessPortal() {
                     </div>
                   )}
                   <div className="flex gap-2">
-                    <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-full text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 text-sm transition-all">
+                    <button type="submit" disabled={loading} className="px-5 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 text-sm transition-all">
                       Create
                     </button>
                     <button type="button" onClick={() => { setShowNewOffer(false); setOfferError(null); }} className="px-5 py-2.5 rounded-full bg-[#F7F7F7] text-[#222222] font-semibold text-sm hover:bg-[#ececec] transition-all">
@@ -590,13 +590,13 @@ export default function BusinessPortal() {
                     value={scanCode}
                     onChange={(e) => { setScanCode(e.target.value); setScanResult(null); }}
                     placeholder="Paste QR token here"
-                    className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-center font-mono text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                    className="w-full px-4 py-3 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.15)] text-center font-mono text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                     required
                   />
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full py-3 rounded-full text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 transition-all text-sm"
+                    className="w-full py-3 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-sm"
                   >
                     {loading ? 'Verifying...' : 'Redeem Pass'}
                   </button>
@@ -644,7 +644,7 @@ export default function BusinessPortal() {
                         <div className="ml-4 flex flex-col gap-2">
                           <button
                             onClick={() => { setScanCode(claim.qr_token); setView('scan'); }}
-                            className="px-4 py-2 rounded-full text-sm font-semibold bg-[#C4674A] text-white hover:bg-[#b35a3f] transition-colors whitespace-nowrap"
+                            className="px-4 py-2 rounded-full text-sm font-semibold bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-colors whitespace-nowrap"
                           >
                             Scan Pass
                           </button>
@@ -697,7 +697,7 @@ export default function BusinessPortal() {
                           href={claim.reel_url!}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full text-white font-semibold text-sm bg-[#C4674A] hover:bg-[#b35a3f] transition-all"
+                          className="flex items-center justify-center gap-2 w-full py-2.5 rounded-full text-white font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
                         >
                           View Reel <ExternalLink className="w-3.5 h-3.5" />
                         </a>
@@ -720,11 +720,11 @@ export default function BusinessPortal() {
                   key={notif.id}
                   onClick={() => !notif.read && markNotificationRead(notif.id)}
                   className={`w-full text-left bg-white rounded-[20px] p-4 border shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] transition-all ${
-                    notif.read ? 'border-[rgba(34,34,34,0.1)] opacity-50' : 'border-[#C4674A]/20 bg-[#C4674A]/5 shadow-sm'
+                    notif.read ? 'border-[rgba(34,34,34,0.1)] opacity-50' : 'border-[var(--terra-20)] bg-[var(--terra-5)] shadow-sm'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.28)]' : 'bg-[#C4674A]'}`} />
+                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.28)]' : 'bg-[var(--terra)]'}`} />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm text-[#222222]">{notif.message}</p>
                       <p className="text-[11px] text-[rgba(34,34,34,0.28)] mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>

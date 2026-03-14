@@ -45,7 +45,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-[#F7F7F7] flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-[#C4674A]" />
+              <Check className="w-8 h-8 text-[var(--terra)]" />
             </div>
             <h3 className="text-xl font-bold text-[#222222] mb-2">Report Submitted</h3>
             <p className="text-[rgba(34,34,34,0.5)] text-sm">
@@ -80,7 +80,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all resize-none"
+                  className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
                   required
                 />
               </div>
@@ -102,7 +102,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="flex-1 py-2.5 rounded-full text-white font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-50 transition-all text-sm"
+                  className="flex-1 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-sm"
                 >
                   {loading ? 'Submitting...' : 'Submit Report'}
                 </button>

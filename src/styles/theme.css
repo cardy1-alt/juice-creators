@@ -2,6 +2,13 @@
   --white: #FFFFFF;
   --bg: #F7F7F7;
   --terra: #C4674A;
+  --terra-hover: #b35a3f;
+  --terra-ring: rgba(196, 103, 74, 0.3);
+  --terra-5: rgba(196, 103, 74, 0.05);
+  --terra-10: rgba(196, 103, 74, 0.1);
+  --terra-15: rgba(196, 103, 74, 0.15);
+  --terra-20: rgba(196, 103, 74, 0.2);
+  --terra-40: rgba(196, 103, 74, 0.4);
   --forest: #1A3C34;
   --near-black: #222222;
   --mid: rgba(34,34,34,0.5);

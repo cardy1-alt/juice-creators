@@ -50,7 +50,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
       <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#C8B8F0' }}>
         <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
           {/* Wordmark */}
-          <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Libre Baskerville', serif" }}>
             nayba
           </span>
 
@@ -166,7 +166,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
       <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#F5C4A0' }}>
         <div className="relative w-full h-full" style={{ padding: '48px 28px 0' }}>
           {/* Wordmark */}
-          <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Libre Baskerville', serif" }}>
             nayba
           </span>
 
@@ -277,7 +277,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             width="100" height="70" viewBox="0 0 100 70" fill="none"
           >
             <path d="M8 60 C20 25, 45 65, 65 30 S85 50, 92 20" stroke="#F4A8C0" strokeWidth="6" strokeLinecap="round" fill="none" />
-            <circle cx="15" cy="15" r="5" fill="#C4674A" opacity="0.6" />
+            <circle cx="15" cy="15" r="5" fill="var(--terra)" opacity="0.6" />
             <circle cx="80" cy="55" r="4" fill="#1A3C34" opacity="0.4" />
           </svg>
         </div>
@@ -290,7 +290,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
     <div className="fixed inset-0 z-50 overflow-hidden" style={{ background: '#FFFFFF' }}>
       <div className="relative w-full h-full flex flex-col items-center justify-center" style={{ padding: '48px 28px' }}>
         {/* Wordmark */}
-        <span style={{ fontSize: '20px', fontWeight: 800, color: '#222222', letterSpacing: '-0.5px', fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 32 }}>
+        <span style={{ fontSize: '26px', fontWeight: 700, color: '#222222', letterSpacing: '-0.3px', fontFamily: "'Libre Baskerville', serif", marginBottom: 32 }}>
           nayba
         </span>
 
@@ -360,7 +360,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
           onClick={handleComplete}
           style={{
             marginTop: 32,
-            background: '#C4674A',
+            background: 'var(--terra)',
             color: '#FFFFFF',
             fontSize: '14px',
             fontWeight: 700,

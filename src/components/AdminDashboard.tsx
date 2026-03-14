@@ -13,7 +13,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   if (type === 'approval') {
     return status === 'approved'
       ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#F7F7F7] text-[#222222] border border-[rgba(34,34,34,0.1)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
-      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20">Pending</span>;
+      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
@@ -23,7 +23,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   const styles: Record<string, string> = {
     active: 'bg-[#F7F7F7] text-[#222222] border border-[rgba(34,34,34,0.1)]',
     redeemed: 'bg-[#F7F7F7] text-[#222222] border border-[rgba(34,34,34,0.1)]',
-    expired: 'bg-[#C4674A]/10 text-[#C4674A] border border-[#C4674A]/20',
+    expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
   };
   return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] border border-[rgba(34,34,34,0.1)]'}`}>{status}</span>;
 }
@@ -218,13 +218,13 @@ export default function AdminDashboard() {
               <div className="relative">
                 <tab.icon className="w-4 h-4" />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[#C4674A] text-white text-[8px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[8px] font-bold flex items-center justify-center">
                     {tab.badge}
                   </span>
                 ) : null}
               </div>
               {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[#C4674A] rounded-full" />}
+              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[var(--terra)] rounded-full" />}
             </button>
           ))}
         </div>
@@ -244,13 +244,13 @@ export default function AdminDashboard() {
           {view === 'stats' && (
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
-                <div className="bg-[#C4674A]/10 rounded-2xl p-5 border border-[#C4674A]/20">
-                  <h3 className="text-sm font-bold text-[#222222] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[#C4674A]" /> Pending Approvals</h3>
+                <div className="bg-[var(--terra-10)] rounded-2xl p-5 border border-[var(--terra-20)]">
+                  <h3 className="text-sm font-bold text-[#222222] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
                         <Users className="w-6 h-6" />
                         <div className="text-left">
@@ -262,7 +262,7 @@ export default function AdminDashboard() {
                     {stats.pendingBusinesses > 0 && (
                       <button
                         onClick={() => setView('businesses')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[#C4674A]/20 hover:border-[#C4674A]/40 transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
                         <Store className="w-6 h-6" />
                         <div className="text-left">
@@ -307,7 +307,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
-                        <tr key={creator.id} className={`hover:bg-[#F7F7F7]/50 transition-colors ${!creator.approved ? 'bg-[#C4674A]/5' : ''}`}>
+                        <tr key={creator.id} className={`hover:bg-[#F7F7F7]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#222222]">{creator.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[rgba(34,34,34,0.5)]">{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
@@ -322,11 +322,11 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Revoke
                               </button>
                             )}
@@ -359,7 +359,7 @@ export default function AdminDashboard() {
                     </thead>
                     <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
                       {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
-                        <tr key={business.id} className={`hover:bg-[#F7F7F7]/50 transition-colors ${!business.approved ? 'bg-[#C4674A]/5' : ''}`}>
+                        <tr key={business.id} className={`hover:bg-[#F7F7F7]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
                               <CategoryIcon category={business.category} className="w-5 h-5" />
@@ -371,11 +371,11 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Revoke
                               </button>
                             )}
@@ -448,7 +448,7 @@ export default function AdminDashboard() {
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-[12px] text-xs font-semibold border border-[rgba(34,34,34,0.15)] text-[#222222] bg-[#F7F7F7] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                              className="px-2.5 py-1 rounded-[12px] text-xs font-semibold border border-[rgba(34,34,34,0.15)] text-[#222222] bg-[#F7F7F7] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
@@ -457,7 +457,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {claim.status === 'active' && (
-                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[#C4674A] hover:bg-[#b35a3f] transition-all">
+                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Expire
                               </button>
                             )}
@@ -487,7 +487,7 @@ export default function AdminDashboard() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-[#F7F7F7] text-[#222222]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[#F7F7F7] text-[#222222]"
                       placeholder="Enter current password"
                     />
                   </div>
@@ -502,7 +502,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-[#F7F7F7] text-[#222222]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[#F7F7F7] text-[#222222]"
                       placeholder="Enter new password (min 8 characters)"
                     />
                   </div>
@@ -517,7 +517,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] text-sm bg-[#F7F7F7] text-[#222222]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(34,34,34,0.15)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[#F7F7F7] text-[#222222]"
                       placeholder="Confirm new password"
                     />
                   </div>
@@ -534,7 +534,7 @@ export default function AdminDashboard() {
                   )}
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-[#C4674A] text-[#FFFFFF] rounded-full font-semibold text-sm hover:bg-[#b35a3f] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[var(--terra)] text-[#FFFFFF] rounded-full font-semibold text-sm hover:bg-[var(--terra-hover)] transition-colors"
                   >
                     Update Password
                   </button>

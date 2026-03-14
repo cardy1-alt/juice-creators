@@ -76,7 +76,7 @@ function AddressAutocomplete({ value, onChange }: {
         value={value}
         onChange={(e) => onChange(e.target.value, null, null)}
         placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
-        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all"
+        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all"
         required
       />
     </div>
@@ -157,7 +157,7 @@ export default function Auth() {
     }
   };
 
-  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all";
+  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all";
 
   return (
     <div className="min-h-screen flex flex-col items-center px-4 pt-[52px] bg-[#FFFFFF]">
@@ -199,12 +199,12 @@ export default function Auth() {
               onClick={() => { setRole('creator'); setSignupStep(1); }}
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'creator'
-                  ? 'border-[#C4674A] bg-[#FFFFFF]'
+                  ? 'border-[var(--terra)] bg-[#FFFFFF]'
                   : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
               }`}
             >
-              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#222222]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#222222]/60'}`}>
+              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[#222222]/40'}`} />
+              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[#222222]/60'}`}>
                 Creator
               </span>
             </button>
@@ -212,12 +212,12 @@ export default function Auth() {
               onClick={() => { setRole('business'); setSignupStep(1); }}
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'business'
-                  ? 'border-[#C4674A] bg-[#FFFFFF]'
+                  ? 'border-[var(--terra)] bg-[#FFFFFF]'
                   : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
               }`}
             >
-              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[#C4674A]' : 'text-[#222222]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[#C4674A]' : 'text-[#222222]/60'}`}>
+              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[var(--terra)]' : 'text-[#222222]/40'}`} />
+              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[#222222]/60'}`}>
                 Business
               </span>
             </button>
@@ -231,14 +231,14 @@ export default function Auth() {
               <div key={step} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
                   signupStep === step
-                    ? 'bg-[#C4674A] text-white'
+                    ? 'bg-[var(--terra)] text-white'
                     : signupStep > step
-                    ? 'bg-[#C4674A] text-white'
+                    ? 'bg-[var(--terra)] text-white'
                     : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]'
                 }`}>
                   {signupStep > step ? <Check className="w-3.5 h-3.5" /> : step}
                 </div>
-                {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-[#C4674A]' : 'bg-[#F7F7F7]'}`} />}
+                {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F7F7F7]'}`} />}
               </div>
             ))}
           </div>
@@ -298,7 +298,7 @@ export default function Auth() {
                           onClick={() => setCategory(cat)}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-left text-sm transition-all ${
                             category === cat
-                              ? 'border-[#C4674A] bg-[#FFFFFF] font-semibold text-[#C4674A]'
+                              ? 'border-[var(--terra)] bg-[#FFFFFF] font-semibold text-[var(--terra)]'
                               : 'border-[rgba(34,34,34,0.1)] text-[rgba(34,34,34,0.5)] hover:border-[rgba(34,34,34,0.2)]'
                           }`}
                         >
@@ -403,7 +403,7 @@ export default function Auth() {
                   setError('');
                   setSignupStep(signupStep + 1);
                 }}
-                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all"
+                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
               >
                 Next
               </button>
@@ -420,7 +420,7 @@ export default function Auth() {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
+                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:bg-[var(--terra-hover)] transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
@@ -434,7 +434,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:bg-[var(--terra-hover)] transition-all disabled:opacity-50"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -465,7 +465,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => { setForgotPassword(false); setResetSent(false); }}
-                  className="text-[11px] font-medium text-[#C4674A] mt-3 hover:underline"
+                  className="text-[11px] font-medium text-[var(--terra)] mt-3 hover:underline"
                 >
                   Back to sign in
                 </button>
@@ -489,7 +489,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all disabled:opacity-50"
+                  className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all disabled:opacity-50"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
