@@ -65,7 +65,7 @@ function AddressAutocomplete({ value, onChange }: {
 
   return (
     <div>
-      <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">
+      <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">
         <MapPin className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />
         Address
       </label>
@@ -75,7 +75,7 @@ function AddressAutocomplete({ value, onChange }: {
         value={value}
         onChange={(e) => onChange(e.target.value, null, null)}
         placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
-        className="w-full px-[14px] py-3 rounded-[11px] bg-[#E8EDE8] text-[13px] text-[#2C2C2C] placeholder:text-[rgba(44,44,44,0.25)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all"
+        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all"
         required
       />
     </div>
@@ -133,38 +133,36 @@ export default function Auth() {
     }
   };
 
-  const inputClass = "w-full px-[14px] py-3 rounded-[11px] bg-[#E8EDE8] text-[13px] text-[#2C2C2C] placeholder:text-[rgba(44,44,44,0.25)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all";
+  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[rgba(34,34,34,0.28)] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 transition-all";
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 pt-[52px] bg-[#FAF8F2]">
+    <div className="min-h-screen flex flex-col items-center px-4 pt-[52px] bg-[#FFFFFF]">
       <div className="w-full max-w-md">
         {/* Logo / Branding */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center justify-center mb-5">
-            <Logo size={38} />
-          </div>
-          <h1 className="text-[26px] font-bold text-[#2C2C2C] tracking-[-0.5px]">nayba</h1>
-          <p className="text-[rgba(44,44,44,0.25)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
+          <Logo size={20} />
+          <h1 className="text-[26px] font-extrabold text-[#222222] tracking-[-0.5px]">nayba</h1>
+          <p className="text-[rgba(34,34,34,0.28)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
         </div>
 
         {/* Sign In / Sign Up toggle */}
-        <div className="flex gap-1 mb-6 p-1 bg-[#E8EDE8] rounded-[14px]">
+        <div className="flex gap-1 mb-6 p-1 bg-[#F7F7F7] rounded-full">
           <button
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); }}
-            className={`flex-1 py-2.5 rounded-[11px] text-sm font-semibold transition-all ${
+            className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
               mode === 'signin'
-                ? 'bg-white text-[#2C2C2C] shadow-[0_1px_4px_rgba(44,44,44,0.08)]'
-                : 'text-[rgba(44,44,44,0.25)] hover:text-[#2C2C2C]/50'
+                ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
+                : 'text-[rgba(34,34,34,0.28)] hover:text-[#222222]/50'
             }`}
           >
             Sign In
           </button>
           <button
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); }}
-            className={`flex-1 py-2.5 rounded-[11px] text-sm font-semibold transition-all ${
+            className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
               mode === 'signup'
-                ? 'bg-white text-[#2C2C2C] shadow-[0_1px_4px_rgba(44,44,44,0.08)]'
-                : 'text-[rgba(44,44,44,0.25)] hover:text-[#2C2C2C]/50'
+                ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
+                : 'text-[rgba(34,34,34,0.28)] hover:text-[#222222]/50'
             }`}
           >
             Sign Up
@@ -178,12 +176,12 @@ export default function Auth() {
               onClick={() => { setRole('creator'); setSignupStep(1); }}
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'creator'
-                  ? 'border-[#C4674A] bg-[#FAF8F2]'
-                  : 'border-[rgba(44,44,44,0.1)] hover:border-[rgba(44,44,44,0.2)]'
+                  ? 'border-[#C4674A] bg-[#FFFFFF]'
+                  : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
               }`}
             >
-              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#2C2C2C]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#2C2C2C]/60'}`}>
+              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#222222]/40'}`} />
+              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[#C4674A]' : 'text-[#222222]/60'}`}>
                 Creator
               </span>
             </button>
@@ -191,12 +189,12 @@ export default function Auth() {
               onClick={() => { setRole('business'); setSignupStep(1); }}
               className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
                 role === 'business'
-                  ? 'border-[#C4674A] bg-[#FAF8F2]'
-                  : 'border-[rgba(44,44,44,0.1)] hover:border-[rgba(44,44,44,0.2)]'
+                  ? 'border-[#C4674A] bg-[#FFFFFF]'
+                  : 'border-[rgba(34,34,34,0.1)] hover:border-[rgba(34,34,34,0.2)]'
               }`}
             >
-              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[#C4674A]' : 'text-[#2C2C2C]/40'}`} />
-              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[#C4674A]' : 'text-[#2C2C2C]/60'}`}>
+              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[#C4674A]' : 'text-[#222222]/40'}`} />
+              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[#C4674A]' : 'text-[#222222]/60'}`}>
                 Business
               </span>
             </button>
@@ -213,11 +211,11 @@ export default function Auth() {
                     ? 'bg-[#C4674A] text-white'
                     : signupStep > step
                     ? 'bg-[#C4674A] text-white'
-                    : 'bg-[#E8EDE8] text-[rgba(44,44,44,0.25)]'
+                    : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]'
                 }`}>
                   {signupStep > step ? <Check className="w-3.5 h-3.5" /> : step}
                 </div>
-                {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-[#C4674A]' : 'bg-[#E8EDE8]'}`} />}
+                {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-[#C4674A]' : 'bg-[#F7F7F7]'}`} />}
               </div>
             ))}
           </div>
@@ -229,15 +227,15 @@ export default function Auth() {
               {role === 'creator' && (
                 <>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Full Name</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Full Name</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Sophie Taylor" className={inputClass} required />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Instagram Handle</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Instagram Handle</label>
                     <input type="text" value={instagramHandle} onChange={(e) => setInstagramHandle(e.target.value)} placeholder="@yourusername" className={inputClass} required />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Follower Count</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Follower Count</label>
                     <select value={followerCount} onChange={(e) => setFollowerCount(e.target.value)} className={inputClass} required>
                       <option value="Under 1k">Under 1k</option>
                       <option value="1k–5k">1k–5k</option>
@@ -246,14 +244,14 @@ export default function Auth() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Email</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Password</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                     <div className="relative">
                       <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/70">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -264,11 +262,11 @@ export default function Auth() {
               {role === 'business' && signupStep === 1 && (
                 <>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Business Name</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Business Name</label>
                     <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Juice Bar Co" className={inputClass} required />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Category</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Category</label>
                     <div className="grid grid-cols-2 gap-2">
                       {CATEGORY_LIST.map((cat) => (
                         <button
@@ -277,8 +275,8 @@ export default function Auth() {
                           onClick={() => setCategory(cat)}
                           className={`flex items-center gap-2 px-3 py-2.5 rounded-lg border-2 text-left text-sm transition-all ${
                             category === cat
-                              ? 'border-[#C4674A] bg-[#FAF8F2] font-semibold text-[#C4674A]'
-                              : 'border-[rgba(44,44,44,0.1)] text-[rgba(44,44,44,0.45)] hover:border-[rgba(44,44,44,0.2)]'
+                              ? 'border-[#C4674A] bg-[#FFFFFF] font-semibold text-[#C4674A]'
+                              : 'border-[rgba(34,34,34,0.1)] text-[rgba(34,34,34,0.5)] hover:border-[rgba(34,34,34,0.2)]'
                           }`}
                         >
                           <CategoryIcon category={cat} className="w-4 h-4" />
@@ -297,7 +295,7 @@ export default function Auth() {
                     onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                   />
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Bio</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Bio</label>
                     <textarea
                       value={bio}
                       onChange={(e) => setBio(e.target.value.slice(0, 150))}
@@ -307,7 +305,7 @@ export default function Auth() {
                       className={`${inputClass} resize-none`}
                       required
                     />
-                    <p className="text-xs text-[#2C2C2C]/40 mt-1 text-right">{bio.length}/150</p>
+                    <p className="text-xs text-[#222222]/40 mt-1 text-right">{bio.length}/150</p>
                   </div>
                 </>
               )}
@@ -315,14 +313,14 @@ export default function Auth() {
               {role === 'business' && signupStep === 3 && (
                 <>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Email</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Email</label>
                     <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Password</label>
+                    <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                     <div className="relative">
                       <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/70">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
                         {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       </button>
                     </div>
@@ -335,14 +333,14 @@ export default function Auth() {
           {mode === 'signin' && (
             <>
               <div>
-                <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Email</label>
+                <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Email</label>
                 <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
               </div>
               <div>
-                <label className="block text-[11px] font-semibold text-[#2C2C2C] tracking-[0.2px] mb-1.5">Password</label>
+                <label className="block text-[11px] font-semibold text-[#222222] tracking-[0.2px] mb-1.5">Password</label>
                 <div className="relative">
                   <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#2C2C2C]/40 hover:text-[#2C2C2C]/70">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[#222222]/40 hover:text-[#222222]/70">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -363,7 +361,7 @@ export default function Auth() {
                 <button
                   type="button"
                   onClick={() => setSignupStep(signupStep - 1)}
-                  className="px-6 py-3 rounded-[13px] text-[#2C2C2C] text-[14px] font-semibold bg-[#FAF8F2] hover:bg-[#FAF8F2]/80 transition-all"
+                  className="px-6 py-3 rounded-full text-[#222222] text-[14px] font-semibold bg-[#FFFFFF] hover:bg-[#FFFFFF]/80 transition-all"
                 >
                   Back
                 </button>
@@ -382,7 +380,7 @@ export default function Auth() {
                   setError('');
                   setSignupStep(signupStep + 1);
                 }}
-                className="flex-1 py-3 rounded-[13px] text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all"
+                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] transition-all"
               >
                 Next
               </button>
@@ -392,14 +390,14 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => setSignupStep(signupStep - 1)}
-                className="px-6 py-3 rounded-[13px] text-[#2C2C2C] text-[14px] font-semibold bg-[#FAF8F2] hover:bg-[#FAF8F2]/80 transition-all"
+                className="px-6 py-3 rounded-full text-[#222222] text-[14px] font-semibold bg-[#FFFFFF] hover:bg-[#FFFFFF]/80 transition-all"
               >
                 Back
               </button>
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 py-3 rounded-[13px] text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
+                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
               >
                 {loading ? (
                   <span className="inline-flex items-center gap-2">
@@ -413,7 +411,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-[13px] text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
+              className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] active:bg-[#a04f36] transition-all disabled:opacity-50"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -426,13 +424,13 @@ export default function Auth() {
         </form>
 
         {mode === 'signin' && (
-          <p className="text-[11px] font-medium text-[rgba(44,44,44,0.25)] text-center mt-5">
+          <p className="text-[11px] font-medium text-[rgba(34,34,34,0.28)] text-center mt-5">
             Forgot password?
           </p>
         )}
 
         {mode === 'signup' && (
-          <p className="text-xs text-[#2C2C2C]/40 text-center mt-5">
+          <p className="text-xs text-[#222222]/40 text-center mt-5">
             Your account will be reviewed and approved by our admin team
           </p>
         )}

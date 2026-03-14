@@ -8,11 +8,14 @@ export default {
       },
       colors: {
         nayba: {
+          white: '#FFFFFF',
+          bg: '#F7F7F7',
+          terra: '#C4674A',
           forest: '#1A3C34',
-          cream: '#FAF8F2',
-          terracotta: '#C4674A',
-          sage: '#E8EDE8',
-          charcoal: '#2C2C2C',
+          'near-black': '#222222',
+          lavender: '#C8B8F0',
+          peach: '#F5C4A0',
+          pink: '#F4A8C0',
         },
       },
     },

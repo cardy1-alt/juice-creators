@@ -29,7 +29,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   const margin = 4;
   const cellSize = size / (n + margin * 2);
 
-  ctx.fillStyle = '#2C2C2C';
+  ctx.fillStyle = '#222222';
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       if (modules[r][c]) {
@@ -354,8 +354,8 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
   return (
     <div className="text-center">
-      {/* QR code — clean, no overlapping elements */}
-      <div className="inline-block bg-[#E8EDE8] p-5 rounded-[16px]">
+      {/* QR code */}
+      <div className="inline-block bg-[#F7F7F7] p-5 rounded-[16px]">
         <img
           src={qrDataUrl}
           alt="QR Code"
@@ -365,20 +365,20 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
       {/* Creator code badge */}
       <div className="mt-4">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white">
-          <Shield className="w-4 h-4 text-[#2C2C2C]" />
-          <span className="font-mono font-bold text-[13px] tracking-[0.5px] text-[#2C2C2C]">
+        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[rgba(34,34,34,0.1)]">
+          <Shield className="w-4 h-4 text-[#222222]" />
+          <span className="font-mono font-bold text-[13px] tracking-[0.5px] text-[#222222]">
             {creatorCode}
           </span>
         </div>
       </div>
 
-      {/* Countdown progress bar — below the QR, never overlapping */}
+      {/* Countdown progress bar */}
       <div className="mt-3 max-w-[280px] mx-auto">
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#C4674A]' : 'text-[rgba(44,44,44,0.25)]'}`} />
-            <span className={`text-[10px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(44,44,44,0.25)]'}`}>
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#C4674A]' : 'text-[rgba(34,34,34,0.28)]'}`} />
+            <span className={`text-[10px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(34,34,34,0.28)]'}`}>
               Refreshes in {timeLeft}s
             </span>
           </div>
