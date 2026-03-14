@@ -79,7 +79,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
 
           {/* Hero headline */}
           <h1 style={{
-            fontSize: '40px',
+            fontSize: '44px',
             fontWeight: 800,
             color: '#222222',
             letterSpacing: '-1.2px',
@@ -187,7 +187,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
 
           {/* Hero headline */}
           <h1 style={{
-            fontSize: '40px',
+            fontSize: '44px',
             fontWeight: 800,
             color: '#222222',
             letterSpacing: '-1.2px',
@@ -309,7 +309,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
         </span>
 
         <h1 style={{
-          fontSize: '40px',
+          fontSize: '44px',
           fontWeight: 800,
           color: '#222222',
           letterSpacing: '-1.2px',

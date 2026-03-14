@@ -8,8 +8,9 @@ import {
   Sparkles, ClipboardList, Clock
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { CategoryIcon } from '../lib/categories';
-import { getInitials, getAvatarGradient } from '../lib/avatar';
+import { CategoryIcon, getCategoryGradient, getCategorySolidColor } from '../lib/categories';
+import { getInitials } from '../lib/avatar';
+import { uploadAvatar } from '../lib/upload';
 import DisputeModal from './DisputeModal';
 import { Logo } from './Logo';
 
@@ -684,7 +685,7 @@ export default function BusinessPortal() {
                     {claims.filter(c => c.reel_url).map((claim) => (
                       <div key={claim.id} className="bg-white rounded-[20px] p-5 border border-[rgba(34,34,34,0.1)] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
                         <div className="flex items-center gap-3 mb-4">
-                          <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${getAvatarGradient(claim.creators.name)} flex items-center justify-center text-white font-bold text-xs shadow-sm`}>
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm" style={{ background: 'linear-gradient(135deg, #1A3C34, #2C4A3E)' }}>
                             {getInitials(claim.creators.name)}
                           </div>
                           <div>
