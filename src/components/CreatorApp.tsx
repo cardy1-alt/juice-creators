@@ -1020,12 +1020,16 @@ export default function CreatorApp() {
                       const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
                       const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
 
-                      // Extract short offer title: cut before "in exchange" / "for a" or hard truncate at 35
+                      // Extract short offer title: cut at natural break points, no ellipsis on complete phrases
                       const desc = claim.offers.description || '';
-                      const cutIdx = Math.min(
-                        ...[desc.indexOf(' in exchange'), desc.indexOf(' for a')].filter(i => i > 0).concat([35])
-                      );
-                      const offerTitle = desc.length > cutIdx ? desc.slice(0, cutIdx) + '…' : desc;
+                      const breakPoints = [' in exchange', ' for a', ' for an', ' when you', ' with your'];
+                      let offerTitle = desc;
+                      let foundBreak = false;
+                      for (const bp of breakPoints) {
+                        const bpIdx = desc.indexOf(bp);
+                        if (bpIdx > 0 && bpIdx <= 50) { offerTitle = desc.slice(0, bpIdx); foundBreak = true; break; }
+                      }
+                      if (!foundBreak && desc.length > 40) offerTitle = desc.slice(0, 40).trimEnd() + '…';
 
                       return (
                         <div
