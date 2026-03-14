@@ -326,14 +326,14 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-[14px] rounded-[20px] p-6" style={{ background: '#F5F3F0' }}>
-      {/* QR code — 240px */}
-      <div className="bg-white p-3 rounded-[12px]">
+    <div className="flex flex-col items-center gap-3 rounded-[20px]" style={{ background: '#F5F3F0', padding: '16px' }}>
+      {/* QR code — 220px */}
+      <div className="bg-white rounded-[10px]" style={{ padding: '10px' }}>
         <img
           src={qrDataUrl}
           alt="QR Code"
           className="rounded-[8px]"
-          style={{ width: '240px', height: '240px' }}
+          style={{ width: '220px', height: '220px' }}
         />
       </div>
 
