@@ -78,3 +78,38 @@ export function CategoryIcon({ category, className = "w-4 h-4" }: { category: st
   const IconComponent = ICON_COMPONENTS[iconName] || Store;
   return <IconComponent className={className} />;
 }
+
+// Category-specific dark gradients for placeholder images
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  'Food & Drink': 'linear-gradient(135deg, #3D2314, #6B3A1F)',
+  'Cafe & Coffee': 'linear-gradient(135deg, #3D2314, #6B3A1F)',
+  'Hair & Beauty': 'linear-gradient(135deg, #2D1F2E, #5C3A5A)',
+  'Wellness & Spa': 'linear-gradient(135deg, #2D1F2E, #5C3A5A)',
+  'Health & Fitness': 'linear-gradient(135deg, #0F1F2E, #1A3A5C)',
+  'Retail': 'linear-gradient(135deg, #1A1F3A, #2D3561)',
+  'Arts & Entertainment': 'linear-gradient(135deg, #1F1A0F, #4A3A1A)',
+  'Education': 'linear-gradient(135deg, #0F2318, #1A4A2E)',
+  'Pets': 'linear-gradient(135deg, #2A1A0F, #5C3D1A)',
+  'Services': 'linear-gradient(135deg, #1A1A1A, #3A3A3A)',
+};
+
+const CATEGORY_SOLID_COLORS: Record<string, string> = {
+  'Food & Drink': '#3D2314',
+  'Cafe & Coffee': '#3D2314',
+  'Hair & Beauty': '#2D1F2E',
+  'Wellness & Spa': '#2D1F2E',
+  'Health & Fitness': '#0F1F2E',
+  'Retail': '#1A1F3A',
+  'Arts & Entertainment': '#1F1A0F',
+  'Education': '#0F2318',
+  'Pets': '#2A1A0F',
+  'Services': '#1A1A1A',
+};
+
+export function getCategoryGradient(category: string | undefined | null): string {
+  return CATEGORY_GRADIENTS[category || ''] || 'linear-gradient(135deg, #1A3C34, #2C4A3E)';
+}
+
+export function getCategorySolidColor(category: string | undefined | null): string {
+  return CATEGORY_SOLID_COLORS[category || ''] || '#1A3C34';
+}

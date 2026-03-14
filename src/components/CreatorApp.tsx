@@ -1,13 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, MessageCircle, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, Clock, Bell, Check, LogOut, ExternalLink, Flag } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, Clock, Bell, Check, LogOut, ExternalLink, Flag, X, User, Copy, Camera, Instagram } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
-import DiscoveryMap from './DiscoveryMap';
-import { getCategoryIconName, getCategoryColor, getCategoryIconBg, getCategoryBorderColor, CategoryIcon } from '../lib/categories';
-import { getInitials, getAvatarGradient } from '../lib/avatar';
+import { getCategoryGradient, getCategorySolidColor, CategoryIcon } from '../lib/categories';
+import { getInitials } from '../lib/avatar';
+import { uploadAvatar } from '../lib/upload';
 import { Logo } from './Logo';
 
 function useCountdown(targetDate: string | null) {
@@ -48,7 +48,7 @@ interface Offer {
   description: string;
   monthly_cap: number | null;
   slotsUsed?: number;
-  businesses: { name: string; category: string };
+  businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
 }
 
 interface Claim {
@@ -63,7 +63,7 @@ interface Claim {
   offer_id: string;
   business_id: string;
   offers: { description: string };
-  businesses: { name: string; category: string };
+  businesses: { name: string; category: string; logo_url?: string | null };
 }
 
 interface Notification {
@@ -75,20 +75,28 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[#F7F7F7] text-[#222222]',
-    claimed: 'bg-[#F7F7F7] text-[#222222]',
+    active: 'bg-[#C4674A] text-white',
+    claimed: 'bg-[#C4674A] text-white',
     redeemed: 'bg-[#F7F7F7] text-[#222222]',
     visited: 'bg-[#F7F7F7] text-[#222222]',
     reel_due: 'bg-[#C4674A] text-white',
-    submitted: 'bg-[#C4674A] text-white',
+    submitted: 'bg-emerald-500 text-white',
     expired: 'bg-rose-50 text-rose-500 border border-rose-100',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
+    completed: 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]',
+    disputed: 'bg-rose-100 text-rose-600',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[#222222]'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${styles[status] || 'bg-[#F7F7F7] text-[#222222]'}`}>
       {status}
     </span>
   );
+}
+
+function formatDate(dateStr: string): string {
+  const d = new Date(dateStr);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
 export default function CreatorApp() {
@@ -98,7 +106,9 @@ export default function CreatorApp() {
   const [activeClaims, setActiveClaims] = useState<Claim[]>([]);
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [view, setView] = useState<'offers' | 'map' | 'active' | 'history' | 'notifications'>('offers');
+  const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
+  const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
+  const [profileSubView, setProfileSubView] = useState<'main' | 'alerts'>('main');
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [reelUrl, setReelUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -109,14 +119,42 @@ export default function CreatorApp() {
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
-  const [viewMode, setViewMode] = useState<'card' | 'compact'>('card');
-  const [releaseModalOpen, setReleaseModalOpen] = useState(false);
+  const [releaseConfirmId, setReleaseConfirmId] = useState<string | null>(null);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [releasingClaim, setReleasingClaim] = useState(false);
   const [reelError, setReelError] = useState<string | null>(null);
   const [claimError, setClaimError] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(userProfile?.avatar_url || null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [copiedCode, setCopiedCode] = useState(false);
+  const [undoToast, setUndoToast] = useState<string | null>(null);
+  const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
+
+  // Load saved offers from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('nayba_saved_offers');
+      if (saved) setSavedOffers(new Set(JSON.parse(saved)));
+    } catch {}
+  }, []);
+
+  const toggleSaved = (offerId: string) => {
+    setSavedOffers(prev => {
+      const next = new Set(prev);
+      if (next.has(offerId)) {
+        next.delete(offerId);
+        setUndoToast('Removed from saved');
+        setTimeout(() => setUndoToast(null), 3000);
+      } else {
+        next.add(offerId);
+      }
+      localStorage.setItem('nayba_saved_offers', JSON.stringify([...next]));
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (userProfile?.approved && !userProfile.onboarding_complete) {
@@ -142,7 +180,6 @@ export default function CreatorApp() {
     setCollabsCompleted(count || 0);
   };
 
-  // Realtime subscriptions for claims and notifications
   useEffect(() => {
     if (!userProfile?.approved) return;
 
@@ -186,7 +223,7 @@ export default function CreatorApp() {
   const fetchOffers = async () => {
     const { data, error } = await supabase
       .from('offers')
-      .select('*, businesses(name, category, latitude, longitude, address)')
+      .select('*, businesses(name, category, latitude, longitude, address, logo_url)')
       .eq('is_live', true);
 
     if (error) {
@@ -206,14 +243,22 @@ export default function CreatorApp() {
           return { ...offer, slotsUsed: count || 0 };
         })
       );
-      setOffers(offersWithSlots as Offer[]);
+      // Deduplicate: if same business_id + same description, keep only one
+      const seen = new Set<string>();
+      const deduped = offersWithSlots.filter(o => {
+        const key = `${o.business_id}::${o.description}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      setOffers(deduped as Offer[]);
     }
   };
 
   const fetchClaims = async () => {
     const { data, error } = await supabase
       .from('claims')
-      .select('*, offers(description), businesses(name, category)')
+      .select('*, offers(description), businesses(name, category, logo_url)')
       .eq('creator_id', userProfile.id)
       .order('claimed_at', { ascending: false });
 
@@ -293,13 +338,12 @@ export default function CreatorApp() {
     }
   };
 
-  const handleReleaseOffer = async () => {
-    if (!selectedClaim) return;
+  const handleReleaseOffer = async (claimId: string) => {
     setReleasingClaim(true);
     setReleaseError(null);
     try {
       const { data, error } = await supabase.rpc('unclaim_offer', {
-        p_claim_id: selectedClaim.id,
+        p_claim_id: claimId,
         p_creator_id: userProfile.id,
       });
 
@@ -309,7 +353,7 @@ export default function CreatorApp() {
         return;
       }
 
-      setReleaseModalOpen(false);
+      setReleaseConfirmId(null);
       fetchOffers();
       fetchClaims();
     } catch (error: any) {
@@ -330,6 +374,27 @@ export default function CreatorApp() {
     return { allowed: true, reason: null };
   };
 
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    setUploadError(null);
+    const { url, error } = await uploadAvatar(file, userProfile.id, 'creators');
+    if (error) {
+      setUploadError(error);
+    } else if (url) {
+      setAvatarUrl(url);
+    }
+    setUploadingAvatar(false);
+    if (avatarInputRef.current) avatarInputRef.current.value = '';
+  };
+
+  const copyCode = () => {
+    navigator.clipboard.writeText(userProfile.code).catch(() => {});
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
+  };
+
   const unreadCount = notifications.filter(n => !n.read).length;
 
   if (!userProfile?.approved) {
@@ -337,13 +402,13 @@ export default function CreatorApp() {
       <div className="min-h-screen flex items-center justify-center px-4 bg-white">
         <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center">
           <Clock className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-4" />
-          <h2 className="text-xl font-bold mb-2 text-[#222222]">Pending Approval</h2>
-          <p className="text-[rgba(34,34,34,0.5)] text-sm mb-6">
+          <h2 className="text-[26px] font-extrabold mb-2 text-[#222222]">Pending Approval</h2>
+          <p className="text-[rgba(34,34,34,0.5)] text-[15px] mb-6">
             Your creator account is under review. You'll be notified once approved!
           </p>
           <button
             onClick={signOut}
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-medium bg-[#C4674A] hover:bg-[#b35a3f] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-medium bg-[#C4674A] hover:bg-[#b35a3f] transition-colors min-h-[48px]"
           >
             <LogOut className="w-4 h-4" /> Sign Out
           </button>
@@ -354,21 +419,17 @@ export default function CreatorApp() {
 
   const getActiveUrgency = () => {
     if (activeClaims.length === 0) return 'none';
-
     const now = new Date().getTime();
     const hasOverdue = activeClaims.some(claim => {
       if (!claim.reel_due_at || claim.reel_url) return false;
       return new Date(claim.reel_due_at).getTime() < now;
     });
-
     if (hasOverdue) return 'overdue';
-
     const hasSoon = activeClaims.some(claim => {
       if (!claim.reel_due_at || claim.reel_url) return false;
       const hoursLeft = (new Date(claim.reel_due_at).getTime() - now) / (1000 * 60 * 60);
       return hoursLeft <= 12;
     });
-
     if (hasSoon) return 'soon';
     return 'normal';
   };
@@ -399,11 +460,33 @@ export default function CreatorApp() {
 
   const tabs = [
     { key: 'offers' as const, label: 'Explore', icon: Search },
-    { key: 'map' as const, label: 'Saved', icon: Heart },
+    { key: 'saved' as const, label: 'Saved', icon: Heart },
     { key: 'active' as const, label: 'Active', icon: Zap, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
-    { key: 'history' as const, label: 'Messages', icon: MessageCircle },
-    { key: 'notifications' as const, label: 'Profile', icon: null as any },
+    { key: 'claims' as const, label: 'Claims', icon: Clock },
+    { key: 'profile' as const, label: 'Profile', icon: null as any },
   ];
+
+  // Helper to render business avatar
+  const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 44) => {
+    if (logoUrl) {
+      return (
+        <img
+          src={logoUrl}
+          alt={name}
+          className="object-cover rounded-full"
+          style={{ width: size, height: size }}
+        />
+      );
+    }
+    return (
+      <div
+        className="rounded-full flex items-center justify-center"
+        style={{ width: size, height: size, background: getCategorySolidColor(category) }}
+      >
+        <span className="text-[rgba(255,255,255,0.8)] font-extrabold" style={{ fontSize: size * 0.4 }}>{name.charAt(0)}</span>
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -420,38 +503,11 @@ export default function CreatorApp() {
           onClose={() => setDisputeClaimId(null)}
         />
       )}
-      {releaseModalOpen && selectedClaim && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-[20px] p-6 max-w-sm w-full shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
-            <h3 className="text-lg font-bold text-[#222222] mb-2">Release this offer?</h3>
-            <p className="text-sm text-[rgba(34,34,34,0.5)] mb-4">
-              The slot goes back to the pool. You won't be able to claim this offer again.
-            </p>
-            {releaseError && (
-              <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200">
-                <p className="text-sm text-rose-700">{releaseError}</p>
-              </div>
-            )}
-            <div className="flex gap-3">
-              <button
-                onClick={() => {
-                  setReleaseModalOpen(false);
-                  setReleaseError(null);
-                }}
-                disabled={releasingClaim}
-                className="flex-1 px-4 py-2.5 rounded-full text-sm font-semibold border-2 border-[rgba(34,34,34,0.1)] text-[#222222] hover:bg-[#F7F7F7] transition-colors disabled:opacity-40"
-              >
-                Keep it
-              </button>
-              <button
-                onClick={handleReleaseOffer}
-                disabled={releasingClaim}
-                className="flex-1 px-4 py-2.5 rounded-full text-sm font-bold bg-rose-500 text-white hover:bg-rose-600 transition-colors disabled:opacity-40"
-              >
-                {releasingClaim ? 'Releasing...' : 'Release'}
-              </button>
-            </div>
-          </div>
+
+      {/* Undo toast */}
+      {undoToast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#222222] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
+          {undoToast}
         </div>
       )}
 
@@ -469,18 +525,25 @@ export default function CreatorApp() {
         return (
           <div className="fixed inset-0 z-50 bg-white flex flex-col">
             {/* Hero */}
-            <div className="relative h-[200px] flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}>
-              <div className="w-[64px] h-[64px] rounded-[16px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                <span className="text-[rgba(255,255,255,0.8)] text-[28px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
-              </div>
+            <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
+              {offer.businesses.logo_url ? (
+                <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+              ) : (
+                <div className="w-[64px] h-[64px] rounded-[16px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
+                  <span className="text-[rgba(255,255,255,0.8)] text-[28px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
+                </div>
+              )}
               <button
                 onClick={() => setExpandedOffer(null)}
                 className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-[0_2px_8px_rgba(34,34,34,0.1)]"
               >
                 <ChevronLeft className="w-[18px] h-[18px] text-[#222222]" />
               </button>
-              <button className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                <Heart className="w-[16px] h-[16px] text-white" />
+              <button
+                onClick={() => toggleSaved(offer.id)}
+                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.15)] flex items-center justify-center"
+              >
+                <Heart className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[#C4674A] fill-[#C4674A]' : 'text-white'}`} strokeWidth={1.5} />
               </button>
             </div>
 
@@ -493,28 +556,26 @@ export default function CreatorApp() {
 
                 {/* Offered by row */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-[38px] h-[38px] rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}>
-                    <span className="text-[rgba(255,255,255,0.8)] text-[14px] font-bold">{offer.businesses.name.charAt(0)}</span>
-                  </div>
+                  {renderBusinessAvatar(offer.businesses.name, offer.businesses.category, offer.businesses.logo_url, 38)}
                   <div>
-                    <p className="text-[13px] font-bold text-[#222222]">{offer.businesses.name}</p>
-                    <p className="text-[11px] text-[rgba(34,34,34,0.5)]">On nayba since 2024 &middot; &#9733; 4.9</p>
+                    <p className="text-[14px] font-bold text-[#222222]">{offer.businesses.name}</p>
+                    <p className="text-[12px] text-[rgba(34,34,34,0.5)]">On nayba since 2024 &middot; &#9733; 4.9</p>
                   </div>
                 </div>
 
                 {/* Description */}
-                <p className="text-[13px] text-[rgba(34,34,34,0.5)] leading-[1.6] mb-4">{offer.description}</p>
+                <p className="text-[15px] text-[rgba(34,34,34,0.5)] leading-[1.6] mb-4">{offer.description}</p>
 
                 {/* Pill row */}
                 <div className="flex flex-wrap gap-2 mb-4">
                   {isUnlimited ? (
-                    <span className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#F5C4A0] text-[#222222]">Open availability</span>
+                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">Open availability</span>
                   ) : full ? (
-                    <span className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]">Sold out</span>
+                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)]">Sold out</span>
                   ) : (
-                    <span className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#F5C4A0] text-[#222222]">{slotsLeft} slots left</span>
+                    <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F5C4A0] text-[#222222]">{slotsLeft} slots left</span>
                   )}
-                  <span className="px-3 py-1.5 rounded-full text-[11px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]">{offer.businesses.category}</span>
+                  <span className="px-3 py-1.5 rounded-full text-[12px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]">{offer.businesses.category}</span>
                 </div>
               </div>
             </div>
@@ -523,25 +584,25 @@ export default function CreatorApp() {
             <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px] flex items-center justify-between">
               <div>
                 <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
-                <p className="text-[11px] text-[rgba(34,34,34,0.5)]">Post reel within 48hrs</p>
+                <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Post reel within 48hrs</p>
               </div>
               {full ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[13px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed">
+                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed min-h-[48px]">
                   Sold Out
                 </button>
               ) : alreadyClaimed ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[13px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed flex items-center gap-1">
+                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
                   <Check className="w-4 h-4" /> Claimed
                 </button>
               ) : hasActiveBusiness ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[13px] font-bold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed">
+                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed min-h-[48px]">
                   Active
                 </button>
               ) : (
                 <button
                   onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
                   disabled={loading}
-                  className="px-[22px] py-[12px] rounded-full text-[13px] font-bold bg-[#C4674A] text-white hover:bg-[#b35a3f] disabled:opacity-40 transition-all"
+                  className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#C4674A] text-white hover:bg-[#b35a3f] disabled:opacity-40 transition-all min-h-[48px]"
                 >
                   Claim
                 </button>
@@ -553,13 +614,13 @@ export default function CreatorApp() {
 
       <div className="max-w-md mx-auto">
         {/* Header */}
-        <div className="bg-white px-[18px] pt-[20px] pb-[14px] border-b border-[rgba(34,34,34,0.1)]">
+        <div className="bg-white px-[20px] pt-[20px] pb-[14px] border-b border-[rgba(34,34,34,0.1)]">
           <div className="flex items-center justify-between">
             <Logo />
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-[12px] font-semibold text-[#222222]">{userProfile.name}</p>
-                <span className="inline-block bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] text-[10px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
+                <p className="text-[14px] font-semibold text-[#222222]">{userProfile.name}</p>
+                <span className="inline-block bg-[#F7F7F7] text-[rgba(34,34,34,0.5)] text-[12px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
                   {userProfile.code}
                 </span>
               </div>
@@ -570,20 +631,20 @@ export default function CreatorApp() {
         {/* Content */}
         <div className="pb-28">
 
-          {/* -- OFFERS -- */}
+          {/* -- EXPLORE FEED -- */}
           {view === 'offers' && (
             <>
               {claimError && (
-                <div className="mx-[18px] mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between">
-                  <p className="text-sm text-rose-700">{claimError}</p>
-                  <button onClick={() => setClaimError(null)} className="text-rose-400 hover:text-rose-600 text-xs font-semibold ml-3">Dismiss</button>
+                <div className="mx-[20px] mt-3 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-between">
+                  <p className="text-[14px] text-rose-700">{claimError}</p>
+                  <button onClick={() => setClaimError(null)} className="text-rose-400 hover:text-rose-600 text-[13px] font-semibold ml-3">Dismiss</button>
                 </div>
               )}
 
-              {/* Search bar - Airbnb pill style */}
-              <div className="px-[18px] pt-4 pb-3">
+              {/* Search bar */}
+              <div className="px-[20px] pt-4 pb-3">
                 <div
-                  className="w-full rounded-full bg-white flex items-center gap-3 px-[16px] py-[12px]"
+                  className="w-full rounded-full bg-white flex items-center gap-3 px-[16px] py-[14px]"
                   style={{
                     border: '1px solid rgba(34,34,34,0.15)',
                     boxShadow: '0 2px 8px rgba(34,34,34,0.1)',
@@ -595,7 +656,8 @@ export default function CreatorApp() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Find local offers..."
-                    className="w-full bg-transparent text-[13px] font-semibold text-[#222222] placeholder:text-[#222222] focus:outline-none"
+                    className="w-full bg-transparent text-[15px] font-semibold text-[#222222] placeholder:text-[#222222] focus:outline-none"
+                    style={{ minHeight: '24px' }}
                   />
                   <button
                     className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0"
@@ -607,7 +669,7 @@ export default function CreatorApp() {
               </div>
 
               {/* Category Tabs */}
-              <div className="px-[18px] border-b border-[rgba(34,34,34,0.1)]">
+              <div className="px-[20px] border-b border-[rgba(34,34,34,0.1)]">
                 <div className="flex">
                   {categoryTabs.map(tab => {
                     const isActive = selectedCategory === tab.key;
@@ -615,14 +677,14 @@ export default function CreatorApp() {
                       <button
                         key={tab.key}
                         onClick={() => setSelectedCategory(tab.key)}
-                        className={`flex-1 flex flex-col items-center gap-1 py-3 relative transition-all ${
+                        className={`flex-1 flex flex-col items-center gap-1 py-3 relative transition-all min-h-[44px] ${
                           isActive ? 'text-[#222222]' : 'text-[rgba(34,34,34,0.28)]'
                         }`}
                       >
                         <tab.icon className="w-[20px] h-[20px]" />
-                        <span className="text-[10px] font-semibold">{tab.label}</span>
+                        <span className="text-[11px] font-semibold">{tab.label}</span>
                         {isActive && (
-                          <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#222222] rounded-full" />
+                          <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[#C4674A] rounded-full" />
                         )}
                       </button>
                     );
@@ -638,29 +700,29 @@ export default function CreatorApp() {
                 const hoursLeft = Math.max(0, Math.floor(48 - (now - claimedTime) / (1000 * 60 * 60)));
                 return (
                   <div
-                    className="mx-[18px] mt-[14px] bg-white rounded-2xl p-[14px_16px] flex items-center justify-between"
+                    className="mx-[20px] mt-[14px] bg-white rounded-2xl p-[16px] flex items-center justify-between"
                     style={{
                       border: '1px solid rgba(34,34,34,0.1)',
                       boxShadow: '0 1px 4px rgba(34,34,34,0.06)',
                     }}
                   >
                     <div>
-                      <p className="text-[13px] font-bold text-[#222222]">Active pass</p>
-                      <button onClick={() => setView('active')} className="flex items-center gap-1 text-[11px] text-[rgba(34,34,34,0.5)]">
+                      <p className="text-[14px] font-bold text-[#222222]">Active pass</p>
+                      <button onClick={() => setView('active')} className="flex items-center gap-1 text-[13px] text-[rgba(34,34,34,0.5)]">
                         {firstActive.businesses.name} <ChevronRight className="w-[10px] h-[10px]" />
                       </button>
                     </div>
                     <div className="w-[50px] h-[50px] rounded-xl bg-[#F5C4A0] flex flex-col items-center justify-center">
-                      <span className="text-[20px] font-extrabold text-[#222222] leading-none">{hoursLeft}</span>
-                      <span className="text-[8px] font-bold text-[rgba(34,34,34,0.28)] leading-none mt-0.5">HRS LEFT</span>
+                      <span className="text-[24px] font-extrabold text-[#222222] leading-none">{hoursLeft}</span>
+                      <span className="text-[9px] font-bold text-[rgba(34,34,34,0.28)] leading-none mt-0.5">HRS LEFT</span>
                     </div>
                   </div>
                 );
               })()}
 
               {/* Section Header */}
-              <div className="flex items-center justify-between px-[18px] mt-4 mb-[12px]">
-                <h2 className="text-[16px] font-extrabold text-[#222222] tracking-[-0.3px]">Near you</h2>
+              <div className="flex items-center justify-between px-[20px] mt-4 mb-[14px]">
+                <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">Near you</h2>
                 <button
                   className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
                   style={{ border: '1px solid rgba(34,34,34,0.15)' }}
@@ -686,9 +748,8 @@ export default function CreatorApp() {
                     return matchesCategory && matchesSearch;
                   })
                   .sort((a, b) => {
-                    if (sortBy === 'name') {
-                      return a.businesses.name.localeCompare(b.businesses.name);
-                    } else if (sortBy === 'slots') {
+                    if (sortBy === 'name') return a.businesses.name.localeCompare(b.businesses.name);
+                    if (sortBy === 'slots') {
                       const aSlots = a.monthly_cap === null ? Infinity : (a.monthly_cap - (a.slotsUsed || 0));
                       const bSlots = b.monthly_cap === null ? Infinity : (b.monthly_cap - (b.slotsUsed || 0));
                       return bSlots - aSlots;
@@ -700,13 +761,10 @@ export default function CreatorApp() {
                   return (
                     <div className="text-center py-16">
                       <Search className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-3" />
-                      <p className="text-[rgba(34,34,34,0.28)] text-sm">No offers found</p>
+                      <p className="text-[rgba(34,34,34,0.28)] text-[15px]">No offers found</p>
                       <button
-                        onClick={() => {
-                          setSelectedCategory('all');
-                          setSearchQuery('');
-                        }}
-                        className="mt-2 text-[#C4674A] text-xs font-semibold hover:underline"
+                        onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
+                        className="mt-2 text-[#C4674A] text-[13px] font-semibold hover:underline"
                       >
                         Clear filters
                       </button>
@@ -714,65 +772,83 @@ export default function CreatorApp() {
                   );
                 }
 
+                const renderOfferCard = (offer: Offer) => {
+                  const isUnlimited = offer.monthly_cap === null;
+                  const slotsUsed = offer.slotsUsed || 0;
+                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                  const full = !isUnlimited && slotsLeft === 0;
+
+                  return (
+                    <button
+                      key={offer.id}
+                      onClick={() => setExpandedOffer(offer.id)}
+                      className="w-[140px] flex-shrink-0 text-left"
+                    >
+                      {/* Image area */}
+                      <div
+                        className="w-full h-[130px] rounded-[14px] overflow-hidden relative flex items-center justify-center"
+                        style={{ background: getCategoryGradient(offer.businesses.category) }}
+                      >
+                        {offer.businesses.logo_url ? (
+                          <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
+                            <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
+                          </div>
+                        )}
+                        {/* Business logo overlay top-left */}
+                        {offer.businesses.logo_url && (
+                          <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-full overflow-hidden" style={{ border: '1.5px solid white' }}>
+                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                        {/* Slots badge bottom-left */}
+                        {!isUnlimited && !full && (
+                          <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[#222222] text-[12px] font-bold rounded-full px-[9px] py-[4px]">
+                            {slotsLeft} slots left
+                          </span>
+                        )}
+                        {full && (
+                          <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[rgba(34,34,34,0.28)] text-[12px] font-bold rounded-full px-[9px] py-[4px]">
+                            Full
+                          </span>
+                        )}
+                        {/* Heart top-right */}
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                          className="absolute top-[6px] right-[6px]"
+                        >
+                          <Heart
+                            className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[#C4674A] fill-[#C4674A]' : 'text-white'}`}
+                            strokeWidth={1.5}
+                          />
+                        </button>
+                      </div>
+                      {/* Below image info */}
+                      <div className="mt-2">
+                        <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
+                        <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category} &middot; collab</p>
+                        <p className="text-[13px]">
+                          <span className="font-semibold text-[#222222]">Free</span>
+                          <span className="text-[rgba(34,34,34,0.5)]"> &middot; &#9733; 4.9</span>
+                        </p>
+                      </div>
+                    </button>
+                  );
+                };
+
                 return (
                   <>
                     {/* Horizontal scroll offer cards */}
                     <div className="overflow-x-auto scrollbar-hide">
-                      <div className="flex gap-[12px] px-[18px] pb-4" style={{ width: 'max-content' }}>
-                        {filteredOffers.map((offer) => {
-                          const isUnlimited = offer.monthly_cap === null;
-                          const slotsUsed = offer.slotsUsed || 0;
-                          const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                          const full = !isUnlimited && slotsLeft === 0;
-
-                          return (
-                            <button
-                              key={offer.id}
-                              onClick={() => setExpandedOffer(offer.id)}
-                              className="w-[130px] flex-shrink-0 text-left"
-                            >
-                              {/* Image area */}
-                              <div
-                                className="w-full h-[120px] rounded-[14px] overflow-hidden relative flex items-center justify-center"
-                                style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}
-                              >
-                                <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                                  <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
-                                </div>
-                                {/* Slots badge bottom-left */}
-                                {!isUnlimited && !full && (
-                                  <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[#222222] text-[10px] font-bold rounded-full px-[9px] py-[4px]">
-                                    {slotsLeft} slots left
-                                  </span>
-                                )}
-                                {full && (
-                                  <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[rgba(34,34,34,0.28)] text-[10px] font-bold rounded-full px-[9px] py-[4px]">
-                                    Full
-                                  </span>
-                                )}
-                                {/* Heart top-right */}
-                                <div className="absolute top-[6px] right-[6px]">
-                                  <Heart className="w-[16px] h-[16px] text-white" strokeWidth={1.5} />
-                                </div>
-                              </div>
-                              {/* Below image info */}
-                              <div className="mt-2">
-                                <p className="text-[12px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                                <p className="text-[11px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category} &middot; collab</p>
-                                <p className="text-[11px]">
-                                  <span className="font-semibold text-[#222222]">Free</span>
-                                  <span className="text-[rgba(34,34,34,0.5)]"> &middot; &#9733; 4.9</span>
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
+                      <div className="flex gap-[14px] px-[20px] pb-4" style={{ width: 'max-content' }}>
+                        {filteredOffers.map(renderOfferCard)}
                       </div>
                     </div>
 
                     {/* Second section */}
-                    <div className="flex items-center justify-between px-[18px] mt-2 mb-[12px]">
-                      <h2 className="text-[16px] font-extrabold text-[#222222] tracking-[-0.3px]">New this week</h2>
+                    <div className="flex items-center justify-between px-[20px] mt-2 mb-[14px]">
+                      <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">New this week</h2>
                       <button
                         className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
                         style={{ border: '1px solid rgba(34,34,34,0.15)' }}
@@ -782,51 +858,8 @@ export default function CreatorApp() {
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">
-                      <div className="flex gap-[12px] px-[18px] pb-4" style={{ width: 'max-content' }}>
-                        {filteredOffers.slice().reverse().map((offer) => {
-                          const isUnlimited = offer.monthly_cap === null;
-                          const slotsUsed = offer.slotsUsed || 0;
-                          const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                          const full = !isUnlimited && slotsLeft === 0;
-
-                          return (
-                            <button
-                              key={offer.id}
-                              onClick={() => setExpandedOffer(offer.id)}
-                              className="w-[130px] flex-shrink-0 text-left"
-                            >
-                              <div
-                                className="w-full h-[120px] rounded-[14px] overflow-hidden relative flex items-center justify-center"
-                                style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}
-                              >
-                                <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                                  <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
-                                </div>
-                                {!isUnlimited && !full && (
-                                  <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[#222222] text-[10px] font-bold rounded-full px-[9px] py-[4px]">
-                                    {slotsLeft} slots left
-                                  </span>
-                                )}
-                                {full && (
-                                  <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[rgba(34,34,34,0.28)] text-[10px] font-bold rounded-full px-[9px] py-[4px]">
-                                    Full
-                                  </span>
-                                )}
-                                <div className="absolute top-[6px] right-[6px]">
-                                  <Heart className="w-[16px] h-[16px] text-white" strokeWidth={1.5} />
-                                </div>
-                              </div>
-                              <div className="mt-2">
-                                <p className="text-[12px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                                <p className="text-[11px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category} &middot; collab</p>
-                                <p className="text-[11px]">
-                                  <span className="font-semibold text-[#222222]">Free</span>
-                                  <span className="text-[rgba(34,34,34,0.5)]"> &middot; &#9733; 4.9</span>
-                                </p>
-                              </div>
-                            </button>
-                          );
-                        })}
+                      <div className="flex gap-[14px] px-[20px] pb-4" style={{ width: 'max-content' }}>
+                        {filteredOffers.slice().reverse().map(renderOfferCard)}
                       </div>
                     </div>
                   </>
@@ -835,49 +868,62 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* -- MAP -- */}
-          {view === 'map' && (
-            <DiscoveryMap
-              businesses={offers.map(offer => ({
-                id: offer.business_id,
-                name: offer.businesses.name,
-                category: offer.businesses.category,
-                latitude: offer.businesses.latitude || 0,
-                longitude: offer.businesses.longitude || 0,
-                address: offer.businesses.address || '',
-                offers: [{
-                  id: offer.id,
-                  description: offer.description,
-                  reward_value: offer.reward_value,
-                  monthly_cap: offer.monthly_cap,
-                  slotsUsed: offer.slotsUsed
-                }]
-              })).reduce((acc, curr) => {
-                const existing = acc.find(b => b.id === curr.id);
-                if (existing) {
-                  existing.offers.push(...curr.offers);
-                } else {
-                  acc.push(curr);
-                }
-                return acc;
-              }, [] as Array<{
-                id: string;
-                name: string;
-                category: string;
-                latitude: number;
-                longitude: number;
-                address: string;
-                offers: Array<{
-                  id: string;
-                  description: string;
-                  reward_value: string;
-                  monthly_cap: number | null;
-                  slotsUsed?: number;
-                }>;
-              }>)}
-              onClaimOffer={handleClaimOffer}
-              userLocation={userLocation}
-            />
+          {/* -- SAVED TAB -- */}
+          {view === 'saved' && (
+            <div className="px-[20px] pt-5">
+              <div className="flex items-center justify-between mb-5">
+                <h1 className="text-[26px] font-extrabold text-[#222222]">Saved</h1>
+                <span className="text-[13px] text-[rgba(34,34,34,0.5)]">{savedOffers.size} saved</span>
+              </div>
+
+              {savedOffers.size === 0 ? (
+                <div className="text-center py-20">
+                  <Heart className="w-12 h-12 text-[rgba(34,34,34,0.28)] mx-auto mb-4" />
+                  <p className="text-[16px] font-semibold text-[#222222]">Nothing saved yet</p>
+                  <p className="text-[14px] text-[rgba(34,34,34,0.5)] mt-1">Heart an offer to save it for later</p>
+                </div>
+              ) : (
+                <div className="space-y-[14px]">
+                  {offers.filter(o => savedOffers.has(o.id)).map(offer => {
+                    const isUnlimited = offer.monthly_cap === null;
+                    const slotsUsed = offer.slotsUsed || 0;
+                    const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                    return (
+                      <button
+                        key={offer.id}
+                        onClick={() => setExpandedOffer(offer.id)}
+                        className="w-full bg-white rounded-[16px] p-[16px] flex items-center gap-4 text-left shadow-[0_1px_4px_rgba(34,34,34,0.06)] border border-[rgba(34,34,34,0.1)]"
+                      >
+                        {/* Business image/gradient */}
+                        <div
+                          className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
+                          style={{ background: getCategoryGradient(offer.businesses.category) }}
+                        >
+                          {offer.businesses.logo_url ? (
+                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <span className="text-white text-[20px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[15px] font-bold text-[#222222] truncate">{offer.businesses.name}</p>
+                          <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category}</p>
+                          <p className="text-[13px] font-semibold text-[#C4674A]">
+                            {isUnlimited ? 'Open availability' : slotsLeft ? `${slotsLeft} slots available` : 'Full'}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                          className="flex-shrink-0 p-2"
+                        >
+                          <Heart className="w-5 h-5 text-[#C4674A] fill-[#C4674A]" />
+                        </button>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           )}
 
           {/* -- ACTIVE PASSES -- */}
@@ -886,10 +932,10 @@ export default function CreatorApp() {
               {activeClaims.length === 0 ? (
                 <div className="text-center py-16">
                   <Zap className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-3" />
-                  <p className="text-[rgba(34,34,34,0.5)] text-sm font-medium">No active passes</p>
+                  <p className="text-[rgba(34,34,34,0.5)] text-[15px] font-medium">No active passes</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="mt-3 text-[#C4674A] text-sm font-semibold hover:underline"
+                    className="mt-3 text-[#C4674A] text-[14px] font-semibold hover:underline"
                   >
                     Browse offers
                   </button>
@@ -906,21 +952,18 @@ export default function CreatorApp() {
                             <button
                               key={claim.id}
                               onClick={() => setSelectedClaim(claim)}
-                              className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-[11px] font-semibold whitespace-nowrap transition-all ${
+                              className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-[12px] font-semibold whitespace-nowrap transition-all min-h-[44px] ${
                                 isSelected
                                   ? 'bg-[#222222] text-white'
                                   : 'bg-[#F7F7F7] text-[rgba(34,34,34,0.5)]'
                               }`}
                             >
-                              <span className="w-5 h-5 rounded-[6px] bg-gradient-to-br from-[#3a3a3a] to-[#222222] flex items-center justify-center flex-shrink-0">
-                                <span className="text-[rgba(255,255,255,0.9)] text-[9px] font-bold">{claim.businesses.name.charAt(0)}</span>
-                              </span>
+                              {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 20)}
                               <span className="max-w-[140px] truncate">{claim.businesses.name}</span>
                             </button>
                           );
                         })}
                       </div>
-                      <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent pointer-events-none" />
                     </div>
                   )}
 
@@ -944,12 +987,10 @@ export default function CreatorApp() {
                       <div className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
                         {/* Business row */}
                         <div className="flex items-center gap-3 mb-5">
-                          <div className="w-[42px] h-[42px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}>
-                            <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-bold">{selectedClaim.businesses.name.charAt(0)}</span>
-                          </div>
+                          {renderBusinessAvatar(selectedClaim.businesses.name, selectedClaim.businesses.category, selectedClaim.businesses.logo_url, 42)}
                           <div className="flex-1">
-                            <h3 className="font-bold text-[14px] text-[#222222]">{selectedClaim.businesses.name}</h3>
-                            <p className="text-[11px] text-[rgba(34,34,34,0.5)] mt-0.5">{selectedClaim.offers.description}</p>
+                            <h3 className="font-bold text-[15px] text-[#222222]">{selectedClaim.businesses.name}</h3>
+                            <p className="text-[13px] text-[rgba(34,34,34,0.5)] mt-0.5">{selectedClaim.offers.description}</p>
                           </div>
                         </div>
 
@@ -979,13 +1020,9 @@ export default function CreatorApp() {
                                 );
                               })}
                             </div>
-                            {/* Connecting lines */}
                             <div className="absolute top-[13px] left-0 right-0 flex items-center px-[12.5%]">
                               {[0, 1, 2].map((idx) => (
-                                <div
-                                  key={idx}
-                                  className="h-[1.5px] flex-1 bg-[rgba(34,34,34,0.1)]"
-                                />
+                                <div key={idx} className="h-[1.5px] flex-1 bg-[rgba(34,34,34,0.1)]" />
                               ))}
                             </div>
                           </div>
@@ -1000,27 +1037,30 @@ export default function CreatorApp() {
                           }`}>
                             <div className="flex items-center gap-2 mb-2">
                               <Clock className={`w-4 h-4 ${isOverdue ? 'text-rose-500' : 'text-amber-500'}`} />
-                              <p className={`text-sm font-bold ${isOverdue ? 'text-rose-700' : 'text-amber-700'}`}>
+                              <p className={`text-[14px] font-bold ${isOverdue ? 'text-rose-700' : 'text-amber-700'}`}>
                                 {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                               </p>
                             </div>
-                            <p className="text-xs text-[rgba(34,34,34,0.5)]">
+                            <p className="text-[13px] text-[rgba(34,34,34,0.5)]">
                               You have 48 hours to post your reel — it must genuinely feature the business.
                             </p>
                           </div>
                         )}
 
                         {selectedClaim.status === 'active' && (
-                          <QRCodeDisplay
-                            token={selectedClaim.qr_token}
-                            claimId={selectedClaim.id}
-                            creatorCode={userProfile.code}
-                          />
+                          <div className="p-[24px]">
+                            <p className="text-[13px] font-medium text-[rgba(34,34,34,0.5)] text-center mb-3">Show this at the door</p>
+                            <QRCodeDisplay
+                              token={selectedClaim.qr_token}
+                              claimId={selectedClaim.id}
+                              creatorCode={userProfile.code}
+                            />
+                          </div>
                         )}
 
                         {selectedClaim.status === 'redeemed' && !selectedClaim.reel_url && (
                           <div className="mt-5 p-4 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
-                            <label className="block text-sm font-semibold text-[#222222] mb-2">
+                            <label className="block text-[14px] font-semibold text-[#222222] mb-2">
                               Submit Your Reel
                             </label>
                             <div className="flex gap-2">
@@ -1029,18 +1069,18 @@ export default function CreatorApp() {
                                 value={reelUrl}
                                 onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                 placeholder="https://instagram.com/reel/..."
-                                className="flex-1 px-3 py-2 rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.1)] text-sm text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A]"
+                                className="flex-1 px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] border border-[rgba(34,34,34,0.1)] text-[15px] text-[#222222] focus:outline-none focus:ring-2 focus:ring-[#C4674A]/30 focus:border-[#C4674A] min-h-[52px]"
                               />
                               <button
                                 onClick={handleSubmitReel}
                                 disabled={loading || !reelUrl}
-                                className="px-4 py-2 rounded-full text-white text-sm font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-40 transition-all"
+                                className="px-4 py-2 rounded-full text-white text-[14px] font-semibold bg-[#C4674A] hover:bg-[#b35a3f] disabled:opacity-40 transition-all min-h-[48px]"
                               >
                                 Submit
                               </button>
                             </div>
                             {reelError && (
-                              <p className="text-xs text-rose-600 mt-2">{reelError}</p>
+                              <p className="text-[13px] text-rose-600 mt-2">{reelError}</p>
                             )}
                           </div>
                         )}
@@ -1048,37 +1088,58 @@ export default function CreatorApp() {
                         {selectedClaim.reel_url && (
                           <div className="mt-4 flex items-center gap-2 p-3 rounded-xl bg-white border border-[rgba(34,34,34,0.1)]">
                             <Check className="w-4 h-4 text-[#C4674A] flex-shrink-0" />
-                            <span className="text-sm text-[#222222] font-medium">Reel submitted!</span>
+                            <span className="text-[14px] text-[#222222] font-medium">Reel submitted!</span>
                           </div>
                         )}
 
-                        <div className="mt-3 flex flex-col items-center gap-1">
+                        <div className="mt-3 flex flex-col items-center gap-2">
                           <button
                             onClick={() => setDisputeClaimId(selectedClaim.id)}
-                            className="w-full flex items-center justify-center gap-2 py-2 text-[11px] font-medium text-[rgba(34,34,34,0.28)] hover:text-amber-600 transition-colors"
+                            className="flex items-center justify-center gap-2 py-2 text-[13px] font-medium text-[rgba(34,34,34,0.28)] hover:text-amber-600 transition-colors"
                           >
-                            <Flag className="w-3 h-3" /> Report an issue
+                            <Flag className="w-3.5 h-3.5" /> Report an issue
                           </button>
                           {(() => {
                             const releaseStatus = canReleaseOffer(selectedClaim);
                             if (releaseStatus.allowed) {
-                              return (
+                              return releaseConfirmId === selectedClaim.id ? (
+                                <div className="flex items-center gap-2 p-3 rounded-xl bg-[#F7F7F7] text-[13px]">
+                                  <span className="text-[rgba(34,34,34,0.5)]">Are you sure? This will release your slot.</span>
+                                  <button
+                                    onClick={() => handleReleaseOffer(selectedClaim.id)}
+                                    disabled={releasingClaim}
+                                    className="font-bold text-[#C4674A]"
+                                  >
+                                    {releasingClaim ? '...' : 'Confirm'}
+                                  </button>
+                                  <button
+                                    onClick={() => setReleaseConfirmId(null)}
+                                    className="font-semibold text-[rgba(34,34,34,0.5)]"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              ) : (
                                 <button
-                                  onClick={() => setReleaseModalOpen(true)}
-                                  className="text-xs text-[rgba(34,34,34,0.28)] hover:text-rose-500 transition-colors"
+                                  onClick={() => setReleaseConfirmId(selectedClaim.id)}
+                                  className="flex items-center gap-1.5 text-[13px] font-medium transition-colors"
+                                  style={{ color: 'rgba(196,103,74,0.6)' }}
                                 >
-                                  Release offer
+                                  <X className="w-3.5 h-3.5" /> Release offer
                                 </button>
                               );
                             } else if (releaseStatus.reason) {
                               return (
-                                <span className="text-xs text-[rgba(34,34,34,0.28)]">
+                                <span className="text-[13px] text-[rgba(34,34,34,0.28)]">
                                   {releaseStatus.reason}
                                 </span>
                               );
                             }
                             return null;
                           })()}
+                          {releaseError && (
+                            <p className="text-[13px] text-rose-600">{releaseError}</p>
+                          )}
                         </div>
                       </div>
                         );
@@ -1090,96 +1151,219 @@ export default function CreatorApp() {
             </>
           )}
 
-          {/* -- HISTORY -- */}
-          {view === 'history' && (
-            <div className="p-4 space-y-3">
-              {claims.length === 0 && (
-                <div className="text-center py-16">
-                  <Clock className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-3" />
-                  <p className="text-[rgba(34,34,34,0.28)] text-sm">No claims yet. Grab an offer to get started!</p>
+          {/* -- CLAIMS (formerly History/Messages) -- */}
+          {view === 'claims' && (
+            <div className="px-[20px] pt-5">
+              <h1 className="text-[26px] font-extrabold text-[#222222] mb-5">Claims</h1>
+              {claims.length === 0 ? (
+                <div className="text-center py-20">
+                  <Zap className="w-12 h-12 text-[rgba(34,34,34,0.28)] mx-auto mb-4" />
+                  <p className="text-[16px] font-semibold text-[#222222]">No claims yet</p>
+                  <p className="text-[14px] text-[rgba(34,34,34,0.5)] mt-1">Claim an offer to get started</p>
+                </div>
+              ) : (
+                <div className="space-y-[14px]">
+                  {claims.map((claim) => (
+                    <button
+                      key={claim.id}
+                      onClick={() => {
+                        if (claim.status === 'active' || (claim.status === 'redeemed' && !claim.reel_url)) {
+                          setSelectedClaim(claim);
+                          setView('active');
+                        }
+                      }}
+                      className="w-full bg-white rounded-[20px] p-[16px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] text-left"
+                    >
+                      <div className="flex items-start gap-3">
+                        {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 36)}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="font-semibold text-[15px] text-[#222222]">{claim.businesses.name}</h3>
+                              <p className="text-[13px] text-[rgba(34,34,34,0.5)] mt-0.5">{claim.businesses.category}</p>
+                              <p className="text-[13px] text-[rgba(34,34,34,0.5)] mt-0.5 leading-[1.4]" style={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical',
+                                overflow: 'hidden',
+                                wordBreak: 'break-word'
+                              }}>{claim.offers.description}</p>
+                            </div>
+                            <StatusPill status={claim.status} />
+                          </div>
+                          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[rgba(34,34,34,0.1)]">
+                            <span className="text-[13px] text-[rgba(34,34,34,0.28)]">
+                              {formatDate(claim.claimed_at)}
+                            </span>
+                            {claim.reel_url && (
+                              <a
+                                href={claim.reel_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="flex items-center gap-1 text-[13px] font-semibold text-[#C4674A] hover:underline"
+                              >
+                                View Reel <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </button>
+                  ))}
                 </div>
               )}
-              {claims.map((claim) => (
-                <div key={claim.id} className="bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
-                  <div className="flex items-start gap-3">
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center text-[rgba(255,255,255,0.9)] text-[14px] font-bold flex-shrink-0" style={{ background: 'linear-gradient(135deg, #2C3A2A, #1A3C34)' }}>
-                      {claim.businesses.name.charAt(0)}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="min-w-0 flex-1">
-                          <h3 className="font-semibold text-[13px] text-[#222222]">{claim.businesses.name}</h3>
-                          <p className="text-xs text-[rgba(34,34,34,0.5)] mt-0.5 leading-[1.4]" style={{
-                            display: '-webkit-box',
-                            WebkitLineClamp: 2,
-                            WebkitBoxOrient: 'vertical',
-                            overflow: 'hidden',
-                            wordBreak: 'break-word'
-                          }}>{claim.offers.description}</p>
-                        </div>
-                        <StatusPill status={claim.status} />
-                      </div>
-                      <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[rgba(34,34,34,0.1)]">
-                        <span className="text-[11px] text-[rgba(34,34,34,0.28)]">
-                          {new Date(claim.claimed_at).toLocaleDateString()}
-                        </span>
-                        {claim.reel_url && (
-                          <a
-                            href={claim.reel_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-[11px] font-semibold text-[#C4674A] hover:underline"
-                          >
-                            View Reel <ExternalLink className="w-3 h-3" />
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
             </div>
           )}
 
-          {/* -- NOTIFICATIONS -- */}
-          {view === 'notifications' && (
-            <div className="p-4 space-y-3">
-              {/* Sign out button in profile/notifications view */}
-              <div className="flex justify-end mb-2">
-                <button
-                  onClick={signOut}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold text-[rgba(34,34,34,0.5)] bg-[#F7F7F7] hover:bg-[rgba(34,34,34,0.1)] transition-colors"
-                >
-                  <LogOut className="w-3 h-3" /> Sign out
-                </button>
-              </div>
-              {notifications.length === 0 && (
-                <div className="text-center py-16">
-                  <Bell className="w-8 h-8 text-[rgba(34,34,34,0.28)] mx-auto mb-3" />
-                  <p className="text-[rgba(34,34,34,0.28)] text-sm">No notifications yet</p>
-                </div>
-              )}
-              {notifications.map((notif) => (
-                <button
-                  key={notif.id}
-                  onClick={() => !notif.read && markNotificationRead(notif.id)}
-                  className={`w-full text-left bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] transition-all ${
-                    notif.read
-                      ? 'opacity-50'
-                      : ''
-                  }`}
-                >
-                  <div className="flex items-start gap-3">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[#C4674A]'}`} />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm text-[#222222]">{notif.message}</p>
-                      <p className="text-[11px] text-[rgba(34,34,34,0.28)] mt-1">
-                        {new Date(notif.created_at).toLocaleDateString()}
+          {/* -- PROFILE -- */}
+          {view === 'profile' && (
+            <div className="px-[20px] pt-8">
+              {profileSubView === 'main' ? (
+                <>
+                  {/* Avatar */}
+                  <div className="flex flex-col items-center mb-6">
+                    <div className="relative mb-3">
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                      />
+                      {uploadingAvatar ? (
+                        <div className="w-[88px] h-[88px] rounded-full bg-[#F7F7F7] flex items-center justify-center">
+                          <div className="w-6 h-6 border-2 border-[#C4674A] border-t-transparent rounded-full animate-spin" />
+                        </div>
+                      ) : avatarUrl ? (
+                        <button onClick={() => avatarInputRef.current?.click()}>
+                          <img src={avatarUrl} alt="Avatar" className="w-[88px] h-[88px] rounded-full object-cover" />
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => avatarInputRef.current?.click()}
+                          className="w-[88px] h-[88px] rounded-full flex items-center justify-center"
+                          style={{ background: getCategoryGradient(null) }}
+                        >
+                          <span className="text-white text-[32px] font-extrabold">{getInitials(userProfile.name)}</span>
+                        </button>
+                      )}
+                      <button
+                        onClick={() => avatarInputRef.current?.click()}
+                        className="absolute bottom-0 right-0 w-[24px] h-[24px] rounded-full bg-[#C4674A] flex items-center justify-center"
+                      >
+                        <Camera className="w-[12px] h-[12px] text-white" />
+                      </button>
+                    </div>
+                    {uploadError && <p className="text-[13px] text-rose-600 mb-2">{uploadError}</p>}
+                    <h2 className="text-[20px] font-extrabold text-[#222222]">{userProfile.name}</h2>
+                    <button onClick={copyCode} className="flex items-center gap-1.5 mt-1 text-[13px] font-semibold text-[rgba(34,34,34,0.5)]">
+                      {userProfile.code}
+                      {copiedCode ? (
+                        <span className="text-[#C4674A] text-[12px]">Copied!</span>
+                      ) : (
+                        <Copy className="w-3.5 h-3.5" />
+                      )}
+                    </button>
+                    {userProfile.instagram_handle && (
+                      <p className="flex items-center gap-1 mt-1 text-[13px] text-[rgba(34,34,34,0.5)]">
+                        <Instagram className="w-3.5 h-3.5" /> {userProfile.instagram_handle}
                       </p>
+                    )}
+                  </div>
+
+                  {/* Stats row */}
+                  <div className="flex items-center justify-center gap-0 mb-8 bg-[#F7F7F7] rounded-2xl p-4">
+                    <div className="flex-1 text-center">
+                      <p className="text-[20px] font-extrabold text-[#222222]">{claims.length}</p>
+                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Claimed</p>
+                    </div>
+                    <div className="w-[1px] h-8 bg-[rgba(34,34,34,0.1)]" />
+                    <div className="flex-1 text-center">
+                      <p className="text-[20px] font-extrabold text-[#222222]">{collabsCompleted}</p>
+                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Posted</p>
+                    </div>
+                    <div className="w-[1px] h-8 bg-[rgba(34,34,34,0.1)]" />
+                    <div className="flex-1 text-center">
+                      <p className="text-[20px] font-extrabold text-[#222222]">&mdash;</p>
+                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Rating</p>
                     </div>
                   </div>
-                </button>
-              ))}
+
+                  {/* Settings list */}
+                  <div className="space-y-0 bg-white rounded-2xl border border-[rgba(34,34,34,0.1)] overflow-hidden">
+                    <button className="w-full flex items-center justify-between px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors">
+                      <div className="flex items-center gap-3">
+                        <User className="w-5 h-5 text-[rgba(34,34,34,0.5)]" />
+                        <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-[rgba(34,34,34,0.28)]" />
+                    </button>
+                    <div className="h-[1px] bg-[rgba(34,34,34,0.06)] mx-4" />
+                    <button
+                      onClick={() => setProfileSubView('alerts')}
+                      className="w-full flex items-center justify-between px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Bell className="w-5 h-5 text-[rgba(34,34,34,0.5)]" />
+                        <span className="text-[15px] font-semibold text-[#222222]">Notifications</span>
+                        {unreadCount > 0 && (
+                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#C4674A] text-white text-[11px] font-bold flex items-center justify-center">
+                            {unreadCount}
+                          </span>
+                        )}
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-[rgba(34,34,34,0.28)]" />
+                    </button>
+                    <div className="h-[1px] bg-[rgba(34,34,34,0.06)] mx-4" />
+                    <button
+                      onClick={signOut}
+                      className="w-full flex items-center gap-3 px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors"
+                    >
+                      <LogOut className="w-5 h-5 text-[#C4674A]" />
+                      <span className="text-[15px] font-semibold text-[#C4674A]">Sign out</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* Alerts/Notifications sub-view */
+                <>
+                  <div className="flex items-center gap-3 mb-5">
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-xl transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    </button>
+                    <h1 className="text-[26px] font-extrabold text-[#222222]">Notifications</h1>
+                  </div>
+                  {notifications.length === 0 ? (
+                    <div className="text-center py-16">
+                      <Bell className="w-12 h-12 text-[rgba(34,34,34,0.28)] mx-auto mb-4" />
+                      <p className="text-[16px] font-semibold text-[#222222]">No notifications yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {notifications.map((notif) => (
+                        <button
+                          key={notif.id}
+                          onClick={() => !notif.read && markNotificationRead(notif.id)}
+                          className={`w-full text-left bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] transition-all ${
+                            notif.read ? 'opacity-50' : ''
+                          }`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[#C4674A]'}`} />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[15px] text-[#222222]">{notif.message}</p>
+                              <p className="text-[13px] text-[rgba(34,34,34,0.28)] mt-1">
+                                {formatDate(notif.created_at)}
+                              </p>
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
         </div>
@@ -1191,8 +1375,8 @@ export default function CreatorApp() {
           {tabs.map(tab => (
             <button
               key={tab.key}
-              onClick={() => setView(tab.key)}
-              className={`flex-1 flex flex-col items-center gap-1 text-[10px] font-semibold transition-all relative ${
+              onClick={() => { setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
+              className={`flex-1 flex flex-col items-center gap-1 text-[11px] font-semibold transition-all relative min-h-[44px] ${
                 view === tab.key ? 'text-[#C4674A]' : 'text-[rgba(34,34,34,0.28)]'
               }`}
             >
@@ -1200,11 +1384,15 @@ export default function CreatorApp() {
                 {tab.icon ? (
                   <tab.icon className="w-[22px] h-[22px]" />
                 ) : (
-                  <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold ${
-                    view === tab.key ? 'bg-[#C4674A] text-white' : 'bg-[rgba(34,34,34,0.1)] text-[rgba(34,34,34,0.5)]'
-                  }`}>
-                    {userProfile.name?.charAt(0)?.toUpperCase() || '?'}
-                  </div>
+                  avatarUrl ? (
+                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${view === tab.key ? 'ring-1.5 ring-[#C4674A]' : ''}`} />
+                  ) : (
+                    <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[10px] font-bold ${
+                      view === tab.key ? 'bg-[#C4674A] text-white' : 'bg-[rgba(34,34,34,0.1)] text-[rgba(34,34,34,0.5)]'
+                    }`}>
+                      {userProfile.name?.charAt(0)?.toUpperCase() || '?'}
+                    </div>
+                  )
                 )}
                 {tab.badge ? (
                   <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[9px] font-bold flex items-center justify-center ${

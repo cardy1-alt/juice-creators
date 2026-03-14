@@ -13,6 +13,7 @@ export type Database = {
           address: string | null;
           bio: string | null;
           approved: boolean;
+          logo_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -26,6 +27,7 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          logo_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -39,6 +41,7 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          logo_url?: string | null;
           created_at?: string;
         };
       };
@@ -78,6 +81,7 @@ export type Database = {
           email: string;
           approved: boolean;
           onboarding_complete: boolean;
+          avatar_url: string | null;
           created_at: string;
         };
         Insert: {
@@ -89,6 +93,7 @@ export type Database = {
           email: string;
           approved?: boolean;
           onboarding_complete?: boolean;
+          avatar_url?: string | null;
           created_at?: string;
         };
         Update: {
@@ -100,6 +105,7 @@ export type Database = {
           email?: string;
           approved?: boolean;
           onboarding_complete?: boolean;
+          avatar_url?: string | null;
           created_at?: string;
         };
       };

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { RefreshCw, Shield } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
 
 interface QRCodeDisplayProps {
   token: string;
@@ -13,9 +13,6 @@ function generateSecureToken(): string {
 }
 
 // ─── Minimal QR Code encoder (Model 2, byte mode, ECC-L) ─────────────────
-// Produces a valid, scannable QR code as a Canvas data URL.
-// Supports up to ~154 bytes at version 6 with low ECC.
-
 function generateQRDataUrl(text: string, size: number = 280): string {
   const canvas = document.createElement('canvas');
   canvas.width = size;
@@ -91,8 +88,6 @@ function rsEncode(data: number[], nsym: number): number[] {
   return res.slice(data.length);
 }
 
-// Version info: [version, size, dataCodewords, eccCodewords, numBlocks]
-// Using ECC level L for maximum data capacity
 const VERSION_TABLE: [number, number, number, number, number][] = [
   [1, 21, 19, 7, 1],
   [2, 25, 34, 10, 1],
@@ -110,10 +105,8 @@ function encodeQR(text: string): boolean[][] {
   const bytes = new TextEncoder().encode(text);
   const len = bytes.length;
 
-  // Pick smallest version that fits
   let ver = 1, qrSize = 21, totalData = 19, eccPerBlock = 7, numBlocks = 1;
   for (const [v, s, d, e, b] of VERSION_TABLE) {
-    // Byte mode overhead: 4 (mode) + 8 or 16 (length) bits
     const lengthBits = v >= 10 ? 16 : 8;
     const overhead = Math.ceil((4 + lengthBits) / 8);
     if (len + overhead <= d) {
@@ -122,35 +115,30 @@ function encodeQR(text: string): boolean[][] {
     }
   }
 
-  // Build data stream
   const lengthBits = ver >= 10 ? 16 : 8;
   const bits: number[] = [];
   const pushBits = (val: number, count: number) => {
     for (let i = count - 1; i >= 0; i--) bits.push((val >> i) & 1);
   };
 
-  pushBits(0b0100, 4); // Byte mode indicator
+  pushBits(0b0100, 4);
   pushBits(len, lengthBits);
   for (const b of bytes) pushBits(b, 8);
-  pushBits(0, 4); // Terminator (up to 4 bits)
+  pushBits(0, 4);
 
-  // Pad to byte boundary
   while (bits.length % 8 !== 0) bits.push(0);
 
-  // Convert to bytes
   const dataBytes: number[] = [];
   for (let i = 0; i < bits.length; i += 8) {
     dataBytes.push(bits.slice(i, i + 8).reduce((a, b) => (a << 1) | b, 0));
   }
 
-  // Pad with alternating 0xec, 0x11
   let padIdx = 0;
   while (dataBytes.length < totalData) {
     dataBytes.push(padIdx % 2 === 0 ? 0xec : 0x11);
     padIdx++;
   }
 
-  // Split into blocks and compute ECC
   const dataPerBlock = Math.floor(totalData / numBlocks);
   const extraBlocks = totalData % numBlocks;
   const allData: number[][] = [];
@@ -164,7 +152,6 @@ function encodeQR(text: string): boolean[][] {
     allEcc.push(rsEncode(blockData, eccPerBlock));
   }
 
-  // Interleave data and ECC
   const interleaved: number[] = [];
   const maxDataLen = Math.max(...allData.map(d => d.length));
   for (let i = 0; i < maxDataLen; i++) {
@@ -178,11 +165,9 @@ function encodeQR(text: string): boolean[][] {
     }
   }
 
-  // Create module grid
   const grid: (boolean | null)[][] = Array.from({ length: qrSize }, () => Array(qrSize).fill(null));
   const reserved: boolean[][] = Array.from({ length: qrSize }, () => Array(qrSize).fill(false));
 
-  // Place finder patterns
   const placeFinder = (row: number, col: number) => {
     for (let r = -1; r <= 7; r++) {
       for (let c = -1; c <= 7; c++) {
@@ -200,7 +185,6 @@ function encodeQR(text: string): boolean[][] {
   placeFinder(0, qrSize - 7);
   placeFinder(qrSize - 7, 0);
 
-  // Place alignment patterns (version >= 2)
   if (ver >= 2) {
     const positions = getAlignmentPositions(ver, qrSize);
     for (const r of positions) {
@@ -217,7 +201,6 @@ function encodeQR(text: string): boolean[][] {
     }
   }
 
-  // Place timing patterns
   for (let i = 8; i < qrSize - 8; i++) {
     grid[6][i] = i % 2 === 0;
     reserved[6][i] = true;
@@ -225,11 +208,9 @@ function encodeQR(text: string): boolean[][] {
     reserved[i][6] = true;
   }
 
-  // Dark module
   grid[qrSize - 8][8] = true;
   reserved[qrSize - 8][8] = true;
 
-  // Reserve format info areas
   for (let i = 0; i < 8; i++) {
     reserved[8][i] = true;
     reserved[8][qrSize - 1 - i] = true;
@@ -238,7 +219,6 @@ function encodeQR(text: string): boolean[][] {
   }
   reserved[8][8] = true;
 
-  // Reserve version info (version >= 7)
   if (ver >= 7) {
     for (let i = 0; i < 6; i++) {
       for (let j = 0; j < 3; j++) {
@@ -248,7 +228,6 @@ function encodeQR(text: string): boolean[][] {
     }
   }
 
-  // Place data bits
   const dataBits: number[] = [];
   for (const byte of interleaved) {
     for (let i = 7; i >= 0; i--) dataBits.push((byte >> i) & 1);
@@ -257,7 +236,7 @@ function encodeQR(text: string): boolean[][] {
   let bitIdx = 0;
   let upward = true;
   for (let right = qrSize - 1; right >= 0; right -= 2) {
-    if (right === 6) right = 5; // Skip timing column
+    if (right === 6) right = 5;
     const rows = upward ? Array.from({ length: qrSize }, (_, i) => qrSize - 1 - i) : Array.from({ length: qrSize }, (_, i) => i);
     for (const row of rows) {
       for (const col of [right, right - 1]) {
@@ -270,7 +249,6 @@ function encodeQR(text: string): boolean[][] {
     upward = !upward;
   }
 
-  // Apply mask pattern 0 (checkerboard: (r+c) % 2 === 0)
   for (let r = 0; r < qrSize; r++) {
     for (let c = 0; c < qrSize; c++) {
       if (!reserved[r][c]) {
@@ -279,13 +257,9 @@ function encodeQR(text: string): boolean[][] {
     }
   }
 
-  // Place format info (ECC level L = 01, mask 0 = 000 → 01000)
-  // Pre-computed format bits for L/mask0: 111011111000100
   const formatBits = [1, 1, 1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 0];
-  // Horizontal (row 8)
   const hPositions = [0, 1, 2, 3, 4, 5, 7, 8, qrSize - 8, qrSize - 7, qrSize - 6, qrSize - 5, qrSize - 4, qrSize - 3, qrSize - 2];
   for (let i = 0; i < 15; i++) grid[8][hPositions[i]] = formatBits[i] === 1;
-  // Vertical (col 8)
   const vPositions = [0, 1, 2, 3, 4, 5, 7, 8, qrSize - 7, qrSize - 6, qrSize - 5, qrSize - 4, qrSize - 3, qrSize - 2, qrSize - 1];
   for (let i = 0; i < 15; i++) grid[vPositions[14 - i]][8] = formatBits[i] === 1;
 
@@ -354,20 +328,20 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
   return (
     <div className="text-center">
-      {/* QR code */}
-      <div className="inline-block bg-[#F7F7F7] p-5 rounded-[16px]">
+      {/* QR code — 240px */}
+      <div className="inline-block bg-[#F7F7F7] p-6 rounded-[16px]">
         <img
           src={qrDataUrl}
           alt="QR Code"
-          className="w-[130px] h-[130px] mx-auto rounded-[12px]"
+          className="mx-auto rounded-[12px]"
+          style={{ width: '240px', height: '240px' }}
         />
       </div>
 
-      {/* Creator code badge */}
-      <div className="mt-4">
+      {/* Creator code badge — no shield icon */}
+      <div className="mt-3">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white border border-[rgba(34,34,34,0.1)]">
-          <Shield className="w-4 h-4 text-[#222222]" />
-          <span className="font-mono font-bold text-[13px] tracking-[0.5px] text-[#222222]">
+          <span className="font-mono font-bold text-[14px] tracking-[0.5px] text-[#222222]">
             {creatorCode}
           </span>
         </div>
@@ -378,7 +352,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
         <div className="flex items-center justify-between mb-1.5">
           <div className="flex items-center gap-1.5">
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[#C4674A]' : 'text-[rgba(34,34,34,0.28)]'}`} />
-            <span className={`text-[10px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(34,34,34,0.28)]'}`}>
+            <span className={`text-[12px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[rgba(34,34,34,0.28)]'}`}>
               Refreshes in {timeLeft}s
             </span>
           </div>
