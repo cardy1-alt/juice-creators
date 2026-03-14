@@ -61,7 +61,7 @@ VALUES
     'Specialty coffee & brunch spot in the heart of town.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/coffee-latte/400/400'
   ),
   (
     'b2222222-2222-2222-2222-222222222222',
@@ -75,7 +75,7 @@ VALUES
     'Facials, lashes & nails — your local glow-up destination.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/beauty-spa/400/400'
   ),
   (
     'b3333333-3333-3333-3333-333333333333',
@@ -89,7 +89,7 @@ VALUES
     'Plant-forward kitchen serving seasonal bowls, juices & smoothies.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/restaurant-food/400/400'
   ),
   (
     'b4444444-4444-4444-4444-444444444444',
@@ -103,7 +103,7 @@ VALUES
     'Boutique strength & conditioning gym with personal training.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/fitness-gym/400/400'
   ),
   (
     'b5555555-5555-5555-5555-555555555555',
@@ -117,7 +117,7 @@ VALUES
     'Independent clothing & lifestyle store. Curated everyday essentials.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/clothing-store/400/400'
   ),
   (
     'b6666666-6666-6666-6666-666666666666',
@@ -131,7 +131,7 @@ VALUES
     'Pet grooming, daycare & boutique treats for your furry friends.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1601758228041-f3b2795255f1?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/cute-pets/400/400'
   ),
   (
     'b7777777-7777-7777-7777-777777777777',
@@ -145,7 +145,7 @@ VALUES
     'Art studio offering workshops, exhibitions & creative events.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop'
+    'https://picsum.photos/seed/art-studio/400/400'
   )
 ON CONFLICT (id) DO UPDATE SET logo_url = EXCLUDED.logo_url;
 
