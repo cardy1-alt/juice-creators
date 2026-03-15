@@ -246,7 +246,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Now we have an authenticated session — INSERT the profile row
       if (role === 'creator') {
         console.log('[AuthContext] Inserting creator profile for:', data.user.id);
-        const insertPayload = {
+        const insertPayload: Record<string, any> = {
           email,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
@@ -254,6 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           code: additionalData.code,
           approved: false
         };
+        if (additionalData.dateOfBirth) insertPayload.date_of_birth = additionalData.dateOfBirth;
         console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
 
         const { error: insertError } = await supabase.from('creators').insert(insertPayload);
@@ -276,6 +277,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           instagram_handle: additionalData.instagramHandle,
           follower_count: additionalData.followerCount || null,
           code: additionalData.code,
+          date_of_birth: additionalData.dateOfBirth || null,
           approved: false,
           onboarding_complete: false
         });

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { Building2, Eye, EyeOff, MapPin, Sparkles, Check, ArrowLeft, ArrowRight, Mail, Lock, User, Instagram, Users, ChevronRight } from 'lucide-react';
+import { Building2, Eye, EyeOff, MapPin, Sparkles, Check, ArrowLeft, ArrowRight, Mail, Lock, User, Instagram, Users, ChevronRight, Cake } from 'lucide-react';
 import { CATEGORY_ICONS, CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -140,6 +140,7 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [followerCount, setFollowerCount] = useState('Under 1k');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [category, setCategory] = useState(CATEGORY_LIST[0]);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -194,7 +195,7 @@ export default function Auth() {
         await signIn(email, password);
       } else {
         const additionalData = role === 'creator'
-          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name) }
+          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null }
           : { name, slug: generateSlug(name), category, address: address || null, latitude, longitude, bio: bio || null };
         await signUp(email, password, role, additionalData);
       }
@@ -424,6 +425,26 @@ export default function Auth() {
                       </button>
                     ))}
                   </div>
+                </div>
+
+                {/* Date of birth */}
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Date of Birth</label>
+                  <div className={`relative rounded-[14px] border transition-all duration-200 ${
+                    dateOfBirth ? 'border-[var(--faint)] bg-[#F7F7F7]' : 'border-[var(--faint)] bg-[#F7F7F7]'
+                  } focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
+                    <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
+                    <input
+                      type="date"
+                      value={dateOfBirth}
+                      onChange={(e) => setDateOfBirth(e.target.value)}
+                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                      className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
+                      style={{ colorScheme: 'light' }}
+                      required
+                    />
+                  </div>
+                  <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
                 </div>
 
                 <div className="pt-[4px]" />
