@@ -7,7 +7,7 @@ import {
   CheckCircle2, XCircle, VideoOff, Flag,
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
-  Check
+  Check, Lightbulb, ArrowRight, X
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -53,6 +53,10 @@ const livePulseStyle = `
   0%, 100% { opacity: 1; transform: scale(1); }
   50% { opacity: 0.5; transform: scale(0.75); }
 }
+@keyframes tipFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 `;
 
 // ─── Offer Builder placeholder map ────────────────────────────────────────
@@ -74,6 +78,32 @@ function getCategoryPlaceholder(category: string | undefined | null, type: strin
 // Keep backward-compatible alias
 function getOfferPlaceholder(category: string | undefined | null, offerType: string): string {
   return getCategoryPlaceholder(category, offerType);
+}
+
+// ─── Scarcity colour shift helper ─────────────────────────────────────────
+function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
+  if (slotsLeft === 0) {
+    return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
+  }
+  if (slotsLeft === 1) {
+    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: 'Last slot' };
+  }
+  if (slotsLeft <= 2) {
+    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: `${slotsLeft} left` };
+  }
+  return { background: '#F5C4A0', color: '#222222', text: `${slotsLeft} left` };
+}
+
+// ─── Offer quality indicator ──────────────────────────────────────────────
+function getOfferQuality(offerItem: string, specificAsk: string | null) {
+  let score = 0;
+  if (offerItem && offerItem.length > 15) score += 1;
+  if (offerItem && offerItem.includes('+')) score += 1;
+  if (offerItem && offerItem !== 'your choice') score += 1;
+  if (specificAsk && specificAsk.length > 10) score += 2;
+  if (score >= 4) return 'excellent';
+  if (score >= 2) return 'great';
+  return 'good';
 }
 
 function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
@@ -218,6 +248,9 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [showSuccess, setShowSuccess] = useState(false);
   const [discountAmount, setDiscountAmount] = useState('20');
   const [discountUnit, setDiscountUnit] = useState<'%' | '£'>('%');
+  const [showTip, setShowTip] = useState(false);
+  const [tipDismissed, setTipDismissed] = useState(false);
+  const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const generatedTitle = offerType === 'discount'
     ? (discountUnit === '%' ? `${discountAmount}% off` : `£${discountAmount} off`)
@@ -341,7 +374,13 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               <input
                 type="text"
                 value={offerItem}
-                onChange={e => setOfferItem(e.target.value.slice(0, 60))}
+                onChange={e => {
+                  setOfferItem(e.target.value.slice(0, 60));
+                  if (!tipDismissed && !showTip) {
+                    if (tipTimerRef.current) clearTimeout(tipTimerRef.current);
+                    tipTimerRef.current = setTimeout(() => setShowTip(true), 2000);
+                  }
+                }}
                 placeholder={getCategoryPlaceholder(category, offerType)}
                 className="flex-1 text-[22px] font-extrabold text-[#222222] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
                 autoFocus
@@ -352,6 +391,34 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[13px] text-[var(--mid)]">
               Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(category, offerType)}</span>
             </p>
+
+            {/* Inline tip card */}
+            {showTip && !tipDismissed && (
+              <div
+                className="relative mt-5 flex gap-[10px] items-start"
+                style={{
+                  background: 'rgba(196,103,74,0.05)',
+                  border: '1px solid rgba(196,103,74,0.12)',
+                  borderRadius: '14px',
+                  padding: '12px 14px',
+                  animation: 'tipFadeIn 300ms ease forwards',
+                }}
+              >
+                <Lightbulb className="w-4 h-4 text-[var(--terra)] flex-shrink-0 mt-[1px]" />
+                <div className="flex-1">
+                  <p className="text-[13px] font-bold text-[#222222]">Specific offers get claimed faster</p>
+                  <p className="text-[12px] text-[var(--mid)] mt-[3px]" style={{ lineHeight: '1.6' }}>
+                    Try 'coffee + almond croissant' instead of just 'coffee' — detail builds excitement and sets clear expectations.
+                  </p>
+                </div>
+                <button
+                  onClick={() => { setTipDismissed(true); setShowTip(false); }}
+                  className="flex-shrink-0 p-1"
+                >
+                  <X className="w-3 h-3 text-[var(--soft)]" />
+                </button>
+              </div>
+            )}
 
             <button
               onClick={() => setScreen(3)}
@@ -545,6 +612,41 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 )}
               </div>
             </div>
+
+            {/* Offer quality indicator */}
+            {(() => {
+              const quality = getOfferQuality(offerItem, specificAsk.trim() || null);
+              const dots = quality === 'excellent' ? 3 : quality === 'great' ? 2 : 1;
+              return (
+                <div className="mb-4">
+                  <div className="flex items-center justify-between rounded-[12px] px-4 py-3" style={{ background: 'var(--bg)' }}>
+                    <span className="text-[12px] font-semibold text-[var(--mid)]">Offer quality</span>
+                    <div className="flex gap-[5px]">
+                      {[1, 2, 3].map(i => (
+                        <span
+                          key={i}
+                          className="w-2 h-2 rounded-full"
+                          style={{ background: i <= dots ? '#C4674A' : 'rgba(34,34,34,0.12)' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-[12px] mt-1.5" style={{ color: quality === 'excellent' ? 'var(--forest)' : 'var(--mid)' }}>
+                    {quality === 'good' && 'Good start. Adding a specific ask can double your reel quality.'}
+                    {quality === 'great' && 'Great offer. Creators will find this clear and compelling.'}
+                    {quality === 'excellent' && 'Excellent. This offer is specific, clear and ready to perform.'}
+                  </p>
+                  {quality === 'good' && (
+                    <button
+                      onClick={() => setScreen(4)}
+                      className="flex items-center gap-1 mt-1 text-[12px] font-semibold text-[var(--terra)]"
+                    >
+                      Add a specific ask <ArrowRight className="w-[11px] h-[11px]" />
+                    </button>
+                  )}
+                </div>
+              );
+            })()}
 
             <button
               onClick={() => setScreen(1)}
@@ -1098,11 +1200,10 @@ export default function BusinessPortal() {
                         <div className="flex items-center justify-between">
                           {isUnlimited ? (
                             <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold bg-[var(--peach)] text-[#222222]">Open</span>
-                          ) : slotsLeft === 0 ? (
-                            <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold bg-[var(--bg)] text-[var(--soft)]">Full</span>
-                          ) : (
-                            <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold bg-[var(--peach)] text-[#222222]">{slotsLeft} left</span>
-                          )}
+                          ) : (() => {
+                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
+                            return <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold" style={{ background: badge.background, color: badge.color }}>{badge.text}</span>;
+                          })()}
                           <button
                             onClick={() => handleToggleOffer(offer.id, offer.is_live)}
                             className={`px-[18px] py-[8px] rounded-[50px] font-semibold text-[13px] transition-all min-h-[36px] ${
