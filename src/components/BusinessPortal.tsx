@@ -1376,73 +1376,53 @@ export default function BusinessPortal() {
                     <p className="text-[14px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
                   </div>
                 ) : (
-                  <div className="flex gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                    {recentActivity.map(claim => (
-                      <div
-                        key={claim.id}
-                        className="w-[200px] flex-shrink-0 bg-white rounded-[16px] border border-[var(--faint)] overflow-hidden"
-                      >
-                        {/* Creator header */}
-                        <div className="p-[14px] pb-[10px]">
-                          <div className="flex items-center gap-[10px]">
+                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    {recentActivity.map(claim => {
+                      const statusLabel = claim.status === 'active' ? 'Active' :
+                        claim.status === 'redeemed' ? 'Visited' :
+                        claim.status === 'reel_due' ? 'Reel due' :
+                        claim.status === 'completed' ? 'Completed' : claim.status;
+                      const statusStyle = claim.status === 'active' ? 'bg-[rgba(196,103,74,0.85)] text-white' :
+                        claim.status === 'redeemed' ? 'bg-[rgba(26,60,52,0.85)] text-white' :
+                        claim.status === 'reel_due' ? 'bg-[var(--peach)] text-[#222222]' :
+                        'bg-[rgba(26,60,52,0.85)] text-white';
+                      const activityText = claim.status === 'completed' ? 'Posted a reel' :
+                        claim.status === 'reel_due' ? 'Reel due' :
+                        claim.status === 'redeemed' ? 'Visited' : 'Claimed offer';
+                      return (
+                        <div key={claim.id} className="w-[140px] flex-shrink-0 text-left">
+                          {/* Full image card */}
+                          <div className="relative w-[140px] h-[180px] rounded-[14px] overflow-hidden">
                             {claim.creators.avatar_url ? (
                               <img
                                 src={claim.creators.avatar_url}
                                 alt={claim.creators.name}
-                                className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0"
+                                className="w-full h-full object-cover"
                               />
                             ) : (
                               <div
-                                className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0"
+                                className="w-full h-full flex items-center justify-center text-white font-bold text-[28px]"
                                 style={{ background: getCategoryGradient(userProfile.category) }}
                               >
                                 {getInitials(claim.creators.name)}
                               </div>
                             )}
-                            <div className="min-w-0">
-                              <p className="text-[13px] font-bold text-[#222222] truncate">{claim.creators.name}</p>
-                              <p className="text-[11px] text-[var(--soft)]">{claim.creators.instagram_handle}</p>
+                            {/* Status badge top-right */}
+                            <span className={`absolute top-[8px] right-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold ${statusStyle}`}>
+                              {statusLabel}
+                            </span>
+                            {/* Activity + time bottom overlay */}
+                            <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[10px] pt-[30px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }}>
+                              <p className="text-[11px] font-semibold text-white leading-[1.3]">{activityText}</p>
+                              <p className="text-[10px] text-white/70 mt-[2px]">{timeAgo(claim.claimed_at)}</p>
                             </div>
                           </div>
+                          {/* Below image info */}
+                          <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{claim.creators.name}</p>
+                          <p className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</p>
                         </div>
-                        {/* Activity content */}
-                        <div className="px-[14px] pb-[14px]">
-                          <p className="text-[12px] text-[var(--mid)] leading-[1.4]">
-                            {claim.status === 'completed' ? 'Posted a reel for' :
-                             claim.status === 'reel_due' ? 'Reel due for' :
-                             claim.status === 'redeemed' ? 'Visited for' :
-                             'Claimed'}{' '}
-                            <span className="font-semibold text-[#222222]">{claim.offers?.generated_title || claim.offers?.description?.slice(0, 30) || 'your offer'}</span>
-                          </p>
-                          <div className="flex items-center justify-between mt-[10px]">
-                            <span className="text-[11px] text-[var(--soft)]">{timeAgo(claim.claimed_at)}</span>
-                            {claim.reel_url ? (
-                              <a
-                                href={claim.reel_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--terra)]"
-                              >
-                                <Video className="w-[11px] h-[11px]" />
-                                View reel
-                              </a>
-                            ) : (
-                              <span className={`text-[10px] font-semibold px-[7px] py-[2px] rounded-full ${
-                                claim.status === 'active' ? 'bg-[rgba(196,103,74,0.1)] text-[var(--terra)]' :
-                                claim.status === 'redeemed' ? 'bg-[rgba(26,60,52,0.08)] text-[var(--forest)]' :
-                                claim.status === 'reel_due' ? 'bg-[var(--peach)] text-[#222222]' :
-                                'bg-[var(--bg)] text-[var(--soft)]'
-                              }`}>
-                                {claim.status === 'active' ? 'Active' :
-                                 claim.status === 'redeemed' ? 'Visited' :
-                                 claim.status === 'reel_due' ? 'Reel due' : claim.status}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
