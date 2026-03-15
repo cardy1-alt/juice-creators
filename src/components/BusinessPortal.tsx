@@ -2076,7 +2076,7 @@ export default function BusinessPortal() {
 
           {/* ═══ PROFILE ═══ */}
           {view === 'profile' && (
-            <div className="px-[20px] pt-8">
+            <div className="pt-4">
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
