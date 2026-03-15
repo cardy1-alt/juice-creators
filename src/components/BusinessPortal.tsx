@@ -7,12 +7,13 @@ import {
   CheckCircle2, XCircle, VideoOff, Flag,
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
-  Check, Lightbulb, ArrowRight, X
+  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
+import { uploadAvatar } from '../lib/upload';
 import { Logo } from './Logo';
 
 interface Offer {
@@ -27,6 +28,7 @@ interface Offer {
   content_type?: string | null;
   specific_ask?: string | null;
   generated_title?: string | null;
+  offer_photo_url?: string | null;
 }
 
 interface ClaimWithDetails {
@@ -78,6 +80,70 @@ function getCategoryPlaceholder(category: string | undefined | null, type: strin
 // Keep backward-compatible alias
 function getOfferPlaceholder(category: string | undefined | null, offerType: string): string {
   return getCategoryPlaceholder(category, offerType);
+}
+
+// ─── Category-aware Screen 2 tip ──────────────────────────────────────────
+function getScreen2Tip(category: string | undefined | null, offerType: string): { title: string; body: string } {
+  const tips: Record<string, Record<string, { title: string; body: string }>> = {
+    'Cafe & Coffee': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"flat white + almond croissant\" instead of \"free coffee\" \u2014 detail builds excitement." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"barista masterclass for two\" instead of \"coffee experience\" \u2014 specificity converts." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"seasonal tasting flight\" instead of \"coffee tasting\" \u2014 unique experiences stand out." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 20\u201325% off \u2014 enough to feel meaningful without underselling your product." },
+    },
+    'Hair & Beauty': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"full-size serum of your choice\" instead of \"product\" \u2014 tangible value is more compelling." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"express facial + brow tidy\" instead of just \"facial\" \u2014 bundled services feel more generous." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"full pamper session with scalp massage\" \u2014 sensory language drives curiosity." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 20% off \u2014 beauty clients respond well to a clear percentage over a fixed amount." },
+    },
+    'Health & Fitness': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"protein shake + energy bar\" instead of \"supplement\" \u2014 concrete products feel real." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"45-min PT session + programme review\" instead of \"training session\" \u2014 show the full value." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"HIIT class + post-workout smoothie\" \u2014 pairing experience with product increases appeal." },
+      discount:   { title: 'Fixed amounts work well here', body: "Try \u00a310 or \u00a315 off a class pack \u2014 fitness clients respond well to fixed savings on recurring spend." },
+    },
+    'Retail': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"any item up to \u00a320\" instead of \"item of your choice\" \u2014 a value ceiling makes the offer feel fair." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"personal styling session \u2014 up to 1 hour\" \u2014 time-bounded services feel premium." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"private shopping event for two\" \u2014 exclusive framing drives interest." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 15\u201320% off \u2014 retail discounts work best when they feel like insider access, not a sale." },
+    },
+    'Wellness & Spa': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"full-size essential oil of your choice\" \u2014 product specificity helps creators plan their content." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"60-min deep tissue massage\" instead of \"massage\" \u2014 duration signals premium value." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"wellness consultation + guided meditation session\" \u2014 multi-part experiences create richer content." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 25% off \u2014 wellness clients appreciate meaningful discounts on higher-ticket treatments." },
+    },
+    'Arts & Entertainment': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"signed print or artwork up to \u00a330\" \u2014 a value ceiling reassures businesses while feeling generous." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"90-min private lesson\" instead of \"class\" \u2014 duration and privacy signal premium quality." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"VIP entry + one drink\" \u2014 event access plus a tangible extra creates compelling content." },
+      discount:   { title: 'Fixed amounts work well here', body: "Try \u00a310 off entry or a class pack \u2014 clear savings on creative experiences feel straightforward." },
+    },
+    'Pets': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"premium treat pack + toy\" instead of \"pet product\" \u2014 bundles feel more generous." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"full groom + bandana\" instead of \"grooming\" \u2014 the finishing touch makes it memorable." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"puppy socialisation class + treat pack\" \u2014 pet owners love experiences for their pets." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 20% off \u2014 pet owners are loyal customers and respond well to rewards for that loyalty." },
+    },
+    'Education': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"course workbook + resource pack\" instead of \"materials\" \u2014 named resources feel more tangible." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"1-hour 1:1 tutoring session\" instead of \"tutoring\" \u2014 time-bound and personal is more compelling." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"full-day workshop + certificate\" \u2014 outcome-oriented framing drives sign-ups." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 25% off \u2014 education purchases are considered, so meaningful discounts matter more." },
+    },
+    'Food & Drink': {
+      product:    { title: 'Specific offers get claimed faster', body: "Try \"starter + main course\" instead of \"meal\" \u2014 specificity builds anticipation." },
+      service:    { title: 'Specific offers get claimed faster', body: "Try \"chef\u2019s table experience for two\" \u2014 exclusive framing creates compelling content." },
+      experience: { title: 'Specific offers get claimed faster', body: "Try \"cocktail masterclass + tasting menu\" \u2014 multi-part experiences stand out." },
+      discount:   { title: 'Percentage discounts convert well', body: "Try 20% off the bill \u2014 food and drink discounts feel generous when applied to the full experience." },
+    },
+  };
+  return tips[category || '']?.[offerType] ?? {
+    title: 'Specific offers get claimed faster',
+    body: 'Add detail to your offer \u2014 the more specific you are, the more excited creators get about visiting.',
+  };
 }
 
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
@@ -232,8 +298,8 @@ interface OfferBuilderProps {
     monthly_cap: number;
     specific_ask: string | null;
     generated_title: string;
-    // content_type locked to 'reel' at launch — expand to 'story'|'post' later
     content_type: string;
+    offer_photo_url: string | null;
   }) => void;
   onCancel: () => void;
 }
@@ -251,6 +317,11 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [showTip, setShowTip] = useState(false);
   const [tipDismissed, setTipDismissed] = useState(false);
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [offerPhotoUrl, setOfferPhotoUrl] = useState<string | null>(null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoError, setPhotoError] = useState<string | null>(null);
+  const [offerId] = useState(() => crypto.randomUUID());
+  const photoInputRef = useRef<HTMLInputElement>(null);
 
   const generatedTitle = offerType === 'discount'
     ? (discountUnit === '%' ? `${discountAmount}% off` : `£${discountAmount} off`)
@@ -278,6 +349,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
       specific_ask: specificAsk.trim() || null,
       generated_title: generatedTitle,
       content_type: 'reel',
+      offer_photo_url: offerPhotoUrl,
     });
   };
 
@@ -307,21 +379,26 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
           <ChevronLeft className="w-5 h-5 text-[#222222]" />
         </button>
         {screen === 4 && (
-          <button onClick={() => { setSpecificAsk(''); setScreen(5); }} className="text-[14px] font-semibold text-[var(--mid)] min-h-[44px] flex items-center">
+          <button onClick={() => { setOfferPhotoUrl(null); setScreen(5); }} className="text-[14px] font-semibold text-[var(--mid)] min-h-[44px] flex items-center">
+            Skip
+          </button>
+        )}
+        {screen === 5 && (
+          <button onClick={() => { setSpecificAsk(''); setScreen(6); }} className="text-[14px] font-semibold text-[var(--mid)] min-h-[44px] flex items-center">
             Skip
           </button>
         )}
       </div>
 
-      {/* Progress bar (screens 1-4) */}
-      {screen <= 4 && (
+      {/* Progress bar (screens 1-5) */}
+      {screen <= 5 && (
         <div className="px-5 mb-1">
           <div className="flex gap-1.5">
-            {[1, 2, 3, 4].map(s => (
+            {[1, 2, 3, 4, 5].map(s => (
               <div key={s} className="flex-1 h-[3px] rounded-[3px]" style={{ background: s <= screen ? 'var(--terra)' : 'var(--bg)' }} />
             ))}
           </div>
-          <p className="text-[11px] text-[var(--soft)] text-right mt-1.5">Step {Math.min(screen, 4)} of 4</p>
+          <p className="text-[11px] text-[var(--soft)] text-right mt-1.5">Step {Math.min(screen, 5)} of 5</p>
         </div>
       )}
 
@@ -406,9 +483,9 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               >
                 <Lightbulb className="w-4 h-4 text-[var(--terra)] flex-shrink-0 mt-[1px]" />
                 <div className="flex-1">
-                  <p className="text-[13px] font-bold text-[#222222]">Specific offers get claimed faster</p>
+                  <p className="text-[13px] font-bold text-[#222222]">{getScreen2Tip(category, offerType).title}</p>
                   <p className="text-[12px] text-[var(--mid)] mt-[3px]" style={{ lineHeight: '1.6' }}>
-                    Try 'coffee + almond croissant' instead of just 'coffee' — detail builds excitement and sets clear expectations.
+                    {getScreen2Tip(category, offerType).body}
                   </p>
                 </div>
                 <button
@@ -542,8 +619,102 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
           </div>
         )}
 
-        {/* ── Screen 4: Any specific ask? ── */}
+        {/* ── Screen 4: Add a photo (optional) ── */}
         {screen === 4 && (
+          <div>
+            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Add a photo</h2>
+            <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Optional — helps your offer stand out</p>
+
+            <div className="flex flex-col items-center mb-6">
+              <div className="relative">
+                {offerPhotoUrl ? (
+                  <div className="relative">
+                    <img
+                      src={offerPhotoUrl}
+                      alt="Offer photo"
+                      className="w-[160px] h-[120px] object-cover rounded-[16px]"
+                    />
+                    <button
+                      onClick={() => setOfferPhotoUrl(null)}
+                      className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center"
+                      style={{ background: 'rgba(0,0,0,0.4)' }}
+                    >
+                      <X className="w-3 h-3 text-white" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => photoInputRef.current?.click()}
+                    className="w-[160px] h-[120px] rounded-[16px] flex flex-col items-center justify-center gap-2"
+                    style={{
+                      background: getCategoryGradient(category),
+                      border: '1.5px dashed rgba(34,34,34,0.15)',
+                    }}
+                  >
+                    {photoUploading ? (
+                      <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    ) : (
+                      <>
+                        <span className="text-[24px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials('Offer')}</span>
+                        <Camera className="w-5 h-5 text-[var(--soft)]" />
+                        <span className="text-[12px] text-[var(--soft)]">Tap to add photo</span>
+                      </>
+                    )}
+                  </button>
+                )}
+                <input
+                  ref={photoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    if (file.size > 5 * 1024 * 1024) {
+                      setPhotoError('File must be under 5MB.');
+                      return;
+                    }
+                    setPhotoUploading(true);
+                    setPhotoError(null);
+                    try {
+                      const ext = file.name.split('.').pop() || 'jpg';
+                      const path = `offers/${offerId}/photo.${ext}`;
+                      const { error: uploadError } = await supabase.storage
+                        .from('avatars')
+                        .upload(path, file, { upsert: true, contentType: file.type });
+                      if (uploadError) throw uploadError;
+                      const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+                      setOfferPhotoUrl(`${data.publicUrl}?t=${Date.now()}`);
+                    } catch {
+                      setPhotoError('Upload failed — try again');
+                    }
+                    setPhotoUploading(false);
+                    e.target.value = '';
+                  }}
+                />
+              </div>
+              {photoError && <p className="text-[12px] text-[var(--terra)] mt-2">{photoError}</p>}
+            </div>
+
+            <div className="flex justify-center gap-2 mb-8">
+              {['Use natural light', 'Show your product', 'Keep it simple'].map(tip => (
+                <span key={tip} className="px-3 py-[5px] rounded-[50px] bg-[var(--bg)] text-[var(--mid)] text-[12px] font-medium">
+                  {tip}
+                </span>
+              ))}
+            </div>
+
+            <button
+              onClick={() => setScreen(5)}
+              className="w-full py-[14px] rounded-[50px] font-bold text-[14px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[52px]"
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {/* ── Screen 5: Any specific ask? ── */}
+        {screen === 5 && (
           <div>
             <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Anything specific?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>Optional — most businesses skip this</p>
@@ -570,7 +741,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             </div>
 
             <button
-              onClick={() => setScreen(5)}
+              onClick={() => setScreen(6)}
               className="w-full py-[14px] rounded-[50px] font-bold text-[14px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[52px]"
             >
               Next
@@ -578,8 +749,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
           </div>
         )}
 
-        {/* ── Screen 5: Preview ── */}
-        {screen === 5 && (
+        {/* ── Screen 6: Preview ── */}
+        {screen === 6 && (
           <div>
             <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Your offer</h2>
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
@@ -588,10 +759,14 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <div className="rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] mb-6">
               {/* Image area */}
               <div
-                className="relative flex items-center justify-center"
-                style={{ height: '120px', background: getCategoryGradient(category) }}
+                className="relative flex items-center justify-center overflow-hidden"
+                style={{ height: '120px', background: offerPhotoUrl ? undefined : getCategoryGradient(category) }}
               >
-                <span className="text-[28px] font-extrabold text-white/80">{getInitials('Offer')}</span>
+                {offerPhotoUrl ? (
+                  <img src={offerPhotoUrl} alt="Offer" className="w-full h-full object-cover" />
+                ) : (
+                  <span className="text-[28px] font-extrabold text-white/80">{getInitials('Offer')}</span>
+                )}
                 <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[50px] text-[11px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                   <Video className="w-[10px] h-[10px]" /> Reel
                 </span>
@@ -638,7 +813,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   </p>
                   {quality === 'good' && (
                     <button
-                      onClick={() => setScreen(4)}
+                      onClick={() => setScreen(5)}
                       className="flex items-center gap-1 mt-1 text-[12px] font-semibold text-[var(--terra)]"
                     >
                       Add a specific ask <ArrowRight className="w-[11px] h-[11px]" />
@@ -699,7 +874,7 @@ export default function BusinessPortal() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [view, setView] = useState<'home' | 'offers' | 'claims' | 'content' | 'scan' | 'notifications'>(
+  const [view, setView] = useState<'home' | 'offers' | 'claims' | 'scan' | 'notifications' | 'profile'>(
     new URLSearchParams(window.location.search).get('redeem') ? 'scan' : 'home'
   );
   const [showOfferBuilder, setShowOfferBuilder] = useState(false);
@@ -713,6 +888,19 @@ export default function BusinessPortal() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [offersLoaded, setOffersLoaded] = useState(false);
   const [claimsFilter, setClaimsFilter] = useState<string>('all');
+  const [claimsSubView, setClaimsSubView] = useState<'claims' | 'content'>('claims');
+  const [profileName, setProfileName] = useState(userProfile?.name || '');
+  const [profileAddress, setProfileAddress] = useState(userProfile?.address || '');
+  const [profileInstagram, setProfileInstagram] = useState(userProfile?.instagram_handle || '');
+  const [profileBio, setProfileBio] = useState(userProfile?.bio || '');
+  const [profileDirty, setProfileDirty] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+  const [profileSaving, setProfileSaving] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(userProfile?.logo_url || null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const [logoError, setLogoError] = useState<string | null>(null);
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Clean redeem param from URL after reading it
   useEffect(() => {
@@ -800,6 +988,7 @@ export default function BusinessPortal() {
     specific_ask: string | null;
     generated_title: string;
     content_type: string;
+    offer_photo_url: string | null;
   }) => {
     try {
       const { error } = await supabase.from('offers').insert({
@@ -812,6 +1001,7 @@ export default function BusinessPortal() {
         content_type: data.content_type,
         specific_ask: data.specific_ask,
         generated_title: data.generated_title,
+        offer_photo_url: data.offer_photo_url,
       });
       if (error) throw error;
       fetchOffers();
@@ -875,13 +1065,12 @@ export default function BusinessPortal() {
     );
   }
 
-  const tabs = [
-    { key: 'home' as const, label: 'Home', icon: LayoutDashboard },
-    { key: 'offers' as const, label: 'Offers', icon: Package },
-    { key: 'scan' as const, label: 'Scan', icon: Camera, badge: activeClaimsCount || undefined },
-    { key: 'claims' as const, label: 'Claims', icon: Users },
-    { key: 'content' as const, label: 'Content', icon: Film },
-    { key: 'notifications' as const, label: 'Alerts', icon: Bell, badge: unreadCount || undefined },
+  const bottomTabs: { key: 'home' | 'offers' | 'scan' | 'claims' | 'profile'; label: string; icon: any }[] = [
+    { key: 'home', label: 'Home', icon: LayoutDashboard },
+    { key: 'offers', label: 'Offers', icon: Tag },
+    { key: 'scan', label: 'Scan', icon: ScanLine },
+    { key: 'claims', label: 'Claims', icon: FileText },
+    { key: 'profile', label: 'Profile', icon: User },
   ];
 
   const claimStatusStyle = (status: string) => {
@@ -962,7 +1151,7 @@ export default function BusinessPortal() {
         />
       )}
 
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto pb-[80px]">
         {/* Header */}
         <div className="bg-white border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
@@ -974,30 +1163,6 @@ export default function BusinessPortal() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Tab bar */}
-        <div className="flex bg-white border-b border-[var(--faint)] overflow-x-auto px-[20px]">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => { setView(tab.key); setScanResult(null); }}
-              className={`flex items-center gap-[5px] px-[14px] py-[10px] pb-[12px] text-[11px] font-semibold whitespace-nowrap transition-all relative min-h-[44px] ${
-                view === tab.key ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
-              }`}
-            >
-              <div className="relative">
-                <tab.icon className="w-[18px] h-[18px]" />
-                {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-[var(--terra)] text-white text-[9px] font-bold flex items-center justify-center">
-                    {tab.badge}
-                  </span>
-                ) : null}
-              </div>
-              {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[var(--terra)] rounded-[1px]" />}
-            </button>
-          ))}
         </div>
 
         <div className="p-[20px]">
@@ -1076,45 +1241,86 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* Live offers strip */}
-              {liveOffers.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-[14px]">
-                    <h3 className="text-[18px] font-extrabold text-[#222222]">Live offers</h3>
-                    <button onClick={() => setView('offers')} className="text-[12px] font-semibold text-[var(--terra)]">
-                      Manage →
+              {/* Live offers — vertical cards */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[18px] font-extrabold text-[#222222]">Live offers</h3>
+                  {liveOffers.length > 0 && (
+                    <button onClick={() => setView('offers')} className="text-[13px] font-semibold text-[var(--terra)]">
+                      See all →
+                    </button>
+                  )}
+                </div>
+
+                {liveOffers.length === 0 ? (
+                  <div className="flex flex-col items-center py-10 px-4">
+                    <Tag className="w-10 h-10 text-[var(--soft)] mb-3" />
+                    <p className="text-[15px] font-semibold text-[#222222]">No live offers yet</p>
+                    <p className="text-[13px] text-[var(--mid)] text-center mt-1 max-w-[260px]">Create your first offer to start getting creator visits</p>
+                    <button
+                      onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
+                      className="mt-[14px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white text-[13px] font-bold hover:bg-[var(--terra-hover)] transition-all"
+                    >
+                      Create offer →
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-                    {liveOffers.map(offer => {
+                ) : (
+                  <div className="space-y-[10px]">
+                    {liveOffers.slice(0, 3).map(offer => {
                       const isUnlimited = offer.monthly_cap === null;
                       const slotsUsed = offer.slotsUsed || 0;
+                      const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
                       const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
                       return (
-                        <div key={offer.id} className="bg-white border border-[var(--faint)] rounded-[14px] flex-shrink-0" style={{ padding: '12px 14px', minWidth: '160px' }}>
-                          <p className="text-[13px] font-semibold text-[#222222] truncate">{offer.generated_title || offer.description}</p>
-                          <p className="text-[11px] text-[var(--mid)] mt-1">
-                            {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
-                          </p>
-                          {!isUnlimited && (
-                            <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-1.5">
-                              <div className="h-full bg-[var(--terra)] rounded-[3px] transition-all" style={{ width: `${pct}%` }} />
+                        <button
+                          key={offer.id}
+                          onClick={() => setView('offers')}
+                          className="w-full bg-white border border-[var(--faint)] rounded-[16px] text-left"
+                          style={{ padding: '14px 16px' }}
+                        >
+                          <div className="flex gap-3 items-center">
+                            <div
+                              className="w-[44px] h-[44px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
+                              style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
+                            >
+                              {offer.offer_photo_url ? (
+                                <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-[16px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials(userProfile.name)}</span>
+                              )}
                             </div>
-                          )}
-                        </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-[14px] font-bold text-[#222222] truncate">{offer.generated_title || offer.description}</p>
+                                <span className="flex-shrink-0 inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[11px] font-bold bg-[rgba(26,60,52,0.08)] text-[var(--forest)]">
+                                  <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                                  Live
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <span className="text-[12px] text-[var(--mid)]">
+                                  {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
+                                </span>
+                                {!isUnlimited && slotsLeft !== null && (() => {
+                                  const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
+                                  return (
+                                    <span className="text-[11px] font-semibold" style={{ color: badge.color }}>{badge.text}</span>
+                                  );
+                                })()}
+                              </div>
+                              {!isUnlimited && (
+                                <div className="h-[3px] bg-[rgba(196,103,74,0.1)] rounded-[3px] overflow-hidden mt-1.5">
+                                  <div className="h-full bg-[var(--terra)] rounded-[3px] transition-all" style={{ width: `${pct}%` }} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
-                </div>
-              )}
-
-              {/* Sign out */}
-              <button
-                onClick={signOut}
-                className="flex items-center gap-1.5 mt-4 text-[13px] font-medium text-[var(--soft)] hover:text-[var(--mid)] transition-colors"
-              >
-                <LogOut className="w-3.5 h-3.5" /> Sign out
-              </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -1158,10 +1364,14 @@ export default function BusinessPortal() {
                     <div key={offer.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] flex gap-[14px] items-start">
                       {/* 52px thumbnail */}
                       <div
-                        className="w-[52px] h-[52px] rounded-[10px] flex items-center justify-center flex-shrink-0"
-                        style={{ background: getCategoryGradient(userProfile.category) }}
+                        className="w-[52px] h-[52px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
+                        style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
                       >
-                        <span className="text-[20px] font-extrabold text-white/80">{getInitials(userProfile.name)}</span>
+                        {offer.offer_photo_url ? (
+                          <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                        ) : (
+                          <span className="text-[20px] font-extrabold text-white/80">{getInitials(userProfile.name)}</span>
+                        )}
                       </div>
 
                       {/* Right content */}
@@ -1295,7 +1505,7 @@ export default function BusinessPortal() {
             </div>
           )}
 
-          {/* ═══ CLAIMS ═══ */}
+          {/* ═══ CLAIMS (with Content toggle) ═══ */}
           {view === 'claims' && (
             <div>
               <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
@@ -1303,121 +1513,139 @@ export default function BusinessPortal() {
                 {claims.filter(c => c.status === 'active').length} active · {claims.length} total
               </p>
 
-              {/* Filter pills */}
-              <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-                {[
-                  { key: 'all', label: 'All' },
-                  { key: 'active', label: 'Active' },
-                  { key: 'redeemed', label: 'Visited' },
-                  { key: 'reel_due', label: 'Reel Due' },
-                  { key: 'completed', label: 'Completed' },
-                ].map(f => (
+              {/* Claims / Content pill toggle */}
+              <div className="inline-flex rounded-[50px] p-[3px] mb-4" style={{ background: 'var(--bg)' }}>
+                {(['claims', 'content'] as const).map(sub => (
                   <button
-                    key={f.key}
-                    onClick={() => setClaimsFilter(f.key)}
-                    className={`px-3 py-1.5 rounded-[50px] text-[12px] font-semibold whitespace-nowrap transition-colors min-h-[32px] ${
-                      claimsFilter === f.key
-                        ? 'bg-[#222222] text-white'
-                        : 'bg-[var(--bg)] text-[var(--mid)]'
-                    }`}
+                    key={sub}
+                    onClick={() => setClaimsSubView(sub)}
+                    className="px-[18px] py-[7px] rounded-[50px] text-[13px] transition-all"
+                    style={{
+                      fontWeight: claimsSubView === sub ? 700 : 500,
+                      background: claimsSubView === sub ? 'white' : 'transparent',
+                      color: claimsSubView === sub ? '#222222' : 'var(--mid)',
+                      boxShadow: claimsSubView === sub ? '0 1px 4px rgba(34,34,34,0.08)' : 'none',
+                    }}
                   >
-                    {f.label} ({filterCounts[f.key] || 0})
+                    {sub === 'claims' ? 'Claims' : 'Content'}
                   </button>
                 ))}
               </div>
 
-              {filteredClaims.length === 0 && claims.length === 0 ? (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No claims yet</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Claims will appear here when creators claim your offers</p>
-                </div>
-              ) : filteredClaims.length === 0 ? (
-                <div className="flex flex-col items-center py-12 px-6">
-                  <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredClaims.map((claim) => (
-                    <div key={claim.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
-                      <div className="flex items-center gap-3">
-                        {/* Avatar */}
-                        <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
-                          style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                        >
-                          {getInitials(claim.creators.name)}
-                        </div>
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
-                          <p className="text-[13px] text-[var(--mid)] truncate">
-                            {claim.offers?.generated_title || claim.offers?.description || claim.creators.instagram_handle}
-                          </p>
-                          <p className="text-[13px] text-[var(--soft)] mt-0.5">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                        </div>
-                        {/* Status + actions */}
-                        <div className="flex flex-col items-end gap-2">
-                          <span className={`px-3 py-1 rounded-[50px] text-[12px] font-bold ${claimStatusStyle(claim.status)}`}>
-                            {claimStatusLabel(claim.status)}
-                          </span>
-                          <button
-                            onClick={() => setDisputeClaimId(claim.id)}
-                            className="flex items-center gap-1 text-[12px] text-[var(--soft)] hover:text-[var(--terra)] transition-colors"
-                          >
-                            <Flag className="w-3 h-3" /> Report
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ═══ CONTENT ═══ */}
-          {view === 'content' && (
-            <div>
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Creator content</h2>
-              <p className="text-[13px] text-[var(--mid)] mb-5">{claims.filter(c => c.reel_url).length} reel{claims.filter(c => c.reel_url).length !== 1 ? 's' : ''} posted about your business</p>
-
-              {claims.filter(c => c.reel_url).length === 0 ? (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No content yet</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
-                </div>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {claims.filter(c => c.reel_url).map((claim) => (
-                    <div key={claim.id} className="bg-white rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
-                      {/* Gradient strip */}
-                      <div
-                        className="h-[48px] flex items-center justify-between px-4"
-                        style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+              {/* Claims sub-view */}
+              {claimsSubView === 'claims' && (
+                <>
+                  {/* Filter pills */}
+                  <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+                    {[
+                      { key: 'all', label: 'All' },
+                      { key: 'active', label: 'Active' },
+                      { key: 'redeemed', label: 'Visited' },
+                      { key: 'reel_due', label: 'Reel Due' },
+                      { key: 'completed', label: 'Completed' },
+                    ].map(f => (
+                      <button
+                        key={f.key}
+                        onClick={() => setClaimsFilter(f.key)}
+                        className={`px-3 py-1.5 rounded-[50px] text-[12px] font-semibold whitespace-nowrap transition-colors min-h-[32px] ${
+                          claimsFilter === f.key
+                            ? 'bg-[#222222] text-white'
+                            : 'bg-[var(--bg)] text-[var(--mid)]'
+                        }`}
                       >
-                        <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
-                        <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
-                      </div>
-                      {/* Body */}
-                      <div className="p-4">
-                        <p className="text-[14px] font-semibold text-[#222222]">
-                          {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
-                        </p>
-                        <p className="text-[12px] text-[var(--soft)] mt-1">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                        <a
-                          href={claim.reel_url!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[var(--terra)] hover:underline"
-                        >
-                          <Video className="w-3.5 h-3.5" /> View on Instagram <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
+                        {f.label} ({filterCounts[f.key] || 0})
+                      </button>
+                    ))}
+                  </div>
+
+                  {filteredClaims.length === 0 && claims.length === 0 ? (
+                    <div className="flex flex-col items-center py-16 px-6">
+                      <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <p className="text-[16px] font-bold text-[#222222] mb-1">No claims yet</p>
+                      <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Claims will appear here when creators claim your offers</p>
                     </div>
-                  ))}
-                </div>
+                  ) : filteredClaims.length === 0 ? (
+                    <div className="flex flex-col items-center py-12 px-6">
+                      <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredClaims.map((claim) => (
+                        <div key={claim.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
+                              style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                            >
+                              {getInitials(claim.creators.name)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
+                              <p className="text-[13px] text-[var(--mid)] truncate">
+                                {claim.offers?.generated_title || claim.offers?.description || claim.creators.instagram_handle}
+                              </p>
+                              <p className="text-[13px] text-[var(--soft)] mt-0.5">{new Date(claim.claimed_at).toLocaleDateString()}</p>
+                            </div>
+                            <div className="flex flex-col items-end gap-2">
+                              <span className={`px-3 py-1 rounded-[50px] text-[12px] font-bold ${claimStatusStyle(claim.status)}`}>
+                                {claimStatusLabel(claim.status)}
+                              </span>
+                              <button
+                                onClick={() => setDisputeClaimId(claim.id)}
+                                className="flex items-center gap-1 text-[12px] text-[var(--soft)] hover:text-[var(--terra)] transition-colors"
+                              >
+                                <Flag className="w-3 h-3" /> Report
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Content sub-view */}
+              {claimsSubView === 'content' && (
+                <>
+                  <p className="text-[13px] text-[var(--mid)] mb-4">{claims.filter(c => c.reel_url).length} reel{claims.filter(c => c.reel_url).length !== 1 ? 's' : ''} posted about your business</p>
+
+                  {claims.filter(c => c.reel_url).length === 0 ? (
+                    <div className="flex flex-col items-center py-16 px-6">
+                      <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <p className="text-[16px] font-bold text-[#222222] mb-1">No content yet</p>
+                      <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {claims.filter(c => c.reel_url).map((claim) => (
+                        <div key={claim.id} className="bg-white rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
+                          <div
+                            className="h-[48px] flex items-center justify-between px-4"
+                            style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                          >
+                            <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
+                            <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-[14px] font-semibold text-[#222222]">
+                              {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
+                            </p>
+                            <p className="text-[12px] text-[var(--soft)] mt-1">{new Date(claim.claimed_at).toLocaleDateString()}</p>
+                            <a
+                              href={claim.reel_url!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[var(--terra)] hover:underline"
+                            >
+                              <Video className="w-3.5 h-3.5" /> View on Instagram <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -1456,25 +1684,221 @@ export default function BusinessPortal() {
               )}
             </div>
           )}
+
+          {/* ═══ PROFILE ═══ */}
+          {view === 'profile' && (
+            <div className="max-w-lg mx-auto">
+              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Your profile</h2>
+              <p className="text-[13px] text-[var(--mid)] mb-7">How you appear to creators</p>
+
+              {/* Section label */}
+              <p className="text-[10px] font-bold text-[var(--soft)] uppercase mb-3" style={{ letterSpacing: '0.8px' }}>BUSINESS</p>
+
+              {/* Logo upload */}
+              <div className="flex flex-col items-center mb-5">
+                <div className="relative">
+                  <div
+                    className="w-[80px] h-[80px] rounded-[16px] overflow-hidden flex items-center justify-center"
+                    style={{ background: logoUrl ? undefined : getCategoryGradient(userProfile.category) }}
+                  >
+                    {logoUrl ? (
+                      <img src={logoUrl} alt={userProfile.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[28px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials(userProfile.name)}</span>
+                    )}
+                    {logoUploading && (
+                      <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-[16px]">
+                        <div className="w-5 h-5 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => logoInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[var(--terra)] flex items-center justify-center"
+                  >
+                    <Camera className="w-3 h-3 text-white" />
+                  </button>
+                  <input
+                    ref={logoInputRef}
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setLogoUploading(true);
+                      setLogoError(null);
+                      const { url, error } = await uploadAvatar(file, userProfile.id, 'businesses');
+                      if (error) {
+                        setLogoError(error);
+                      } else if (url) {
+                        setLogoUrl(url);
+                      }
+                      setLogoUploading(false);
+                      e.target.value = '';
+                    }}
+                  />
+                </div>
+                <p className="text-[16px] font-bold text-[#222222] mt-3">{userProfile.name}</p>
+                <p className="text-[13px] text-[var(--mid)]">{userProfile.category}</p>
+                {logoError && <p className="text-[12px] text-[var(--terra)] mt-2">{logoError}</p>}
+              </div>
+
+              {/* Edit fields */}
+              <div className="space-y-4 mb-6">
+                <div>
+                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Business name</label>
+                  <input
+                    type="text"
+                    value={profileName}
+                    onChange={e => { setProfileName(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Address / location</label>
+                  <input
+                    type="text"
+                    value={profileAddress}
+                    onChange={e => { setProfileAddress(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Instagram handle</label>
+                  <input
+                    type="text"
+                    value={profileInstagram}
+                    onChange={e => { setProfileInstagram(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                    placeholder="@yourbusiness"
+                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
+                  />
+                </div>
+                <div>
+                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Short bio</label>
+                  <textarea
+                    value={profileBio}
+                    onChange={e => { setProfileBio(e.target.value.slice(0, 120)); setProfileDirty(true); setProfileSaved(false); }}
+                    placeholder="Tell creators what makes your business special"
+                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
+                    style={{ minHeight: '80px' }}
+                  />
+                  <p className="text-[11px] text-[var(--soft)] text-right mt-1">{profileBio.length}/120</p>
+                </div>
+              </div>
+
+              <button
+                onClick={async () => {
+                  setProfileSaving(true);
+                  try {
+                    await supabase.from('businesses').update({
+                      name: profileName,
+                      address: profileAddress,
+                      instagram_handle: profileInstagram,
+                      bio: profileBio,
+                    }).eq('id', userProfile.id);
+                    setProfileDirty(false);
+                    setProfileSaved(true);
+                    setTimeout(() => setProfileSaved(false), 2000);
+                  } catch {}
+                  setProfileSaving(false);
+                }}
+                disabled={!profileDirty || profileSaving}
+                className={`w-full py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
+                  profileDirty
+                    ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                    : 'bg-[var(--bg)] text-[var(--soft)]'
+                }`}
+              >
+                {profileSaved ? 'Saved \u2713' : profileSaving ? 'Saving...' : 'Save changes'}
+              </button>
+
+              {/* Account section */}
+              <div className="mt-6 pt-6 border-t border-[var(--faint)]">
+                <p className="text-[10px] font-bold text-[var(--soft)] uppercase mb-3" style={{ letterSpacing: '0.8px' }}>ACCOUNT</p>
+
+                <button
+                  onClick={() => setView('notifications')}
+                  className="w-full flex items-center justify-between py-3 border-b border-[var(--faint)] min-h-[48px]"
+                >
+                  <div className="flex items-center gap-3">
+                    <Bell className="w-4 h-4 text-[var(--mid)]" />
+                    <span className="text-[14px] text-[#222222]">Notifications</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-[var(--soft)]" />
+                </button>
+
+                {showSignOutConfirm ? (
+                  <div className="mt-4 p-4 rounded-[14px] bg-[var(--bg)]">
+                    <p className="text-[14px] font-semibold text-[#222222] mb-3">Sign out of nayba?</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={signOut}
+                        className="flex-1 py-[10px] rounded-[50px] text-[13px] font-semibold text-white bg-[var(--terra)]"
+                      >
+                        Confirm
+                      </button>
+                      <button
+                        onClick={() => setShowSignOutConfirm(false)}
+                        className="flex-1 py-[10px] rounded-[50px] text-[13px] font-semibold text-[var(--mid)] bg-white border border-[var(--faint)]"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => setShowSignOutConfirm(true)}
+                    className="flex items-center gap-3 mt-2 py-3 min-h-[48px]"
+                  >
+                    <LogOut className="w-4 h-4 text-[var(--terra)]" />
+                    <span className="text-[14px] font-semibold text-[var(--terra)]">Sign out</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ═══ Floating Scan FAB ═══ */}
-      {view !== 'scan' && (
-        <button
-          onClick={() => { setView('scan'); setScanResult(null); }}
-          className="fixed z-50 flex items-center gap-2 px-5 py-[14px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all"
-          style={{ bottom: '24px', right: '20px', boxShadow: '0 4px 20px rgba(196,103,74,0.35)' }}
-        >
-          <div className="relative">
-            <ScanLine className="w-[18px] h-[18px]" />
-            {activeClaimsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[var(--terra)] border-2 border-white" />
-            )}
-          </div>
-          Scan
-        </button>
-      )}
+      {/* ═══ Fixed Bottom Nav ═══ */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 bg-white flex items-end justify-around"
+        style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 16px' }}
+      >
+        {bottomTabs.map((tab) => {
+          const isActive = view === tab.key;
+          const Icon = tab.icon;
+
+          if (tab.key === 'scan') {
+            return (
+              <div key={tab.key} className="flex-1 flex items-center justify-center">
+                <button
+                  onClick={() => { setView('scan'); setScanResult(null); }}
+                  className="flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white"
+                  style={{ marginTop: '-8px', boxShadow: '0 4px 16px rgba(196,103,74,0.3)' }}
+                >
+                  <Icon className="w-[18px] h-[18px] text-white" />
+                  <span className="text-[12px] font-bold text-white">Scan</span>
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setView(tab.key)}
+              className="flex-1 flex flex-col items-center gap-1"
+            >
+              <Icon className={`w-5 h-5 ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-[10px] font-semibold ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
