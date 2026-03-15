@@ -40,7 +40,7 @@ interface ClaimWithDetails {
   reel_url: string | null;
   reel_due_at: string | null;
   qr_token: string;
-  creators: { name: string; instagram_handle: string; code: string; avatar_url?: string | null };
+  creators: { name: string; instagram_handle: string; code: string; avatar_url?: string | null; follower_count?: string | null };
   offers?: { description: string; generated_title?: string | null };
 }
 
@@ -1026,7 +1026,7 @@ export default function BusinessPortal() {
   };
 
   const fetchClaims = async () => {
-    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code, avatar_url), offers(description, generated_title)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
+    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code, avatar_url, follower_count), offers(description, generated_title)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
     if (error) { setFetchError('Failed to load claims.'); return; }
     if (data) setClaims(data as ClaimWithDetails[]);
   };
@@ -1419,7 +1419,15 @@ export default function BusinessPortal() {
                           </div>
                           {/* Below image info */}
                           <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{claim.creators.name}</p>
-                          <p className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</p>
+                          <div className="flex items-center gap-[6px]">
+                            <span className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</span>
+                            {claim.creators.follower_count && (
+                              <>
+                                <span className="text-[11px] text-[var(--faint)]">·</span>
+                                <span className="text-[11px] font-semibold text-[var(--mid)]">{claim.creators.follower_count}</span>
+                              </>
+                            )}
+                          </div>
                         </div>
                       );
                     })}
@@ -1726,7 +1734,7 @@ export default function BusinessPortal() {
                                     </button>
                                   </div>
                                 </div>
-                                <p className="text-[13px] text-[var(--mid)]">{displayHandle}</p>
+                                <p className="text-[13px] text-[var(--mid)]">{displayHandle}{claim.creators.follower_count ? ` · ${claim.creators.follower_count}` : ''}</p>
                               </div>
                             </div>
                             {/* Offer description */}
