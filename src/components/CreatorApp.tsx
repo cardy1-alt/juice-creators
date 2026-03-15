@@ -53,6 +53,7 @@ interface Offer {
   content_type?: string | null;
   specific_ask?: string | null;
   generated_title?: string | null;
+  offer_photo_url?: string | null;
   businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
 }
 
@@ -603,8 +604,10 @@ export default function CreatorApp() {
         return (
           <div className="fixed inset-0 z-50 bg-white flex flex-col">
             {/* Hero */}
-            <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
-              {offer.businesses.logo_url ? (
+            <div className="relative h-[200px] flex items-center justify-center" style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}>
+              {offer.offer_photo_url ? (
+                <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+              ) : offer.businesses.logo_url ? (
                 <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-[64px] h-[64px] rounded-[16px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
@@ -955,9 +958,11 @@ export default function CreatorApp() {
                       {/* Image area */}
                       <div
                         className="w-full h-[130px] rounded-[14px] overflow-hidden relative flex items-center justify-center"
-                        style={{ background: getCategoryGradient(offer.businesses.category) }}
+                        style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
                       >
-                        {offer.businesses.logo_url ? (
+                        {offer.offer_photo_url ? (
+                          <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                        ) : offer.businesses.logo_url ? (
                           <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
@@ -965,7 +970,7 @@ export default function CreatorApp() {
                           </div>
                         )}
                         {/* Business logo overlay top-left */}
-                        {offer.businesses.logo_url && (
+                        {(offer.offer_photo_url || offer.businesses.logo_url) && offer.businesses.logo_url && (
                           <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-[8px] overflow-hidden" style={{ border: '1.5px solid white' }}>
                             <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
                           </div>
@@ -1081,9 +1086,11 @@ export default function CreatorApp() {
                         {/* Business image/gradient */}
                         <div
                           className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
-                          style={{ background: getCategoryGradient(offer.businesses.category) }}
+                          style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
                         >
-                          {offer.businesses.logo_url ? (
+                          {offer.offer_photo_url ? (
+                            <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                          ) : offer.businesses.logo_url ? (
                             <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
                             <span className="text-white text-[20px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
