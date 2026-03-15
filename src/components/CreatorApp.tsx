@@ -698,7 +698,7 @@ export default function CreatorApp() {
             <p className="text-[14px] text-[var(--mid)] mb-6 leading-[1.5]">
               {showLevelUpOverlay.level === 2 && 'You posted your first reel. You can now access more offers.'}
               {showLevelUpOverlay.level === 3 && 'Businesses are starting to notice you. Keep it up.'}
-              {showLevelUpOverlay.level === 4 && 'You're a local favourite. Premium offers are unlocking.'}
+              {showLevelUpOverlay.level === 4 && "You're a local favourite. Premium offers are unlocking."}
               {showLevelUpOverlay.level === 5 && 'Trusted creator status. The best offers are now available to you.'}
               {showLevelUpOverlay.level === 6 && 'The highest tier. You are a Nayba.'}
             </p>
