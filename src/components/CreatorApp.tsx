@@ -689,7 +689,7 @@ export default function CreatorApp() {
       {/* Level Up Overlay */}
       {showLevelUpOverlay && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.85)' }}>
-          <div className="bg-white rounded-[24px] p-[36px_28px] text-center max-w-[320px] mx-4">
+          <div className="bg-white rounded-[16px] p-[36px_28px] text-center max-w-[320px] mx-4">
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
@@ -1122,7 +1122,7 @@ export default function CreatorApp() {
                     const myIdx = myEntry ? leaderboard.indexOf(myEntry) : -1;
                     if (myIdx < 0 && (userProfile.total_reels || 0) === 0) return null;
                     return (
-                      <div className="pt-2 mt-1 border-t border-dashed border-[var(--faint)]">
+                      <div className="pt-2 mt-1 border-t border-[var(--faint)]">
                         <p className="text-[13px] text-[var(--mid)] text-center">
                           You · {myIdx >= 0 ? `${myIdx + 1}${myIdx === 0 ? 'st' : myIdx === 1 ? 'nd' : myIdx === 2 ? 'rd' : 'th'} this week · ${myEntry!.reels_this_week} reels` : '0 reels this week'}
                         </p>
@@ -1202,7 +1202,7 @@ export default function CreatorApp() {
                     >
                       {/* Image area */}
                       <div
-                        className="w-full h-[130px] rounded-[14px] overflow-hidden relative flex items-center justify-center"
+                        className="w-full h-[130px] rounded-[16px] overflow-hidden relative flex items-center justify-center"
                         style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
                       >
                         {offer.offer_photo_url ? (
@@ -1703,7 +1703,7 @@ export default function CreatorApp() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[24px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 16px rgba(34,34,34,0.06)' }}>
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(34,34,34,0.08)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
@@ -1921,7 +1921,7 @@ export default function CreatorApp() {
                         <button
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className={`w-full text-left bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] transition-all ${
+                          className={`w-full text-left bg-white rounded-[16px] p-4 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] transition-all ${
                             notif.read ? 'opacity-50' : ''
                           }`}
                         >

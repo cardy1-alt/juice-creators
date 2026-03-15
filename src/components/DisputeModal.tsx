@@ -41,7 +41,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-white rounded-[20px] max-w-md w-full p-6 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]" onClick={(e) => e.stopPropagation()}>
+      <div className="bg-white rounded-[16px] max-w-md w-full p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-[#F7F7F7] flex items-center justify-center mx-auto mb-4">

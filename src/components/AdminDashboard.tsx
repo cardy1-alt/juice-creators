@@ -277,7 +277,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, i) => (
-                  <div key={i} className="bg-white rounded-[16px] p-6 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                  <div key={i} className="bg-white rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                     <div className="mb-3"><stat.icon className="w-6 h-6 text-[var(--mid)]" /></div>
                     <p className="text-3xl font-bold text-[#222222]">{stat.value}</p>
                     <p className="text-xs text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No creators yet.</p></div>
               ) : (
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No businesses yet.</p></div>
               ) : (
@@ -401,7 +401,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-white rounded-[16px] p-5 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                    <div key={offer.id} className="bg-white rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -422,7 +422,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No claims yet.</p></div>
               ) : (
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
+              <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
                 <h2 className="text-lg font-bold text-[#222222] mb-5">Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>

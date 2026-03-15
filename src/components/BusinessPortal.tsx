@@ -789,7 +789,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               value={specificAsk}
               onChange={e => setSpecificAsk(e.target.value.slice(0, 100))}
               placeholder="e.g. Please show the latte art, or mention our new seasonal menu"
-              className="w-full px-4 py-4 rounded-[14px] bg-[var(--bg)] border-[1.5px] border-transparent focus:border-[var(--terra)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none resize-none"
+              className="w-full px-4 py-4 rounded-[12px] bg-[var(--bg)] border border-transparent focus:border-[var(--terra)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none resize-none"
               style={{ minHeight: '100px' }}
             />
             <p className="text-[11px] text-[var(--soft)] text-right mt-1 mb-4">{specificAsk.length}/100</p>
@@ -1289,84 +1289,86 @@ export default function BusinessPortal() {
             </div>
 
             {/* Scrollable content */}
-            <div className="flex-1 overflow-y-auto">
-              {/* Hero / Logo area */}
-              <div className="px-[20px] pt-[32px] pb-[24px] flex flex-col items-center">
-                <div
-                  className="w-[80px] h-[80px] rounded-[20px] flex items-center justify-center overflow-hidden mb-[16px]"
-                  style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category), boxShadow: '0 4px 20px rgba(34,34,34,0.08)' }}
-                >
-                  {biz.logo_url ? (
-                    <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-[28px] font-bold text-white">{biz.name.charAt(0)}</span>
-                  )}
+            <div className="flex-1 overflow-y-auto px-[20px] pt-[24px]">
+              {/* ═══ Profile card (matches creator profile DNA) ═══ */}
+              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                <div className="flex items-start gap-[16px]">
+                  {/* Logo */}
+                  <div
+                    className="w-[72px] h-[72px] rounded-[16px] flex items-center justify-center overflow-hidden flex-shrink-0"
+                    style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
+                  >
+                    {biz.logo_url ? (
+                      <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[26px] font-bold text-white">{biz.name.charAt(0)}</span>
+                    )}
+                  </div>
+                  {/* Name + meta */}
+                  <div className="flex-1 min-w-0 pt-[2px]">
+                    <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{biz.name}</h2>
+                    <p className="text-[14px] text-[var(--mid)] mt-[2px]">{biz.category}</p>
+                    {biz.address && (
+                      <p className="text-[12px] text-[var(--soft)] mt-[4px] flex items-center gap-[4px]">
+                        <MapPin className="w-[12px] h-[12px]" /> {biz.address}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <h2 className="text-[22px] font-extrabold text-[#222222] text-center" style={{ letterSpacing: '-0.3px' }}>{biz.name}</h2>
-                <p className="text-[14px] text-[var(--mid)] mt-[4px]">{biz.category}</p>
+
+                {/* Stats row inside card */}
+                <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
+                  <div className="flex-1 text-center">
+                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.claim_count}</p>
+                    <p className="text-[11px] text-[var(--soft)] font-semibold">Collabs</p>
+                  </div>
+                  <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.creator_count}</p>
+                    <p className="text-[11px] text-[var(--soft)] font-semibold">Creators</p>
+                  </div>
+                  <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                  <div className="flex-1 text-center">
+                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.offer_count}</p>
+                    <p className="text-[11px] text-[var(--soft)] font-semibold">Live offers</p>
+                  </div>
+                </div>
               </div>
 
-              {/* Stats row */}
-              <div className="mx-[20px] flex items-center justify-center gap-0 bg-[#F7F7F7] rounded-[16px] p-[16px] mb-[24px]">
-                <div className="flex-1 text-center">
-                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.claim_count}</p>
-                  <p className="text-[12px] text-[var(--mid)]">Collabs</p>
-                </div>
-                <div className="w-[1px] h-[32px] bg-[rgba(34,34,34,0.08)]" />
-                <div className="flex-1 text-center">
-                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.creator_count}</p>
-                  <p className="text-[12px] text-[var(--mid)]">Creators</p>
-                </div>
-                <div className="w-[1px] h-[32px] bg-[rgba(34,34,34,0.08)]" />
-                <div className="flex-1 text-center">
-                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.offer_count}</p>
-                  <p className="text-[12px] text-[var(--mid)]">Live offers</p>
-                </div>
-              </div>
-
-              {/* About section */}
+              {/* ═══ About card ═══ */}
               {biz.bio && (
-                <div className="mx-[20px] mb-[24px]">
-                  <h3 className="text-[16px] font-extrabold text-[#222222] mb-[8px]">About</h3>
+                <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                  <h3 className="text-[14px] font-bold text-[#222222] mb-[8px]">About</h3>
                   <p className="text-[14px] text-[var(--mid)] leading-[1.5]">{biz.bio}</p>
                 </div>
               )}
 
-              {/* Details */}
-              <div className="mx-[20px] mb-[24px] space-y-[12px]">
+              {/* ═══ Details card ═══ */}
+              <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
                 {biz.address && (
-                  <div className="flex items-start gap-[12px]">
-                    <div className="w-[36px] h-[36px] rounded-[10px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-[16px] h-[16px] text-[var(--mid)]" />
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-semibold text-[#222222]">Location</p>
-                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{biz.address}</p>
-                    </div>
+                  <div className="flex items-center gap-[10px] py-[4px]">
+                    <MapPin className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
+                    <p className="text-[14px] text-[#222222]">{biz.address}</p>
                   </div>
                 )}
+                {biz.address && biz.latest_claim_at && <div className="border-t border-[var(--faint)] my-[10px]" />}
                 {biz.latest_claim_at && (
-                  <div className="flex items-start gap-[12px]">
-                    <div className="w-[36px] h-[36px] rounded-[10px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
-                      <Clock className="w-[16px] h-[16px] text-[var(--mid)]" />
-                    </div>
-                    <div>
-                      <p className="text-[13px] font-semibold text-[#222222]">Last activity</p>
-                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{timeAgo(biz.latest_claim_at)}</p>
-                    </div>
+                  <div className="flex items-center gap-[10px] py-[4px]">
+                    <Clock className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
+                    <p className="text-[14px] text-[#222222]">Last activity {timeAgo(biz.latest_claim_at)}</p>
                   </div>
                 )}
               </div>
 
-              {/* Nayba verified badge */}
-              <div className="mx-[20px] mb-[32px] rounded-[16px] border border-[var(--faint)] p-[16px]">
+              {/* ═══ Verified badge card ═══ */}
+              <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[32px]">
                 <div className="flex items-center gap-[10px]">
-                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center">
+                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
                     <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
                   </div>
                   <div>
                     <p className="text-[14px] font-bold text-[#222222]">Verified on Nayba</p>
-                    <p className="text-[12px] text-[var(--mid)]">This business has been approved by the Nayba team</p>
+                    <p className="text-[12px] text-[var(--mid)]">Approved by the Nayba team</p>
                   </div>
                 </div>
               </div>
@@ -1483,7 +1485,7 @@ export default function BusinessPortal() {
                           className="w-[140px] flex-shrink-0 text-left"
                         >
                           {/* Image card */}
-                          <div className="relative w-[140px] h-[180px] rounded-[14px] overflow-hidden">
+                          <div className="relative w-[140px] h-[180px] rounded-[16px] overflow-hidden">
                             {offer.offer_photo_url ? (
                               <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -1525,7 +1527,7 @@ export default function BusinessPortal() {
                       onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
                       className="w-[140px] flex-shrink-0 text-left"
                     >
-                      <div className="w-[140px] h-[180px] rounded-[14px] border-2 border-dashed border-[var(--faint)] flex flex-col items-center justify-center gap-2">
+                      <div className="w-[140px] h-[180px] rounded-[16px] border border-[var(--faint)] flex flex-col items-center justify-center gap-2">
                         <div className="w-[36px] h-[36px] rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
                           <Plus className="w-[16px] h-[16px] text-[var(--terra)]" />
                         </div>
@@ -1564,7 +1566,7 @@ export default function BusinessPortal() {
                           className="w-[140px] flex-shrink-0 text-left"
                           onClick={() => { setCreatorFilter(claim.creator_id); setClaimsFilter('all'); setView('claims'); }}
                         >
-                          <div className="relative w-[140px] h-[180px] rounded-[14px] overflow-hidden">
+                          <div className="relative w-[140px] h-[180px] rounded-[16px] overflow-hidden">
                             {claim.creators.avatar_url ? (
                               <img
                                 src={claim.creators.avatar_url}
@@ -1613,7 +1615,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
@@ -1865,7 +1867,7 @@ export default function BusinessPortal() {
                     <button
                       key={f.key}
                       onClick={() => setClaimsFilter(isSelected ? 'all' : f.key)}
-                      className="flex flex-col items-center py-3 rounded-[14px] transition-all"
+                      className="flex flex-col items-center py-3 rounded-[12px] transition-all"
                       style={{
                         background: isSelected ? '#222222' : 'var(--bg)',
                       }}
@@ -2213,7 +2215,7 @@ export default function BusinessPortal() {
                 </button>
 
                 {showSignOutConfirm ? (
-                  <div className="mt-4 p-4 rounded-[14px] bg-[var(--bg)]">
+                  <div className="mt-4 p-4 rounded-[16px] bg-[var(--bg)]">
                     <p className="text-[14px] font-semibold text-[#222222] mb-3">Sign out of nayba?</p>
                     <div className="flex gap-2">
                       <button

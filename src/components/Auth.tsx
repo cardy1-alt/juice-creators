@@ -197,7 +197,7 @@ export default function Auth() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={() => { setRole('creator'); setSignupStep(1); }}
-              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border-2 transition-all ${
+              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border transition-all ${
                 role === 'creator'
                   ? 'border-[var(--terra)] bg-[#FFFFFF]'
                   : 'border-[var(--faint)] hover:border-[var(--soft)]'
@@ -210,7 +210,7 @@ export default function Auth() {
             </button>
             <button
               onClick={() => { setRole('business'); setSignupStep(1); }}
-              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border-2 transition-all ${
+              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border transition-all ${
                 role === 'business'
                   ? 'border-[var(--terra)] bg-[#FFFFFF]'
                   : 'border-[var(--faint)] hover:border-[var(--soft)]'
@@ -296,7 +296,7 @@ export default function Auth() {
                           key={cat}
                           type="button"
                           onClick={() => setCategory(cat)}
-                          className={`flex items-center gap-2 px-3 py-2.5 rounded-[12px] border-2 text-left text-sm transition-all ${
+                          className={`flex items-center gap-2 px-3 py-2.5 rounded-[12px] border text-left text-sm transition-all ${
                             category === cat
                               ? 'border-[var(--terra)] bg-[#FFFFFF] font-semibold text-[var(--terra)]'
                               : 'border-[var(--faint)] text-[var(--mid)] hover:border-[var(--soft)]'
