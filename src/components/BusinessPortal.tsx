@@ -2362,25 +2362,28 @@ export default function BusinessPortal() {
                             </span>
                           )}
                         </div>
-                        <div className="flex items-center gap-[10px] mt-[6px]">
-                          {userProfile.address && (
-                            <span className="flex items-center gap-1 text-[12px] text-[var(--soft)] truncate">
-                              <MapPin className="w-3 h-3 flex-shrink-0" /> {userProfile.address}
-                            </span>
-                          )}
-                        </div>
+                        {userProfile.address && (
+                          <div className="flex items-start gap-[6px] mt-[6px]">
+                            <MapPin className="w-[13px] h-[13px] text-[var(--soft)] flex-shrink-0 mt-[1px]" />
+                            <button
+                              onClick={() => { navigator.clipboard.writeText(userProfile.address || ''); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }}
+                              className="text-[12px] text-[var(--soft)] text-left leading-[1.4]"
+                            >
+                              {userProfile.address}
+                            </button>
+                            <button
+                              onClick={() => { navigator.clipboard.writeText(userProfile.address || ''); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }}
+                              className="flex-shrink-0 mt-[1px]"
+                            >
+                              {copiedCode ? (
+                                <span className="text-[var(--terra)] text-[11px] font-semibold">Copied!</span>
+                              ) : (
+                                <Copy className="w-[12px] h-[12px] text-[var(--soft)]" />
+                              )}
+                            </button>
+                          </div>
+                        )}
                         <div className="flex items-center gap-[10px] mt-[4px]">
-                          <button
-                            onClick={() => { navigator.clipboard.writeText(userProfile.code); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }}
-                            className="flex items-center gap-1 text-[12px] font-semibold text-[var(--soft)]"
-                          >
-                            {userProfile.code}
-                            {copiedCode ? (
-                              <span className="text-[var(--terra)] text-[11px]">Copied!</span>
-                            ) : (
-                              <Copy className="w-3 h-3" />
-                            )}
-                          </button>
                           {userProfile.instagram_handle && (
                             <span className="flex items-center gap-1 text-[12px] text-[var(--soft)]">
                               <Instagram className="w-3 h-3" /> {userProfile.instagram_handle}
