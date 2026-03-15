@@ -1670,27 +1670,25 @@ export default function BusinessPortal() {
                                 <p className="text-[13px] text-[var(--mid)]">{displayHandle}</p>
                               </div>
                             </div>
-                            {/* Offer + reel status footer */}
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--faint)]">
-                              <p className="text-[12px] text-[var(--soft)] truncate flex-1 mr-3">
-                                {claim.offers?.generated_title || claim.offers?.description}
-                              </p>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
-                                {claim.reel_url ? (
-                                  <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
-                                    <Video className="w-3 h-3" />
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                ) : claim.status === 'reel_due' && claim.reel_due_at ? (
-                                  <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
-                                    <Clock className="w-3 h-3" /> {(() => {
-                                      const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
-                                      return hours > 24 ? `${Math.round(hours / 24)}d` : `${hours}h`;
-                                    })()}
-                                  </span>
-                                ) : null}
-                              </div>
+                            {/* Offer description */}
+                            <p className="text-[13px] text-[var(--mid)] mt-2 leading-[1.4]">
+                              {claim.offers?.generated_title || claim.offers?.description}
+                            </p>
+                            {/* Date + reel status */}
+                            <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-[var(--faint)]">
+                              <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                              {claim.reel_url ? (
+                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
+                                  <Video className="w-3 h-3" /> Reel posted <ExternalLink className="w-3 h-3" />
+                                </a>
+                              ) : claim.status === 'reel_due' && claim.reel_due_at ? (
+                                <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
+                                  <Clock className="w-3 h-3" /> Due {(() => {
+                                    const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
+                                    return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
+                                  })()}
+                                </span>
+                              ) : null}
                             </div>
                           </div>
                         </div>
