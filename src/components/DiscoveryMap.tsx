@@ -223,10 +223,10 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </div>
       )}
 
-      <div className="relative bg-[#F7F7F7] rounded-[20px] overflow-hidden" style={{ height: '400px' }}>
+      <div className="relative bg-[#F7F7F7] rounded-[16px] overflow-hidden" style={{ height: '400px' }}>
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="text-center bg-white/95 backdrop-blur-sm p-6 rounded-[20px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] border border-[var(--faint)]">
+            <div className="text-center bg-white/95 backdrop-blur-sm p-6 rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] border border-[var(--faint)]">
               <MapPin className="w-12 h-12 text-[var(--soft)] mx-auto mb-2" />
               <p className="text-[var(--mid)] text-[15px] font-semibold">No businesses near you yet</p>
               <p className="text-[var(--soft)] text-[13px] mt-1">Check back soon!</p>
@@ -321,7 +321,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           onClick={() => setSelectedBusiness(null)}
         >
           <div
-            className="bg-white rounded-[20px] w-full max-w-md shadow-[0_4px_24px_rgba(34,34,34,0.12)] overflow-hidden animate-slide-up"
+            className="bg-white rounded-[16px] w-full max-w-md shadow-[0_4px_24px_rgba(34,34,34,0.12)] overflow-hidden animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5">
