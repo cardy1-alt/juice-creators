@@ -56,12 +56,12 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
           <>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-amber-600" />
+                <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-[var(--terra)]" />
                 </div>
                 <h3 className="text-lg font-bold text-[#222222]">Report an Issue</h3>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-[#F7F7F7] rounded-lg transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
                 <X className="w-5 h-5 text-[var(--soft)]" />
               </button>
             </div>
@@ -86,8 +86,8 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
               </div>
 
               {disputeError && (
-                <div className="p-3 rounded-xl bg-rose-50 border border-rose-200">
-                  <p className="text-sm text-rose-700">{disputeError}</p>
+                <div className="p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)]">
+                  <p className="text-[13px] font-medium text-[var(--terra)]">{disputeError}</p>
                 </div>
               )}
 
@@ -95,14 +95,14 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-2.5 rounded-full text-[#222222] font-semibold bg-[#F7F7F7] hover:bg-[#eeeeee] transition-all text-sm"
+                  className="flex-1 py-3 rounded-full min-h-[48px] text-[#222222] font-semibold bg-[#F7F7F7] hover:bg-[#eeeeee] transition-all text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="flex-1 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-sm"
+                  className="flex-1 py-3 rounded-full min-h-[48px] text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-sm"
                 >
                   {loading ? 'Submitting...' : 'Submit Report'}
                 </button>

@@ -460,7 +460,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     setDiscountUnit('%');
                     setScreen(2);
                   }}
-                  className={`flex flex-col items-center justify-center gap-2.5 rounded-[20px] min-h-[110px] transition-all ${
+                  className={`flex flex-col items-center justify-center gap-2.5 rounded-[16px] min-h-[110px] transition-all ${
                     offerType === t.key
                       ? 'border-2 border-[var(--terra)]'
                       : 'border-[1.5px] border-[var(--faint)]'
@@ -822,7 +822,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
-            <div className="rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] mb-6">
+            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] mb-6">
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
@@ -1181,7 +1181,7 @@ export default function BusinessPortal() {
   if (!userProfile?.approved) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-white">
-        <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.05)] p-8 max-w-sm text-center border border-[var(--faint)]">
+        <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-8 max-w-sm text-center border border-[var(--faint)]">
           <Clock className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
           <h2 className="text-[18px] font-bold mb-1 text-[#222222]">Pending Approval</h2>
           <p className="text-[14px] text-[var(--mid)] mb-6">Your business account is under review.</p>
@@ -1411,7 +1411,7 @@ export default function BusinessPortal() {
 
         <div className="p-[20px]">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-[12px] bg-rose-50 border border-rose-200 text-[14px] text-rose-700 font-medium">
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[13px] text-[var(--terra)] font-medium">
               {fetchError}
             </div>
           )}
@@ -1613,7 +1613,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
@@ -1681,7 +1681,7 @@ export default function BusinessPortal() {
                   const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
 
                   return (
-                    <div key={offer.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] flex gap-[14px] items-start">
+                    <div key={offer.id} className="bg-white rounded-[16px] p-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] flex gap-[14px] items-start">
                       {/* 52px thumbnail */}
                       <div
                         className="w-[52px] h-[52px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
@@ -1917,7 +1917,7 @@ export default function BusinessPortal() {
                         const handle = claim.creators.instagram_handle || claim.creators.code;
                         const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
                         return (
-                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] flex">
+                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] flex">
                           {/* Left status edge bar */}
                           <div className="w-[4px] flex-shrink-0 rounded-l-[16px]" style={{ background: statusColor }} />
                           <div className="flex-1 p-4">
@@ -1998,7 +1998,7 @@ export default function BusinessPortal() {
                   ) : (
                     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                       {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-white rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
+                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                           <div
                             className="h-[48px] flex items-center justify-between px-4"
                             style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
@@ -2051,7 +2051,7 @@ export default function BusinessPortal() {
                     <button
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
-                      className={`w-full text-left bg-white rounded-[20px] p-4 shadow-[0_1px_4px_rgba(34,34,34,0.05)] transition-all ${
+                      className={`w-full text-left bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(34,34,34,0.08)] transition-all ${
                         notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)] bg-[var(--terra-5)]'
                       }`}
                     >

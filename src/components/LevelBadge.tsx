@@ -15,7 +15,7 @@ export default function LevelBadge({ level, levelName, size = 'sm' }: LevelBadge
 
   return (
     <span
-      className="inline-block rounded-[50px] font-bold whitespace-nowrap"
+      className="inline-block rounded-full font-bold whitespace-nowrap"
       style={{
         background: getLevelColour(level),
         color: 'white',

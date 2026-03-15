@@ -326,7 +326,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[20px]" style={{ background: '#F5F3F0', padding: '16px' }}>
+    <div className="flex flex-col items-center gap-3 rounded-[16px] bg-[var(--bg)] p-[16px]">
       {/* QR code — 220px */}
       <div className="inline-block rounded-[10px] overflow-hidden">
         <img
@@ -339,8 +339,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
       {/* Creator code badge */}
       <span
-        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#1A1A1A] inline-block rounded-[50px] bg-white"
-        style={{ border: '1.5px solid rgba(26,26,26,0.12)', padding: '8px 20px' }}
+        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#222222] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
       >
         {creatorCode}
       </span>
@@ -348,7 +347,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
       {/* Refresh timer */}
       <div className="flex items-center gap-1.5">
         <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-        <span className={`text-[12px] font-medium ${isUrgent ? 'text-rose-500' : 'text-[var(--soft)]'}`}>
+        <span className={`text-[12px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
           Refreshes in {timeLeft}s
         </span>
       </div>
