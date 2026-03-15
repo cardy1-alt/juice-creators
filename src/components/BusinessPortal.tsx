@@ -1752,27 +1752,27 @@ export default function BusinessPortal() {
                     )}
                   </div>
 
-                  {/* Stats row */}
-                  <div className="flex items-center gap-[16px] mb-[20px]">
-                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
-                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.slotsUsed || 0}</p>
-                      <p className="text-[11px] font-semibold text-[var(--mid)]">Claimed</p>
+                  {/* Stats row + action */}
+                  <div className="flex items-stretch gap-[10px] mb-[24px]">
+                    <div className="flex-1 text-center py-[14px] rounded-[12px] bg-[var(--bg)] flex flex-col items-center justify-center">
+                      <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.slotsUsed || 0}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)] mt-[2px]">Claimed</p>
                     </div>
-                    <div className={`flex-1 text-center py-[12px] rounded-[12px] ${selectedOffer.monthly_cap === null ? 'bg-[var(--terra-10)]' : 'bg-[var(--bg)]'}`}>
+                    <div className={`flex-1 text-center py-[14px] rounded-[12px] flex flex-col items-center justify-center ${selectedOffer.monthly_cap === null ? 'bg-[var(--terra-10)]' : 'bg-[var(--bg)]'}`}>
                       {selectedOffer.monthly_cap === null ? (
-                        <Infinity className="w-[20px] h-[20px] text-[var(--terra)] mx-auto mb-[2px]" />
+                        <Infinity className="w-[22px] h-[22px] text-[var(--terra)]" />
                       ) : (
-                        <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.monthly_cap}</p>
+                        <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.monthly_cap}</p>
                       )}
-                      <p className="text-[11px] font-semibold text-[var(--mid)]">{selectedOffer.monthly_cap === null ? 'Unlimited' : 'Monthly cap'}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)] mt-[2px]">{selectedOffer.monthly_cap === null ? 'Unlimited' : 'Monthly cap'}</p>
                     </div>
-                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
+                    <div className="flex-1 text-center py-[14px] rounded-[12px] bg-[var(--bg)] flex flex-col items-center justify-center">
                       {selectedOffer.content_type ? (
-                        <Film className="w-[18px] h-[18px] text-[var(--terra)] mx-auto mb-[2px]" />
+                        <Film className="w-[20px] h-[20px] text-[var(--terra)]" />
                       ) : (
-                        <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.offer_type || '\u2014'}</p>
+                        <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.offer_type || '\u2014'}</p>
                       )}
-                      <p className="text-[11px] font-semibold text-[var(--mid)] capitalize">{selectedOffer.content_type || selectedOffer.offer_type || 'Type'}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)] capitalize mt-[2px]">{selectedOffer.content_type || selectedOffer.offer_type || 'Type'}</p>
                     </div>
                   </div>
 
@@ -1782,9 +1782,9 @@ export default function BusinessPortal() {
                       await handleToggleOffer(selectedOffer.id, selectedOffer.is_live);
                       setSelectedOffer(prev => prev ? { ...prev, is_live: !prev.is_live } : null);
                     }}
-                    className={`w-full py-[12px] rounded-[50px] font-bold text-[14px] transition-all mb-[24px] ${
+                    className={`w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all mb-[24px] ${
                       selectedOffer.is_live
-                        ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
+                        ? 'bg-white text-[var(--mid)] border-[1.5px] border-[var(--faint)] hover:border-[var(--soft)]'
                         : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
                     }`}
                   >
