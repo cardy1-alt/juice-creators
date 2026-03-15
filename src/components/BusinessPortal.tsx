@@ -968,6 +968,7 @@ export default function BusinessPortal() {
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
+  const [platformStats, setPlatformStats] = useState<{ totalCreators: number; totalBusinesses: number; totalClaims: number; recentClaims: number } | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Clean redeem param from URL after reading it
@@ -1048,7 +1049,10 @@ export default function BusinessPortal() {
       .eq('approved', true)
       .neq('id', userProfile.id)
       .limit(10);
-    if (!businesses || businesses.length === 0) return;
+    if (!businesses || businesses.length === 0) {
+      setNearbyBusinesses([]);
+      return;
+    }
 
     // Fetch claim counts for these businesses
     const ids = businesses.map(b => b.id);
@@ -1078,11 +1082,27 @@ export default function BusinessPortal() {
           latest_claim_at: s?.latest || null,
         };
       })
-      .filter(b => b.claim_count > 0)
       .sort((a, b) => b.claim_count - a.claim_count)
       .slice(0, 5);
 
     setNearbyBusinesses(result);
+
+    // Platform-wide stats
+    const [creatorsRes, businessesRes, claimsRes] = await Promise.all([
+      supabase.from('creators').select('id', { count: 'exact', head: true }),
+      supabase.from('businesses').select('id', { count: 'exact', head: true }).eq('approved', true),
+      supabase.from('claims').select('id', { count: 'exact', head: true }),
+    ]);
+    // Claims in the last 7 days
+    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const recentRes = await supabase.from('claims').select('id', { count: 'exact', head: true }).gte('claimed_at', weekAgo);
+
+    setPlatformStats({
+      totalCreators: creatorsRes.count || 0,
+      totalBusinesses: businessesRes.count || 0,
+      totalClaims: claimsRes.count || 0,
+      recentClaims: recentRes.count || 0,
+    });
   };
 
   const markNotificationRead = async (id: string) => {
@@ -1485,30 +1505,54 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* ═══ Trending nearby ═══ */}
-              {nearbyBusinesses.length > 0 && (
+              {/* ═══ Platform pulse ═══ */}
+              {platformStats && (
                 <div className="mt-2">
-                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Trending nearby</h3>
-                  <div className="space-y-[10px]">
-                    {nearbyBusinesses.map((biz, i) => (
-                      <div key={biz.id} className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px]" style={{ background: 'var(--bg)' }}>
-                        <div
-                          className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0"
-                          style={{ background: getCategoryGradient(biz.category) }}
-                        >
-                          <span className="text-[14px] font-bold text-white">{i + 1}</span>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
-                          <p className="text-[11px] text-[var(--mid)]">
-                            {biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}
-                            {biz.latest_claim_at && <> · last {timeAgo(biz.latest_claim_at)}</>}
-                          </p>
-                        </div>
-                        <TrendingUp className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
+                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Nayba pulse</h3>
+
+                  {/* Stats strip */}
+                  <div className="grid grid-cols-3 gap-[10px] mb-[16px]">
+                    {[
+                      { label: 'Creators', value: platformStats.totalCreators },
+                      { label: 'Businesses', value: platformStats.totalBusinesses },
+                      { label: 'Claims this week', value: platformStats.recentClaims },
+                    ].map(stat => (
+                      <div key={stat.label} className="bg-white rounded-[14px] p-[12px] text-center border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
+                        <p className="text-[20px] font-extrabold text-[var(--terra)]">{stat.value}</p>
+                        <p className="text-[10px] text-[var(--mid)] mt-[2px] leading-tight">{stat.label}</p>
                       </div>
                     ))}
                   </div>
+
+                  {/* Trending businesses */}
+                  {nearbyBusinesses.length > 0 && (
+                    <>
+                      <p className="text-[13px] font-bold text-[var(--mid)] mb-[10px] uppercase tracking-wide">Also on Nayba</p>
+                      <div className="space-y-[8px]">
+                        {nearbyBusinesses.map((biz, i) => (
+                          <div key={biz.id} className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
+                            <div
+                              className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0"
+                              style={{ background: getCategoryGradient(biz.category) }}
+                            >
+                              <span className="text-[14px] font-bold text-white">{i + 1}</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
+                              <p className="text-[11px] text-[var(--mid)]">
+                                {biz.claim_count > 0 ? (
+                                  <>{biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}{biz.latest_claim_at && <> · {timeAgo(biz.latest_claim_at)}</>}</>
+                                ) : (
+                                  <>{biz.category} · Just joined</>
+                                )}
+                              </p>
+                            </div>
+                            {biz.claim_count > 0 && <TrendingUp className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />}
+                          </div>
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
               )}
             </div>
