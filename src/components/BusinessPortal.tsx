@@ -967,7 +967,7 @@ export default function BusinessPortal() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
-  const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
+  const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
   const [platformStats, setPlatformStats] = useState<{ totalCreators: number; totalBusinesses: number; totalClaims: number; recentClaims: number } | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
@@ -1045,7 +1045,7 @@ export default function BusinessPortal() {
     // Fetch other approved businesses and their claim activity
     const { data: businesses } = await supabase
       .from('businesses')
-      .select('id, name, category')
+      .select('id, name, category, logo_url')
       .eq('approved', true)
       .neq('id', userProfile.id)
       .limit(10);
@@ -1077,6 +1077,7 @@ export default function BusinessPortal() {
           id: b.id,
           name: b.name,
           category: b.category || 'Food & Drink',
+          logo_url: b.logo_url || null,
           claim_count: s?.claim_count || 0,
           creator_count: s?.creators.size || 0,
           latest_claim_at: s?.latest || null,
@@ -1276,7 +1277,7 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-white" style={{ overscrollBehavior: 'none' }}>
+    <div className="bg-white" style={{ overscrollBehavior: 'none', minHeight: '100dvh' }}>
       <style>{livePulseStyle}</style>
 
       {disputeClaimId && (
@@ -1532,10 +1533,14 @@ export default function BusinessPortal() {
                         {nearbyBusinesses.map((biz, i) => (
                           <div key={biz.id} className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
                             <div
-                              className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0"
-                              style={{ background: getCategoryGradient(biz.category) }}
+                              className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
+                              style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
                             >
-                              <span className="text-[14px] font-bold text-white">{i + 1}</span>
+                              {biz.logo_url ? (
+                                <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-[14px] font-bold text-white">{biz.name.charAt(0)}</span>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
