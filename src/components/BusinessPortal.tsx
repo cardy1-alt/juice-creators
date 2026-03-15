@@ -1243,87 +1243,41 @@ export default function BusinessPortal() {
           {/* ═══ HOME ═══ */}
           {view === 'home' && (
             <div>
-              {/* Greeting */}
-              <h2 className="text-[20px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>
-                {getGreeting()}, {userProfile.name}
-              </h2>
-              <p className="text-[13px] text-[var(--mid)] mb-6">
-                {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-              </p>
-
-              {/* Stats row */}
-              <div className="flex gap-[10px] mb-7">
-                <div className="flex-1 bg-white border border-[var(--faint)] rounded-[16px] p-4">
-                  <p className="text-[24px] font-extrabold text-[var(--terra)]">{activeClaimsCount}</p>
-                  <p className="text-[11px] font-semibold text-[var(--mid)]">Active</p>
-                </div>
-                <div className="flex-1 bg-white border border-[var(--faint)] rounded-[16px] p-4">
-                  <p className="text-[24px] font-extrabold text-[#222222]">{reelsThisMonth}</p>
-                  <p className="text-[11px] font-semibold text-[var(--mid)]">Reels</p>
-                </div>
-                <div className="flex-1 bg-white border border-[var(--faint)] rounded-[16px] p-4">
-                  <p className="text-[24px] font-extrabold text-[#222222]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</p>
-                  <p className="text-[11px] font-semibold text-[var(--mid)]">Slots left</p>
+              {/* Greeting + compact stats banner */}
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h2 className="text-[20px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>
+                    {getGreeting()}, {userProfile.name}
+                  </h2>
+                  <p className="text-[13px] text-[var(--mid)]">
+                    {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                  </p>
                 </div>
               </div>
 
-              {/* Recent creator activity */}
+              {/* Compact inline stats */}
+              <div className="flex items-center gap-[6px] mb-7 flex-wrap">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(196,103,74,0.08)]">
+                  <span className="text-[13px] font-extrabold text-[var(--terra)]">{activeClaimsCount}</span>
+                  <span className="text-[12px] font-semibold text-[var(--mid)]">active</span>
+                </span>
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
+                  <span className="text-[13px] font-extrabold text-[#222222]">{reelsThisMonth}</span>
+                  <span className="text-[12px] font-semibold text-[var(--mid)]">reels</span>
+                </span>
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
+                  <span className="text-[13px] font-extrabold text-[#222222]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
+                  <span className="text-[12px] font-semibold text-[var(--mid)]">slots left</span>
+                </span>
+              </div>
+
+              {/* Your live offers — horizontal visual cards */}
               <div className="mb-7">
-                <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Recent creator activity</h3>
-                {recentActivity.length === 0 ? (
-                  <div className="flex flex-col items-center py-8 px-4">
-                    <Sparkles className="w-10 h-10 text-[var(--soft)] mb-3" />
-                    <p className="text-[14px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
-                  </div>
-                ) : (
-                  <div className="space-y-[10px]">
-                    {recentActivity.map(claim => (
-                      <div key={claim.id} className="bg-white border border-[var(--faint)] rounded-[16px] p-[16px] flex gap-3 items-start">
-                        {claim.creators.avatar_url ? (
-                          <img
-                            src={claim.creators.avatar_url}
-                            alt={claim.creators.name}
-                            className="w-11 h-11 rounded-full object-cover flex-shrink-0"
-                          />
-                        ) : (
-                          <div
-                            className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
-                            style={{ background: getCategoryGradient(userProfile.category) }}
-                          >
-                            {getInitials(claim.creators.name)}
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[14px] font-bold text-[#222222]">{claim.creators.name}</p>
-                          <p className="text-[13px] text-[var(--mid)] truncate">
-                            posted a reel for {claim.offers?.generated_title || claim.offers?.description || 'your offer'}
-                          </p>
-                          <p className="text-[12px] text-[var(--soft)] mt-0.5">{timeAgo(claim.claimed_at)}</p>
-                          {claim.reel_url && (
-                            <a
-                              href={claim.reel_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center mt-2 px-3 py-1 rounded-[50px] text-[12px] font-semibold text-[var(--terra)]"
-                              style={{ background: 'rgba(196,103,74,0.08)' }}
-                            >
-                              View reel →
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Live offers — vertical cards */}
-              <div className="mb-6">
-                <div className="flex items-center justify-between mb-3">
-                  <h3 className="text-[18px] font-extrabold text-[#222222]">Live offers</h3>
+                <div className="flex items-center justify-between mb-[14px]">
+                  <h3 className="text-[18px] font-extrabold text-[#222222]">Your live offers</h3>
                   {liveOffers.length > 0 && (
-                    <button onClick={() => setView('offers')} className="text-[13px] font-semibold text-[var(--terra)]">
-                      See all →
+                    <button onClick={() => setView('offers')} className="w-[28px] h-[28px] flex items-center justify-center rounded-full border border-[var(--faint)]">
+                      <ChevronRight className="w-[14px] h-[14px] text-[var(--mid)]" />
                     </button>
                   )}
                 </div>
@@ -1341,59 +1295,144 @@ export default function BusinessPortal() {
                     </button>
                   </div>
                 ) : (
-                  <div className="space-y-[10px]">
-                    {liveOffers.slice(0, 3).map(offer => {
+                  <div className="flex gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    {liveOffers.map(offer => {
                       const isUnlimited = offer.monthly_cap === null;
                       const slotsUsed = offer.slotsUsed || 0;
                       const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                      const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
                       return (
                         <button
                           key={offer.id}
                           onClick={() => setView('offers')}
-                          className="w-full bg-white border border-[var(--faint)] rounded-[16px] text-left"
-                          style={{ padding: '14px 16px' }}
+                          className="w-[160px] flex-shrink-0 text-left"
                         >
-                          <div className="flex gap-3 items-center">
-                            <div
-                              className="w-[44px] h-[44px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
-                              style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
-                            >
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-[16px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials(userProfile.name)}</span>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
-                                <p className="text-[14px] font-bold text-[#222222] truncate">{offer.generated_title || offer.description}</p>
-                                <span className="flex-shrink-0 inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[11px] font-bold bg-[rgba(26,60,52,0.08)] text-[var(--forest)]">
-                                  <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
-                                  Live
-                                </span>
+                          {/* Image card */}
+                          <div className="relative w-[160px] h-[200px] rounded-[14px] overflow-hidden">
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
+                            )}
+                            {/* Live badge top-right */}
+                            <span className="absolute top-[8px] right-[8px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
+                              <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                              Live
+                            </span>
+                            {/* Business logo top-left */}
+                            {userProfile.logo_url && (
+                              <div className="absolute top-[8px] left-[8px] w-[28px] h-[28px] rounded-[7px] overflow-hidden" style={{ border: '1.5px solid white' }}>
+                                <img src={userProfile.logo_url} alt="" className="w-full h-full object-cover" />
                               </div>
-                              <div className="flex items-center justify-between mt-1.5">
-                                <span className="text-[12px] text-[var(--mid)]">
-                                  {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
+                            )}
+                            {/* Slots badge bottom-left */}
+                            {!isUnlimited && slotsLeft !== null && (() => {
+                              const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
+                              return (
+                                <span
+                                  className="absolute bottom-[8px] left-[8px] backdrop-blur text-[11px] font-bold rounded-full px-[8px] py-[3px]"
+                                  style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
+                                >
+                                  {badge.text}
                                 </span>
-                                {!isUnlimited && slotsLeft !== null && (() => {
-                                  const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
-                                  return (
-                                    <span className="text-[11px] font-semibold" style={{ color: badge.color }}>{badge.text}</span>
-                                  );
-                                })()}
-                              </div>
-                              {!isUnlimited && (
-                                <div className="h-[3px] bg-[rgba(196,103,74,0.1)] rounded-[3px] overflow-hidden mt-1.5">
-                                  <div className="h-full bg-[var(--terra)] rounded-[3px] transition-all" style={{ width: `${pct}%` }} />
-                                </div>
-                              )}
-                            </div>
+                              );
+                            })()}
+                          </div>
+                          {/* Below image info */}
+                          <div className="mt-2">
+                            <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">
+                              {offer.generated_title || offer.description.slice(0, 30)}
+                            </p>
+                            <p className="text-[12px] text-[var(--mid)] mt-0.5">
+                              {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
+                            </p>
                           </div>
                         </button>
                       );
                     })}
+                    {/* Add offer card */}
+                    <button
+                      onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
+                      className="w-[160px] flex-shrink-0"
+                    >
+                      <div className="w-[160px] h-[200px] rounded-[14px] border-2 border-dashed border-[var(--faint)] flex flex-col items-center justify-center gap-2">
+                        <div className="w-[36px] h-[36px] rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
+                          <Plus className="w-[16px] h-[16px] text-[var(--terra)]" />
+                        </div>
+                        <span className="text-[12px] font-semibold text-[var(--mid)]">New offer</span>
+                      </div>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Recent creator activity — visual feed */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-[14px]">
+                  <h3 className="text-[18px] font-extrabold text-[#222222]">Creator activity</h3>
+                  {recentActivity.length > 0 && (
+                    <button onClick={() => setView('claims')} className="w-[28px] h-[28px] flex items-center justify-center rounded-full border border-[var(--faint)]">
+                      <ChevronRight className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    </button>
+                  )}
+                </div>
+                {recentActivity.length === 0 ? (
+                  <div className="flex flex-col items-center py-8 px-4">
+                    <Sparkles className="w-10 h-10 text-[var(--soft)] mb-3" />
+                    <p className="text-[14px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
+                  </div>
+                ) : (
+                  <div className="flex gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                    {recentActivity.map(claim => (
+                      <div
+                        key={claim.id}
+                        className="w-[200px] flex-shrink-0 bg-white rounded-[16px] border border-[var(--faint)] overflow-hidden"
+                      >
+                        {/* Creator header */}
+                        <div className="p-[14px] pb-[10px]">
+                          <div className="flex items-center gap-[10px]">
+                            {claim.creators.avatar_url ? (
+                              <img
+                                src={claim.creators.avatar_url}
+                                alt={claim.creators.name}
+                                className="w-[36px] h-[36px] rounded-full object-cover flex-shrink-0"
+                              />
+                            ) : (
+                              <div
+                                className="w-[36px] h-[36px] rounded-full flex items-center justify-center text-white font-bold text-[11px] flex-shrink-0"
+                                style={{ background: getCategoryGradient(userProfile.category) }}
+                              >
+                                {getInitials(claim.creators.name)}
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-[13px] font-bold text-[#222222] truncate">{claim.creators.name}</p>
+                              <p className="text-[11px] text-[var(--soft)]">{claim.creators.instagram_handle}</p>
+                            </div>
+                          </div>
+                        </div>
+                        {/* Activity content */}
+                        <div className="px-[14px] pb-[14px]">
+                          <p className="text-[12px] text-[var(--mid)] leading-[1.4]">
+                            Posted a reel for <span className="font-semibold text-[#222222]">{claim.offers?.generated_title || claim.offers?.description?.slice(0, 30) || 'your offer'}</span>
+                          </p>
+                          <div className="flex items-center justify-between mt-[10px]">
+                            <span className="text-[11px] text-[var(--soft)]">{timeAgo(claim.claimed_at)}</span>
+                            {claim.reel_url && (
+                              <a
+                                href={claim.reel_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={(e) => e.stopPropagation()}
+                                className="inline-flex items-center gap-1 text-[11px] font-semibold text-[var(--terra)]"
+                              >
+                                <Video className="w-[11px] h-[11px]" />
+                                View reel
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
