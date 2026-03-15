@@ -230,11 +230,12 @@ export default function CreatorApp() {
   const fetchLeaderboard = async () => {
     setLeaderboardLoading(true);
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('weekly_leaderboard')
         .select('*')
+        .order('reels_this_week', { ascending: false })
         .limit(10);
-      if (data) setLeaderboard(data as LeaderboardEntry[]);
+      if (data && !error) setLeaderboard(data as LeaderboardEntry[]);
     } catch {
       // view may not exist yet
     } finally {
@@ -663,7 +664,7 @@ export default function CreatorApp() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="h-[100dvh] flex flex-col bg-white">
       {showOnboarding && (
         <CreatorOnboarding
           creatorId={userProfile.id}
@@ -928,6 +929,7 @@ export default function CreatorApp() {
         );
       })()}
 
+      <div className="flex-1 overflow-y-auto">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="bg-white px-[20px] pt-[20px] pb-[14px] border-b border-[rgba(34,34,34,0.1)]">
@@ -945,7 +947,7 @@ export default function CreatorApp() {
         </div>
 
         {/* Content */}
-        <div className="pb-28">
+        <div className="pb-6">
 
           {/* -- EXPLORE FEED -- */}
           {view === 'offers' && (
@@ -1069,7 +1071,7 @@ export default function CreatorApp() {
               )}
 
               {/* Weekly Leaderboard */}
-              {leaderboard.length >= 2 && (
+              {leaderboard.length >= 1 && (
                 <div className="mx-[20px] mt-[14px] bg-white rounded-[20px] border border-[var(--faint)] p-[16px_18px]">
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-[15px] font-extrabold text-[#222222]">This week's top creators</h3>
@@ -1700,90 +1702,120 @@ export default function CreatorApp() {
             <div className="px-[20px] pt-8">
               {profileSubView === 'main' ? (
                 <>
-                  {/* Avatar */}
-                  <div className="flex flex-col items-center mb-6">
-                    <div className="relative mb-3">
-                      <input
-                        ref={avatarInputRef}
-                        type="file"
-                        accept="image/jpeg,image/png,image/webp"
-                        className="hidden"
-                        onChange={handleAvatarUpload}
-                      />
-                      {uploadingAvatar ? (
-                        <div className="w-[88px] h-[88px] rounded-full bg-[#F7F7F7] flex items-center justify-center">
-                          <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
-                        </div>
-                      ) : avatarUrl ? (
-                        <button onClick={() => avatarInputRef.current?.click()}>
-                          <img src={avatarUrl} alt="Avatar" className="w-[88px] h-[88px] rounded-full object-cover" />
-                        </button>
-                      ) : (
+                  {/* ═══ Profile card (Airbnb-style) ═══ */}
+                  <div className="rounded-[24px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 16px rgba(34,34,34,0.06)' }}>
+                    <div className="flex items-start gap-[16px]">
+                      {/* Avatar */}
+                      <div className="relative flex-shrink-0">
+                        <input
+                          ref={avatarInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={handleAvatarUpload}
+                        />
+                        {uploadingAvatar ? (
+                          <div className="w-[72px] h-[72px] rounded-full bg-[#F7F7F7] flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        ) : avatarUrl ? (
+                          <button onClick={() => avatarInputRef.current?.click()}>
+                            <img src={avatarUrl} alt="Avatar" className="w-[72px] h-[72px] rounded-full object-cover" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => avatarInputRef.current?.click()}
+                            className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
+                            style={{ background: getCategoryGradient(null) }}
+                          >
+                            <span className="text-white text-[26px] font-extrabold">{getInitials(userProfile.name)}</span>
+                          </button>
+                        )}
                         <button
                           onClick={() => avatarInputRef.current?.click()}
-                          className="w-[88px] h-[88px] rounded-full flex items-center justify-center"
-                          style={{ background: getCategoryGradient(null) }}
+                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
                         >
-                          <span className="text-white text-[32px] font-extrabold">{getInitials(userProfile.name)}</span>
+                          <Camera className="w-[11px] h-[11px] text-white" />
                         </button>
-                      )}
-                      <button
-                        onClick={() => avatarInputRef.current?.click()}
-                        className="absolute bottom-0 right-0 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center"
-                      >
-                        <Camera className="w-[12px] h-[12px] text-white" />
-                      </button>
-                    </div>
-                    {uploadError && <p className="text-[13px] text-rose-600 mb-2">{uploadError}</p>}
-                    <h2 className="text-[20px] font-extrabold text-[#222222]">{userProfile.name}</h2>
-                    <button onClick={copyCode} className="flex items-center gap-1.5 mt-1 text-[13px] font-semibold text-[rgba(34,34,34,0.5)]">
-                      {userProfile.code}
-                      {copiedCode ? (
-                        <span className="text-[var(--terra)] text-[12px]">Copied!</span>
-                      ) : (
-                        <Copy className="w-3.5 h-3.5" />
-                      )}
-                    </button>
-                    {userProfile.instagram_handle && (
-                      <p className="flex items-center gap-1 mt-1 text-[13px] text-[rgba(34,34,34,0.5)]">
-                        <Instagram className="w-3.5 h-3.5" /> {userProfile.instagram_handle}
-                      </p>
-                    )}
-                    {/* Level badge */}
-                    <div className="mt-3">
-                      <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="lg" />
-                    </div>
-                    {/* Verified badge */}
-                    {userProfile.profile_complete && (
-                      <div className="flex items-center gap-1 mt-2">
-                        <BadgeCheck className="w-[14px] h-[14px] text-[var(--forest)]" />
-                        <span className="text-[12px] font-semibold text-[var(--forest)]">Verified creator</span>
                       </div>
-                    )}
+
+                      {/* Name + meta */}
+                      <div className="flex-1 min-w-0 pt-[2px]">
+                        <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
+                          <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
+                          {userProfile.profile_complete && (
+                            <span className="flex items-center gap-[3px] text-[11px] font-semibold text-[var(--forest)]">
+                              <BadgeCheck className="w-[13px] h-[13px]" /> Verified
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-[10px] mt-[6px]">
+                          <button onClick={copyCode} className="flex items-center gap-1 text-[12px] font-semibold text-[var(--soft)]">
+                            {userProfile.code}
+                            {copiedCode ? (
+                              <span className="text-[var(--terra)] text-[11px]">Copied!</span>
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                          {userProfile.instagram_handle && (
+                            <span className="flex items-center gap-1 text-[12px] text-[var(--soft)]">
+                              <Instagram className="w-3 h-3" /> {userProfile.instagram_handle}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {uploadError && <p className="text-[13px] text-rose-600 mt-2">{uploadError}</p>}
+
+                    {/* Stats row inside card */}
+                    <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.length}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Claimed</p>
+                      </div>
+                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{collabsCompleted}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Posted</p>
+                      </div>
+                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Rating</p>
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Profile completeness */}
+                  {/* ═══ Profile completeness ═══ */}
                   {(() => {
                     const completeness = getProfileCompleteness(userProfile);
                     if (completeness.score === 100) {
                       return (
-                        <div className="flex items-center gap-2 rounded-[12px] p-[10px_14px] mb-4" style={{ background: 'rgba(26,60,52,0.06)' }}>
-                          <BadgeCheck className="w-4 h-4 text-[var(--forest)]" />
-                          <span className="text-[13px] font-semibold text-[var(--forest)]">Profile complete</span>
+                        <div className="flex items-center gap-[10px] rounded-[16px] border border-[var(--faint)] p-[14px_16px] mb-[16px]">
+                          <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
+                            <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
+                          </div>
+                          <div>
+                            <p className="text-[14px] font-bold text-[#222222]">Profile complete</p>
+                            <p className="text-[12px] text-[var(--mid)]">Your profile is ready for businesses</p>
+                          </div>
                         </div>
                       );
                     }
                     return (
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex-1 h-[4px] rounded-[4px] mr-3" style={{ background: 'var(--bg)' }}>
-                            <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
-                          </div>
-                          <span className="text-[12px] text-[var(--soft)]">{completeness.score}% complete</span>
+                      <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                        <div className="flex items-center justify-between mb-[10px]">
+                          <span className="text-[14px] font-bold text-[#222222]">Complete your profile</span>
+                          <span className="text-[12px] font-semibold text-[var(--terra)]">{completeness.score}%</span>
                         </div>
-                        <div className="flex flex-wrap gap-2">
+                        <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: 'var(--bg)' }}>
+                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
+                        </div>
+                        <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
-                            <span key={field.key} className="flex items-center gap-1 px-3 py-1.5 rounded-[50px] text-[12px] font-semibold text-[var(--mid)]" style={{ background: 'var(--bg)' }}>
+                            <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[50px] text-[12px] font-semibold text-[var(--mid)] bg-[var(--bg)]">
                               <Plus className="w-[10px] h-[10px]" /> {field.label}
                             </span>
                           ))}
@@ -1792,82 +1824,65 @@ export default function CreatorApp() {
                     );
                   })()}
 
-                  {/* Level progress */}
-                  {(() => {
-                    const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
-                    return (
-                      <div className="rounded-[12px] p-[12px_16px] mb-3" style={{ background: 'var(--bg)' }}>
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-[13px] font-bold text-[#222222]">Level {progress.currentLevel} · {progress.currentName}</span>
-                          {!progress.isMaxLevel && (
-                            <span className="text-[12px] text-[var(--mid)]">Level {progress.nextLevel} · {progress.nextName}</span>
-                          )}
-                        </div>
-                        <div className="h-[4px] rounded-[4px] mb-2" style={{ background: 'rgba(196,103,74,0.1)' }}>
-                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${progress.progressPercent}%`, background: 'var(--terra)' }} />
-                        </div>
-                        <p className="text-[12px] text-[var(--soft)] text-center">
-                          {progress.isMaxLevel
-                            ? "You've reached the top. You're a Nayba."
-                            : progress.ratingNeeded
-                              ? `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} + ${progress.ratingNeeded}★ rating to reach ${progress.nextName}`
-                              : `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} to reach ${progress.nextName}`
+                  {/* ═══ Level + streak section ═══ */}
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                    {(() => {
+                      const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
+                      return (
+                        <>
+                          <div className="flex items-center justify-between mb-[8px]">
+                            <span className="text-[14px] font-bold text-[#222222]">Level {progress.currentLevel} · {progress.currentName}</span>
+                            {!progress.isMaxLevel && (
+                              <span className="text-[12px] text-[var(--mid)]">Level {progress.nextLevel} · {progress.nextName}</span>
+                            )}
+                          </div>
+                          <div className="h-[4px] rounded-[4px] mb-[8px]" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                            <div className="h-full rounded-[4px] transition-all" style={{ width: `${progress.progressPercent}%`, background: 'var(--terra)' }} />
+                          </div>
+                          <p className="text-[12px] text-[var(--soft)] text-center">
+                            {progress.isMaxLevel
+                              ? "You've reached the top. You're a Nayba."
+                              : progress.ratingNeeded
+                                ? `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} + ${progress.ratingNeeded}★ rating to reach ${progress.nextName}`
+                                : `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} to reach ${progress.nextName}`
+                            }
+                          </p>
+                        </>
+                      );
+                    })()}
+
+                    {/* Streak */}
+                    <div className="flex items-center justify-between mt-[14px] pt-[14px] border-t border-[var(--faint)]">
+                      <div className="flex items-center gap-[8px]">
+                        <FlameIcon active={(userProfile.current_streak || 0) > 0} />
+                        <span className="text-[14px] font-bold text-[#222222]">
+                          {(userProfile.current_streak || 0) > 0
+                            ? `${userProfile.current_streak} month streak`
+                            : 'Start your streak'
                           }
-                        </p>
+                        </span>
                       </div>
-                    );
-                  })()}
-
-                  {/* Streak row */}
-                  <div className="flex items-center justify-between rounded-[12px] p-[12px_16px] mb-6" style={{ background: 'var(--bg)' }}>
-                    <div className="flex items-center gap-2">
-                      <FlameIcon active={(userProfile.current_streak || 0) > 0} />
-                      <span className="text-[13px] font-bold text-[#222222]">
-                        {(userProfile.current_streak || 0) > 0
-                          ? `${userProfile.current_streak} month streak`
-                          : 'Start your streak this month'
-                        }
-                      </span>
-                    </div>
-                    {(userProfile.longest_streak || 0) > 0 && (
-                      <span className="text-[12px] text-[var(--soft)]">Best: {userProfile.longest_streak}</span>
-                    )}
-                  </div>
-
-                  {/* Stats row */}
-                  <div className="flex items-center justify-center gap-0 mb-8 bg-[#F7F7F7] rounded-2xl p-4">
-                    <div className="flex-1 text-center">
-                      <p className="text-[20px] font-extrabold text-[#222222]">{claims.length}</p>
-                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Claimed</p>
-                    </div>
-                    <div className="w-[1px] h-8 bg-[rgba(34,34,34,0.1)]" />
-                    <div className="flex-1 text-center">
-                      <p className="text-[20px] font-extrabold text-[#222222]">{collabsCompleted}</p>
-                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Posted</p>
-                    </div>
-                    <div className="w-[1px] h-8 bg-[rgba(34,34,34,0.1)]" />
-                    <div className="flex-1 text-center">
-                      <p className="text-[20px] font-extrabold text-[#222222]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
-                      <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Rating</p>
+                      {(userProfile.longest_streak || 0) > 0 && (
+                        <span className="text-[12px] text-[var(--soft)]">Best: {userProfile.longest_streak}</span>
+                      )}
                     </div>
                   </div>
 
-                  {/* Settings list */}
-                  <div className="space-y-0 bg-white rounded-2xl border border-[rgba(34,34,34,0.1)] overflow-hidden">
-                    <button className="w-full flex items-center justify-between px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors">
-                      <div className="flex items-center gap-3">
-                        <User className="w-5 h-5 text-[rgba(34,34,34,0.5)]" />
+                  {/* ═══ Settings ═══ */}
+                  <div className="mt-[8px]">
+                    <button className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left">
+                      <div className="flex items-center gap-[12px]">
+                        <User className="w-[20px] h-[20px] text-[var(--mid)]" />
                         <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[rgba(34,34,34,0.28)]" />
+                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
                     </button>
-                    <div className="h-[1px] bg-[rgba(34,34,34,0.06)] mx-4" />
                     <button
                       onClick={() => setProfileSubView('alerts')}
-                      className="w-full flex items-center justify-between px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors"
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
                     >
-                      <div className="flex items-center gap-3">
-                        <Bell className="w-5 h-5 text-[rgba(34,34,34,0.5)]" />
+                      <div className="flex items-center gap-[12px]">
+                        <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
                         <span className="text-[15px] font-semibold text-[#222222]">Notifications</span>
                         {unreadCount > 0 && (
                           <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[11px] font-bold flex items-center justify-center">
@@ -1875,14 +1890,13 @@ export default function CreatorApp() {
                           </span>
                         )}
                       </div>
-                      <ChevronRight className="w-4 h-4 text-[rgba(34,34,34,0.28)]" />
+                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
                     </button>
-                    <div className="h-[1px] bg-[rgba(34,34,34,0.06)] mx-4" />
                     <button
                       onClick={signOut}
-                      className="w-full flex items-center gap-3 px-4 py-4 min-h-[48px] text-left hover:bg-[#F7F7F7] transition-colors"
+                      className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
-                      <LogOut className="w-5 h-5 text-[var(--terra)]" />
+                      <LogOut className="w-[20px] h-[20px] text-[var(--terra)]" />
                       <span className="text-[15px] font-semibold text-[var(--terra)]">Sign out</span>
                     </button>
                   </div>
@@ -1931,19 +1945,11 @@ export default function CreatorApp() {
         </div>
       </div>
 
-      {/* Bottom fade gradient */}
-      <div
-        className="fixed left-0 right-0 z-30 pointer-events-none"
-        style={{
-          bottom: 60,
-          height: 72,
-          background: 'linear-gradient(to bottom, transparent 0%, #ffffff 100%)',
-        }}
-      />
+      </div>{/* end scroll container */}
 
       {/* Bottom Navigation Bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white z-40" style={{ borderTop: '1px solid rgba(34,34,34,0.1)' }}>
-        <div className="max-w-md mx-auto flex pt-[10px] pb-[12px]">
+      <div className="bg-white flex-shrink-0" style={{ borderTop: '1px solid rgba(34,34,34,0.1)' }}>
+        <div className="max-w-md mx-auto flex pt-[10px]" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
           {tabs.map(tab => (
             <button
               key={tab.key}
