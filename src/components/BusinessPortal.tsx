@@ -1847,7 +1847,20 @@ export default function BusinessPortal() {
           {/* ═══ CLAIMS (with Content toggle) ═══ */}
           {view === 'claims' && (
             <div>
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
+              <div className="flex items-center justify-between mb-[4px]">
+                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
+                <button
+                  onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
+                  className={`inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
+                    claimsSubView === 'content'
+                      ? 'bg-[#222222] text-white'
+                      : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
+                  }`}
+                >
+                  <Film className="w-[14px] h-[14px]" />
+                  Content
+                </button>
+              </div>
               {creatorFilter ? (
                 <button
                   onClick={() => setCreatorFilter(null)}
@@ -1863,42 +1876,33 @@ export default function BusinessPortal() {
                 </p>
               )}
 
-              {/* Filter chips + Claims/Content toggle */}
-              <div className="flex items-center gap-[6px] overflow-x-auto pb-[14px] mb-[4px]" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+              {/* Stat grid filters */}
+              <div className="grid grid-cols-4 gap-[8px] mb-[16px]">
                 {[
-                  { key: 'all', label: 'All' },
-                  { key: 'active', label: `Active (${filterCounts.active || 0})` },
-                  { key: 'redeemed', label: `Visited (${filterCounts.redeemed || 0})` },
-                  { key: 'reel_due', label: `Reel due (${filterCounts.reel_due || 0})` },
-                  { key: 'completed', label: `Done (${filterCounts.completed || 0})` },
+                  { key: 'active', label: 'Active', icon: Clock },
+                  { key: 'redeemed', label: 'Visited', icon: Eye },
+                  { key: 'reel_due', label: 'Reel Due', icon: Video },
+                  { key: 'completed', label: 'Done', icon: Check },
                 ].map(f => {
+                  const count = filterCounts[f.key] || 0;
                   const isSelected = claimsFilter === f.key;
+                  const Icon = f.icon;
                   return (
                     <button
                       key={f.key}
-                      onClick={() => setClaimsFilter(f.key)}
-                      className={`flex-shrink-0 px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
+                      onClick={() => setClaimsFilter(isSelected ? 'all' : f.key)}
+                      className={`flex flex-col items-center py-[12px] rounded-[12px] transition-all border ${
                         isSelected
-                          ? 'bg-[#222222] text-white'
-                          : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
+                          ? 'bg-[#222222] border-[#222222]'
+                          : 'bg-white border-[var(--faint)]'
                       }`}
                     >
-                      {f.label}
+                      <Icon className="w-[16px] h-[16px] mb-[4px]" style={{ color: isSelected ? 'white' : 'var(--mid)' }} />
+                      <span className="text-[18px] font-extrabold" style={{ color: isSelected ? 'white' : '#222222' }}>{count}</span>
+                      <span className="text-[10px] font-semibold mt-[2px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{f.label}</span>
                     </button>
                   );
                 })}
-                <div className="w-[1px] h-[24px] bg-[var(--faint)] flex-shrink-0 mx-[4px]" />
-                <button
-                  onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
-                  className={`flex-shrink-0 inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
-                    claimsSubView === 'content'
-                      ? 'bg-[#222222] text-white'
-                      : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
-                  }`}
-                >
-                  <Film className="w-[14px] h-[14px]" />
-                  Content
-                </button>
               </div>
 
               {/* Claims list */}
@@ -1989,8 +1993,6 @@ export default function BusinessPortal() {
               {/* Content sub-view */}
               {claimsSubView === 'content' && (
                 <>
-                  <p className="text-[13px] text-[var(--mid)] mb-4">{claims.filter(c => c.reel_url).length} reel{claims.filter(c => c.reel_url).length !== 1 ? 's' : ''} posted about your business</p>
-
                   {claims.filter(c => c.reel_url).length === 0 ? (
                     <div className="flex flex-col items-center py-16 px-6">
                       <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
@@ -1998,34 +2000,35 @@ export default function BusinessPortal() {
                       <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
                     </div>
                   ) : (
-                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                    <div className="space-y-[12px]">
                       {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
-                          <div
-                            className="h-[48px] flex items-center justify-between px-4"
-                            style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                          >
-                            <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
-                            <div className="flex items-center gap-2">
-                              {claim.creators.avatar_url ? (
-                                <img src={claim.creators.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-white/30" />
-                              ) : null}
-                              <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
+                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-[16px]">
+                          <div className="flex items-start gap-[12px]">
+                            {claim.creators.avatar_url ? (
+                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" />
+                            ) : (
+                              <div
+                                className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0"
+                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                              >
+                                {getInitials(claim.creators.name)}
+                              </div>
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
+                              <p className="text-[14px] text-[#222222] font-semibold mt-[4px]">
+                                {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
+                              </p>
+                              <p className="text-[12px] text-[var(--soft)] mt-[4px]">{timeAgo(claim.claimed_at)}</p>
+                              <a
+                                href={claim.reel_url!}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[#222222] hover:bg-[#eeeeee] transition-colors"
+                              >
+                                <Video className="w-[14px] h-[14px]" /> View reel <ExternalLink className="w-3 h-3 text-[var(--soft)]" />
+                              </a>
                             </div>
-                          </div>
-                          <div className="p-4">
-                            <p className="text-[14px] font-semibold text-[#222222]">
-                              {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
-                            </p>
-                            <p className="text-[12px] text-[var(--soft)] mt-1">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                            <a
-                              href={claim.reel_url!}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[var(--terra)] hover:underline"
-                            >
-                              <Video className="w-3.5 h-3.5" /> View on Instagram <ExternalLink className="w-3 h-3" />
-                            </a>
                           </div>
                         </div>
                       ))}
