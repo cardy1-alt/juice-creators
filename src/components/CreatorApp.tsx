@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram, Video } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram, Video, AlertCircle } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -104,6 +104,20 @@ function formatDate(dateStr: string): string {
   return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }
 
+// ─── Scarcity colour shift helper ─────────────────────────────────────────
+function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
+  if (slotsLeft === 0) {
+    return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
+  }
+  if (slotsLeft === 1) {
+    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: 'Last slot' };
+  }
+  if (slotsLeft <= 2) {
+    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: `${slotsLeft} left` };
+  }
+  return { background: '#F5C4A0', color: '#222222', text: `${slotsLeft} left` };
+}
+
 export default function CreatorApp() {
   const { userProfile, signOut } = useAuth();
   const [offers, setOffers] = useState<Offer[]>([]);
@@ -134,6 +148,9 @@ export default function CreatorApp() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [undoToast, setUndoToast] = useState<string | null>(null);
+  const [waitlistedOffers, setWaitlistedOffers] = useState<Record<string, { id: string; position: number }>>({});
+  const [waitlistLoading, setWaitlistLoading] = useState<string | null>(null);
+  const [waitlistConfirmLeave, setWaitlistConfirmLeave] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
@@ -173,8 +190,64 @@ export default function CreatorApp() {
       fetchClaims();
       fetchNotifications();
       fetchCollabsCompleted();
+      fetchWaitlist();
     }
   }, [userProfile]);
+
+  const fetchWaitlist = async () => {
+    const { data } = await supabase
+      .from('waitlist')
+      .select('id, offer_id')
+      .eq('creator_id', userProfile.id);
+    if (data) {
+      const map: Record<string, { id: string; position: number }> = {};
+      for (const entry of data) {
+        // Get position for this entry
+        const { count } = await supabase
+          .from('waitlist')
+          .select('*', { count: 'exact', head: true })
+          .eq('offer_id', entry.offer_id)
+          .lte('created_at', new Date().toISOString());
+        map[entry.offer_id] = { id: entry.id, position: count || 1 };
+      }
+      setWaitlistedOffers(map);
+    }
+  };
+
+  const joinWaitlist = async (offerId: string) => {
+    setWaitlistLoading(offerId);
+    try {
+      const { error } = await supabase
+        .from('waitlist')
+        .insert({ offer_id: offerId, creator_id: userProfile.id });
+      if (error) throw error;
+      await fetchWaitlist();
+    } catch {
+      // silently fail — may already be on waitlist
+    } finally {
+      setWaitlistLoading(null);
+    }
+  };
+
+  const leaveWaitlist = async (offerId: string) => {
+    setWaitlistLoading(offerId);
+    try {
+      const entry = waitlistedOffers[offerId];
+      if (entry) {
+        await supabase.from('waitlist').delete().eq('id', entry.id);
+        setWaitlistedOffers(prev => {
+          const next = { ...prev };
+          delete next[offerId];
+          return next;
+        });
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setWaitlistLoading(null);
+      setWaitlistConfirmLeave(null);
+    }
+  };
 
   const fetchCollabsCompleted = async () => {
     const { count } = await supabase
@@ -605,8 +678,8 @@ export default function CreatorApp() {
                 <div className="flex items-center justify-between rounded-[12px] bg-[#F7F7F7] px-[16px] py-[12px]">
                   <div className="flex items-center gap-2">
                     <Users className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    <span className="text-[14px] font-semibold text-[#222222]">
-                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} slots left`}
+                    <span className="text-[14px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#222222' }}>
+                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -618,32 +691,80 @@ export default function CreatorApp() {
             </div>
 
             {/* Sticky bottom bar */}
-            <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px] flex items-center justify-between">
-              <div>
-                <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
-                <p className="text-[12px] text-[var(--mid)]">Post reel within 48hrs</p>
+            <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px]">
+              <div className="flex items-center justify-between">
+                <div>
+                  {full && waitlistedOffers[offer.id] ? (
+                    <>
+                      <p className="text-[14px] font-semibold text-[#222222]">You're on the waitlist</p>
+                      {waitlistedOffers[offer.id].position && (
+                        <p className="text-[12px] text-[var(--soft)]">You're #{waitlistedOffers[offer.id].position} on the waitlist</p>
+                      )}
+                    </>
+                  ) : full ? (
+                    <p className="text-[14px] text-[var(--mid)]">All slots taken</p>
+                  ) : (
+                    <>
+                      <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
+                      <p className="text-[12px] text-[var(--mid)]">Post reel within 48hrs</p>
+                    </>
+                  )}
+                </div>
+                {full ? (
+                  waitlistedOffers[offer.id] ? (
+                    waitlistConfirmLeave === offer.id ? (
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => leaveWaitlist(offer.id)}
+                          disabled={waitlistLoading === offer.id}
+                          className="px-[18px] py-[10px] rounded-full text-[13px] font-semibold border border-[rgba(34,34,34,0.15)] text-[#222222] min-h-[44px]"
+                        >
+                          {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
+                        </button>
+                        <button
+                          onClick={() => setWaitlistConfirmLeave(null)}
+                          className="px-[18px] py-[10px] rounded-full text-[13px] font-semibold text-[var(--mid)] min-h-[44px]"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setWaitlistConfirmLeave(offer.id)}
+                        className="px-[22px] py-[12px] rounded-full text-[14px] font-semibold min-h-[48px] flex items-center gap-1"
+                        style={{ border: '1.5px solid var(--terra)', color: 'var(--terra)', background: 'rgba(196,103,74,0.04)' }}
+                      >
+                        On waitlist <Check className="w-4 h-4" />
+                      </button>
+                    )
+                  ) : (
+                    <button
+                      onClick={() => joinWaitlist(offer.id)}
+                      disabled={waitlistLoading === offer.id}
+                      className="px-[22px] py-[12px] rounded-full text-[14px] font-semibold text-[#222222] min-h-[48px] disabled:opacity-40"
+                      style={{ border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
+                    >
+                      {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
+                    </button>
+                  )
+                ) : alreadyClaimed ? (
+                  <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
+                    <Check className="w-4 h-4" /> Claimed
+                  </button>
+                ) : hasActiveBusiness ? (
+                  <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed min-h-[48px]">
+                    Active
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
+                    disabled={loading}
+                    className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
+                  >
+                    Claim
+                  </button>
+                )}
               </div>
-              {full ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed min-h-[48px]">
-                  Sold Out
-                </button>
-              ) : alreadyClaimed ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[rgba(34,34,34,0.28)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
-                  <Check className="w-4 h-4" /> Claimed
-                </button>
-              ) : hasActiveBusiness ? (
-                <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed min-h-[48px]">
-                  Active
-                </button>
-              ) : (
-                <button
-                  onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
-                  disabled={loading}
-                  className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
-                >
-                  Claim
-                </button>
-              )}
             </div>
           </div>
         );
@@ -850,16 +971,17 @@ export default function CreatorApp() {
                           </div>
                         )}
                         {/* Slots badge bottom-left */}
-                        {!isUnlimited && !full && (
-                          <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[#222222] text-[12px] font-bold rounded-full px-[9px] py-[4px]">
-                            {slotsLeft} slots left
-                          </span>
-                        )}
-                        {full && (
-                          <span className="absolute bottom-[6px] left-[6px] bg-[rgba(255,255,255,0.92)] backdrop-blur text-[rgba(34,34,34,0.28)] text-[12px] font-bold rounded-full px-[9px] py-[4px]">
-                            Full
-                          </span>
-                        )}
+                        {!isUnlimited && (() => {
+                          const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
+                          return (
+                            <span
+                              className="absolute bottom-[6px] left-[6px] backdrop-blur text-[12px] font-bold rounded-full px-[9px] py-[4px]"
+                              style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
+                            >
+                              {badge.text}
+                            </span>
+                          );
+                        })()}
                         {/* Reel badge top-right */}
                         <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                           <Video className="w-[10px] h-[10px]" /> Reel
@@ -884,18 +1006,15 @@ export default function CreatorApp() {
                         <div className="flex items-center gap-1 mt-0.5">
                           <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
                           <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
-                          {!isUnlimited && !full && (
-                            <>
-                              <span className="text-[11px] text-[var(--mid)]">·</span>
-                              <span className="text-[11px] text-[var(--mid)]">{slotsLeft} slots left</span>
-                            </>
-                          )}
-                          {full && (
-                            <>
-                              <span className="text-[11px] text-[var(--mid)]">·</span>
-                              <span className="text-[11px] text-[var(--mid)]">Full</span>
-                            </>
-                          )}
+                          {!isUnlimited && (() => {
+                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
+                            return (
+                              <>
+                                <span className="text-[11px] text-[var(--mid)]">·</span>
+                                <span className="text-[11px]" style={{ color: badge.color }}>{badge.text}</span>
+                              </>
+                            );
+                          })()}
                         </div>
                       </div>
                     </button>
@@ -973,8 +1092,8 @@ export default function CreatorApp() {
                         <div className="flex-1 min-w-0">
                           <p className="text-[15px] font-bold text-[#222222] truncate">{offer.businesses.name}</p>
                           <p className="text-[13px] text-[rgba(34,34,34,0.5)] truncate">{offer.businesses.category}</p>
-                          <p className="text-[13px] font-semibold text-[var(--terra)]">
-                            {isUnlimited ? 'Open availability' : slotsLeft ? `${slotsLeft} slots available` : 'Full'}
+                          <p className="text-[13px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--terra)' }}>
+                            {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                           </p>
                         </div>
                         <button
