@@ -1382,10 +1382,6 @@ export default function BusinessPortal() {
                         claim.status === 'redeemed' ? 'Visited' :
                         claim.status === 'reel_due' ? 'Reel due' :
                         claim.status === 'completed' ? 'Completed' : claim.status;
-                      const statusStyle = claim.status === 'active' ? 'bg-[rgba(196,103,74,0.85)] text-white' :
-                        claim.status === 'redeemed' ? 'bg-[rgba(26,60,52,0.85)] text-white' :
-                        claim.status === 'reel_due' ? 'bg-[var(--peach)] text-[#222222]' :
-                        'bg-[rgba(26,60,52,0.85)] text-white';
                       const activityText = claim.status === 'completed' ? 'Posted a reel' :
                         claim.status === 'reel_due' ? 'Reel due' :
                         claim.status === 'redeemed' ? 'Visited' : 'Claimed offer';
@@ -1407,10 +1403,16 @@ export default function BusinessPortal() {
                                 {getInitials(claim.creators.name)}
                               </div>
                             )}
-                            {/* Status badge top-right */}
-                            <span className={`absolute top-[8px] right-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold ${statusStyle}`}>
+                            {/* Status badge top-right — consistent white/translucent style */}
+                            <span className="absolute top-[8px] right-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold bg-white/90 text-[#222222]">
                               {statusLabel}
                             </span>
+                            {/* Follower count badge top-left */}
+                            {claim.creators.follower_count && (
+                              <span className="absolute top-[8px] left-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold bg-white/90 text-[#222222]">
+                                {claim.creators.follower_count}
+                              </span>
+                            )}
                             {/* Activity + time bottom overlay */}
                             <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[10px] pt-[30px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }}>
                               <p className="text-[11px] font-semibold text-white leading-[1.3]">{activityText}</p>
@@ -1419,15 +1421,7 @@ export default function BusinessPortal() {
                           </div>
                           {/* Below image info */}
                           <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{claim.creators.name}</p>
-                          <div className="flex items-center gap-[6px]">
-                            <span className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</span>
-                            {claim.creators.follower_count && (
-                              <>
-                                <span className="text-[11px] text-[var(--faint)]">·</span>
-                                <span className="text-[11px] font-semibold text-[var(--mid)]">{claim.creators.follower_count}</span>
-                              </>
-                            )}
-                          </div>
+                          <p className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</p>
                         </div>
                       );
                     })}
