@@ -1304,10 +1304,10 @@ export default function BusinessPortal() {
                         <button
                           key={offer.id}
                           onClick={() => setView('offers')}
-                          className="w-[160px] flex-shrink-0 text-left"
+                          className="w-[152px] flex-shrink-0 text-left"
                         >
                           {/* Image card */}
-                          <div className="relative w-[160px] h-[200px] rounded-[14px] overflow-hidden">
+                          <div className="relative w-[152px] h-[190px] rounded-[14px] overflow-hidden">
                             {offer.offer_photo_url ? (
                               <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
                             ) : (
@@ -1338,11 +1338,11 @@ export default function BusinessPortal() {
                             })()}
                           </div>
                           {/* Below image info */}
-                          <div className="mt-2">
-                            <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">
-                              {offer.generated_title || offer.description.slice(0, 30)}
+                          <div className="mt-[6px]">
+                            <p className="text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] leading-[1.2]" style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                              {offer.generated_title || offer.description}
                             </p>
-                            <p className="text-[12px] text-[var(--mid)] mt-0.5">
+                            <p className="text-[11px] text-[var(--mid)] mt-[3px]">
                               {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
                             </p>
                           </div>
@@ -1352,13 +1352,18 @@ export default function BusinessPortal() {
                     {/* Add offer card */}
                     <button
                       onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
-                      className="w-[160px] flex-shrink-0"
+                      className="w-[152px] flex-shrink-0 text-left"
                     >
-                      <div className="w-[160px] h-[200px] rounded-[14px] border-2 border-dashed border-[var(--faint)] flex flex-col items-center justify-center gap-2">
+                      <div className="w-[152px] h-[190px] rounded-[14px] border-2 border-dashed border-[var(--faint)] flex flex-col items-center justify-center gap-2">
                         <div className="w-[36px] h-[36px] rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
                           <Plus className="w-[16px] h-[16px] text-[var(--terra)]" />
                         </div>
                         <span className="text-[12px] font-semibold text-[var(--mid)]">New offer</span>
+                      </div>
+                      {/* Invisible spacer to match text height below offer cards */}
+                      <div className="mt-[6px]">
+                        <p className="text-[13px] leading-[1.2] invisible">‎</p>
+                        <p className="text-[11px] mt-[3px] invisible">‎</p>
                       </div>
                     </button>
                   </div>
