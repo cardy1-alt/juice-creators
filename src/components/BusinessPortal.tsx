@@ -178,25 +178,49 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
+  const regionRef = useRef<HTMLDivElement>(null);
+
+  const extractToken = (decodedText: string) => {
+    try {
+      const url = new URL(decodedText);
+      const redeemParam = url.searchParams.get('redeem');
+      if (redeemParam) return redeemParam;
+    } catch {
+      // Not a URL — use raw value
+    }
+    return decodedText;
+  };
 
   const startScanner = async () => {
     setCameraError(null);
+    // Ensure the DOM element is ready
+    await new Promise(r => setTimeout(r, 100));
+    if (!document.getElementById('qr-scanner-region')) {
+      setCameraError('Scanner not ready. Try again.');
+      return;
+    }
     try {
+      // Stop any existing scanner first
+      if (scannerRef.current) {
+        try { await scannerRef.current.stop(); } catch {}
+        scannerRef.current = null;
+      }
       const scanner = new Html5Qrcode('qr-scanner-region');
       scannerRef.current = scanner;
+
+      // Request camera permission explicitly on iOS
+      try {
+        await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+          .then(stream => { stream.getTracks().forEach(t => t.stop()); });
+      } catch {
+        // Will be caught by scanner.start below
+      }
+
       await scanner.start(
         { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 220, height: 220 } },
+        { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1 },
         (decodedText) => {
-          let token = decodedText;
-          try {
-            const url = new URL(decodedText);
-            const redeemParam = url.searchParams.get('redeem');
-            if (redeemParam) token = redeemParam;
-          } catch {
-            // Not a URL — use the raw scanned value
-          }
-          onScan(token);
+          onScan(extractToken(decodedText));
           scanner.stop().catch(() => {});
           setScanning(false);
         },
@@ -206,11 +230,13 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
     } catch (err: any) {
       const msg = String(err?.message || err);
       if (msg.includes('NotAllowedError') || msg.includes('Permission')) {
-        setCameraError('Camera permission denied. Please allow camera access in your browser settings.');
-      } else if (msg.includes('NotFoundError')) {
+        setCameraError('Camera permission denied. Allow camera access in your browser settings, then try again.');
+      } else if (msg.includes('NotFoundError') || msg.includes('DevicesNotFound')) {
         setCameraError('No camera found on this device.');
+      } else if (msg.includes('NotReadableError') || msg.includes('TrackStartError')) {
+        setCameraError('Camera is in use by another app. Close it and try again.');
       } else {
-        setCameraError('Could not start camera. Use the code field below instead.');
+        setCameraError(`Could not start camera. ${msg.slice(0, 80)}`);
       }
     }
   };
@@ -231,22 +257,32 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
     if (!active && scanning) stopScanner();
   }, [active]);
 
-  if (cameraError) {
-    return (
-      <div className="p-5 rounded-[20px] bg-amber-50 border border-amber-100 text-center">
-        <VideoOff className="w-6 h-6 text-amber-500 mx-auto mb-2" />
-        <p className="text-[14px] text-amber-700">{cameraError}</p>
-      </div>
-    );
-  }
-
   return (
     <div>
+      {cameraError && (
+        <div className="p-4 rounded-[16px] bg-amber-50 border border-amber-100 text-center mb-4">
+          <VideoOff className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+          <p className="text-[13px] text-amber-700 mb-3">{cameraError}</p>
+          <button
+            onClick={() => { setCameraError(null); startScanner(); }}
+            className="text-[13px] font-semibold text-[var(--terra)] underline"
+          >
+            Try again
+          </button>
+        </div>
+      )}
       <div className="relative mx-auto" style={{ maxWidth: '280px' }}>
+        {/* Always render the div so html5-qrcode can find it */}
         <div
+          ref={regionRef}
           id="qr-scanner-region"
-          className="rounded-[20px] overflow-hidden"
-          style={{ display: scanning ? 'block' : 'none', background: '#222222' }}
+          className="rounded-[16px] overflow-hidden"
+          style={{
+            height: scanning ? 'auto' : '0',
+            opacity: scanning ? 1 : 0,
+            background: '#222222',
+            transition: 'opacity 0.2s',
+          }}
         />
         {/* Corner brackets */}
         {scanning && (
@@ -269,7 +305,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {scanning && (
         <p className="text-[12px] text-[var(--soft)] text-center mt-3">Point at the creator's QR code</p>
       )}
-      {!scanning && (
+      {!scanning && !cameraError && (
         <button
           onClick={startScanner}
           className="w-full flex items-center justify-center gap-2 py-[14px] rounded-[50px] font-bold text-[14px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
@@ -1521,28 +1557,29 @@ export default function BusinessPortal() {
                 {claims.filter(c => c.status === 'active').length} active · {claims.length} total
               </p>
 
-              {/* Stat row filters — replaces horizontal scrolling pills */}
+              {/* Stat row filters */}
               <div className="grid grid-cols-4 gap-2 mb-5">
                 {[
-                  { key: 'active', label: 'Active', color: 'var(--terra)' },
-                  { key: 'redeemed', label: 'Visited', color: 'var(--forest)' },
-                  { key: 'reel_due', label: 'Reel Due', color: '#c78c20' },
-                  { key: 'completed', label: 'Done', color: 'var(--soft)' },
+                  { key: 'active', label: 'Active', icon: Clock },
+                  { key: 'redeemed', label: 'Visited', icon: Eye },
+                  { key: 'reel_due', label: 'Reel Due', icon: Video },
+                  { key: 'completed', label: 'Done', icon: Check },
                 ].map(f => {
                   const count = filterCounts[f.key] || 0;
-                  const isActive = claimsFilter === f.key;
+                  const isSelected = claimsFilter === f.key;
+                  const Icon = f.icon;
                   return (
                     <button
                       key={f.key}
-                      onClick={() => setClaimsFilter(isActive ? 'all' : f.key)}
+                      onClick={() => setClaimsFilter(isSelected ? 'all' : f.key)}
                       className="flex flex-col items-center py-3 rounded-[14px] transition-all"
                       style={{
-                        background: isActive ? `${f.color}10` : 'var(--bg)',
-                        border: isActive ? `1.5px solid ${f.color}` : '1.5px solid transparent',
+                        background: isSelected ? '#222222' : 'var(--bg)',
                       }}
                     >
-                      <span className="text-[20px] font-extrabold" style={{ color: isActive ? f.color : '#222222' }}>{count}</span>
-                      <span className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? f.color : 'var(--mid)' }}>{f.label}</span>
+                      <Icon className="w-4 h-4 mb-1" style={{ color: isSelected ? 'white' : 'var(--mid)' }} />
+                      <span className="text-[18px] font-extrabold" style={{ color: isSelected ? 'white' : '#222222' }}>{count}</span>
+                      <span className="text-[10px] font-semibold mt-0.5" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{f.label}</span>
                     </button>
                   );
                 })}
@@ -1584,52 +1621,60 @@ export default function BusinessPortal() {
                     <div className="space-y-3">
                       {filteredClaims.map((claim) => {
                         const statusColor = claim.status === 'active' ? 'var(--terra)' : claim.status === 'redeemed' ? 'var(--forest)' : claim.status === 'reel_due' ? '#c78c20' : claim.status === 'completed' ? 'var(--soft)' : 'var(--terra)';
+                        const handle = claim.creators.instagram_handle || claim.creators.code;
+                        const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
                         return (
                         <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] flex">
                           {/* Left status edge bar */}
-                          <div className="w-[4px] flex-shrink-0" style={{ background: statusColor }} />
+                          <div className="w-[4px] flex-shrink-0 rounded-l-[16px]" style={{ background: statusColor }} />
                           <div className="flex-1 p-4">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <p className="text-[14px] font-bold text-[#222222]">@{claim.creators.instagram_handle || claim.creators.code}</p>
-                                <p className="text-[13px] text-[var(--mid)] mt-0.5">{claim.creators.name}</p>
-                                <p className="text-[12px] text-[var(--soft)] mt-1 truncate">
-                                  {claim.offers?.generated_title || claim.offers?.description}
-                                </p>
+                            <div className="flex items-center gap-3">
+                              <div
+                                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
+                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                              >
+                                {getInitials(claim.creators.name)}
                               </div>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-[8px]" style={{ background: `${statusColor}12`, color: statusColor }}>
-                                  {claimStatusLabel(claim.status)}
-                                </span>
-                                <button
-                                  onClick={() => setDisputeClaimId(claim.id)}
-                                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
-                                  title="Report"
-                                >
-                                  <MoreHorizontal className="w-4 h-4 text-[var(--soft)]" />
-                                </button>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between gap-2">
+                                  <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
+                                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-[50px] ${claimStatusStyle(claim.status)}`}>
+                                      {claimStatusLabel(claim.status)}
+                                    </span>
+                                    <button
+                                      onClick={() => setDisputeClaimId(claim.id)}
+                                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
+                                      title="Report"
+                                    >
+                                      <MoreHorizontal className="w-4 h-4 text-[var(--soft)]" />
+                                    </button>
+                                  </div>
+                                </div>
+                                <p className="text-[13px] text-[var(--mid)]">{displayHandle}</p>
                               </div>
                             </div>
-                            {/* Inline reel status */}
-                            <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-[var(--faint)]">
-                              <span className="text-[12px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
-                              {claim.reel_url ? (
-                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--forest)]">
-                                  <Video className="w-3 h-3" /> Reel posted
-                                  <ExternalLink className="w-3 h-3 ml-0.5" />
-                                </a>
-                              ) : claim.status === 'reel_due' && claim.reel_due_at ? (
-                                <span className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: '#c78c20' }}>
-                                  <Clock className="w-3 h-3" /> Reel due {(() => {
-                                    const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
-                                    return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
-                                  })()}
-                                </span>
-                              ) : claim.status === 'redeemed' ? (
-                                <span className="flex items-center gap-1 text-[12px] text-[var(--forest)]">
-                                  <Check className="w-3 h-3" /> Visited
-                                </span>
-                              ) : null}
+                            {/* Offer + reel status footer */}
+                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--faint)]">
+                              <p className="text-[12px] text-[var(--soft)] truncate flex-1 mr-3">
+                                {claim.offers?.generated_title || claim.offers?.description}
+                              </p>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                                {claim.reel_url ? (
+                                  <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
+                                    <Video className="w-3 h-3" />
+                                    <ExternalLink className="w-3 h-3" />
+                                  </a>
+                                ) : claim.status === 'reel_due' && claim.reel_due_at ? (
+                                  <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
+                                    <Clock className="w-3 h-3" /> {(() => {
+                                      const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
+                                      return hours > 24 ? `${Math.round(hours / 24)}d` : `${hours}h`;
+                                    })()}
+                                  </span>
+                                ) : null}
+                              </div>
                             </div>
                           </div>
                         </div>
