@@ -56,17 +56,24 @@ const livePulseStyle = `
 `;
 
 // ─── Offer Builder placeholder map ────────────────────────────────────────
-function getOfferPlaceholder(category: string | undefined | null, offerType: string): string {
-  const key = `${category || ''}|${offerType}`;
-  const map: Record<string, string> = {
-    'Cafe & Coffee|product': 'coffee + pastry',
-    'Food & Drink|product': 'meal or drink',
-    'Hair & Beauty|service': 'express facial',
-    'Health & Fitness|service': 'personal training session',
-    'Retail|product': 'item of your choice',
-    'Wellness & Spa|service': '30-minute massage',
+function getCategoryPlaceholder(category: string | undefined | null, type: string): string {
+  const map: Record<string, Record<string, string>> = {
+    'Cafe & Coffee':        { product: 'coffee + pastry',           service: 'barista experience',       experience: 'coffee tasting session' },
+    'Food & Drink':         { product: 'meal or drink',             service: 'chef experience',          experience: 'tasting session' },
+    'Hair & Beauty':        { product: 'product of your choice',    service: 'express facial',           experience: 'pamper session' },
+    'Health & Fitness':     { product: 'supplement of your choice', service: 'personal training session', experience: 'fitness class' },
+    'Retail':               { product: 'item of your choice',       service: 'styling session',          experience: 'shopping experience' },
+    'Wellness & Spa':       { product: 'product of your choice',    service: '30-minute massage',        experience: 'wellness session' },
+    'Arts & Entertainment': { product: 'item of your choice',       service: 'class or lesson',          experience: 'event or show entry' },
+    'Pets':                 { product: 'treat or accessory',        service: 'grooming session',         experience: 'pet experience' },
+    'Education':            { product: 'resource or material',      service: 'tutoring session',         experience: 'workshop or class' },
   };
-  return map[key] || 'your choice';
+  return map[category || '']?.[type] ?? 'your choice';
+}
+
+// Keep backward-compatible alias
+function getOfferPlaceholder(category: string | undefined | null, offerType: string): string {
+  return getCategoryPlaceholder(category, offerType);
 }
 
 function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
@@ -209,8 +216,12 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [specificAsk, setSpecificAsk] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [discountAmount, setDiscountAmount] = useState('20');
+  const [discountUnit, setDiscountUnit] = useState<'%' | '£'>('%');
 
-  const generatedTitle = `Free ${offerItem}`;
+  const generatedTitle = offerType === 'discount'
+    ? (discountUnit === '%' ? `${discountAmount}% off` : `£${discountAmount} off`)
+    : `Free ${offerItem}`;
 
   const tiles = [
     { key: 'product', label: 'Free Product', icon: Gift, sub: 'Coffee, meal, item' },
@@ -229,11 +240,11 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
     setIsSubmitting(true);
     onComplete({
       offer_type: offerType,
-      offer_item: offerItem,
+      offer_item: offerType === 'discount' ? `${discountAmount}${discountUnit}` : offerItem,
       monthly_cap: monthlyCap,
       specific_ask: specificAsk.trim() || null,
       generated_title: generatedTitle,
-      content_type: 'reel', // content_type locked to 'reel' at launch — expand to 'story'|'post' later
+      content_type: 'reel',
     });
   };
 
@@ -294,6 +305,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   onClick={() => {
                     setOfferType(t.key);
                     setOfferItem('');
+                    setDiscountAmount('20');
+                    setDiscountUnit('%');
                     setScreen(2);
                   }}
                   className={`flex flex-col items-center justify-center gap-2.5 rounded-[20px] min-h-[110px] transition-all ${
@@ -318,7 +331,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         )}
 
         {/* ── Screen 2: Fill in the blank ── */}
-        {screen === 2 && (
+        {screen === 2 && offerType !== 'discount' && (
           <div>
             <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What exactly will you give?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>We'll use this to create your offer card</p>
@@ -329,7 +342,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 type="text"
                 value={offerItem}
                 onChange={e => setOfferItem(e.target.value.slice(0, 60))}
-                placeholder={getOfferPlaceholder(category, offerType)}
+                placeholder={getCategoryPlaceholder(category, offerType)}
                 className="flex-1 text-[22px] font-extrabold text-[#222222] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
                 autoFocus
               />
@@ -337,7 +350,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[11px] text-[var(--soft)] text-right mb-4">{offerItem.length}/60</p>
 
             <p className="text-[13px] text-[var(--mid)]">
-              Creators will see: <span className="font-semibold">Free {offerItem || getOfferPlaceholder(category, offerType)}</span>
+              Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(category, offerType)}</span>
             </p>
 
             <button
@@ -345,6 +358,75 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               disabled={offerItem.trim().length < 3}
               className={`w-full mt-8 py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
                 offerItem.trim().length >= 3
+                  ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                  : 'bg-[var(--bg)] text-[var(--soft)]'
+              }`}
+            >
+              Next
+            </button>
+          </div>
+        )}
+
+        {/* ── Screen 2 (Discount): Amount + unit toggle ── */}
+        {screen === 2 && offerType === 'discount' && (
+          <div>
+            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What's the discount?</h2>
+            <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Set the amount creators will receive</p>
+
+            <div className="flex justify-center mb-4">
+              <input
+                type="number"
+                value={discountAmount}
+                onChange={e => {
+                  const max = discountUnit === '%' ? 100 : 999;
+                  const val = e.target.value.replace(/[^0-9]/g, '');
+                  if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= max)) {
+                    setDiscountAmount(val);
+                  }
+                }}
+                min={1}
+                max={discountUnit === '%' ? 100 : 999}
+                className="text-[48px] font-extrabold text-[#222222] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                style={{ width: '120px' }}
+                autoFocus
+              />
+            </div>
+
+            <div className="flex justify-center gap-2 mb-6">
+              <button
+                onClick={() => {
+                  setDiscountUnit('%');
+                  if (parseInt(discountAmount) > 100) setDiscountAmount('100');
+                }}
+                className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
+                style={{
+                  background: discountUnit === '%' ? '#222222' : 'var(--bg)',
+                  color: discountUnit === '%' ? 'white' : 'var(--mid)',
+                }}
+              >
+                %
+              </button>
+              <button
+                onClick={() => setDiscountUnit('£')}
+                className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
+                style={{
+                  background: discountUnit === '£' ? '#222222' : 'var(--bg)',
+                  color: discountUnit === '£' ? 'white' : 'var(--mid)',
+                }}
+              >
+                £
+              </button>
+            </div>
+
+            <p className="text-[13px] text-[var(--mid)] text-center">
+              Creators will see: <span className="font-semibold">{discountUnit === '%' ? `${discountAmount || '0'}% off` : `£${discountAmount || '0'} off`}</span>
+            </p>
+
+            <button
+              onClick={() => setScreen(3)}
+              disabled={!discountAmount || parseInt(discountAmount) < 1}
+              className={`w-full mt-8 py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
+                discountAmount && parseInt(discountAmount) >= 1
                   ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
                   : 'bg-[var(--bg)] text-[var(--soft)]'
               }`}
