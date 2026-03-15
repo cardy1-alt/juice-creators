@@ -1181,9 +1181,20 @@ export default function BusinessPortal() {
     return sum + Math.max(0, (o.monthly_cap - (o.slotsUsed || 0)));
   }, 0);
 
-  const recentActivity = [...claims]
-    .sort((a, b) => new Date(b.claimed_at).getTime() - new Date(a.claimed_at).getTime())
-    .slice(0, 8);
+  // Deduplicate by creator — show only the most recent claim per creator
+  const recentActivity = (() => {
+    const sorted = [...claims].sort((a, b) => new Date(b.claimed_at).getTime() - new Date(a.claimed_at).getTime());
+    const seen = new Map<string, { claim: ClaimWithDetails; count: number }>();
+    for (const claim of sorted) {
+      const cid = claim.creator_id;
+      if (seen.has(cid)) {
+        seen.get(cid)!.count++;
+      } else {
+        seen.set(cid, { claim, count: 1 });
+      }
+    }
+    return Array.from(seen.values()).slice(0, 8);
+  })();
 
   const liveOffers = offers.filter(o => o.is_live);
 
@@ -1377,7 +1388,7 @@ export default function BusinessPortal() {
                   </div>
                 ) : (
                   <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                    {recentActivity.map(claim => {
+                    {recentActivity.map(({ claim, count }) => {
                       const statusLabel = claim.status === 'active' ? 'Active' :
                         claim.status === 'redeemed' ? 'Visited' :
                         claim.status === 'reel_due' ? 'Reel due' :
@@ -1421,7 +1432,9 @@ export default function BusinessPortal() {
                           </div>
                           {/* Below image info */}
                           <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{claim.creators.name}</p>
-                          <p className="text-[11px] text-[var(--soft)] truncate">{claim.creators.instagram_handle}</p>
+                          <p className="text-[11px] text-[var(--soft)] truncate">
+                            {count > 1 ? `${count} claims` : claim.creators.instagram_handle}
+                          </p>
                         </div>
                       );
                     })}
