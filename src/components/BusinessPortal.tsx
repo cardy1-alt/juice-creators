@@ -8,7 +8,7 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy
+  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy, Infinity
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -333,7 +333,7 @@ interface OfferBuilderProps {
   onComplete: (data: {
     offer_type: string;
     offer_item: string;
-    monthly_cap: number;
+    monthly_cap: number | null;
     specific_ask: string | null;
     generated_title: string;
     content_type: string;
@@ -347,7 +347,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [screen, setScreen] = useState(1);
   const [offerType, setOfferType] = useState('');
   const [offerItem, setOfferItem] = useState('');
-  const [monthlyCap, setMonthlyCap] = useState(4);
+  const [monthlyCap, setMonthlyCap] = useState<number | null>(4);
   const [specificAsk, setSpecificAsk] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -627,24 +627,51 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>How many creators?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-10" style={{ lineHeight: '1.6' }}>Each slot is one creator visit</p>
 
-            <div className="flex items-center justify-center gap-6 mb-4">
-              <button
-                onClick={() => setMonthlyCap(Math.max(1, monthlyCap - 1))}
-                className="w-14 h-14 rounded-full border-[1.5px] border-[var(--faint)] flex items-center justify-center bg-white min-h-[44px]"
-              >
-                <Minus className="w-5 h-5 text-[#222222]" />
-              </button>
-              <span className="text-[64px] font-extrabold text-[#222222] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
-                {monthlyCap}
-              </span>
-              <button
-                onClick={() => setMonthlyCap(Math.min(20, monthlyCap + 1))}
-                className="w-14 h-14 rounded-full bg-[var(--terra)] flex items-center justify-center min-h-[44px]"
-              >
-                <Plus className="w-5 h-5 text-white" />
-              </button>
-            </div>
-            <p className="text-[13px] text-[var(--soft)] text-center mb-8">We recommend starting with 4</p>
+            {monthlyCap === null ? (
+              <div className="flex flex-col items-center mb-4">
+                <div className="w-20 h-20 rounded-full bg-[var(--terra-10)] flex items-center justify-center mb-3">
+                  <Infinity className="w-10 h-10 text-[var(--terra)]" />
+                </div>
+                <span className="text-[28px] font-extrabold text-[#222222]">Unlimited</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-6 mb-4">
+                <button
+                  onClick={() => setMonthlyCap(Math.max(1, monthlyCap - 1))}
+                  className="w-14 h-14 rounded-full border-[1.5px] border-[var(--faint)] flex items-center justify-center bg-white min-h-[44px]"
+                >
+                  <Minus className="w-5 h-5 text-[#222222]" />
+                </button>
+                <span className="text-[64px] font-extrabold text-[#222222] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
+                  {monthlyCap}
+                </span>
+                <button
+                  onClick={() => setMonthlyCap(Math.min(20, monthlyCap + 1))}
+                  className="w-14 h-14 rounded-full bg-[var(--terra)] flex items-center justify-center min-h-[44px]"
+                >
+                  <Plus className="w-5 h-5 text-white" />
+                </button>
+              </div>
+            )}
+            <p className="text-[13px] text-[var(--soft)] text-center mb-4">{monthlyCap === null ? 'No limit on claims per month' : 'We recommend starting with 4'}</p>
+
+            {/* Unlimited toggle */}
+            <button
+              onClick={() => setMonthlyCap(monthlyCap === null ? 4 : null)}
+              className={`w-full flex items-center justify-between px-[16px] py-[14px] rounded-[12px] mb-8 transition-all ${
+                monthlyCap === null
+                  ? 'bg-[var(--terra-10)] border border-[var(--terra)]'
+                  : 'bg-[var(--bg)] border border-transparent'
+              }`}
+            >
+              <div className="flex items-center gap-[10px]">
+                <Infinity className="w-[18px] h-[18px]" style={{ color: monthlyCap === null ? 'var(--terra)' : 'var(--mid)' }} />
+                <span className="text-[14px] font-semibold text-[#222222]">Unlimited claims</span>
+              </div>
+              <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${monthlyCap === null ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--faint)] justify-start'}`}>
+                <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+              </div>
+            </button>
 
             <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-6">
               <Info className="w-[14px] h-[14px] text-[var(--soft)] mt-0.5 flex-shrink-0" />
@@ -845,7 +872,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   <Video className="w-[13px] h-[13px] text-[var(--terra)]" />
                   <span className="text-[13px] text-[var(--mid)]">Instagram Reel</span>
                 </div>
-                <p className="text-[13px] text-[var(--mid)] mt-1">{monthlyCap} slots available</p>
+                <p className="text-[13px] text-[var(--mid)] mt-1">{monthlyCap === null ? 'Unlimited slots' : `${monthlyCap} slots available`}</p>
                 {specificAsk.trim() && (
                   <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
                     <p className="text-[14px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
@@ -1119,7 +1146,7 @@ export default function BusinessPortal() {
   const handleCreateOffer = async (data: {
     offer_type: string;
     offer_item: string;
-    monthly_cap: number;
+    monthly_cap: number | null;
     specific_ask: string | null;
     generated_title: string;
     content_type: string;
@@ -1731,13 +1758,21 @@ export default function BusinessPortal() {
                       <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.slotsUsed || 0}</p>
                       <p className="text-[11px] font-semibold text-[var(--mid)]">Claimed</p>
                     </div>
-                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
-                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.monthly_cap === null ? '\u221E' : selectedOffer.monthly_cap}</p>
-                      <p className="text-[11px] font-semibold text-[var(--mid)]">Monthly cap</p>
+                    <div className={`flex-1 text-center py-[12px] rounded-[12px] ${selectedOffer.monthly_cap === null ? 'bg-[var(--terra-10)]' : 'bg-[var(--bg)]'}`}>
+                      {selectedOffer.monthly_cap === null ? (
+                        <Infinity className="w-[20px] h-[20px] text-[var(--terra)] mx-auto mb-[2px]" />
+                      ) : (
+                        <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.monthly_cap}</p>
+                      )}
+                      <p className="text-[11px] font-semibold text-[var(--mid)]">{selectedOffer.monthly_cap === null ? 'Unlimited' : 'Monthly cap'}</p>
                     </div>
                     <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
-                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.offer_type || '\u2014'}</p>
-                      <p className="text-[11px] font-semibold text-[var(--mid)]">Type</p>
+                      {selectedOffer.content_type ? (
+                        <Film className="w-[18px] h-[18px] text-[var(--terra)] mx-auto mb-[2px]" />
+                      ) : (
+                        <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.offer_type || '\u2014'}</p>
+                      )}
+                      <p className="text-[11px] font-semibold text-[var(--mid)] capitalize">{selectedOffer.content_type || selectedOffer.offer_type || 'Type'}</p>
                     </div>
                   </div>
 
@@ -1799,7 +1834,10 @@ export default function BusinessPortal() {
                     {selectedOffer.content_type && (
                       <div>
                         <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Content type</label>
-                        <p className="px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--mid)]">{selectedOffer.content_type}</p>
+                        <div className="inline-flex items-center gap-[6px] px-[14px] py-[10px] rounded-[12px] bg-[var(--bg)]">
+                          <Film className="w-[16px] h-[16px] text-[var(--terra)]" />
+                          <span className="text-[14px] font-semibold text-[#222222] capitalize">{selectedOffer.content_type}</span>
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1891,7 +1929,11 @@ export default function BusinessPortal() {
                               </span>
                             )}
                             {/* Slots badge overlaid top-left */}
-                            {!isUnlimited && slotsLeft !== null && (() => {
+                            {isUnlimited ? (
+                              <span className="absolute top-[12px] left-[12px] inline-flex items-center gap-[4px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm" style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--terra)' }}>
+                                <Infinity className="w-[14px] h-[14px]" /> Unlimited
+                              </span>
+                            ) : slotsLeft !== null && (() => {
                               const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
                               return (
                                 <span
@@ -1911,9 +1953,16 @@ export default function BusinessPortal() {
                                 <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
                                   {offer.generated_title || offer.description}
                                 </h3>
-                                <p className="text-[13px] text-[var(--mid)]">
-                                  {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
-                                </p>
+                                <div className="flex items-center gap-[8px] flex-wrap">
+                                  <p className="text-[13px] text-[var(--mid)]">
+                                    {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
+                                  </p>
+                                  {offer.content_type && (
+                                    <span className="inline-flex items-center gap-[3px] text-[11px] font-semibold text-[var(--terra)]">
+                                      <Film className="w-[11px] h-[11px]" /> {offer.content_type}
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                               <ChevronRight className="w-5 h-5 text-[var(--soft)] flex-shrink-0 mt-[2px]" />
                             </div>
