@@ -1181,9 +1181,9 @@ export default function BusinessPortal() {
     return sum + Math.max(0, (o.monthly_cap - (o.slotsUsed || 0)));
   }, 0);
 
-  const recentActivity = claims
-    .filter(c => c.reel_url)
-    .slice(0, 5);
+  const recentActivity = [...claims]
+    .sort((a, b) => new Date(b.claimed_at).getTime() - new Date(a.claimed_at).getTime())
+    .slice(0, 8);
 
   const liveOffers = offers.filter(o => o.is_live);
 
@@ -1408,11 +1408,15 @@ export default function BusinessPortal() {
                         {/* Activity content */}
                         <div className="px-[14px] pb-[14px]">
                           <p className="text-[12px] text-[var(--mid)] leading-[1.4]">
-                            Posted a reel for <span className="font-semibold text-[#222222]">{claim.offers?.generated_title || claim.offers?.description?.slice(0, 30) || 'your offer'}</span>
+                            {claim.status === 'completed' ? 'Posted a reel for' :
+                             claim.status === 'reel_due' ? 'Reel due for' :
+                             claim.status === 'redeemed' ? 'Visited for' :
+                             'Claimed'}{' '}
+                            <span className="font-semibold text-[#222222]">{claim.offers?.generated_title || claim.offers?.description?.slice(0, 30) || 'your offer'}</span>
                           </p>
                           <div className="flex items-center justify-between mt-[10px]">
                             <span className="text-[11px] text-[var(--soft)]">{timeAgo(claim.claimed_at)}</span>
-                            {claim.reel_url && (
+                            {claim.reel_url ? (
                               <a
                                 href={claim.reel_url}
                                 target="_blank"
@@ -1423,6 +1427,17 @@ export default function BusinessPortal() {
                                 <Video className="w-[11px] h-[11px]" />
                                 View reel
                               </a>
+                            ) : (
+                              <span className={`text-[10px] font-semibold px-[7px] py-[2px] rounded-full ${
+                                claim.status === 'active' ? 'bg-[rgba(196,103,74,0.1)] text-[var(--terra)]' :
+                                claim.status === 'redeemed' ? 'bg-[rgba(26,60,52,0.08)] text-[var(--forest)]' :
+                                claim.status === 'reel_due' ? 'bg-[var(--peach)] text-[#222222]' :
+                                'bg-[var(--bg)] text-[var(--soft)]'
+                              }`}>
+                                {claim.status === 'active' ? 'Active' :
+                                 claim.status === 'redeemed' ? 'Visited' :
+                                 claim.status === 'reel_due' ? 'Reel due' : claim.status}
+                              </span>
                             )}
                           </div>
                         </div>
