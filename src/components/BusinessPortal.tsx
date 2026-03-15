@@ -8,7 +8,7 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye, TrendingUp
+  MoreHorizontal, QrCode, Eye
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -967,8 +967,8 @@ export default function BusinessPortal() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
-  const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
-  const [platformStats, setPlatformStats] = useState<{ totalCreators: number; totalBusinesses: number; totalClaims: number; recentClaims: number } | null>(null);
+  const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; address: string | null; bio: string | null; offer_count: number; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
+  const [expandedNearbyBiz, setExpandedNearbyBiz] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Clean redeem param from URL after reading it
@@ -1045,7 +1045,7 @@ export default function BusinessPortal() {
     // Fetch other approved businesses and their claim activity
     const { data: businesses } = await supabase
       .from('businesses')
-      .select('id, name, category, logo_url')
+      .select('id, name, category, logo_url, address, bio')
       .eq('approved', true)
       .neq('id', userProfile.id)
       .limit(10);
@@ -1054,12 +1054,12 @@ export default function BusinessPortal() {
       return;
     }
 
-    // Fetch claim counts for these businesses
+    // Fetch claim counts and offer counts for these businesses
     const ids = businesses.map(b => b.id);
-    const { data: claimsData } = await supabase
-      .from('claims')
-      .select('business_id, creator_id, claimed_at')
-      .in('business_id', ids);
+    const [{ data: claimsData }, { data: offersData }] = await Promise.all([
+      supabase.from('claims').select('business_id, creator_id, claimed_at').in('business_id', ids),
+      supabase.from('offers').select('business_id').eq('is_live', true).in('business_id', ids),
+    ]);
 
     const statsMap = new Map<string, { claim_count: number; creators: Set<string>; latest: string | null }>();
     for (const c of (claimsData || [])) {
@@ -1070,6 +1070,11 @@ export default function BusinessPortal() {
       statsMap.set(c.business_id, s);
     }
 
+    const offerMap = new Map<string, number>();
+    for (const o of (offersData || [])) {
+      offerMap.set(o.business_id, (offerMap.get(o.business_id) || 0) + 1);
+    }
+
     const result = businesses
       .map(b => {
         const s = statsMap.get(b.id);
@@ -1078,6 +1083,9 @@ export default function BusinessPortal() {
           name: b.name,
           category: b.category || 'Food & Drink',
           logo_url: b.logo_url || null,
+          address: b.address || null,
+          bio: b.bio || null,
+          offer_count: offerMap.get(b.id) || 0,
           claim_count: s?.claim_count || 0,
           creator_count: s?.creators.size || 0,
           latest_claim_at: s?.latest || null,
@@ -1087,23 +1095,6 @@ export default function BusinessPortal() {
       .slice(0, 5);
 
     setNearbyBusinesses(result);
-
-    // Platform-wide stats
-    const [creatorsRes, businessesRes, claimsRes] = await Promise.all([
-      supabase.from('creators').select('id', { count: 'exact', head: true }),
-      supabase.from('businesses').select('id', { count: 'exact', head: true }).eq('approved', true),
-      supabase.from('claims').select('id', { count: 'exact', head: true }),
-    ]);
-    // Claims in the last 7 days
-    const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-    const recentRes = await supabase.from('claims').select('id', { count: 'exact', head: true }).gte('claimed_at', weekAgo);
-
-    setPlatformStats({
-      totalCreators: creatorsRes.count || 0,
-      totalBusinesses: businessesRes.count || 0,
-      totalClaims: claimsRes.count || 0,
-      recentClaims: recentRes.count || 0,
-    });
   };
 
   const markNotificationRead = async (id: string) => {
@@ -1375,7 +1366,7 @@ export default function BusinessPortal() {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none' }}>
                     {liveOffers.map(offer => {
                       const isUnlimited = offer.monthly_cap === null;
                       const slotsUsed = offer.slotsUsed || 0;
@@ -1456,7 +1447,7 @@ export default function BusinessPortal() {
                     <p className="text-[14px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none' }}>
                     {recentActivity.map(({ claim, count }) => {
                       const activityText = claim.status === 'completed' ? 'Posted a reel' :
                         claim.status === 'reel_due' ? 'Reel due' :
@@ -1506,58 +1497,56 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* ═══ Platform pulse ═══ */}
-              {platformStats && (
+              {/* ═══ Also on Nayba ═══ */}
+              {nearbyBusinesses.length > 0 && (
                 <div className="mt-2">
-                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Nayba pulse</h3>
-
-                  {/* Stats strip */}
-                  <div className="grid grid-cols-3 gap-[10px] mb-[16px]">
-                    {[
-                      { label: 'Creators', value: platformStats.totalCreators },
-                      { label: 'Businesses', value: platformStats.totalBusinesses },
-                      { label: 'Claims this week', value: platformStats.recentClaims },
-                    ].map(stat => (
-                      <div key={stat.label} className="bg-white rounded-[14px] p-[12px] text-center border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
-                        <p className="text-[20px] font-extrabold text-[var(--terra)]">{stat.value}</p>
-                        <p className="text-[10px] text-[var(--mid)] mt-[2px] leading-tight">{stat.label}</p>
-                      </div>
+                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Also on Nayba</h3>
+                  <div className="space-y-[8px]">
+                    {nearbyBusinesses.map((biz) => (
+                      <button
+                        key={biz.id}
+                        onClick={() => setExpandedNearbyBiz(expandedNearbyBiz === biz.id ? null : biz.id)}
+                        className="w-full text-left"
+                      >
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)] transition-all">
+                          <div
+                            className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
+                            style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
+                          >
+                            {biz.logo_url ? (
+                              <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <span className="text-[14px] font-bold text-white">{biz.name.charAt(0)}</span>
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
+                            <p className="text-[11px] text-[var(--mid)]">
+                              {biz.claim_count > 0 ? (
+                                <>{biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}{biz.latest_claim_at && <> · {timeAgo(biz.latest_claim_at)}</>}</>
+                              ) : (
+                                <>{biz.category} · Just joined</>
+                              )}
+                            </p>
+                          </div>
+                          <ChevronRight className={`w-4 h-4 text-[var(--soft)] flex-shrink-0 transition-transform ${expandedNearbyBiz === biz.id ? 'rotate-90' : ''}`} />
+                        </div>
+                        {expandedNearbyBiz === biz.id && (
+                          <div className="mt-[2px] rounded-[14px] bg-[var(--bg)] border border-[var(--faint)] p-[16px]">
+                            {biz.logo_url && (
+                              <img src={biz.logo_url} alt="" className="w-[60px] h-[60px] rounded-[12px] object-cover mb-3" />
+                            )}
+                            <p className="text-[15px] font-bold text-[#222222]">{biz.name}</p>
+                            <p className="text-[12px] text-[var(--mid)] mt-[2px]">{biz.category}{biz.address ? ` · ${biz.address}` : ''}</p>
+                            {biz.bio && <p className="text-[13px] text-[var(--mid)] mt-[8px] leading-[1.4]">{biz.bio}</p>}
+                            {biz.offer_count > 0 && (
+                              <p className="text-[12px] font-bold text-[var(--terra)] mt-[10px]">{biz.offer_count} live offer{biz.offer_count !== 1 ? 's' : ''}</p>
+                            )}
+                          </div>
+                        )}
+                      </button>
                     ))}
                   </div>
-
-                  {/* Trending businesses */}
-                  {nearbyBusinesses.length > 0 && (
-                    <>
-                      <p className="text-[13px] font-bold text-[var(--mid)] mb-[10px] uppercase tracking-wide">Also on Nayba</p>
-                      <div className="space-y-[8px]">
-                        {nearbyBusinesses.map((biz, i) => (
-                          <div key={biz.id} className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
-                            <div
-                              className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
-                              style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
-                            >
-                              {biz.logo_url ? (
-                                <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
-                              ) : (
-                                <span className="text-[14px] font-bold text-white">{biz.name.charAt(0)}</span>
-                              )}
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
-                              <p className="text-[11px] text-[var(--mid)]">
-                                {biz.claim_count > 0 ? (
-                                  <>{biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}{biz.latest_claim_at && <> · {timeAgo(biz.latest_claim_at)}</>}</>
-                                ) : (
-                                  <>{biz.category} · Just joined</>
-                                )}
-                              </p>
-                            </div>
-                            {biz.claim_count > 0 && <TrendingUp className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />}
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
                 </div>
               )}
             </div>

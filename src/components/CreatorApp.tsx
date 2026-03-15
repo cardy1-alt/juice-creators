@@ -1394,7 +1394,7 @@ export default function CreatorApp() {
               ) : (
                 <div>
                   {/* Pill tab strip */}
-                  <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                  <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none' }}>
                     {activeClaims.map(claim => {
                       const isSelected = selectedClaim?.id === claim.id;
                       return (
@@ -1425,7 +1425,6 @@ export default function CreatorApp() {
                     className="flex overflow-x-auto"
                     style={{
                       scrollSnapType: 'x mandatory',
-                      WebkitOverflowScrolling: 'touch',
                       scrollbarWidth: 'none',
                     }}
                     onScroll={(e) => {
