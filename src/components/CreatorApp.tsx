@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram, Video, AlertCircle } from 'lucide-react';
+import { Search, Heart, Zap, SlidersHorizontal, Home, Coffee, Sparkles, LayoutGrid, ChevronRight, ChevronLeft, FileText, Bell, Check, LogOut, ExternalLink, Flag, X, User, Users, Clock, Copy, Camera, Instagram, Video, AlertCircle, Lock, Plus, BadgeCheck } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
+import LevelBadge from './LevelBadge';
 import { getCategoryGradient, getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { uploadAvatar } from '../lib/upload';
 import { Logo } from './Logo';
+import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
 
 function useCountdown(targetDate: string | null) {
   const [timeLeft, setTimeLeft] = useState('');
@@ -47,6 +49,7 @@ interface Offer {
   business_id: string;
   description: string;
   monthly_cap: number | null;
+  min_level?: number;
   slotsUsed?: number;
   offer_type?: string | null;
   offer_item?: string | null;
@@ -55,6 +58,28 @@ interface Offer {
   generated_title?: string | null;
   offer_photo_url?: string | null;
   businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
+}
+
+// ─── Flame SVG for streaks ────────────────────────────────────────────────
+function FlameIcon({ active, size = 16 }: { active: boolean; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
+      <path
+        d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1ZM8 12.5C6.07 12.5 4.5 11.16 4.5 9.5C4.5 7.5 6.5 5 8 3.5C9.5 5 11.5 7.5 11.5 9.5C11.5 11.16 9.93 12.5 8 12.5Z"
+        fill={active ? 'var(--terra)' : 'rgba(34,34,34,0.28)'}
+      />
+    </svg>
+  );
+}
+
+interface LeaderboardEntry {
+  id: string;
+  display_name: string | null;
+  name: string;
+  avatar_url: string | null;
+  level: number;
+  level_name: string;
+  reels_this_week: number;
 }
 
 interface Claim {
@@ -152,6 +177,10 @@ export default function CreatorApp() {
   const [waitlistedOffers, setWaitlistedOffers] = useState<Record<string, { id: string; position: number }>>({});
   const [waitlistLoading, setWaitlistLoading] = useState<string | null>(null);
   const [waitlistConfirmLeave, setWaitlistConfirmLeave] = useState<string | null>(null);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
+  const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<{ level: number; levelName: string } | null>(null);
+  const [streakWarningDismissed, setStreakWarningDismissed] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
@@ -192,8 +221,55 @@ export default function CreatorApp() {
       fetchNotifications();
       fetchCollabsCompleted();
       fetchWaitlist();
+      fetchLeaderboard();
+      checkLevelUp();
+      checkAndResetStreak();
     }
   }, [userProfile]);
+
+  const fetchLeaderboard = async () => {
+    setLeaderboardLoading(true);
+    try {
+      const { data } = await supabase
+        .from('weekly_leaderboard')
+        .select('*')
+        .limit(10);
+      if (data) setLeaderboard(data as LeaderboardEntry[]);
+    } catch {
+      // view may not exist yet
+    } finally {
+      setLeaderboardLoading(false);
+    }
+  };
+
+  const checkLevelUp = () => {
+    if (!userProfile?.level) return;
+    const storedLevel = localStorage.getItem(`nayba_level_${userProfile.id}`);
+    const currentLevel = userProfile.level || 1;
+    if (storedLevel && parseInt(storedLevel) < currentLevel) {
+      setShowLevelUpOverlay({ level: currentLevel, levelName: userProfile.level_name || 'Newcomer' });
+    }
+    localStorage.setItem(`nayba_level_${userProfile.id}`, String(currentLevel));
+  };
+
+  const checkAndResetStreak = async () => {
+    if (!userProfile?.last_reel_month) return;
+    const status = checkStreakStatus(userProfile.last_reel_month);
+    if (status === 'broken' && userProfile.current_streak > 0) {
+      await supabase
+        .from('creators')
+        .update({ current_streak: 0 })
+        .eq('id', userProfile.id);
+    }
+    // Dismiss streak warning if already posted this month
+    const dismissed = localStorage.getItem(`nayba_streak_dismiss_${getCurrentMonth()}`);
+    if (dismissed) setStreakWarningDismissed(true);
+  };
+
+  const dismissStreakWarning = () => {
+    setStreakWarningDismissed(true);
+    localStorage.setItem(`nayba_streak_dismiss_${getCurrentMonth()}`, 'true');
+  };
 
   const fetchWaitlist = async () => {
     const { data } = await supabase
@@ -404,12 +480,31 @@ export default function CreatorApp() {
     try {
       const { error } = await supabase
         .from('claims')
-        .update({ reel_url: reelUrl })
+        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString() })
         .eq('id', selectedClaim.id);
       if (error) throw error;
+
+      // Update creator stats: total_reels, streak, last_reel_month
+      const currentMonth = getCurrentMonth();
+      const newTotalReels = (userProfile.total_reels || 0) + 1;
+      const isNewMonth = userProfile.last_reel_month !== currentMonth;
+      const newStreak = isNewMonth ? (userProfile.current_streak || 0) + 1 : (userProfile.current_streak || 0);
+      const newLongest = Math.max(newStreak, userProfile.longest_streak || 0);
+
+      await supabase
+        .from('creators')
+        .update({
+          total_reels: newTotalReels,
+          current_streak: newStreak,
+          longest_streak: newLongest,
+          last_reel_month: currentMonth,
+        })
+        .eq('id', userProfile.id);
+
       setReelUrl('');
       setReelError(null);
       fetchClaims();
+      fetchCollabsCompleted();
     } catch (error: any) {
       setReelError(error.message || 'Failed to submit reel');
     } finally {
@@ -590,6 +685,33 @@ export default function CreatorApp() {
         </div>
       )}
 
+      {/* Level Up Overlay */}
+      {showLevelUpOverlay && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.85)' }}>
+          <div className="bg-white rounded-[24px] p-[36px_28px] text-center max-w-[320px] mx-4">
+            <div className="flex justify-center mb-5">
+              <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
+            </div>
+            <h2 className="text-[24px] font-extrabold text-[#222222] mb-2" style={{ letterSpacing: '-0.5px' }}>
+              You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
+            </h2>
+            <p className="text-[14px] text-[var(--mid)] mb-6 leading-[1.5]">
+              {showLevelUpOverlay.level === 2 && 'You posted your first reel. You can now access more offers.'}
+              {showLevelUpOverlay.level === 3 && 'Businesses are starting to notice you. Keep it up.'}
+              {showLevelUpOverlay.level === 4 && 'You're a local favourite. Premium offers are unlocking.'}
+              {showLevelUpOverlay.level === 5 && 'Trusted creator status. The best offers are now available to you.'}
+              {showLevelUpOverlay.level === 6 && 'The highest tier. You are a Nayba.'}
+            </p>
+            <button
+              onClick={() => setShowLevelUpOverlay(null)}
+              className="w-full py-[14px] rounded-[50px] font-bold text-[14px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
+            >
+              Keep going →
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Expanded Offer Detail Modal */}
       {expandedOffer && (() => {
         const offer = offers.find(o => o.id === expandedOffer);
@@ -600,6 +722,15 @@ export default function CreatorApp() {
         const full = !isUnlimited && slotsLeft === 0;
         const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
         const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
+        const detailCreatorLevel = userProfile.level || 1;
+        const detailMinLevel = offer.min_level || 1;
+        const detailIsLocked = detailCreatorLevel < detailMinLevel;
+        const detailLockedName = detailMinLevel === 2 ? 'Explorer' : detailMinLevel === 3 ? 'Regular' : detailMinLevel === 4 ? 'Local' : detailMinLevel === 5 ? 'Trusted' : detailMinLevel === 6 ? 'Nayba' : 'Newcomer';
+        const detailReelsToUnlock = (() => {
+          const thresholds = [0, 1, 3, 6, 11, 21];
+          const needed = thresholds[detailMinLevel - 1] || 0;
+          return Math.max(0, needed - (userProfile.total_reels || 0));
+        })();
 
         return (
           <div className="fixed inset-0 z-50 bg-white flex flex-col">
@@ -620,6 +751,10 @@ export default function CreatorApp() {
               >
                 <ChevronLeft className="w-[18px] h-[18px] text-[#222222]" />
               </button>
+              {/* Locked overlay on hero */}
+              {detailIsLocked && (
+                <div className="absolute inset-0" style={{ background: 'rgba(26,26,26,0.45)' }} />
+              )}
               <button
                 onClick={() => toggleSaved(offer.id)}
                 className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.15)] flex items-center justify-center"
@@ -634,6 +769,17 @@ export default function CreatorApp() {
                 {/* A) Business name + category */}
                 <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
                 <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
+
+                {/* Level requirement banner */}
+                {detailIsLocked && (
+                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mt-3" style={{ background: 'rgba(26,26,26,0.04)' }}>
+                    <Lock className="w-[14px] h-[14px] text-[var(--mid)] mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#222222]">{detailLockedName} creators only</p>
+                      <p className="text-[12px] text-[var(--mid)] mt-0.5">You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Offer headline */}
                 <p className="text-[20px] font-extrabold text-[#222222] mt-3" style={{ letterSpacing: '-0.4px' }}>
@@ -695,6 +841,14 @@ export default function CreatorApp() {
 
             {/* Sticky bottom bar */}
             <div className="border-t border-[rgba(34,34,34,0.1)] bg-white px-[20px] py-[14px]">
+              {detailIsLocked ? (
+                <div
+                  className="w-full py-[14px] rounded-[50px] text-center text-[12px] text-[var(--soft)]"
+                  style={{ background: 'var(--bg)' }}
+                >
+                  Unlocks at {detailLockedName}
+                </div>
+              ) : (
               <div className="flex items-center justify-between">
                 <div>
                   {full && waitlistedOffers[offer.id] ? (
@@ -768,6 +922,7 @@ export default function CreatorApp() {
                   </button>
                 )}
               </div>
+              )}
             </div>
           </div>
         );
@@ -891,6 +1046,90 @@ export default function CreatorApp() {
                 );
               })()}
 
+              {/* Streak Warning Banner */}
+              {!streakWarningDismissed && userProfile.current_streak > 0 && isStreakWarningPeriod(userProfile.last_reel_month) && (
+                <div
+                  className="mx-[20px] mt-[14px] flex items-center gap-[10px] rounded-[12px] p-[12px_16px]"
+                  style={{ background: 'rgba(196,103,74,0.06)', border: '1px solid rgba(196,103,74,0.15)' }}
+                >
+                  <FlameIcon active size={16} />
+                  <p className="flex-1 text-[13px] text-[#222222]">
+                    Your streak ends in {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate()} days — claim an offer to keep it
+                  </p>
+                  <button
+                    onClick={() => { /* scroll to offers section */ }}
+                    className="text-[12px] font-semibold text-[var(--terra)] whitespace-nowrap"
+                  >
+                    Browse →
+                  </button>
+                  <button onClick={dismissStreakWarning} className="ml-1 text-[var(--soft)]">
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+
+              {/* Weekly Leaderboard */}
+              {leaderboard.length >= 2 && (
+                <div className="mx-[20px] mt-[14px] bg-white rounded-[20px] border border-[var(--faint)] p-[16px_18px]">
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[15px] font-extrabold text-[#222222]">This week's top creators</h3>
+                    <span className="text-[11px] text-[var(--soft)]">
+                      Resets in {(() => {
+                        const now = new Date();
+                        const nextMonday = new Date(now);
+                        nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
+                        nextMonday.setHours(0, 0, 0, 0);
+                        const diff = nextMonday.getTime() - now.getTime();
+                        const d = Math.floor(diff / 86400000);
+                        const h = Math.floor((diff % 86400000) / 3600000);
+                        return `${d}d ${h}h`;
+                      })()}
+                    </span>
+                  </div>
+                  {leaderboard.slice(0, 5).map((entry, idx) => {
+                    const posColor = idx === 0 ? 'var(--terra)' : idx === 1 ? '#222222' : idx === 2 ? 'var(--mid)' : 'var(--soft)';
+                    return (
+                      <div
+                        key={entry.id}
+                        className={`flex items-center gap-3 py-[10px] ${idx < Math.min(leaderboard.length, 5) - 1 ? 'border-b border-[var(--faint)]' : ''}`}
+                      >
+                        <span className="text-[20px] font-extrabold w-6 text-center" style={{ color: posColor }}>{idx + 1}</span>
+                        {entry.avatar_url ? (
+                          <img src={entry.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getLevelColour(entry.level) }}>
+                            <span className="text-white text-[12px] font-bold">{getInitials(entry.display_name || entry.name)}</span>
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-[14px] font-bold text-[#222222] truncate">{entry.display_name || entry.name}</span>
+                            <LevelBadge level={entry.level} levelName={entry.level_name} size="sm" />
+                          </div>
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="text-[15px] font-extrabold text-[#222222]">{entry.reels_this_week}</p>
+                          <p className="text-[11px] text-[var(--soft)]">reels</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                  {/* Your position if not in top 5 */}
+                  {!leaderboard.slice(0, 5).some(e => e.id === userProfile.id) && (() => {
+                    const myEntry = leaderboard.find(e => e.id === userProfile.id);
+                    const myIdx = myEntry ? leaderboard.indexOf(myEntry) : -1;
+                    if (myIdx < 0 && (userProfile.total_reels || 0) === 0) return null;
+                    return (
+                      <div className="pt-2 mt-1 border-t border-dashed border-[var(--faint)]">
+                        <p className="text-[13px] text-[var(--mid)] text-center">
+                          You · {myIdx >= 0 ? `${myIdx + 1}${myIdx === 0 ? 'st' : myIdx === 1 ? 'nd' : myIdx === 2 ? 'rd' : 'th'} this week · ${myEntry!.reels_this_week} reels` : '0 reels this week'}
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
               {/* Section Header */}
               <div className="flex items-center justify-between px-[20px] mt-4 mb-[14px]">
                 <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">Near you</h2>
@@ -948,6 +1187,10 @@ export default function CreatorApp() {
                   const slotsUsed = offer.slotsUsed || 0;
                   const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
                   const full = !isUnlimited && slotsLeft === 0;
+                  const creatorLevel = userProfile.level || 1;
+                  const offerMinLevel = offer.min_level || 1;
+                  const isLocked = creatorLevel < offerMinLevel;
+                  const lockedLevelName = offerMinLevel === 2 ? 'Explorer' : offerMinLevel === 3 ? 'Regular' : offerMinLevel === 4 ? 'Local' : offerMinLevel === 5 ? 'Trusted' : offerMinLevel === 6 ? 'Nayba' : 'Newcomer';
 
                   return (
                     <button
@@ -969,38 +1212,59 @@ export default function CreatorApp() {
                             <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
                           </div>
                         )}
+                        {/* Locked overlay */}
+                        {isLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
+                            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+                              <Lock className="w-3.5 h-3.5 text-[#222222]" />
+                            </div>
+                          </div>
+                        )}
                         {/* Business logo overlay top-left */}
-                        {(offer.offer_photo_url || offer.businesses.logo_url) && offer.businesses.logo_url && (
+                        {!isLocked && (offer.offer_photo_url || offer.businesses.logo_url) && offer.businesses.logo_url && (
                           <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-[8px] overflow-hidden" style={{ border: '1.5px solid white' }}>
                             <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
                           </div>
                         )}
-                        {/* Slots badge bottom-left */}
-                        {!isUnlimited && (() => {
-                          const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
-                          return (
-                            <span
-                              className="absolute bottom-[6px] left-[6px] backdrop-blur text-[12px] font-bold rounded-full px-[9px] py-[4px]"
-                              style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
-                            >
-                              {badge.text}
-                            </span>
-                          );
-                        })()}
+                        {/* Slots badge bottom-left or level requirement */}
+                        {isLocked ? (
+                          <span
+                            className="absolute bottom-[6px] left-[6px] text-[10px] font-bold rounded-[50px] px-[10px] py-[4px] text-white"
+                            style={{ background: 'rgba(26,26,26,0.85)' }}
+                          >
+                            Level {offerMinLevel}+ only
+                          </span>
+                        ) : (
+                          !isUnlimited && (() => {
+                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
+                            return (
+                              <span
+                                className="absolute bottom-[6px] left-[6px] backdrop-blur text-[12px] font-bold rounded-full px-[9px] py-[4px]"
+                                style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
+                              >
+                                {badge.text}
+                              </span>
+                            );
+                          })()
+                        )}
                         {/* Reel badge top-right */}
-                        <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
-                          <Video className="w-[10px] h-[10px]" /> Reel
-                        </span>
+                        {!isLocked && (
+                          <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
+                            <Video className="w-[10px] h-[10px]" /> Reel
+                          </span>
+                        )}
                         {/* Heart */}
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                          className="absolute bottom-[6px] right-[6px]"
-                        >
-                          <Heart
-                            className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
-                            strokeWidth={1.5}
-                          />
-                        </button>
+                        {!isLocked && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                            className="absolute bottom-[6px] right-[6px]"
+                          >
+                            <Heart
+                              className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
+                              strokeWidth={1.5}
+                            />
+                          </button>
+                        )}
                       </div>
                       {/* Below image info */}
                       <div className="mt-2">
@@ -1008,19 +1272,23 @@ export default function CreatorApp() {
                         <p className="text-[13px] font-semibold text-[#222222] truncate">
                           {offer.generated_title || offer.description.slice(0, 35)}
                         </p>
-                        <div className="flex items-center gap-1 mt-0.5">
-                          <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
-                          <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
-                          {!isUnlimited && (() => {
-                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
-                            return (
-                              <>
-                                <span className="text-[11px] text-[var(--mid)]">·</span>
-                                <span className="text-[11px]" style={{ color: badge.color }}>{badge.text}</span>
-                              </>
-                            );
-                          })()}
-                        </div>
+                        {isLocked ? (
+                          <p className="text-[11px] text-[var(--soft)] mt-0.5">Unlocks at {lockedLevelName}</p>
+                        ) : (
+                          <div className="flex items-center gap-1 mt-0.5">
+                            <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
+                            <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
+                            {!isUnlimited && (() => {
+                              const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
+                              return (
+                                <>
+                                  <span className="text-[11px] text-[var(--mid)]">·</span>
+                                  <span className="text-[11px]" style={{ color: badge.color }}>{badge.text}</span>
+                                </>
+                              );
+                            })()}
+                          </div>
+                        )}
                       </div>
                     </button>
                   );
@@ -1245,6 +1513,13 @@ export default function CreatorApp() {
                                     claimId={claim.id}
                                     creatorCode={userProfile.code}
                                   />
+                                  {/* Level badge + verified on QR screen */}
+                                  <div className="flex items-center justify-center gap-2 mt-3">
+                                    <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
+                                    {userProfile.profile_complete && (
+                                      <BadgeCheck className="w-[14px] h-[14px] text-[var(--forest)]" title="Verified creator" />
+                                    )}
+                                  </div>
                                 </>
                               )}
 
@@ -1484,6 +1759,89 @@ export default function CreatorApp() {
                         <Instagram className="w-3.5 h-3.5" /> {userProfile.instagram_handle}
                       </p>
                     )}
+                    {/* Level badge */}
+                    <div className="mt-3">
+                      <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="lg" />
+                    </div>
+                    {/* Verified badge */}
+                    {userProfile.profile_complete && (
+                      <div className="flex items-center gap-1 mt-2">
+                        <BadgeCheck className="w-[14px] h-[14px] text-[var(--forest)]" />
+                        <span className="text-[12px] font-semibold text-[var(--forest)]">Verified creator</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Profile completeness */}
+                  {(() => {
+                    const completeness = getProfileCompleteness(userProfile);
+                    if (completeness.score === 100) {
+                      return (
+                        <div className="flex items-center gap-2 rounded-[12px] p-[10px_14px] mb-4" style={{ background: 'rgba(26,60,52,0.06)' }}>
+                          <BadgeCheck className="w-4 h-4 text-[var(--forest)]" />
+                          <span className="text-[13px] font-semibold text-[var(--forest)]">Profile complete</span>
+                        </div>
+                      );
+                    }
+                    return (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex-1 h-[4px] rounded-[4px] mr-3" style={{ background: 'var(--bg)' }}>
+                            <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
+                          </div>
+                          <span className="text-[12px] text-[var(--soft)]">{completeness.score}% complete</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {completeness.missing.map(field => (
+                            <span key={field.key} className="flex items-center gap-1 px-3 py-1.5 rounded-[50px] text-[12px] font-semibold text-[var(--mid)]" style={{ background: 'var(--bg)' }}>
+                              <Plus className="w-[10px] h-[10px]" /> {field.label}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Level progress */}
+                  {(() => {
+                    const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
+                    return (
+                      <div className="rounded-[12px] p-[12px_16px] mb-3" style={{ background: 'var(--bg)' }}>
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[13px] font-bold text-[#222222]">Level {progress.currentLevel} · {progress.currentName}</span>
+                          {!progress.isMaxLevel && (
+                            <span className="text-[12px] text-[var(--mid)]">Level {progress.nextLevel} · {progress.nextName}</span>
+                          )}
+                        </div>
+                        <div className="h-[4px] rounded-[4px] mb-2" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${progress.progressPercent}%`, background: 'var(--terra)' }} />
+                        </div>
+                        <p className="text-[12px] text-[var(--soft)] text-center">
+                          {progress.isMaxLevel
+                            ? "You've reached the top. You're a Nayba."
+                            : progress.ratingNeeded
+                              ? `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} + ${progress.ratingNeeded}★ rating to reach ${progress.nextName}`
+                              : `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} to reach ${progress.nextName}`
+                          }
+                        </p>
+                      </div>
+                    );
+                  })()}
+
+                  {/* Streak row */}
+                  <div className="flex items-center justify-between rounded-[12px] p-[12px_16px] mb-6" style={{ background: 'var(--bg)' }}>
+                    <div className="flex items-center gap-2">
+                      <FlameIcon active={(userProfile.current_streak || 0) > 0} />
+                      <span className="text-[13px] font-bold text-[#222222]">
+                        {(userProfile.current_streak || 0) > 0
+                          ? `${userProfile.current_streak} month streak`
+                          : 'Start your streak this month'
+                        }
+                      </span>
+                    </div>
+                    {(userProfile.longest_streak || 0) > 0 && (
+                      <span className="text-[12px] text-[var(--soft)]">Best: {userProfile.longest_streak}</span>
+                    )}
                   </div>
 
                   {/* Stats row */}
@@ -1499,7 +1857,7 @@ export default function CreatorApp() {
                     </div>
                     <div className="w-[1px] h-8 bg-[rgba(34,34,34,0.1)]" />
                     <div className="flex-1 text-center">
-                      <p className="text-[20px] font-extrabold text-[#222222]">&mdash;</p>
+                      <p className="text-[20px] font-extrabold text-[#222222]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
                       <p className="text-[12px] text-[rgba(34,34,34,0.5)]">Rating</p>
                     </div>
                   </div>

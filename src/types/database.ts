@@ -83,6 +83,16 @@ export type Database = {
           onboarding_complete: boolean;
           avatar_url: string | null;
           created_at: string;
+          level: number;
+          level_name: string;
+          total_reels: number;
+          average_rating: number;
+          current_streak: number;
+          longest_streak: number;
+          last_reel_month: string | null;
+          profile_complete: boolean;
+          display_name: string | null;
+          bio: string | null;
         };
         Insert: {
           id?: string;
@@ -95,6 +105,16 @@ export type Database = {
           onboarding_complete?: boolean;
           avatar_url?: string | null;
           created_at?: string;
+          level?: number;
+          level_name?: string;
+          total_reels?: number;
+          average_rating?: number;
+          current_streak?: number;
+          longest_streak?: number;
+          last_reel_month?: string | null;
+          profile_complete?: boolean;
+          display_name?: string | null;
+          bio?: string | null;
         };
         Update: {
           id?: string;
@@ -107,6 +127,16 @@ export type Database = {
           onboarding_complete?: boolean;
           avatar_url?: string | null;
           created_at?: string;
+          level?: number;
+          level_name?: string;
+          total_reels?: number;
+          average_rating?: number;
+          current_streak?: number;
+          longest_streak?: number;
+          last_reel_month?: string | null;
+          profile_complete?: boolean;
+          display_name?: string | null;
+          bio?: string | null;
         };
       };
       claims: {

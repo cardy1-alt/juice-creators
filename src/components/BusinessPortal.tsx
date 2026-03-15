@@ -338,6 +338,7 @@ interface OfferBuilderProps {
     generated_title: string;
     content_type: string;
     offer_photo_url: string | null;
+    min_level: number;
   }) => void;
   onCancel: () => void;
 }
@@ -356,6 +357,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [tipDismissed, setTipDismissed] = useState(false);
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [offerPhotoUrl, setOfferPhotoUrl] = useState<string | null>(null);
+  const [minLevel, setMinLevel] = useState(1);
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [offerId] = useState(() => crypto.randomUUID());
@@ -388,6 +390,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
       generated_title: generatedTitle,
       content_type: 'reel',
       offer_photo_url: offerPhotoUrl,
+      min_level: minLevel,
     });
   };
 
@@ -643,9 +646,34 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             </div>
             <p className="text-[13px] text-[var(--soft)] text-center mb-8">We recommend starting with 4</p>
 
-            <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-8">
+            <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-6">
               <Info className="w-[14px] h-[14px] text-[var(--soft)] mt-0.5 flex-shrink-0" />
               <p className="text-[12px] text-[var(--soft)]">Each creator visits in person and posts within 48 hours</p>
+            </div>
+
+            {/* Who can claim this? */}
+            <div className="mb-8">
+              <p className="text-[14px] font-bold text-[#222222] mb-3">Who can claim this?</p>
+              <div className="flex gap-2 flex-wrap">
+                {[
+                  { label: 'Everyone', value: 1 },
+                  { label: 'Level 3+', value: 3 },
+                  { label: 'Level 5+', value: 5 },
+                ].map(opt => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setMinLevel(opt.value)}
+                    className="px-[14px] py-[7px] rounded-[50px] text-[12px] font-semibold transition-all"
+                    style={{
+                      background: minLevel === opt.value ? '#222222' : 'var(--bg)',
+                      color: minLevel === opt.value ? 'white' : 'var(--mid)',
+                    }}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-[12px] text-[var(--soft)] mt-2">Higher level creators have posted more reels and have better ratings</p>
             </div>
 
             <button
@@ -1027,6 +1055,7 @@ export default function BusinessPortal() {
     generated_title: string;
     content_type: string;
     offer_photo_url: string | null;
+    min_level: number;
   }) => {
     try {
       const { error } = await supabase.from('offers').insert({
@@ -1040,6 +1069,7 @@ export default function BusinessPortal() {
         specific_ask: data.specific_ask,
         generated_title: data.generated_title,
         offer_photo_url: data.offer_photo_url,
+        min_level: data.min_level,
       });
       if (error) throw error;
       fetchOffers();
@@ -1670,27 +1700,25 @@ export default function BusinessPortal() {
                                 <p className="text-[13px] text-[var(--mid)]">{displayHandle}</p>
                               </div>
                             </div>
-                            {/* Offer + reel status footer */}
-                            <div className="flex items-center justify-between mt-3 pt-3 border-t border-[var(--faint)]">
-                              <p className="text-[12px] text-[var(--soft)] truncate flex-1 mr-3">
-                                {claim.offers?.generated_title || claim.offers?.description}
-                              </p>
-                              <div className="flex items-center gap-2 flex-shrink-0">
-                                <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
-                                {claim.reel_url ? (
-                                  <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
-                                    <Video className="w-3 h-3" />
-                                    <ExternalLink className="w-3 h-3" />
-                                  </a>
-                                ) : claim.status === 'reel_due' && claim.reel_due_at ? (
-                                  <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
-                                    <Clock className="w-3 h-3" /> {(() => {
-                                      const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
-                                      return hours > 24 ? `${Math.round(hours / 24)}d` : `${hours}h`;
-                                    })()}
-                                  </span>
-                                ) : null}
-                              </div>
+                            {/* Offer description */}
+                            <p className="text-[13px] text-[var(--mid)] mt-2 leading-[1.4]">
+                              {claim.offers?.generated_title || claim.offers?.description}
+                            </p>
+                            {/* Date + reel status */}
+                            <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-[var(--faint)]">
+                              <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                              {claim.reel_url ? (
+                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
+                                  <Video className="w-3 h-3" /> Reel posted <ExternalLink className="w-3 h-3" />
+                                </a>
+                              ) : claim.status === 'reel_due' && claim.reel_due_at ? (
+                                <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
+                                  <Clock className="w-3 h-3" /> Due {(() => {
+                                    const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
+                                    return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
+                                  })()}
+                                </span>
+                              ) : null}
                             </div>
                           </div>
                         </div>
