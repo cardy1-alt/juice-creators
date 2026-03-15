@@ -954,6 +954,7 @@ export default function BusinessPortal() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [offersLoaded, setOffersLoaded] = useState(false);
   const [claimsFilter, setClaimsFilter] = useState<string>('all');
+  const [creatorFilter, setCreatorFilter] = useState<string | null>(null);
   const [claimsSubView, setClaimsSubView] = useState<'claims' | 'content'>('claims');
   const [profileName, setProfileName] = useState(userProfile?.name || '');
   const [profileAddress, setProfileAddress] = useState(userProfile?.address || '');
@@ -1164,9 +1165,9 @@ export default function BusinessPortal() {
   };
 
   // Filter claims
-  const filteredClaims = claimsFilter === 'all'
-    ? claims
-    : claims.filter(c => c.status === claimsFilter);
+  const filteredClaims = claims
+    .filter(c => claimsFilter === 'all' || c.status === claimsFilter)
+    .filter(c => !creatorFilter || c.creator_id === creatorFilter);
 
   // Stats
   const reelsThisMonth = claims.filter(c => {
@@ -1394,7 +1395,11 @@ export default function BusinessPortal() {
                         claim.status === 'redeemed' ? 'Visited' : 'Claimed offer';
                       const firstName = claim.creators.name.split(' ')[0];
                       return (
-                        <div key={claim.id} className="w-[140px] flex-shrink-0 text-left">
+                        <button
+                          key={claim.id}
+                          className="w-[140px] flex-shrink-0 text-left"
+                          onClick={() => { setCreatorFilter(claim.creator_id); setClaimsFilter('all'); setView('claims'); }}
+                        >
                           <div className="relative w-[140px] h-[180px] rounded-[14px] overflow-hidden">
                             {claim.creators.avatar_url ? (
                               <img
@@ -1426,7 +1431,7 @@ export default function BusinessPortal() {
                           <p className="mt-[6px] text-[11px] text-[var(--soft)] truncate">
                             {count > 1 ? `${count} claims` : claim.creators.instagram_handle}
                           </p>
-                        </div>
+                        </button>
                       );
                     })}
                   </div>
@@ -1626,9 +1631,20 @@ export default function BusinessPortal() {
           {view === 'claims' && (
             <div>
               <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
-              <p className="text-[14px] text-[var(--mid)] mb-5">
-                {claims.filter(c => c.status === 'active').length} active · {claims.length} total
-              </p>
+              {creatorFilter ? (
+                <button
+                  onClick={() => setCreatorFilter(null)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold mb-4 transition-colors"
+                  style={{ background: 'var(--bg)', color: '#222222' }}
+                >
+                  {claims.find(c => c.creator_id === creatorFilter)?.creators.name || 'Creator'}
+                  <X className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <p className="text-[14px] text-[var(--mid)] mb-5">
+                  {claims.filter(c => c.status === 'active').length} active · {claims.length} total
+                </p>
+              )}
 
               {/* Stat row filters */}
               <div className="grid grid-cols-4 gap-2 mb-5">
@@ -2062,7 +2078,7 @@ export default function BusinessPortal() {
           return (
             <button
               key={tab.key}
-              onClick={() => setView(tab.key)}
+              onClick={() => { setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); }}
               className="flex-1 flex flex-col items-center gap-1"
             >
               <Icon className={`w-5 h-5 ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
