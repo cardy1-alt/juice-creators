@@ -7,7 +7,7 @@ import {
   CheckCircle2, XCircle, VideoOff, Flag,
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
-  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight
+  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -874,7 +874,7 @@ export default function BusinessPortal() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [view, setView] = useState<'home' | 'offers' | 'claims' | 'content' | 'scan' | 'notifications' | 'profile'>(
+  const [view, setView] = useState<'home' | 'offers' | 'claims' | 'scan' | 'notifications' | 'profile'>(
     new URLSearchParams(window.location.search).get('redeem') ? 'scan' : 'home'
   );
   const [showOfferBuilder, setShowOfferBuilder] = useState(false);
@@ -888,6 +888,7 @@ export default function BusinessPortal() {
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [offersLoaded, setOffersLoaded] = useState(false);
   const [claimsFilter, setClaimsFilter] = useState<string>('all');
+  const [claimsSubView, setClaimsSubView] = useState<'claims' | 'content'>('claims');
   const [profileName, setProfileName] = useState(userProfile?.name || '');
   const [profileAddress, setProfileAddress] = useState(userProfile?.address || '');
   const [profileInstagram, setProfileInstagram] = useState(userProfile?.instagram_handle || '');
@@ -1064,13 +1065,12 @@ export default function BusinessPortal() {
     );
   }
 
-  const tabs = [
-    { key: 'home' as const, label: 'Home', icon: LayoutDashboard },
-    { key: 'offers' as const, label: 'Offers', icon: Package },
-    { key: 'scan' as const, label: 'Scan', icon: Camera, badge: activeClaimsCount || undefined },
-    { key: 'claims' as const, label: 'Claims', icon: Users },
-    { key: 'content' as const, label: 'Content', icon: Film },
-    { key: 'profile' as const, label: 'Profile', icon: User },
+  const bottomTabs: { key: 'home' | 'offers' | 'scan' | 'claims' | 'profile'; label: string; icon: any }[] = [
+    { key: 'home', label: 'Home', icon: LayoutDashboard },
+    { key: 'offers', label: 'Offers', icon: Tag },
+    { key: 'scan', label: 'Scan', icon: ScanLine },
+    { key: 'claims', label: 'Claims', icon: FileText },
+    { key: 'profile', label: 'Profile', icon: User },
   ];
 
   const claimStatusStyle = (status: string) => {
@@ -1151,7 +1151,7 @@ export default function BusinessPortal() {
         />
       )}
 
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto pb-[80px]">
         {/* Header */}
         <div className="bg-white border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
@@ -1163,30 +1163,6 @@ export default function BusinessPortal() {
               </span>
             </div>
           </div>
-        </div>
-
-        {/* Tab bar */}
-        <div className="flex bg-white border-b border-[var(--faint)] overflow-x-auto px-[20px]">
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => { setView(tab.key); setScanResult(null); }}
-              className={`flex items-center gap-[5px] px-[14px] py-[10px] pb-[12px] text-[11px] font-semibold whitespace-nowrap transition-all relative min-h-[44px] ${
-                view === tab.key ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
-              }`}
-            >
-              <div className="relative">
-                <tab.icon className="w-[18px] h-[18px]" />
-                {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-2 min-w-[16px] h-4 px-1 rounded-full bg-[var(--terra)] text-white text-[9px] font-bold flex items-center justify-center">
-                    {tab.badge}
-                  </span>
-                ) : null}
-              </div>
-              {tab.label}
-              {view === tab.key && <div className="absolute bottom-0 left-2 right-2 h-[2px] bg-[var(--terra)] rounded-[1px]" />}
-            </button>
-          ))}
         </div>
 
         <div className="p-[20px]">
@@ -1265,45 +1241,86 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* Live offers strip */}
-              {liveOffers.length > 0 && (
-                <div className="mb-6">
-                  <div className="flex items-center justify-between mb-[14px]">
-                    <h3 className="text-[18px] font-extrabold text-[#222222]">Live offers</h3>
-                    <button onClick={() => setView('offers')} className="text-[12px] font-semibold text-[var(--terra)]">
-                      Manage →
+              {/* Live offers — vertical cards */}
+              <div className="mb-6">
+                <div className="flex items-center justify-between mb-3">
+                  <h3 className="text-[18px] font-extrabold text-[#222222]">Live offers</h3>
+                  {liveOffers.length > 0 && (
+                    <button onClick={() => setView('offers')} className="text-[13px] font-semibold text-[var(--terra)]">
+                      See all →
+                    </button>
+                  )}
+                </div>
+
+                {liveOffers.length === 0 ? (
+                  <div className="flex flex-col items-center py-10 px-4">
+                    <Tag className="w-10 h-10 text-[var(--soft)] mb-3" />
+                    <p className="text-[15px] font-semibold text-[#222222]">No live offers yet</p>
+                    <p className="text-[13px] text-[var(--mid)] text-center mt-1 max-w-[260px]">Create your first offer to start getting creator visits</p>
+                    <button
+                      onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
+                      className="mt-[14px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white text-[13px] font-bold hover:bg-[var(--terra-hover)] transition-all"
+                    >
+                      Create offer →
                     </button>
                   </div>
-                  <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
-                    {liveOffers.map(offer => {
+                ) : (
+                  <div className="space-y-[10px]">
+                    {liveOffers.slice(0, 3).map(offer => {
                       const isUnlimited = offer.monthly_cap === null;
                       const slotsUsed = offer.slotsUsed || 0;
+                      const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
                       const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
                       return (
-                        <div key={offer.id} className="bg-white border border-[var(--faint)] rounded-[14px] flex-shrink-0" style={{ padding: '12px 14px', minWidth: '160px' }}>
-                          <p className="text-[13px] font-semibold text-[#222222] truncate">{offer.generated_title || offer.description}</p>
-                          <p className="text-[11px] text-[var(--mid)] mt-1">
-                            {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
-                          </p>
-                          {!isUnlimited && (
-                            <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-1.5">
-                              <div className="h-full bg-[var(--terra)] rounded-[3px] transition-all" style={{ width: `${pct}%` }} />
+                        <button
+                          key={offer.id}
+                          onClick={() => setView('offers')}
+                          className="w-full bg-white border border-[var(--faint)] rounded-[16px] text-left"
+                          style={{ padding: '14px 16px' }}
+                        >
+                          <div className="flex gap-3 items-center">
+                            <div
+                              className="w-[44px] h-[44px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
+                              style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
+                            >
+                              {offer.offer_photo_url ? (
+                                <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                              ) : (
+                                <span className="text-[16px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials(userProfile.name)}</span>
+                              )}
                             </div>
-                          )}
-                        </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <p className="text-[14px] font-bold text-[#222222] truncate">{offer.generated_title || offer.description}</p>
+                                <span className="flex-shrink-0 inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[11px] font-bold bg-[rgba(26,60,52,0.08)] text-[var(--forest)]">
+                                  <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                                  Live
+                                </span>
+                              </div>
+                              <div className="flex items-center justify-between mt-1.5">
+                                <span className="text-[12px] text-[var(--mid)]">
+                                  {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed}/${offer.monthly_cap} claimed`}
+                                </span>
+                                {!isUnlimited && slotsLeft !== null && (() => {
+                                  const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
+                                  return (
+                                    <span className="text-[11px] font-semibold" style={{ color: badge.color }}>{badge.text}</span>
+                                  );
+                                })()}
+                              </div>
+                              {!isUnlimited && (
+                                <div className="h-[3px] bg-[rgba(196,103,74,0.1)] rounded-[3px] overflow-hidden mt-1.5">
+                                  <div className="h-full bg-[var(--terra)] rounded-[3px] transition-all" style={{ width: `${pct}%` }} />
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </button>
                       );
                     })}
                   </div>
-                </div>
-              )}
-
-              {/* Sign out */}
-              <button
-                onClick={signOut}
-                className="flex items-center gap-1.5 mt-4 text-[13px] font-medium text-[var(--soft)] hover:text-[var(--mid)] transition-colors"
-              >
-                <LogOut className="w-3.5 h-3.5" /> Sign out
-              </button>
+                )}
+              </div>
             </div>
           )}
 
@@ -1488,7 +1505,7 @@ export default function BusinessPortal() {
             </div>
           )}
 
-          {/* ═══ CLAIMS ═══ */}
+          {/* ═══ CLAIMS (with Content toggle) ═══ */}
           {view === 'claims' && (
             <div>
               <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
@@ -1496,121 +1513,139 @@ export default function BusinessPortal() {
                 {claims.filter(c => c.status === 'active').length} active · {claims.length} total
               </p>
 
-              {/* Filter pills */}
-              <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-                {[
-                  { key: 'all', label: 'All' },
-                  { key: 'active', label: 'Active' },
-                  { key: 'redeemed', label: 'Visited' },
-                  { key: 'reel_due', label: 'Reel Due' },
-                  { key: 'completed', label: 'Completed' },
-                ].map(f => (
+              {/* Claims / Content pill toggle */}
+              <div className="inline-flex rounded-[50px] p-[3px] mb-4" style={{ background: 'var(--bg)' }}>
+                {(['claims', 'content'] as const).map(sub => (
                   <button
-                    key={f.key}
-                    onClick={() => setClaimsFilter(f.key)}
-                    className={`px-3 py-1.5 rounded-[50px] text-[12px] font-semibold whitespace-nowrap transition-colors min-h-[32px] ${
-                      claimsFilter === f.key
-                        ? 'bg-[#222222] text-white'
-                        : 'bg-[var(--bg)] text-[var(--mid)]'
-                    }`}
+                    key={sub}
+                    onClick={() => setClaimsSubView(sub)}
+                    className="px-[18px] py-[7px] rounded-[50px] text-[13px] transition-all"
+                    style={{
+                      fontWeight: claimsSubView === sub ? 700 : 500,
+                      background: claimsSubView === sub ? 'white' : 'transparent',
+                      color: claimsSubView === sub ? '#222222' : 'var(--mid)',
+                      boxShadow: claimsSubView === sub ? '0 1px 4px rgba(34,34,34,0.08)' : 'none',
+                    }}
                   >
-                    {f.label} ({filterCounts[f.key] || 0})
+                    {sub === 'claims' ? 'Claims' : 'Content'}
                   </button>
                 ))}
               </div>
 
-              {filteredClaims.length === 0 && claims.length === 0 ? (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No claims yet</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Claims will appear here when creators claim your offers</p>
-                </div>
-              ) : filteredClaims.length === 0 ? (
-                <div className="flex flex-col items-center py-12 px-6">
-                  <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {filteredClaims.map((claim) => (
-                    <div key={claim.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
-                      <div className="flex items-center gap-3">
-                        {/* Avatar */}
-                        <div
-                          className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
-                          style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                        >
-                          {getInitials(claim.creators.name)}
-                        </div>
-                        {/* Info */}
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
-                          <p className="text-[13px] text-[var(--mid)] truncate">
-                            {claim.offers?.generated_title || claim.offers?.description || claim.creators.instagram_handle}
-                          </p>
-                          <p className="text-[13px] text-[var(--soft)] mt-0.5">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                        </div>
-                        {/* Status + actions */}
-                        <div className="flex flex-col items-end gap-2">
-                          <span className={`px-3 py-1 rounded-[50px] text-[12px] font-bold ${claimStatusStyle(claim.status)}`}>
-                            {claimStatusLabel(claim.status)}
-                          </span>
-                          <button
-                            onClick={() => setDisputeClaimId(claim.id)}
-                            className="flex items-center gap-1 text-[12px] text-[var(--soft)] hover:text-[var(--terra)] transition-colors"
-                          >
-                            <Flag className="w-3 h-3" /> Report
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ═══ CONTENT ═══ */}
-          {view === 'content' && (
-            <div>
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Creator content</h2>
-              <p className="text-[13px] text-[var(--mid)] mb-5">{claims.filter(c => c.reel_url).length} reel{claims.filter(c => c.reel_url).length !== 1 ? 's' : ''} posted about your business</p>
-
-              {claims.filter(c => c.reel_url).length === 0 ? (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No content yet</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
-                </div>
-              ) : (
-                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                  {claims.filter(c => c.reel_url).map((claim) => (
-                    <div key={claim.id} className="bg-white rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
-                      {/* Gradient strip */}
-                      <div
-                        className="h-[48px] flex items-center justify-between px-4"
-                        style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+              {/* Claims sub-view */}
+              {claimsSubView === 'claims' && (
+                <>
+                  {/* Filter pills */}
+                  <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
+                    {[
+                      { key: 'all', label: 'All' },
+                      { key: 'active', label: 'Active' },
+                      { key: 'redeemed', label: 'Visited' },
+                      { key: 'reel_due', label: 'Reel Due' },
+                      { key: 'completed', label: 'Completed' },
+                    ].map(f => (
+                      <button
+                        key={f.key}
+                        onClick={() => setClaimsFilter(f.key)}
+                        className={`px-3 py-1.5 rounded-[50px] text-[12px] font-semibold whitespace-nowrap transition-colors min-h-[32px] ${
+                          claimsFilter === f.key
+                            ? 'bg-[#222222] text-white'
+                            : 'bg-[var(--bg)] text-[var(--mid)]'
+                        }`}
                       >
-                        <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
-                        <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
-                      </div>
-                      {/* Body */}
-                      <div className="p-4">
-                        <p className="text-[14px] font-semibold text-[#222222]">
-                          {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
-                        </p>
-                        <p className="text-[12px] text-[var(--soft)] mt-1">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                        <a
-                          href={claim.reel_url!}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[var(--terra)] hover:underline"
-                        >
-                          <Video className="w-3.5 h-3.5" /> View on Instagram <ExternalLink className="w-3 h-3" />
-                        </a>
-                      </div>
+                        {f.label} ({filterCounts[f.key] || 0})
+                      </button>
+                    ))}
+                  </div>
+
+                  {filteredClaims.length === 0 && claims.length === 0 ? (
+                    <div className="flex flex-col items-center py-16 px-6">
+                      <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <p className="text-[16px] font-bold text-[#222222] mb-1">No claims yet</p>
+                      <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Claims will appear here when creators claim your offers</p>
                     </div>
-                  ))}
-                </div>
+                  ) : filteredClaims.length === 0 ? (
+                    <div className="flex flex-col items-center py-12 px-6">
+                      <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {filteredClaims.map((claim) => (
+                        <div key={claim.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
+                          <div className="flex items-center gap-3">
+                            <div
+                              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
+                              style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                            >
+                              {getInitials(claim.creators.name)}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
+                              <p className="text-[13px] text-[var(--mid)] truncate">
+                                {claim.offers?.generated_title || claim.offers?.description || claim.creators.instagram_handle}
+                              </p>
+                              <p className="text-[13px] text-[var(--soft)] mt-0.5">{new Date(claim.claimed_at).toLocaleDateString()}</p>
+                            </div>
+                            <div className="flex flex-col items-end gap-2">
+                              <span className={`px-3 py-1 rounded-[50px] text-[12px] font-bold ${claimStatusStyle(claim.status)}`}>
+                                {claimStatusLabel(claim.status)}
+                              </span>
+                              <button
+                                onClick={() => setDisputeClaimId(claim.id)}
+                                className="flex items-center gap-1 text-[12px] text-[var(--soft)] hover:text-[var(--terra)] transition-colors"
+                              >
+                                <Flag className="w-3 h-3" /> Report
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Content sub-view */}
+              {claimsSubView === 'content' && (
+                <>
+                  <p className="text-[13px] text-[var(--mid)] mb-4">{claims.filter(c => c.reel_url).length} reel{claims.filter(c => c.reel_url).length !== 1 ? 's' : ''} posted about your business</p>
+
+                  {claims.filter(c => c.reel_url).length === 0 ? (
+                    <div className="flex flex-col items-center py-16 px-6">
+                      <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <p className="text-[16px] font-bold text-[#222222] mb-1">No content yet</p>
+                      <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
+                    </div>
+                  ) : (
+                    <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                      {claims.filter(c => c.reel_url).map((claim) => (
+                        <div key={claim.id} className="bg-white rounded-[20px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
+                          <div
+                            className="h-[48px] flex items-center justify-between px-4"
+                            style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                          >
+                            <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
+                            <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
+                          </div>
+                          <div className="p-4">
+                            <p className="text-[14px] font-semibold text-[#222222]">
+                              {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
+                            </p>
+                            <p className="text-[12px] text-[var(--soft)] mt-1">{new Date(claim.claimed_at).toLocaleDateString()}</p>
+                            <a
+                              href={claim.reel_url!}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1.5 mt-3 text-[13px] font-semibold text-[var(--terra)] hover:underline"
+                            >
+                              <Video className="w-3.5 h-3.5" /> View on Instagram <ExternalLink className="w-3 h-3" />
+                            </a>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           )}
@@ -1826,22 +1861,44 @@ export default function BusinessPortal() {
         </div>
       </div>
 
-      {/* ═══ Floating Scan FAB ═══ */}
-      {view !== 'scan' && (
-        <button
-          onClick={() => { setView('scan'); setScanResult(null); }}
-          className="fixed z-50 flex items-center gap-2 px-5 py-[14px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all"
-          style={{ bottom: '24px', right: '20px', boxShadow: '0 4px 20px rgba(196,103,74,0.35)' }}
-        >
-          <div className="relative">
-            <ScanLine className="w-[18px] h-[18px]" />
-            {activeClaimsCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-[var(--terra)] border-2 border-white" />
-            )}
-          </div>
-          Scan
-        </button>
-      )}
+      {/* ═══ Fixed Bottom Nav ═══ */}
+      <nav
+        className="fixed bottom-0 left-0 right-0 z-40 bg-white flex items-end justify-around"
+        style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 16px' }}
+      >
+        {bottomTabs.map((tab) => {
+          const isActive = view === tab.key;
+          const Icon = tab.icon;
+
+          if (tab.key === 'scan') {
+            return (
+              <div key={tab.key} className="flex-1 flex items-center justify-center">
+                <button
+                  onClick={() => { setView('scan'); setScanResult(null); }}
+                  className="flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white"
+                  style={{ marginTop: '-8px', boxShadow: '0 4px 16px rgba(196,103,74,0.3)' }}
+                >
+                  <Icon className="w-[18px] h-[18px] text-white" />
+                  <span className="text-[12px] font-bold text-white">Scan</span>
+                </button>
+              </div>
+            );
+          }
+
+          return (
+            <button
+              key={tab.key}
+              onClick={() => setView(tab.key)}
+              className="flex-1 flex flex-col items-center gap-1"
+            >
+              <Icon className={`w-5 h-5 ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-[10px] font-semibold ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+                {tab.label}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
     </div>
   );
 }
