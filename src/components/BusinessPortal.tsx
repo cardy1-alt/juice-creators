@@ -1389,16 +1389,12 @@ export default function BusinessPortal() {
                 ) : (
                   <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                     {recentActivity.map(({ claim, count }) => {
-                      const statusLabel = claim.status === 'active' ? 'Active' :
-                        claim.status === 'redeemed' ? 'Visited' :
-                        claim.status === 'reel_due' ? 'Reel due' :
-                        claim.status === 'completed' ? 'Completed' : claim.status;
                       const activityText = claim.status === 'completed' ? 'Posted a reel' :
                         claim.status === 'reel_due' ? 'Reel due' :
                         claim.status === 'redeemed' ? 'Visited' : 'Claimed offer';
+                      const firstName = claim.creators.name.split(' ')[0];
                       return (
                         <div key={claim.id} className="w-[140px] flex-shrink-0 text-left">
-                          {/* Full image card */}
                           <div className="relative w-[140px] h-[180px] rounded-[14px] overflow-hidden">
                             {claim.creators.avatar_url ? (
                               <img
@@ -1414,25 +1410,20 @@ export default function BusinessPortal() {
                                 {getInitials(claim.creators.name)}
                               </div>
                             )}
-                            {/* Status badge top-right — consistent white/translucent style */}
-                            <span className="absolute top-[8px] right-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold bg-white/90 text-[#222222]">
-                              {statusLabel}
-                            </span>
                             {/* Follower count badge top-left */}
                             {claim.creators.follower_count && (
                               <span className="absolute top-[8px] left-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold bg-white/90 text-[#222222]">
                                 {claim.creators.follower_count}
                               </span>
                             )}
-                            {/* Activity + time bottom overlay */}
+                            {/* Name, activity + time bottom overlay */}
                             <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[10px] pt-[30px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }}>
-                              <p className="text-[11px] font-semibold text-white leading-[1.3]">{activityText}</p>
-                              <p className="text-[10px] text-white/70 mt-[2px]">{timeAgo(claim.claimed_at)}</p>
+                              <p className="text-[13px] font-bold text-white leading-[1.2] truncate">{firstName}</p>
+                              <p className="text-[10px] text-white/70 mt-[2px]">{activityText} · {timeAgo(claim.claimed_at)}</p>
                             </div>
                           </div>
-                          {/* Below image info */}
-                          <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{claim.creators.name}</p>
-                          <p className="text-[11px] text-[var(--soft)] truncate">
+                          {/* Below image — handle or claim count */}
+                          <p className="mt-[6px] text-[11px] text-[var(--soft)] truncate">
                             {count > 1 ? `${count} claims` : claim.creators.instagram_handle}
                           </p>
                         </div>
