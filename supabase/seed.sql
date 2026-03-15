@@ -152,7 +152,25 @@ VALUES
     NULL,
     NULL
   )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  avatar_url = EXCLUDED.avatar_url,
+  name = EXCLUDED.name,
+  instagram_handle = EXCLUDED.instagram_handle,
+  code = EXCLUDED.code,
+  follower_count = EXCLUDED.follower_count,
+  approved = EXCLUDED.approved,
+  onboarding_complete = EXCLUDED.onboarding_complete,
+  region = EXCLUDED.region,
+  level = EXCLUDED.level,
+  level_name = EXCLUDED.level_name,
+  total_reels = EXCLUDED.total_reels,
+  average_rating = EXCLUDED.average_rating,
+  current_streak = EXCLUDED.current_streak,
+  longest_streak = EXCLUDED.longest_streak,
+  last_reel_month = EXCLUDED.last_reel_month,
+  profile_complete = EXCLUDED.profile_complete,
+  display_name = EXCLUDED.display_name,
+  bio = EXCLUDED.bio;
 
 -- ============================================================
 -- BUSINESSES
