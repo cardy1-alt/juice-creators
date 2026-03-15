@@ -8,7 +8,7 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye
+  MoreHorizontal, QrCode, Eye, TrendingUp
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -967,6 +967,7 @@ export default function BusinessPortal() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   // Clean redeem param from URL after reading it
@@ -982,6 +983,7 @@ export default function BusinessPortal() {
       fetchOffers();
       fetchClaims();
       fetchNotifications();
+      fetchNearbyBusinesses();
     }
   }, [userProfile]);
 
@@ -1036,6 +1038,51 @@ export default function BusinessPortal() {
     const { data, error } = await supabase.from('notifications').select('*').eq('user_id', userProfile.id).order('created_at', { ascending: false }).limit(20);
     if (error) return;
     if (data) setNotifications(data);
+  };
+
+  const fetchNearbyBusinesses = async () => {
+    // Fetch other approved businesses and their claim activity
+    const { data: businesses } = await supabase
+      .from('businesses')
+      .select('id, name, category')
+      .eq('approved', true)
+      .neq('id', userProfile.id)
+      .limit(10);
+    if (!businesses || businesses.length === 0) return;
+
+    // Fetch claim counts for these businesses
+    const ids = businesses.map(b => b.id);
+    const { data: claimsData } = await supabase
+      .from('claims')
+      .select('business_id, creator_id, claimed_at')
+      .in('business_id', ids);
+
+    const statsMap = new Map<string, { claim_count: number; creators: Set<string>; latest: string | null }>();
+    for (const c of (claimsData || [])) {
+      const s = statsMap.get(c.business_id) || { claim_count: 0, creators: new Set<string>(), latest: null };
+      s.claim_count++;
+      s.creators.add(c.creator_id);
+      if (!s.latest || c.claimed_at > s.latest) s.latest = c.claimed_at;
+      statsMap.set(c.business_id, s);
+    }
+
+    const result = businesses
+      .map(b => {
+        const s = statsMap.get(b.id);
+        return {
+          id: b.id,
+          name: b.name,
+          category: b.category || 'Food & Drink',
+          claim_count: s?.claim_count || 0,
+          creator_count: s?.creators.size || 0,
+          latest_claim_at: s?.latest || null,
+        };
+      })
+      .filter(b => b.claim_count > 0)
+      .sort((a, b) => b.claim_count - a.claim_count)
+      .slice(0, 5);
+
+    setNearbyBusinesses(result);
   };
 
   const markNotificationRead = async (id: string) => {
@@ -1437,6 +1484,33 @@ export default function BusinessPortal() {
                   </div>
                 )}
               </div>
+
+              {/* ═══ Trending nearby ═══ */}
+              {nearbyBusinesses.length > 0 && (
+                <div className="mt-2">
+                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Trending nearby</h3>
+                  <div className="space-y-[10px]">
+                    {nearbyBusinesses.map((biz, i) => (
+                      <div key={biz.id} className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px]" style={{ background: 'var(--bg)' }}>
+                        <div
+                          className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0"
+                          style={{ background: getCategoryGradient(biz.category) }}
+                        >
+                          <span className="text-[14px] font-bold text-white">{i + 1}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
+                          <p className="text-[11px] text-[var(--mid)]">
+                            {biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}
+                            {biz.latest_claim_at && <> · last {timeAgo(biz.latest_claim_at)}</>}
+                          </p>
+                        </div>
+                        <TrendingUp className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
