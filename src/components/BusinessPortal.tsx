@@ -40,7 +40,7 @@ interface ClaimWithDetails {
   reel_url: string | null;
   reel_due_at: string | null;
   qr_token: string;
-  creators: { name: string; instagram_handle: string; code: string };
+  creators: { name: string; instagram_handle: string; code: string; avatar_url?: string | null };
   offers?: { description: string; generated_title?: string | null };
 }
 
@@ -998,7 +998,7 @@ export default function BusinessPortal() {
   };
 
   const fetchClaims = async () => {
-    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code), offers(description, generated_title)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
+    const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code, avatar_url), offers(description, generated_title)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
     if (error) { setFetchError('Failed to load claims.'); return; }
     if (data) setClaims(data as ClaimWithDetails[]);
   };
@@ -1249,12 +1249,20 @@ export default function BusinessPortal() {
                   <div className="space-y-[10px]">
                     {recentActivity.map(claim => (
                       <div key={claim.id} className="bg-white border border-[var(--faint)] rounded-[16px] p-[16px] flex gap-3 items-start">
-                        <div
-                          className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
-                          style={{ background: getCategoryGradient(userProfile.category) }}
-                        >
-                          {getInitials(claim.creators.name)}
-                        </div>
+                        {claim.creators.avatar_url ? (
+                          <img
+                            src={claim.creators.avatar_url}
+                            alt={claim.creators.name}
+                            className="w-11 h-11 rounded-full object-cover flex-shrink-0"
+                          />
+                        ) : (
+                          <div
+                            className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
+                            style={{ background: getCategoryGradient(userProfile.category) }}
+                          >
+                            {getInitials(claim.creators.name)}
+                          </div>
+                        )}
                         <div className="flex-1 min-w-0">
                           <p className="text-[14px] font-bold text-[#222222]">{claim.creators.name}</p>
                           <p className="text-[13px] text-[var(--mid)] truncate">
@@ -1629,12 +1637,20 @@ export default function BusinessPortal() {
                           <div className="w-[4px] flex-shrink-0 rounded-l-[16px]" style={{ background: statusColor }} />
                           <div className="flex-1 p-4">
                             <div className="flex items-center gap-3">
-                              <div
-                                className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
-                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                              >
-                                {getInitials(claim.creators.name)}
-                              </div>
+                              {claim.creators.avatar_url ? (
+                                <img
+                                  src={claim.creators.avatar_url}
+                                  alt={claim.creators.name}
+                                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                                />
+                              ) : (
+                                <div
+                                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
+                                  style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                                >
+                                  {getInitials(claim.creators.name)}
+                                </div>
+                              )}
                               <div className="flex-1 min-w-0">
                                 <div className="flex items-center justify-between gap-2">
                                   <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
@@ -1705,7 +1721,12 @@ export default function BusinessPortal() {
                             style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
                           >
                             <span className="text-[12px] font-semibold text-white">{getInitials(userProfile.name)}</span>
-                            <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
+                            <div className="flex items-center gap-2">
+                              {claim.creators.avatar_url ? (
+                                <img src={claim.creators.avatar_url} alt="" className="w-6 h-6 rounded-full object-cover border border-white/30" />
+                              ) : null}
+                              <span className="text-[12px] font-semibold text-white">{claim.creators.name}</span>
+                            </div>
                           </div>
                           <div className="p-4">
                             <p className="text-[14px] font-semibold text-[#222222]">

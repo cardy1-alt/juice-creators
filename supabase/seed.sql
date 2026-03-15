@@ -18,7 +18,7 @@
 -- ============================================================
 -- CREATORS
 -- ============================================================
-INSERT INTO creators (id, name, instagram_handle, code, email, follower_count, approved, onboarding_complete, region)
+INSERT INTO creators (id, name, instagram_handle, code, email, follower_count, approved, onboarding_complete, region, avatar_url)
 VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
@@ -29,7 +29,8 @@ VALUES
     '5k–10k',
     true,
     true,
-    'bury-st-edmunds'
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
   ),
   (
     'a2222222-2222-2222-2222-222222222222',
@@ -40,7 +41,8 @@ VALUES
     '1k–5k',
     true,
     false,
-    'bury-st-edmunds'
+    'bury-st-edmunds',
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
   )
 ON CONFLICT (id) DO NOTHING;
 
