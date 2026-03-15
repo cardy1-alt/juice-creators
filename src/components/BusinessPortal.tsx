@@ -8,7 +8,7 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye
+  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -1268,8 +1268,112 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="bg-white" style={{ overscrollBehavior: 'none', minHeight: '100dvh' }}>
+    <div className="h-[100dvh] flex flex-col bg-white" style={{ overscrollBehavior: 'none' }}>
       <style>{livePulseStyle}</style>
+
+      {/* ═══ Business Profile Overlay ═══ */}
+      {expandedNearbyBiz && (() => {
+        const biz = nearbyBusinesses.find(b => b.id === expandedNearbyBiz);
+        if (!biz) return null;
+        return (
+          <div className="fixed inset-0 z-50 bg-white flex flex-col">
+            {/* Header */}
+            <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
+              <button
+                onClick={() => setExpandedNearbyBiz(null)}
+                className="w-[36px] h-[36px] rounded-full bg-[#F7F7F7] flex items-center justify-center"
+              >
+                <X className="w-[18px] h-[18px] text-[#222222]" />
+              </button>
+              <span className="text-[15px] font-bold text-[#222222] flex-1 truncate">{biz.name}</span>
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Hero / Logo area */}
+              <div className="px-[20px] pt-[32px] pb-[24px] flex flex-col items-center">
+                <div
+                  className="w-[80px] h-[80px] rounded-[20px] flex items-center justify-center overflow-hidden mb-[16px]"
+                  style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category), boxShadow: '0 4px 20px rgba(34,34,34,0.08)' }}
+                >
+                  {biz.logo_url ? (
+                    <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-[28px] font-bold text-white">{biz.name.charAt(0)}</span>
+                  )}
+                </div>
+                <h2 className="text-[22px] font-extrabold text-[#222222] text-center" style={{ letterSpacing: '-0.3px' }}>{biz.name}</h2>
+                <p className="text-[14px] text-[var(--mid)] mt-[4px]">{biz.category}</p>
+              </div>
+
+              {/* Stats row */}
+              <div className="mx-[20px] flex items-center justify-center gap-0 bg-[#F7F7F7] rounded-[16px] p-[16px] mb-[24px]">
+                <div className="flex-1 text-center">
+                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.claim_count}</p>
+                  <p className="text-[12px] text-[var(--mid)]">Collabs</p>
+                </div>
+                <div className="w-[1px] h-[32px] bg-[rgba(34,34,34,0.08)]" />
+                <div className="flex-1 text-center">
+                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.creator_count}</p>
+                  <p className="text-[12px] text-[var(--mid)]">Creators</p>
+                </div>
+                <div className="w-[1px] h-[32px] bg-[rgba(34,34,34,0.08)]" />
+                <div className="flex-1 text-center">
+                  <p className="text-[20px] font-extrabold text-[#222222]">{biz.offer_count}</p>
+                  <p className="text-[12px] text-[var(--mid)]">Live offers</p>
+                </div>
+              </div>
+
+              {/* About section */}
+              {biz.bio && (
+                <div className="mx-[20px] mb-[24px]">
+                  <h3 className="text-[16px] font-extrabold text-[#222222] mb-[8px]">About</h3>
+                  <p className="text-[14px] text-[var(--mid)] leading-[1.5]">{biz.bio}</p>
+                </div>
+              )}
+
+              {/* Details */}
+              <div className="mx-[20px] mb-[24px] space-y-[12px]">
+                {biz.address && (
+                  <div className="flex items-start gap-[12px]">
+                    <div className="w-[36px] h-[36px] rounded-[10px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
+                      <MapPin className="w-[16px] h-[16px] text-[var(--mid)]" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#222222]">Location</p>
+                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{biz.address}</p>
+                    </div>
+                  </div>
+                )}
+                {biz.latest_claim_at && (
+                  <div className="flex items-start gap-[12px]">
+                    <div className="w-[36px] h-[36px] rounded-[10px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
+                      <Clock className="w-[16px] h-[16px] text-[var(--mid)]" />
+                    </div>
+                    <div>
+                      <p className="text-[13px] font-semibold text-[#222222]">Last activity</p>
+                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{timeAgo(biz.latest_claim_at)}</p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Nayba verified badge */}
+              <div className="mx-[20px] mb-[32px] rounded-[16px] border border-[var(--faint)] p-[16px]">
+                <div className="flex items-center gap-[10px]">
+                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center">
+                    <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-bold text-[#222222]">Verified on Nayba</p>
+                    <p className="text-[12px] text-[var(--mid)]">This business has been approved by the Nayba team</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {disputeClaimId && (
         <DisputeModal
@@ -1290,7 +1394,8 @@ export default function BusinessPortal() {
         />
       )}
 
-      <div className="max-w-5xl mx-auto pb-[80px]">
+      <div className="flex-1 overflow-y-auto">
+      <div className="max-w-5xl mx-auto">
         {/* Header */}
         <div className="bg-white border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
@@ -1505,10 +1610,10 @@ export default function BusinessPortal() {
                     {nearbyBusinesses.map((biz) => (
                       <button
                         key={biz.id}
-                        onClick={() => setExpandedNearbyBiz(expandedNearbyBiz === biz.id ? null : biz.id)}
+                        onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)] transition-all">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[14px] bg-white border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.04)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
@@ -1529,21 +1634,8 @@ export default function BusinessPortal() {
                               )}
                             </p>
                           </div>
-                          <ChevronRight className={`w-4 h-4 text-[var(--soft)] flex-shrink-0 transition-transform ${expandedNearbyBiz === biz.id ? 'rotate-90' : ''}`} />
+                          <ChevronRight className="w-4 h-4 text-[var(--soft)] flex-shrink-0" />
                         </div>
-                        {expandedNearbyBiz === biz.id && (
-                          <div className="mt-[2px] rounded-[14px] bg-[var(--bg)] border border-[var(--faint)] p-[16px]">
-                            {biz.logo_url && (
-                              <img src={biz.logo_url} alt="" className="w-[60px] h-[60px] rounded-[12px] object-cover mb-3" />
-                            )}
-                            <p className="text-[15px] font-bold text-[#222222]">{biz.name}</p>
-                            <p className="text-[12px] text-[var(--mid)] mt-[2px]">{biz.category}{biz.address ? ` · ${biz.address}` : ''}</p>
-                            {biz.bio && <p className="text-[13px] text-[var(--mid)] mt-[8px] leading-[1.4]">{biz.bio}</p>}
-                            {biz.offer_count > 0 && (
-                              <p className="text-[12px] font-bold text-[var(--terra)] mt-[10px]">{biz.offer_count} live offer{biz.offer_count !== 1 ? 's' : ''}</p>
-                            )}
-                          </div>
-                        )}
                       </button>
                     ))}
                   </div>
@@ -2153,20 +2245,12 @@ export default function BusinessPortal() {
         </div>
       </div>
 
-      {/* Bottom fade gradient */}
-      <div
-        className="fixed left-0 right-0 z-30 pointer-events-none"
-        style={{
-          bottom: 60,
-          height: 72,
-          background: 'linear-gradient(to bottom, transparent 0%, #ffffff 100%)',
-        }}
-      />
+      </div>{/* end scroll container */}
 
-      {/* ═══ Fixed Bottom Nav ═══ */}
+      {/* ═══ Bottom Nav ═══ */}
       <nav
-        className="fixed bottom-0 left-0 right-0 z-40 bg-white flex items-end justify-around"
-        style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 16px' }}
+        className="bg-white flex items-end justify-around flex-shrink-0"
+        style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 max(16px, env(safe-area-inset-bottom))' }}
       >
         {bottomTabs.map((tab) => {
           const isActive = view === tab.key;
