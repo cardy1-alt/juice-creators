@@ -7,7 +7,8 @@ import {
   CheckCircle2, XCircle, VideoOff, Flag,
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
-  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText
+  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
+  MoreHorizontal, QrCode, Eye
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -37,6 +38,7 @@ interface ClaimWithDetails {
   claimed_at: string;
   redeemed_at: string | null;
   reel_url: string | null;
+  reel_due_at: string | null;
   qr_token: string;
   creators: { name: string; instagram_handle: string; code: string };
   offers?: { description: string; generated_title?: string | null };
@@ -1470,8 +1472,14 @@ export default function BusinessPortal() {
               ) : (
                 /* Scanner UI */
                 <>
-                  <h2 className="text-[22px] font-extrabold text-[#222222] mb-2" style={{ letterSpacing: '-0.4px' }}>Scan creator pass</h2>
-                  <p className="text-[14px] text-[var(--mid)] mb-7">Ask the creator to open their Active tab and show their QR code</p>
+                  {/* Visual header */}
+                  <div className="flex flex-col items-center mb-8">
+                    <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--bg)' }}>
+                      <QrCode className="w-8 h-8 text-[var(--terra)]" />
+                    </div>
+                    <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Scan creator pass</h2>
+                    <p className="text-[14px] text-[var(--mid)] text-center">Ask the creator to open their Active tab<br />and show their QR code</p>
+                  </div>
 
                   <QRScanner
                     onScan={(token) => { setScanCode(token); }}
@@ -1495,7 +1503,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] text-white font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-[14px] min-h-[48px]"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[#222222] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -1509,9 +1517,36 @@ export default function BusinessPortal() {
           {view === 'claims' && (
             <div>
               <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
-              <p className="text-[14px] text-[var(--mid)] mb-4">
+              <p className="text-[14px] text-[var(--mid)] mb-5">
                 {claims.filter(c => c.status === 'active').length} active · {claims.length} total
               </p>
+
+              {/* Stat row filters — replaces horizontal scrolling pills */}
+              <div className="grid grid-cols-4 gap-2 mb-5">
+                {[
+                  { key: 'active', label: 'Active', color: 'var(--terra)' },
+                  { key: 'redeemed', label: 'Visited', color: 'var(--forest)' },
+                  { key: 'reel_due', label: 'Reel Due', color: '#c78c20' },
+                  { key: 'completed', label: 'Done', color: 'var(--soft)' },
+                ].map(f => {
+                  const count = filterCounts[f.key] || 0;
+                  const isActive = claimsFilter === f.key;
+                  return (
+                    <button
+                      key={f.key}
+                      onClick={() => setClaimsFilter(isActive ? 'all' : f.key)}
+                      className="flex flex-col items-center py-3 rounded-[14px] transition-all"
+                      style={{
+                        background: isActive ? `${f.color}10` : 'var(--bg)',
+                        border: isActive ? `1.5px solid ${f.color}` : '1.5px solid transparent',
+                      }}
+                    >
+                      <span className="text-[20px] font-extrabold" style={{ color: isActive ? f.color : '#222222' }}>{count}</span>
+                      <span className="text-[11px] font-semibold mt-0.5" style={{ color: isActive ? f.color : 'var(--mid)' }}>{f.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
 
               {/* Claims / Content pill toggle */}
               <div className="inline-flex rounded-[50px] p-[3px] mb-4" style={{ background: 'var(--bg)' }}>
@@ -1535,29 +1570,6 @@ export default function BusinessPortal() {
               {/* Claims sub-view */}
               {claimsSubView === 'claims' && (
                 <>
-                  {/* Filter pills */}
-                  <div className="flex gap-2 overflow-x-auto pb-4" style={{ scrollbarWidth: 'none' }}>
-                    {[
-                      { key: 'all', label: 'All' },
-                      { key: 'active', label: 'Active' },
-                      { key: 'redeemed', label: 'Visited' },
-                      { key: 'reel_due', label: 'Reel Due' },
-                      { key: 'completed', label: 'Completed' },
-                    ].map(f => (
-                      <button
-                        key={f.key}
-                        onClick={() => setClaimsFilter(f.key)}
-                        className={`px-3 py-1.5 rounded-[50px] text-[12px] font-semibold whitespace-nowrap transition-colors min-h-[32px] ${
-                          claimsFilter === f.key
-                            ? 'bg-[#222222] text-white'
-                            : 'bg-[var(--bg)] text-[var(--mid)]'
-                        }`}
-                      >
-                        {f.label} ({filterCounts[f.key] || 0})
-                      </button>
-                    ))}
-                  </div>
-
                   {filteredClaims.length === 0 && claims.length === 0 ? (
                     <div className="flex flex-col items-center py-16 px-6">
                       <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
@@ -1570,36 +1582,59 @@ export default function BusinessPortal() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {filteredClaims.map((claim) => (
-                        <div key={claim.id} className="bg-white rounded-[20px] p-[18px] border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)]">
-                          <div className="flex items-center gap-3">
-                            <div
-                              className="w-12 h-12 rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
-                              style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                            >
-                              {getInitials(claim.creators.name)}
+                      {filteredClaims.map((claim) => {
+                        const statusColor = claim.status === 'active' ? 'var(--terra)' : claim.status === 'redeemed' ? 'var(--forest)' : claim.status === 'reel_due' ? '#c78c20' : claim.status === 'completed' ? 'var(--soft)' : 'var(--terra)';
+                        return (
+                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_1px_4px_rgba(34,34,34,0.05)] flex">
+                          {/* Left status edge bar */}
+                          <div className="w-[4px] flex-shrink-0" style={{ background: statusColor }} />
+                          <div className="flex-1 p-4">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[14px] font-bold text-[#222222]">@{claim.creators.instagram_handle || claim.creators.code}</p>
+                                <p className="text-[13px] text-[var(--mid)] mt-0.5">{claim.creators.name}</p>
+                                <p className="text-[12px] text-[var(--soft)] mt-1 truncate">
+                                  {claim.offers?.generated_title || claim.offers?.description}
+                                </p>
+                              </div>
+                              <div className="flex items-center gap-2 flex-shrink-0">
+                                <span className="text-[11px] font-semibold px-2.5 py-1 rounded-[8px]" style={{ background: `${statusColor}12`, color: statusColor }}>
+                                  {claimStatusLabel(claim.status)}
+                                </span>
+                                <button
+                                  onClick={() => setDisputeClaimId(claim.id)}
+                                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
+                                  title="Report"
+                                >
+                                  <MoreHorizontal className="w-4 h-4 text-[var(--soft)]" />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
-                              <p className="text-[13px] text-[var(--mid)] truncate">
-                                {claim.offers?.generated_title || claim.offers?.description || claim.creators.instagram_handle}
-                              </p>
-                              <p className="text-[13px] text-[var(--soft)] mt-0.5">{new Date(claim.claimed_at).toLocaleDateString()}</p>
-                            </div>
-                            <div className="flex flex-col items-end gap-2">
-                              <span className={`px-3 py-1 rounded-[50px] text-[12px] font-bold ${claimStatusStyle(claim.status)}`}>
-                                {claimStatusLabel(claim.status)}
-                              </span>
-                              <button
-                                onClick={() => setDisputeClaimId(claim.id)}
-                                className="flex items-center gap-1 text-[12px] text-[var(--soft)] hover:text-[var(--terra)] transition-colors"
-                              >
-                                <Flag className="w-3 h-3" /> Report
-                              </button>
+                            {/* Inline reel status */}
+                            <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-[var(--faint)]">
+                              <span className="text-[12px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
+                              {claim.reel_url ? (
+                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--forest)]">
+                                  <Video className="w-3 h-3" /> Reel posted
+                                  <ExternalLink className="w-3 h-3 ml-0.5" />
+                                </a>
+                              ) : claim.status === 'reel_due' && claim.reel_due_at ? (
+                                <span className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: '#c78c20' }}>
+                                  <Clock className="w-3 h-3" /> Reel due {(() => {
+                                    const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
+                                    return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
+                                  })()}
+                                </span>
+                              ) : claim.status === 'redeemed' ? (
+                                <span className="flex items-center gap-1 text-[12px] text-[var(--forest)]">
+                                  <Check className="w-3 h-3" /> Visited
+                                </span>
+                              ) : null}
                             </div>
                           </div>
                         </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </>
