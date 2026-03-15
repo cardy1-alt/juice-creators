@@ -8,7 +8,7 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck
+  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy
 } from 'lucide-react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -967,6 +967,8 @@ export default function BusinessPortal() {
   const [logoUploading, setLogoUploading] = useState(false);
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+  const [profileSubView, setProfileSubView] = useState<'main' | 'edit'>('main');
+  const [copiedCode, setCopiedCode] = useState(false);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; address: string | null; bio: string | null; offer_count: number; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
   const [expandedNearbyBiz, setExpandedNearbyBiz] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -2073,175 +2075,239 @@ export default function BusinessPortal() {
 
           {/* ═══ PROFILE ═══ */}
           {view === 'profile' && (
-            <div className="max-w-lg mx-auto">
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Your profile</h2>
-              <p className="text-[13px] text-[var(--mid)] mb-7">How you appear to creators</p>
-
-              {/* Section label */}
-              <p className="text-[10px] font-bold text-[var(--soft)] uppercase mb-3" style={{ letterSpacing: '0.8px' }}>BUSINESS</p>
-
-              {/* Logo upload */}
-              <div className="flex flex-col items-center mb-5">
-                <div className="relative">
-                  <div
-                    className="w-[80px] h-[80px] rounded-[16px] overflow-hidden flex items-center justify-center"
-                    style={{ background: logoUrl ? undefined : getCategoryGradient(userProfile.category) }}
-                  >
-                    {logoUrl ? (
-                      <img src={logoUrl} alt={userProfile.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-[28px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials(userProfile.name)}</span>
-                    )}
-                    {logoUploading && (
-                      <div className="absolute inset-0 bg-white/60 flex items-center justify-center rounded-[16px]">
-                        <div className="w-5 h-5 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+            <div className="px-[20px] pt-8">
+              {profileSubView === 'main' ? (
+                <>
+                  {/* ═══ Profile card (Airbnb-style) ═══ */}
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(34,34,34,0.08)' }}>
+                    <div className="flex items-start gap-[16px]">
+                      {/* Logo */}
+                      <div className="relative flex-shrink-0">
+                        <input
+                          ref={logoInputRef}
+                          type="file"
+                          accept="image/jpeg,image/png,image/webp"
+                          className="hidden"
+                          onChange={async (e) => {
+                            const file = e.target.files?.[0];
+                            if (!file) return;
+                            setLogoUploading(true);
+                            setLogoError(null);
+                            const { url, error } = await uploadAvatar(file, userProfile.id, 'businesses');
+                            if (error) {
+                              setLogoError(error);
+                            } else if (url) {
+                              setLogoUrl(url);
+                            }
+                            setLogoUploading(false);
+                            e.target.value = '';
+                          }}
+                        />
+                        {logoUploading ? (
+                          <div className="w-[72px] h-[72px] rounded-[16px] bg-[#F7F7F7] flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        ) : logoUrl ? (
+                          <button onClick={() => logoInputRef.current?.click()}>
+                            <img src={logoUrl} alt={userProfile.name} className="w-[72px] h-[72px] rounded-[16px] object-cover" />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => logoInputRef.current?.click()}
+                            className="w-[72px] h-[72px] rounded-[16px] flex items-center justify-center"
+                            style={{ background: getCategoryGradient(userProfile.category) }}
+                          >
+                            <span className="text-white text-[26px] font-extrabold">{getInitials(userProfile.name)}</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => logoInputRef.current?.click()}
+                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
+                        >
+                          <Camera className="w-[11px] h-[11px] text-white" />
+                        </button>
                       </div>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => logoInputRef.current?.click()}
-                    className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-[var(--terra)] flex items-center justify-center"
-                  >
-                    <Camera className="w-3 h-3 text-white" />
-                  </button>
-                  <input
-                    ref={logoInputRef}
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp"
-                    className="hidden"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      setLogoUploading(true);
-                      setLogoError(null);
-                      const { url, error } = await uploadAvatar(file, userProfile.id, 'businesses');
-                      if (error) {
-                        setLogoError(error);
-                      } else if (url) {
-                        setLogoUrl(url);
-                      }
-                      setLogoUploading(false);
-                      e.target.value = '';
-                    }}
-                  />
-                </div>
-                <p className="text-[16px] font-bold text-[#222222] mt-3">{userProfile.name}</p>
-                <p className="text-[13px] text-[var(--mid)]">{userProfile.category}</p>
-                {logoError && <p className="text-[12px] text-[var(--terra)] mt-2">{logoError}</p>}
-              </div>
 
-              {/* Edit fields */}
-              <div className="space-y-4 mb-6">
-                <div>
-                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Business name</label>
-                  <input
-                    type="text"
-                    value={profileName}
-                    onChange={e => { setProfileName(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
-                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Address / location</label>
-                  <input
-                    type="text"
-                    value={profileAddress}
-                    onChange={e => { setProfileAddress(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
-                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Instagram handle</label>
-                  <input
-                    type="text"
-                    value={profileInstagram}
-                    onChange={e => { setProfileInstagram(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
-                    placeholder="@yourbusiness"
-                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
-                  />
-                </div>
-                <div>
-                  <label className="text-[11px] font-semibold text-[#222222] block mb-1.5">Short bio</label>
-                  <textarea
-                    value={profileBio}
-                    onChange={e => { setProfileBio(e.target.value.slice(0, 120)); setProfileDirty(true); setProfileSaved(false); }}
-                    placeholder="Tell creators what makes your business special"
-                    className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
-                    style={{ minHeight: '80px' }}
-                  />
-                  <p className="text-[11px] text-[var(--soft)] text-right mt-1">{profileBio.length}/120</p>
-                </div>
-              </div>
+                      {/* Name + meta */}
+                      <div className="flex-1 min-w-0 pt-[2px]">
+                        <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
+                          <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[11px] font-bold rounded-full px-[10px] py-[3px]">
+                            {userProfile.category}
+                          </span>
+                          {userProfile.approved && (
+                            <span className="flex items-center gap-[3px] text-[11px] font-semibold text-[var(--forest)]">
+                              <BadgeCheck className="w-[13px] h-[13px]" /> Verified
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-[10px] mt-[6px]">
+                          {userProfile.address && (
+                            <span className="flex items-center gap-1 text-[12px] text-[var(--soft)] truncate">
+                              <MapPin className="w-3 h-3 flex-shrink-0" /> {userProfile.address}
+                            </span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-[10px] mt-[4px]">
+                          <button
+                            onClick={() => { navigator.clipboard.writeText(userProfile.code); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }}
+                            className="flex items-center gap-1 text-[12px] font-semibold text-[var(--soft)]"
+                          >
+                            {userProfile.code}
+                            {copiedCode ? (
+                              <span className="text-[var(--terra)] text-[11px]">Copied!</span>
+                            ) : (
+                              <Copy className="w-3 h-3" />
+                            )}
+                          </button>
+                          {userProfile.instagram_handle && (
+                            <span className="flex items-center gap-1 text-[12px] text-[var(--soft)]">
+                              <Instagram className="w-3 h-3" /> {userProfile.instagram_handle}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    {logoError && <p className="text-[13px] text-[var(--terra)] mt-2">{logoError}</p>}
 
-              <button
-                onClick={async () => {
-                  setProfileSaving(true);
-                  try {
-                    await supabase.from('businesses').update({
-                      name: profileName,
-                      address: profileAddress,
-                      instagram_handle: profileInstagram,
-                      bio: profileBio,
-                    }).eq('id', userProfile.id);
-                    setProfileDirty(false);
-                    setProfileSaved(true);
-                    setTimeout(() => setProfileSaved(false), 2000);
-                  } catch {}
-                  setProfileSaving(false);
-                }}
-                disabled={!profileDirty || profileSaving}
-                className={`w-full py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
-                  profileDirty
-                    ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
-                    : 'bg-[var(--bg)] text-[var(--soft)]'
-                }`}
-              >
-                {profileSaved ? 'Saved \u2713' : profileSaving ? 'Saving...' : 'Save changes'}
-              </button>
-
-              {/* Account section */}
-              <div className="mt-6 pt-6 border-t border-[var(--faint)]">
-                <p className="text-[10px] font-bold text-[var(--soft)] uppercase mb-3" style={{ letterSpacing: '0.8px' }}>ACCOUNT</p>
-
-                <button
-                  onClick={() => setView('notifications')}
-                  className="w-full flex items-center justify-between py-3 border-b border-[var(--faint)] min-h-[48px]"
-                >
-                  <div className="flex items-center gap-3">
-                    <Bell className="w-4 h-4 text-[var(--mid)]" />
-                    <span className="text-[14px] text-[#222222]">Notifications</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-[var(--soft)]" />
-                </button>
-
-                {showSignOutConfirm ? (
-                  <div className="mt-4 p-4 rounded-[16px] bg-[var(--bg)]">
-                    <p className="text-[14px] font-semibold text-[#222222] mb-3">Sign out of nayba?</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={signOut}
-                        className="flex-1 py-[10px] rounded-[50px] text-[13px] font-semibold text-white bg-[var(--terra)]"
-                      >
-                        Confirm
-                      </button>
-                      <button
-                        onClick={() => setShowSignOutConfirm(false)}
-                        className="flex-1 py-[10px] rounded-[50px] text-[13px] font-semibold text-[var(--mid)] bg-white border border-[var(--faint)]"
-                      >
-                        Cancel
-                      </button>
+                    {/* Stats row inside card */}
+                    <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{offers.filter(o => o.is_live).length}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Live offers</p>
+                      </div>
+                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.length}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Claims</p>
+                      </div>
+                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
+                      <div className="flex-1 text-center">
+                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.filter(c => c.status === 'completed').length}</p>
+                        <p className="text-[11px] text-[var(--soft)] font-semibold">Collabs</p>
+                      </div>
                     </div>
                   </div>
-                ) : (
+
+                  {/* ═══ About card ═══ */}
+                  {userProfile.bio && (
+                    <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                      <h3 className="text-[14px] font-bold text-[#222222] mb-[8px]">About</h3>
+                      <p className="text-[14px] text-[var(--mid)] leading-[1.5]">{userProfile.bio}</p>
+                    </div>
+                  )}
+
+                  {/* ═══ Settings ═══ */}
+                  <div className="mt-[8px]">
+                    <button
+                      onClick={() => setProfileSubView('edit')}
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
+                    >
+                      <div className="flex items-center gap-[12px]">
+                        <User className="w-[20px] h-[20px] text-[var(--mid)]" />
+                        <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
+                      </div>
+                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
+                    </button>
+                    <button
+                      onClick={() => setView('notifications')}
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
+                    >
+                      <div className="flex items-center gap-[12px]">
+                        <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
+                        <span className="text-[15px] font-semibold text-[#222222]">Notifications</span>
+                      </div>
+                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
+                    </button>
+                    <button
+                      onClick={signOut}
+                      className="w-full flex items-center gap-[12px] py-[16px] text-left"
+                    >
+                      <LogOut className="w-[20px] h-[20px] text-[var(--terra)]" />
+                      <span className="text-[15px] font-semibold text-[var(--terra)]">Sign out</span>
+                    </button>
+                  </div>
+                </>
+              ) : (
+                /* Edit profile sub-view */
+                <>
+                  <div className="flex items-center gap-3 mb-5">
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    </button>
+                    <h1 className="text-[26px] font-extrabold text-[#222222]">Edit profile</h1>
+                  </div>
+
+                  {/* Edit fields */}
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Business name</label>
+                      <input
+                        type="text"
+                        value={profileName}
+                        onChange={e => { setProfileName(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Address / location</label>
+                      <input
+                        type="text"
+                        value={profileAddress}
+                        onChange={e => { setProfileAddress(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Instagram handle</label>
+                      <input
+                        type="text"
+                        value={profileInstagram}
+                        onChange={e => { setProfileInstagram(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
+                        placeholder="@yourbusiness"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Short bio</label>
+                      <textarea
+                        value={profileBio}
+                        onChange={e => { setProfileBio(e.target.value.slice(0, 120)); setProfileDirty(true); setProfileSaved(false); }}
+                        placeholder="Tell creators what makes your business special"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
+                        style={{ minHeight: '80px' }}
+                      />
+                      <p className="text-[11px] text-[var(--soft)] text-right mt-1">{profileBio.length}/120</p>
+                    </div>
+                  </div>
+
                   <button
-                    onClick={() => setShowSignOutConfirm(true)}
-                    className="flex items-center gap-3 mt-2 py-3 min-h-[48px]"
+                    onClick={async () => {
+                      setProfileSaving(true);
+                      try {
+                        await supabase.from('businesses').update({
+                          name: profileName,
+                          address: profileAddress,
+                          instagram_handle: profileInstagram,
+                          bio: profileBio,
+                        }).eq('id', userProfile.id);
+                        setProfileDirty(false);
+                        setProfileSaved(true);
+                        setTimeout(() => setProfileSaved(false), 2000);
+                      } catch {}
+                      setProfileSaving(false);
+                    }}
+                    disabled={!profileDirty || profileSaving}
+                    className={`w-full py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
+                      profileDirty
+                        ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                        : 'bg-[var(--bg)] text-[var(--soft)]'
+                    }`}
                   >
-                    <LogOut className="w-4 h-4 text-[var(--terra)]" />
-                    <span className="text-[14px] font-semibold text-[var(--terra)]">Sign out</span>
+                    {profileSaved ? 'Saved \u2713' : profileSaving ? 'Saving...' : 'Save changes'}
                   </button>
-                )}
-              </div>
+                </>
+              )}
             </div>
           )}
         </div>
