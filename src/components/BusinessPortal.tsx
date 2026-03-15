@@ -1209,7 +1209,7 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white" style={{ overscrollBehavior: 'none' }}>
       <style>{livePulseStyle}</style>
 
       {disputeClaimId && (
