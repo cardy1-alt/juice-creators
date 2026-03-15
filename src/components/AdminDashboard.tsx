@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
+import LevelBadge from './LevelBadge';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
@@ -308,7 +309,10 @@ export default function AdminDashboard() {
                     <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[#F7F7F7]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#222222]">{creator.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[#222222]">
+                            <span className="mr-2">{creator.name}</span>
+                            {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
+                          </td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)]">{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {creator.follower_count ? (

@@ -18,7 +18,7 @@
 -- ============================================================
 -- CREATORS
 -- ============================================================
-INSERT INTO creators (id, name, instagram_handle, code, email, follower_count, approved, onboarding_complete, region, avatar_url)
+INSERT INTO creators (id, name, instagram_handle, code, email, follower_count, approved, onboarding_complete, region, avatar_url, level, level_name, total_reels, average_rating, current_streak, longest_streak, last_reel_month, profile_complete, display_name, bio)
 VALUES
   (
     'a1111111-1111-1111-1111-111111111111',
@@ -30,7 +30,17 @@ VALUES
     true,
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face'
+    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&h=200&fit=crop&crop=face',
+    3,
+    'Regular',
+    4,
+    4.2,
+    2,
+    2,
+    '2026-03',
+    true,
+    'Sophie Carter',
+    'Coffee lover & content creator in Bury St Edmunds'
   ),
   (
     'a2222222-2222-2222-2222-222222222222',
@@ -42,7 +52,17 @@ VALUES
     true,
     false,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face'
+    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
+    1,
+    'Newcomer',
+    0,
+    0,
+    0,
+    0,
+    NULL,
+    false,
+    NULL,
+    NULL
   )
 ON CONFLICT (id) DO NOTHING;
 
