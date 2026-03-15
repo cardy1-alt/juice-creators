@@ -1728,28 +1728,18 @@ export default function BusinessPortal() {
 
                       {/* Card body */}
                       <div className="p-[16px]">
-                        <h3 className="text-[17px] font-extrabold text-[#222222] mb-[6px]" style={{ letterSpacing: '-0.2px' }}>
-                          {offer.generated_title || offer.description}
-                        </h3>
-                        <p className="text-[13px] text-[var(--mid)] mb-[12px]">
-                          {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
-                        </p>
-
-                        {/* Progress bar */}
-                        {!isUnlimited && (
-                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mb-[14px]">
-                            <div
-                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
-                              style={{ width: `${pct}%` }}
-                            />
+                        <div className="flex items-start justify-between gap-[12px]">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
+                              {offer.generated_title || offer.description}
+                            </h3>
+                            <p className="text-[13px] text-[var(--mid)]">
+                              {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
+                            </p>
                           </div>
-                        )}
-
-                        {/* Action row */}
-                        <div className="flex items-center justify-end">
                           <button
                             onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                            className={`px-[20px] py-[9px] rounded-[50px] font-semibold text-[13px] transition-all ${
+                            className={`flex-shrink-0 px-[18px] py-[8px] rounded-[50px] font-semibold text-[13px] transition-all mt-[2px] ${
                               offer.is_live
                                 ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
                                 : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
@@ -1758,6 +1748,16 @@ export default function BusinessPortal() {
                             {offer.is_live ? 'Pause' : 'Resume'}
                           </button>
                         </div>
+
+                        {/* Progress bar */}
+                        {!isUnlimited && (
+                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-[12px]">
+                            <div
+                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
@@ -1858,59 +1858,50 @@ export default function BusinessPortal() {
                   <X className="w-3.5 h-3.5" />
                 </button>
               ) : (
-                <p className="text-[14px] text-[var(--mid)] mb-5">
+                <p className="text-[14px] text-[var(--mid)] mb-[16px]">
                   {claims.filter(c => c.status === 'active').length} active · {claims.length} total
                 </p>
               )}
 
-              {/* Stat row filters */}
-              <div className="grid grid-cols-4 gap-2 mb-5">
+              {/* Filter chips + Claims/Content toggle */}
+              <div className="flex items-center gap-[6px] overflow-x-auto pb-[14px] mb-[4px]" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                 {[
-                  { key: 'active', label: 'Active', icon: Clock },
-                  { key: 'redeemed', label: 'Visited', icon: Eye },
-                  { key: 'reel_due', label: 'Reel Due', icon: Video },
-                  { key: 'completed', label: 'Done', icon: Check },
+                  { key: 'all', label: 'All' },
+                  { key: 'active', label: `Active (${filterCounts.active || 0})` },
+                  { key: 'redeemed', label: `Visited (${filterCounts.redeemed || 0})` },
+                  { key: 'reel_due', label: `Reel due (${filterCounts.reel_due || 0})` },
+                  { key: 'completed', label: `Done (${filterCounts.completed || 0})` },
                 ].map(f => {
-                  const count = filterCounts[f.key] || 0;
                   const isSelected = claimsFilter === f.key;
-                  const Icon = f.icon;
                   return (
                     <button
                       key={f.key}
-                      onClick={() => setClaimsFilter(isSelected ? 'all' : f.key)}
-                      className="flex flex-col items-center py-3 rounded-[12px] transition-all"
-                      style={{
-                        background: isSelected ? '#222222' : 'var(--bg)',
-                      }}
+                      onClick={() => setClaimsFilter(f.key)}
+                      className={`flex-shrink-0 px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
+                        isSelected
+                          ? 'bg-[#222222] text-white'
+                          : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
+                      }`}
                     >
-                      <Icon className="w-4 h-4 mb-1" style={{ color: isSelected ? 'white' : 'var(--mid)' }} />
-                      <span className="text-[18px] font-extrabold" style={{ color: isSelected ? 'white' : '#222222' }}>{count}</span>
-                      <span className="text-[10px] font-semibold mt-0.5" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{f.label}</span>
+                      {f.label}
                     </button>
                   );
                 })}
+                <div className="w-[1px] h-[24px] bg-[var(--faint)] flex-shrink-0 mx-[4px]" />
+                <button
+                  onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
+                  className={`flex-shrink-0 inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
+                    claimsSubView === 'content'
+                      ? 'bg-[#222222] text-white'
+                      : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
+                  }`}
+                >
+                  <Film className="w-[14px] h-[14px]" />
+                  Content
+                </button>
               </div>
 
-              {/* Claims / Content pill toggle */}
-              <div className="inline-flex rounded-[50px] p-[3px] mb-4" style={{ background: 'var(--bg)' }}>
-                {(['claims', 'content'] as const).map(sub => (
-                  <button
-                    key={sub}
-                    onClick={() => setClaimsSubView(sub)}
-                    className="px-[18px] py-[7px] rounded-[50px] text-[13px] transition-all"
-                    style={{
-                      fontWeight: claimsSubView === sub ? 700 : 500,
-                      background: claimsSubView === sub ? 'white' : 'transparent',
-                      color: claimsSubView === sub ? '#222222' : 'var(--mid)',
-                      boxShadow: claimsSubView === sub ? '0 1px 4px rgba(34,34,34,0.08)' : 'none',
-                    }}
-                  >
-                    {sub === 'claims' ? 'Claims' : 'Content'}
-                  </button>
-                ))}
-              </div>
-
-              {/* Claims sub-view */}
+              {/* Claims list */}
               {claimsSubView === 'claims' && (
                 <>
                   {filteredClaims.length === 0 && claims.length === 0 ? (
@@ -1924,69 +1915,67 @@ export default function BusinessPortal() {
                       <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
                     </div>
                   ) : (
-                    <div className="space-y-3">
+                    <div className="space-y-[12px]">
                       {filteredClaims.map((claim) => {
-                        const statusColor = claim.status === 'active' ? 'var(--terra)' : claim.status === 'redeemed' ? 'var(--forest)' : claim.status === 'reel_due' ? '#c78c20' : claim.status === 'completed' ? 'var(--soft)' : 'var(--terra)';
                         const handle = claim.creators.instagram_handle || claim.creators.code;
                         const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
                         return (
-                        <div key={claim.id} className="bg-white rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] flex">
-                          {/* Left status edge bar */}
-                          <div className="w-[4px] flex-shrink-0 rounded-l-[16px]" style={{ background: statusColor }} />
-                          <div className="flex-1 p-4">
-                            <div className="flex items-center gap-3">
-                              {claim.creators.avatar_url ? (
-                                <img
-                                  src={claim.creators.avatar_url}
-                                  alt={claim.creators.name}
-                                  className="w-10 h-10 rounded-full object-cover flex-shrink-0"
-                                />
-                              ) : (
-                                <div
-                                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-[13px] flex-shrink-0"
-                                  style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                                >
-                                  {getInitials(claim.creators.name)}
-                                </div>
-                              )}
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center justify-between gap-2">
-                                  <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
-                                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                                    <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-[50px] ${claimStatusStyle(claim.status)}`}>
-                                      {claimStatusLabel(claim.status)}
-                                    </span>
-                                    <button
-                                      onClick={() => setDisputeClaimId(claim.id)}
-                                      className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
-                                      title="Report"
-                                    >
-                                      <MoreHorizontal className="w-4 h-4 text-[var(--soft)]" />
-                                    </button>
-                                  </div>
-                                </div>
-                                <p className="text-[13px] text-[var(--mid)]">{displayHandle}{claim.creators.follower_count ? ` · ${claim.creators.follower_count}` : ''}</p>
+                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-[16px]">
+                          <div className="flex items-start gap-[12px]">
+                            {/* Larger avatar */}
+                            {claim.creators.avatar_url ? (
+                              <img
+                                src={claim.creators.avatar_url}
+                                alt={claim.creators.name}
+                                className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0"
+                              />
+                            ) : (
+                              <div
+                                className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0"
+                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                              >
+                                {getInitials(claim.creators.name)}
                               </div>
-                            </div>
-                            {/* Offer description */}
-                            <p className="text-[13px] text-[var(--mid)] mt-2 leading-[1.4]">
-                              {claim.offers?.generated_title || claim.offers?.description}
-                            </p>
-                            {/* Date + reel status */}
-                            <div className="flex items-center gap-3 mt-2.5 pt-2.5 border-t border-[var(--faint)]">
-                              <span className="text-[11px] text-[var(--soft)]">{new Date(claim.claimed_at).toLocaleDateString()}</span>
-                              {claim.reel_url ? (
-                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[11px] font-semibold text-[var(--forest)]">
-                                  <Video className="w-3 h-3" /> Reel posted <ExternalLink className="w-3 h-3" />
-                                </a>
-                              ) : claim.status === 'reel_due' && claim.reel_due_at ? (
-                                <span className="flex items-center gap-1 text-[11px] font-semibold" style={{ color: '#c78c20' }}>
-                                  <Clock className="w-3 h-3" /> Due {(() => {
-                                    const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
-                                    return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
-                                  })()}
-                                </span>
-                              ) : null}
+                            )}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="min-w-0">
+                                  <p className="text-[15px] font-bold text-[#222222] truncate">{claim.creators.name}</p>
+                                  <p className="text-[12px] text-[var(--soft)]">{displayHandle}{claim.creators.follower_count ? ` · ${claim.creators.follower_count}` : ''}</p>
+                                </div>
+                                <div className="flex items-center gap-[6px] flex-shrink-0">
+                                  <span className={`text-[11px] font-semibold px-[10px] py-[4px] rounded-[50px] ${claimStatusStyle(claim.status)}`}>
+                                    {claimStatusLabel(claim.status)}
+                                  </span>
+                                  <button
+                                    onClick={() => setDisputeClaimId(claim.id)}
+                                    className="w-[28px] h-[28px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
+                                    title="Report"
+                                  >
+                                    <MoreHorizontal className="w-[16px] h-[16px] text-[var(--soft)]" />
+                                  </button>
+                                </div>
+                              </div>
+                              {/* Offer name */}
+                              <p className="text-[14px] text-[#222222] font-semibold mt-[6px]">
+                                {claim.offers?.generated_title || claim.offers?.description}
+                              </p>
+                              {/* Time + reel info */}
+                              <div className="flex items-center gap-[8px] mt-[8px]">
+                                <span className="text-[12px] text-[var(--soft)]">{timeAgo(claim.claimed_at)}</span>
+                                {claim.reel_url ? (
+                                  <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--forest)]">
+                                    <Video className="w-3 h-3" /> Reel posted
+                                  </a>
+                                ) : claim.status === 'reel_due' && claim.reel_due_at ? (
+                                  <span className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: '#c78c20' }}>
+                                    <Clock className="w-3 h-3" /> Due {(() => {
+                                      const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
+                                      return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
+                                    })()}
+                                  </span>
+                                ) : null}
+                              </div>
                             </div>
                           </div>
                         </div>
