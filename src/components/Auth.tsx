@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { Building2, Eye, EyeOff, MapPin, Sparkles, Check } from 'lucide-react';
+import { Building2, Eye, EyeOff, MapPin, Sparkles, Check, ArrowLeft, ArrowRight, Mail, Lock, User, Instagram, Users, ChevronRight } from 'lucide-react';
 import { CATEGORY_ICONS, CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -66,19 +66,67 @@ function AddressAutocomplete({ value, onChange }: {
 
   return (
     <div>
-      <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">
-        <MapPin className="w-3.5 h-3.5 inline mr-1 -mt-0.5" />
-        Address
-      </label>
+      <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
+      <div className="relative">
+        <MapPin className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
+        <input
+          ref={inputRef}
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value, null, null)}
+          placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
+          className="w-full pl-[40px] pr-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all"
+          required
+        />
+      </div>
+    </div>
+  );
+}
+
+/* Floating label input component */
+function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, placeholder, required, minLength, rightElement }: {
+  label: string;
+  icon?: any;
+  type?: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder?: string;
+  required?: boolean;
+  minLength?: number;
+  rightElement?: React.ReactNode;
+}) {
+  const [focused, setFocused] = useState(false);
+  const hasValue = value.length > 0;
+
+  return (
+    <div className={`relative rounded-[14px] border transition-all duration-200 ${
+      focused
+        ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
+        : hasValue
+          ? 'border-[var(--faint)] bg-[#F7F7F7]'
+          : 'border-[var(--faint)] bg-[#F7F7F7]'
+    }`}>
+      {Icon && (
+        <Icon className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
+          focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+        }`} />
+      )}
       <input
-        ref={inputRef}
-        type="text"
+        type={type}
         value={value}
-        onChange={(e) => onChange(e.target.value, null, null)}
-        placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
-        className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all"
-        required
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        placeholder={focused ? placeholder : label}
+        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none`}
+        required={required}
+        minLength={minLength}
       />
+      {rightElement && (
+        <div className="absolute right-[14px] top-1/2 -translate-y-1/2">
+          {rightElement}
+        </div>
+      )}
     </div>
   );
 }
@@ -157,34 +205,39 @@ export default function Auth() {
     }
   };
 
-  const inputClass = "w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all";
+  // Business signup step titles
+  const stepTitles = [
+    { title: 'About your business', subtitle: 'Help creators find you' },
+    { title: 'Location & vibe', subtitle: 'Where can creators visit?' },
+    { title: 'Almost there', subtitle: 'Set up your login' },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col items-center px-4 pt-[52px] bg-[#FFFFFF]">
-      <div className="w-full max-w-md">
-        {/* Logo / Branding */}
-        <div className="text-center mb-10">
-          <Logo size={26} />
-          <p className="text-[var(--soft)] mt-2 text-[12px] font-normal">Hyperlocal creator network</p>
-        </div>
+    <div className="min-h-screen flex flex-col bg-[#FFFFFF]">
+      {/* Top section with branding */}
+      <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
+        <Logo size={24} />
+        <p className="text-[var(--soft)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
+      </div>
 
-        {/* Sign In / Sign Up toggle */}
-        <div className="flex gap-1 mb-6 p-1 bg-[#F7F7F7] rounded-full">
+      <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
+        {/* Sign In / Sign Up toggle — pill style */}
+        <div className="flex gap-[4px] mb-[28px] p-[3px] bg-[#F3F3F3] rounded-[14px]">
           <button
-            onClick={() => { setMode('signin'); setError(''); setSignupStep(1); }}
-            className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
+            onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+            className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
+                ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
             Sign In
           </button>
           <button
-            onClick={() => { setMode('signup'); setError(''); setSignupStep(1); }}
-            className={`flex-1 py-2.5 rounded-full text-sm font-semibold transition-all ${
+            onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+            className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-white text-[#222222] shadow-[0_1px_4px_rgba(34,34,34,0.08)]'
+                ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -192,323 +245,392 @@ export default function Auth() {
           </button>
         </div>
 
-        {/* Role selector (sign-up only) */}
-        {mode === 'signup' && (
-          <div className="flex gap-3 mb-6">
-            <button
-              onClick={() => { setRole('creator'); setSignupStep(1); }}
-              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border transition-all ${
-                role === 'creator'
-                  ? 'border-[var(--terra)] bg-[#FFFFFF]'
-                  : 'border-[var(--faint)] hover:border-[var(--soft)]'
-              }`}
-            >
-              <Sparkles className={`w-5 h-5 ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-              <span className={`text-sm font-semibold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
-                Creator
-              </span>
-            </button>
-            <button
-              onClick={() => { setRole('business'); setSignupStep(1); }}
-              className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-[16px] border transition-all ${
-                role === 'business'
-                  ? 'border-[var(--terra)] bg-[#FFFFFF]'
-                  : 'border-[var(--faint)] hover:border-[var(--soft)]'
-              }`}
-            >
-              <Building2 className={`w-5 h-5 ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-              <span className={`text-sm font-semibold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
-                Business
-              </span>
-            </button>
-          </div>
-        )}
-
-        {/* Multi-step progress for business signup */}
-        {mode === 'signup' && role === 'business' && (
-          <div className="flex items-center justify-center gap-2 mb-6">
-            {[1, 2, 3].map((step) => (
-              <div key={step} className="flex items-center">
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all ${
-                  signupStep === step
-                    ? 'bg-[var(--terra)] text-white'
-                    : signupStep > step
-                    ? 'bg-[var(--terra)] text-white'
-                    : 'bg-[#F7F7F7] text-[var(--soft)]'
-                }`}>
-                  {signupStep > step ? <Check className="w-3.5 h-3.5" /> : step}
-                </div>
-                {step < 3 && <div className={`w-8 h-0.5 mx-1 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F7F7F7]'}`} />}
-              </div>
-            ))}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {mode === 'signup' && (
-            <>
-              {role === 'creator' && (
-                <>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Full Name</label>
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Sophie Taylor" className={inputClass} required />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Instagram Handle</label>
-                    <input type="text" value={instagramHandle} onChange={(e) => setInstagramHandle(e.target.value)} placeholder="@yourusername" className={inputClass} required />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Follower Count</label>
-                    <select value={followerCount} onChange={(e) => setFollowerCount(e.target.value)} className={inputClass} required>
-                      <option value="Under 1k">Under 1k</option>
-                      <option value="1k–5k">1k–5k</option>
-                      <option value="5k–10k">5k–10k</option>
-                      <option value="10k+">10k+</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Email</label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Password</label>
-                    <div className="relative">
-                      <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {role === 'business' && signupStep === 1 && (
-                <>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Business Name</label>
-                    <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Juice Bar Co" className={inputClass} required />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Category</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {CATEGORY_LIST.map((cat) => (
-                        <button
-                          key={cat}
-                          type="button"
-                          onClick={() => setCategory(cat)}
-                          className={`flex items-center gap-2 px-3 py-2.5 rounded-[12px] border text-left text-sm transition-all ${
-                            category === cat
-                              ? 'border-[var(--terra)] bg-[#FFFFFF] font-semibold text-[var(--terra)]'
-                              : 'border-[var(--faint)] text-[var(--mid)] hover:border-[var(--soft)]'
-                          }`}
-                        >
-                          <CategoryIcon category={cat} className="w-4 h-4" />
-                          <span className="truncate">{cat}</span>
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {role === 'business' && signupStep === 2 && (
-                <>
-                  <AddressAutocomplete
-                    value={address}
-                    onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
-                  />
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Bio</label>
-                    <textarea
-                      value={bio}
-                      onChange={(e) => setBio(e.target.value.slice(0, 150))}
-                      placeholder="Tell creators a bit about your business"
-                      maxLength={150}
-                      rows={2}
-                      className={`${inputClass} resize-none`}
-                      required
-                    />
-                    <p className="text-xs text-[var(--soft)] mt-1 text-right">{bio.length}/150</p>
-                  </div>
-                </>
-              )}
-
-              {role === 'business' && signupStep === 3 && (
-                <>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Email</label>
-                    <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
-                  </div>
-                  <div>
-                    <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Password</label>
-                    <div className="relative">
-                      <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
-                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                      </button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-
-          {mode === 'signin' && (
-            <>
-              <div>
-                <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Email</label>
-                <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} required />
-              </div>
-              <div>
-                <label className="block text-[12px] font-semibold text-[#222222] mb-1.5">Password</label>
-                <div className="relative">
-                  <input type={showPassword ? 'text' : 'password'} value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Min 8 characters" className={`${inputClass} pr-11`} required minLength={8} />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--soft)] hover:text-[#222222]/70">
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+        {/* ─── SIGN IN ─── */}
+        {mode === 'signin' && !forgotPassword && (
+          <form onSubmit={handleSubmit} className="space-y-[14px]">
+            <div className="space-y-[12px]">
+              <FloatingInput
+                label="Email"
+                icon={Mail}
+                type="email"
+                value={email}
+                onChange={setEmail}
+                placeholder="you@example.com"
+                required
+              />
+              <FloatingInput
+                label="Password"
+                icon={Lock}
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={setPassword}
+                placeholder="Enter your password"
+                required
+                minLength={8}
+                rightElement={
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                    {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
                   </button>
-                </div>
+                }
+              />
+            </div>
+
+            {error && (
+              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium">
+                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                {error}
               </div>
-            </>
-          )}
+            )}
 
-          {error && (
-            <div className="bg-[var(--terra-10)] text-[var(--terra)] px-4 py-3 rounded-[12px] text-[13px] font-medium border border-[var(--terra-20)]">
-              {error}
-            </div>
-          )}
-
-          {/* Navigation buttons */}
-          {mode === 'signup' && role === 'business' && signupStep < 3 ? (
-            <div className="flex gap-3">
-              {signupStep > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setSignupStep(signupStep - 1)}
-                  className="px-6 py-3 rounded-full text-[#222222] text-[14px] font-semibold bg-[#F7F7F7] hover:bg-[#eeeeee] transition-all min-h-[48px]"
-                >
-                  Back
-                </button>
-              )}
-              <button
-                type="button"
-                onClick={() => {
-                  if (signupStep === 1 && !name) {
-                    setError('Please enter your business name');
-                    return;
-                  }
-                  if (signupStep === 2 && (!address || !bio)) {
-                    setError('Please enter your business address and bio');
-                    return;
-                  }
-                  setError('');
-                  setSignupStep(signupStep + 1);
-                }}
-                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] min-h-[48px] transition-all"
-              >
-                Next
-              </button>
-            </div>
-          ) : mode === 'signup' && role === 'business' && signupStep === 3 ? (
-            <div className="flex gap-3">
-              <button
-                type="button"
-                onClick={() => setSignupStep(signupStep - 1)}
-                className="px-6 py-3 rounded-full text-[#222222] text-[14px] font-semibold bg-[#F7F7F7] hover:bg-[#eeeeee] transition-all min-h-[48px]"
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] min-h-[48px] active:bg-[var(--terra-hover)] transition-all disabled:opacity-50"
-              >
-                {loading ? (
-                  <span className="inline-flex items-center gap-2">
-                    <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Processing...
-                  </span>
-                ) : 'Create Account'}
-              </button>
-            </div>
-          ) : (
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] min-h-[48px] active:bg-[var(--terra-hover)] transition-all disabled:opacity-50"
+              className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Processing...
+                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 </span>
-              ) : mode === 'signin' ? 'Sign In' : 'Create Account'}
+              ) : 'Sign In'}
             </button>
-          )}
-        </form>
 
-        {mode === 'signin' && !forgotPassword && (
-          <button
-            type="button"
-            onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-            className="block text-[12px] font-medium text-[var(--soft)] text-center mt-5 hover:text-[var(--mid)] transition-colors mx-auto"
-          >
-            Forgot password?
-          </button>
+            <button
+              type="button"
+              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
+              className="block text-[13px] font-medium text-[var(--soft)] text-center mt-[16px] hover:text-[var(--terra)] transition-colors mx-auto"
+            >
+              Forgot password?
+            </button>
+          </form>
         )}
 
-        {forgotPassword && (
-          <div className="mt-5">
+        {/* ─── FORGOT PASSWORD ─── */}
+        {mode === 'signin' && forgotPassword && (
+          <div>
+            <button
+              type="button"
+              onClick={() => setForgotPassword(false)}
+              className="flex items-center gap-[6px] text-[13px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[#222222] transition-colors"
+            >
+              <ArrowLeft className="w-[14px] h-[14px]" /> Back to sign in
+            </button>
+
             {resetSent ? (
-              <div className="text-center">
-                <p className="text-sm text-[#222222] font-semibold mb-1">Check your email</p>
-                <p className="text-xs text-[var(--mid)]">We sent a password reset link to {resetEmail}</p>
-                <button
-                  type="button"
-                  onClick={() => { setForgotPassword(false); setResetSent(false); }}
-                  className="text-[11px] font-medium text-[var(--terra)] mt-3 hover:underline"
-                >
-                  Back to sign in
-                </button>
+              <div className="text-center py-[32px]">
+                <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
+                  <Mail className="w-[24px] h-[24px] text-[var(--terra)]" />
+                </div>
+                <p className="text-[17px] font-bold text-[#222222] mb-[6px]">Check your email</p>
+                <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[#222222]">{resetEmail}</span></p>
               </div>
             ) : (
-              <form onSubmit={handleResetPassword} className="space-y-3">
-                <p className="text-xs text-[var(--mid)] text-center">Enter your email and we'll send a reset link.</p>
-                <input
+              <form onSubmit={handleResetPassword} className="space-y-[14px]">
+                <div className="mb-[4px]">
+                  <p className="text-[17px] font-bold text-[#222222] mb-[4px]">Reset password</p>
+                  <p className="text-[13px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
+                </div>
+                <FloatingInput
+                  label="Email"
+                  icon={Mail}
                   type="email"
                   value={resetEmail}
-                  onChange={(e) => setResetEmail(e.target.value)}
+                  onChange={setResetEmail}
                   placeholder="you@example.com"
-                  className={inputClass}
                   required
                 />
                 {resetError && (
-                  <div className="bg-[var(--terra-10)] text-[var(--terra)] px-4 py-3 rounded-[12px] text-[13px] font-medium border border-[var(--terra-20)]">
+                  <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium">
+                    <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                     {resetError}
                   </div>
                 )}
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-3 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] min-h-[48px] transition-all disabled:opacity-50"
+                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForgotPassword(false)}
-                  className="block text-[12px] font-medium text-[var(--soft)] text-center hover:text-[var(--mid)] transition-colors mx-auto"
-                >
-                  Back to sign in
                 </button>
               </form>
             )}
           </div>
         )}
 
+        {/* ─── SIGN UP ─── */}
         {mode === 'signup' && (
-          <p className="text-xs text-[var(--soft)] text-center mt-5">
-            Your account will be reviewed and approved by our admin team
-          </p>
+          <form onSubmit={handleSubmit}>
+            {/* Role selector cards */}
+            <div className="flex gap-[10px] mb-[24px]">
+              <button
+                type="button"
+                onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
+                  role === 'creator'
+                    ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
+                    : 'border-[var(--faint)] bg-white hover:border-[var(--soft)]'
+                }`}
+              >
+                <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
+                  role === 'creator' ? 'bg-[var(--terra-15)]' : 'bg-[#F7F7F7]'
+                }`}>
+                  <Sparkles className={`w-[18px] h-[18px] ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                </div>
+                <span className={`text-[13px] font-bold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                  Creator
+                </span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
+                  role === 'business'
+                    ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
+                    : 'border-[var(--faint)] bg-white hover:border-[var(--soft)]'
+                }`}
+              >
+                <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
+                  role === 'business' ? 'bg-[var(--terra-15)]' : 'bg-[#F7F7F7]'
+                }`}>
+                  <Building2 className={`w-[18px] h-[18px] ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                </div>
+                <span className={`text-[13px] font-bold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                  Business
+                </span>
+              </button>
+            </div>
+
+            {/* ── Creator signup (single page) ── */}
+            {role === 'creator' && (
+              <div className="space-y-[12px]">
+                <FloatingInput label="Full Name" icon={User} value={name} onChange={setName} placeholder="Sophie Taylor" required />
+                <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
+
+                {/* Follower count as nice pills */}
+                <div>
+                  <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Follower Count</label>
+                  <div className="flex gap-[8px]">
+                    {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
+                      <button
+                        key={opt}
+                        type="button"
+                        onClick={() => setFollowerCount(opt)}
+                        className={`flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all ${
+                          followerCount === opt
+                            ? 'bg-[#222222] text-white'
+                            : 'bg-[#F7F7F7] text-[var(--mid)] hover:bg-[#EEEEEE]'
+                        }`}
+                      >
+                        {opt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="pt-[4px]" />
+                <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
+                <FloatingInput
+                  label="Password"
+                  icon={Lock}
+                  type={showPassword ? 'text' : 'password'}
+                  value={password}
+                  onChange={setPassword}
+                  placeholder="Min 8 characters"
+                  required
+                  minLength={8}
+                  rightElement={
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                      {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                    </button>
+                  }
+                />
+              </div>
+            )}
+
+            {/* ── Business signup (multi-step) ── */}
+            {role === 'business' && (
+              <>
+                {/* Step indicator */}
+                <div className="flex items-center gap-[6px] mb-[20px]">
+                  {[1, 2, 3].map((step) => (
+                    <div key={step} className="flex items-center gap-[6px]">
+                      <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
+                        signupStep > step
+                          ? 'bg-[var(--terra)] text-white'
+                          : signupStep === step
+                            ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
+                            : 'bg-[#F3F3F3] text-[var(--soft)]'
+                      }`}>
+                        {signupStep > step ? <Check className="w-[13px] h-[13px]" /> : step}
+                      </div>
+                      {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F3F3F3]'}`} />}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Step header */}
+                <div className="mb-[20px]">
+                  <h2 className="text-[19px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>
+                    {stepTitles[signupStep - 1].title}
+                  </h2>
+                  <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
+                </div>
+
+                {/* Step 1: Name & Category */}
+                {signupStep === 1 && (
+                  <div className="space-y-[16px]">
+                    <FloatingInput label="Business Name" icon={Building2} value={name} onChange={setName} placeholder="Juice Bar Co" required />
+
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[#222222] mb-[10px]">Category</label>
+                      <div className="grid grid-cols-2 gap-[8px]">
+                        {CATEGORY_LIST.map((cat) => (
+                          <button
+                            key={cat}
+                            type="button"
+                            onClick={() => setCategory(cat)}
+                            className={`flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] border-[1.5px] text-left transition-all duration-200 ${
+                              category === cat
+                                ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_2px_var(--terra-ring)]'
+                                : 'border-[var(--faint)] bg-white hover:border-[var(--soft)] hover:bg-[#FAFAFA]'
+                            }`}
+                          >
+                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                            <span className={`text-[13px] font-semibold truncate ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>{cat}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Address & Bio */}
+                {signupStep === 2 && (
+                  <div className="space-y-[14px]">
+                    <AddressAutocomplete
+                      value={address}
+                      onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
+                    />
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[#222222] mb-2">Bio</label>
+                      <div className="relative">
+                        <textarea
+                          value={bio}
+                          onChange={(e) => setBio(e.target.value.slice(0, 150))}
+                          placeholder="Tell creators a bit about your business..."
+                          maxLength={150}
+                          rows={3}
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          required
+                        />
+                        <span className={`absolute bottom-[10px] right-[12px] text-[11px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 3: Email & Password */}
+                {signupStep === 3 && (
+                  <div className="space-y-[12px]">
+                    <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
+                    <FloatingInput
+                      label="Password"
+                      icon={Lock}
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={setPassword}
+                      placeholder="Min 8 characters"
+                      required
+                      minLength={8}
+                      rightElement={
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                          {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                        </button>
+                      }
+                    />
+                  </div>
+                )}
+              </>
+            )}
+
+            {error && (
+              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium mt-[14px]">
+                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                {error}
+              </div>
+            )}
+
+            {/* Navigation buttons */}
+            <div className="mt-[20px]">
+              {role === 'business' && signupStep < 3 ? (
+                <div className="flex gap-[10px]">
+                  {signupStep > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
+                      className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
+                    >
+                      <ArrowLeft className="w-[18px] h-[18px] text-[#222222]" />
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (signupStep === 1 && !name) {
+                        setError('Please enter your business name');
+                        return;
+                      }
+                      if (signupStep === 2 && (!address || !bio)) {
+                        setError('Please enter your business address and bio');
+                        return;
+                      }
+                      setError('');
+                      setSignupStep(signupStep + 1);
+                    }}
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(196,103,74,0.3)] inline-flex items-center justify-center gap-[6px]"
+                  >
+                    Continue <ArrowRight className="w-[16px] h-[16px]" />
+                  </button>
+                </div>
+              ) : role === 'business' && signupStep === 3 ? (
+                <div className="flex gap-[10px]">
+                  <button
+                    type="button"
+                    onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
+                    className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
+                  >
+                    <ArrowLeft className="w-[18px] h-[18px] text-[#222222]" />
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
+                  >
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      </span>
+                    ) : 'Create Account'}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
+                >
+                  {loading ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </span>
+                  ) : 'Create Account'}
+                </button>
+              )}
+            </div>
+
+            <p className="text-[12px] text-[var(--soft)] text-center mt-[20px] leading-[1.5]">
+              By signing up you agree to our terms. Your account will be reviewed by our team.
+            </p>
+          </form>
         )}
       </div>
     </div>
