@@ -366,3 +366,70 @@ VALUES
 ON CONFLICT (id) DO UPDATE SET
   generated_title = EXCLUDED.generated_title,
   offer_photo_url = EXCLUDED.offer_photo_url;
+
+-- ============================================================
+-- CLAIMS  (demo activity for Midgar Coffee)
+-- ============================================================
+INSERT INTO claims (id, creator_id, offer_id, business_id, status, qr_token, qr_expires_at, claimed_at, redeemed_at, reel_url, reel_due_at, month)
+VALUES
+  (
+    'd1111111-1111-1111-1111-111111111111',
+    'a1111111-1111-1111-1111-111111111111',  -- Sophie Carter
+    'c1111111-1111-1111-1111-111111111111',  -- Free coffee + pastry
+    'b1111111-1111-1111-1111-111111111111',  -- Midgar Coffee
+    'active',
+    'QR-SOPHIE-MC1',
+    NOW() + interval '24 hours',
+    NOW() - interval '2 hours',
+    NULL,
+    NULL,
+    NULL,
+    '2026-03'
+  ),
+  (
+    'd2222222-2222-2222-2222-222222222222',
+    'a3333333-3333-3333-3333-333333333333',  -- Mia Chen
+    'c2222222-2222-2222-2222-222222222222',  -- Brunch for two
+    'b1111111-1111-1111-1111-111111111111',  -- Midgar Coffee
+    'completed',
+    'QR-MIA-MC1',
+    NOW() + interval '24 hours',
+    NOW() - interval '3 days',
+    NOW() - interval '2 days',
+    'https://instagram.com/reel/example1',
+    NOW() - interval '1 day',
+    '2026-03'
+  ),
+  (
+    'd3333333-3333-3333-3333-333333333333',
+    'a5555555-5555-5555-5555-555555555555',  -- Isla Morgan
+    'c1111111-1111-1111-1111-111111111111',  -- Free coffee + pastry
+    'b1111111-1111-1111-1111-111111111111',  -- Midgar Coffee
+    'redeemed',
+    'QR-ISLA-MC1',
+    NOW() + interval '24 hours',
+    NOW() - interval '1 day',
+    NOW() - interval '6 hours',
+    NULL,
+    NOW() + interval '6 days',
+    '2026-03'
+  ),
+  (
+    'd4444444-4444-4444-4444-444444444444',
+    'a4444444-4444-4444-4444-444444444444',  -- Tom Bradley
+    'c2222222-2222-2222-2222-222222222222',  -- Brunch for two
+    'b1111111-1111-1111-1111-111111111111',  -- Midgar Coffee
+    'reel_due',
+    'QR-TOM-MC1',
+    NOW() + interval '24 hours',
+    NOW() - interval '5 days',
+    NOW() - interval '4 days',
+    NULL,
+    NOW() + interval '2 days',
+    '2026-03'
+  )
+ON CONFLICT (id) DO UPDATE SET
+  status = EXCLUDED.status,
+  redeemed_at = EXCLUDED.redeemed_at,
+  reel_url = EXCLUDED.reel_url,
+  reel_due_at = EXCLUDED.reel_due_at;
