@@ -1728,28 +1728,18 @@ export default function BusinessPortal() {
 
                       {/* Card body */}
                       <div className="p-[16px]">
-                        <h3 className="text-[17px] font-extrabold text-[#222222] mb-[6px]" style={{ letterSpacing: '-0.2px' }}>
-                          {offer.generated_title || offer.description}
-                        </h3>
-                        <p className="text-[13px] text-[var(--mid)] mb-[12px]">
-                          {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
-                        </p>
-
-                        {/* Progress bar */}
-                        {!isUnlimited && (
-                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mb-[14px]">
-                            <div
-                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
-                              style={{ width: `${pct}%` }}
-                            />
+                        <div className="flex items-start justify-between gap-[12px]">
+                          <div className="flex-1 min-w-0">
+                            <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
+                              {offer.generated_title || offer.description}
+                            </h3>
+                            <p className="text-[13px] text-[var(--mid)]">
+                              {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
+                            </p>
                           </div>
-                        )}
-
-                        {/* Action row */}
-                        <div className="flex items-center justify-end">
                           <button
                             onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                            className={`px-[20px] py-[9px] rounded-[50px] font-semibold text-[13px] transition-all ${
+                            className={`flex-shrink-0 px-[18px] py-[8px] rounded-[50px] font-semibold text-[13px] transition-all mt-[2px] ${
                               offer.is_live
                                 ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
                                 : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
@@ -1758,6 +1748,16 @@ export default function BusinessPortal() {
                             {offer.is_live ? 'Pause' : 'Resume'}
                           </button>
                         </div>
+
+                        {/* Progress bar */}
+                        {!isUnlimited && (
+                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-[12px]">
+                            <div
+                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
                       </div>
                     </div>
                   );
