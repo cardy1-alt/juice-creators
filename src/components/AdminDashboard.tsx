@@ -200,7 +200,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-[var(--mid)]">Admin Dashboard</p>
               </div>
             </div>
-            <button onClick={signOut} className="p-2 rounded-lg hover:bg-[#F7F7F7] transition-colors">
+            <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[#F7F7F7] transition-colors">
               <LogOut className="w-4.5 h-4.5 text-[var(--soft)]" />
             </button>
           </div>
@@ -232,12 +232,12 @@ export default function AdminDashboard() {
 
         <div className="p-6">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-xl bg-rose-50 border border-rose-200 text-sm text-rose-700 font-medium">
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[13px] text-[var(--terra)] font-medium">
               {fetchError}
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-xl border text-sm font-medium ${actionFeedback.type === 'error' ? 'bg-rose-50 border-rose-200 text-rose-700' : 'bg-emerald-50 border-emerald-200 text-emerald-700'}`}>
+            <div className={`mb-4 p-3 rounded-[12px] border text-[13px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,60,52,0.06)] border-[rgba(26,60,52,0.12)] text-[var(--forest)]'}`}>
               {actionFeedback.text}
             </div>
           )}
@@ -245,13 +245,13 @@ export default function AdminDashboard() {
           {view === 'stats' && (
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
-                <div className="bg-[var(--terra-10)] rounded-2xl p-5 border border-[var(--terra-20)]">
+                <div className="bg-[var(--terra-10)] rounded-[16px] p-5 border border-[var(--terra-20)]">
                   <h3 className="text-sm font-bold text-[#222222] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
                         <Users className="w-6 h-6" />
                         <div className="text-left">
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
                     {stats.pendingBusinesses > 0 && (
                       <button
                         onClick={() => setView('businesses')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
                         <Store className="w-6 h-6" />
                         <div className="text-left">
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, i) => (
-                  <div key={i} className="bg-white rounded-[20px] p-6 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                  <div key={i} className="bg-white rounded-[16px] p-6 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                     <div className="mb-3"><stat.icon className="w-6 h-6 text-[var(--mid)]" /></div>
                     <p className="text-3xl font-bold text-[#222222]">{stat.value}</p>
                     <p className="text-xs text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No creators yet.</p></div>
               ) : (
@@ -346,7 +346,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No businesses yet.</p></div>
               ) : (
@@ -401,7 +401,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-white rounded-[20px] p-5 shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]">
+                    <div key={offer.id} className="bg-white rounded-[16px] p-5 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -422,7 +422,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] overflow-hidden">
+            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No claims yet.</p></div>
               ) : (
@@ -478,7 +478,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-6">
+              <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
                 <h2 className="text-lg font-bold text-[#222222] mb-5">Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -527,10 +527,10 @@ export default function AdminDashboard() {
                   </div>
                   {passwordMessage && (
                     <div
-                      className={`p-3 rounded-xl text-sm font-medium ${
+                      className={`p-3 rounded-[12px] text-[13px] font-medium ${
                         passwordMessage.type === 'success'
-                          ? 'bg-emerald-50 text-emerald-600 border border-emerald-100'
-                          : 'bg-rose-50 text-rose-600 border border-rose-100'
+                          ? 'bg-[rgba(26,60,52,0.06)] text-[var(--forest)] border border-[rgba(26,60,52,0.12)]'
+                          : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
                       }`}
                     >
                       {passwordMessage.text}

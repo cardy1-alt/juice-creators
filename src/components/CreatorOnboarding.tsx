@@ -216,17 +216,18 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             <button
               onClick={() => setStep(3)}
               style={{
-                background: '#222222',
+                background: 'var(--terra)',
                 color: '#FFFFFF',
                 fontSize: '14px',
                 fontWeight: 700,
                 borderRadius: '50px',
-                padding: '13px 26px',
+                padding: '14px 28px',
                 border: 'none',
                 cursor: 'pointer',
                 display: 'inline-flex',
                 alignItems: 'center',
                 gap: '8px',
+                minHeight: '48px',
               }}
             >
               Continue <ArrowRight size={16} />
@@ -336,7 +337,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
         <div style={{ display: 'flex', gap: '12px', marginTop: 28 }}>
           <div style={{
             background: 'var(--bg)',
-            borderRadius: '14px',
+            borderRadius: '16px',
             padding: '16px 20px',
             textAlign: 'center',
             minWidth: '100px',
@@ -346,7 +347,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
           </div>
           <div style={{
             background: 'var(--bg)',
-            borderRadius: '14px',
+            borderRadius: '16px',
             padding: '16px 20px',
             textAlign: 'center',
             minWidth: '100px',
@@ -365,9 +366,10 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             fontSize: '14px',
             fontWeight: 700,
             borderRadius: '50px',
-            padding: '13px 30px',
+            padding: '14px 30px',
             border: 'none',
             cursor: 'pointer',
+            minHeight: '48px',
           }}
         >
           Start exploring
