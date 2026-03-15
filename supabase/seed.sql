@@ -262,69 +262,89 @@ ON CONFLICT (id) DO UPDATE SET logo_url = EXCLUDED.logo_url;
 -- ============================================================
 -- OFFERS
 -- ============================================================
-INSERT INTO offers (id, business_id, description, monthly_cap, is_live)
+INSERT INTO offers (id, business_id, description, monthly_cap, is_live, generated_title, offer_photo_url)
 VALUES
   (
     'c1111111-1111-1111-1111-111111111111',
     'b1111111-1111-1111-1111-111111111111',
     'Free coffee + pastry in exchange for an Instagram reel featuring our shop',
     8,
-    true
+    true,
+    'Free coffee + pastry',
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=500&fit=crop'
   ),
   (
     'c2222222-2222-2222-2222-222222222222',
     'b1111111-1111-1111-1111-111111111111',
     'Free brunch for two — post a story tagging @midgarcoffee',
     4,
-    true
+    true,
+    'Brunch for two',
+    'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=400&h=500&fit=crop'
   ),
   (
     'c3333333-3333-3333-3333-333333333333',
     'b2222222-2222-2222-2222-222222222222',
     'Complimentary express facial for a reel showing the full experience',
     6,
-    true
+    true,
+    'Express facial',
+    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=400&h=500&fit=crop'
   ),
   (
     'c4444444-4444-4444-4444-444444444444',
     'b2222222-2222-2222-2222-222222222222',
     'Free gel manicure — share a before/after reel',
     null,
-    true
+    true,
+    'Free gel manicure',
+    'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=400&h=500&fit=crop'
   ),
   (
     'c5555555-5555-5555-5555-555555555555',
     'b3333333-3333-3333-3333-333333333333',
     'Free smoothie bowl + juice — film a 30s reel of your visit',
     10,
-    true
+    true,
+    'Smoothie bowl + juice',
+    'https://images.unsplash.com/photo-1546039907-7b3a4711ad8f?w=400&h=500&fit=crop'
   ),
   (
     'c6666666-6666-6666-6666-666666666666',
     'b4444444-4444-4444-4444-444444444444',
     'Free day pass + PT session — post a workout reel tagging @ironoakgym',
     4,
-    true
+    true,
+    'Free day pass + PT session',
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=500&fit=crop'
   ),
   (
     'c7777777-7777-7777-7777-777777777777',
     'b5555555-5555-5555-5555-555555555555',
     'Free outfit styling session — share a try-on haul reel',
     6,
-    true
+    true,
+    'Outfit styling session',
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=500&fit=crop'
   ),
   (
     'c8888888-8888-8888-8888-888888888888',
     'b6666666-6666-6666-6666-666666666666',
     'Free dog grooming session — post a cute before/after reel',
     null,
-    true
+    true,
+    'Free dog grooming',
+    'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=400&h=500&fit=crop'
   ),
   (
     'c9999999-9999-9999-9999-999999999999',
     'b7777777-7777-7777-7777-777777777777',
     'Free paint & sip evening for two — reel the experience',
     5,
-    true
+    true,
+    'Paint & sip for two',
+    'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=400&h=500&fit=crop'
   )
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (id) DO UPDATE SET
+  generated_title = EXCLUDED.generated_title,
+  offer_photo_url = EXCLUDED.offer_photo_url;
