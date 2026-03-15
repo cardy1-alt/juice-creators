@@ -2024,6 +2024,16 @@ export default function BusinessPortal() {
         </div>
       </div>
 
+      {/* Bottom fade gradient */}
+      <div
+        className="fixed left-0 right-0 z-30 pointer-events-none"
+        style={{
+          bottom: 60,
+          height: 72,
+          background: 'linear-gradient(to bottom, transparent 0%, #ffffff 100%)',
+        }}
+      />
+
       {/* ═══ Fixed Bottom Nav ═══ */}
       <nav
         className="fixed bottom-0 left-0 right-0 z-40 bg-white flex items-end justify-around"
