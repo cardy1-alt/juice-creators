@@ -968,6 +968,13 @@ export default function BusinessPortal() {
   const [logoError, setLogoError] = useState<string | null>(null);
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
   const [profileSubView, setProfileSubView] = useState<'main' | 'edit'>('main');
+  const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [editOfferTitle, setEditOfferTitle] = useState('');
+  const [editOfferCap, setEditOfferCap] = useState<number | null>(null);
+  const [editOfferAsk, setEditOfferAsk] = useState('');
+  const [editOfferDirty, setEditOfferDirty] = useState(false);
+  const [editOfferSaving, setEditOfferSaving] = useState(false);
+  const [editOfferSaved, setEditOfferSaved] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; address: string | null; bio: string | null; offer_count: number; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
   const [expandedNearbyBiz, setExpandedNearbyBiz] = useState<string | null>(null);
@@ -1148,6 +1155,38 @@ export default function BusinessPortal() {
     } catch (err: any) {
       console.error('Failed to toggle offer:', err.message);
     }
+  };
+
+  const handleUpdateOffer = async () => {
+    if (!selectedOffer || !editOfferDirty) return;
+    setEditOfferSaving(true);
+    try {
+      const updates: Record<string, unknown> = {};
+      if (editOfferTitle !== (selectedOffer.generated_title || selectedOffer.description)) updates.generated_title = editOfferTitle;
+      if (editOfferTitle !== selectedOffer.description) updates.description = editOfferTitle;
+      if (editOfferCap !== selectedOffer.monthly_cap) updates.monthly_cap = editOfferCap;
+      if (editOfferAsk !== (selectedOffer.specific_ask || '')) updates.specific_ask = editOfferAsk || null;
+      const { error } = await supabase.from('offers').update(updates).eq('id', selectedOffer.id);
+      if (error) throw error;
+      setEditOfferDirty(false);
+      setEditOfferSaved(true);
+      setTimeout(() => setEditOfferSaved(false), 2000);
+      fetchOffers();
+      // Update local selectedOffer to reflect changes
+      setSelectedOffer(prev => prev ? { ...prev, ...updates } as Offer : null);
+    } catch (err: any) {
+      console.error('Failed to update offer:', err.message);
+    }
+    setEditOfferSaving(false);
+  };
+
+  const openOfferDetail = (offer: Offer) => {
+    setSelectedOffer(offer);
+    setEditOfferTitle(offer.generated_title || offer.description);
+    setEditOfferCap(offer.monthly_cap);
+    setEditOfferAsk(offer.specific_ask || '');
+    setEditOfferDirty(false);
+    setEditOfferSaved(false);
   };
 
   const handleScanCode = async (e: React.FormEvent) => {
@@ -1651,118 +1690,250 @@ export default function BusinessPortal() {
           {/* ═══ OFFERS ═══ */}
           {view === 'offers' && (
             <div>
-              <div className="flex items-center justify-between mb-[20px]">
-                <div>
-                  <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Offers</h2>
-                  <p className="text-[14px] text-[var(--mid)] mt-[2px]">{offers.length} offer{offers.length !== 1 ? 's' : ''} · {offers.filter(o => o.is_live).length} live</p>
-                </div>
-                {offers.length > 0 && (
-                  <button
-                    onClick={() => setShowOfferBuilder(true)}
-                    className="inline-flex items-center gap-[6px] px-[18px] py-[10px] rounded-[50px] bg-[#222222] text-white font-bold text-[13px] hover:bg-[#333] transition-all"
+              {selectedOffer ? (
+                /* ── Offer detail / edit sub-view ── */
+                <>
+                  <div className="flex items-center gap-3 mb-5">
+                    <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    </button>
+                    <h1 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
+                  </div>
+
+                  {/* Hero image */}
+                  <div
+                    className="w-full h-[200px] rounded-[16px] overflow-hidden relative mb-[20px]"
+                    style={{ background: selectedOffer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
                   >
-                    <Plus className="w-4 h-4" /> New
-                  </button>
-                )}
-              </div>
-
-              {offersLoaded && offers.length === 0 && (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <Sparkles className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center mb-5 max-w-[260px]">Create your first offer to start receiving creators</p>
-                  <button
-                    onClick={() => setShowOfferBuilder(true)}
-                    className="inline-flex items-center gap-2 px-[24px] py-[13px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
-                  >
-                    <Plus className="w-4 h-4" /> Create First Offer
-                  </button>
-                </div>
-              )}
-
-              <div className="space-y-[16px]">
-                {offers.map((offer) => {
-                  const isUnlimited = offer.monthly_cap === null;
-                  const slotsUsed = offer.slotsUsed || 0;
-                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                  const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
-
-                  return (
-                    <div key={offer.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
-                      {/* Image-led hero */}
-                      <div
-                        className="w-full h-[180px] relative overflow-hidden"
-                        style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
-                      >
-                        {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <Gift className="w-12 h-12 text-white/40" />
-                          </div>
-                        )}
-                        {/* Status badge overlaid top-right */}
-                        {offer.is_live ? (
-                          <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
-                            <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
-                            Live
-                          </span>
-                        ) : (
-                          <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
-                            Paused
-                          </span>
-                        )}
-                        {/* Slots badge overlaid top-left */}
-                        {!isUnlimited && slotsLeft !== null && (() => {
-                          const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
-                          return (
-                            <span
-                              className="absolute top-[12px] left-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm"
-                              style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
-                            >
-                              {badge.text}
-                            </span>
-                          );
-                        })()}
+                    {selectedOffer.offer_photo_url ? (
+                      <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Gift className="w-12 h-12 text-white/40" />
                       </div>
+                    )}
+                    {/* Status badge */}
+                    {selectedOffer.is_live ? (
+                      <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
+                        <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                        Live
+                      </span>
+                    ) : (
+                      <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
+                        Paused
+                      </span>
+                    )}
+                  </div>
 
-                      {/* Card body */}
-                      <div className="p-[16px]">
-                        <div className="flex items-start justify-between gap-[12px]">
-                          <div className="flex-1 min-w-0">
-                            <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
-                              {offer.generated_title || offer.description}
-                            </h3>
-                            <p className="text-[13px] text-[var(--mid)]">
-                              {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
-                            </p>
-                          </div>
-                          <button
-                            onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                            className={`flex-shrink-0 px-[18px] py-[8px] rounded-[50px] font-semibold text-[13px] transition-all mt-[2px] ${
-                              offer.is_live
-                                ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
-                                : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
-                            }`}
-                          >
-                            {offer.is_live ? 'Pause' : 'Resume'}
-                          </button>
-                        </div>
+                  {/* Stats row */}
+                  <div className="flex items-center gap-[16px] mb-[20px]">
+                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
+                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.slotsUsed || 0}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)]">Claimed</p>
+                    </div>
+                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
+                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.monthly_cap === null ? '\u221E' : selectedOffer.monthly_cap}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)]">Monthly cap</p>
+                    </div>
+                    <div className="flex-1 text-center py-[12px] rounded-[12px] bg-[var(--bg)]">
+                      <p className="text-[18px] font-extrabold text-[#222222]">{selectedOffer.offer_type || '\u2014'}</p>
+                      <p className="text-[11px] font-semibold text-[var(--mid)]">Type</p>
+                    </div>
+                  </div>
 
-                        {/* Progress bar */}
-                        {!isUnlimited && (
-                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-[12px]">
-                            <div
-                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
-                              style={{ width: `${pct}%` }}
-                            />
-                          </div>
-                        )}
+                  {/* Pause / Resume toggle */}
+                  <button
+                    onClick={async () => {
+                      await handleToggleOffer(selectedOffer.id, selectedOffer.is_live);
+                      setSelectedOffer(prev => prev ? { ...prev, is_live: !prev.is_live } : null);
+                    }}
+                    className={`w-full py-[12px] rounded-[50px] font-bold text-[14px] transition-all mb-[24px] ${
+                      selectedOffer.is_live
+                        ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
+                        : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                    }`}
+                  >
+                    {selectedOffer.is_live ? 'Pause offer' : 'Resume offer'}
+                  </button>
+
+                  {/* Edit fields */}
+                  <div className="space-y-4 mb-6">
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Offer title</label>
+                      <input
+                        type="text"
+                        value={editOfferTitle}
+                        onChange={e => { setEditOfferTitle(e.target.value); setEditOfferDirty(true); setEditOfferSaved(false); }}
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Monthly cap</label>
+                      <div className="flex items-center gap-[12px]">
+                        <input
+                          type="number"
+                          min={1}
+                          value={editOfferCap === null ? '' : editOfferCap}
+                          onChange={e => {
+                            const v = e.target.value === '' ? null : parseInt(e.target.value);
+                            setEditOfferCap(v);
+                            setEditOfferDirty(true);
+                            setEditOfferSaved(false);
+                          }}
+                          placeholder="Unlimited"
+                          className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
+                        />
+                        <span className="text-[12px] text-[var(--soft)] flex-shrink-0">{editOfferCap === null ? 'Unlimited' : `${editOfferCap}/mo`}</span>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                    <div>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Content ask</label>
+                      <textarea
+                        value={editOfferAsk}
+                        onChange={e => { setEditOfferAsk(e.target.value); setEditOfferDirty(true); setEditOfferSaved(false); }}
+                        placeholder="e.g. Show the latte art in a reel"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
+                        style={{ minHeight: '80px' }}
+                      />
+                    </div>
+                    {selectedOffer.content_type && (
+                      <div>
+                        <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Content type</label>
+                        <p className="px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--mid)]">{selectedOffer.content_type}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Save button */}
+                  <button
+                    onClick={handleUpdateOffer}
+                    disabled={!editOfferDirty || editOfferSaving}
+                    className={`w-full py-[14px] rounded-[50px] font-bold text-[14px] transition-all min-h-[52px] ${
+                      editOfferDirty
+                        ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                        : 'bg-[var(--bg)] text-[var(--soft)]'
+                    }`}
+                  >
+                    {editOfferSaved ? 'Saved \u2713' : editOfferSaving ? 'Saving...' : 'Save changes'}
+                  </button>
+
+                  {/* Created date */}
+                  <p className="text-[12px] text-[var(--soft)] text-center mt-[16px]">
+                    Created {new Date(selectedOffer.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                  </p>
+                </>
+              ) : (
+                /* ── Offers list view ── */
+                <>
+                  <div className="flex items-center justify-between mb-[20px]">
+                    <div>
+                      <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Offers</h2>
+                      <p className="text-[14px] text-[var(--mid)] mt-[2px]">{offers.length} offer{offers.length !== 1 ? 's' : ''} · {offers.filter(o => o.is_live).length} live</p>
+                    </div>
+                    {offers.length > 0 && (
+                      <button
+                        onClick={() => setShowOfferBuilder(true)}
+                        className="inline-flex items-center gap-[6px] px-[18px] py-[10px] rounded-[50px] bg-[#222222] text-white font-bold text-[13px] hover:bg-[#333] transition-all"
+                      >
+                        <Plus className="w-4 h-4" /> New
+                      </button>
+                    )}
+                  </div>
+
+                  {offersLoaded && offers.length === 0 && (
+                    <div className="flex flex-col items-center py-16 px-6">
+                      <Sparkles className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
+                      <p className="text-[14px] text-[var(--mid)] text-center mb-5 max-w-[260px]">Create your first offer to start receiving creators</p>
+                      <button
+                        onClick={() => setShowOfferBuilder(true)}
+                        className="inline-flex items-center gap-2 px-[24px] py-[13px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
+                      >
+                        <Plus className="w-4 h-4" /> Create First Offer
+                      </button>
+                    </div>
+                  )}
+
+                  <div className="space-y-[16px]">
+                    {offers.map((offer) => {
+                      const isUnlimited = offer.monthly_cap === null;
+                      const slotsUsed = offer.slotsUsed || 0;
+                      const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                      const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
+
+                      return (
+                        <button
+                          key={offer.id}
+                          onClick={() => openOfferDetail(offer)}
+                          className="w-full text-left bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden transition-all active:scale-[0.98]"
+                        >
+                          {/* Image-led hero */}
+                          <div
+                            className="w-full h-[180px] relative overflow-hidden"
+                            style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
+                          >
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                            ) : (
+                              <div className="w-full h-full flex items-center justify-center">
+                                <Gift className="w-12 h-12 text-white/40" />
+                              </div>
+                            )}
+                            {/* Status badge overlaid top-right */}
+                            {offer.is_live ? (
+                              <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
+                                <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                                Live
+                              </span>
+                            ) : (
+                              <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
+                                Paused
+                              </span>
+                            )}
+                            {/* Slots badge overlaid top-left */}
+                            {!isUnlimited && slotsLeft !== null && (() => {
+                              const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
+                              return (
+                                <span
+                                  className="absolute top-[12px] left-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm"
+                                  style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
+                                >
+                                  {badge.text}
+                                </span>
+                              );
+                            })()}
+                          </div>
+
+                          {/* Card body */}
+                          <div className="p-[16px]">
+                            <div className="flex items-start justify-between gap-[12px]">
+                              <div className="flex-1 min-w-0">
+                                <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
+                                  {offer.generated_title || offer.description}
+                                </h3>
+                                <p className="text-[13px] text-[var(--mid)]">
+                                  {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
+                                </p>
+                              </div>
+                              <ChevronRight className="w-5 h-5 text-[var(--soft)] flex-shrink-0 mt-[2px]" />
+                            </div>
+
+                            {/* Progress bar */}
+                            {!isUnlimited && (
+                              <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-[12px]">
+                                <div
+                                  className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
+                                  style={{ width: `${pct}%` }}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </>
+              )}
             </div>
           )}
 
@@ -2343,7 +2514,7 @@ export default function BusinessPortal() {
           return (
             <button
               key={tab.key}
-              onClick={() => { setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); }}
+              onClick={() => { setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
               className="flex-1 flex flex-col items-center gap-1"
             >
               <Icon className={`w-5 h-5 ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
