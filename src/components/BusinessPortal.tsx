@@ -1651,8 +1651,20 @@ export default function BusinessPortal() {
           {/* ═══ OFFERS ═══ */}
           {view === 'offers' && (
             <div>
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Offers</h2>
-              <p className="text-[14px] text-[var(--mid)] mb-5">{offers.length} offer{offers.length !== 1 ? 's' : ''} · {offers.filter(o => o.is_live).length} live</p>
+              <div className="flex items-center justify-between mb-[20px]">
+                <div>
+                  <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Offers</h2>
+                  <p className="text-[14px] text-[var(--mid)] mt-[2px]">{offers.length} offer{offers.length !== 1 ? 's' : ''} · {offers.filter(o => o.is_live).length} live</p>
+                </div>
+                {offers.length > 0 && (
+                  <button
+                    onClick={() => setShowOfferBuilder(true)}
+                    className="inline-flex items-center gap-[6px] px-[18px] py-[10px] rounded-[50px] bg-[#222222] text-white font-bold text-[13px] hover:bg-[#333] transition-all"
+                  >
+                    <Plus className="w-4 h-4" /> New
+                  </button>
+                )}
+              </div>
 
               {offersLoaded && offers.length === 0 && (
                 <div className="flex flex-col items-center py-16 px-6">
@@ -1668,16 +1680,7 @@ export default function BusinessPortal() {
                 </div>
               )}
 
-              {offers.length > 0 && (
-                <button
-                  onClick={() => setShowOfferBuilder(true)}
-                  className="inline-flex items-center gap-2 px-[24px] py-[13px] rounded-[50px] text-white font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all text-[14px] mb-4 min-h-[48px]"
-                >
-                  <Plus className="w-4 h-4" /> New Offer
-                </button>
-              )}
-
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="space-y-[16px]">
                 {offers.map((offer) => {
                   const isUnlimited = offer.monthly_cap === null;
                   const slotsUsed = offer.slotsUsed || 0;
@@ -1685,65 +1688,71 @@ export default function BusinessPortal() {
                   const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
 
                   return (
-                    <div key={offer.id} className="bg-white rounded-[16px] p-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] flex gap-[14px] items-start">
-                      {/* 52px thumbnail */}
+                    <div key={offer.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+                      {/* Image-led hero */}
                       <div
-                        className="w-[52px] h-[52px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
+                        className="w-full h-[180px] relative overflow-hidden"
                         style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
                       >
                         {offer.offer_photo_url ? (
                           <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
                         ) : (
-                          <span className="text-[20px] font-extrabold text-white/80">{getInitials(userProfile.name)}</span>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Gift className="w-12 h-12 text-white/40" />
+                          </div>
                         )}
+                        {/* Status badge overlaid top-right */}
+                        {offer.is_live ? (
+                          <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
+                            <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                            Live
+                          </span>
+                        ) : (
+                          <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
+                            Paused
+                          </span>
+                        )}
+                        {/* Slots badge overlaid top-left */}
+                        {!isUnlimited && slotsLeft !== null && (() => {
+                          const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
+                          return (
+                            <span
+                              className="absolute top-[12px] left-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm"
+                              style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
+                            >
+                              {badge.text}
+                            </span>
+                          );
+                        })()}
                       </div>
 
-                      {/* Right content */}
-                      <div className="flex-1 min-w-0">
-                        {/* Top: title + status */}
-                        <div className="flex items-start justify-between gap-3 mb-2">
-                          <p className="text-[15px] font-bold text-[#222222] flex-1 line-clamp-2">{offer.generated_title || offer.description}</p>
-                          {offer.is_live ? (
-                            <span className="flex-shrink-0 inline-flex items-center gap-[5px] px-[10px] py-1 rounded-[50px] text-[12px] font-bold bg-[rgba(26,60,52,0.08)] text-[var(--forest)]">
-                              <span className="w-[7px] h-[7px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
-                              Live
-                            </span>
-                          ) : (
-                            <span className="flex-shrink-0 px-3 py-1 rounded-[50px] text-[12px] font-bold bg-[var(--bg)] text-[var(--soft)]">
-                              Paused
-                            </span>
-                          )}
-                        </div>
+                      {/* Card body */}
+                      <div className="p-[16px]">
+                        <h3 className="text-[17px] font-extrabold text-[#222222] mb-[6px]" style={{ letterSpacing: '-0.2px' }}>
+                          {offer.generated_title || offer.description}
+                        </h3>
+                        <p className="text-[13px] text-[var(--mid)] mb-[12px]">
+                          {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
+                        </p>
 
-                        {/* Middle: claims + progress */}
-                        <div className="mb-2">
-                          <p className="text-[13px] text-[var(--mid)] mb-2">
-                            {isUnlimited ? `${slotsUsed} claimed · Unlimited` : `${slotsUsed}/${offer.monthly_cap} claimed`}
-                          </p>
-                          {!isUnlimited && (
-                            <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden">
-                              <div
-                                className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
-                                style={{ width: `${pct}%` }}
-                              />
-                            </div>
-                          )}
-                        </div>
+                        {/* Progress bar */}
+                        {!isUnlimited && (
+                          <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mb-[14px]">
+                            <div
+                              className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        )}
 
-                        {/* Bottom: slots badge + toggle */}
-                        <div className="flex items-center justify-between">
-                          {isUnlimited ? (
-                            <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold bg-[var(--peach)] text-[#222222]">Open</span>
-                          ) : (() => {
-                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
-                            return <span className="px-3 py-1 rounded-[50px] text-[12px] font-bold" style={{ background: badge.background, color: badge.color }}>{badge.text}</span>;
-                          })()}
+                        {/* Action row */}
+                        <div className="flex items-center justify-end">
                           <button
                             onClick={() => handleToggleOffer(offer.id, offer.is_live)}
-                            className={`px-[18px] py-[8px] rounded-[50px] font-semibold text-[13px] transition-all min-h-[36px] ${
+                            className={`px-[20px] py-[9px] rounded-[50px] font-semibold text-[13px] transition-all ${
                               offer.is_live
-                                ? 'bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]'
-                                : 'bg-[var(--terra)] text-white'
+                                ? 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#eeeeee]'
+                                : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
                             }`}
                           >
                             {offer.is_live ? 'Pause' : 'Resume'}
