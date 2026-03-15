@@ -1278,15 +1278,6 @@ export default function CreatorApp() {
                           <div className="flex items-center gap-1 mt-0.5">
                             <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
                             <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
-                            {!isUnlimited && (() => {
-                              const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
-                              return (
-                                <>
-                                  <span className="text-[11px] text-[var(--mid)]">·</span>
-                                  <span className="text-[11px]" style={{ color: badge.color }}>{badge.text}</span>
-                                </>
-                              );
-                            })()}
                           </div>
                         )}
                       </div>
