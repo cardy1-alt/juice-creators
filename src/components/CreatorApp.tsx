@@ -181,7 +181,9 @@ export default function CreatorApp() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<{ level: number; levelName: string } | null>(null);
   const [streakWarningDismissed, setStreakWarningDismissed] = useState(false);
+  const [redeemToast, setRedeemToast] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
+  const prevClaimStatusesRef = useRef<Record<string, string>>({});
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -424,8 +426,20 @@ export default function CreatorApp() {
     }
 
     if (data) {
-      setClaims(data as Claim[]);
-      const active = (data as Claim[]).filter(c => c.status === 'active' || (c.status === 'redeemed' && !c.reel_url));
+      const newClaims = data as Claim[];
+      // Detect newly redeemed claims to show confirmation toast
+      for (const claim of newClaims) {
+        const prev = prevClaimStatusesRef.current[claim.id];
+        if (prev === 'active' && claim.status === 'redeemed') {
+          const bizName = (claim as any).businesses?.name;
+          setRedeemToast(bizName ? `Visit confirmed at ${bizName}!` : 'Visit confirmed! Time to post your reel.');
+          setTimeout(() => setRedeemToast(null), 5000);
+        }
+      }
+      prevClaimStatusesRef.current = Object.fromEntries(newClaims.map(c => [c.id, c.status]));
+
+      setClaims(newClaims);
+      const active = newClaims.filter(c => c.status === 'active' || (c.status === 'redeemed' && !c.reel_url));
       setActiveClaims(active);
       if (selectedClaim && !active.find(c => c.id === selectedClaim.id)) {
         setSelectedClaim(active[0] || null);
@@ -683,6 +697,13 @@ export default function CreatorApp() {
       {undoToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#222222] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
           {undoToast}
+        </div>
+      )}
+
+      {redeemToast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--terra)] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+          <Check className="w-4 h-4" />
+          {redeemToast}
         </div>
       )}
 
