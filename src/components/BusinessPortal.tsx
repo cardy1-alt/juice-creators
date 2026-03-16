@@ -973,9 +973,19 @@ export default function BusinessPortal() {
   const [showOfferBuilder, setShowOfferBuilder] = useState(false);
   const [scanCode, setScanCode] = useState(() => {
     const params = new URLSearchParams(window.location.search);
-    return params.get('redeem') || '';
+    const token = params.get('redeem') || '';
+    if (token) {
+      // Clean the redeem param from URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('redeem');
+      window.history.replaceState({}, '', url.pathname + url.search);
+    }
+    return token;
   });
   const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string; creatorName?: string } | null>(null);
+  const pendingScanRef = useRef<string | null>(
+    new URLSearchParams(window.location.search).get('redeem') || null
+  );
   const [loading, setLoading] = useState(false);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -1216,12 +1226,11 @@ export default function BusinessPortal() {
     setEditOfferSaved(false);
   };
 
-  const handleScanCode = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const verifyToken = async (token: string) => {
     setLoading(true);
     setScanResult(null);
     try {
-      const { data: claim } = await supabase.from('claims').select('*, creators(name, code)').eq('qr_token', scanCode).eq('business_id', userProfile.id).maybeSingle();
+      const { data: claim } = await supabase.from('claims').select('*, creators(name, code)').eq('qr_token', token).eq('business_id', userProfile.id).maybeSingle();
       if (!claim) { setScanResult({ type: 'error', message: 'Code not recognised. Check and try again.' }); setScanCode(''); return; }
       if (claim.status !== 'active') {
         setScanResult({ type: 'error', message: claim.status === 'redeemed' ? 'This pass has already been used.' : `This pass is ${claim.status}. Cannot redeem.` });
@@ -1242,6 +1251,20 @@ export default function BusinessPortal() {
       setLoading(false);
     }
   };
+
+  const handleScanCode = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await verifyToken(scanCode);
+  };
+
+  // Auto-verify when QR scanner provides a token
+  useEffect(() => {
+    if (pendingScanRef.current) {
+      const token = pendingScanRef.current;
+      pendingScanRef.current = null;
+      verifyToken(token);
+    }
+  });
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const activeClaimsCount = claims.filter(c => c.status === 'active').length;
@@ -2033,7 +2056,7 @@ export default function BusinessPortal() {
                   </div>
 
                   <QRScanner
-                    onScan={(token) => { setScanCode(token); }}
+                    onScan={(token) => { setScanCode(token); pendingScanRef.current = token; }}
                     active={view === 'scan' && !scanResult}
                   />
 

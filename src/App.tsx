@@ -3,7 +3,7 @@ import Auth from './components/Auth';
 import CreatorApp from './components/CreatorApp';
 import BusinessPortal from './components/BusinessPortal';
 import AdminDashboard from './components/AdminDashboard';
-import { AlertCircle, LogOut } from 'lucide-react';
+import { AlertCircle, LogOut, QrCode } from 'lucide-react';
 
 function DemoBanner() {
   if (import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
@@ -40,9 +40,34 @@ function DemoBanner() {
   );
 }
 
+function RedeemLanding() {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+      <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+          <QrCode className="w-7 h-7 text-[var(--terra)]" />
+        </div>
+        <h2 className="text-xl font-bold mb-2 text-[#222222]">
+          Creator Pass
+        </h2>
+        <p className="text-[var(--mid)] text-sm mb-6">
+          This QR code is for the business to scan. Ask the business to open their app and use the Scan tab to verify your visit.
+        </p>
+        <a
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+        >
+          Go to app
+        </a>
+      </div>
+    </div>
+  );
+}
+
 function App() {
   const { user, userRole, loading, signOut } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
+  const hasRedeemParam = new URLSearchParams(window.location.search).has('redeem');
 
   if (loading) {
     return (
@@ -53,6 +78,11 @@ function App() {
         </div>
       </div>
     );
+  }
+
+  // If ?redeem= is present and user is not a business, show helpful landing
+  if (hasRedeemParam && userRole !== 'business') {
+    return <RedeemLanding />;
   }
 
   if (!user) {
