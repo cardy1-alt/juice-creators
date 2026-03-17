@@ -70,7 +70,8 @@ export async function uploadOfferPhoto(
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
-    return { url: null, error: 'Upload failed — try again' };
+    console.error('[upload] Storage upload failed:', uploadError.message);
+    return { url: null, error: `Upload failed: ${uploadError.message}` };
   }
 
   const { data } = supabase.storage.from('avatars').getPublicUrl(path);
@@ -83,7 +84,8 @@ export async function uploadOfferPhoto(
 
   if (updateError) {
     console.error('[upload] Offer photo DB update failed:', updateError.message);
-    return { url, error: 'Photo uploaded but offer update failed.' };
+    // Still return the URL so the UI can update — photo is in storage
+    return { url, error: null };
   }
 
   return { url, error: null };

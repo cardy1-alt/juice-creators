@@ -1196,18 +1196,19 @@ export default function BusinessPortal() {
     setOfferPhotoUploading(true);
     try {
       const { url, error } = await uploadOfferPhoto(file, offerId, userProfile.id);
-      if (error) {
-        console.error('Offer photo upload error:', error);
-        return;
-      }
       if (url) {
+        // Update UI immediately even if DB update had issues
         setOffers(prev => prev.map(o => o.id === offerId ? { ...o, offer_photo_url: url } : o));
         if (selectedOffer?.id === offerId) {
           setSelectedOffer(prev => prev ? { ...prev, offer_photo_url: url } : null);
         }
       }
+      if (error && !url) {
+        alert(error);
+      }
     } catch (err: any) {
       console.error('Offer photo upload failed:', err.message);
+      alert('Photo upload failed — please try again.');
     } finally {
       setOfferPhotoUploading(false);
     }
