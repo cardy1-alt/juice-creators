@@ -25,7 +25,7 @@ function loadGoogleMaps(): Promise<void> {
         return;
       }
       const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places`;
+      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
       script.async = true;
       script.onload = () => {
         window._gmapsLoaded = true;
@@ -59,18 +59,11 @@ function AddressAutocomplete({ value, onChange }: {
     if (!mapsReady || !containerRef.current || elementRef.current) return;
 
     const autocomplete = new window.google.maps.places.PlaceAutocompleteElement({
+      componentRestrictions: { country: 'gb' },
       types: ['geocode'],
     });
     elementRef.current = autocomplete;
 
-    // Style the Google-provided input to match our design
-    const style = document.createElement('style');
-    style.textContent = `
-      .pac-container {
-        font-family: inherit;
-      }
-    `;
-    containerRef.current.appendChild(style);
     containerRef.current.appendChild(autocomplete);
 
     autocomplete.addEventListener('gmp-select', async (e: any) => {
