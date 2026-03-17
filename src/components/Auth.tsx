@@ -217,7 +217,10 @@ export default function Auth() {
     <div className="min-h-screen flex flex-col bg-[#FFFFFF]">
       {/* Top section with branding */}
       <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
-        <Logo size={24} />
+        <Logo size={52} variant="icon" />
+        <div className="mt-[10px]">
+          <Logo size={24} variant="wordmark" />
+        </div>
         <p className="text-[var(--soft)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 

@@ -194,7 +194,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Logo size={18} />
+                <Logo size={24} />
               </div>
               <div>
                 <p className="text-xs text-[var(--mid)]">Admin Dashboard</p>
