@@ -4,9 +4,9 @@
 
 - [x] **#4** Placeholder env vars allow deployment — App now throws at init if env vars missing (`src/lib/supabase.ts`)
 - [x] **#28** Demo mode vulnerable to URL manipulation — Demo mode now blocked in production builds (`src/contexts/AuthContext.tsx`)
-- [ ] **#6** Double-redemption via concurrent QR scans — No atomic check-then-update on redemption (`BusinessPortal`)
-- [ ] **#1** Offer redemption timing window — reel_due_at can extend beyond qr_expires_at (`claim_offer()` RPC)
-- [ ] **#2** Unclaim function missing rollback — Partial state corruption if post-deletion ops fail (`unclaim_offer()` RPC)
+- [x] **#6** Double-redemption via concurrent QR scans — New `redeem_offer` RPC with `FOR UPDATE SKIP LOCKED` replaces client-side check-then-update (`BusinessPortal`, `20260317100000_create_redeem_offer_rpc.sql`)
+- [x] **#1** Offer redemption timing window — `reel_due_at` now capped at `qr_expires_at + 24h` in `redeem_offer` RPC
+- [x] **#2** Unclaim function missing rollback — Already fixed: atomic `DELETE ... RETURNING` in `20260312100200_fix_unclaim_offer_race_condition.sql`
 
 ## High Severity
 

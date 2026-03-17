@@ -1218,19 +1218,26 @@ export default function BusinessPortal() {
     setLoading(true);
     setScanResult(null);
     try {
-      const { data: claim } = await supabase.from('claims').select('*, creators(name, code)').eq('qr_token', token).eq('business_id', userProfile.id).maybeSingle();
-      if (!claim) { setScanResult({ type: 'error', message: 'Code not recognised. Check and try again.' }); setScanCode(''); return; }
-      if (claim.status !== 'active') {
-        setScanResult({ type: 'error', message: claim.status === 'redeemed' ? 'This pass has already been used.' : `This pass is ${claim.status}. Cannot redeem.` });
+      const { data, error } = await supabase.rpc('redeem_offer', {
+        p_qr_token: token,
+        p_business_id: userProfile.id,
+      });
+
+      if (error) throw error;
+      if (data?.error) {
+        setScanResult({ type: 'error', message: data.error });
         setScanCode('');
         return;
       }
-      if (new Date(claim.qr_expires_at) < new Date()) { setScanResult({ type: 'error', message: 'QR code expired. Ask the creator to refresh it.' }); setScanCode(''); return; }
-      const redeemedAt = new Date();
-      const reelDueAt = new Date(redeemedAt.getTime() + 48 * 60 * 60 * 1000);
-      const { error } = await supabase.from('claims').update({ status: 'redeemed', redeemed_at: redeemedAt.toISOString(), reel_due_at: reelDueAt.toISOString() }).eq('id', claim.id);
-      if (error) throw error;
-      setScanResult({ type: 'success', message: 'Visit confirmed', creatorName: claim.creators.name });
+
+      // Fetch creator name for the success message
+      const { data: claim } = await supabase
+        .from('claims')
+        .select('creators(name)')
+        .eq('id', data.claim_id)
+        .maybeSingle();
+
+      setScanResult({ type: 'success', message: 'Visit confirmed', creatorName: claim?.creators?.name || 'Creator' });
       setScanCode('');
       fetchClaims();
     } catch (error: any) {
