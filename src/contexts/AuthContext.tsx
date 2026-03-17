@@ -46,6 +46,8 @@ const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
       longitude: -0.1278,
       bio: 'Specialty coffee & brunch spot',
       approved: true,
+      onboarding_complete: true,
+      onboarding_step: 5,
       created_at: new Date().toISOString(),
     },
   },

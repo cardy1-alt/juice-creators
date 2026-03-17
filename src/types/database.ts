@@ -14,6 +14,8 @@ export type Database = {
           bio: string | null;
           approved: boolean;
           logo_url: string | null;
+          onboarding_complete: boolean;
+          onboarding_step: number;
           created_at: string;
         };
         Insert: {
@@ -28,6 +30,8 @@ export type Database = {
           bio?: string | null;
           approved?: boolean;
           logo_url?: string | null;
+          onboarding_complete?: boolean;
+          onboarding_step?: number;
           created_at?: string;
         };
         Update: {
@@ -42,6 +46,8 @@ export type Database = {
           bio?: string | null;
           approved?: boolean;
           logo_url?: string | null;
+          onboarding_complete?: boolean;
+          onboarding_step?: number;
           created_at?: string;
         };
       };
@@ -52,6 +58,9 @@ export type Database = {
           description: string;
           monthly_cap: number | null;
           is_live: boolean;
+          is_active: boolean;
+          monthly_slot_cap: number;
+          slots_used_this_month: number;
           created_at: string;
         };
         Insert: {
@@ -60,6 +69,9 @@ export type Database = {
           description: string;
           monthly_cap?: number | null;
           is_live?: boolean;
+          is_active?: boolean;
+          monthly_slot_cap?: number;
+          slots_used_this_month?: number;
           created_at?: string;
         };
         Update: {
@@ -68,6 +80,9 @@ export type Database = {
           description?: string;
           monthly_cap?: number | null;
           is_live?: boolean;
+          is_active?: boolean;
+          monthly_slot_cap?: number;
+          slots_used_this_month?: number;
           created_at?: string;
         };
       };

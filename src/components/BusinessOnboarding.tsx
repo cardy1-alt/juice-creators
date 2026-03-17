@@ -1,0 +1,689 @@
+import { useState, useRef, useEffect } from 'react';
+import { ChevronLeft, Camera, Gift, Sparkles, Tag, Star, Minus, Plus, CheckCircle } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { uploadAvatar } from '../lib/upload';
+import { CATEGORY_LIST, CategoryIcon, getCategoryGradient } from '../lib/categories';
+import { getInitials } from '../lib/avatar';
+
+// ─── Category-aware placeholder map (mirrors BusinessPortal) ─────────────
+function getCategoryPlaceholder(category: string, type: string): string {
+  const map: Record<string, Record<string, string>> = {
+    'Cafe & Coffee':        { product: 'coffee + pastry',           service: 'barista experience',       experience: 'coffee tasting session' },
+    'Food & Drink':         { product: 'meal or drink',             service: 'chef experience',          experience: 'tasting session' },
+    'Hair & Beauty':        { product: 'product of your choice',    service: 'express facial',           experience: 'pamper session' },
+    'Health & Fitness':     { product: 'supplement of your choice', service: 'personal training session', experience: 'fitness class' },
+    'Retail':               { product: 'item of your choice',       service: 'styling session',          experience: 'shopping experience' },
+    'Wellness & Spa':       { product: 'product of your choice',    service: '30-minute massage',        experience: 'wellness session' },
+    'Arts & Entertainment': { product: 'item of your choice',       service: 'class or lesson',          experience: 'event or show entry' },
+    'Pets':                 { product: 'treat or accessory',        service: 'grooming session',         experience: 'pet experience' },
+    'Education':            { product: 'resource or material',      service: 'tutoring session',         experience: 'workshop or class' },
+    'Services':             { product: 'service of your choice',    service: 'consultation',             experience: 'experience session' },
+  };
+  return map[category]?.[type] ?? 'your choice';
+}
+
+// ─── CSS keyframes for slide transitions & success animation ─────────────
+const onboardingStyles = `
+@keyframes slideInRight {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+@keyframes ringExpand1 {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes ringExpand2 {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+@keyframes ringExpand3 {
+  0% { transform: scale(1); opacity: 0.4; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+`;
+
+interface BusinessOnboardingProps {
+  profile: any;
+  onComplete: () => void;
+}
+
+export default function BusinessOnboarding({ profile, onComplete }: BusinessOnboardingProps) {
+  const [screen, setScreen] = useState(1);
+  const [direction, setDirection] = useState<'forward' | 'back'>('forward');
+  const [animKey, setAnimKey] = useState(0);
+
+  // Screen 3 state
+  const [bizName, setBizName] = useState(profile.name || '');
+  const [category, setCategory] = useState(profile.category || '');
+  const [instagram, setInstagram] = useState(profile.instagram_handle || '');
+  const [logoUrl, setLogoUrl] = useState<string | null>(profile.logo_url || null);
+  const [logoUploading, setLogoUploading] = useState(false);
+  const logoInputRef = useRef<HTMLInputElement>(null);
+
+  // Screen 4 state
+  const [offerType, setOfferType] = useState('');
+  const [offerItem, setOfferItem] = useState('');
+  const [discountAmount, setDiscountAmount] = useState('20');
+  const [discountUnit, setDiscountUnit] = useState<'%' | '£'>('%');
+  const [monthlySlots, setMonthlySlots] = useState(4);
+
+  // Screen 5 state
+  const [linkCopied, setLinkCopied] = useState(false);
+
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const goForward = () => {
+    setDirection('forward');
+    setAnimKey(k => k + 1);
+    setScreen(s => s + 1);
+  };
+
+  const goBack = () => {
+    setDirection('back');
+    setAnimKey(k => k + 1);
+    setScreen(s => s - 1);
+  };
+
+  const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setLogoUploading(true);
+    const { url, error } = await uploadAvatar(file, profile.id, 'businesses');
+    if (url) setLogoUrl(url);
+    if (error) console.error('Logo upload failed:', error);
+    setLogoUploading(false);
+  };
+
+  const handleLaunch = async () => {
+    setSaving(true);
+    setError('');
+    try {
+      const generatedTitle = offerType === 'discount'
+        ? `${discountAmount}${discountUnit} off`
+        : `Free ${offerItem}`;
+
+      // Update business profile
+      await supabase.from('businesses').update({
+        name: bizName,
+        category,
+        instagram_handle: instagram || null,
+        onboarding_step: 5,
+      }).eq('id', profile.id);
+
+      // Deactivate any existing offers
+      await supabase.from('offers').update({ is_active: false, is_live: false }).eq('business_id', profile.id);
+
+      // Create offer
+      const { error: offerError } = await supabase.from('offers').insert({
+        business_id: profile.id,
+        description: generatedTitle,
+        generated_title: generatedTitle,
+        offer_type: offerType,
+        offer_item: offerType === 'discount' ? `${discountAmount}${discountUnit}` : offerItem,
+        monthly_cap: monthlySlots,
+        monthly_slot_cap: monthlySlots,
+        is_live: true,
+        is_active: true,
+        content_type: 'reel',
+      });
+      if (offerError) throw offerError;
+
+      // Mark onboarding complete
+      await supabase.from('businesses').update({
+        onboarding_complete: true,
+        onboarding_step: 5,
+      }).eq('id', profile.id);
+
+      goForward(); // go to screen 5 (success)
+    } catch (err: any) {
+      setError(err.message || 'Something went wrong');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const generatedTitle = offerType === 'discount'
+    ? `${discountAmount}${discountUnit} off`
+    : `Free ${offerItem}`;
+
+  // Extract town from address for success screen
+  const town = (() => {
+    if (!profile.address) return 'your area';
+    const parts = profile.address.split(',').map((s: string) => s.trim());
+    // Try to get the town/city — usually 2nd or 3rd part
+    if (parts.length >= 3) return parts[parts.length - 2];
+    if (parts.length >= 2) return parts[1];
+    return parts[0];
+  })();
+
+  const totalScreens = 4; // progress dots for screens 1-4 (screen 5 is success, no dots)
+  const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
+
+  const offerTiles = [
+    { key: 'product', label: 'Free Product', icon: Gift, sub: 'Coffee, meal, item' },
+    { key: 'service', label: 'Free Service', icon: Sparkles, sub: 'Haircut, facial, class' },
+    { key: 'discount', label: 'Discount', icon: Tag, sub: '% off or £ off' },
+    { key: 'experience', label: 'Experience', icon: Star, sub: 'Tasting, tour, event' },
+  ];
+
+  // Only show "Cafe & Coffee" if not already covered by Food & Drink
+  const onboardingCategories = CATEGORY_LIST.filter(c => c !== 'Cafe & Coffee');
+
+  return (
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
+      <style>{onboardingStyles}</style>
+
+      {/* ─── Top bar ─── */}
+      {screen <= totalScreens && (
+        <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
+          {screen > 1 ? (
+            <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
+              <ChevronLeft className="w-[20px] h-[20px] text-[var(--soft)]" />
+            </button>
+          ) : (
+            <div className="w-[40px]" />
+          )}
+          <span className="text-[18px] font-extrabold text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
+          {screen === 3 ? (
+            <button onClick={goForward} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
+          ) : (
+            <div className="w-[40px]" />
+          )}
+        </div>
+      )}
+
+      {/* ─── Progress dots ─── */}
+      {screen <= totalScreens && (
+        <div className="flex items-center justify-center gap-[8px] py-[8px]">
+          {Array.from({ length: totalScreens }, (_, i) => i + 1).map(dot => (
+            <div
+              key={dot}
+              className="rounded-full transition-all duration-300"
+              style={{
+                width: dot === screen ? 8 : 6,
+                height: dot === screen ? 8 : 6,
+                background: dot === screen ? 'var(--terra)' : dot < screen ? 'var(--terra)' : 'var(--faint)',
+              }}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* ─── Screen content ─── */}
+      <div
+        key={animKey}
+        className="flex-1 flex flex-col overflow-y-auto px-[20px] pb-[20px]"
+        style={{ animation: `${animClass} 280ms ease` }}
+      >
+        {/* ═══ SCREEN 1 — WELCOME ═══ */}
+        {screen === 1 && (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-shrink-0 pt-[60px] flex flex-col items-center">
+              {/* Simple editorial illustration */}
+              <div className="h-[200px] flex items-center justify-center">
+                <svg width="200" height="160" viewBox="0 0 200 160" fill="none">
+                  {/* Coffee cup */}
+                  <rect x="30" y="60" width="40" height="45" rx="6" fill="var(--peach)" opacity="0.7"/>
+                  <rect x="35" y="55" width="30" height="8" rx="4" fill="var(--forest)" opacity="0.5"/>
+                  <path d="M70 72 C78 72, 82 80, 78 88 C74 96, 70 88, 70 88" stroke="var(--forest)" strokeWidth="2.5" fill="none" opacity="0.4"/>
+                  {/* Steam */}
+                  <path d="M45 50 C45 42, 50 42, 50 35" stroke="var(--forest)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
+                  <path d="M55 48 C55 40, 60 40, 60 33" stroke="var(--forest)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
+                  {/* Scissors */}
+                  <circle cx="120" cy="50" r="12" fill="none" stroke="var(--forest)" strokeWidth="2.5" opacity="0.6"/>
+                  <circle cx="120" cy="82" r="12" fill="none" stroke="var(--forest)" strokeWidth="2.5" opacity="0.6"/>
+                  <line x1="120" y1="62" x2="135" y2="100" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
+                  <line x1="120" y1="70" x2="105" y2="100" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
+                  {/* Plant/leaf */}
+                  <path d="M160 120 C160 90, 180 70, 180 70 C180 70, 175 95, 160 120Z" fill="var(--forest)" opacity="0.35"/>
+                  <path d="M160 120 C160 90, 140 75, 140 75 C140 75, 145 95, 160 120Z" fill="var(--peach)" opacity="0.5"/>
+                  <line x1="160" y1="120" x2="160" y2="140" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" opacity="0.4"/>
+                </svg>
+              </div>
+
+              <h1
+                className="text-[28px] font-extrabold text-[var(--near-black)] text-center"
+                style={{ letterSpacing: '-0.5px' }}
+              >
+                Welcome to nayba
+              </h1>
+              <p
+                className="text-[16px] text-[var(--mid)] text-center mt-[12px] max-w-[260px] mx-auto"
+                style={{ fontWeight: 400, lineHeight: 1.6 }}
+              >
+                Local creators. Real content. Zero&nbsp;ad&nbsp;spend.
+              </p>
+            </div>
+
+            <div className="flex-1" />
+
+            <button
+              onClick={goForward}
+              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+            >
+              Let's get started →
+            </button>
+            <p className="text-[12px] text-[var(--soft)] text-center mt-[10px]">Takes about 3 minutes</p>
+          </div>
+        )}
+
+        {/* ═══ SCREEN 2 — THE CONCEPT ═══ */}
+        {screen === 2 && (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-shrink-0 pt-[24px]">
+              <h1
+                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                style={{ letterSpacing: '-0.4px' }}
+              >
+                Here's how it works
+              </h1>
+              <p className="text-[15px] text-[var(--mid)] mt-[6px]">Creators visit. They post. You grow.</p>
+
+              <div className="flex flex-col gap-[20px] mt-[28px]">
+                {[
+                  { num: 1, bg: 'var(--terra)', title: 'You create an offer', desc: 'Choose what you\'ll give away \u2014 a free coffee, a haircut, whatever feels right.' },
+                  { num: 2, bg: 'var(--forest)', title: 'Creators visit your business', desc: 'Local creators claim your offer, visit in person, and experience what you do.' },
+                  { num: 3, bg: 'var(--near-black)', title: 'They post a reel about you', desc: 'Within 48 hours they post an Instagram reel. Real content. Real people. Real reach.' },
+                ].map(step => (
+                  <div key={step.num} className="flex items-start gap-[16px]">
+                    <div
+                      className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
+                      style={{ background: step.bg }}
+                    >
+                      <span className="text-[15px] font-bold text-white">{step.num}</span>
+                    </div>
+                    <div className="flex-1 pt-[2px]">
+                      <p className="text-[15px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
+                      <p className="text-[13px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="flex-1" />
+
+            <button
+              onClick={goForward}
+              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+            >
+              Sounds good →
+            </button>
+          </div>
+        )}
+
+        {/* ═══ SCREEN 3 — BUSINESS PROFILE ═══ */}
+        {screen === 3 && (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-shrink-0 pt-[24px]">
+              <h1
+                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                style={{ letterSpacing: '-0.4px' }}
+              >
+                Tell us about your business
+              </h1>
+              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[28px]">Creators will see this when they discover your offer</p>
+
+              {/* Logo upload */}
+              <div className="flex flex-col items-center mb-[24px]">
+                <button
+                  onClick={() => logoInputRef.current?.click()}
+                  className="relative"
+                  disabled={logoUploading}
+                >
+                  <div
+                    className="w-[80px] h-[80px] rounded-[16px] flex items-center justify-center overflow-hidden"
+                    style={{ background: logoUrl ? undefined : getCategoryGradient(category || 'Food & Drink') }}
+                  >
+                    {logoUrl ? (
+                      <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[28px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                        {getInitials(bizName || 'B')}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="absolute -bottom-[4px] -right-[4px] w-[24px] h-[24px] rounded-full flex items-center justify-center"
+                    style={{ background: 'var(--terra)' }}
+                  >
+                    <Camera className="w-[12px] h-[12px] text-white" />
+                  </div>
+                </button>
+                <input
+                  ref={logoInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="hidden"
+                  onChange={handleLogoUpload}
+                />
+                <p className="text-[12px] text-[var(--soft)] mt-[10px] text-center">
+                  {logoUploading ? 'Uploading...' : 'Add your logo or a photo of your business'}
+                </p>
+              </div>
+
+              {/* Fields */}
+              <div className="flex flex-col gap-[14px]">
+                {/* Business name */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Business name</label>
+                  <input
+                    type="text"
+                    value={bizName}
+                    onChange={e => setBizName(e.target.value)}
+                    placeholder="Your business name"
+                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  />
+                </div>
+
+                {/* Category */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[10px]">What type of business?</label>
+                  <div className="grid grid-cols-2 gap-[8px]">
+                    {onboardingCategories.map(cat => (
+                      <button
+                        key={cat}
+                        type="button"
+                        onClick={() => setCategory(cat)}
+                        className="flex flex-col items-center gap-[6px] px-[12px] py-[12px] rounded-[14px] text-center transition-all"
+                        style={{
+                          background: category === cat ? 'rgba(196,103,74,0.04)' : 'var(--bg)',
+                          border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid transparent',
+                        }}
+                      >
+                        <CategoryIcon
+                          category={cat}
+                          className={`w-[20px] h-[20px] ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}
+                        />
+                        <span className={`text-[12px] font-semibold ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}>
+                          {cat}
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Instagram */}
+                <div>
+                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
+                  <input
+                    type="text"
+                    value={instagram}
+                    onChange={e => setInstagram(e.target.value)}
+                    placeholder="@yourbusiness"
+                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  />
+                  <p className="text-[12px] text-[var(--soft)] mt-[4px]">Add later</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex-1 min-h-[24px]" />
+
+            <button
+              onClick={goForward}
+              disabled={!bizName.trim() || !category}
+              className="w-full py-[16px] rounded-[50px] text-[15px] font-bold min-h-[52px] transition-all"
+              style={{
+                background: bizName.trim() && category ? 'var(--terra)' : 'var(--bg)',
+                color: bizName.trim() && category ? 'white' : 'var(--soft)',
+                boxShadow: bizName.trim() && category ? '0 4px 16px rgba(196,103,74,0.25)' : 'none',
+              }}
+            >
+              Looking good →
+            </button>
+          </div>
+        )}
+
+        {/* ═══ SCREEN 4 — CREATE YOUR OFFER ═══ */}
+        {screen === 4 && (
+          <div className="flex-1 flex flex-col">
+            <div className="flex-shrink-0 pt-[24px]">
+              <h1
+                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                style={{ letterSpacing: '-0.4px' }}
+              >
+                Create your offer
+              </h1>
+              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[24px]">This is what you'll give creators in exchange for a reel</p>
+
+              {/* DECISION 1 — Offer type tiles */}
+              <div className="grid grid-cols-2 gap-[10px]">
+                {offerTiles.map(t => (
+                  <button
+                    key={t.key}
+                    onClick={() => {
+                      setOfferType(t.key);
+                      setOfferItem('');
+                      setDiscountAmount('20');
+                      setDiscountUnit('%');
+                    }}
+                    className="flex flex-col items-center justify-center gap-[8px] rounded-[16px] min-h-[100px] transition-all"
+                    style={{
+                      padding: '20px 16px',
+                      border: offerType === t.key ? '2px solid var(--terra)' : '1.5px solid var(--faint)',
+                      background: offerType === t.key ? 'rgba(196,103,74,0.04)' : 'white',
+                    }}
+                  >
+                    <t.icon className="w-[24px] h-[24px] text-[var(--near-black)]" />
+                    <div className="text-center">
+                      <p className="text-[13px] font-bold text-[var(--near-black)]">{t.label}</p>
+                      <p className="text-[11px] text-[var(--mid)] mt-[2px]">{t.sub}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Fill-in field — appears after type selection */}
+              {offerType && offerType !== 'discount' && (
+                <div className="mt-[20px]">
+                  <div className="flex items-baseline gap-[8px] mb-[4px]">
+                    <span className="text-[20px] font-extrabold text-[var(--near-black)]">Free</span>
+                    <input
+                      type="text"
+                      value={offerItem}
+                      onChange={e => setOfferItem(e.target.value.slice(0, 60))}
+                      placeholder={getCategoryPlaceholder(category, offerType)}
+                      className="flex-1 text-[20px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
+                      autoFocus
+                    />
+                  </div>
+                  <p className="text-[11px] text-[var(--soft)] text-right">{offerItem.length}/60</p>
+                  <p className="text-[13px] text-[var(--mid)] mt-[4px]">
+                    Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(category, offerType)}</span>
+                  </p>
+                </div>
+              )}
+
+              {/* Discount fill-in */}
+              {offerType === 'discount' && (
+                <div className="mt-[20px]">
+                  <div className="flex justify-center mb-[12px]">
+                    <input
+                      type="number"
+                      value={discountAmount}
+                      onChange={e => {
+                        const max = discountUnit === '%' ? 100 : 999;
+                        const val = e.target.value.replace(/[^0-9]/g, '');
+                        if (val === '' || (parseInt(val) >= 1 && parseInt(val) <= max)) {
+                          setDiscountAmount(val);
+                        }
+                      }}
+                      className="text-[40px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                      style={{ width: '100px' }}
+                      autoFocus
+                    />
+                  </div>
+                  <div className="flex justify-center gap-[8px] mb-[8px]">
+                    <button
+                      onClick={() => { setDiscountUnit('%'); if (parseInt(discountAmount) > 100) setDiscountAmount('100'); }}
+                      className="px-[20px] py-[8px] rounded-[50px] text-[14px] font-bold transition-all"
+                      style={{ background: discountUnit === '%' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '%' ? 'white' : 'var(--mid)' }}
+                    >%</button>
+                    <button
+                      onClick={() => setDiscountUnit('£')}
+                      className="px-[20px] py-[8px] rounded-[50px] text-[14px] font-bold transition-all"
+                      style={{ background: discountUnit === '£' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '£' ? 'white' : 'var(--mid)' }}
+                    >£</button>
+                  </div>
+                  <p className="text-[13px] text-[var(--mid)] text-center">
+                    Creators will see: <span className="font-semibold">{discountAmount}{discountUnit} off</span>
+                  </p>
+                </div>
+              )}
+
+              {/* DECISION 2 — Monthly creators stepper */}
+              {offerType && (
+                <div className="mt-[24px]">
+                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[12px]">Monthly creators</label>
+                  <div className="flex items-center justify-center gap-[24px]">
+                    <button
+                      onClick={() => setMonthlySlots(Math.max(1, monthlySlots - 1))}
+                      className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
+                      style={{ border: '1.5px solid var(--faint)' }}
+                    >
+                      <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
+                    </button>
+                    <span className="text-[48px] font-extrabold text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
+                      {monthlySlots}
+                    </span>
+                    <button
+                      onClick={() => setMonthlySlots(Math.min(20, monthlySlots + 1))}
+                      className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
+                      style={{ background: 'var(--terra)' }}
+                    >
+                      <Plus className="w-[18px] h-[18px] text-white" />
+                    </button>
+                  </div>
+                  <p className="text-[12px] text-[var(--soft)] text-center mt-[8px]">
+                    {monthlySlots === 4 ? '4 creators/month is a great starting point' : `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month`}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex-1 min-h-[24px]" />
+
+            {error && (
+              <p className="text-[13px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
+            )}
+
+            <button
+              onClick={handleLaunch}
+              disabled={saving || !offerType || (offerType !== 'discount' && offerItem.trim().length < 3) || (offerType === 'discount' && !discountAmount)}
+              className="w-full py-[16px] rounded-[50px] text-[15px] font-bold min-h-[52px] transition-all"
+              style={{
+                background: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
+                  ? 'var(--terra)' : 'var(--bg)',
+                color: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
+                  ? 'white' : 'var(--soft)',
+                boxShadow: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
+                  ? '0 4px 16px rgba(196,103,74,0.25)' : 'none',
+              }}
+            >
+              {saving ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                </span>
+              ) : 'Launch my campaign →'}
+            </button>
+          </div>
+        )}
+
+        {/* ═══ SCREEN 5 — SUCCESS ═══ */}
+        {screen === 5 && (
+          <div className="flex-1 flex flex-col items-center justify-center">
+            {/* Expanding rings animation */}
+            <div className="relative w-[60px] h-[60px] mb-[8px]">
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'var(--terra)', animation: 'ringExpand1 1.2s ease-out forwards' }}
+              />
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'var(--peach)', animation: 'ringExpand2 1.2s ease-out 0.3s forwards', opacity: 0 }}
+              />
+              <div
+                className="absolute inset-0 rounded-full"
+                style={{ background: 'var(--lavender)', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
+              />
+              <div className="absolute inset-0 flex items-center justify-center z-10">
+                <CheckCircle className="w-[48px] h-[48px] text-[var(--terra)]" />
+              </div>
+            </div>
+
+            <h1
+              className="text-[32px] font-extrabold text-[var(--near-black)] text-center mt-[28px]"
+              style={{ letterSpacing: '-0.8px' }}
+            >
+              You're live.
+            </h1>
+
+            <p
+              className="text-[15px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
+              style={{ fontWeight: 400, lineHeight: 1.7 }}
+            >
+              Your offer for {generatedTitle} is now live on nayba.
+              {' '}Creators in {town} can discover and claim it right now.
+            </p>
+
+            {/* Offer summary card */}
+            <div
+              className="mt-[24px] w-full max-w-[260px] rounded-[20px] p-[16px] flex items-center gap-[12px]"
+              style={{ background: 'white', border: '1px solid var(--faint)' }}
+            >
+              <div
+                className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0"
+                style={{ background: getCategoryGradient(category) }}
+              >
+                <CategoryIcon category={category} className="w-[18px] h-[18px] text-white" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>
+                <p className="text-[12px] text-[var(--mid)]">{monthlySlots} creator{monthlySlots === 1 ? '' : 's'} per month</p>
+              </div>
+              <span
+                className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold flex-shrink-0"
+                style={{ background: 'rgba(26,60,52,0.08)', color: 'var(--forest)' }}
+              >
+                <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                Live
+              </span>
+            </div>
+
+            <div className="flex-1 min-h-[24px]" />
+
+            <button
+              onClick={onComplete}
+              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+            >
+              Go to my dashboard →
+            </button>
+
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(`${window.location.origin}?ref=${profile.slug || profile.id}`);
+                setLinkCopied(true);
+                setTimeout(() => setLinkCopied(false), 2000);
+              }}
+              className="text-[12px] text-[var(--soft)] text-center mt-[10px] py-[8px]"
+            >
+              {linkCopied ? 'Link copied \u2713' : 'Share nayba with another local business'}
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* livePulse for the success card badge */}
+      <style>{`@keyframes livePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.75); } }`}</style>
+    </div>
+  );
+}
