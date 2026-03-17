@@ -302,8 +302,8 @@ export default function CreatorApp() {
         .insert({ offer_id: offerId, creator_id: userProfile.id });
       if (error) throw error;
       await fetchWaitlist();
-    } catch {
-      // silently fail — may already be on waitlist
+    } catch (err: any) {
+      setClaimError(err?.code === '23505' ? 'You are already on this waitlist.' : 'Failed to join waitlist. Please try again.');
     } finally {
       setWaitlistLoading(null);
     }
@@ -322,7 +322,7 @@ export default function CreatorApp() {
         });
       }
     } catch {
-      // silently fail
+      setClaimError('Failed to leave waitlist. Please try again.');
     } finally {
       setWaitlistLoading(null);
       setWaitlistConfirmLeave(null);
@@ -460,7 +460,13 @@ export default function CreatorApp() {
 
       if (error) throw error;
       if (data?.error) {
-        setClaimError(data.error);
+        const errorMessages: Record<string, string> = {
+          'monthly_cap_reached': 'This offer has reached its monthly limit. Try again next month or join the waitlist.',
+          'already_claimed': 'You already have an active claim for this offer.',
+          'not_approved': 'Your account needs to be approved before claiming offers.',
+          'offer_not_live': 'This offer is no longer available.',
+        };
+        setClaimError(errorMessages[data.error] || data.error);
         return;
       }
 
@@ -484,6 +490,11 @@ export default function CreatorApp() {
   const handleSubmitReel = async () => {
     if (!reelUrl || !selectedClaim) return;
     setReelError(null);
+
+    if (selectedClaim.reel_due_at && new Date() > new Date(selectedClaim.reel_due_at)) {
+      setReelError('The deadline for this reel has passed. Please contact support if you need an extension.');
+      return;
+    }
 
     const instagramPattern = /^https:\/\/(www\.)?instagram\.com\//i;
     if (!instagramPattern.test(reelUrl)) {

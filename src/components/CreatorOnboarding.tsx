@@ -11,6 +11,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
   const [step, setStep] = useState(1);
   const [businessCount, setBusinessCount] = useState(0);
   const [offerCount, setOfferCount] = useState(0);
+  const [completing, setCompleting] = useState(false);
 
   useEffect(() => {
     fetchStats();
@@ -32,6 +33,8 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
   };
 
   const handleComplete = async () => {
+    if (completing) return;
+    setCompleting(true);
     try {
       const { error } = await supabase
         .from('creators')
@@ -41,6 +44,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
       onComplete();
     } catch (err: any) {
       console.error('Failed to complete onboarding:', err.message);
+      setCompleting(false);
     }
   };
 
@@ -234,16 +238,18 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             </button>
             <button
               onClick={handleComplete}
+              disabled={completing}
               style={{
                 background: 'none',
                 border: 'none',
                 color: 'rgba(34,34,34,0.5)',
                 fontSize: '13px',
                 fontWeight: 500,
-                cursor: 'pointer',
+                cursor: completing ? 'not-allowed' : 'pointer',
+                opacity: completing ? 0.5 : 1,
               }}
             >
-              Skip
+              {completing ? 'Saving...' : 'Skip'}
             </button>
           </div>
 
@@ -359,6 +365,7 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
 
         <button
           onClick={handleComplete}
+          disabled={completing}
           style={{
             marginTop: 32,
             background: 'var(--terra)',
@@ -368,11 +375,12 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
             borderRadius: '50px',
             padding: '14px 30px',
             border: 'none',
-            cursor: 'pointer',
+            cursor: completing ? 'not-allowed' : 'pointer',
             minHeight: '48px',
+            opacity: completing ? 0.7 : 1,
           }}
         >
-          Start exploring
+          {completing ? 'Loading...' : 'Start exploring'}
         </button>
       </div>
     </div>

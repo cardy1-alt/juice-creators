@@ -29,7 +29,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[#F7F7F7] text-[var(--mid)] border border-[var(--faint)]'}`}>{status}</span>;
 }
 
-interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
+interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
 interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
 interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
@@ -78,8 +78,8 @@ export default function AdminDashboard() {
       console.error('[AdminDashboard] Fetch errors:', errors.map(e => `${e!.code}: ${e!.message}`));
       setFetchError('Failed to load some data. Check console for details.');
     }
-    if (creatorsData.data) setCreators(creatorsData.data);
-    if (businessesData.data) setBusinesses(businessesData.data);
+    if (creatorsData.data) setCreators([...creatorsData.data]);
+    if (businessesData.data) setBusinesses([...businessesData.data]);
     if (offersData.data) setOffers(offersData.data as OfferWithBusiness[]);
     if (claimsData.data) setClaims(claimsData.data as ClaimWithDetails[]);
 
