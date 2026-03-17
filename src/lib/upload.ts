@@ -49,3 +49,42 @@ export async function uploadAvatar(
 
   return { url, error: null };
 }
+
+export async function uploadOfferPhoto(
+  file: File,
+  offerId: string,
+  businessId: string
+): Promise<{ url: string | null; error: string | null }> {
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    return { url: null, error: 'Only JPEG, PNG, and WebP images are allowed.' };
+  }
+  if (file.size > MAX_SIZE) {
+    return { url: null, error: 'File must be under 5MB.' };
+  }
+
+  const ext = file.name.split('.').pop() || 'jpg';
+  const path = `businesses/${businessId}/offer_${offerId}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(path, file, { upsert: true, contentType: file.type });
+
+  if (uploadError) {
+    return { url: null, error: 'Upload failed — try again' };
+  }
+
+  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  const url = `${data.publicUrl}?t=${Date.now()}`;
+
+  const { error: updateError } = await supabase
+    .from('offers')
+    .update({ offer_photo_url: url })
+    .eq('id', offerId);
+
+  if (updateError) {
+    console.error('[upload] Offer photo DB update failed:', updateError.message);
+    return { url, error: 'Photo uploaded but offer update failed.' };
+  }
+
+  return { url, error: null };
+}
