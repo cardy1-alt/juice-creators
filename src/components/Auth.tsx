@@ -282,12 +282,20 @@ export default function Auth() {
     }
   };
 
-  // Business signup step titles
-  const stepTitles = [
+  // Signup step titles
+  const creatorStepTitles = [
+    { title: 'About you', subtitle: 'Tell us a bit about yourself' },
+    { title: 'Your details', subtitle: 'Help us verify your identity' },
+    { title: 'Almost there', subtitle: 'Set up your login' },
+  ];
+
+  const businessStepTitles = [
     { title: 'About your business', subtitle: 'Help creators find you' },
     { title: 'Location & vibe', subtitle: 'Where can creators visit?' },
     { title: 'Almost there', subtitle: 'Set up your login' },
   ];
+
+  const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
     <div className="min-h-screen flex flex-col bg-[#FFFFFF]">
@@ -479,108 +487,117 @@ export default function Auth() {
               </button>
             </div>
 
-            {/* ── Creator signup (single page) ── */}
-            {role === 'creator' && (
-              <div className="space-y-[12px]">
-                <FloatingInput label="Full Name" icon={User} value={name} onChange={setName} placeholder="Sophie Taylor" required />
-                <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
-
-                {/* Follower count as nice pills */}
-                <div>
-                  <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Follower Count</label>
-                  <div className="flex gap-[8px]">
-                    {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => setFollowerCount(opt)}
-                        className={`flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all ${
-                          followerCount === opt
-                            ? 'bg-[#222222] text-white'
-                            : 'bg-[#F7F7F7] text-[var(--mid)] hover:bg-[#EEEEEE]'
-                        }`}
-                      >
-                        {opt}
-                      </button>
-                    ))}
+            {/* Step indicator (both Creator & Business) */}
+            <div className="flex items-center gap-[6px] mb-[20px]">
+              {[1, 2, 3].map((step) => (
+                <div key={step} className="flex items-center gap-[6px]">
+                  <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
+                    signupStep > step
+                      ? 'bg-[var(--terra)] text-white'
+                      : signupStep === step
+                        ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
+                        : 'bg-[#F3F3F3] text-[var(--soft)]'
+                  }`}>
+                    {signupStep > step ? <Check className="w-[13px] h-[13px]" /> : step}
                   </div>
+                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F3F3F3]'}`} />}
                 </div>
+              ))}
+            </div>
 
-                {/* Date of birth */}
-                <div>
-                  <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Date of Birth</label>
-                  <div className={`relative rounded-[14px] border transition-all duration-200 ${
-                    dateOfBirth ? 'border-[var(--faint)] bg-[#F7F7F7]' : 'border-[var(--faint)] bg-[#F7F7F7]'
-                  } focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
-                    <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
-                    <input
-                      type="date"
-                      value={dateOfBirth}
-                      onChange={(e) => setDateOfBirth(e.target.value)}
-                      max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
-                      className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
-                      style={{ colorScheme: 'light' }}
-                      required
+            {/* Step header */}
+            <div className="mb-[20px]">
+              <h2 className="text-[19px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>
+                {stepTitles[signupStep - 1].title}
+              </h2>
+              <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
+            </div>
+
+            {/* ── Creator signup (multi-step) ── */}
+            {role === 'creator' && (
+              <>
+                {/* Step 1: Name, Instagram, Follower Count */}
+                {signupStep === 1 && (
+                  <div className="space-y-[12px]">
+                    <FloatingInput label="Full Name" icon={User} value={name} onChange={setName} placeholder="Sophie Taylor" required />
+                    <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
+
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Follower Count</label>
+                      <div className="flex gap-[8px]">
+                        {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setFollowerCount(opt)}
+                            className={`flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all ${
+                              followerCount === opt
+                                ? 'bg-[#222222] text-white'
+                                : 'bg-[#F7F7F7] text-[var(--mid)] hover:bg-[#EEEEEE]'
+                            }`}
+                          >
+                            {opt}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 2: Date of Birth & Address */}
+                {signupStep === 2 && (
+                  <div className="space-y-[12px]">
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Date of Birth</label>
+                      <div className={`relative rounded-[14px] border transition-all duration-200 border-[var(--faint)] bg-[#F7F7F7] focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
+                        <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
+                        <input
+                          type="date"
+                          value={dateOfBirth}
+                          onChange={(e) => setDateOfBirth(e.target.value)}
+                          max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
+                          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
+                          style={{ colorScheme: 'light' }}
+                          required
+                        />
+                      </div>
+                      <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
+                    </div>
+
+                    <AddressAutocomplete
+                      value={address}
+                      onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
                   </div>
-                  <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
-                </div>
+                )}
 
-                {/* Address for local offer matching */}
-                <AddressAutocomplete
-                  value={address}
-                  onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
-                />
-
-                <div className="pt-[4px]" />
-                <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
-                <FloatingInput
-                  label="Password"
-                  icon={Lock}
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  onChange={setPassword}
-                  placeholder="Min 8 characters"
-                  required
-                  minLength={8}
-                  rightElement={
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
-                      {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
-                    </button>
-                  }
-                />
-              </div>
+                {/* Step 3: Email & Password */}
+                {signupStep === 3 && (
+                  <div className="space-y-[12px]">
+                    <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
+                    <FloatingInput
+                      label="Password"
+                      icon={Lock}
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={setPassword}
+                      placeholder="Min 8 characters"
+                      required
+                      minLength={8}
+                      rightElement={
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                          {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                        </button>
+                      }
+                    />
+                  </div>
+                )}
+              </>
             )}
 
             {/* ── Business signup (multi-step) ── */}
             {role === 'business' && (
               <>
-                {/* Step indicator */}
-                <div className="flex items-center gap-[6px] mb-[20px]">
-                  {[1, 2, 3].map((step) => (
-                    <div key={step} className="flex items-center gap-[6px]">
-                      <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
-                        signupStep > step
-                          ? 'bg-[var(--terra)] text-white'
-                          : signupStep === step
-                            ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
-                            : 'bg-[#F3F3F3] text-[var(--soft)]'
-                      }`}>
-                        {signupStep > step ? <Check className="w-[13px] h-[13px]" /> : step}
-                      </div>
-                      {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F3F3F3]'}`} />}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Step header */}
-                <div className="mb-[20px]">
-                  <h2 className="text-[19px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>
-                    {stepTitles[signupStep - 1].title}
-                  </h2>
-                  <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
-                </div>
-
                 {/* Step 1: Name & Category */}
                 {signupStep === 1 && (
                   <div className="space-y-[16px]">
@@ -667,7 +684,7 @@ export default function Auth() {
 
             {/* Navigation buttons */}
             <div className="mt-[20px]">
-              {role === 'business' && signupStep < 3 ? (
+              {signupStep < 3 ? (
                 <div className="flex gap-[10px]">
                   {signupStep > 1 && (
                     <button
@@ -681,11 +698,19 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (signupStep === 1 && !name) {
+                      if (role === 'creator' && signupStep === 1 && (!name || !instagramHandle)) {
+                        setError('Please enter your name and Instagram handle');
+                        return;
+                      }
+                      if (role === 'creator' && signupStep === 2 && !dateOfBirth) {
+                        setError('Please enter your date of birth');
+                        return;
+                      }
+                      if (role === 'business' && signupStep === 1 && !name) {
                         setError('Please enter your business name');
                         return;
                       }
-                      if (signupStep === 2 && (!address || !bio)) {
+                      if (role === 'business' && signupStep === 2 && (!address || !bio)) {
                         setError('Please enter your business address and bio');
                         return;
                       }
@@ -697,7 +722,7 @@ export default function Auth() {
                     Continue <ArrowRight className="w-[16px] h-[16px]" />
                   </button>
                 </div>
-              ) : role === 'business' && signupStep === 3 ? (
+              ) : (
                 <div className="flex gap-[10px]">
                   <button
                     type="button"
@@ -718,18 +743,6 @@ export default function Auth() {
                     ) : 'Create Account'}
                   </button>
                 </div>
-              ) : (
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
-                >
-                  {loading ? (
-                    <span className="inline-flex items-center gap-2">
-                      <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    </span>
-                  ) : 'Create Account'}
-                </button>
               )}
             </div>
 
