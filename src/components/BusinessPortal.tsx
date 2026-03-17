@@ -2090,89 +2090,53 @@ export default function BusinessPortal() {
             </div>
           )}
 
-          {/* ═══ CLAIMS (with Content toggle) ═══ */}
+          {/* ═══ CLAIMS ═══ */}
           {view === 'claims' && (
             <div>
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
-              {creatorFilter ? (
-                <button
-                  onClick={() => setCreatorFilter(null)}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[13px] font-semibold mb-4 transition-colors"
-                  style={{ background: 'var(--bg)', color: '#222222' }}
-                >
-                  {claims.find(c => c.creator_id === creatorFilter)?.creators.name || 'Creator'}
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              ) : (
-                <p className="text-[14px] text-[var(--mid)] mb-[12px]">
-                  {claims.filter(c => c.status === 'active').length} active · {claims.length} total
-                </p>
-              )}
-
-              {/* Claims | Content tab bar */}
-              <div className="flex gap-[4px] p-[3px] rounded-[12px] bg-[#F3F3F3] mb-[14px]">
-                {[
-                  { key: 'claims' as const, label: 'Claims', icon: ClipboardList },
-                  { key: 'content' as const, label: 'Content', icon: Film },
-                ].map(tab => {
-                  const isActive = claimsSubView === tab.key;
-                  const Icon = tab.icon;
-                  return (
-                    <button
-                      key={tab.key}
-                      onClick={() => setClaimsSubView(tab.key)}
-                      className={`flex-1 flex items-center justify-center gap-[6px] py-[9px] rounded-[10px] text-[13px] font-semibold transition-all ${
-                        isActive
-                          ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
-                          : 'text-[var(--mid)]'
-                      }`}
-                    >
-                      <Icon className="w-[14px] h-[14px]" />
-                      {tab.label}
-                    </button>
-                  );
-                })}
+              {/* Header row */}
+              <div className="flex items-baseline justify-between mb-[16px]">
+                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
+                {creatorFilter ? (
+                  <button
+                    onClick={() => setCreatorFilter(null)}
+                    className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--terra)]"
+                  >
+                    {claims.find(c => c.creator_id === creatorFilter)?.creators.name || 'Creator'}
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
+                    className={`text-[13px] font-semibold ${claimsSubView === 'content' ? 'text-[#222222] underline underline-offset-4' : 'text-[var(--mid)]'}`}
+                  >
+                    {claimsSubView === 'claims' ? 'View reels' : 'View claims'}
+                  </button>
+                )}
               </div>
 
-              {/* Onboarding banner */}
-              {!claimsOnboardingDismissed && claims.length <= 5 && (
-                <div className="flex items-center gap-[10px] rounded-[12px] bg-[#FAFAF8] border border-[var(--faint)] px-[14px] py-[11px] mb-[14px]">
-                  <Lightbulb className="w-[15px] h-[15px] text-[var(--terra)] flex-shrink-0" />
-                  <p className="text-[12px] text-[var(--mid)] flex-1">Creator claims offer → you scan their QR → they post a reel</p>
-                  <button
-                    onClick={() => { setClaimsOnboardingDismissed(true); localStorage.setItem('nayba_biz_claims_onboarding', 'true'); }}
-                    className="flex-shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
-                  >
-                    <X className="w-[13px] h-[13px] text-[var(--soft)]" />
-                  </button>
-                </div>
-              )}
-
-              {/* Filter pills */}
-              <div className="flex gap-[8px] mb-[16px] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+              {/* Filter row — Airbnb-style underline tabs */}
+              <div className="flex gap-[20px] border-b border-[var(--faint)] mb-[20px]">
                 {[
                   { key: 'all', label: 'All' },
-                  { key: 'active', label: 'Active', icon: Clock },
-                  { key: 'redeemed', label: 'Visited', icon: Eye },
-                  { key: 'reel_due', label: 'Reel Due', icon: Video },
-                  { key: 'completed', label: 'Done', icon: Check },
+                  { key: 'active', label: 'Active' },
+                  { key: 'redeemed', label: 'Visited' },
+                  { key: 'reel_due', label: 'Reel due' },
+                  { key: 'completed', label: 'Done' },
                 ].map(f => {
                   const count = f.key === 'all' ? claims.length : (filterCounts[f.key] || 0);
                   const isSelected = claimsFilter === f.key;
-                  const Icon = 'icon' in f ? f.icon : null;
                   return (
                     <button
                       key={f.key}
                       onClick={() => setClaimsFilter(f.key)}
-                      className={`inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
-                        isSelected
-                          ? 'bg-[#222222] text-white'
-                          : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
+                      className={`pb-[10px] text-[13px] font-semibold whitespace-nowrap transition-colors relative ${
+                        isSelected ? 'text-[#222222]' : 'text-[var(--soft)]'
                       }`}
                     >
-                      {Icon && <Icon className="w-[13px] h-[13px]" />}
-                      {f.label}
-                      <span className={`text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--soft)]'}`}>{count}</span>
+                      {f.label}{count > 0 ? ` ${count}` : ''}
+                      {isSelected && (
+                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
+                      )}
                     </button>
                   );
                 })}
@@ -2182,101 +2146,72 @@ export default function BusinessPortal() {
               {claimsSubView === 'claims' && (
                 <>
                   {filteredClaims.length === 0 && claims.length === 0 ? (
-                    <div className="flex flex-col items-center py-16 px-6">
-                      <ClipboardList className="w-12 h-12 text-[var(--soft)] mb-4" />
-                      <p className="text-[16px] font-bold text-[#222222] mb-1">No claims yet</p>
-                      <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Claims will appear here when creators claim your offers</p>
+                    <div className="flex flex-col items-center py-20 px-6">
+                      <div className="w-[56px] h-[56px] rounded-full bg-[var(--bg)] flex items-center justify-center mb-[16px]">
+                        <ClipboardList className="w-6 h-6 text-[var(--soft)]" />
+                      </div>
+                      <p className="text-[15px] font-bold text-[#222222] mb-[4px]">No claims yet</p>
+                      <p className="text-[13px] text-[var(--mid)] text-center">Creators will appear here once they claim your offers</p>
                     </div>
                   ) : filteredClaims.length === 0 ? (
-                    <div className="flex flex-col items-center py-12 px-6">
+                    <div className="flex flex-col items-center py-16 px-6">
                       <p className="text-[14px] text-[var(--mid)]">No {claimsFilter.replace('_', ' ')} claims</p>
                     </div>
                   ) : (
-                    <div className="space-y-[12px]">
+                    <div className="space-y-[2px]">
                       {filteredClaims.map((claim) => {
                         const handle = claim.creators.instagram_handle || claim.creators.code;
                         const displayHandle = handle.startsWith('@') ? handle : `@${handle}`;
                         return (
-                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-[16px]">
-                          <div className="flex items-start gap-[12px]">
-                            {/* Larger avatar */}
-                            {claim.creators.avatar_url ? (
-                              <img
-                                src={claim.creators.avatar_url}
-                                alt={claim.creators.name}
-                                className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0"
-                              />
-                            ) : (
-                              <div
-                                className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0"
-                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                              >
-                                {getInitials(claim.creators.name)}
-                              </div>
-                            )}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center justify-between gap-2">
-                                <div className="min-w-0">
-                                  <p className="text-[15px] font-bold text-[#222222] truncate">{claim.creators.name}</p>
-                                  <p className="text-[12px] text-[var(--soft)]">{displayHandle}{claim.creators.follower_count ? ` · ${claim.creators.follower_count}` : ''}</p>
-                                </div>
-                                <div className="flex items-center gap-[6px] flex-shrink-0">
-                                  <span className={`text-[11px] font-semibold px-[10px] py-[4px] rounded-[50px] ${claimStatusStyle(claim.status)}`}>
-                                    {claimStatusLabel(claim.status)}
-                                  </span>
-                                  <button
-                                    onClick={() => setDisputeClaimId(claim.id)}
-                                    className="w-[28px] h-[28px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
-                                    title="Report"
-                                  >
-                                    <MoreHorizontal className="w-[16px] h-[16px] text-[var(--soft)]" />
-                                  </button>
-                                </div>
-                              </div>
-                              {/* Offer name */}
-                              <p className="text-[14px] text-[#222222] font-semibold mt-[6px]">
-                                {claim.offers?.generated_title || claim.offers?.description}
-                              </p>
-                              {/* Time + reel info */}
-                              <div className="flex items-center gap-[8px] mt-[8px]">
-                                <span className="text-[12px] text-[var(--soft)]">{timeAgo(claim.claimed_at)}</span>
-                                {claim.reel_url ? (
-                                  <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[12px] font-semibold text-[var(--forest)]">
-                                    <Video className="w-3 h-3" /> Reel posted
-                                  </a>
-                                ) : claim.status === 'reel_due' && claim.reel_due_at ? (
-                                  <span className="flex items-center gap-1 text-[12px] font-semibold" style={{ color: '#c78c20' }}>
-                                    <Clock className="w-3 h-3" /> Due {(() => {
-                                      const hours = Math.max(0, Math.round((new Date(claim.reel_due_at).getTime() - Date.now()) / 3600000));
-                                      return hours > 24 ? `in ${Math.round(hours / 24)}d` : `in ${hours}h`;
-                                    })()}
-                                  </span>
-                                ) : null}
-                              </div>
-                              {/* Status context */}
-                              {claim.status === 'active' && (
-                                <div className="flex items-center justify-between mt-[8px]">
-                                  <span className="text-[12px] text-[var(--mid)]">Awaiting visit</span>
-                                  <button
-                                    onClick={() => { setView('scan'); setScanResult(null); }}
-                                    className="flex items-center gap-[5px] px-[12px] py-[6px] rounded-[50px] bg-[#222222] text-white text-[12px] font-semibold flex-shrink-0 hover:bg-[#333333] transition-colors"
-                                  >
-                                    <ScanLine className="w-3 h-3" /> Scan QR
-                                  </button>
-                                </div>
-                              )}
-                              {claim.status === 'redeemed' && (
-                                <span className="text-[12px] text-[var(--mid)] mt-[6px] block">Waiting for reel</span>
-                              )}
-                              {claim.status === 'reel_due' && !claim.reel_url && (
-                                <span className="text-[12px] text-[var(--mid)] mt-[6px] block">Reel pending</span>
-                              )}
-                              {claim.status === 'completed' && claim.reel_url && (
-                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[5px] text-[12px] font-semibold text-[var(--forest)] mt-[6px]">
-                                  <Video className="w-3 h-3" /> View reel
-                                </a>
-                              )}
+                        <div
+                          key={claim.id}
+                          className="flex items-center gap-[14px] py-[14px] border-b border-[var(--faint)] last:border-b-0"
+                        >
+                          {/* Avatar */}
+                          {claim.creators.avatar_url ? (
+                            <img
+                              src={claim.creators.avatar_url}
+                              alt={claim.creators.name}
+                              className="w-[44px] h-[44px] rounded-full object-cover flex-shrink-0"
+                            />
+                          ) : (
+                            <div
+                              className="w-[44px] h-[44px] rounded-full flex items-center justify-center text-white font-bold text-[14px] flex-shrink-0"
+                              style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
+                            >
+                              {getInitials(claim.creators.name)}
                             </div>
+                          )}
+
+                          {/* Info */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-[6px]">
+                              <p className="text-[15px] font-semibold text-[#222222] truncate">{claim.creators.name}</p>
+                              <span className="text-[11px] text-[var(--soft)] flex-shrink-0">{timeAgo(claim.claimed_at)}</span>
+                            </div>
+                            <p className="text-[13px] text-[var(--mid)] truncate mt-[1px]">
+                              {claim.offers?.generated_title || claim.offers?.description}
+                            </p>
+                          </div>
+
+                          {/* Right side: action or status */}
+                          <div className="flex-shrink-0">
+                            {claim.status === 'active' ? (
+                              <button
+                                onClick={() => { setView('scan'); setScanResult(null); }}
+                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[#222222] text-white text-[13px] font-semibold hover:bg-[#333333] transition-colors"
+                              >
+                                <ScanLine className="w-[14px] h-[14px]" /> Scan
+                              </button>
+                            ) : claim.status === 'completed' && claim.reel_url ? (
+                              <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[#222222] hover:bg-[#eee] transition-colors">
+                                <Video className="w-[14px] h-[14px]" /> Reel
+                              </a>
+                            ) : (
+                              <span className={`text-[11px] font-semibold px-[10px] py-[5px] rounded-[50px] ${claimStatusStyle(claim.status)}`}>
+                                {claimStatusLabel(claim.status)}
+                              </span>
+                            )}
                           </div>
                         </div>
                         );
