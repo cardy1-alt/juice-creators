@@ -13,22 +13,22 @@
 - [x] **#7** Avatar upload claims partial success — Now returns error message when DB update fails (`src/lib/upload.ts`)
 - [x] **#5** Silent failure on waitlist operations — Now shows error feedback to user (`src/components/CreatorApp.tsx`)
 - [x] **#8** Admin email case sensitivity — Already fixed (`.toLowerCase()` applied at line 16) _(false positive)_
-- [ ] **#3** Missing index on `(creator_id, status)` for claims table
+- [x] **#3** Missing index on `(creator_id, status)` for claims table — Added composite index (`20260317100100_fix_high_medium_audit_issues.sql`)
 - [x] **#9** Infinite loop risk in countdown timer — Already has proper cleanup via `return () => clearInterval(interval)` _(false positive)_
 - [x] **#10** Missing error feedback for claim submission — Now maps error codes to user-friendly messages (`src/components/CreatorApp.tsx`)
 
 ## Medium Severity
 
-- [ ] **#18** Notifications INSERT policy removed, no server-side enforcement (migrations line 1305)
-- [ ] **#11** Empty state missing for "no offers" when creator is approved (`src/components/CreatorApp.tsx:1193-1199`)
+- [x] **#18** Notifications INSERT policy removed, no server-side enforcement — Added `service_role` INSERT policy (`20260317100100_fix_high_medium_audit_issues.sql`)
+- [x] **#11** Empty state missing for "no offers" when creator is approved — Shows "No offers yet" when offers array is empty (`src/components/CreatorApp.tsx`)
 - [x] **#12** Reel due date not validated against current time before submission — Now checks deadline before accepting (`src/components/CreatorApp.tsx`)
-- [ ] **#13** Ambiguous "completed" status never set — dead code path (`CreatorApp StatusPill`)
-- [ ] **#14** Monthly cap calculation uses current month, clock-skew risk (`claim_offer()` RPC)
-- [ ] **#15** Creator onboarding stats not real-time (`src/components/CreatorOnboarding.tsx:19-31`)
+- [x] **#13** Ambiguous "completed" status never set — Reel submission now sets `status: 'completed'` (`src/components/CreatorApp.tsx`)
+- [x] **#14** Monthly cap calculation uses current month, clock-skew risk — Server-side `now()` is authoritative; no client clock dependency _(false positive)_
+- [x] **#15** Creator onboarding stats not real-time — Added realtime subscription for businesses/offers tables (`src/components/CreatorOnboarding.tsx`)
 - [x] **#16** No loading state during onboarding completion — Added loading/disabled state to buttons (`src/components/CreatorOnboarding.tsx`)
-- [ ] **#17** Realtime subscription memory leak on unmount (`src/components/AdminDashboard.tsx:56-65`)
-- [ ] **#26** Build output not optimized — no minify/sourcemap/splitChunks config (`vite.config.ts:7-9`)
-- [ ] **#27** No env var validation at build time
+- [x] **#17** Realtime subscription memory leak on unmount — Already has proper cleanup via `supabase.removeChannel(channel)` _(false positive)_
+- [x] **#26** Build output not optimized — Added sourcemaps, vendor chunk splitting (`vite.config.ts`)
+- [x] **#27** No env var validation at build time — Added `validateEnv()` check during build (`vite.config.ts`)
 
 ## Low Severity
 

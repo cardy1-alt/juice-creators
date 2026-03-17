@@ -506,7 +506,7 @@ export default function CreatorApp() {
     try {
       const { error } = await supabase
         .from('claims')
-        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString() })
+        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString(), status: 'completed' })
         .eq('id', selectedClaim.id);
       if (error) throw error;
 
@@ -1175,7 +1175,12 @@ export default function CreatorApp() {
                 </button>
               </div>
 
-              {(() => {
+              {offers.length === 0 ? (
+                <div className="text-center py-16 px-6">
+                  <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
+                  <p className="text-[var(--soft)] text-[13px]">New offers from local businesses will appear here. Check back soon!</p>
+                </div>
+              ) : (() => {
                 const filteredOffers = offers
                   .filter(o => {
                     let matchesCategory = true;
