@@ -971,21 +971,9 @@ export default function BusinessPortal() {
     new URLSearchParams(window.location.search).get('redeem') ? 'scan' : 'home'
   );
   const [showOfferBuilder, setShowOfferBuilder] = useState(false);
-  const [scanCode, setScanCode] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('redeem') || '';
-    if (token) {
-      // Clean the redeem param from URL
-      const url = new URL(window.location.href);
-      url.searchParams.delete('redeem');
-      window.history.replaceState({}, '', url.pathname + url.search);
-    }
-    return token;
-  });
+  const [scanCode, setScanCode] = useState('');
   const [scanResult, setScanResult] = useState<{ type: 'success' | 'error'; message: string; creatorName?: string } | null>(null);
-  const pendingScanRef = useRef<string | null>(
-    new URLSearchParams(window.location.search).get('redeem') || null
-  );
+  const urlRedeemHandledRef = useRef(false);
   const [loading, setLoading] = useState(false);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
   const [fetchError, setFetchError] = useState<string | null>(null);
@@ -1257,14 +1245,21 @@ export default function BusinessPortal() {
     await verifyToken(scanCode);
   };
 
-  // Auto-verify when QR scanner provides a token
+  // Auto-verify token from ?redeem= URL param on mount
   useEffect(() => {
-    if (pendingScanRef.current) {
-      const token = pendingScanRef.current;
-      pendingScanRef.current = null;
+    if (urlRedeemHandledRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('redeem');
+    if (token) {
+      urlRedeemHandledRef.current = true;
+      // Clean URL
+      const url = new URL(window.location.href);
+      url.searchParams.delete('redeem');
+      window.history.replaceState({}, '', url.pathname + url.search);
+      // Auto-verify
       verifyToken(token);
     }
-  });
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const activeClaimsCount = claims.filter(c => c.status === 'active').length;
@@ -2056,7 +2051,7 @@ export default function BusinessPortal() {
                   </div>
 
                   <QRScanner
-                    onScan={(token) => { setScanCode(token); pendingScanRef.current = token; }}
+                    onScan={(token) => { setScanCode(token); verifyToken(token); }}
                     active={view === 'scan' && !scanResult}
                   />
 
