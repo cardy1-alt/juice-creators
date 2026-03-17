@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
 import { CATEGORY_LIST, CategoryIcon, getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
+import { Logo } from './Logo';
 
 // ─── Category-aware placeholder map (mirrors BusinessPortal) ─────────────
 function getCategoryPlaceholder(category: string, type: string): string {
@@ -69,6 +70,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
   const [offerItem, setOfferItem] = useState('');
   const [discountAmount, setDiscountAmount] = useState('20');
   const [discountUnit, setDiscountUnit] = useState<'%' | '£'>('%');
+  const [hasCap, setHasCap] = useState(false);
   const [monthlySlots, setMonthlySlots] = useState(4);
 
   // Screen 5 state
@@ -112,11 +114,10 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         name: bizName,
         category,
         instagram_handle: instagram || null,
-        onboarding_step: 5,
       }).eq('id', profile.id);
 
       // Deactivate any existing offers
-      await supabase.from('offers').update({ is_active: false, is_live: false }).eq('business_id', profile.id);
+      await supabase.from('offers').update({ is_live: false }).eq('business_id', profile.id);
 
       // Create offer
       const { error: offerError } = await supabase.from('offers').insert({
@@ -125,19 +126,14 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         generated_title: generatedTitle,
         offer_type: offerType,
         offer_item: offerType === 'discount' ? `${discountAmount}${discountUnit}` : offerItem,
-        monthly_cap: monthlySlots,
-        monthly_slot_cap: monthlySlots,
+        monthly_cap: hasCap ? monthlySlots : null,
         is_live: true,
-        is_active: true,
         content_type: 'reel',
       });
       if (offerError) throw offerError;
 
-      // Mark onboarding complete
-      await supabase.from('businesses').update({
-        onboarding_complete: true,
-        onboarding_step: 5,
-      }).eq('id', profile.id);
+      // Mark onboarding complete via localStorage (migration-safe)
+      localStorage.setItem(`onboarding_complete_${profile.id}`, 'true');
 
       goForward(); // go to screen 5 (success)
     } catch (err: any) {
@@ -224,26 +220,8 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         {screen === 1 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[60px] flex flex-col items-center">
-              {/* Simple editorial illustration */}
               <div className="h-[200px] flex items-center justify-center">
-                <svg width="200" height="160" viewBox="0 0 200 160" fill="none">
-                  {/* Coffee cup */}
-                  <rect x="30" y="60" width="40" height="45" rx="6" fill="var(--peach)" opacity="0.7"/>
-                  <rect x="35" y="55" width="30" height="8" rx="4" fill="var(--forest)" opacity="0.5"/>
-                  <path d="M70 72 C78 72, 82 80, 78 88 C74 96, 70 88, 70 88" stroke="var(--forest)" strokeWidth="2.5" fill="none" opacity="0.4"/>
-                  {/* Steam */}
-                  <path d="M45 50 C45 42, 50 42, 50 35" stroke="var(--forest)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
-                  <path d="M55 48 C55 40, 60 40, 60 33" stroke="var(--forest)" strokeWidth="1.5" strokeLinecap="round" opacity="0.3"/>
-                  {/* Scissors */}
-                  <circle cx="120" cy="50" r="12" fill="none" stroke="var(--forest)" strokeWidth="2.5" opacity="0.6"/>
-                  <circle cx="120" cy="82" r="12" fill="none" stroke="var(--forest)" strokeWidth="2.5" opacity="0.6"/>
-                  <line x1="120" y1="62" x2="135" y2="100" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
-                  <line x1="120" y1="70" x2="105" y2="100" stroke="var(--forest)" strokeWidth="2.5" strokeLinecap="round" opacity="0.6"/>
-                  {/* Plant/leaf */}
-                  <path d="M160 120 C160 90, 180 70, 180 70 C180 70, 175 95, 160 120Z" fill="var(--forest)" opacity="0.35"/>
-                  <path d="M160 120 C160 90, 140 75, 140 75 C140 75, 145 95, 160 120Z" fill="var(--peach)" opacity="0.5"/>
-                  <line x1="160" y1="120" x2="160" y2="140" stroke="var(--forest)" strokeWidth="2" strokeLinecap="round" opacity="0.4"/>
-                </svg>
+                <Logo variant="icon" size={120} color="var(--forest)" />
               </div>
 
               <h1
@@ -253,10 +231,10 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                 Welcome to nayba
               </h1>
               <p
-                className="text-[16px] text-[var(--mid)] text-center mt-[12px] max-w-[260px] mx-auto"
+                className="text-[16px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
                 style={{ fontWeight: 400, lineHeight: 1.6 }}
               >
-                Local creators. Real content. Zero&nbsp;ad&nbsp;spend.
+                Turn local creators into your marketing&nbsp;team — no&nbsp;budget&nbsp;required.
               </p>
             </div>
 
@@ -539,32 +517,54 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                 </div>
               )}
 
-              {/* DECISION 2 — Monthly creators stepper */}
+              {/* DECISION 2 — Monthly creators */}
               {offerType && (
                 <div className="mt-[24px]">
                   <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[12px]">Monthly creators</label>
-                  <div className="flex items-center justify-center gap-[24px]">
-                    <button
-                      onClick={() => setMonthlySlots(Math.max(1, monthlySlots - 1))}
-                      className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
-                      style={{ border: '1.5px solid var(--faint)' }}
-                    >
-                      <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
-                    </button>
-                    <span className="text-[48px] font-extrabold text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
-                      {monthlySlots}
-                    </span>
-                    <button
-                      onClick={() => setMonthlySlots(Math.min(20, monthlySlots + 1))}
-                      className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
-                      style={{ background: 'var(--terra)' }}
-                    >
-                      <Plus className="w-[18px] h-[18px] text-white" />
-                    </button>
-                  </div>
-                  <p className="text-[12px] text-[var(--soft)] text-center mt-[8px]">
-                    {monthlySlots === 4 ? '4 creators/month is a great starting point' : `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month`}
-                  </p>
+
+                  {!hasCap ? (
+                    <div className="text-center">
+                      <p className="text-[15px] font-bold text-[var(--near-black)]">Unlimited</p>
+                      <p className="text-[12px] text-[var(--soft)] mt-[4px]">Accept as many creators as you like each month</p>
+                      <button
+                        onClick={() => setHasCap(true)}
+                        className="mt-[12px] text-[13px] font-semibold text-[var(--terra)]"
+                      >
+                        Set a monthly cap instead
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-center gap-[24px]">
+                        <button
+                          onClick={() => setMonthlySlots(Math.max(1, monthlySlots - 1))}
+                          className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
+                          style={{ border: '1.5px solid var(--faint)' }}
+                        >
+                          <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
+                        </button>
+                        <span className="text-[48px] font-extrabold text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
+                          {monthlySlots}
+                        </span>
+                        <button
+                          onClick={() => setMonthlySlots(Math.min(20, monthlySlots + 1))}
+                          className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
+                          style={{ background: 'var(--terra)' }}
+                        >
+                          <Plus className="w-[18px] h-[18px] text-white" />
+                        </button>
+                      </div>
+                      <p className="text-[12px] text-[var(--soft)] text-center mt-[8px]">
+                        {monthlySlots} creator{monthlySlots === 1 ? '' : 's'} per month
+                      </p>
+                      <button
+                        onClick={() => setHasCap(false)}
+                        className="block mx-auto mt-[8px] text-[13px] font-semibold text-[var(--terra)]"
+                      >
+                        Remove cap
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
             </div>
@@ -647,7 +647,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>
-                <p className="text-[12px] text-[var(--mid)]">{monthlySlots} creator{monthlySlots === 1 ? '' : 's'} per month</p>
+                <p className="text-[12px] text-[var(--mid)]">{hasCap ? `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month` : 'Unlimited creators'}</p>
               </div>
               <span
                 className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold flex-shrink-0"

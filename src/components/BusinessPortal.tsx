@@ -24,9 +24,6 @@ interface Offer {
   description: string;
   monthly_cap: number | null;
   is_live: boolean;
-  is_active?: boolean;
-  monthly_slot_cap?: number;
-  slots_used_this_month?: number;
   created_at: string;
   slotsUsed?: number;
   offer_type?: string | null;
@@ -969,7 +966,11 @@ function timeAgo(dateStr: string): string {
 
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
-  const [showOnboarding, setShowOnboarding] = useState(!userProfile?.onboarding_complete);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    if (userProfile?.onboarding_complete) return false;
+    if (localStorage.getItem(`onboarding_complete_${userProfile?.id}`)) return false;
+    return true;
+  });
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -1370,7 +1371,7 @@ export default function BusinessPortal() {
   })();
 
   const liveOffers = offers.filter(o => o.is_live);
-  const activeOffer = offers.find(o => o.is_active) || liveOffers[0] || null;
+  const activeOffer = liveOffers[0] || null;
 
   // Filter pill counts
   const filterCounts: Record<string, number> = {
@@ -1569,8 +1570,9 @@ export default function BusinessPortal() {
 
                 {activeOffer ? (() => {
                   const slotsUsed = activeOffer.slotsUsed || 0;
-                  const slotCap = activeOffer.monthly_slot_cap || activeOffer.monthly_cap || 4;
-                  const progress = Math.min(1, slotsUsed / slotCap);
+                  const slotCap = activeOffer.monthly_cap;
+                  const isUnlimited = slotCap === null;
+                  const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
                     <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
                       {/* Top image strip */}
@@ -1600,11 +1602,13 @@ export default function BusinessPortal() {
                       {/* Body */}
                       <div className="px-[16px] py-[14px]">
                         <p className="text-[16px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
-                        <p className="text-[13px] text-[var(--mid)] mt-[2px]">{slotCap} creator{slotCap === 1 ? '' : 's'} per month</p>
+                        <p className="text-[13px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                         <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
-                        <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
-                          <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
-                        </div>
+                        {!isUnlimited && (
+                          <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                            <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
+                          </div>
+                        )}
                       </div>
                       {/* Footer */}
                       <div className="flex items-center justify-between px-[16px] py-[12px] border-t border-[var(--faint)]">
@@ -1859,8 +1863,9 @@ export default function BusinessPortal() {
                   {/* Active offer section */}
                   {activeOffer ? (() => {
                     const slotsUsed = activeOffer.slotsUsed || 0;
-                    const slotCap = activeOffer.monthly_slot_cap || activeOffer.monthly_cap || 4;
-                    const progress = Math.min(1, slotsUsed / slotCap);
+                    const slotCap = activeOffer.monthly_cap;
+                    const isUnlimited = slotCap === null;
+                    const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                     return (
                       <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
                         <div className="relative h-[120px]">
@@ -1882,11 +1887,13 @@ export default function BusinessPortal() {
                         </div>
                         <div className="px-[16px] py-[14px]">
                           <p className="text-[16px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
-                          <p className="text-[13px] text-[var(--mid)] mt-[2px]">{slotCap} creator{slotCap === 1 ? '' : 's'} per month</p>
+                          <p className="text-[13px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                           <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
-                          <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
-                            <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
-                          </div>
+                          {!isUnlimited && (
+                            <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                              <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
+                            </div>
+                          )}
                         </div>
                         <div className="flex items-center justify-between px-[16px] py-[12px] border-t border-[var(--faint)]">
                           <button
@@ -1920,11 +1927,11 @@ export default function BusinessPortal() {
 
                   {/* Campaign history */}
                   <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Past campaigns</h3>
-                  {offers.filter(o => !o.is_active && o !== activeOffer).length === 0 ? (
+                  {offers.filter(o => !o.is_live && o !== activeOffer).length === 0 ? (
                     <p className="text-[14px] text-[var(--mid)] text-center py-[24px]">Your campaign history will appear here</p>
                   ) : (
                     <div className="space-y-[10px]">
-                      {offers.filter(o => !o.is_active && o !== activeOffer).map(offer => {
+                      {offers.filter(o => !o.is_live && o !== activeOffer).map(offer => {
                         const offerClaims = claims.filter(c => c.offer_id === offer.id);
                         const completedReels = offerClaims.filter(c => c.reel_url).length;
                         const createdDate = new Date(offer.created_at);
