@@ -981,6 +981,7 @@ export default function BusinessPortal() {
   const [claimsFilter, setClaimsFilter] = useState<string>('all');
   const [creatorFilter, setCreatorFilter] = useState<string | null>(null);
   const [claimsSubView, setClaimsSubView] = useState<'claims' | 'content'>('claims');
+  const [claimsOnboardingDismissed, setClaimsOnboardingDismissed] = useState(() => localStorage.getItem('nayba_biz_claims_onboarding') === 'true');
   const [profileName, setProfileName] = useState(userProfile?.name || '');
   const [profileAddress, setProfileAddress] = useState(userProfile?.address || '');
   const [profileInstagram, setProfileInstagram] = useState(userProfile?.instagram_handle || '');
@@ -2092,20 +2093,7 @@ export default function BusinessPortal() {
           {/* ═══ CLAIMS (with Content toggle) ═══ */}
           {view === 'claims' && (
             <div>
-              <div className="flex items-center justify-between mb-[4px]">
-                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
-                <button
-                  onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
-                  className={`inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold transition-all ${
-                    claimsSubView === 'content'
-                      ? 'bg-[#222222] text-white'
-                      : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
-                  }`}
-                >
-                  <Film className="w-[14px] h-[14px]" />
-                  Content
-                </button>
-              </div>
+              <h2 className="text-[22px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
               {creatorFilter ? (
                 <button
                   onClick={() => setCreatorFilter(null)}
@@ -2116,35 +2104,90 @@ export default function BusinessPortal() {
                   <X className="w-3.5 h-3.5" />
                 </button>
               ) : (
-                <p className="text-[14px] text-[var(--mid)] mb-[16px]">
+                <p className="text-[14px] text-[var(--mid)] mb-[12px]">
                   {claims.filter(c => c.status === 'active').length} active · {claims.length} total
                 </p>
               )}
 
-              {/* Stat grid filters */}
-              <div className="grid grid-cols-4 gap-[8px] mb-[16px]">
+              {/* Claims | Content tab bar */}
+              <div className="flex gap-[4px] p-[3px] rounded-[12px] bg-[#F3F3F3] mb-[14px]">
                 {[
+                  { key: 'claims' as const, label: 'Claims', icon: ClipboardList },
+                  { key: 'content' as const, label: 'Content', icon: Film },
+                ].map(tab => {
+                  const isActive = claimsSubView === tab.key;
+                  const Icon = tab.icon;
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setClaimsSubView(tab.key)}
+                      className={`flex-1 flex items-center justify-center gap-[6px] py-[9px] rounded-[10px] text-[13px] font-semibold transition-all ${
+                        isActive
+                          ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08)]'
+                          : 'text-[var(--mid)]'
+                      }`}
+                    >
+                      <Icon className="w-[14px] h-[14px]" />
+                      {tab.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Onboarding banner */}
+              {!claimsOnboardingDismissed && claims.length <= 5 && (
+                <div className="rounded-[14px] border border-[var(--faint)] bg-[#FAFAF8] p-[14px] mb-[14px]">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-[10px]">
+                      <div className="w-[32px] h-[32px] rounded-full bg-[var(--terra-10)] flex items-center justify-center flex-shrink-0 mt-[2px]">
+                        <Lightbulb className="w-[16px] h-[16px] text-[var(--terra)]" />
+                      </div>
+                      <div>
+                        <p className="text-[13px] font-bold text-[#222222] mb-[4px]">How claims work</p>
+                        <div className="flex flex-wrap items-center gap-[4px] text-[12px] text-[var(--mid)]">
+                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><Gift className="w-3 h-3" /> Creator claims</span>
+                          <ArrowRight className="w-3 h-3 text-[var(--soft)]" />
+                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><ScanLine className="w-3 h-3" /> You scan QR</span>
+                          <ArrowRight className="w-3 h-3 text-[var(--soft)]" />
+                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><Video className="w-3 h-3" /> They post reel</span>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => { setClaimsOnboardingDismissed(true); localStorage.setItem('nayba_biz_claims_onboarding', 'true'); }}
+                      className="flex-shrink-0 w-[24px] h-[24px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
+                    >
+                      <X className="w-[14px] h-[14px] text-[var(--soft)]" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Filter pills */}
+              <div className="flex gap-[8px] mb-[16px] overflow-x-auto" style={{ scrollbarWidth: 'none' }}>
+                {[
+                  { key: 'all', label: 'All' },
                   { key: 'active', label: 'Active', icon: Clock },
                   { key: 'redeemed', label: 'Visited', icon: Eye },
                   { key: 'reel_due', label: 'Reel Due', icon: Video },
                   { key: 'completed', label: 'Done', icon: Check },
                 ].map(f => {
-                  const count = filterCounts[f.key] || 0;
+                  const count = f.key === 'all' ? claims.length : (filterCounts[f.key] || 0);
                   const isSelected = claimsFilter === f.key;
-                  const Icon = f.icon;
+                  const Icon = 'icon' in f ? f.icon : null;
                   return (
                     <button
                       key={f.key}
-                      onClick={() => setClaimsFilter(isSelected ? 'all' : f.key)}
-                      className={`flex flex-col items-center py-[12px] rounded-[12px] transition-all border ${
+                      onClick={() => setClaimsFilter(f.key)}
+                      className={`inline-flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
                         isSelected
-                          ? 'bg-[#222222] border-[#222222]'
-                          : 'bg-white border-[var(--faint)]'
+                          ? 'bg-[#222222] text-white'
+                          : 'bg-white text-[var(--mid)] border border-[var(--faint)]'
                       }`}
                     >
-                      <Icon className="w-[16px] h-[16px] mb-[4px]" style={{ color: isSelected ? 'white' : 'var(--mid)' }} />
-                      <span className="text-[18px] font-extrabold" style={{ color: isSelected ? 'white' : '#222222' }}>{count}</span>
-                      <span className="text-[10px] font-semibold mt-[2px]" style={{ color: isSelected ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{f.label}</span>
+                      {Icon && <Icon className="w-[13px] h-[13px]" />}
+                      {f.label}
+                      <span className={`text-[11px] ${isSelected ? 'text-white/70' : 'text-[var(--soft)]'}`}>{count}</span>
                     </button>
                   );
                 })}
@@ -2225,6 +2268,27 @@ export default function BusinessPortal() {
                                   </span>
                                 ) : null}
                               </div>
+                              {/* Status helper text + action */}
+                              {claim.status === 'active' && (
+                                <div className="flex items-center justify-between mt-[10px] pt-[10px] border-t border-[var(--faint)]">
+                                  <span className="text-[12px] text-[var(--mid)]">Creator is coming to visit — scan their QR when they arrive</span>
+                                  <button
+                                    onClick={() => { setView('scan'); setScanResult(null); }}
+                                    className="flex items-center gap-[5px] px-[12px] py-[6px] rounded-[50px] bg-[var(--terra)] text-white text-[12px] font-semibold flex-shrink-0 ml-[8px] hover:bg-[var(--terra-hover)] transition-colors"
+                                  >
+                                    <ScanLine className="w-3 h-3" /> Scan
+                                  </button>
+                                </div>
+                              )}
+                              {claim.status === 'redeemed' && (
+                                <p className="text-[12px] text-[var(--mid)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Visit confirmed — waiting for creator to post their reel</p>
+                              )}
+                              {claim.status === 'reel_due' && !claim.reel_url && (
+                                <p className="text-[12px] text-[var(--mid)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Reel deadline active — creator needs to submit their post</p>
+                              )}
+                              {claim.status === 'completed' && (
+                                <p className="text-[12px] text-[var(--forest)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Collab complete — reel has been posted</p>
+                              )}
                             </div>
                           </div>
                         </div>
