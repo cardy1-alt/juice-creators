@@ -8,8 +8,10 @@ import {
   Sparkles, ClipboardList, Clock, ScanLine,
   Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
   Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy, Infinity
+  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy, Infinity,
+  Megaphone, PauseCircle, RefreshCw
 } from 'lucide-react';
+import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
@@ -22,6 +24,9 @@ interface Offer {
   description: string;
   monthly_cap: number | null;
   is_live: boolean;
+  is_active?: boolean;
+  monthly_slot_cap?: number;
+  slots_used_this_month?: number;
   created_at: string;
   slotsUsed?: number;
   offer_type?: string | null;
@@ -964,6 +969,7 @@ function timeAgo(dateStr: string): string {
 
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
+  const [showOnboarding, setShowOnboarding] = useState(!userProfile?.onboarding_complete);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -1287,9 +1293,22 @@ export default function BusinessPortal() {
     );
   }
 
+  // Business onboarding — shown until onboarding_complete = true
+  if (showOnboarding) {
+    return (
+      <BusinessOnboarding
+        profile={userProfile}
+        onComplete={() => {
+          setShowOnboarding(false);
+          fetchOffers();
+        }}
+      />
+    );
+  }
+
   const bottomTabs: { key: 'home' | 'offers' | 'scan' | 'claims' | 'profile'; label: string; icon: any }[] = [
     { key: 'home', label: 'Home', icon: LayoutDashboard },
-    { key: 'offers', label: 'Offers', icon: Tag },
+    { key: 'offers', label: 'Campaign', icon: Megaphone },
     { key: 'scan', label: 'Scan', icon: ScanLine },
     { key: 'claims', label: 'Claims', icon: FileText },
     { key: 'profile', label: 'Profile', icon: User },
@@ -1351,6 +1370,7 @@ export default function BusinessPortal() {
   })();
 
   const liveOffers = offers.filter(o => o.is_live);
+  const activeOffer = offers.find(o => o.is_active) || liveOffers[0] || null;
 
   // Filter pill counts
   const filterCounts: Record<string, number> = {
@@ -1543,90 +1563,76 @@ export default function BusinessPortal() {
                 </span>
               </div>
 
-              {/* Your live offers — horizontal visual cards */}
+              {/* Your campaign — single active offer card */}
               <div className="mb-7">
-                <div className="flex items-center justify-between mb-[14px]">
-                  <h3 className="text-[18px] font-extrabold text-[#222222]">Your live offers</h3>
-                  {liveOffers.length > 0 && (
-                    <button onClick={() => setView('offers')} className="w-[28px] h-[28px] flex items-center justify-center rounded-full border border-[var(--faint)]">
-                      <ChevronRight className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    </button>
-                  )}
-                </div>
+                <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Your campaign</h3>
 
-                {liveOffers.length === 0 ? (
-                  <div className="flex flex-col items-center py-10 px-4">
-                    <Tag className="w-10 h-10 text-[var(--soft)] mb-3" />
-                    <p className="text-[15px] font-semibold text-[#222222]">No live offers yet</p>
-                    <p className="text-[13px] text-[var(--mid)] text-center mt-1 max-w-[260px]">Create your first offer to start getting creator visits</p>
-                    <button
-                      onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
-                      className="mt-[14px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white text-[13px] font-bold hover:bg-[var(--terra-hover)] transition-all"
-                    >
-                      Create offer →
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none' }}>
-                    {liveOffers.map(offer => {
-                      const isUnlimited = offer.monthly_cap === null;
-                      const slotsUsed = offer.slotsUsed || 0;
-                      const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                      return (
-                        <button
-                          key={offer.id}
-                          onClick={() => setView('offers')}
-                          className="w-[140px] flex-shrink-0 text-left"
-                        >
-                          {/* Image card */}
-                          <div className="relative w-[140px] h-[180px] rounded-[16px] overflow-hidden">
-                            {offer.offer_photo_url ? (
-                              <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
-                            )}
-                            {/* Live badge top-right */}
-                            <span className="absolute top-[8px] right-[8px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
-                              <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
-                              Live
-                            </span>
-                            {/* Business logo top-left */}
-                            {userProfile.logo_url && (
-                              <div className="absolute top-[8px] left-[8px] w-[28px] h-[28px] rounded-[7px] overflow-hidden" style={{ border: '1.5px solid white' }}>
-                                <img src={userProfile.logo_url} alt="" className="w-full h-full object-cover" />
-                              </div>
-                            )}
-                            {/* Slots badge bottom-left */}
-                            {!isUnlimited && slotsLeft !== null && (() => {
-                              const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
-                              return (
-                                <span
-                                  className="absolute bottom-[8px] left-[8px] backdrop-blur text-[11px] font-bold rounded-full px-[8px] py-[3px]"
-                                  style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
-                                >
-                                  {badge.text}
-                                </span>
-                              );
-                            })()}
+                {activeOffer ? (() => {
+                  const slotsUsed = activeOffer.slotsUsed || 0;
+                  const slotCap = activeOffer.monthly_slot_cap || activeOffer.monthly_cap || 4;
+                  const progress = Math.min(1, slotsUsed / slotCap);
+                  return (
+                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                      {/* Top image strip */}
+                      <div className="relative h-[100px]">
+                        {activeOffer.offer_photo_url ? (
+                          <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                        ) : userProfile.logo_url ? (
+                          <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
+                            <img src={userProfile.logo_url} alt="" className="w-[48px] h-[48px] rounded-[12px] object-cover" style={{ border: '2px solid rgba(255,255,255,0.3)' }} />
                           </div>
-                          {/* Below image — title only */}
-                          <p className="mt-[6px] text-[13px] font-extrabold text-[#222222] tracking-[-0.1px] leading-[1.2] truncate">
-                            {offer.generated_title || offer.description}
-                          </p>
+                        ) : (
+                          <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
+                        )}
+                        {/* Live badge */}
+                        <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
+                          <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                          Live
+                        </span>
+                        {/* Edit button */}
+                        <button
+                          onClick={() => { openOfferDetail(activeOffer); setView('offers'); }}
+                          className="absolute top-[10px] right-[10px] px-[14px] py-[5px] rounded-[50px] text-[12px] font-semibold bg-white text-[var(--near-black)]"
+                        >
+                          Edit
                         </button>
-                      );
-                    })}
-                    {/* Add offer card */}
+                      </div>
+                      {/* Body */}
+                      <div className="px-[16px] py-[14px]">
+                        <p className="text-[16px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
+                        <p className="text-[13px] text-[var(--mid)] mt-[2px]">{slotCap} creator{slotCap === 1 ? '' : 's'} per month</p>
+                        <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
+                        <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                          <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
+                        </div>
+                      </div>
+                      {/* Footer */}
+                      <div className="flex items-center justify-between px-[16px] py-[12px] border-t border-[var(--faint)]">
+                        <button
+                          onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
+                          className="inline-flex items-center gap-[6px] text-[13px] font-medium text-[var(--soft)]"
+                        >
+                          <PauseCircle className="w-[14px] h-[14px]" /> Pause campaign
+                        </button>
+                        <button
+                          onClick={() => { setView('offers'); }}
+                          className="inline-flex items-center gap-[6px] text-[13px] font-semibold text-[var(--terra)]"
+                        >
+                          <RefreshCw className="w-[14px] h-[14px]" /> Change offer
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })() : (
+                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                    <p className="text-[15px] font-semibold text-[var(--mid)]">No active campaign</p>
+                    <p className="text-[13px] text-[var(--mid)] mt-[4px]">Create your first offer to start getting creator visits</p>
                     <button
                       onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
-                      className="w-[140px] flex-shrink-0 text-left"
+                      className="mt-[16px] px-[24px] py-[12px] rounded-[50px] text-white text-[14px] font-bold transition-all"
+                      style={{ background: 'var(--terra)' }}
                     >
-                      <div className="w-[140px] h-[180px] rounded-[16px] border border-[var(--faint)] flex flex-col items-center justify-center gap-2">
-                        <div className="w-[36px] h-[36px] rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
-                          <Plus className="w-[16px] h-[16px] text-[var(--terra)]" />
-                        </div>
-                        <span className="text-[12px] font-semibold text-[var(--mid)]">New offer</span>
-                      </div>
+                      Launch a campaign →
                     </button>
                   </div>
                 )}
@@ -1744,7 +1750,7 @@ export default function BusinessPortal() {
           {view === 'offers' && (
             <div>
               {selectedOffer ? (
-                /* ── Offer detail / edit sub-view ── */
+                /* ── Offer detail / edit sub-view (inline editor) ── */
                 <>
                   <div className="flex items-center gap-3 mb-5">
                     <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
@@ -1765,7 +1771,6 @@ export default function BusinessPortal() {
                         <Gift className="w-12 h-12 text-white/40" />
                       </div>
                     )}
-                    {/* Status badge */}
                     {selectedOffer.is_live ? (
                       <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
                         <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
@@ -1777,45 +1782,6 @@ export default function BusinessPortal() {
                       </span>
                     )}
                   </div>
-
-                  {/* Stats row + action */}
-                  <div className="flex items-stretch gap-[10px] mb-[24px]">
-                    <div className="flex-1 text-center py-[14px] rounded-[12px] bg-[var(--bg)] flex flex-col items-center justify-center">
-                      <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.slotsUsed || 0}</p>
-                      <p className="text-[11px] font-semibold text-[var(--mid)] mt-[2px]">Claimed</p>
-                    </div>
-                    <div className={`flex-1 text-center py-[14px] rounded-[12px] flex flex-col items-center justify-center ${selectedOffer.monthly_cap === null ? 'bg-[var(--terra-10)]' : 'bg-[var(--bg)]'}`}>
-                      {selectedOffer.monthly_cap === null ? (
-                        <Infinity className="w-[22px] h-[22px] text-[var(--terra)]" />
-                      ) : (
-                        <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.monthly_cap}</p>
-                      )}
-                      <p className="text-[11px] font-semibold text-[var(--mid)] mt-[2px]">{selectedOffer.monthly_cap === null ? 'Unlimited' : 'Monthly cap'}</p>
-                    </div>
-                    <div className="flex-1 text-center py-[14px] rounded-[12px] bg-[var(--bg)] flex flex-col items-center justify-center">
-                      {selectedOffer.content_type ? (
-                        <Film className="w-[20px] h-[20px] text-[var(--terra)]" />
-                      ) : (
-                        <p className="text-[18px] font-extrabold text-[#222222] leading-[1.2]">{selectedOffer.offer_type || '\u2014'}</p>
-                      )}
-                      <p className="text-[11px] font-semibold text-[var(--mid)] capitalize mt-[2px]">{selectedOffer.content_type || selectedOffer.offer_type || 'Type'}</p>
-                    </div>
-                  </div>
-
-                  {/* Pause / Resume toggle */}
-                  <button
-                    onClick={async () => {
-                      await handleToggleOffer(selectedOffer.id, selectedOffer.is_live);
-                      setSelectedOffer(prev => prev ? { ...prev, is_live: !prev.is_live } : null);
-                    }}
-                    className={`w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all mb-[24px] ${
-                      selectedOffer.is_live
-                        ? 'bg-white text-[var(--mid)] border-[1.5px] border-[var(--faint)] hover:border-[var(--soft)]'
-                        : 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
-                    }`}
-                  >
-                    {selectedOffer.is_live ? 'Pause offer' : 'Resume offer'}
-                  </button>
 
                   {/* Edit fields */}
                   <div className="space-y-4 mb-6">
@@ -1829,7 +1795,7 @@ export default function BusinessPortal() {
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Monthly cap</label>
+                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Monthly creators</label>
                       <div className="flex items-center gap-[12px]">
                         <input
                           type="number"
@@ -1857,15 +1823,6 @@ export default function BusinessPortal() {
                         style={{ minHeight: '80px' }}
                       />
                     </div>
-                    {selectedOffer.content_type && (
-                      <div>
-                        <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Content type</label>
-                        <div className="inline-flex items-center gap-[6px] px-[14px] py-[10px] rounded-[12px] bg-[var(--bg)]">
-                          <Film className="w-[16px] h-[16px] text-[var(--terra)]" />
-                          <span className="text-[14px] font-semibold text-[#222222] capitalize">{selectedOffer.content_type}</span>
-                        </div>
-                      </div>
-                    )}
                   </div>
 
                   {/* Save button */}
@@ -1881,132 +1838,127 @@ export default function BusinessPortal() {
                     {editOfferSaved ? 'Saved \u2713' : editOfferSaving ? 'Saving...' : 'Save changes'}
                   </button>
 
-                  {/* Created date */}
-                  <p className="text-[12px] text-[var(--soft)] text-center mt-[16px]">
-                    Created {new Date(selectedOffer.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                  </p>
+                  {/* Pause campaign link */}
+                  <button
+                    onClick={async () => {
+                      if (confirm('Are you sure you want to pause this campaign?')) {
+                        await handleToggleOffer(selectedOffer.id, selectedOffer.is_live);
+                        setSelectedOffer(prev => prev ? { ...prev, is_live: !prev.is_live } : null);
+                      }
+                    }}
+                    className="block text-[13px] font-medium text-[var(--soft)] text-center mt-[16px] mx-auto"
+                  >
+                    {selectedOffer.is_live ? 'Pause campaign' : 'Resume campaign'}
+                  </button>
                 </>
               ) : (
-                /* ── Offers list view ── */
+                /* ── Campaign view with active offer + history ── */
                 <>
-                  <div className="flex items-center justify-between mb-[20px]">
-                    <div>
-                      <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Offers</h2>
-                      <p className="text-[14px] text-[var(--mid)] mt-[2px]">{offers.length} offer{offers.length !== 1 ? 's' : ''} · {offers.filter(o => o.is_live).length} live</p>
-                    </div>
-                    {offers.length > 0 && (
-                      <button
-                        onClick={() => setShowOfferBuilder(true)}
-                        className="inline-flex items-center gap-[6px] px-[18px] py-[10px] rounded-[50px] bg-[#222222] text-white font-bold text-[13px] hover:bg-[#333] transition-all"
-                      >
-                        <Plus className="w-4 h-4" /> New
-                      </button>
-                    )}
-                  </div>
+                  <h2 className="text-[22px] font-extrabold text-[#222222] mb-[20px]" style={{ letterSpacing: '-0.4px' }}>Your campaign</h2>
 
-                  {offersLoaded && offers.length === 0 && (
-                    <div className="flex flex-col items-center py-16 px-6">
-                      <Sparkles className="w-12 h-12 text-[var(--soft)] mb-4" />
-                      <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
-                      <p className="text-[14px] text-[var(--mid)] text-center mb-5 max-w-[260px]">Create your first offer to start receiving creators</p>
+                  {/* Active offer section */}
+                  {activeOffer ? (() => {
+                    const slotsUsed = activeOffer.slotsUsed || 0;
+                    const slotCap = activeOffer.monthly_slot_cap || activeOffer.monthly_cap || 4;
+                    const progress = Math.min(1, slotsUsed / slotCap);
+                    return (
+                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                        <div className="relative h-[120px]">
+                          {activeOffer.offer_photo_url ? (
+                            <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
+                          )}
+                          <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
+                            <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                            Live
+                          </span>
+                          <button
+                            onClick={() => openOfferDetail(activeOffer)}
+                            className="absolute top-[10px] right-[10px] px-[14px] py-[5px] rounded-[50px] text-[12px] font-semibold bg-white text-[var(--near-black)]"
+                          >
+                            Edit
+                          </button>
+                        </div>
+                        <div className="px-[16px] py-[14px]">
+                          <p className="text-[16px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
+                          <p className="text-[13px] text-[var(--mid)] mt-[2px]">{slotCap} creator{slotCap === 1 ? '' : 's'} per month</p>
+                          <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
+                          <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                            <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
+                          </div>
+                        </div>
+                        <div className="flex items-center justify-between px-[16px] py-[12px] border-t border-[var(--faint)]">
+                          <button
+                            onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
+                            className="inline-flex items-center gap-[6px] text-[13px] font-medium text-[var(--soft)]"
+                          >
+                            <PauseCircle className="w-[14px] h-[14px]" /> Pause campaign
+                          </button>
+                          <button
+                            onClick={() => setShowOfferBuilder(true)}
+                            className="inline-flex items-center gap-[6px] text-[13px] font-semibold text-[var(--terra)]"
+                          >
+                            <RefreshCw className="w-[14px] h-[14px]" /> Change offer
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })() : (
+                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                      <p className="text-[15px] font-semibold text-[var(--mid)]">No active campaign</p>
+                      <p className="text-[13px] text-[var(--mid)] mt-[4px]">Create your first offer</p>
                       <button
                         onClick={() => setShowOfferBuilder(true)}
-                        className="inline-flex items-center gap-2 px-[24px] py-[13px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
+                        className="mt-[16px] px-[24px] py-[12px] rounded-[50px] text-white text-[14px] font-bold transition-all"
+                        style={{ background: 'var(--terra)' }}
                       >
-                        <Plus className="w-4 h-4" /> Create First Offer
+                        Launch a campaign →
                       </button>
                     </div>
                   )}
 
-                  <div className="space-y-[16px]">
-                    {offers.map((offer) => {
-                      const isUnlimited = offer.monthly_cap === null;
-                      const slotsUsed = offer.slotsUsed || 0;
-                      const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                      const pct = isUnlimited ? 0 : Math.min((slotsUsed / (offer.monthly_cap as number)) * 100, 100);
-
-                      return (
-                        <button
-                          key={offer.id}
-                          onClick={() => openOfferDetail(offer)}
-                          className="w-full text-left bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden transition-all active:scale-[0.98]"
-                        >
-                          {/* Image-led hero */}
-                          <div
-                            className="w-full h-[180px] relative overflow-hidden"
-                            style={{ background: offer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
-                          >
-                            {offer.offer_photo_url ? (
-                              <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center">
-                                <Gift className="w-12 h-12 text-white/40" />
-                              </div>
-                            )}
-                            {/* Status badge overlaid top-right */}
-                            {offer.is_live ? (
-                              <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
-                                <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
-                                Live
-                              </span>
-                            ) : (
-                              <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
-                                Paused
-                              </span>
-                            )}
-                            {/* Slots badge overlaid top-left */}
-                            {isUnlimited ? (
-                              <span className="absolute top-[12px] left-[12px] inline-flex items-center gap-[4px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm" style={{ background: 'rgba(255,255,255,0.92)', color: 'var(--terra)' }}>
-                                <Infinity className="w-[14px] h-[14px]" /> Unlimited
-                              </span>
-                            ) : slotsLeft !== null && (() => {
-                              const badge = getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number);
-                              return (
-                                <span
-                                  className="absolute top-[12px] left-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold backdrop-blur-sm"
-                                  style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
-                                >
-                                  {badge.text}
-                                </span>
-                              );
-                            })()}
-                          </div>
-
-                          {/* Card body */}
-                          <div className="p-[16px]">
-                            <div className="flex items-start justify-between gap-[12px]">
-                              <div className="flex-1 min-w-0">
-                                <h3 className="text-[17px] font-extrabold text-[#222222] mb-[4px]" style={{ letterSpacing: '-0.2px' }}>
-                                  {offer.generated_title || offer.description}
-                                </h3>
-                                <div className="flex items-center gap-[8px] flex-wrap">
-                                  <p className="text-[13px] text-[var(--mid)]">
-                                    {isUnlimited ? `${slotsUsed} claimed` : `${slotsUsed} of ${offer.monthly_cap} claimed`}
-                                  </p>
-                                  {offer.content_type && (
-                                    <span className="inline-flex items-center gap-[3px] text-[11px] font-semibold text-[var(--terra)]">
-                                      <Film className="w-[11px] h-[11px]" /> {offer.content_type}
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                              <ChevronRight className="w-5 h-5 text-[var(--soft)] flex-shrink-0 mt-[2px]" />
+                  {/* Campaign history */}
+                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Past campaigns</h3>
+                  {offers.filter(o => !o.is_active && o !== activeOffer).length === 0 ? (
+                    <p className="text-[14px] text-[var(--mid)] text-center py-[24px]">Your campaign history will appear here</p>
+                  ) : (
+                    <div className="space-y-[10px]">
+                      {offers.filter(o => !o.is_active && o !== activeOffer).map(offer => {
+                        const offerClaims = claims.filter(c => c.offer_id === offer.id);
+                        const completedReels = offerClaims.filter(c => c.reel_url).length;
+                        const createdDate = new Date(offer.created_at);
+                        return (
+                          <div key={offer.id} className="rounded-[16px] border border-[var(--faint)] p-[14px] flex items-center gap-[12px]" style={{ paddingRight: 16 }}>
+                            <div
+                              className="w-[44px] h-[44px] rounded-[8px] flex items-center justify-center flex-shrink-0"
+                              style={{ background: getCategoryGradient(userProfile.category) }}
+                            >
+                              <Gift className="w-[18px] h-[18px] text-white/60" />
                             </div>
-
-                            {/* Progress bar */}
-                            {!isUnlimited && (
-                              <div className="h-[3px] bg-[var(--terra-10)] rounded-[3px] overflow-hidden mt-[12px]">
-                                <div
-                                  className="h-full bg-[var(--terra)] rounded-[3px] transition-all duration-300"
-                                  style={{ width: `${pct}%` }}
-                                />
-                              </div>
-                            )}
+                            <div className="flex-1 min-w-0">
+                              <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{offer.generated_title || offer.description}</p>
+                              <p className="text-[12px] text-[var(--soft)]">
+                                {createdDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+                              </p>
+                              <p className="text-[12px] text-[var(--mid)]">
+                                {offerClaims.length} creator visit{offerClaims.length !== 1 ? 's' : ''} · {completedReels} reel{completedReels !== 1 ? 's' : ''} posted
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                // Pre-fill the builder with this offer's data and open it
+                                setShowOfferBuilder(true);
+                              }}
+                              className="text-[12px] font-semibold text-[var(--terra)] flex-shrink-0"
+                            >
+                              Run again
+                            </button>
                           </div>
-                        </button>
-                      );
-                    })}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  )}
                 </>
               )}
             </div>
