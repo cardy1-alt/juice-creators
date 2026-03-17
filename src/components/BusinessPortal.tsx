@@ -36,6 +36,7 @@ interface Offer {
 
 interface ClaimWithDetails {
   id: string;
+  creator_id: string;
   status: string;
   claimed_at: string;
   redeemed_at: string | null;
@@ -2123,8 +2124,8 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* Filter row — Airbnb-style underline tabs */}
-              <div className="flex gap-[20px] border-b border-[var(--faint)] mb-[20px]">
+              {/* Filter row — pill style */}
+              <div className="flex gap-[8px] flex-wrap mb-[20px]">
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'active', label: 'Active' },
@@ -2138,14 +2139,13 @@ export default function BusinessPortal() {
                     <button
                       key={f.key}
                       onClick={() => setClaimsFilter(f.key)}
-                      className={`pb-[10px] text-[13px] font-semibold whitespace-nowrap transition-colors relative ${
-                        isSelected ? 'text-[#222222]' : 'text-[var(--soft)]'
+                      className={`px-[14px] py-[7px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
+                        isSelected
+                          ? 'bg-[var(--terra)] text-white'
+                          : 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#ececec]'
                       }`}
                     >
                       {f.label}{count > 0 ? ` ${count}` : ''}
-                      {isSelected && (
-                        <span className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#222222] rounded-full" />
-                      )}
                     </button>
                   );
                 })}
