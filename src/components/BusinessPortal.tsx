@@ -2253,26 +2253,28 @@ export default function BusinessPortal() {
                                   </span>
                                 ) : null}
                               </div>
-                              {/* Status helper text + action */}
+                              {/* Status context */}
                               {claim.status === 'active' && (
-                                <div className="flex items-center justify-between mt-[10px] pt-[10px] border-t border-[var(--faint)]">
-                                  <span className="text-[12px] text-[var(--mid)]">Creator is coming to visit — scan their QR when they arrive</span>
+                                <div className="flex items-center justify-between mt-[8px]">
+                                  <span className="text-[12px] text-[var(--mid)]">Awaiting visit</span>
                                   <button
                                     onClick={() => { setView('scan'); setScanResult(null); }}
-                                    className="flex items-center gap-[5px] px-[12px] py-[6px] rounded-[50px] bg-[var(--terra)] text-white text-[12px] font-semibold flex-shrink-0 ml-[8px] hover:bg-[var(--terra-hover)] transition-colors"
+                                    className="flex items-center gap-[5px] px-[12px] py-[6px] rounded-[50px] bg-[#222222] text-white text-[12px] font-semibold flex-shrink-0 hover:bg-[#333333] transition-colors"
                                   >
-                                    <ScanLine className="w-3 h-3" /> Scan
+                                    <ScanLine className="w-3 h-3" /> Scan QR
                                   </button>
                                 </div>
                               )}
                               {claim.status === 'redeemed' && (
-                                <p className="text-[12px] text-[var(--mid)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Visit confirmed — waiting for creator to post their reel</p>
+                                <span className="text-[12px] text-[var(--mid)] mt-[6px] block">Waiting for reel</span>
                               )}
                               {claim.status === 'reel_due' && !claim.reel_url && (
-                                <p className="text-[12px] text-[var(--mid)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Reel deadline active — creator needs to submit their post</p>
+                                <span className="text-[12px] text-[var(--mid)] mt-[6px] block">Reel pending</span>
                               )}
-                              {claim.status === 'completed' && (
-                                <p className="text-[12px] text-[var(--forest)] mt-[8px] pt-[8px] border-t border-[var(--faint)]">Collab complete — reel has been posted</p>
+                              {claim.status === 'completed' && claim.reel_url && (
+                                <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-[5px] text-[12px] font-semibold text-[var(--forest)] mt-[6px]">
+                                  <Video className="w-3 h-3" /> View reel
+                                </a>
                               )}
                             </div>
                           </div>
