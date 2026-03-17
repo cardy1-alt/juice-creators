@@ -43,7 +43,8 @@ export async function uploadAvatar(
     .eq('id', userId);
 
   if (updateError) {
-    return { url, error: null }; // Upload worked, DB update may fail due to RLS
+    console.error('[upload] DB update failed:', updateError.message);
+    return { url, error: 'Photo uploaded but profile update failed. Try saving again.' };
   }
 
   return { url, error: null };
