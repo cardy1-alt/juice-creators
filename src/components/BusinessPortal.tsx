@@ -1597,7 +1597,7 @@ export default function BusinessPortal() {
                   const isUnlimited = slotCap === null;
                   const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
-                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(34,34,34,0.10)' }}>
                       {/* Hidden file input for offer photo */}
                       <input
                         ref={offerPhotoInputRef}
@@ -1610,50 +1610,40 @@ export default function BusinessPortal() {
                           e.target.value = '';
                         }}
                       />
-                      {/* Top image strip */}
-                      <div className="relative h-[100px]">
+                      {/* Photo-dominant hero */}
+                      <div className="relative h-[220px]">
                         {activeOffer.offer_photo_url ? (
-                          <img
-                            src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover cursor-pointer"
-                            onClick={() => offerPhotoInputRef.current?.click()}
-                          />
+                          <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
                             <button
                               onClick={() => offerPhotoInputRef.current?.click()}
                               disabled={offerPhotoUploading}
-                              className="px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
+                              className="px-[16px] py-[8px] rounded-[50px] text-[13px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
                             >
-                              <Camera className="w-[13px] h-[13px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
+                              <Camera className="w-[14px] h-[14px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add a photo'}
                             </button>
                           </div>
                         )}
-                        {/* Live badge */}
-                        <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
+                        {/* Top badges */}
+                        <span className="absolute top-[12px] left-[12px] inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-[50px] text-[11px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
                           <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                           Live
                         </span>
-                        {/* Edit button */}
                         <button
                           onClick={() => { openOfferDetail(activeOffer); setView('offers'); }}
-                          className="absolute top-[10px] right-[10px] px-[14px] py-[5px] rounded-[50px] text-[12px] font-semibold bg-white text-[var(--near-black)]"
+                          className="absolute top-[12px] right-[12px] px-[14px] py-[5px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] backdrop-blur-sm"
                         >
                           Edit
                         </button>
+                        {/* Bottom gradient overlay with info */}
+                        <div className="absolute bottom-0 left-0 right-0 px-[16px] pb-[14px] pt-[48px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)' }}>
+                          <p className="text-[18px] font-extrabold text-white leading-tight">{activeOffer.generated_title || activeOffer.description}</p>
+                          <p className="text-[13px] text-white/80 mt-[3px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`} · {slotsUsed} claimed</p>
+                        </div>
                       </div>
-                      {/* Body */}
-                      <div className="px-[16px] py-[14px]">
-                        <p className="text-[16px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
-                        <p className="text-[13px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
-                        <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
-                        {!isUnlimited && (
-                          <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
-                            <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
-                          </div>
-                        )}
-                      </div>
-                      {/* Footer */}
-                      <div className="flex items-center justify-between px-[16px] py-[12px] border-t border-[var(--faint)]">
+                      {/* Footer actions */}
+                      <div className="flex items-center justify-between px-[16px] py-[12px] bg-white">
                         <button
                           onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
                           className="inline-flex items-center gap-[6px] text-[13px] font-medium text-[var(--soft)]"
@@ -1790,25 +1780,46 @@ export default function BusinessPortal() {
                     <h1 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
                   </div>
 
-                  {/* Hero image */}
+                  {/* Hero image with upload */}
+                  <input
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    className="hidden"
+                    id="editOfferPhotoInput"
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (file && selectedOffer) await handleOfferPhotoUpload(file, selectedOffer.id);
+                      e.target.value = '';
+                    }}
+                  />
                   <div
-                    className="w-full h-[200px] rounded-[16px] overflow-hidden relative mb-[20px]"
+                    className="w-full h-[200px] rounded-[16px] overflow-hidden relative mb-[20px] cursor-pointer"
                     style={{ background: selectedOffer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
+                    onClick={() => document.getElementById('editOfferPhotoInput')?.click()}
                   >
                     {selectedOffer.offer_photo_url ? (
-                      <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                      <>
+                        <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center group">
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]">
+                            <Camera className="w-[13px] h-[13px]" /> Change photo
+                          </span>
+                        </div>
+                      </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <Gift className="w-12 h-12 text-white/40" />
+                        <span className="px-[16px] py-[8px] rounded-[50px] text-[13px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]">
+                          <Camera className="w-[14px] h-[14px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
+                        </span>
                       </div>
                     )}
                     {selectedOffer.is_live ? (
-                      <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
+                      <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm pointer-events-none">
                         <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                         Live
                       </span>
                     ) : (
-                      <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm">
+                      <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm pointer-events-none">
                         Paused
                       </span>
                     )}
