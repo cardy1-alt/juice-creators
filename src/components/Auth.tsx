@@ -298,7 +298,7 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF]">
+    <div className="min-h-screen flex flex-col bg-[#FFFFFF] overscroll-none">
       {/* Top section with branding */}
       <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
         <Logo size={52} variant="icon" />
