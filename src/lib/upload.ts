@@ -2,6 +2,18 @@ import { supabase } from './supabase';
 
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+const BUCKET = 'avatars';
+
+let bucketEnsured = false;
+
+async function ensureBucket() {
+  if (bucketEnsured) return;
+  const { data } = await supabase.storage.getBucket(BUCKET);
+  if (!data) {
+    await supabase.storage.createBucket(BUCKET, { public: true });
+  }
+  bucketEnsured = true;
+}
 
 export async function uploadAvatar(
   file: File,
@@ -15,26 +27,27 @@ export async function uploadAvatar(
     return { url: null, error: 'File must be under 5MB.' };
   }
 
+  await ensureBucket();
+
   const ext = file.name.split('.').pop() || 'jpg';
   const fileName = type === 'creators' ? 'avatar' : 'logo';
   const path = `${type}/${userId}/${fileName}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
-    .from('avatars')
+    .from(BUCKET)
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
-    return { url: null, error: 'Upload failed — try again' };
+    return { url: null, error: `Upload failed: ${uploadError.message}` };
   }
 
-  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   // Add cache-busting param
   const url = `${data.publicUrl}?t=${Date.now()}`;
 
   // Update the profile row
   const table = type === 'creators' ? 'creators' : 'businesses';
   const column = type === 'creators' ? 'avatar_url' : 'logo_url';
-  const idColumn = type === 'creators' ? 'email' : 'owner_email';
 
   // We'll use the id directly since we know it
   const { error: updateError } = await supabase
@@ -62,11 +75,13 @@ export async function uploadOfferPhoto(
     return { url: null, error: 'File must be under 5MB.' };
   }
 
+  await ensureBucket();
+
   const ext = file.name.split('.').pop() || 'jpg';
   const path = `businesses/${businessId}/offer_${offerId}.${ext}`;
 
   const { error: uploadError } = await supabase.storage
-    .from('avatars')
+    .from(BUCKET)
     .upload(path, file, { upsert: true, contentType: file.type });
 
   if (uploadError) {
@@ -74,7 +89,7 @@ export async function uploadOfferPhoto(
     return { url: null, error: `Upload failed: ${uploadError.message}` };
   }
 
-  const { data } = supabase.storage.from('avatars').getPublicUrl(path);
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   const url = `${data.publicUrl}?t=${Date.now()}`;
 
   const { error: updateError } = await supabase
