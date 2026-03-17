@@ -20,7 +20,7 @@ function loadGoogleMaps(): Promise<void> {
     if (!window._gmapsCallbacks) {
       window._gmapsCallbacks = [];
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-      if (!apiKey) {
+      if (!apiKey || !/^AIza[a-zA-Z0-9_-]{31,}$/.test(apiKey)) {
         resolve();
         return;
       }

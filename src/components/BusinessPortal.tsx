@@ -271,7 +271,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
           </button>
         </div>
       )}
-      <div className="relative mx-auto" style={{ maxWidth: '280px' }}>
+      <div className="relative mx-auto w-full" style={{ maxWidth: 'min(280px, calc(100vw - 40px))' }}>
         {/* Always render the div so html5-qrcode can find it */}
         <div
           ref={regionRef}

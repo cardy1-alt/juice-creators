@@ -32,10 +32,10 @@
 
 ## Low Severity
 
-- [ ] **#19** QR scanner not mobile-responsive (`src/components/BusinessPortal.tsx:177-250`)
+- [x] **#19** QR scanner not mobile-responsive — Use responsive `min(280px, calc(100vw - 40px))` max-width (`src/components/BusinessPortal.tsx`)
 - [x] **#20** `creator.level` referenced but not in select query — Added `level` and `level_name` to Creator interface (`src/components/AdminDashboard.tsx`)
-- [ ] **#21** Leaderboard position uses O(n) indexOf on every render (`src/components/CreatorApp.tsx:1141-1152`)
-- [ ] **#22** localStorage stores app data in plain text — XSS risk (`AuthContext:81-92`, `CreatorApp:193-255`)
-- [ ] **#23** Missing validation on Google Maps API key (`src/components/Auth.tsx:22-26`)
+- [x] **#21** Leaderboard position uses O(n) indexOf on every render — Replaced with single `findIndex` pass (`src/components/CreatorApp.tsx`)
+- [x] **#22** localStorage stores app data in plain text — XSS risk — Added type validation for parsed JSON (`src/components/CreatorApp.tsx`)
+- [x] **#23** Missing validation on Google Maps API key — Added format regex validation (`src/components/Auth.tsx`)
 - [x] **#24** Data mutation: direct reference instead of spread — Now spreads data before setting state (`src/components/AdminDashboard.tsx`)
 - [x] **#25** Unused import: QRCodeDisplay — _(false positive, QRCodeDisplay IS used at line 1524)_
