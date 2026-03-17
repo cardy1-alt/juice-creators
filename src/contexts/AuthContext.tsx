@@ -255,6 +255,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           approved: false
         };
         if (additionalData.dateOfBirth) insertPayload.date_of_birth = additionalData.dateOfBirth;
+        if (additionalData.address) {
+          insertPayload.address = additionalData.address;
+          insertPayload.latitude = additionalData.latitude;
+          insertPayload.longitude = additionalData.longitude;
+        }
         console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
 
         const { error: insertError } = await supabase.from('creators').insert(insertPayload);
@@ -278,6 +283,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           follower_count: additionalData.followerCount || null,
           code: additionalData.code,
           date_of_birth: additionalData.dateOfBirth || null,
+          address: additionalData.address || null,
+          latitude: additionalData.latitude || null,
+          longitude: additionalData.longitude || null,
           approved: false,
           onboarding_complete: false
         });
