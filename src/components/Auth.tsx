@@ -59,8 +59,8 @@ function AddressAutocomplete({ value, onChange }: {
     if (!mapsReady || !containerRef.current || elementRef.current) return;
 
     const autocomplete = new window.google.maps.places.PlaceAutocompleteElement({
-      componentRestrictions: { country: 'gb' },
-      types: ['geocode'],
+      includedRegionCodes: ['gb'],
+      includedPrimaryTypes: ['geocode'],
     });
     elementRef.current = autocomplete;
 
