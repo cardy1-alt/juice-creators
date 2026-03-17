@@ -42,43 +42,70 @@ function AddressAutocomplete({ value, onChange }: {
   value: string;
   onChange: (address: string, lat: number | null, lng: number | null) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [mapsReady, setMapsReady] = useState(false);
+  const elementRef = useRef<any>(null);
 
   useEffect(() => {
-    loadGoogleMaps().then(() => {
-      if (window.google?.maps?.places) setMapsReady(true);
+    loadGoogleMaps().then(async () => {
+      if (window.google?.maps) {
+        await window.google.maps.importLibrary('places');
+        setMapsReady(true);
+      }
     });
   }, []);
 
   useEffect(() => {
-    if (!mapsReady || !inputRef.current) return;
-    const autocomplete = new window.google.maps.places.Autocomplete(inputRef.current, {
-      types: ['establishment', 'geocode'],
+    if (!mapsReady || !containerRef.current || elementRef.current) return;
+
+    const autocomplete = new window.google.maps.places.PlaceAutocompleteElement({
+      types: ['geocode'],
     });
-    autocomplete.addListener('place_changed', () => {
-      const place = autocomplete.getPlace();
-      const lat = place.geometry?.location?.lat() ?? null;
-      const lng = place.geometry?.location?.lng() ?? null;
-      onChange(place.formatted_address || place.name || '', lat, lng);
+    elementRef.current = autocomplete;
+
+    // Style the Google-provided input to match our design
+    const style = document.createElement('style');
+    style.textContent = `
+      .pac-container {
+        font-family: inherit;
+      }
+    `;
+    containerRef.current.appendChild(style);
+    containerRef.current.appendChild(autocomplete);
+
+    autocomplete.addEventListener('gmp-select', async (e: any) => {
+      const place = e.placePrediction.toPlace();
+      await place.fetchFields({ fields: ['formattedAddress', 'location'] });
+      const loc = place.location;
+      const lat = loc ? loc.lat() : null;
+      const lng = loc ? loc.lng() : null;
+      onChange(place.formattedAddress || '', lat, lng);
     });
   }, [mapsReady]);
+
+  // Fallback: plain text input when Google Maps isn't available
+  if (!mapsReady) {
+    return (
+      <div>
+        <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
+        <div className="relative">
+          <MapPin className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value, null, null)}
+            placeholder="Enter your address"
+            className="w-full pl-[40px] pr-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all"
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
       <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
-      <div className="relative">
-        <MapPin className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
-        <input
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value, null, null)}
-          placeholder={mapsReady ? 'Start typing to search...' : 'Enter your address'}
-          className="w-full pl-[40px] pr-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all"
-          required
-        />
-      </div>
+      <div ref={containerRef} className="address-autocomplete-wrapper rounded-[14px] bg-[#F7F7F7] focus-within:ring-2 focus-within:ring-[var(--terra-ring)] focus-within:bg-white transition-all [&_input]:w-full [&_input]:px-[14px] [&_input]:py-[14px] [&_input]:bg-transparent [&_input]:text-[14px] [&_input]:text-[#222222] [&_input]:placeholder:text-[var(--soft)] [&_input]:focus:outline-none [&_input]:border-none" />
     </div>
   );
 }
