@@ -74,7 +74,7 @@ function AddressAutocomplete({ value, onChange }: {
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value, null, null)}
-          placeholder={mapsReady ? 'Start typing to search...' : 'Enter your business address'}
+          placeholder={mapsReady ? 'Start typing to search...' : 'Enter your address'}
           className="w-full pl-[40px] pr-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all"
           required
         />
