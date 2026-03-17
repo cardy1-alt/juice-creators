@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Camera, Gift, Sparkles, Tag, Star, Minus, Plus, CheckCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
-import { CATEGORY_LIST, CategoryIcon, getCategoryGradient } from '../lib/categories';
+import { CategoryIcon, getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { Logo } from './Logo';
 
@@ -57,9 +57,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [animKey, setAnimKey] = useState(0);
 
-  // Screen 3 state
-  const [bizName, setBizName] = useState(profile.name || '');
-  const [category, setCategory] = useState(profile.category || '');
+  // Screen 3 state — only collects fields NOT already gathered at signup
   const [instagram, setInstagram] = useState(profile.instagram_handle || '');
   const [logoUrl, setLogoUrl] = useState<string | null>(profile.logo_url || null);
   const [logoUploading, setLogoUploading] = useState(false);
@@ -109,11 +107,11 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         ? `${discountAmount}${discountUnit} off`
         : `Free ${offerItem}`;
 
-      // Update business profile
+      // Update business profile — only new fields (name & category already set at signup)
       await supabase.from('businesses').update({
-        name: bizName,
-        category,
         instagram_handle: instagram || null,
+        logo_url: logoUrl || null,
+        onboarding_complete: true,
       }).eq('id', profile.id);
 
       // Deactivate any existing offers
@@ -131,9 +129,6 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         content_type: 'reel',
       });
       if (offerError) throw offerError;
-
-      // Mark onboarding complete via localStorage (migration-safe)
-      localStorage.setItem(`onboarding_complete_${profile.id}`, 'true');
 
       goForward(); // go to screen 5 (success)
     } catch (err: any) {
@@ -166,9 +161,6 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
     { key: 'discount', label: 'Discount', icon: Tag, sub: '% off or £ off' },
     { key: 'experience', label: 'Experience', icon: Star, sub: 'Tasting, tour, event' },
   ];
-
-  // Only show "Cafe & Coffee" if not already covered by Food & Drink
-  const onboardingCategories = CATEGORY_LIST.filter(c => c !== 'Cafe & Coffee');
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col">
@@ -297,7 +289,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
           </div>
         )}
 
-        {/* ═══ SCREEN 3 — BUSINESS PROFILE ═══ */}
+        {/* ═══ SCREEN 3 — BUSINESS PROFILE (logo + Instagram only; name & category already collected at signup) ═══ */}
         {screen === 3 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
@@ -305,9 +297,9 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                 className="text-[24px] font-extrabold text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
-                Tell us about your business
+                Polish your profile
               </h1>
-              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[28px]">Creators will see this when they discover your offer</p>
+              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[28px]">Add a logo and Instagram so creators can find you</p>
 
               {/* Logo upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -318,13 +310,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                 >
                   <div
                     className="w-[80px] h-[80px] rounded-[16px] flex items-center justify-center overflow-hidden"
-                    style={{ background: logoUrl ? undefined : getCategoryGradient(category || 'Food & Drink') }}
+                    style={{ background: logoUrl ? undefined : getCategoryGradient(profile.category || 'Food & Drink') }}
                   >
                     {logoUrl ? (
                       <img src={logoUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-[28px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {getInitials(bizName || 'B')}
+                        {getInitials(profile.name || 'B')}
                       </span>
                     )}
                   </div>
@@ -347,59 +339,17 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                 </p>
               </div>
 
-              {/* Fields */}
-              <div className="flex flex-col gap-[14px]">
-                {/* Business name */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Business name</label>
-                  <input
-                    type="text"
-                    value={bizName}
-                    onChange={e => setBizName(e.target.value)}
-                    placeholder="Your business name"
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  />
-                </div>
-
-                {/* Category */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[10px]">What type of business?</label>
-                  <div className="grid grid-cols-2 gap-[8px]">
-                    {onboardingCategories.map(cat => (
-                      <button
-                        key={cat}
-                        type="button"
-                        onClick={() => setCategory(cat)}
-                        className="flex flex-col items-center gap-[6px] px-[12px] py-[12px] rounded-[14px] text-center transition-all"
-                        style={{
-                          background: category === cat ? 'rgba(196,103,74,0.04)' : 'var(--bg)',
-                          border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid transparent',
-                        }}
-                      >
-                        <CategoryIcon
-                          category={cat}
-                          className={`w-[20px] h-[20px] ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}
-                        />
-                        <span className={`text-[12px] font-semibold ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}>
-                          {cat}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Instagram */}
-                <div>
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
-                  <input
-                    type="text"
-                    value={instagram}
-                    onChange={e => setInstagram(e.target.value)}
-                    placeholder="@yourbusiness"
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  />
-                  <p className="text-[12px] text-[var(--soft)] mt-[4px]">Add later</p>
-                </div>
+              {/* Instagram */}
+              <div>
+                <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
+                <input
+                  type="text"
+                  value={instagram}
+                  onChange={e => setInstagram(e.target.value)}
+                  placeholder="@yourbusiness"
+                  className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                />
+                <p className="text-[12px] text-[var(--soft)] mt-[4px]">Optional — add later if you prefer</p>
               </div>
             </div>
 
@@ -407,12 +357,11 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
 
             <button
               onClick={goForward}
-              disabled={!bizName.trim() || !category}
               className="w-full py-[16px] rounded-[50px] text-[15px] font-bold min-h-[52px] transition-all"
               style={{
-                background: bizName.trim() && category ? 'var(--terra)' : 'var(--bg)',
-                color: bizName.trim() && category ? 'white' : 'var(--soft)',
-                boxShadow: bizName.trim() && category ? '0 4px 16px rgba(196,103,74,0.25)' : 'none',
+                background: 'var(--terra)',
+                color: 'white',
+                boxShadow: '0 4px 16px rgba(196,103,74,0.25)',
               }}
             >
               Looking good →
@@ -468,14 +417,14 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                       type="text"
                       value={offerItem}
                       onChange={e => setOfferItem(e.target.value.slice(0, 60))}
-                      placeholder={getCategoryPlaceholder(category, offerType)}
+                      placeholder={getCategoryPlaceholder(profile.category, offerType)}
                       className="flex-1 text-[20px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
                       autoFocus
                     />
                   </div>
                   <p className="text-[11px] text-[var(--soft)] text-right">{offerItem.length}/60</p>
                   <p className="text-[13px] text-[var(--mid)] mt-[4px]">
-                    Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(category, offerType)}</span>
+                    Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(profile.category, offerType)}</span>
                   </p>
                 </div>
               )}
@@ -641,9 +590,9 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
             >
               <div
                 className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0"
-                style={{ background: getCategoryGradient(category) }}
+                style={{ background: getCategoryGradient(profile.category) }}
               >
-                <CategoryIcon category={category} className="w-[18px] h-[18px] text-white" />
+                <CategoryIcon category={profile.category} className="w-[18px] h-[18px] text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>

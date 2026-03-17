@@ -968,9 +968,7 @@ function timeAgo(dateStr: string): string {
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    if (userProfile?.onboarding_complete) return false;
-    if (localStorage.getItem(`onboarding_complete_${userProfile?.id}`)) return false;
-    return true;
+    return !userProfile?.onboarding_complete;
   });
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
