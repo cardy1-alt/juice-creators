@@ -432,7 +432,8 @@ export default function CreatorApp() {
     }
 
     if (data) {
-      const newClaims = data as Claim[];
+      // Filter out claims with missing join data to prevent render crashes
+      const newClaims = (data as Claim[]).filter(c => c.businesses && c.offers);
       // Detect newly redeemed claims to show confirmation toast
       for (const claim of newClaims) {
         const prev = prevClaimStatusesRef.current[claim.id];
@@ -1049,7 +1050,7 @@ export default function CreatorApp() {
               </div>
 
               {/* Active Claim Banner */}
-              {activeClaims.length > 0 && (() => {
+              {activeClaims.length > 0 && activeClaims[0].businesses && (() => {
                 const firstActive = activeClaims[0];
                 const claimedTime = new Date(firstActive.claimed_at).getTime();
                 const now = new Date().getTime();
@@ -1350,14 +1351,16 @@ export default function CreatorApp() {
           )}
 
           {/* -- SAVED TAB -- */}
-          {view === 'saved' && (
+          {view === 'saved' && (() => {
+            const matchedSaved = offers.filter(o => savedOffers.has(o.id));
+            return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
                 <h1 className="text-[26px] font-extrabold text-[#222222]">Saved</h1>
-                <span className="text-[13px] text-[var(--mid)]">{savedOffers.size} saved</span>
+                <span className="text-[13px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
-              {savedOffers.size === 0 ? (
+              {matchedSaved.length === 0 ? (
                 <div className="text-center py-20">
                   <Heart className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
                   <p className="text-[16px] font-semibold text-[#222222]">Nothing saved yet</p>
@@ -1365,7 +1368,7 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[14px]">
-                  {offers.filter(o => savedOffers.has(o.id)).map(offer => {
+                  {matchedSaved.map(offer => {
                     const isUnlimited = offer.monthly_cap === null;
                     const slotsUsed = offer.slotsUsed || 0;
                     const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
@@ -1407,7 +1410,8 @@ export default function CreatorApp() {
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* -- ACTIVE PASSES -- */}
           {view === 'active' && (
@@ -1428,7 +1432,7 @@ export default function CreatorApp() {
                 <div>
                   {/* Pill tab strip */}
                   <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none' }}>
-                    {activeClaims.map(claim => {
+                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
                       const isSelected = selectedClaim?.id === claim.id;
                       return (
                         <button
@@ -1468,7 +1472,7 @@ export default function CreatorApp() {
                       }
                     }}
                   >
-                    {activeClaims.map(claim => {
+                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
                       const currentStage = claim.reel_url
                         ? 'submitted'
                         : claim.redeemed_at
@@ -1675,7 +1679,7 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[14px]">
-                  {claims.map((claim) => (
+                  {claims.filter(c => c.businesses && c.offers).map((claim) => (
                     <button
                       key={claim.id}
                       onClick={() => {
