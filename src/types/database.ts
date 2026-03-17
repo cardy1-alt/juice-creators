@@ -82,6 +82,9 @@ export type Database = {
           approved: boolean;
           onboarding_complete: boolean;
           avatar_url: string | null;
+          address: string | null;
+          latitude: number | null;
+          longitude: number | null;
           created_at: string;
           level: number;
           level_name: string;
@@ -104,6 +107,9 @@ export type Database = {
           approved?: boolean;
           onboarding_complete?: boolean;
           avatar_url?: string | null;
+          address?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           created_at?: string;
           level?: number;
           level_name?: string;
@@ -126,6 +132,9 @@ export type Database = {
           approved?: boolean;
           onboarding_complete?: boolean;
           avatar_url?: string | null;
+          address?: string | null;
+          latitude?: number | null;
+          longitude?: number | null;
           created_at?: string;
           level?: number;
           level_name?: string;

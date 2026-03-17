@@ -195,7 +195,7 @@ export default function Auth() {
         await signIn(email, password);
       } else {
         const additionalData = role === 'creator'
-          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null }
+          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude }
           : { name, slug: generateSlug(name), category, address: address || null, latitude, longitude, bio: bio || null };
         await signUp(email, password, role, additionalData);
       }
@@ -449,6 +449,12 @@ export default function Auth() {
                   </div>
                   <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
                 </div>
+
+                {/* Address for local offer matching */}
+                <AddressAutocomplete
+                  value={address}
+                  onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
+                />
 
                 <div className="pt-[4px]" />
                 <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
