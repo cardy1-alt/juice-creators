@@ -153,7 +153,10 @@ export default function CreatorApp() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
   const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
-  const [profileSubView, setProfileSubView] = useState<'main' | 'alerts'>('main');
+  const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
+  const [editName, setEditName] = useState('');
+  const [editHandle, setEditHandle] = useState('');
+  const [editSaving, setEditSaving] = useState(false);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [reelUrl, setReelUrl] = useState('');
   const [loading, setLoading] = useState(false);
@@ -429,7 +432,8 @@ export default function CreatorApp() {
     }
 
     if (data) {
-      const newClaims = data as Claim[];
+      // Filter out claims with missing join data to prevent render crashes
+      const newClaims = (data as Claim[]).filter(c => c.businesses && c.offers);
       // Detect newly redeemed claims to show confirmation toast
       for (const claim of newClaims) {
         const prev = prevClaimStatusesRef.current[claim.id];
@@ -1012,12 +1016,12 @@ export default function CreatorApp() {
                     className="w-full bg-transparent text-[15px] font-semibold text-[#222222] placeholder:text-[#222222] focus:outline-none"
                     style={{ minHeight: '24px' }}
                   />
-                  <button
+                  <div
                     className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0"
                     style={{ border: '1px solid rgba(34,34,34,0.15)' }}
                   >
                     <SlidersHorizontal className="w-[12px] h-[12px] text-[#222222]" />
-                  </button>
+                  </div>
                 </div>
               </div>
 
@@ -1046,7 +1050,7 @@ export default function CreatorApp() {
               </div>
 
               {/* Active Claim Banner */}
-              {activeClaims.length > 0 && (() => {
+              {activeClaims.length > 0 && activeClaims[0].businesses && (() => {
                 const firstActive = activeClaims[0];
                 const claimedTime = new Date(firstActive.claimed_at).getTime();
                 const now = new Date().getTime();
@@ -1094,7 +1098,7 @@ export default function CreatorApp() {
                     Your streak ends in {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate()} days — claim an offer to keep it
                   </p>
                   <button
-                    onClick={() => { /* scroll to offers section */ }}
+                    onClick={() => setView('offers')}
                     className="text-[12px] font-semibold text-[var(--terra)] whitespace-nowrap"
                   >
                     Browse →
@@ -1170,12 +1174,6 @@ export default function CreatorApp() {
               {/* Section Header */}
               <div className="flex items-center justify-between px-[20px] mt-4 mb-[14px]">
                 <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">Near you</h2>
-                <button
-                  className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
-                  style={{ border: '1px solid rgba(34,34,34,0.15)' }}
-                >
-                  <ChevronRight className="w-[12px] h-[12px] text-[#222222]" />
-                </button>
               </div>
 
               {offers.length === 0 ? (
@@ -1339,12 +1337,6 @@ export default function CreatorApp() {
                     {/* Second section */}
                     <div className="flex items-center justify-between px-[20px] mt-2 mb-[14px]">
                       <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">New this week</h2>
-                      <button
-                        className="w-[30px] h-[30px] rounded-full flex items-center justify-center"
-                        style={{ border: '1px solid rgba(34,34,34,0.15)' }}
-                      >
-                        <ChevronRight className="w-[12px] h-[12px] text-[#222222]" />
-                      </button>
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">
@@ -1359,14 +1351,16 @@ export default function CreatorApp() {
           )}
 
           {/* -- SAVED TAB -- */}
-          {view === 'saved' && (
+          {view === 'saved' && (() => {
+            const matchedSaved = offers.filter(o => savedOffers.has(o.id));
+            return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
                 <h1 className="text-[26px] font-extrabold text-[#222222]">Saved</h1>
-                <span className="text-[13px] text-[var(--mid)]">{savedOffers.size} saved</span>
+                <span className="text-[13px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
-              {savedOffers.size === 0 ? (
+              {matchedSaved.length === 0 ? (
                 <div className="text-center py-20">
                   <Heart className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
                   <p className="text-[16px] font-semibold text-[#222222]">Nothing saved yet</p>
@@ -1374,7 +1368,7 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[14px]">
-                  {offers.filter(o => savedOffers.has(o.id)).map(offer => {
+                  {matchedSaved.map(offer => {
                     const isUnlimited = offer.monthly_cap === null;
                     const slotsUsed = offer.slotsUsed || 0;
                     const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
@@ -1416,7 +1410,8 @@ export default function CreatorApp() {
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {/* -- ACTIVE PASSES -- */}
           {view === 'active' && (
@@ -1437,7 +1432,7 @@ export default function CreatorApp() {
                 <div>
                   {/* Pill tab strip */}
                   <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none' }}>
-                    {activeClaims.map(claim => {
+                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
                       const isSelected = selectedClaim?.id === claim.id;
                       return (
                         <button
@@ -1477,7 +1472,7 @@ export default function CreatorApp() {
                       }
                     }}
                   >
-                    {activeClaims.map(claim => {
+                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
                       const currentStage = claim.reel_url
                         ? 'submitted'
                         : claim.redeemed_at
@@ -1684,7 +1679,7 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[14px]">
-                  {claims.map((claim) => (
+                  {claims.filter(c => c.businesses && c.offers).map((claim) => (
                     <button
                       key={claim.id}
                       onClick={() => {
@@ -1910,7 +1905,10 @@ export default function CreatorApp() {
 
                   {/* ═══ Settings ═══ */}
                   <div className="mt-[8px]">
-                    <button className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left">
+                    <button
+                      onClick={() => { setEditName(userProfile.name || ''); setEditHandle(userProfile.instagram_handle || ''); setProfileSubView('edit'); }}
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
+                    >
                       <div className="flex items-center gap-[12px]">
                         <User className="w-[20px] h-[20px] text-[var(--mid)]" />
                         <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
@@ -1941,7 +1939,7 @@ export default function CreatorApp() {
                     </button>
                   </div>
                 </>
-              ) : (
+              ) : profileSubView === 'alerts' ? (
                 /* Alerts/Notifications sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
@@ -1978,6 +1976,53 @@ export default function CreatorApp() {
                       ))}
                     </div>
                   )}
+                </>
+              ) : (
+                /* Edit Profile sub-view */
+                <>
+                  <div className="flex items-center gap-3 mb-5">
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    </button>
+                    <h1 className="text-[26px] font-extrabold text-[#222222]">Edit profile</h1>
+                  </div>
+                  <div className="space-y-[16px]">
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[var(--mid)] mb-[6px]">Name</label>
+                      <input
+                        type="text"
+                        value={editName}
+                        onChange={(e) => setEditName(e.target.value)}
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[#222222] focus:outline-none focus:border-[var(--terra)]"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-semibold text-[var(--mid)] mb-[6px]">Instagram handle</label>
+                      <input
+                        type="text"
+                        value={editHandle}
+                        onChange={(e) => setEditHandle(e.target.value)}
+                        placeholder="@yourhandle"
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[#222222] focus:outline-none focus:border-[var(--terra)]"
+                      />
+                    </div>
+                    <button
+                      disabled={editSaving || !editName.trim()}
+                      onClick={async () => {
+                        setEditSaving(true);
+                        await supabase.from('creators').update({
+                          name: editName.trim(),
+                          instagram_handle: editHandle.trim() || null,
+                        }).eq('id', userProfile.id);
+                        setEditSaving(false);
+                        setProfileSubView('main');
+                        window.location.reload();
+                      }}
+                      className="w-full py-[14px] rounded-[50px] bg-[var(--terra)] text-white text-[15px] font-semibold disabled:opacity-50"
+                    >
+                      {editSaving ? 'Saving...' : 'Save changes'}
+                    </button>
+                  </div>
                 </>
               )}
             </div>
