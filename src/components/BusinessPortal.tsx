@@ -16,7 +16,7 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
-import { uploadAvatar } from '../lib/upload';
+import { uploadAvatar, uploadOfferPhoto } from '../lib/upload';
 import { Logo } from './Logo';
 
 interface Offer {
@@ -1012,6 +1012,8 @@ export default function BusinessPortal() {
   const [nearbyBusinesses, setNearbyBusinesses] = useState<{ id: string; name: string; category: string; logo_url: string | null; address: string | null; bio: string | null; offer_count: number; claim_count: number; creator_count: number; latest_claim_at: string | null }[]>([]);
   const [expandedNearbyBiz, setExpandedNearbyBiz] = useState<string | null>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
+  const offerPhotoInputRef = useRef<HTMLInputElement>(null);
+  const [offerPhotoUploading, setOfferPhotoUploading] = useState(false);
 
   // Clean redeem param from URL after reading it
   useEffect(() => {
@@ -1187,6 +1189,27 @@ export default function BusinessPortal() {
       fetchOffers();
     } catch (err: any) {
       console.error('Failed to toggle offer:', err.message);
+    }
+  };
+
+  const handleOfferPhotoUpload = async (file: File, offerId: string) => {
+    setOfferPhotoUploading(true);
+    try {
+      const { url, error } = await uploadOfferPhoto(file, offerId, userProfile.id);
+      if (error) {
+        console.error('Offer photo upload error:', error);
+        return;
+      }
+      if (url) {
+        setOffers(prev => prev.map(o => o.id === offerId ? { ...o, offer_photo_url: url } : o));
+        if (selectedOffer?.id === offerId) {
+          setSelectedOffer(prev => prev ? { ...prev, offer_photo_url: url } : null);
+        }
+      }
+    } catch (err: any) {
+      console.error('Offer photo upload failed:', err.message);
+    } finally {
+      setOfferPhotoUploading(false);
     }
   };
 
@@ -1575,17 +1598,33 @@ export default function BusinessPortal() {
                   const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
                     <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                      {/* Hidden file input for offer photo */}
+                      <input
+                        ref={offerPhotoInputRef}
+                        type="file"
+                        accept="image/jpeg,image/png,image/webp"
+                        className="hidden"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file && activeOffer) await handleOfferPhotoUpload(file, activeOffer.id);
+                          e.target.value = '';
+                        }}
+                      />
                       {/* Top image strip */}
                       <div className="relative h-[100px]">
                         {activeOffer.offer_photo_url ? (
-                          <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                          <img
+                            src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover cursor-pointer"
+                            onClick={() => offerPhotoInputRef.current?.click()}
+                          />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
                             <button
-                              onClick={() => { openOfferDetail(activeOffer); setView('offers'); }}
+                              onClick={() => offerPhotoInputRef.current?.click()}
+                              disabled={offerPhotoUploading}
                               className="px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
                             >
-                              <Camera className="w-[13px] h-[13px]" /> Add offer photo
+                              <Camera className="w-[13px] h-[13px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
                             </button>
                           </div>
                         )}
@@ -1858,14 +1897,18 @@ export default function BusinessPortal() {
                       <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
                         <div className="relative h-[120px]">
                           {activeOffer.offer_photo_url ? (
-                            <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                            <img
+                              src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover cursor-pointer"
+                              onClick={() => offerPhotoInputRef.current?.click()}
+                            />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
                               <button
-                                onClick={() => openOfferDetail(activeOffer)}
+                                onClick={() => offerPhotoInputRef.current?.click()}
+                                disabled={offerPhotoUploading}
                                 className="px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
                               >
-                                <Camera className="w-[13px] h-[13px]" /> Add offer photo
+                                <Camera className="w-[13px] h-[13px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
                               </button>
                             </div>
                           )}
