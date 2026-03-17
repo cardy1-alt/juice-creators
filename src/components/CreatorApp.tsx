@@ -699,7 +699,7 @@ export default function CreatorApp() {
     <div className="h-[100dvh] flex flex-col bg-white">
       {showOnboarding && (
         <CreatorOnboarding
-          creatorId={userProfile.id}
+          profile={userProfile}
           onComplete={() => setShowOnboarding(false)}
         />
       )}
