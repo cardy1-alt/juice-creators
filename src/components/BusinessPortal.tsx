@@ -2136,30 +2136,15 @@ export default function BusinessPortal() {
 
               {/* Onboarding banner */}
               {!claimsOnboardingDismissed && claims.length <= 5 && (
-                <div className="rounded-[14px] border border-[var(--faint)] bg-[#FAFAF8] p-[14px] mb-[14px]">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-start gap-[10px]">
-                      <div className="w-[32px] h-[32px] rounded-full bg-[var(--terra-10)] flex items-center justify-center flex-shrink-0 mt-[2px]">
-                        <Lightbulb className="w-[16px] h-[16px] text-[var(--terra)]" />
-                      </div>
-                      <div>
-                        <p className="text-[13px] font-bold text-[#222222] mb-[4px]">How claims work</p>
-                        <div className="flex flex-wrap items-center gap-[4px] text-[12px] text-[var(--mid)]">
-                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><Gift className="w-3 h-3" /> Creator claims</span>
-                          <ArrowRight className="w-3 h-3 text-[var(--soft)]" />
-                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><ScanLine className="w-3 h-3" /> You scan QR</span>
-                          <ArrowRight className="w-3 h-3 text-[var(--soft)]" />
-                          <span className="inline-flex items-center gap-1 bg-white border border-[var(--faint)] rounded-full px-[8px] py-[2px]"><Video className="w-3 h-3" /> They post reel</span>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => { setClaimsOnboardingDismissed(true); localStorage.setItem('nayba_biz_claims_onboarding', 'true'); }}
-                      className="flex-shrink-0 w-[24px] h-[24px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
-                    >
-                      <X className="w-[14px] h-[14px] text-[var(--soft)]" />
-                    </button>
-                  </div>
+                <div className="flex items-center gap-[10px] rounded-[12px] bg-[#FAFAF8] border border-[var(--faint)] px-[14px] py-[11px] mb-[14px]">
+                  <Lightbulb className="w-[15px] h-[15px] text-[var(--terra)] flex-shrink-0" />
+                  <p className="text-[12px] text-[var(--mid)] flex-1">Creator claims offer → you scan their QR → they post a reel</p>
+                  <button
+                    onClick={() => { setClaimsOnboardingDismissed(true); localStorage.setItem('nayba_biz_claims_onboarding', 'true'); }}
+                    className="flex-shrink-0 w-[22px] h-[22px] rounded-full flex items-center justify-center hover:bg-[var(--bg)] transition-colors"
+                  >
+                    <X className="w-[13px] h-[13px] text-[var(--soft)]" />
+                  </button>
                 </div>
               )}
 
