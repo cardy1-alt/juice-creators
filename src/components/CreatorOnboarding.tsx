@@ -13,10 +13,6 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
   const [offerCount, setOfferCount] = useState(0);
   const [completing, setCompleting] = useState(false);
 
-  useEffect(() => {
-    fetchStats();
-  }, []);
-
   const fetchStats = async () => {
     const { count: bCount } = await supabase
       .from('businesses')
@@ -31,6 +27,18 @@ export default function CreatorOnboarding({ creatorId, onComplete }: CreatorOnbo
     setBusinessCount(bCount || 0);
     setOfferCount(oCount || 0);
   };
+
+  useEffect(() => {
+    fetchStats();
+
+    const channel = supabase
+      .channel('onboarding-stats')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'businesses' }, () => { fetchStats(); })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'offers' }, () => { fetchStats(); })
+      .subscribe();
+
+    return () => { supabase.removeChannel(channel); };
+  }, []);
 
   const handleComplete = async () => {
     if (completing) return;

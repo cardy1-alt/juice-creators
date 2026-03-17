@@ -191,7 +191,10 @@ export default function CreatorApp() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('nayba_saved_offers');
-      if (saved) setSavedOffers(new Set(JSON.parse(saved)));
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed)) setSavedOffers(new Set(parsed.filter((v): v is string => typeof v === 'string')));
+      }
     } catch {}
   }, []);
 
@@ -506,7 +509,7 @@ export default function CreatorApp() {
     try {
       const { error } = await supabase
         .from('claims')
-        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString() })
+        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString(), status: 'completed' })
         .eq('id', selectedClaim.id);
       if (error) throw error;
 
@@ -1150,8 +1153,8 @@ export default function CreatorApp() {
                   })}
                   {/* Your position if not in top 5 */}
                   {!leaderboard.slice(0, 5).some(e => e.id === userProfile.id) && (() => {
-                    const myEntry = leaderboard.find(e => e.id === userProfile.id);
-                    const myIdx = myEntry ? leaderboard.indexOf(myEntry) : -1;
+                    const myIdx = leaderboard.findIndex(e => e.id === userProfile.id);
+                    const myEntry = myIdx >= 0 ? leaderboard[myIdx] : null;
                     if (myIdx < 0 && (userProfile.total_reels || 0) === 0) return null;
                     return (
                       <div className="pt-2 mt-1 border-t border-[var(--faint)]">
@@ -1175,7 +1178,12 @@ export default function CreatorApp() {
                 </button>
               </div>
 
-              {(() => {
+              {offers.length === 0 ? (
+                <div className="text-center py-16 px-6">
+                  <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
+                  <p className="text-[var(--soft)] text-[13px]">New offers from local businesses will appear here. Check back soon!</p>
+                </div>
+              ) : (() => {
                 const filteredOffers = offers
                   .filter(o => {
                     let matchesCategory = true;
