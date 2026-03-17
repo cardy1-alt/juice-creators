@@ -1398,13 +1398,14 @@ export default function BusinessPortal() {
   const liveOffers = offers.filter(o => o.is_live);
   const activeOffer = liveOffers[0] || null;
 
-  // Filter pill counts
+  // Filter pill counts (respect creatorFilter when active)
+  const countBase = creatorFilter ? claims.filter(c => c.creator_id === creatorFilter) : claims;
   const filterCounts: Record<string, number> = {
-    all: claims.length,
-    active: claims.filter(c => c.status === 'active').length,
-    redeemed: claims.filter(c => c.status === 'redeemed').length,
-    reel_due: claims.filter(c => c.status === 'reel_due').length,
-    completed: claims.filter(c => c.status === 'completed').length,
+    all: countBase.length,
+    active: countBase.filter(c => c.status === 'active').length,
+    redeemed: countBase.filter(c => c.status === 'redeemed').length,
+    reel_due: countBase.filter(c => c.status === 'reel_due').length,
+    completed: countBase.filter(c => c.status === 'completed').length,
   };
 
   return (
@@ -2125,7 +2126,7 @@ export default function BusinessPortal() {
               </div>
 
               {/* Filter row — pill style */}
-              <div className="flex gap-[8px] flex-wrap mb-[20px]">
+              <div className="flex gap-[8px] overflow-x-auto mb-[20px] pb-[4px] -mx-[4px] px-[4px]" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'active', label: 'Active' },
@@ -2133,7 +2134,7 @@ export default function BusinessPortal() {
                   { key: 'reel_due', label: 'Reel due' },
                   { key: 'completed', label: 'Done' },
                 ].map(f => {
-                  const count = f.key === 'all' ? claims.length : (filterCounts[f.key] || 0);
+                  const count = filterCounts[f.key] || 0;
                   const isSelected = claimsFilter === f.key;
                   return (
                     <button
