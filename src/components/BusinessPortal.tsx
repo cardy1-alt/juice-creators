@@ -2125,8 +2125,8 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* Filter row — pill style */}
-              <div className="flex gap-[8px] flex-wrap mb-[20px]">
+              {/* Filter pills */}
+              <div className="flex gap-[6px] mb-[20px]">
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'active', label: 'Active' },
@@ -2138,12 +2138,13 @@ export default function BusinessPortal() {
                   const isSelected = claimsFilter === f.key;
                   return (
                     <button
+                      type="button"
                       key={f.key}
                       onClick={() => setClaimsFilter(f.key)}
-                      className={`px-[14px] py-[7px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
+                      className={`px-[10px] py-[6px] rounded-[50px] text-[12px] font-semibold whitespace-nowrap ${
                         isSelected
                           ? 'bg-[var(--terra)] text-white'
-                          : 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#ececec]'
+                          : 'bg-[var(--bg)] text-[var(--mid)]'
                       }`}
                     >
                       {f.label}{count > 0 ? ` ${count}` : ''}
@@ -2154,7 +2155,7 @@ export default function BusinessPortal() {
 
               {/* Claims list */}
               {claimsSubView === 'claims' && (
-                <>
+                <div key={claimsFilter}>
                   {filteredClaims.length === 0 && claims.length === 0 ? (
                     <div className="flex flex-col items-center py-20 px-6">
                       <div className="w-[56px] h-[56px] rounded-full bg-[var(--bg)] flex items-center justify-center mb-[16px]">
@@ -2228,7 +2229,7 @@ export default function BusinessPortal() {
                       })}
                     </div>
                   )}
-                </>
+                </div>
               )}
 
               {/* Content sub-view */}
