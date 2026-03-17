@@ -360,7 +360,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [tipDismissed, setTipDismissed] = useState(false);
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [offerPhotoUrl, setOfferPhotoUrl] = useState<string | null>(null);
-  const [minLevel, setMinLevel] = useState(1);
+
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [offerId] = useState(() => crypto.randomUUID());
@@ -393,7 +393,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
       generated_title: generatedTitle,
       content_type: 'reel',
       offer_photo_url: offerPhotoUrl,
-      min_level: minLevel,
+      min_level: 1,
     });
   };
 
@@ -679,31 +679,6 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-6">
               <Info className="w-[14px] h-[14px] text-[var(--soft)] mt-0.5 flex-shrink-0" />
               <p className="text-[12px] text-[var(--soft)]">Each creator visits in person and posts within 48 hours</p>
-            </div>
-
-            {/* Who can claim this? */}
-            <div className="mb-8">
-              <p className="text-[14px] font-bold text-[#222222] mb-3">Who can claim this?</p>
-              <div className="flex gap-2 flex-wrap">
-                {[
-                  { label: 'Everyone', value: 1 },
-                  { label: 'Level 3+', value: 3 },
-                  { label: 'Level 5+', value: 5 },
-                ].map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setMinLevel(opt.value)}
-                    className="px-[14px] py-[7px] rounded-[50px] text-[12px] font-semibold transition-all"
-                    style={{
-                      background: minLevel === opt.value ? '#222222' : 'var(--bg)',
-                      color: minLevel === opt.value ? 'white' : 'var(--mid)',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[12px] text-[var(--soft)] mt-2">Higher level creators have posted more reels and have better ratings</p>
             </div>
 
             <button
