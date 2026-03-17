@@ -1579,12 +1579,15 @@ export default function BusinessPortal() {
                       <div className="relative h-[100px]">
                         {activeOffer.offer_photo_url ? (
                           <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
-                        ) : userProfile.logo_url ? (
-                          <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
-                            <img src={userProfile.logo_url} alt="" className="w-[48px] h-[48px] rounded-[12px] object-cover" style={{ border: '2px solid rgba(255,255,255,0.3)' }} />
-                          </div>
                         ) : (
-                          <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
+                          <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
+                            <button
+                              onClick={() => { openOfferDetail(activeOffer); setView('offers'); }}
+                              className="px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
+                            >
+                              <Camera className="w-[13px] h-[13px]" /> Add offer photo
+                            </button>
+                          </div>
                         )}
                         {/* Live badge */}
                         <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
@@ -1642,13 +1645,13 @@ export default function BusinessPortal() {
                 )}
               </div>
 
-              {/* Recent creator activity — visual feed */}
+              {/* Recent creator activity — vertical list */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-[14px]">
                   <h3 className="text-[18px] font-extrabold text-[#222222]">Creator activity</h3>
                   {recentActivity.length > 0 && (
-                    <button onClick={() => setView('claims')} className="w-[28px] h-[28px] flex items-center justify-center rounded-full border border-[var(--faint)]">
-                      <ChevronRight className="w-[14px] h-[14px] text-[var(--mid)]" />
+                    <button onClick={() => setView('claims')} className="text-[13px] font-semibold text-[var(--terra)]">
+                      View all
                     </button>
                   )}
                 </div>
@@ -1658,49 +1661,34 @@ export default function BusinessPortal() {
                     <p className="text-[14px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
                   </div>
                 ) : (
-                  <div className="flex items-start gap-[12px] overflow-x-auto pb-2 -mx-5 px-5" style={{ scrollbarWidth: 'none' }}>
-                    {recentActivity.map(({ claim, count }) => {
+                  <div className="space-y-[2px]">
+                    {recentActivity.slice(0, 5).map(({ claim, count }) => {
                       const activityText = claim.status === 'completed' ? 'Posted a reel' :
                         claim.status === 'reel_due' ? 'Reel due' :
                         claim.status === 'redeemed' ? 'Visited' : 'Claimed offer';
-                      const firstName = claim.creators.name.split(' ')[0];
                       return (
                         <button
                           key={claim.id}
-                          className="w-[140px] flex-shrink-0 text-left"
+                          className="w-full flex items-center gap-[12px] py-[10px] px-[2px] text-left"
                           onClick={() => { setCreatorFilter(claim.creator_id); setClaimsFilter('all'); setView('claims'); }}
                         >
-                          <div className="relative w-[140px] h-[180px] rounded-[16px] overflow-hidden">
+                          <div className="w-[40px] h-[40px] rounded-full overflow-hidden flex-shrink-0">
                             {claim.creators.avatar_url ? (
-                              <img
-                                src={claim.creators.avatar_url}
-                                alt={claim.creators.name}
-                                className="w-full h-full object-cover"
-                              />
+                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-full h-full object-cover" />
                             ) : (
-                              <div
-                                className="w-full h-full flex items-center justify-center text-white font-bold text-[28px]"
-                                style={{ background: getCategoryGradient(userProfile.category) }}
-                              >
+                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-[14px]" style={{ background: getCategoryGradient(userProfile.category) }}>
                                 {getInitials(claim.creators.name)}
                               </div>
                             )}
-                            {/* Follower count badge top-left */}
-                            {claim.creators.follower_count && (
-                              <span className="absolute top-[8px] left-[8px] px-[8px] py-[3px] rounded-full text-[10px] font-bold bg-white/90 text-[#222222]">
-                                {claim.creators.follower_count}
-                              </span>
-                            )}
-                            {/* Name, activity + time bottom overlay */}
-                            <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[10px] pt-[30px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }}>
-                              <p className="text-[13px] font-bold text-white leading-[1.2] truncate">{firstName}</p>
-                              <p className="text-[10px] text-white/70 mt-[2px]">{activityText} · {timeAgo(claim.claimed_at)}</p>
-                            </div>
                           </div>
-                          {/* Below image — handle or claim count */}
-                          <p className="mt-[6px] text-[11px] text-[var(--soft)] truncate">
-                            {count > 1 ? `${count} claims` : claim.creators.instagram_handle}
-                          </p>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-[14px] font-semibold text-[var(--near-black)] truncate">
+                              {claim.creators.name}
+                              {claim.creators.follower_count && <span className="text-[11px] font-normal text-[var(--soft)] ml-[6px]">{claim.creators.follower_count}</span>}
+                            </p>
+                            <p className="text-[12px] text-[var(--mid)]">{activityText} · {timeAgo(claim.claimed_at)}{count > 1 ? ` · ${count} claims` : ''}</p>
+                          </div>
+                          <ChevronRight className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
                         </button>
                       );
                     })}
@@ -1872,7 +1860,14 @@ export default function BusinessPortal() {
                           {activeOffer.offer_photo_url ? (
                             <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
                           ) : (
-                            <div className="w-full h-full" style={{ background: getCategoryGradient(userProfile.category) }} />
+                            <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
+                              <button
+                                onClick={() => openOfferDetail(activeOffer)}
+                                className="px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
+                              >
+                                <Camera className="w-[13px] h-[13px]" /> Add offer photo
+                              </button>
+                            </div>
                           )}
                           <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold bg-white/90 text-[var(--forest)]">
                             <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
