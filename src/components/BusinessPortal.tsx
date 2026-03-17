@@ -2126,7 +2126,7 @@ export default function BusinessPortal() {
               </div>
 
               {/* Filter row — pill style */}
-              <div id="claims-filter-pills" className="flex gap-[8px] overflow-x-auto mb-[20px] pb-[4px] -mx-[4px] px-[4px]" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+              <div className="flex gap-[8px] flex-wrap mb-[20px]">
                 {[
                   { key: 'all', label: 'All' },
                   { key: 'active', label: 'Active' },
@@ -2140,7 +2140,7 @@ export default function BusinessPortal() {
                     <button
                       key={f.key}
                       onClick={() => setClaimsFilter(f.key)}
-                      className={`flex-shrink-0 px-[14px] py-[7px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
+                      className={`px-[14px] py-[7px] rounded-[50px] text-[13px] font-semibold whitespace-nowrap transition-all ${
                         isSelected
                           ? 'bg-[var(--terra)] text-white'
                           : 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[#ececec]'
