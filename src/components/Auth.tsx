@@ -42,63 +42,119 @@ function AddressAutocomplete({ value, onChange }: {
   value: string;
   onChange: (address: string, lat: number | null, lng: number | null) => void;
 }) {
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [query, setQuery] = useState(value);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
   const [mapsReady, setMapsReady] = useState(false);
-  const elementRef = useRef<any>(null);
+  const [focused, setFocused] = useState(false);
+  const serviceRef = useRef<any>(null);
+  const geocoderRef = useRef<any>(null);
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
     loadGoogleMaps().then(async () => {
       if (window.google?.maps) {
         await window.google.maps.importLibrary('places');
+        serviceRef.current = new window.google.maps.places.AutocompleteService();
+        geocoderRef.current = new window.google.maps.Geocoder();
         setMapsReady(true);
       }
     });
   }, []);
 
   useEffect(() => {
-    if (!mapsReady || !containerRef.current || elementRef.current) return;
+    setQuery(value);
+  }, [value]);
 
-    const autocomplete = new window.google.maps.places.PlaceAutocompleteElement({
-      includedRegionCodes: ['gb'],
-      includedPrimaryTypes: ['geocode'],
-    });
-    elementRef.current = autocomplete;
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
 
-    containerRef.current.appendChild(autocomplete);
-
-    autocomplete.addEventListener('gmp-select', async (e: any) => {
-      const place = e.placePrediction.toPlace();
-      await place.fetchFields({ fields: ['formattedAddress', 'location'] });
-      const loc = place.location;
-      const lat = loc ? loc.lat() : null;
-      const lng = loc ? loc.lng() : null;
-      onChange(place.formattedAddress || '', lat, lng);
-    });
-  }, [mapsReady]);
-
-  // Fallback: plain text input when Google Maps isn't available
-  if (!mapsReady) {
-    return (
-      <div>
-        <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
-        <div className="relative">
-          <MapPin className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value, null, null)}
-            placeholder="Enter your address"
-            className="w-full pl-[40px] pr-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all"
-          />
-        </div>
-      </div>
+  const fetchSuggestions = (input: string) => {
+    if (!serviceRef.current || input.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    serviceRef.current.getPlacePredictions(
+      { input, componentRestrictions: { country: 'gb' }, types: ['geocode'] },
+      (predictions: any[] | null) => {
+        setSuggestions(predictions || []);
+        setShowSuggestions(true);
+      }
     );
-  }
+  };
+
+  const handleInput = (val: string) => {
+    setQuery(val);
+    onChange(val, null, null);
+    clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(() => fetchSuggestions(val), 250);
+  };
+
+  const handleSelect = (suggestion: any) => {
+    const description = suggestion.description;
+    setQuery(description);
+    setShowSuggestions(false);
+    if (geocoderRef.current) {
+      geocoderRef.current.geocode({ placeId: suggestion.place_id }, (results: any[], status: string) => {
+        if (status === 'OK' && results[0]) {
+          const loc = results[0].geometry.location;
+          onChange(description, loc.lat(), loc.lng());
+        } else {
+          onChange(description, null, null);
+        }
+      });
+    } else {
+      onChange(description, null, null);
+    }
+  };
 
   return (
-    <div>
+    <div ref={wrapperRef} className="relative">
       <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
-      <div ref={containerRef} className="address-autocomplete-wrapper rounded-[14px] bg-[#F7F7F7] focus-within:ring-2 focus-within:ring-[var(--terra-ring)] focus-within:bg-white transition-all [&_input]:w-full [&_input]:px-[14px] [&_input]:py-[14px] [&_input]:bg-transparent [&_input]:text-[14px] [&_input]:text-[#222222] [&_input]:placeholder:text-[var(--soft)] [&_input]:focus:outline-none [&_input]:border-none" />
+      <div className={`relative rounded-[14px] border transition-all duration-200 ${
+        focused
+          ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
+          : 'border-[var(--faint)] bg-[#F7F7F7]'
+      }`}>
+        <MapPin className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
+          focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+        }`} />
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => handleInput(e.target.value)}
+          onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
+          onBlur={() => setFocused(false)}
+          placeholder="Enter your address"
+          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none"
+          autoComplete="off"
+        />
+      </div>
+      {showSuggestions && suggestions.length > 0 && (
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[#f0f0f0] shadow-[0_4px_16px_rgba(0,0,0,0.12)] overflow-hidden">
+          {suggestions.map((s) => (
+            <button
+              key={s.place_id}
+              type="button"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => handleSelect(s)}
+              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[#222222] hover:bg-[#F7F7F7] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
+            >
+              <MapPin className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
+              <span className="truncate">{s.description}</span>
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
