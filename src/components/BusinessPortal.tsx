@@ -2113,7 +2113,7 @@ export default function BusinessPortal() {
                     onClick={() => setCreatorFilter(null)}
                     className="inline-flex items-center gap-1 text-[13px] font-semibold text-[var(--terra)]"
                   >
-                    {claims.find(c => c.creator_id === creatorFilter)?.creators.name || 'Creator'}
+                    {claims.find(c => c.creator_id === creatorFilter)?.creators?.name || 'Creator'}
                     <X className="w-3.5 h-3.5" />
                   </button>
                 ) : (

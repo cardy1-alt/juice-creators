@@ -7,13 +7,13 @@ import AdminDashboard from './components/AdminDashboard';
 import { AlertCircle, LogOut, QrCode, RefreshCw } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
-class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMessage: string }> {
   constructor(props: { children: ReactNode }) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, errorMessage: '' };
   }
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, errorMessage: `${error.name}: ${error.message}` };
   }
   componentDidCatch(error: Error, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
@@ -27,7 +27,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
               <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
             </div>
             <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">Something went wrong</h2>
-            <p className="text-[var(--mid)] text-sm mb-6">An unexpected error occurred. Please refresh the page.</p>
+            <p className="text-[var(--mid)] text-sm mb-4">An unexpected error occurred. Please refresh the page.</p>
+            {this.state.errorMessage && (
+              <p className="text-[var(--soft)] text-xs mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
+            )}
             <button
               onClick={() => window.location.reload()}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
