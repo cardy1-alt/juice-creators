@@ -157,6 +157,8 @@ export default function CreatorApp() {
   const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
   const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
   const [showQrFullscreen, setShowQrFullscreen] = useState(false);
+  const [qrScreenTab, setQrScreenTab] = useState<'pass' | 'reel'>('pass');
+  const [qrOpenSource, setQrOpenSource] = useState<'home' | 'active'>('home');
   const [activePassIdx, setActivePassIdx] = useState(0);
   const [showReelCelebration, setShowReelCelebration] = useState<{ offerName: string; businessName: string } | null>(null);
   const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
@@ -795,7 +797,7 @@ export default function CreatorApp() {
       {showQrFullscreen && selectedClaim && (() => {
         const qrClaim = selectedClaim;
         const qrOfferTitle = qrClaim.snapshot_generated_title || qrClaim.offers.generated_title || qrClaim.offers.description || '';
-        const isReelDue = qrClaim.redeemed_at && !qrClaim.reel_url;
+        const isReelDue = !!(qrClaim.redeemed_at && !qrClaim.reel_url);
         const reelDueTimeLeft = (() => {
           if (!qrClaim.reel_due_at) return '';
           const diff = new Date(qrClaim.reel_due_at).getTime() - Date.now();
@@ -804,87 +806,161 @@ export default function CreatorApp() {
           const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
           return `${h}h ${m}m`;
         })();
+        const activeTab = isReelDue ? qrScreenTab : 'pass' as const;
+        const isSubmitEnabled = reelUrl.startsWith('http') && reelUrl.length > 4;
         return (
           <div
             className="fixed top-0 left-0 right-0 bottom-0 bg-white"
-            style={{ zIndex: 9999, overflowY: isReelDue ? 'auto' : 'hidden' }}
+            style={{ zIndex: 9999, overflowY: 'auto' }}
           >
             {/* Back button — fixed so it stays visible when scrolling */}
             <button
-              onClick={() => { setShowQrFullscreen(false); setReelError(null); }}
+              onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
               className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-white"
               style={{ zIndex: 10000, borderRadius: 8 }}
             >
               ← Back
             </button>
-            {/* QR Content */}
-            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 64, paddingBottom: isReelDue ? 40 : 0, minHeight: isReelDue ? undefined : '100%', justifyContent: isReelDue ? undefined : 'center' }}>
+            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
+              {/* Offer name + business name */}
               <p className="text-[18px] font-semibold text-[var(--near-black)] text-center">{qrOfferTitle}</p>
               <p className="text-[14px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
-              <div className="mt-[24px]">
-                <QRCodeDisplay
-                  token={qrClaim.qr_token}
-                  claimId={qrClaim.id}
-                  creatorCode={userProfile.code}
-                  size={280}
-                />
-              </div>
-              <span
-                className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px] mt-[16px]"
-              >
-                {userProfile.code}
-              </span>
-              <div className="mt-[12px]">
-                <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
-              </div>
 
-              {/* Reel submission section — only for reel_due status */}
+              {/* Segmented toggle — only for reel_due */}
               {isReelDue && (
-                <>
-                  <div className="w-full mt-[24px] mb-[24px]" style={{ height: 1, background: 'rgba(34,34,34,0.1)' }} />
-                  <div className="w-full">
-                    <h3 className="text-[18px] font-extrabold text-[var(--near-black)]">Submit your reel</h3>
-                    <p className="text-[14px] text-[var(--mid)] mt-[8px]">
-                      {reelDueTimeLeft ? `You have ${reelDueTimeLeft} to post your reel.` : 'Post your reel now.'}
+                <div
+                  className="relative flex items-center mt-[20px]"
+                  style={{ width: 240, height: 42, background: 'var(--bg)', borderRadius: 50, padding: 3 }}
+                >
+                  {/* Sliding active indicator */}
+                  <div
+                    className="absolute"
+                    style={{
+                      width: 'calc(50% - 3px)',
+                      height: 36,
+                      borderRadius: 50,
+                      background: 'white',
+                      boxShadow: '0 1px 3px rgba(34,34,34,0.12)',
+                      left: activeTab === 'pass' ? 3 : 'calc(50%)',
+                      transition: 'all 0.2s ease',
+                    }}
+                  />
+                  <button
+                    onClick={() => setQrScreenTab('pass')}
+                    className="relative flex-1 text-center text-[14px] font-semibold"
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? 'var(--near-black)' : 'var(--mid)', borderRadius: 50 }}
+                  >
+                    Show pass
+                  </button>
+                  <button
+                    onClick={() => setQrScreenTab('reel')}
+                    className="relative flex-1 text-center text-[14px] font-semibold"
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? 'var(--near-black)' : 'var(--mid)', borderRadius: 50 }}
+                  >
+                    Submit reel
+                  </button>
+                </div>
+              )}
+
+              {/* === SHOW PASS STATE === */}
+              {activeTab === 'pass' && (
+                <div className="flex flex-col items-center w-full" style={{ marginTop: 24, minHeight: isReelDue ? undefined : 'calc(100vh - 200px)', justifyContent: isReelDue ? undefined : 'center' }}>
+                  <QRCodeDisplay
+                    token={qrClaim.qr_token}
+                    claimId={qrClaim.id}
+                    creatorCode={userProfile.code}
+                    size={280}
+                    hideExtras
+                  />
+                  {/* Ref code pill — single instance */}
+                  <span
+                    className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full px-[20px] py-[8px] mt-[16px]"
+                    style={{ background: 'var(--near-black)' }}
+                  >
+                    {userProfile.code}
+                  </span>
+                  {/* Refresh countdown */}
+                  <p className="text-[13px] text-[var(--mid)] mt-[10px]">Auto-refreshes every 30s</p>
+                  {/* Level badge */}
+                  <div className="mt-[10px]">
+                    <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
+                  </div>
+                </div>
+              )}
+
+              {/* === SUBMIT REEL STATE === */}
+              {activeTab === 'reel' && isReelDue && (
+                <div className="flex flex-col w-full" style={{ marginTop: 24 }}>
+                  {/* Timer block */}
+                  <div style={{ background: 'var(--bg)', borderRadius: 12, padding: 16 }}>
+                    <div className="flex items-center gap-[8px]">
+                      <Clock className="w-[16px] h-[16px] text-[var(--mid)]" />
+                      <span className="text-[16px] font-semibold text-[var(--near-black)]">
+                        {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
+                      </span>
+                    </div>
+                    <p className="text-[14px] text-[var(--mid)] mt-[8px]" style={{ lineHeight: 1.6 }}>
+                      Post your reel within this window — it must genuinely feature the business.
                     </p>
-                    <p className="text-[14px] text-[var(--mid)] mt-[2px]">It must genuinely feature the business.</p>
+                  </div>
+
+                  {/* Reel URL input */}
+                  <div style={{ marginTop: 20 }}>
+                    <label className="text-[13px] font-semibold text-[var(--near-black)]" style={{ marginBottom: 8, display: 'block' }}>
+                      Reel URL
+                    </label>
                     <input
                       type="url"
                       value={reelUrl}
                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                       placeholder="https://instagram.com/reel/"
-                      className="w-full mt-[16px] px-[16px] py-[14px] rounded-[12px] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
-                      style={{ background: 'var(--bg)', border: '1px solid rgba(34,34,34,0.15)' }}
+                      className="w-full text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
+                      style={{ background: 'white', border: '1.5px solid rgba(34,34,34,0.15)', borderRadius: 12, padding: '14px 16px', ...(reelUrl ? {} : {}), }}
+                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--terra)'; }}
+                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.15)'; }}
                     />
-                    {reelError && (
+                    {reelError ? (
                       <p className="text-[13px] text-[var(--terra)] mt-[8px]">Please check the URL and try again.</p>
+                    ) : (
+                      <p className="text-[12px] text-[var(--soft)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
                     )}
-                    <button
-                      onClick={async () => {
-                        const success = await handleSubmitReel();
-                        if (success) {
-                          setShowQrFullscreen(false);
-                        }
-                      }}
-                      disabled={loading || !reelUrl}
-                      className="w-full mt-[12px] rounded-[50px] text-white text-[16px] font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
-                      style={{ background: 'var(--terra)', height: 52 }}
-                    >
-                      {loading ? (
-                        <>
-                          <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                          Submitting…
-                        </>
-                      ) : 'Submit reel'}
-                    </button>
-                    <button
-                      onClick={() => setDisputeClaimId(qrClaim.id)}
-                      className="w-full mt-[16px] text-center text-[13px] text-[var(--mid)] underline min-h-[44px]"
-                    >
-                      Report an issue
-                    </button>
                   </div>
-                </>
+
+                  {/* Submit button */}
+                  <button
+                    onClick={async () => {
+                      const success = await handleSubmitReel();
+                      if (success) {
+                        setShowQrFullscreen(false);
+                      }
+                    }}
+                    disabled={loading || !isSubmitEnabled}
+                    className="w-full text-white text-[16px] font-bold flex items-center justify-center gap-2 transition-all"
+                    style={{
+                      background: isSubmitEnabled ? 'var(--terra)' : 'rgba(196,103,74,0.4)',
+                      height: 52,
+                      borderRadius: 50,
+                      marginTop: 16,
+                      cursor: isSubmitEnabled && !loading ? 'pointer' : 'not-allowed',
+                    }}
+                  >
+                    {loading ? (
+                      <>
+                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        Submitting…
+                      </>
+                    ) : 'Submit reel →'}
+                  </button>
+
+                  {/* Report link */}
+                  <button
+                    onClick={() => setDisputeClaimId(qrClaim.id)}
+                    className="w-full text-center text-[13px] text-[var(--mid)] underline min-h-[44px]"
+                    style={{ marginTop: 12 }}
+                  >
+                    Report an issue
+                  </button>
+                </div>
               )}
             </div>
           </div>
@@ -1313,7 +1389,7 @@ export default function CreatorApp() {
                     {/* Swipeable scroll container */}
                     <div
                       className="overflow-x-scroll scrollbar-hide"
-                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', padding: '0 16px' }}
+                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
                       onScroll={(e) => {
                         const el = e.currentTarget;
                         const cardWidth = el.clientWidth;
@@ -1329,11 +1405,13 @@ export default function CreatorApp() {
                           const matchedOffer = offers.find(o => o.id === claim.offer_id);
                           const photoUrl = matchedOffer?.offer_photo_url || null;
                           const status = getGiftCardStatus(claim);
+                          const isFirst = idx === 0;
+                          const isLast = idx === giftCardClaims.length - 1;
 
                           return (
                             <button
                               key={claim.id}
-                              onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); }}
+                              onClick={() => { setSelectedClaim(claim); setQrOpenSource('home'); setQrScreenTab(claim.redeemed_at && !claim.reel_url ? 'reel' : 'pass'); setShowQrFullscreen(true); }}
                               className="relative overflow-hidden text-left flex-shrink-0"
                               style={{
                                 width: 'calc(100vw - 32px)',
@@ -1341,7 +1419,9 @@ export default function CreatorApp() {
                                 borderRadius: 16,
                                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
                                 background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
-                                scrollSnapAlign: 'center',
+                                scrollSnapAlign: 'start',
+                                marginLeft: isFirst ? 16 : 0,
+                                marginRight: isLast ? 16 : 12,
                               }}
                             >
                               {photoUrl && (
@@ -1893,7 +1973,7 @@ export default function CreatorApp() {
                               {/* QR Code section — tap to go fullscreen */}
                               {claim.status === 'active' && (
                                 <button
-                                  onClick={() => setShowQrFullscreen(true)}
+                                  onClick={() => { setQrOpenSource('active'); setQrScreenTab('pass'); setShowQrFullscreen(true); }}
                                   className="w-full text-left"
                                 >
                                   <p className="text-[13px] font-semibold text-[#1A1A1A] text-center mb-[10px]">Tap to show pass</p>
