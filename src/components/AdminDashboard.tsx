@@ -9,6 +9,7 @@ import {
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
+import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedEmail, sendBusinessDeniedEmail } from '../lib/notifications';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
@@ -98,7 +99,13 @@ export default function AdminDashboard() {
       setActionFeedback(null);
       const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
       if (error) throw error;
-      setActionFeedback({ type: 'success', text: `Creator ${approved ? 'approved' : 'unapproved'} successfully.` });
+      setActionFeedback({ type: 'success', text: `Creator ${approved ? 'approved' : 'denied'} successfully.` });
+      // Send approval/denial email (non-blocking)
+      if (approved) {
+        sendCreatorApprovedEmail(id).catch(() => {});
+      } else {
+        sendCreatorDeniedEmail(id).catch(() => {});
+      }
       fetchAll();
     } catch (err: any) {
       setActionFeedback({ type: 'error', text: err.message || 'Failed to update creator.' });
@@ -109,7 +116,13 @@ export default function AdminDashboard() {
       setActionFeedback(null);
       const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
       if (error) throw error;
-      setActionFeedback({ type: 'success', text: `Business ${approved ? 'approved' : 'unapproved'} successfully.` });
+      setActionFeedback({ type: 'success', text: `Business ${approved ? 'approved' : 'denied'} successfully.` });
+      // Send approval/denial email (non-blocking)
+      if (approved) {
+        sendBusinessApprovedEmail(id).catch(() => {});
+      } else {
+        sendBusinessDeniedEmail(id).catch(() => {});
+      }
       fetchAll();
     } catch (err: any) {
       setActionFeedback({ type: 'error', text: err.message || 'Failed to update business.' });

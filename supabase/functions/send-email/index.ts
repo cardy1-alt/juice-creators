@@ -174,6 +174,81 @@ function newClaimBusinessEmail(name: string, meta: Record<string, string>): { su
   };
 }
 
+function creatorApprovedEmail(name: string): { subject: string; html: string } {
+  return {
+    subject: "You're approved — welcome to Nayba!",
+    html: wrapEmail(`
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Great news — your Nayba creator account has been approved! 🎉</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">You can now browse offers from local businesses in your area, claim the ones you like, and start creating. Here's how it works:</p>
+      <ol style="font-size: 15px; line-height: 1.8; margin: 0 0 16px; padding-left: 20px;">
+        <li>Browse and claim an offer</li>
+        <li>Visit the business and show your QR pass</li>
+        <li>Post an Instagram Reel within 48 hours</li>
+      </ol>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">Jump in and claim your first offer — there are businesses waiting to work with you.</p>
+      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Explore offers</a>
+    `),
+  };
+}
+
+function businessApprovedEmail(name: string): { subject: string; html: string } {
+  return {
+    subject: "You're approved — welcome to Nayba!",
+    html: wrapEmail(`
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Great news — your Nayba business account has been approved! 🎉</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">You're now live on the platform. Create your first offer and local creators will be able to discover and claim it right away.</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">If you need any help getting started, just reply to this email — we're here for you.</p>
+      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Create your first offer</a>
+    `),
+  };
+}
+
+function creatorDeniedEmail(name: string): { subject: string; html: string } {
+  return {
+    subject: 'Update on your Nayba application',
+    html: wrapEmail(`
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Thanks for your interest in Nayba. After reviewing your application, we're unable to approve your creator account at this time.</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">This could be for a number of reasons — incomplete profile, follower count, or content fit. If you think this was a mistake, or if anything has changed, feel free to reply to this email and we'll take another look.</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">We appreciate your time and hope to welcome you in the future.</p>
+    `),
+  };
+}
+
+function businessDeniedEmail(name: string): { subject: string; html: string } {
+  return {
+    subject: 'Update on your Nayba application',
+    html: wrapEmail(`
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Thanks for your interest in Nayba. After reviewing your application, we're unable to approve your business account at this time.</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">If you believe this was a mistake or would like more information, please reply to this email and we'll be happy to help.</p>
+      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">We appreciate your interest and hope to work with you in the future.</p>
+    `),
+  };
+}
+
+function adminApprovalRequestEmail(meta: Record<string, string>): { subject: string; html: string } {
+  const userType = meta.user_type || 'unknown';
+  const displayName = meta.display_name || 'Unknown';
+  const userEmail = meta.email || 'Unknown';
+  return {
+    subject: `Action required: New ${userType} awaiting approval — ${displayName}`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
+        <h3 style="margin: 0 0 16px; color: #222;">New ${escapeHtml(userType)} awaiting approval</h3>
+        <table style="font-size: 14px; line-height: 1.6; color: #333; margin-bottom: 20px;">
+          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Type</td><td>${escapeHtml(userType)}</td></tr>
+          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Name</td><td>${escapeHtml(displayName)}</td></tr>
+          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Email</td><td>${escapeHtml(userEmail)}</td></tr>
+        </table>
+        <a href="${APP_URL}?demo=admin" style="display: inline-block; background: #1A3C34; color: white; padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px;">Review in Admin Dashboard</a>
+      </div>
+    `,
+  };
+}
+
 function genericNotificationEmail(name: string, message: string): { subject: string; html: string } {
   return {
     subject: `Nayba — ${message.slice(0, 60)}`,
@@ -236,17 +311,21 @@ function feedbackEmail(meta: Record<string, string>): { subject: string; html: s
 Deno.serve(async (req: Request) => {
   try {
     const payload = (await req.json()) as WebhookPayload;
+    console.log('[send-email] Payload received:', JSON.stringify(payload).slice(0, 500));
 
     // Only process notification inserts
     if (payload.table !== 'notifications' || payload.type !== 'INSERT') {
-      return new Response(JSON.stringify({ skipped: true }), { status: 200 });
+      console.log('[send-email] Skipped: not a notifications INSERT', payload.type, payload.table);
+      return new Response(JSON.stringify({ skipped: true, reason: 'not_insert' }), { status: 200 });
     }
 
     const notification = payload.record as NotificationRecord;
+    console.log('[send-email] Notification:', JSON.stringify(notification).slice(0, 500));
 
     // Skip if already sent
     if (notification.email_sent) {
-      return new Response(JSON.stringify({ skipped: true }), { status: 200 });
+      console.log('[send-email] Skipped: already sent');
+      return new Response(JSON.stringify({ skipped: true, reason: 'already_sent' }), { status: 200 });
     }
 
     const supabase = createClient(
@@ -291,8 +370,11 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!recipientEmail) {
-      return new Response(JSON.stringify({ error: 'No recipient found' }), { status: 200 });
+      console.log('[send-email] No recipient found. emailType:', emailType, 'user_type:', notification.user_type, 'user_id:', notification.user_id);
+      return new Response(JSON.stringify({ error: 'No recipient found', emailType, user_type: notification.user_type }), { status: 200 });
     }
+
+    console.log('[send-email] Sending', emailType, 'to', recipientEmail);
 
     // Build email based on type
     let email: { subject: string; html: string };
@@ -316,8 +398,23 @@ Deno.serve(async (req: Request) => {
       case 'new_claim_business':
         email = newClaimBusinessEmail(recipientName, meta);
         break;
+      case 'creator_approved':
+        email = creatorApprovedEmail(recipientName);
+        break;
+      case 'business_approved':
+        email = businessApprovedEmail(recipientName);
+        break;
+      case 'creator_denied':
+        email = creatorDeniedEmail(recipientName);
+        break;
+      case 'business_denied':
+        email = businessDeniedEmail(recipientName);
+        break;
       case 'admin_signup':
         email = adminSignupEmail(meta);
+        break;
+      case 'admin_approval_request':
+        email = adminApprovalRequestEmail(meta);
         break;
       case 'feedback':
         email = feedbackEmail(meta);

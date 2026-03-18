@@ -119,6 +119,62 @@ export async function sendAdminSignupNotification(params: {
   });
 }
 
+export async function sendCreatorApprovedEmail(creatorId: string): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: 'Your creator account has been approved! Start exploring offers.',
+    emailType: 'creator_approved',
+  });
+}
+
+export async function sendBusinessApprovedEmail(businessId: string): Promise<void> {
+  await insertNotification({
+    userId: businessId,
+    userType: 'business',
+    message: 'Your business account has been approved! Create your first offer.',
+    emailType: 'business_approved',
+  });
+}
+
+export async function sendCreatorDeniedEmail(creatorId: string): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: 'Your creator application was not approved at this time.',
+    emailType: 'creator_denied',
+  });
+}
+
+export async function sendBusinessDeniedEmail(businessId: string): Promise<void> {
+  await insertNotification({
+    userId: businessId,
+    userType: 'business',
+    message: 'Your business application was not approved at this time.',
+    emailType: 'business_denied',
+  });
+}
+
+export async function sendAdminApprovalRequest(params: {
+  userType: 'creator' | 'business';
+  userId: string;
+  displayName: string;
+  email: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `New ${params.userType} awaiting approval: ${params.displayName} (${params.email})`,
+    emailType: 'admin_approval_request',
+    emailMeta: {
+      user_type: params.userType,
+      user_id: params.userId,
+      display_name: params.displayName,
+      email: params.email,
+    },
+  });
+}
+
 export async function sendFeedbackEmail(params: {
   userId: string;
   userType: 'creator' | 'business';

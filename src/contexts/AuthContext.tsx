@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, ReactNode } fro
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminSignupNotification } from '../lib/notifications';
+import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminSignupNotification, sendAdminApprovalRequest } from '../lib/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.com').toLowerCase();
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'hello@nayba.app').toLowerCase();
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -54,7 +54,7 @@ const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
   },
   admin: {
     role: 'admin',
-    profile: { email: 'admin@juicecreators.com', name: 'Admin' },
+    profile: { email: 'hello@nayba.app', name: 'Admin' },
   },
 };
 
@@ -323,9 +323,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserRole('creator');
         setUserProfile(creatorProfile);
 
-        // Fire welcome email + admin signup notification (non-blocking)
+        // Fire welcome email + admin notifications (non-blocking)
         if (creatorId) {
           sendCreatorWelcomeEmail(creatorId).catch(() => {});
+          sendAdminApprovalRequest({ userType: 'creator', userId: creatorId, displayName: additionalData.name, email: normEmail }).catch(() => {});
         }
         sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email: normEmail }).catch(() => {});
       } else if (role === 'business') {
@@ -395,9 +396,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserRole('business');
         setUserProfile(businessProfile);
 
-        // Fire welcome email + admin signup notification (non-blocking)
+        // Fire welcome email + admin notifications (non-blocking)
         if (businessId) {
           sendBusinessWelcomeEmail(businessId).catch(() => {});
+          sendAdminApprovalRequest({ userType: 'business', userId: businessId, displayName: additionalData.name, email: normEmail }).catch(() => {});
         }
         sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email: normEmail }).catch(() => {});
       }
