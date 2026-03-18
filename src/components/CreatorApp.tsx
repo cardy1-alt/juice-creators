@@ -121,7 +121,7 @@ function StatusPill({ status }: { status: string }) {
     disputed: 'bg-[var(--terra-10)] text-[var(--terra)]',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-[6px] font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
       {status}
     </span>
   );
@@ -156,6 +156,8 @@ export default function CreatorApp() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
   const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
+  const [showQrFullscreen, setShowQrFullscreen] = useState(false);
+  const [showReelCelebration, setShowReelCelebration] = useState<{ offerName: string; businessName: string } | null>(null);
   const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
   const [editName, setEditName] = useState('');
   const [editHandle, setEditHandle] = useState('');
@@ -563,10 +565,16 @@ export default function CreatorApp() {
         })
         .eq('id', userProfile.id);
 
+      // Show celebration overlay
+      const celebOfferName = selectedClaim.snapshot_generated_title || selectedClaim.offers.generated_title || selectedClaim.offers.description || '';
+      const celebBizName = selectedClaim.businesses?.name || '';
+
       setReelUrl('');
       setReelError(null);
       fetchClaims();
       fetchCollabsCompleted();
+
+      setShowReelCelebration({ offerName: celebOfferName, businessName: celebBizName });
     } catch (error: any) {
       setReelError(error.message || 'Failed to submit reel');
     } finally {
@@ -779,6 +787,131 @@ export default function CreatorApp() {
           </div>
         </div>
       )}
+
+      {/* Fullscreen QR Pass Overlay */}
+      {showQrFullscreen && selectedClaim && selectedClaim.status === 'active' && (() => {
+        const qrClaim = selectedClaim;
+        const qrOfferTitle = qrClaim.snapshot_generated_title || qrClaim.offers.generated_title || qrClaim.offers.description || '';
+        return (
+          <div className="fixed top-0 left-0 right-0 bottom-0 bg-white flex flex-col items-center" style={{ zIndex: 9999 }}>
+            {/* Back button */}
+            <button
+              onClick={() => setShowQrFullscreen(false)}
+              className="absolute top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px]"
+            >
+              ← Back
+            </button>
+            {/* Content */}
+            <div className="flex flex-col items-center justify-center flex-1 w-full px-[20px]" style={{ paddingTop: 48 }}>
+              <p className="text-[18px] font-semibold text-[var(--near-black)] text-center">{qrOfferTitle}</p>
+              <p className="text-[14px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
+              <div className="mt-[24px]">
+                <QRCodeDisplay
+                  token={qrClaim.qr_token}
+                  claimId={qrClaim.id}
+                  creatorCode={userProfile.code}
+                  size={280}
+                />
+              </div>
+              <span
+                className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px] mt-[16px]"
+              >
+                {userProfile.code}
+              </span>
+              <div className="mt-[12px]">
+                <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* Reel Celebration Overlay */}
+      {showReelCelebration && (() => {
+        const celebrationStyles = `
+          @keyframes checkDraw {
+            0% { stroke-dashoffset: 48; }
+            100% { stroke-dashoffset: 0; }
+          }
+          @keyframes confettiFall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+          }
+          @media (prefers-reduced-motion: reduce) {
+            .confetti-piece { animation: none !important; display: none; }
+          }
+        `;
+        const confettiColors = ['#C4674A', '#F5C4A0', '#C8B8F0', '#F4A8C0'];
+        const confettiPieces = Array.from({ length: 30 }, (_, i) => ({
+          id: i,
+          left: Math.random() * 100,
+          size: 6 + Math.random() * 6,
+          color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
+          delay: Math.random() * 1.5,
+          duration: 1.5 + Math.random() * 1.5,
+          drift: -20 + Math.random() * 40,
+        }));
+        return (
+          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center" style={{ zIndex: 9999, background: 'var(--forest)' }}>
+            <style>{celebrationStyles}</style>
+            {/* Confetti */}
+            {confettiPieces.map(p => (
+              <div
+                key={p.id}
+                className="confetti-piece"
+                style={{
+                  position: 'absolute',
+                  top: -10,
+                  left: `${p.left}%`,
+                  width: p.size,
+                  height: p.size,
+                  borderRadius: p.size > 9 ? '50%' : '2px',
+                  background: p.color,
+                  animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards`,
+                  transform: `translateX(${p.drift}px)`,
+                  opacity: 0,
+                  animationFillMode: 'forwards',
+                }}
+              />
+            ))}
+            {/* Animated checkmark */}
+            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+              <circle cx="40" cy="40" r="36" stroke="white" strokeWidth="3" opacity="0.3" />
+              <path
+                d="M24 40L35 51L56 30"
+                stroke="white"
+                strokeWidth="4"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                style={{
+                  strokeDasharray: 48,
+                  strokeDashoffset: 48,
+                  animation: 'checkDraw 0.6s 0.3s ease forwards',
+                }}
+              />
+            </svg>
+            <h2 className="text-[32px] font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.5px' }}>
+              Reel submitted!
+            </h2>
+            <p className="text-[16px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
+              {showReelCelebration.offerName}
+            </p>
+            <p className="text-[14px] text-white text-center mt-[2px]" style={{ opacity: 0.6 }}>
+              {showReelCelebration.businessName}
+            </p>
+            <div className="mt-[16px]">
+              <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="lg" />
+            </div>
+            <button
+              onClick={() => { setShowReelCelebration(null); setView('offers'); }}
+              className="mt-[32px] px-[32px] py-[14px] rounded-full text-white text-[15px] font-bold min-h-[48px]"
+              style={{ background: 'var(--terra)' }}
+            >
+              Back to explore
+            </button>
+          </div>
+        );
+      })()}
 
       {/* Expanded Offer Detail Modal */}
       {expandedOffer && (() => {
@@ -1102,7 +1235,7 @@ export default function CreatorApp() {
                       </button>
                     </div>
                     <span
-                      className="text-[14px] font-bold rounded-[50px] whitespace-nowrap"
+                      className="text-[14px] font-bold rounded-[6px] whitespace-nowrap"
                       style={{
                         background: 'var(--peach)',
                         color: hoursLeft < 10 ? 'var(--terra)' : 'var(--near-black)',
@@ -1289,98 +1422,96 @@ export default function CreatorApp() {
                   const isUnlimited = offer.monthly_cap === null;
                   const slotsUsed = offer.slotsUsed || 0;
                   const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                  const full = !isUnlimited && slotsLeft === 0;
                   const creatorLevel = userProfile.level || 1;
                   const offerMinLevel = offer.min_level || 1;
                   const isLocked = creatorLevel < offerMinLevel;
                   const lockedLevelName = offerMinLevel === 2 ? 'Explorer' : offerMinLevel === 3 ? 'Regular' : offerMinLevel === 4 ? 'Local' : offerMinLevel === 5 ? 'Trusted' : offerMinLevel === 6 ? 'Nayba' : 'Newcomer';
 
+                  // Change 5: Calculate reels away for locked cards
+                  const reelsAway = (() => {
+                    if (!isLocked) return null;
+                    const thresholds = [0, 1, 3, 6, 11, 21];
+                    const needed = thresholds[offerMinLevel - 1] || 0;
+                    const current = userProfile.total_reels || 0;
+                    return Math.max(0, needed - current);
+                  })();
+
                   return (
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="w-[140px] flex-shrink-0 text-left"
+                      className="flex-shrink-0 text-left rounded-[16px] overflow-hidden relative"
+                      style={{ width: 'calc(70vw - 20px)', maxWidth: '240px' }}
                     >
-                      {/* Image area */}
+                      {/* Full card is the image with 3:4 aspect ratio */}
                       <div
-                        className="w-full h-[130px] rounded-[16px] overflow-hidden relative flex items-center justify-center"
-                        style={{ background: getCategoryGradient(offer.businesses.category) }}
+                        className="w-full relative overflow-hidden"
+                        style={{ aspectRatio: '3/4', background: getCategoryGradient(offer.businesses.category) }}
                       >
                         {offer.offer_photo_url ? (
                           <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : offer.businesses.logo_url ? (
                           <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
-                          <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                            <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
+                          <div className="w-full h-full flex items-center justify-center">
+                            <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
                           </div>
                         )}
+
                         {/* Locked overlay */}
                         {isLocked && (
-                          <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
+                          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
                             <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
                               <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
                             </div>
+                            <p className="text-[12px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
+                            {reelsAway !== null && reelsAway <= 5 && (
+                              <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                                {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
+                              </p>
+                            )}
                           </div>
                         )}
-                        {/* Business logo overlay top-left */}
-                        {!isLocked && (offer.offer_photo_url || offer.businesses.logo_url) && offer.businesses.logo_url && (
-                          <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-[8px] overflow-hidden" style={{ border: '1.5px solid white' }}>
-                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                          </div>
-                        )}
-                        {/* Slots badge bottom-left or level requirement */}
-                        {isLocked ? (
+
+                        {/* Slot badge — top-left */}
+                        {!isLocked && !isUnlimited && slotsLeft !== null && (
                           <span
-                            className="absolute bottom-[6px] left-[6px] text-[10px] font-bold rounded-[50px] px-[10px] py-[4px] text-white"
-                            style={{ background: 'rgba(26,26,26,0.85)' }}
+                            className="absolute top-[8px] left-[8px] text-[12px] font-semibold rounded-full px-[8px] py-[5px]"
+                            style={{
+                              background: slotsLeft <= 2 ? 'var(--terra)' : 'var(--peach)',
+                              color: slotsLeft <= 2 ? 'white' : 'var(--near-black)',
+                            }}
                           >
-                            Level {offerMinLevel}+ only
-                          </span>
-                        ) : (
-                          !isUnlimited && (() => {
-                            const badge = getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number);
-                            return (
-                              <span
-                                className="absolute bottom-[6px] left-[6px] backdrop-blur text-[12px] font-bold rounded-full px-[9px] py-[4px]"
-                                style={{ background: 'rgba(255,255,255,0.92)', color: badge.color }}
-                              >
-                                {badge.text}
-                              </span>
-                            );
-                          })()
-                        )}
-                        {/* Reel badge top-right */}
-                        {!isLocked && (
-                          <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[var(--near-black)]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
-                            <Video className="w-[10px] h-[10px]" /> Reel
+                            {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
                           </span>
                         )}
-                        {/* Heart */}
+
+                        {/* Heart — top-right */}
                         {!isLocked && (
                           <button
                             onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                            className="absolute bottom-[6px] right-[6px]"
+                            className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
+                            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
                           >
                             <Heart
-                              className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
-                              strokeWidth={1.5}
+                              className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
+                              strokeWidth={2}
                             />
                           </button>
                         )}
-                      </div>
-                      {/* Below image info */}
-                      <div className="mt-2">
-                        <p className="text-[14px] font-extrabold text-[var(--near-black)] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                        <p className="text-[13px] font-semibold text-[var(--near-black)] truncate">
-                          {offer.generated_title || offer.description.slice(0, 35)}
-                        </p>
-                        {isLocked ? (
-                          <p className="text-[11px] text-[var(--soft)] mt-0.5">Unlocks at {lockedLevelName}</p>
-                        ) : (
-                          <div className="flex items-center gap-1 mt-0.5">
-                            <Video className="w-[11px] h-[11px] text-[var(--terra)]" />
-                            <span className="text-[11px] font-semibold text-[var(--terra)]">Reel</span>
+
+                        {/* Gradient overlay at bottom with title + business name */}
+                        {!isLocked && (
+                          <div
+                            className="absolute bottom-0 left-0 right-0 p-[12px] pt-[40px]"
+                            style={{ background: 'linear-gradient(to top, rgba(34,34,34,0.85) 0%, transparent 60%)' }}
+                          >
+                            <p className="text-[14px] font-extrabold text-white truncate leading-tight">
+                              {offer.generated_title || offer.description.slice(0, 35)}
+                            </p>
+                            <p className="text-[12px] text-white truncate mt-[2px]" style={{ opacity: 0.6 }}>
+                              {offer.businesses.name}
+                            </p>
                           </div>
                         )}
                       </div>
@@ -1424,10 +1555,24 @@ export default function CreatorApp() {
               </div>
 
               {matchedSaved.length === 0 ? (
-                <div className="text-center py-20">
-                  <Heart className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-                  <p className="text-[16px] font-semibold text-[var(--near-black)]">Nothing saved yet</p>
-                  <p className="text-[14px] text-[var(--mid)] mt-1">Heart an offer to save it for later</p>
+                <div className="flex flex-col items-center justify-center py-20 px-[40px]">
+                  {/* Heart with map pin SVG */}
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <path d="M40 68S14 48 14 32C14 22 22 14 32 14C36 14 39 16 40 18C41 16 44 14 48 14C58 14 66 22 66 32C66 48 40 68 40 68Z" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    <circle cx="40" cy="36" r="6" stroke="var(--peach)" strokeWidth="2" fill="none" />
+                    <circle cx="40" cy="36" r="2" fill="var(--peach)" />
+                  </svg>
+                  <p className="text-[18px] font-extrabold text-[var(--near-black)] mt-[16px]">Nothing saved yet</p>
+                  <p className="text-[15px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
+                    Heart an offer on the explore feed to save it for later.
+                  </p>
+                  <button
+                    onClick={() => setView('offers')}
+                    className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[14px] font-semibold min-h-[44px]"
+                    style={{ background: 'var(--terra)' }}
+                  >
+                    Find offers
+                  </button>
                 </div>
               ) : (
                 <div className="space-y-[14px]">
@@ -1506,7 +1651,7 @@ export default function CreatorApp() {
                             const slider = document.getElementById('claims-slider');
                             if (slider) slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
                           }}
-                          className={`whitespace-nowrap text-[12px] font-semibold rounded-[50px] px-[14px] flex-shrink-0 transition-all ${
+                          className={`whitespace-nowrap text-[12px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
                             isSelected
                               ? 'bg-[var(--near-black)] text-white'
                               : 'bg-[#F0EFED] text-[var(--mid)]'
@@ -1594,23 +1739,25 @@ export default function CreatorApp() {
                                 })}
                               </div>
 
-                              {/* QR Code section */}
+                              {/* QR Code section — tap to go fullscreen */}
                               {claim.status === 'active' && (
-                                <>
-                                  <p className="text-[13px] font-semibold text-[#1A1A1A] text-center mb-[10px]">Show this at the door</p>
+                                <button
+                                  onClick={() => setShowQrFullscreen(true)}
+                                  className="w-full text-left"
+                                >
+                                  <p className="text-[13px] font-semibold text-[#1A1A1A] text-center mb-[10px]">Tap to show pass</p>
                                   <QRCodeDisplay
                                     token={claim.qr_token}
                                     claimId={claim.id}
                                     creatorCode={userProfile.code}
                                   />
-                                  {/* Level badge + verified on QR screen */}
                                   <div className="flex items-center justify-center gap-2 mt-3">
                                     <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
                                     {userProfile.profile_complete && (
                                       <BadgeCheck className="w-[14px] h-[14px] text-[var(--forest)]" title="Verified creator" />
                                     )}
                                   </div>
-                                </>
+                                </button>
                               )}
 
                               {/* Reel Countdown/Prompt */}
@@ -1968,12 +2115,12 @@ export default function CreatorApp() {
                                       style={{
                                         width: 40,
                                         height: 40,
-                                        background: isLocked ? '#FFFFFF' : colour,
+                                        background: isCompleted ? 'var(--forest)' : isCurrent ? '#F5E8E3' : '#FFFFFF',
                                         border: isLocked ? '1.5px solid var(--faint)' : 'none',
                                       }}
                                     >
                                       {isCompleted ? (
-                                        /* Checkmark for completed levels */
+                                        /* Checkmark for completed levels — white tick on --forest */
                                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                                           <path d="M4.5 9L7.5 12L13.5 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
@@ -1984,7 +2131,7 @@ export default function CreatorApp() {
                                             fontFamily: "'Plus Jakarta Sans', sans-serif",
                                             fontWeight: isCurrent ? 700 : 500,
                                             fontSize: 16,
-                                            color: isLocked ? 'var(--soft)' : 'white',
+                                            color: isLocked ? 'var(--soft)' : isCurrent ? 'var(--terra)' : 'white',
                                           }}
                                         >
                                           {lvl === 6 ? '✦' : lvl}
@@ -2000,7 +2147,7 @@ export default function CreatorApp() {
                                         height: 3,
                                         borderRadius: 3,
                                         background: isCompleted
-                                          ? levelColours[lvl]
+                                          ? 'var(--forest)'
                                           : 'var(--faint)',
                                       }}
                                     />
@@ -2155,9 +2302,26 @@ export default function CreatorApp() {
                     <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
-                    <div className="text-center py-16">
-                      <Bell className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-                      <p className="text-[16px] font-semibold text-[var(--near-black)]">No notifications yet</p>
+                    <div className="flex flex-col items-center justify-center py-16 px-[40px]">
+                      {/* Envelope with spark SVG */}
+                      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                        <rect x="12" y="24" width="56" height="36" rx="4" stroke="var(--peach)" strokeWidth="2.5" fill="none" />
+                        <path d="M12 28L40 48L68 28" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                        <path d="M58 18L62 14" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
+                        <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
+                        <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
+                      </svg>
+                      <p className="text-[18px] font-extrabold text-[var(--near-black)] mt-[16px]">Nothing yet</p>
+                      <p className="text-[15px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
+                        You'll see a notification when a business confirms your visit or when a new offer drops nearby.
+                      </p>
+                      <button
+                        onClick={() => setView('offers')}
+                        className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[14px] font-semibold min-h-[44px]"
+                        style={{ background: 'var(--terra)' }}
+                      >
+                        Browse offers
+                      </button>
                     </div>
                   ) : (
                     <div className="space-y-3">

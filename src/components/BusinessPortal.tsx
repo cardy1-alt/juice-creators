@@ -2316,10 +2316,17 @@ export default function BusinessPortal() {
               <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.4px' }}>Alerts</h2>
 
               {notifications.length === 0 ? (
-                <div className="flex flex-col items-center py-16 px-6">
-                  <Bell className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[var(--near-black)] mb-1">No notifications</p>
-                  <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">You'll be notified when creators claim your offers</p>
+                <div className="flex flex-col items-center justify-center py-16 px-[40px]">
+                  {/* Bell with lightning bolt SVG */}
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <path d="M40 12C28 12 20 22 20 32V48L14 56H66L60 48V32C60 22 52 12 40 12Z" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                    <path d="M32 56C32 60.4 35.6 64 40 64C44.4 64 48 60.4 48 56" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
+                    <path d="M62 20L58 28H64L60 36" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+                  </svg>
+                  <p className="text-[18px] font-extrabold text-[var(--near-black)] mt-[16px]">No alerts yet</p>
+                  <p className="text-[15px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
+                    When a creator claims your offer and visits, you'll see it here instantly.
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
