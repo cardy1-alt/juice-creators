@@ -1060,7 +1060,11 @@ export default function BusinessPortal() {
   const fetchClaims = async () => {
     const { data, error } = await supabase.from('claims').select('*, creators(name, instagram_handle, code, avatar_url, follower_count), offers(description, generated_title)').eq('business_id', userProfile.id).order('claimed_at', { ascending: false });
     if (error) { setFetchError('Failed to load claims.'); return; }
-    if (data) setClaims(data as ClaimWithDetails[]);
+    if (data) {
+      // Filter out claims where the creator join returned null (RLS or deleted creator)
+      const valid = data.filter((c: any) => c.creators !== null) as ClaimWithDetails[];
+      setClaims(valid);
+    }
   };
 
   const fetchNotifications = async () => {
@@ -1240,20 +1244,26 @@ export default function BusinessPortal() {
       });
 
       if (error) throw error;
-      if (data?.error) {
-        setScanResult({ type: 'error', message: data.error });
+      if (!data || data?.error) {
+        setScanResult({ type: 'error', message: data?.error || 'No response from server.' });
         setScanCode('');
         return;
       }
 
       // Fetch creator name for the success message
-      const { data: claim } = await supabase
-        .from('claims')
-        .select('creators(name)')
-        .eq('id', data.claim_id)
-        .maybeSingle();
+      let creatorName = 'Creator';
+      try {
+        const { data: claim } = await supabase
+          .from('claims')
+          .select('creators(name)')
+          .eq('id', data.claim_id)
+          .maybeSingle();
+        creatorName = (claim as any)?.creators?.name || 'Creator';
+      } catch {
+        // Non-critical — proceed with fallback name
+      }
 
-      setScanResult({ type: 'success', message: 'Visit confirmed', creatorName: claim?.creators?.name || 'Creator' });
+      setScanResult({ type: 'success', message: 'Visit confirmed', creatorName });
       setScanCode('');
       fetchClaims();
     } catch (error: any) {
