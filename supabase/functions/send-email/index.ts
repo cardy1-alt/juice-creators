@@ -101,14 +101,18 @@ function infoBox(content: string, bg = TERRA_LIGHT, border = TERRA_BORDER): stri
 }
 
 function stepList(steps: string[]): string {
-  return `<div style="margin: 20px 0;">
+  return `<table role="presentation" style="width: 100%; border-collapse: collapse; margin: 20px 0;">
     ${steps.map((step, i) => `
-      <div style="display: flex; align-items: flex-start; margin-bottom: ${i < steps.length - 1 ? '14px' : '0'};">
-        <div style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: ${TERRA_LIGHT}; color: ${TERRA}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px; margin-right: 14px;">${i + 1}</div>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; color: ${NEAR_BLACK}; margin: 2px 0 0;">${step}</p>
-      </div>
+      <tr>
+        <td style="width: 28px; vertical-align: top; padding: 0 14px ${i < steps.length - 1 ? '14px' : '0'} 0;">
+          <div style="width: 28px; height: 28px; border-radius: 50%; background: ${TERRA_LIGHT}; color: ${TERRA}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px;">${i + 1}</div>
+        </td>
+        <td style="vertical-align: top; padding: 0 0 ${i < steps.length - 1 ? '14px' : '0'} 0;">
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; color: ${NEAR_BLACK}; margin: 2px 0 0;">${step}</p>
+        </td>
+      </tr>
     `).join('')}
-  </div>`;
+  </table>`;
 }
 
 // ─── Template builders ────────────────────────────────────────────────────
