@@ -215,6 +215,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signUp = async (email: string, password: string, role: UserRole, additionalData: any) => {
+    // Normalise email to lowercase to match Supabase Auth's JWT (auth.jwt()->>'email')
+    // which is always lowercase. Without this, RLS policies like
+    // `email = auth.jwt()->>'email'` fail on case-mismatched emails.
+    const normEmail = email.toLowerCase().trim();
+
     // Block onAuthStateChange from racing with us
     signingUpRef.current = true;
 
@@ -222,7 +227,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.log('[AuthContext] Starting signup as', role);
 
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normEmail,
         password,
         options: {
           data: { type: role }
@@ -237,7 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // and the INSERT will fail because RLS requires an authenticated session.
       if (!data.session) {
         console.log('[AuthContext] No session — attempting sign in to establish session');
-        const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+        const { error: signInError } = await supabase.auth.signInWithPassword({ email: normEmail, password });
         if (signInError) {
           throw new Error(
             'Account created. Please check your email to confirm, then sign in.'
@@ -250,7 +255,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (role === 'creator') {
         console.log('[AuthContext] Inserting creator profile for:', data.user.id);
         const insertPayload: Record<string, any> = {
-          email,
+          email: normEmail,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
           follower_count: additionalData.followerCount || null,
@@ -270,6 +275,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (insertError) {
           console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
           if (insertError.code === '23505') {
+            // Profile already exists — ghost row from a previous failed signup.
+            // Recover by loading the existing profile directly.
+            console.log('[AuthContext] Creator profile already exists, recovering');
+            const { data: existing } = await supabase
+              .from('creators')
+              .select('*')
+              .eq('email', normEmail)
+              .maybeSingle();
+            if (existing) {
+              setUser(data.user);
+              setUserRole('creator');
+              setUserProfile(existing);
+              return; // Recovered — existing profile loaded
+            }
             throw new Error('An account with this email or Instagram handle already exists. Please sign in instead.');
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
@@ -280,13 +299,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // read (e.g. email case mismatch with JWT), fall back gracefully
         let creatorId: string | undefined;
         try {
-          const { data: row } = await supabase.from('creators').select('id').eq('email', email).maybeSingle();
+          const { data: row } = await supabase.from('creators').select('id').eq('email', normEmail).maybeSingle();
           creatorId = row?.id;
         } catch { /* non-critical */ }
 
         const creatorProfile = {
           id: creatorId,
-          email,
+          email: normEmail,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
           follower_count: additionalData.followerCount || null,
@@ -307,11 +326,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (creatorId) {
           sendCreatorWelcomeEmail(creatorId).catch(() => {});
         }
-        sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email }).catch(() => {});
+        sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email: normEmail }).catch(() => {});
       } else if (role === 'business') {
         console.log('[AuthContext] Inserting business profile for:', data.user.id);
         const insertPayload = {
-          owner_email: email,
+          owner_email: normEmail,
           name: additionalData.name,
           slug: additionalData.slug,
           category: additionalData.category || 'Food & Drink',
@@ -328,6 +347,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (insertError) {
           console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
           if (insertError.code === '23505') {
+            // Profile already exists — ghost row from a previous failed signup.
+            console.log('[AuthContext] Business profile already exists, recovering');
+            const { data: existing } = await supabase
+              .from('businesses')
+              .select('*')
+              .eq('owner_email', normEmail)
+              .maybeSingle();
+            if (existing) {
+              setUser(data.user);
+              setUserRole('business');
+              setUserProfile(existing);
+              return; // Recovered
+            }
             throw new Error('A business with this email or name already exists. Please sign in instead.');
           }
           throw new Error(`Failed to create business profile: ${insertError.message}`);
@@ -337,13 +369,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Best-effort fetch to get the generated id
         let businessId: string | undefined;
         try {
-          const { data: row } = await supabase.from('businesses').select('id').eq('owner_email', email).maybeSingle();
+          const { data: row } = await supabase.from('businesses').select('id').eq('owner_email', normEmail).maybeSingle();
           businessId = row?.id;
         } catch { /* non-critical */ }
 
         const businessProfile = {
           id: businessId,
-          owner_email: email,
+          owner_email: normEmail,
           name: additionalData.name,
           slug: additionalData.slug,
           category: additionalData.category || 'Food & Drink',
@@ -363,8 +395,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (businessId) {
           sendBusinessWelcomeEmail(businessId).catch(() => {});
         }
-        sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email }).catch(() => {});
+        sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email: normEmail }).catch(() => {});
       }
+    } catch (err) {
+      // If signup fails after onAuthStateChange has already set `user`,
+      // clear everything so the user lands back on the Auth screen
+      // where the error message will be visible — not on "Account Not Found".
+      setUser(null);
+      setUserRole(null);
+      setUserProfile(null);
+      await supabase.auth.signOut().catch(() => {});
+      throw err;
     } finally {
       // Delay releasing the guard so queued onAuthStateChange events
       // (from signUp/signIn above) don't race with our state updates
