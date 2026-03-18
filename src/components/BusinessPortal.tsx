@@ -179,6 +179,7 @@ function getOfferQuality(offerItem: string, specificAsk: string | null) {
 
 function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scanHandledRef = useRef(false);
 
   const safeStopScanner = async (scanner: Html5Qrcode) => {
     try {
@@ -187,7 +188,16 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
         await scanner.stop();
       }
     } catch {
-      // Already stopped or cleared
+      // Already stopped or cleared — force cleanup of video elements
+      try {
+        const container = document.getElementById('qr-scanner-region');
+        if (container) {
+          container.querySelectorAll('video').forEach(v => {
+            v.srcObject && (v.srcObject as MediaStream).getTracks().forEach(t => t.stop());
+          });
+          container.innerHTML = '';
+        }
+      } catch {}
     }
   };
   const [scanning, setScanning] = useState(false);
@@ -219,6 +229,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
         await safeStopScanner(scannerRef.current);
       }
       scannerRef.current = null;
+      scanHandledRef.current = false;
       const scanner = new Html5Qrcode('qr-scanner-region');
       scannerRef.current = scanner;
 
@@ -234,9 +245,13 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1 },
         (decodedText) => {
-          onScan(extractToken(decodedText));
-          safeStopScanner(scanner);
+          // Guard: only handle the first successful scan
+          if (scanHandledRef.current) return;
+          scanHandledRef.current = true;
+          const token = extractToken(decodedText);
           setScanning(false);
+          scannerRef.current = null;
+          safeStopScanner(scanner).then(() => onScan(token));
         },
         () => {}
       );
@@ -256,11 +271,13 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
   };
 
   const stopScanner = () => {
-    if (scannerRef.current) {
-      safeStopScanner(scannerRef.current);
-    }
+    const scanner = scannerRef.current;
     scannerRef.current = null;
+    scanHandledRef.current = true;
     setScanning(false);
+    if (scanner) {
+      safeStopScanner(scanner);
+    }
   };
 
   useEffect(() => {
