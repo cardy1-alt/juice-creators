@@ -1696,73 +1696,68 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[12px] overflow-hidden flex flex-col"
-                      style={{ border: '0.5px solid rgba(34,34,34,0.08)' }}
+                      className="text-left rounded-[12px] overflow-hidden relative"
+                      style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category) }}
                     >
-                      {/* ZONE 1 — Image (4:3 aspect) */}
-                      <div
-                        className="w-full relative overflow-hidden"
-                        style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category), borderRadius: '12px 12px 0 0' }}
-                      >
-                        {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt={bizName} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : offer.businesses.logo_url ? (
-                          <img src={offer.businesses.logo_url} alt={bizName} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
+                      {/* Full-bleed image */}
+                      {offer.offer_photo_url ? (
+                        <img src={offer.offer_photo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      ) : offer.businesses.logo_url ? (
+                        <img src={offer.businesses.logo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                      ) : (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
+                        </div>
+                      )}
+
+                      {/* Locked overlay */}
+                      {isLocked && (
+                        <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
+                          <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+                            <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
                           </div>
-                        )}
+                          <p className="text-[12px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
+                          {reelsAway !== null && reelsAway <= 5 && (
+                            <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                              {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
+                            </p>
+                          )}
+                        </div>
+                      )}
 
-                        {/* Locked overlay */}
-                        {isLocked && (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
-                            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                              <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
-                            </div>
-                            <p className="text-[12px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
-                            {reelsAway !== null && reelsAway <= 5 && (
-                              <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
-                              </p>
-                            )}
-                          </div>
-                        )}
+                      {/* Slot badge — top-left */}
+                      {!isLocked && !isUnlimited && slotsLeft !== null && (
+                        <span
+                          className="absolute top-[8px] left-[8px] text-[12px] font-semibold rounded-full px-[8px] py-[5px]"
+                          style={{
+                            background: slotsLeft <= 2 ? 'var(--terra)' : 'var(--peach)',
+                            color: slotsLeft <= 2 ? 'white' : 'var(--near-black)',
+                          }}
+                        >
+                          {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
+                        </span>
+                      )}
 
-                        {/* Slot badge — top-left */}
-                        {!isLocked && !isUnlimited && slotsLeft !== null && (
-                          <span
-                            className="absolute top-[8px] left-[8px] text-[12px] font-semibold rounded-full px-[8px] py-[5px]"
-                            style={{
-                              background: slotsLeft <= 2 ? 'var(--terra)' : 'var(--peach)',
-                              color: slotsLeft <= 2 ? 'white' : 'var(--near-black)',
-                            }}
-                          >
-                            {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
-                          </span>
-                        )}
+                      {/* Heart — top-right */}
+                      {!isLocked && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                          className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
+                          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
+                        >
+                          <Heart
+                            className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
+                            strokeWidth={2}
+                          />
+                        </button>
+                      )}
 
-                        {/* Heart — top-right */}
-                        {!isLocked && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                            className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
-                            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
-                          >
-                            <Heart
-                              className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
-                              strokeWidth={2}
-                            />
-                          </button>
-                        )}
-                      </div>
-
-                      {/* ZONE 2 — Text strip (bottom) */}
-                      <div className="bg-white" style={{ padding: '8px 10px 10px 10px', borderRadius: '0 0 12px 12px' }}>
-                        <p className="text-[14px] font-bold text-[var(--near-black)] truncate leading-tight">
+                      {/* Text overlay at bottom with gradient scrim */}
+                      <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[8px] pt-[24px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)' }}>
+                        <p className="text-[13px] font-bold text-white truncate leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
                           {offerTitle || bizName}
                         </p>
-                        <p className="text-[12px] text-[var(--mid)] truncate mt-[2px]" style={{ fontWeight: 400 }}>
+                        <p className="text-[11px] text-[rgba(255,255,255,0.8)] truncate mt-[1px]" style={{ fontWeight: 400 }}>
                           {bizName}
                         </p>
                       </div>
