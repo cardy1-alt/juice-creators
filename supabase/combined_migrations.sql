@@ -22,6 +22,7 @@
 -- Drop existing functions to avoid return-type conflicts on re-runs
 DROP FUNCTION IF EXISTS claim_offer(uuid, uuid);
 DROP FUNCTION IF EXISTS unclaim_offer(uuid, uuid);
+DROP FUNCTION IF EXISTS redeem_offer(text, uuid);
 
 -- Create businesses table
 CREATE TABLE IF NOT EXISTS businesses (
@@ -1444,3 +1445,78 @@ CREATE POLICY "Admin full access to disputes"
   TO authenticated
   USING (lower((SELECT (auth.jwt() ->> 'email'))) = 'admin@juicecreators.com')
   WITH CHECK (lower((SELECT (auth.jwt() ->> 'email'))) = 'admin@juicecreators.com');
+
+-- =============================================================================
+-- Atomic redeem_offer RPC
+-- Replaces client-side SELECT → check → UPDATE with single atomic RPC
+-- =============================================================================
+
+CREATE OR REPLACE FUNCTION redeem_offer(
+  p_qr_token text,
+  p_business_id uuid
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
+DECLARE
+  v_claim record;
+  v_redeemed_at timestamptz;
+  v_reel_due_at timestamptz;
+  v_max_reel_due timestamptz;
+BEGIN
+  v_redeemed_at := now();
+
+  -- Atomic lookup + lock: prevents concurrent scans from both proceeding
+  SELECT id, status, qr_expires_at, creator_id, offer_id
+  INTO v_claim
+  FROM claims
+  WHERE qr_token = p_qr_token
+    AND business_id = p_business_id
+  FOR UPDATE SKIP LOCKED;
+
+  IF v_claim IS NULL THEN
+    IF EXISTS (
+      SELECT 1 FROM claims
+      WHERE qr_token = p_qr_token AND business_id = p_business_id
+    ) THEN
+      RETURN jsonb_build_object('error', 'This scan is already being processed. Please wait.');
+    END IF;
+    RETURN jsonb_build_object('error', 'Code not recognised. Check and try again.');
+  END IF;
+
+  IF v_claim.status = 'redeemed' THEN
+    RETURN jsonb_build_object('error', 'This pass has already been used.');
+  END IF;
+
+  IF v_claim.status <> 'active' THEN
+    RETURN jsonb_build_object('error', format('This pass is %s. Cannot redeem.', v_claim.status));
+  END IF;
+
+  IF v_claim.qr_expires_at < v_redeemed_at THEN
+    RETURN jsonb_build_object('error', 'QR code expired. Ask the creator to refresh it.');
+  END IF;
+
+  v_reel_due_at := v_redeemed_at + interval '48 hours';
+  v_max_reel_due := v_claim.qr_expires_at + interval '24 hours';
+  IF v_reel_due_at > v_max_reel_due THEN
+    v_reel_due_at := v_max_reel_due;
+  END IF;
+
+  UPDATE claims
+  SET status = 'redeemed',
+      redeemed_at = v_redeemed_at,
+      reel_due_at = v_reel_due_at
+  WHERE id = v_claim.id
+    AND status = 'active';
+
+  IF NOT FOUND THEN
+    RETURN jsonb_build_object('error', 'This pass has already been used.');
+  END IF;
+
+  RETURN jsonb_build_object(
+    'success', true,
+    'claim_id', v_claim.id
+  );
+END;
+$$;
