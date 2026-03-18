@@ -13,7 +13,7 @@ function DemoBanner() {
 
   const roles = ['creator', 'business', 'admin'] as const;
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[#222222] text-white px-4 py-2 flex items-center justify-between text-xs">
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--near-black)] text-white px-4 py-2 flex items-center justify-between text-xs">
       <span className="font-semibold">DEMO MODE</span>
       <div className="flex gap-2">
         {roles.map((r) => (
@@ -47,7 +47,7 @@ function RedeemLanding() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <QrCode className="w-7 h-7 text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2 text-[#222222]">
+        <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">
           Creator Pass
         </h2>
         <p className="text-[var(--mid)] text-sm mb-6">
@@ -108,7 +108,7 @@ function App() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2 text-[#222222]">
+        <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">
           Account Not Found
         </h2>
         <p className="text-[var(--mid)] text-sm mb-6">

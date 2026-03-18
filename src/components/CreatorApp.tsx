@@ -108,17 +108,17 @@ function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
     active: 'bg-[var(--terra)] text-white',
     claimed: 'bg-[var(--terra)] text-white',
-    redeemed: 'bg-[#F7F7F7] text-[#222222]',
-    visited: 'bg-[#F7F7F7] text-[#222222]',
+    redeemed: 'bg-[var(--bg)] text-[var(--near-black)]',
+    visited: 'bg-[var(--bg)] text-[var(--near-black)]',
     reel_due: 'bg-[var(--terra)] text-white',
     submitted: 'bg-emerald-500 text-white',
     expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
-    completed: 'bg-[#F7F7F7] text-[var(--mid)]',
+    completed: 'bg-[var(--bg)] text-[var(--mid)]',
     disputed: 'bg-[var(--terra-10)] text-[var(--terra)]',
   };
   return (
-    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${styles[status] || 'bg-[#F7F7F7] text-[#222222]'}`}>
+    <span className={`text-[11px] px-2.5 py-1 rounded-full font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
       {status}
     </span>
   );
@@ -136,12 +136,12 @@ function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
     return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: 'Last slot' };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: `${slotsLeft} left` };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
-  return { background: '#F5C4A0', color: '#222222', text: `${slotsLeft} left` };
+  return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
 }
 
 export default function CreatorApp() {
@@ -609,7 +609,7 @@ export default function CreatorApp() {
       <div className="min-h-screen flex items-center justify-center px-4 bg-white">
         <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-8 max-w-sm text-center">
           <Clock className="w-8 h-8 text-[var(--soft)] mx-auto mb-4" />
-          <h2 className="text-[26px] font-extrabold mb-2 text-[#222222]">Pending Approval</h2>
+          <h2 className="text-[26px] font-extrabold mb-2 text-[var(--near-black)]">Pending Approval</h2>
           <p className="text-[var(--mid)] text-[15px] mb-6">
             Your creator account is under review. You'll be notified once approved!
           </p>
@@ -713,7 +713,7 @@ export default function CreatorApp() {
 
       {/* Undo toast */}
       {undoToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[#222222] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--near-black)] text-white text-[13px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
           {undoToast}
         </div>
       )}
@@ -732,7 +732,7 @@ export default function CreatorApp() {
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[24px] font-extrabold text-[#222222] mb-2" style={{ letterSpacing: '-0.5px' }}>
+            <h2 className="text-[24px] font-extrabold text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.5px' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
             <p className="text-[14px] text-[var(--mid)] mb-6 leading-[1.5]">
@@ -789,7 +789,7 @@ export default function CreatorApp() {
                 onClick={() => setExpandedOffer(null)}
                 className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-white flex items-center justify-center shadow-[0_2px_8px_rgba(34,34,34,0.1)]"
               >
-                <ChevronLeft className="w-[18px] h-[18px] text-[#222222]" />
+                <ChevronLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
@@ -807,7 +807,7 @@ export default function CreatorApp() {
             <div className="flex-1 overflow-y-auto bg-white">
               <div className="p-[20px]">
                 {/* A) Business name + category */}
-                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
+                <h2 className="text-[22px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
                 <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
 
                 {/* Level requirement banner */}
@@ -815,21 +815,21 @@ export default function CreatorApp() {
                   <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mt-3" style={{ background: 'rgba(26,26,26,0.04)' }}>
                     <Lock className="w-[14px] h-[14px] text-[var(--mid)] mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-[13px] font-semibold text-[#222222]">{detailLockedName} creators only</p>
+                      <p className="text-[13px] font-semibold text-[var(--near-black)]">{detailLockedName} creators only</p>
                       <p className="text-[12px] text-[var(--mid)] mt-0.5">You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
                     </div>
                   </div>
                 )}
 
                 {/* Offer headline */}
-                <p className="text-[20px] font-extrabold text-[#222222] mt-3" style={{ letterSpacing: '-0.4px' }}>
+                <p className="text-[20px] font-extrabold text-[var(--near-black)] mt-3" style={{ letterSpacing: '-0.4px' }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
                 {/* B) What you get */}
                 <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT YOU GET</p>
-                <p className="text-[16px] font-semibold text-[#222222] leading-[1.5] mb-5">
+                <p className="text-[16px] font-semibold text-[var(--near-black)] leading-[1.5] mb-5">
                   {offer.generated_title || offer.description}
                 </p>
 
@@ -837,7 +837,7 @@ export default function CreatorApp() {
                 <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT TO POST</p>
                 <div className="flex items-center gap-2 mb-2">
                   <Video className="w-5 h-5 text-[var(--terra)]" />
-                  <span className="text-[15px] font-bold text-[#222222]">One Instagram Reel</span>
+                  <span className="text-[15px] font-bold text-[var(--near-black)]">One Instagram Reel</span>
                 </div>
                 <p className="text-[13px] text-[var(--mid)] mb-3">Post within 48 hours of your visit</p>
                 <div className="flex flex-col gap-2.5 mb-5">
@@ -864,16 +864,16 @@ export default function CreatorApp() {
                 )}
 
                 {/* D) Availability row */}
-                <div className="flex items-center justify-between rounded-[12px] bg-[#F7F7F7] px-[16px] py-[12px]">
+                <div className="flex items-center justify-between rounded-[12px] bg-[var(--bg)] px-[16px] py-[12px]">
                   <div className="flex items-center gap-2">
                     <Users className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    <span className="text-[14px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#222222' }}>
+                    <span className="text-[14px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--near-black)' }}>
                       {isUnlimited ? 'Open availability' : full ? 'Sold out' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    <span className="text-[14px] font-semibold text-[#222222]">48hrs to post</span>
+                    <span className="text-[14px] font-semibold text-[var(--near-black)]">48hrs to post</span>
                   </div>
                 </div>
               </div>
@@ -893,7 +893,7 @@ export default function CreatorApp() {
                 <div>
                   {full && waitlistedOffers[offer.id] ? (
                     <>
-                      <p className="text-[14px] font-semibold text-[#222222]">You're on the waitlist</p>
+                      <p className="text-[14px] font-semibold text-[var(--near-black)]">You're on the waitlist</p>
                       {waitlistedOffers[offer.id].position && (
                         <p className="text-[12px] text-[var(--soft)]">You're #{waitlistedOffers[offer.id].position} on the waitlist</p>
                       )}
@@ -902,7 +902,7 @@ export default function CreatorApp() {
                     <p className="text-[14px] text-[var(--mid)]">All slots taken</p>
                   ) : (
                     <>
-                      <p className="text-[15px] font-extrabold text-[#222222]">Free visit</p>
+                      <p className="text-[15px] font-extrabold text-[var(--near-black)]">Free visit</p>
                       <p className="text-[12px] text-[var(--mid)]">Post reel within 48hrs</p>
                     </>
                   )}
@@ -914,7 +914,7 @@ export default function CreatorApp() {
                         <button
                           onClick={() => leaveWaitlist(offer.id)}
                           disabled={waitlistLoading === offer.id}
-                          className="px-[18px] py-[10px] rounded-full text-[13px] font-semibold border border-[rgba(34,34,34,0.15)] text-[#222222] min-h-[44px]"
+                          className="px-[18px] py-[10px] rounded-full text-[13px] font-semibold border border-[rgba(34,34,34,0.15)] text-[var(--near-black)] min-h-[44px]"
                         >
                           {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                         </button>
@@ -938,14 +938,14 @@ export default function CreatorApp() {
                     <button
                       onClick={() => joinWaitlist(offer.id)}
                       disabled={waitlistLoading === offer.id}
-                      className="px-[22px] py-[12px] rounded-full text-[14px] font-semibold text-[#222222] min-h-[48px] disabled:opacity-40"
+                      className="px-[22px] py-[12px] rounded-full text-[14px] font-semibold text-[var(--near-black)] min-h-[48px] disabled:opacity-40"
                       style={{ border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
                     >
                       {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
                     </button>
                   )
                 ) : alreadyClaimed ? (
-                  <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[#F7F7F7] text-[var(--soft)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
+                  <button disabled className="px-[22px] py-[12px] rounded-full text-[14px] font-bold bg-[var(--bg)] text-[var(--soft)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
                     <Check className="w-4 h-4" /> Claimed
                   </button>
                 ) : hasActiveBusiness ? (
@@ -976,8 +976,8 @@ export default function CreatorApp() {
             <Logo />
             <div className="flex items-center gap-3">
               <div className="text-right">
-                <p className="text-[14px] font-semibold text-[#222222]">{userProfile.name}</p>
-                <span className="inline-block bg-[#F7F7F7] text-[var(--mid)] text-[12px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
+                <p className="text-[14px] font-semibold text-[var(--near-black)]">{userProfile.name}</p>
+                <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[12px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
                   {userProfile.code}
                 </span>
               </div>
@@ -1013,14 +1013,14 @@ export default function CreatorApp() {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Find local offers..."
-                    className="w-full bg-transparent text-[15px] font-semibold text-[#222222] placeholder:text-[#222222] focus:outline-none"
+                    className="w-full bg-transparent text-[15px] font-semibold text-[var(--near-black)] placeholder:text-[var(--near-black)] focus:outline-none"
                     style={{ minHeight: '24px' }}
                   />
                   <div
                     className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0"
                     style={{ border: '1px solid rgba(34,34,34,0.15)' }}
                   >
-                    <SlidersHorizontal className="w-[12px] h-[12px] text-[#222222]" />
+                    <SlidersHorizontal className="w-[12px] h-[12px] text-[var(--near-black)]" />
                   </div>
                 </div>
               </div>
@@ -1035,7 +1035,7 @@ export default function CreatorApp() {
                         key={tab.key}
                         onClick={() => setSelectedCategory(tab.key)}
                         className={`flex-1 flex flex-col items-center gap-1 py-3 relative transition-all min-h-[44px] ${
-                          isActive ? 'text-[#222222]' : 'text-[var(--soft)]'
+                          isActive ? 'text-[var(--near-black)]' : 'text-[var(--soft)]'
                         }`}
                       >
                         <tab.icon className="w-[20px] h-[20px]" />
@@ -1058,7 +1058,7 @@ export default function CreatorApp() {
                 const hoursLeft = Math.floor(totalMinutesLeft / 60);
                 const minutesLeft = totalMinutesLeft % 60;
                 const timerLabel = hoursLeft >= 1 ? `${hoursLeft}h left` : `${minutesLeft}m left`;
-                const timerColor = hoursLeft < 10 ? 'var(--terra)' : '#222222';
+                const timerColor = hoursLeft < 10 ? 'var(--terra)' : 'var(--near-black)';
                 return (
                   <div
                     className="mx-[20px] mt-[14px] bg-white rounded-2xl p-[16px] flex items-center justify-between"
@@ -1068,7 +1068,7 @@ export default function CreatorApp() {
                     }}
                   >
                     <div>
-                      <p className="text-[14px] font-bold text-[#222222]">Active pass</p>
+                      <p className="text-[14px] font-bold text-[var(--near-black)]">Active pass</p>
                       <button onClick={() => setView('active')} className="flex items-center gap-1 text-[13px] text-[var(--mid)]">
                         {firstActive.businesses.name} <ChevronRight className="w-[10px] h-[10px]" />
                       </button>
@@ -1076,8 +1076,8 @@ export default function CreatorApp() {
                     <span
                       className="text-[14px] font-bold rounded-[50px] whitespace-nowrap"
                       style={{
-                        background: '#F5C4A0',
-                        color: hoursLeft < 10 ? 'var(--terra)' : '#222222',
+                        background: 'var(--peach)',
+                        color: hoursLeft < 10 ? 'var(--terra)' : 'var(--near-black)',
                         padding: '6px 14px',
                       }}
                     >
@@ -1094,7 +1094,7 @@ export default function CreatorApp() {
                   style={{ background: 'rgba(196,103,74,0.06)', border: '1px solid rgba(196,103,74,0.15)' }}
                 >
                   <FlameIcon active size={16} />
-                  <p className="flex-1 text-[13px] text-[#222222]">
+                  <p className="flex-1 text-[13px] text-[var(--near-black)]">
                     Your streak ends in {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate()} days — claim an offer to keep it
                   </p>
                   <button
@@ -1113,7 +1113,7 @@ export default function CreatorApp() {
               {leaderboard.length >= 1 && (
                 <div className="mx-[20px] mt-[14px] bg-white rounded-[16px] border border-[var(--faint)] p-[16px_18px]">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[15px] font-extrabold text-[#222222]">This week's top creators</h3>
+                    <h3 className="text-[15px] font-extrabold text-[var(--near-black)]">This week's top creators</h3>
                     <span className="text-[11px] text-[var(--soft)]">
                       Resets in {(() => {
                         const now = new Date();
@@ -1128,7 +1128,7 @@ export default function CreatorApp() {
                     </span>
                   </div>
                   {leaderboard.slice(0, 5).map((entry, idx) => {
-                    const posColor = idx === 0 ? 'var(--terra)' : idx === 1 ? '#222222' : idx === 2 ? 'var(--mid)' : 'var(--soft)';
+                    const posColor = idx === 0 ? 'var(--terra)' : idx === 1 ? 'var(--near-black)' : idx === 2 ? 'var(--mid)' : 'var(--soft)';
                     return (
                       <div
                         key={entry.id}
@@ -1144,12 +1144,12 @@ export default function CreatorApp() {
                         )}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <span className="text-[14px] font-bold text-[#222222] truncate">{entry.display_name || entry.name}</span>
+                            <span className="text-[14px] font-bold text-[var(--near-black)] truncate">{entry.display_name || entry.name}</span>
                             <LevelBadge level={entry.level} levelName={entry.level_name} size="sm" />
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="text-[15px] font-extrabold text-[#222222]">{entry.reels_this_week}</p>
+                          <p className="text-[15px] font-extrabold text-[var(--near-black)]">{entry.reels_this_week}</p>
                           <p className="text-[11px] text-[var(--soft)]">reels</p>
                         </div>
                       </div>
@@ -1173,12 +1173,12 @@ export default function CreatorApp() {
 
               {/* Section Header */}
               <div className="flex items-center justify-between px-[20px] mt-4 mb-[14px]">
-                <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">Near you</h2>
+                <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
               {offers.length === 0 ? (
                 <div className="text-center py-16 px-6">
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No offers yet</p>
+                  <p className="text-[16px] font-bold text-[var(--near-black)] mb-1">No offers yet</p>
                   <p className="text-[var(--soft)] text-[13px]">New offers from local businesses will appear here. Check back soon!</p>
                 </div>
               ) : (() => {
@@ -1256,7 +1256,7 @@ export default function CreatorApp() {
                         {isLocked && (
                           <div className="absolute inset-0 flex items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
                             <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                              <Lock className="w-3.5 h-3.5 text-[#222222]" />
+                              <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
                             </div>
                           </div>
                         )}
@@ -1289,7 +1289,7 @@ export default function CreatorApp() {
                         )}
                         {/* Reel badge top-right */}
                         {!isLocked && (
-                          <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
+                          <span className="absolute top-[6px] right-[6px] inline-flex items-center gap-1 px-2 py-[3px] rounded-[50px] text-[10px] font-bold text-[var(--near-black)]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                             <Video className="w-[10px] h-[10px]" /> Reel
                           </span>
                         )}
@@ -1308,8 +1308,8 @@ export default function CreatorApp() {
                       </div>
                       {/* Below image info */}
                       <div className="mt-2">
-                        <p className="text-[14px] font-extrabold text-[#222222] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
-                        <p className="text-[13px] font-semibold text-[#222222] truncate">
+                        <p className="text-[14px] font-extrabold text-[var(--near-black)] tracking-[-0.1px] truncate">{offer.businesses.name}</p>
+                        <p className="text-[13px] font-semibold text-[var(--near-black)] truncate">
                           {offer.generated_title || offer.description.slice(0, 35)}
                         </p>
                         {isLocked ? (
@@ -1336,7 +1336,7 @@ export default function CreatorApp() {
 
                     {/* Second section */}
                     <div className="flex items-center justify-between px-[20px] mt-2 mb-[14px]">
-                      <h2 className="text-[18px] font-extrabold text-[#222222] tracking-[-0.3px]">New this week</h2>
+                      <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
                     <div className="overflow-x-auto scrollbar-hide">
@@ -1356,14 +1356,14 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[26px] font-extrabold text-[#222222]">Saved</h1>
+                <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Saved</h1>
                 <span className="text-[13px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
               {matchedSaved.length === 0 ? (
                 <div className="text-center py-20">
                   <Heart className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-                  <p className="text-[16px] font-semibold text-[#222222]">Nothing saved yet</p>
+                  <p className="text-[16px] font-semibold text-[var(--near-black)]">Nothing saved yet</p>
                   <p className="text-[14px] text-[var(--mid)] mt-1">Heart an offer to save it for later</p>
                 </div>
               ) : (
@@ -1392,7 +1392,7 @@ export default function CreatorApp() {
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[15px] font-bold text-[#222222] truncate">{offer.businesses.name}</p>
+                          <p className="text-[15px] font-bold text-[var(--near-black)] truncate">{offer.businesses.name}</p>
                           <p className="text-[13px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
                           <p className="text-[13px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--terra)' }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
@@ -1419,7 +1419,7 @@ export default function CreatorApp() {
               {activeClaims.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-6">
                   <Zap className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[18px] font-bold text-[#222222] mb-1">No active claims</p>
+                  <p className="text-[18px] font-bold text-[var(--near-black)] mb-1">No active claims</p>
                   <p className="text-[14px] text-[var(--mid)] mb-5">Claim an offer to get started</p>
                   <button
                     onClick={() => setView('offers')}
@@ -1445,7 +1445,7 @@ export default function CreatorApp() {
                           }}
                           className={`whitespace-nowrap text-[12px] font-semibold rounded-[50px] px-[14px] flex-shrink-0 transition-all ${
                             isSelected
-                              ? 'bg-[#222222] text-white'
+                              ? 'bg-[var(--near-black)] text-white'
                               : 'bg-[#F0EFED] text-[var(--mid)]'
                           }`}
                           style={{ height: '32px' }}
@@ -1559,7 +1559,7 @@ export default function CreatorApp() {
                                 }`}>
                                   <div className="flex items-center gap-2 mb-2">
                                     <Clock className={`w-4 h-4 ${isOverdue ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-                                    <p className={`text-[14px] font-bold ${isOverdue ? 'text-[var(--terra)]' : 'text-[#222222]'}`}>
+                                    <p className={`text-[14px] font-bold ${isOverdue ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
@@ -1572,7 +1572,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-white border border-[var(--faint)]">
-                                  <label className="block text-[14px] font-semibold text-[#222222] mb-2">
+                                  <label className="block text-[14px] font-semibold text-[var(--near-black)] mb-2">
                                     Submit Your Reel
                                   </label>
                                   <div className="flex gap-2">
@@ -1581,7 +1581,7 @@ export default function CreatorApp() {
                                       value={reelUrl}
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="https://instagram.com/reel/..."
-                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] border border-[var(--faint)] text-[15px] text-[#222222] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
+                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[15px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
                                     />
                                     <button
                                       onClick={handleSubmitReel}
@@ -1600,7 +1600,7 @@ export default function CreatorApp() {
                               {claim.reel_url && (
                                 <div className="flex items-center gap-2 p-3 rounded-[12px] bg-white border border-[var(--faint)]">
                                   <Check className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
-                                  <span className="text-[14px] text-[#222222] font-medium">Reel submitted!</span>
+                                  <span className="text-[14px] text-[var(--near-black)] font-medium">Reel submitted!</span>
                                 </div>
                               )}
 
@@ -1670,11 +1670,11 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[26px] font-extrabold text-[#222222] mb-5">Claims</h1>
+              <h1 className="text-[26px] font-extrabold text-[var(--near-black)] mb-5">Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <Zap className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-                  <p className="text-[16px] font-semibold text-[#222222]">No claims yet</p>
+                  <p className="text-[16px] font-semibold text-[var(--near-black)]">No claims yet</p>
                   <p className="text-[14px] text-[var(--mid)] mt-1">Claim an offer to get started</p>
                 </div>
               ) : (
@@ -1695,7 +1695,7 @@ export default function CreatorApp() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-[15px] text-[#222222]">{claim.businesses.name}</h3>
+                              <h3 className="font-semibold text-[15px] text-[var(--near-black)]">{claim.businesses.name}</h3>
                               <p className="text-[13px] text-[var(--mid)] mt-0.5">{claim.businesses.category}</p>
                               <p className="text-[13px] text-[var(--mid)] mt-0.5 leading-[1.4]" style={{
                                 display: '-webkit-box',
@@ -1750,7 +1750,7 @@ export default function CreatorApp() {
                           onChange={handleAvatarUpload}
                         />
                         {uploadingAvatar ? (
-                          <div className="w-[72px] h-[72px] rounded-full bg-[#F7F7F7] flex items-center justify-center">
+                          <div className="w-[72px] h-[72px] rounded-full bg-[var(--bg)] flex items-center justify-center">
                             <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : avatarUrl ? (
@@ -1776,7 +1776,7 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
@@ -1807,17 +1807,17 @@ export default function CreatorApp() {
                     {/* Stats row inside card */}
                     <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.length}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{claims.length}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Claimed</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{collabsCompleted}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{collabsCompleted}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Posted</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Rating</p>
                       </div>
                     </div>
@@ -1833,7 +1833,7 @@ export default function CreatorApp() {
                             <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
                           </div>
                           <div>
-                            <p className="text-[14px] font-bold text-[#222222]">Profile complete</p>
+                            <p className="text-[14px] font-bold text-[var(--near-black)]">Profile complete</p>
                             <p className="text-[12px] text-[var(--mid)]">Your profile is ready for businesses</p>
                           </div>
                         </div>
@@ -1842,7 +1842,7 @@ export default function CreatorApp() {
                     return (
                       <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
                         <div className="flex items-center justify-between mb-[10px]">
-                          <span className="text-[14px] font-bold text-[#222222]">Complete your profile</span>
+                          <span className="text-[14px] font-bold text-[var(--near-black)]">Complete your profile</span>
                           <span className="text-[12px] font-semibold text-[var(--terra)]">{completeness.score}%</span>
                         </div>
                         <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: 'var(--bg)' }}>
@@ -1866,7 +1866,7 @@ export default function CreatorApp() {
                       return (
                         <>
                           <div className="flex items-center justify-between mb-[8px]">
-                            <span className="text-[14px] font-bold text-[#222222]">Level {progress.currentLevel} · {progress.currentName}</span>
+                            <span className="text-[14px] font-bold text-[var(--near-black)]">Level {progress.currentLevel} · {progress.currentName}</span>
                             {!progress.isMaxLevel && (
                               <span className="text-[12px] text-[var(--mid)]">Level {progress.nextLevel} · {progress.nextName}</span>
                             )}
@@ -1890,7 +1890,7 @@ export default function CreatorApp() {
                     <div className="flex items-center justify-between mt-[14px] pt-[14px] border-t border-[var(--faint)]">
                       <div className="flex items-center gap-[8px]">
                         <FlameIcon active={(userProfile.current_streak || 0) > 0} />
-                        <span className="text-[14px] font-bold text-[#222222]">
+                        <span className="text-[14px] font-bold text-[var(--near-black)]">
                           {(userProfile.current_streak || 0) > 0
                             ? `${userProfile.current_streak} month streak`
                             : 'Start your streak'
@@ -1911,7 +1911,7 @@ export default function CreatorApp() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <User className="w-[20px] h-[20px] text-[var(--mid)]" />
-                        <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
+                        <span className="text-[15px] font-semibold text-[var(--near-black)]">Edit profile</span>
                       </div>
                       <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
                     </button>
@@ -1921,7 +1921,7 @@ export default function CreatorApp() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
-                        <span className="text-[15px] font-semibold text-[#222222]">Notifications</span>
+                        <span className="text-[15px] font-semibold text-[var(--near-black)]">Notifications</span>
                         {unreadCount > 0 && (
                           <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[11px] font-bold flex items-center justify-center">
                             {unreadCount}
@@ -1943,15 +1943,15 @@ export default function CreatorApp() {
                 /* Alerts/Notifications sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[26px] font-extrabold text-[#222222]">Notifications</h1>
+                    <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="text-center py-16">
                       <Bell className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-                      <p className="text-[16px] font-semibold text-[#222222]">No notifications yet</p>
+                      <p className="text-[16px] font-semibold text-[var(--near-black)]">No notifications yet</p>
                     </div>
                   ) : (
                     <div className="space-y-3">
@@ -1966,7 +1966,7 @@ export default function CreatorApp() {
                           <div className="flex items-start gap-3">
                             <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'}`} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-[15px] text-[#222222]">{notif.message}</p>
+                              <p className="text-[15px] text-[var(--near-black)]">{notif.message}</p>
                               <p className="text-[13px] text-[var(--soft)] mt-1">
                                 {formatDate(notif.created_at)}
                               </p>
@@ -1981,10 +1981,10 @@ export default function CreatorApp() {
                 /* Edit Profile sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[26px] font-extrabold text-[#222222]">Edit profile</h1>
+                    <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     <div>
@@ -1993,7 +1993,7 @@ export default function CreatorApp() {
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[#222222] focus:outline-none focus:border-[var(--terra)]"
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)]"
                       />
                     </div>
                     <div>
@@ -2003,7 +2003,7 @@ export default function CreatorApp() {
                         value={editHandle}
                         onChange={(e) => setEditHandle(e.target.value)}
                         placeholder="@yourhandle"
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[#222222] focus:outline-none focus:border-[var(--terra)]"
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[15px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)]"
                       />
                     </div>
                     <button

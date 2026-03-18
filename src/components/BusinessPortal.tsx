@@ -157,12 +157,12 @@ function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
     return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: 'Last slot' };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: `${slotsLeft} left` };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
-  return { background: '#F5C4A0', color: '#222222', text: `${slotsLeft} left` };
+  return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
 }
 
 // ─── Offer quality indicator ──────────────────────────────────────────────
@@ -283,7 +283,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
           style={{
             height: scanning ? 'auto' : '0',
             opacity: scanning ? 1 : 0,
-            background: '#222222',
+            background: 'var(--near-black)',
             transition: 'opacity 0.2s',
           }}
         />
@@ -319,7 +319,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {scanning && (
         <button
           onClick={stopScanner}
-          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[13px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[#ececec] transition-all border border-[var(--faint)] min-h-[44px]"
+          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[13px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)] transition-all border border-[var(--faint)] min-h-[44px]"
         >
           Stop Scanner
         </button>
@@ -588,7 +588,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 }}
                 className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
                 style={{
-                  background: discountUnit === '%' ? '#222222' : 'var(--bg)',
+                  background: discountUnit === '%' ? 'var(--near-black)' : 'var(--bg)',
                   color: discountUnit === '%' ? 'white' : 'var(--mid)',
                 }}
               >
@@ -598,7 +598,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 onClick={() => setDiscountUnit('£')}
                 className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
                 style={{
-                  background: discountUnit === '£' ? '#222222' : 'var(--bg)',
+                  background: discountUnit === '£' ? 'var(--near-black)' : 'var(--bg)',
                   color: discountUnit === '£' ? 'white' : 'var(--mid)',
                 }}
               >
@@ -804,7 +804,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <button
                   key={i}
                   onClick={() => setSpecificAsk(chip.slice(0, 100))}
-                  className="px-3 py-1.5 rounded-[50px] bg-[var(--bg)] text-[var(--mid)] text-[12px] font-semibold hover:bg-[#ececec] transition-colors"
+                  className="px-3 py-1.5 rounded-[50px] bg-[var(--bg)] text-[var(--mid)] text-[12px] font-semibold hover:bg-[var(--pressed)] transition-colors"
                 >
                   {chip}
                 </button>
@@ -872,7 +872,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                         <span
                           key={i}
                           className="w-2 h-2 rounded-full"
-                          style={{ background: i <= dots ? '#C4674A' : 'rgba(34,34,34,0.12)' }}
+                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(34,34,34,0.12)' }}
                         />
                       ))}
                     </div>
@@ -1395,7 +1395,7 @@ export default function BusinessPortal() {
             <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
               <button
                 onClick={() => setExpandedNearbyBiz(null)}
-                className="w-[36px] h-[36px] rounded-full bg-[#F7F7F7] flex items-center justify-center"
+                className="w-[36px] h-[36px] rounded-full bg-[var(--bg)] flex items-center justify-center"
               >
                 <X className="w-[18px] h-[18px] text-[var(--near-black)]" />
               </button>
@@ -1750,7 +1750,7 @@ export default function BusinessPortal() {
                 /* ── Offer detail / edit sub-view (inline editor) ── */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+                    <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
                     <h1 className="text-[22px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
@@ -2012,7 +2012,7 @@ export default function BusinessPortal() {
                       <p className="text-[12px] text-[var(--soft)] mb-6">{new Date().toLocaleString()}</p>
                       <button
                         onClick={() => setScanResult(null)}
-                        className="px-[28px] py-[13px] rounded-[50px] bg-[#222222] text-white font-bold text-[14px] hover:bg-[#333] transition-all min-h-[48px]"
+                        className="px-[28px] py-[13px] rounded-[50px] bg-[var(--near-black)] text-white font-bold text-[14px] hover:bg-[#333] transition-all min-h-[48px]"
                       >
                         Done
                       </button>
@@ -2064,7 +2064,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[#222222] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2183,12 +2183,12 @@ export default function BusinessPortal() {
                             {claim.status === 'active' ? (
                               <button
                                 onClick={() => { setView('scan'); setScanResult(null); }}
-                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[#222222] text-white text-[13px] font-semibold hover:bg-[#333333] transition-colors"
+                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--near-black)] text-white text-[13px] font-semibold hover:bg-[#333333] transition-colors"
                               >
                                 <ScanLine className="w-[14px] h-[14px]" /> Scan
                               </button>
                             ) : claim.status === 'completed' && claim.reel_url ? (
-                              <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[#eee] transition-colors">
+                              <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors">
                                 <Video className="w-[14px] h-[14px]" /> Reel
                               </a>
                             ) : (
@@ -2239,7 +2239,7 @@ export default function BusinessPortal() {
                                 href={claim.reel_url!}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[#eeeeee] transition-colors"
+                                className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors"
                               >
                                 <Video className="w-[14px] h-[14px]" /> View reel <ExternalLink className="w-3 h-3 text-[var(--soft)]" />
                               </a>
@@ -2320,7 +2320,7 @@ export default function BusinessPortal() {
                           }}
                         />
                         {logoUploading ? (
-                          <div className="w-[72px] h-[72px] rounded-[16px] bg-[#F7F7F7] flex items-center justify-center">
+                          <div className="w-[72px] h-[72px] rounded-[16px] bg-[var(--bg)] flex items-center justify-center">
                             <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : logoUrl ? (
@@ -2451,7 +2451,7 @@ export default function BusinessPortal() {
                 /* Edit profile sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
                     <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Edit profile</h1>

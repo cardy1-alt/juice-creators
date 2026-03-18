@@ -44,10 +44,10 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
       <div className="bg-white rounded-[16px] max-w-md w-full p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-[#F7F7F7] flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full bg-[var(--bg)] flex items-center justify-center mx-auto mb-4">
               <Check className="w-8 h-8 text-[var(--terra)]" />
             </div>
-            <h3 className="text-xl font-bold text-[#222222] mb-2">Report Submitted</h3>
+            <h3 className="text-xl font-bold text-[var(--near-black)] mb-2">Report Submitted</h3>
             <p className="text-[var(--mid)] text-sm">
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
@@ -59,9 +59,9 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
                   <AlertTriangle className="w-5 h-5 text-[var(--terra)]" />
                 </div>
-                <h3 className="text-lg font-bold text-[#222222]">Report an Issue</h3>
+                <h3 className="text-lg font-bold text-[var(--near-black)]">Report an Issue</h3>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
+              <button onClick={onClose} className="p-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                 <X className="w-5 h-5 text-[var(--soft)]" />
               </button>
             </div>
@@ -72,7 +72,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-sm font-semibold text-[#222222] mb-2">
+                <label className="block text-sm font-semibold text-[var(--near-black)] mb-2">
                   What happened?
                 </label>
                 <textarea
@@ -80,7 +80,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-[14px] py-3 rounded-[12px] bg-[#F7F7F7] text-[13px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
+                  className="w-full px-[14px] py-3 rounded-[12px] bg-[var(--bg)] text-[13px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
                   required
                 />
               </div>
@@ -95,7 +95,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-3 rounded-full min-h-[48px] text-[#222222] font-semibold bg-[#F7F7F7] hover:bg-[#eeeeee] transition-all text-sm"
+                  className="flex-1 py-3 rounded-full min-h-[48px] text-[var(--near-black)] font-semibold bg-[var(--bg)] hover:bg-[var(--pressed)] transition-all text-sm"
                 >
                   Cancel
                 </button>

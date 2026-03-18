@@ -123,7 +123,7 @@ function AddressAutocomplete({ value, onChange }: {
       <div className={`relative rounded-[14px] border transition-all duration-200 ${
         focused
           ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
-          : 'border-[var(--faint)] bg-[#F7F7F7]'
+          : 'border-[var(--faint)] bg-[var(--bg)]'
       }`}>
         <MapPin className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
           focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
@@ -140,14 +140,14 @@ function AddressAutocomplete({ value, onChange }: {
         />
       </div>
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[#f0f0f0] shadow-[0_4px_16px_rgba(0,0,0,0.12)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(34,34,34,0.10)] overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.place_id}
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[var(--near-black)] hover:bg-[#F7F7F7] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
+              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
             >
               <MapPin className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
@@ -179,8 +179,8 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
       focused
         ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
         : hasValue
-          ? 'border-[var(--faint)] bg-[#F7F7F7]'
-          : 'border-[var(--faint)] bg-[#F7F7F7]'
+          ? 'border-[var(--faint)] bg-[var(--bg)]'
+          : 'border-[var(--faint)] bg-[var(--bg)]'
     }`}>
       {Icon && (
         <Icon className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
@@ -310,12 +310,12 @@ export default function Auth() {
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
         {/* Sign In / Sign Up toggle — pill style */}
-        <div className="flex gap-[4px] mb-[28px] p-[3px] bg-[#F3F3F3] rounded-[14px]">
+        <div className="flex gap-[4px] mb-[28px] p-[3px] bg-[var(--elevated)] rounded-[14px]">
           <button
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(34,34,34,0.06),0_1px_2px_rgba(34,34,34,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -325,7 +325,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(34,34,34,0.06),0_1px_2px_rgba(34,34,34,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -459,7 +459,7 @@ export default function Auth() {
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'creator' ? 'bg-[var(--terra-15)]' : 'bg-[#F7F7F7]'
+                  role === 'creator' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
                 }`}>
                   <Sparkles className={`w-[18px] h-[18px] ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
@@ -477,7 +477,7 @@ export default function Auth() {
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'business' ? 'bg-[var(--terra-15)]' : 'bg-[#F7F7F7]'
+                  role === 'business' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
                 }`}>
                   <Building2 className={`w-[18px] h-[18px] ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
@@ -496,11 +496,11 @@ export default function Auth() {
                       ? 'bg-[var(--terra)] text-white'
                       : signupStep === step
                         ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
-                        : 'bg-[#F3F3F3] text-[var(--soft)]'
+                        : 'bg-[var(--elevated)] text-[var(--soft)]'
                   }`}>
                     {signupStep > step ? <Check className="w-[13px] h-[13px]" /> : step}
                   </div>
-                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[#F3F3F3]'}`} />}
+                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[var(--elevated)]'}`} />}
                 </div>
               ))}
             </div>
@@ -532,8 +532,8 @@ export default function Auth() {
                             onClick={() => setFollowerCount(opt)}
                             className={`flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all ${
                               followerCount === opt
-                                ? 'bg-[#222222] text-white'
-                                : 'bg-[#F7F7F7] text-[var(--mid)] hover:bg-[#EEEEEE]'
+                                ? 'bg-[var(--near-black)] text-white'
+                                : 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)]'
                             }`}
                           >
                             {opt}
@@ -549,7 +549,7 @@ export default function Auth() {
                   <div className="space-y-[12px]">
                     <div>
                       <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
-                      <div className={`relative rounded-[14px] border transition-all duration-200 border-[var(--faint)] bg-[#F7F7F7] focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
+                      <div className={`relative rounded-[14px] border transition-all duration-200 border-[var(--faint)] bg-[var(--bg)] focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
                         <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
                         <input
                           type="date"
@@ -642,7 +642,7 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[11px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
@@ -690,7 +690,7 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                      className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
+                      className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
                     >
                       <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
                     </button>
@@ -727,7 +727,7 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                    className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
+                    className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
                   >
                     <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
                   </button>

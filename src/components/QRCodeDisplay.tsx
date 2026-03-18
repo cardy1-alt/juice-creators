@@ -339,7 +339,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
 
       {/* Creator code badge */}
       <span
-        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#222222] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
+        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
       >
         {creatorCode}
       </span>

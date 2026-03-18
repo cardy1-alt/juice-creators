@@ -174,7 +174,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         <button
           onClick={requestLocation}
           disabled={isLocating}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-[#222222] rounded-full text-[13px] font-semibold hover:bg-[#F7F7F7] transition-colors disabled:opacity-50 min-h-[44px]"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-[var(--near-black)] rounded-full text-[13px] font-semibold hover:bg-[var(--bg)] transition-colors disabled:opacity-50 min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
           <Navigation className="w-4 h-4" />
@@ -182,7 +182,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </button>
         <button
           onClick={() => setShowLocationInput(!showLocationInput)}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-[#222222] rounded-full text-[13px] font-semibold hover:bg-[#F7F7F7] transition-colors min-h-[44px]"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white text-[var(--near-black)] rounded-full text-[13px] font-semibold hover:bg-[var(--bg)] transition-colors min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
           <Search className="w-4 h-4" />
@@ -196,7 +196,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       {showLocationInput && (
         <div className="mb-3 bg-white rounded-[16px] p-4 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] relative">
-          <label className="block text-[13px] font-semibold text-[#222222] mb-2">
+          <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-2">
             Enter address or postcode
           </label>
           <input
@@ -204,7 +204,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             value={locationInput}
             onChange={(e) => handleLocationInputChange(e.target.value)}
             placeholder="e.g., London SW1A 1AA"
-            className="w-full px-4 py-[14px] rounded-[12px] bg-[#F7F7F7] text-[15px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] min-h-[52px]"
+            className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] min-h-[52px]"
           />
           {/* Autocomplete dropdown */}
           {searchResults.length > 0 && (
@@ -213,7 +213,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                 <button
                   key={idx}
                   onClick={() => selectSearchResult(result)}
-                  className="w-full text-left px-4 py-3 text-[14px] text-[#222222] hover:bg-[#F7F7F7] transition-colors border-b border-[var(--faint)] last:border-0"
+                  className="w-full text-left px-4 py-3 text-[14px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors border-b border-[var(--faint)] last:border-0"
                 >
                   {result.display_name.length > 60 ? result.display_name.slice(0, 60) + '...' : result.display_name}
                 </button>
@@ -223,7 +223,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </div>
       )}
 
-      <div className="relative bg-[#F7F7F7] rounded-[16px] overflow-hidden" style={{ height: '400px' }}>
+      <div className="relative bg-[var(--bg)] rounded-[16px] overflow-hidden" style={{ height: '400px' }}>
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <div className="text-center bg-white/95 backdrop-blur-sm p-6 rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] border border-[var(--faint)]">
@@ -257,7 +257,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             >
               <Popup closeButton={true}>
                 <div className="min-w-[180px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-                  <h4 className="font-bold text-[14px] text-[#222222] mb-1">{business.name}</h4>
+                  <h4 className="font-bold text-[14px] text-[var(--near-black)] mb-1">{business.name}</h4>
                   <p className="text-[13px] text-[var(--mid)] mb-2">{business.category}</p>
                   {business.offers.length > 0 && (
                     <p className="text-[13px] text-[var(--terra)] font-semibold mb-2">
@@ -279,7 +279,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       <div className="mt-4 space-y-[14px] overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-extrabold text-[15px] text-[#222222]">Nearby Businesses</h3>
+          <h3 className="font-extrabold text-[15px] text-[var(--near-black)]">Nearby Businesses</h3>
           <span className="text-[13px] text-[var(--soft)]">{businessesWithDistance.length} found</span>
         </div>
 
@@ -290,12 +290,12 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             onClick={() => setSelectedBusiness(business)}
           >
             <div className="flex items-start gap-3">
-              <div className="w-10 h-10 rounded-[12px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 rounded-[12px] bg-[var(--bg)] flex items-center justify-center flex-shrink-0">
                 <CategoryIcon category={business.category} className="w-5 h-5 text-[var(--mid)]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
-                  <h4 className="font-semibold text-[15px] text-[#222222]">{business.name}</h4>
+                  <h4 className="font-semibold text-[15px] text-[var(--near-black)]">{business.name}</h4>
                   <span className="text-[13px] text-[var(--mid)] whitespace-nowrap">
                     {business.distance < 1
                       ? `${(business.distance * 1000).toFixed(0)} m`
@@ -327,11 +327,11 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
             <div className="p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-[16px] bg-[#F7F7F7] flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-[16px] bg-[var(--bg)] flex items-center justify-center flex-shrink-0">
                     <CategoryIcon category={selectedBusiness.category} className="w-6 h-6 text-[var(--mid)]" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-[16px] text-[#222222]">{selectedBusiness.name}</h3>
+                    <h3 className="font-bold text-[16px] text-[var(--near-black)]">{selectedBusiness.name}</h3>
                     <p className="text-[13px] text-[var(--mid)] mt-0.5">{selectedBusiness.address}</p>
                     <p className="text-[13px] text-[var(--soft)] mt-1">
                       {selectedBusiness.distance < 1
@@ -359,7 +359,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                   const full = !isUnlimited && slotsLeft === 0;
 
                   return (
-                    <div key={offer.id} className="bg-[#F7F7F7] rounded-[12px] p-3">
+                    <div key={offer.id} className="bg-[var(--bg)] rounded-[12px] p-3">
                       <p className="text-[14px] text-[var(--mid)] mb-2">{offer.description}</p>
                       <div className="flex items-center justify-between">
                         <span className="text-[13px] font-bold text-[var(--forest)]">{offer.reward_value}</span>
