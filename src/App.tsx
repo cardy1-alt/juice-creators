@@ -12,10 +12,16 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
     super(props);
     this.state = { hasError: false, errorMessage: '' };
   }
-  static getDerivedStateFromError(error: Error) {
-    return { hasError: true, errorMessage: `${error.name}: ${error.message}` };
+  static getDerivedStateFromError(error: unknown) {
+    let msg: string;
+    if (error instanceof Error) {
+      msg = `${error.name}: ${error.message}`;
+    } else {
+      try { msg = JSON.stringify(error); } catch { msg = String(error); }
+    }
+    return { hasError: true, errorMessage: msg };
   }
-  componentDidCatch(error: Error, info: React.ErrorInfo) {
+  componentDidCatch(error: unknown, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
   }
   render() {
