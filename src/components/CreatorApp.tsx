@@ -9,7 +9,6 @@ import LevelBadge from './LevelBadge';
 import { getCategoryGradient, getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
-import FeedbackButton from './FeedbackButton';
 import { uploadAvatar } from '../lib/upload';
 import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
 
@@ -1697,13 +1696,13 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="flex-shrink-0 text-left rounded-[12px] overflow-hidden flex flex-col"
-                      style={{ width: 'calc(70vw - 20px)', maxWidth: '240px', border: '0.5px solid rgba(34,34,34,0.08)' }}
+                      className="text-left rounded-[12px] overflow-hidden flex flex-col"
+                      style={{ border: '0.5px solid rgba(34,34,34,0.08)' }}
                     >
                       {/* ZONE 1 — Image (4:3 aspect) */}
                       <div
                         className="w-full relative overflow-hidden"
-                        style={{ aspectRatio: '4/3', background: getCategoryGradient(offer.businesses.category), borderRadius: '12px 12px 0 0' }}
+                        style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category), borderRadius: '12px 12px 0 0' }}
                       >
                         {offer.offer_photo_url ? (
                           <img src={offer.offer_photo_url} alt={bizName} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1773,9 +1772,9 @@ export default function CreatorApp() {
 
                 return (
                   <>
-                    {/* Horizontal scroll offer cards */}
-                    <div className="overflow-x-auto scrollbar-hide">
-                      <div className="flex gap-[14px] px-[20px] pb-4" style={{ width: 'max-content' }}>
+                    {/* Near you offer cards grid */}
+                    <div className="px-[20px] pb-4">
+                      <div className="grid grid-cols-2 gap-[12px]">
                         {filteredOffers.map(renderOfferCard)}
                       </div>
                     </div>
@@ -1785,8 +1784,8 @@ export default function CreatorApp() {
                       <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
-                    <div className="overflow-x-auto scrollbar-hide">
-                      <div className="flex gap-[14px] px-[20px] pb-4" style={{ width: 'max-content' }}>
+                    <div className="px-[20px] pb-4">
+                      <div className="grid grid-cols-2 gap-[12px]">
                         {filteredOffers.slice().reverse().map(renderOfferCard)}
                       </div>
                     </div>
@@ -2732,12 +2731,6 @@ export default function CreatorApp() {
           ))}
         </div>
       </div>
-      <FeedbackButton
-        userId={userProfile.id}
-        userType="creator"
-        displayName={userProfile.display_name || userProfile.name}
-        currentPage={view}
-      />
     </div>
   );
 }
