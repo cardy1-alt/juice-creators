@@ -196,6 +196,7 @@ export default function CreatorApp() {
   const [redeemToast, setRedeemToast] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const prevClaimStatusesRef = useRef<Record<string, string>>({});
+  const passTouchRef = useRef<{ startX: number; startY: number } | null>(null);
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -1351,7 +1352,7 @@ export default function CreatorApp() {
                 </div>
               </div>
 
-              {/* Your passes — full-width swipeable card */}
+              {/* Your passes — JS-controlled slider */}
               {activeClaims.length > 0 && activeClaims.some(c => c.businesses && c.offers) && (() => {
                 const giftCardClaims = activeClaims.filter(c => c.businesses && c.offers);
 
@@ -1386,42 +1387,69 @@ export default function CreatorApp() {
                         </button>
                       )}
                     </div>
-                    {/* Swipeable scroll container */}
+                    {/* Slider container */}
                     <div
-                      className="overflow-x-scroll scrollbar-hide"
-                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
-                      onScroll={(e) => {
-                        const el = e.currentTarget;
-                        const cardWidth = el.clientWidth;
-                        const idx = Math.round(el.scrollLeft / cardWidth);
-                        if (idx !== activePassIdx && idx >= 0 && idx < giftCardClaims.length) {
-                          setActivePassIdx(idx);
+                      style={{ overflow: 'hidden', position: 'relative', padding: '0 16px' }}
+                      onTouchStart={(e) => {
+                        passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
+                      }}
+                      onTouchEnd={(e) => {
+                        if (!passTouchRef.current) return;
+                        const endX = e.changedTouches[0].clientX;
+                        const endY = e.changedTouches[0].clientY;
+                        const deltaX = passTouchRef.current.startX - endX;
+                        const deltaY = passTouchRef.current.startY - endY;
+                        const absDeltaX = Math.abs(deltaX);
+                        const absDeltaY = Math.abs(deltaY);
+
+                        // Tap detection: very small movement
+                        if (absDeltaX < 10 && absDeltaY < 10) {
+                          const claim = giftCardClaims[activePassIdx];
+                          if (claim) {
+                            setSelectedClaim(claim);
+                            setQrOpenSource('home');
+                            setQrScreenTab(claim.redeemed_at && !claim.reel_url ? 'reel' : 'pass');
+                            setShowQrFullscreen(true);
+                          }
+                          passTouchRef.current = null;
+                          return;
                         }
+
+                        // Swipe detection: horizontal threshold > 50px
+                        if (absDeltaX > 50 && absDeltaX > absDeltaY) {
+                          if (deltaX > 0 && activePassIdx < giftCardClaims.length - 1) {
+                            setActivePassIdx(activePassIdx + 1);
+                          } else if (deltaX < 0 && activePassIdx > 0) {
+                            setActivePassIdx(activePassIdx - 1);
+                          }
+                        }
+                        passTouchRef.current = null;
                       }}
                     >
-                      <div className="flex" style={{ gap: 0 }}>
-                        {giftCardClaims.map((claim, idx) => {
+                      <div
+                        className="flex"
+                        style={{
+                          transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                          transform: `translateX(-${activePassIdx * 100}%)`,
+                        }}
+                      >
+                        {giftCardClaims.map((claim) => {
                           const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                           const matchedOffer = offers.find(o => o.id === claim.offer_id);
                           const photoUrl = matchedOffer?.offer_photo_url || null;
                           const status = getGiftCardStatus(claim);
-                          const isFirst = idx === 0;
-                          const isLast = idx === giftCardClaims.length - 1;
 
                           return (
-                            <button
+                            <div
                               key={claim.id}
-                              onClick={() => { setSelectedClaim(claim); setQrOpenSource('home'); setQrScreenTab(claim.redeemed_at && !claim.reel_url ? 'reel' : 'pass'); setShowQrFullscreen(true); }}
-                              className="relative overflow-hidden text-left flex-shrink-0"
+                              className="relative overflow-hidden text-left"
                               style={{
-                                width: 'calc(100vw - 32px)',
+                                width: '100%',
+                                flexShrink: 0,
                                 height: 200,
                                 borderRadius: 16,
                                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
                                 background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
-                                scrollSnapAlign: 'start',
-                                marginLeft: isFirst ? 16 : 0,
-                                marginRight: isLast ? 16 : 12,
                               }}
                             >
                               {photoUrl && (
@@ -1455,7 +1483,7 @@ export default function CreatorApp() {
                                 <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
                                 <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
                               </svg>
-                            </button>
+                            </div>
                           );
                         })}
                       </div>
