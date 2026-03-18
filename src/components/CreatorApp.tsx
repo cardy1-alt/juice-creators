@@ -1210,41 +1210,107 @@ export default function CreatorApp() {
                 </div>
               </div>
 
-              {/* Active Claim Banner */}
-              {activeClaims.length > 0 && activeClaims[0].businesses && (() => {
-                const firstActive = activeClaims[0];
-                const claimedTime = new Date(firstActive.claimed_at).getTime();
-                const now = new Date().getTime();
-                const totalMinutesLeft = Math.max(0, Math.floor((48 * 60) - (now - claimedTime) / (1000 * 60)));
-                const hoursLeft = Math.floor(totalMinutesLeft / 60);
-                const minutesLeft = totalMinutesLeft % 60;
-                const timerLabel = hoursLeft >= 1 ? `${hoursLeft}h left` : `${minutesLeft}m left`;
-                const timerColor = hoursLeft < 10 ? 'var(--terra)' : 'var(--near-black)';
+              {/* Your passes — gift card row (replaces old Active Claim Banner) */}
+              {activeClaims.length > 0 && activeClaims.some(c => c.businesses && c.offers) && (() => {
+                const giftCardClaims = activeClaims.filter(c => c.businesses && c.offers);
+
+                const getGiftCardBg = (category: string): string => {
+                  const lower = category.toLowerCase();
+                  if (['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'].some(c => lower.includes(c))) return '#3D2314';
+                  if (['salon', 'spa', 'beauty', 'nails', 'hair', 'skincare', 'barbershop', 'wellness'].some(c => lower.includes(c))) return '#3D1A2A';
+                  return 'var(--forest)';
+                };
+
+                const getGiftCardStatus = (claim: Claim): { dotColor: string; text: string } => {
+                  if (claim.status === 'active') {
+                    return { dotColor: 'var(--peach)', text: 'Show at the door' };
+                  }
+                  if (claim.redeemed_at && !claim.reel_url) {
+                    // Reel due — compute hours left
+                    if (claim.reel_due_at) {
+                      const hoursLeft = Math.max(0, Math.floor((new Date(claim.reel_due_at).getTime() - Date.now()) / (1000 * 60 * 60)));
+                      return { dotColor: 'var(--terra)', text: `Reel due · ${hoursLeft}h left` };
+                    }
+                    return { dotColor: 'var(--terra)', text: 'Post your reel' };
+                  }
+                  // Visited but not yet reel_due
+                  return { dotColor: 'var(--terra)', text: 'Post your reel' };
+                };
+
                 return (
-                  <div
-                    className="mx-[20px] mt-[14px] bg-white rounded-2xl p-[16px] flex items-center justify-between"
-                    style={{
-                      border: '1px solid rgba(34,34,34,0.1)',
-                      boxShadow: '0 1px 4px rgba(34,34,34,0.06)',
-                    }}
-                  >
-                    <div>
-                      <p className="text-[14px] font-bold text-[var(--near-black)]">Active pass</p>
-                      <button onClick={() => setView('active')} className="flex items-center gap-1 text-[13px] text-[var(--mid)]">
-                        {firstActive.businesses.name} <ChevronRight className="w-[10px] h-[10px]" />
-                      </button>
+                  <>
+                    <div className="flex items-center justify-between px-[20px] mt-[14px] mb-[10px]">
+                      <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
+                      {giftCardClaims.length >= 4 && (
+                        <button onClick={() => setView('active')} className="text-[13px] font-semibold text-[var(--terra)]">
+                          View all
+                        </button>
+                      )}
                     </div>
-                    <span
-                      className="text-[14px] font-bold rounded-[6px] whitespace-nowrap"
-                      style={{
-                        background: 'var(--peach)',
-                        color: hoursLeft < 10 ? 'var(--terra)' : 'var(--near-black)',
-                        padding: '6px 14px',
-                      }}
-                    >
-                      {timerLabel}
-                    </span>
-                  </div>
+                    <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
+                      <div className="flex gap-[12px] px-[16px] pb-[4px]" style={{ width: 'max-content' }}>
+                        {giftCardClaims.map(claim => {
+                          const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
+                          const matchedOffer = offers.find(o => o.id === claim.offer_id);
+                          const photoUrl = matchedOffer?.offer_photo_url || null;
+                          const status = getGiftCardStatus(claim);
+
+                          return (
+                            <button
+                              key={claim.id}
+                              onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); }}
+                              className="flex-shrink-0 relative overflow-hidden text-left"
+                              style={{
+                                width: 260,
+                                height: 140,
+                                borderRadius: 14,
+                                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)',
+                                background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
+                              }}
+                            >
+                              {/* Background image */}
+                              {photoUrl && (
+                                <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                              )}
+                              {/* Gradient overlay */}
+                              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(34,34,34,0.55) 0%, rgba(34,34,34,0.15) 100%)' }} />
+
+                              {/* Top-left: business name */}
+                              <span className="absolute top-[12px] left-[14px] text-[11px] font-semibold text-white" style={{ opacity: 0.8 }}>
+                                {claim.businesses.name}
+                              </span>
+
+                              {/* Centre: offer title */}
+                              <p
+                                className="absolute left-[14px] right-[14px] text-[18px] font-extrabold text-white"
+                                style={{ top: '50%', transform: 'translateY(-50%)', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                              >
+                                {offerTitle}
+                              </p>
+
+                              {/* Bottom-left: status */}
+                              <div className="absolute bottom-[12px] left-[14px] flex items-center gap-[6px]">
+                                <span className="rounded-full flex-shrink-0" style={{ width: 6, height: 6, background: status.dotColor }} />
+                                <span className="text-[11px] font-medium text-white" style={{ opacity: 0.8 }}>{status.text}</span>
+                              </div>
+
+                              {/* Bottom-right: QR icon */}
+                              <svg className="absolute bottom-[12px] right-[14px]" width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.7 }}>
+                                <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
+                                <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
+                                <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
+                                <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
+                                <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
+                              </svg>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </>
                 );
               })()}
 
@@ -1436,25 +1502,28 @@ export default function CreatorApp() {
                     return Math.max(0, needed - current);
                   })();
 
+                  const offerTitle = offer.generated_title || offer.description.slice(0, 35);
+                  const bizName = offer.businesses.name;
+
                   return (
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="flex-shrink-0 text-left rounded-[16px] overflow-hidden relative"
-                      style={{ width: 'calc(70vw - 20px)', maxWidth: '240px' }}
+                      className="flex-shrink-0 text-left rounded-[12px] overflow-hidden flex flex-col"
+                      style={{ width: 'calc(70vw - 20px)', maxWidth: '240px', border: '0.5px solid rgba(34,34,34,0.08)' }}
                     >
-                      {/* Full card is the image with 3:4 aspect ratio */}
+                      {/* ZONE 1 — Image (4:3 aspect) */}
                       <div
                         className="w-full relative overflow-hidden"
-                        style={{ aspectRatio: '3/4', background: getCategoryGradient(offer.businesses.category) }}
+                        style={{ aspectRatio: '4/3', background: getCategoryGradient(offer.businesses.category), borderRadius: '12px 12px 0 0' }}
                       >
                         {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          <img src={offer.offer_photo_url} alt={bizName} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : offer.businesses.logo_url ? (
-                          <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          <img src={offer.businesses.logo_url} alt={bizName} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
+                            <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
                           </div>
                         )}
 
@@ -1499,21 +1568,16 @@ export default function CreatorApp() {
                             />
                           </button>
                         )}
+                      </div>
 
-                        {/* Gradient overlay at bottom with title + business name */}
-                        {!isLocked && (
-                          <div
-                            className="absolute bottom-0 left-0 right-0 p-[12px] pt-[40px]"
-                            style={{ background: 'linear-gradient(to top, rgba(34,34,34,0.85) 0%, transparent 60%)' }}
-                          >
-                            <p className="text-[14px] font-extrabold text-white truncate leading-tight">
-                              {offer.generated_title || offer.description.slice(0, 35)}
-                            </p>
-                            <p className="text-[12px] text-white truncate mt-[2px]" style={{ opacity: 0.6 }}>
-                              {offer.businesses.name}
-                            </p>
-                          </div>
-                        )}
+                      {/* ZONE 2 — Text strip (bottom) */}
+                      <div className="bg-white" style={{ padding: '8px 10px 10px 10px', borderRadius: '0 0 12px 12px' }}>
+                        <p className="text-[14px] font-bold text-[var(--near-black)] truncate leading-tight">
+                          {offerTitle || bizName}
+                        </p>
+                        <p className="text-[12px] text-[var(--mid)] truncate mt-[2px]" style={{ fontWeight: 400 }}>
+                          {bizName}
+                        </p>
                       </div>
                     </button>
                   );
