@@ -311,17 +311,21 @@ function feedbackEmail(meta: Record<string, string>): { subject: string; html: s
 Deno.serve(async (req: Request) => {
   try {
     const payload = (await req.json()) as WebhookPayload;
+    console.log('[send-email] Payload received:', JSON.stringify(payload).slice(0, 500));
 
     // Only process notification inserts
     if (payload.table !== 'notifications' || payload.type !== 'INSERT') {
-      return new Response(JSON.stringify({ skipped: true }), { status: 200 });
+      console.log('[send-email] Skipped: not a notifications INSERT', payload.type, payload.table);
+      return new Response(JSON.stringify({ skipped: true, reason: 'not_insert' }), { status: 200 });
     }
 
     const notification = payload.record as NotificationRecord;
+    console.log('[send-email] Notification:', JSON.stringify(notification).slice(0, 500));
 
     // Skip if already sent
     if (notification.email_sent) {
-      return new Response(JSON.stringify({ skipped: true }), { status: 200 });
+      console.log('[send-email] Skipped: already sent');
+      return new Response(JSON.stringify({ skipped: true, reason: 'already_sent' }), { status: 200 });
     }
 
     const supabase = createClient(
@@ -366,8 +370,11 @@ Deno.serve(async (req: Request) => {
     }
 
     if (!recipientEmail) {
-      return new Response(JSON.stringify({ error: 'No recipient found' }), { status: 200 });
+      console.log('[send-email] No recipient found. emailType:', emailType, 'user_type:', notification.user_type, 'user_id:', notification.user_id);
+      return new Response(JSON.stringify({ error: 'No recipient found', emailType, user_type: notification.user_type }), { status: 200 });
     }
+
+    console.log('[send-email] Sending', emailType, 'to', recipientEmail);
 
     // Build email based on type
     let email: { subject: string; html: string };
