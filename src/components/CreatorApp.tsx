@@ -11,7 +11,6 @@ import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
 import FeedbackButton from './FeedbackButton';
 import { uploadAvatar } from '../lib/upload';
-import { Logo } from './Logo';
 import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
 
 function useCountdown(targetDate: string | null) {
@@ -1281,20 +1280,6 @@ export default function CreatorApp() {
 
       <div className="flex-1 overflow-y-auto">
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <div className="bg-white px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)]">
-          <div className="flex items-center justify-between">
-            <Logo />
-            <div className="flex items-center gap-3">
-              <div className="text-right">
-                <p className="text-[14px] font-semibold text-[var(--near-black)]">{userProfile.name}</p>
-                <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[12px] font-bold rounded-full px-[9px] py-[3px] mt-0.5">
-                  {userProfile.code}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Content */}
         <div className="pb-6">
@@ -1310,7 +1295,7 @@ export default function CreatorApp() {
               )}
 
               {/* Search bar */}
-              <div className="px-[20px] pt-4 pb-3">
+              <div className="px-[20px] pt-[20px] pb-3">
                 <div
                   className="w-full rounded-full bg-white flex items-center gap-3 px-[16px] py-[14px]"
                   style={{
