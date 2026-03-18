@@ -555,11 +555,12 @@ export default function Auth() {
                             key={opt}
                             type="button"
                             onClick={() => setFollowerCount(opt)}
-                            className={`flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all ${
-                              followerCount === opt
-                                ? 'bg-[var(--near-black)] text-white'
-                                : 'bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)]'
-                            }`}
+                            className="flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all"
+                            style={{
+                              background: followerCount === opt ? 'var(--terra)' : 'white',
+                              color: followerCount === opt ? 'white' : 'var(--near-black)',
+                              border: followerCount === opt ? 'none' : '0.5px solid var(--near-black)',
+                            }}
                           >
                             {opt}
                           </button>
@@ -636,11 +637,12 @@ export default function Auth() {
                             key={cat}
                             type="button"
                             onClick={() => setCategory(cat)}
-                            className={`flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] border-[1.5px] text-left transition-all duration-200 ${
-                              category === cat
-                                ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_2px_var(--terra-ring)]'
-                                : 'border-[var(--faint)] bg-white hover:border-[var(--soft)] hover:bg-[#FAFAFA]'
-                            }`}
+                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] text-left transition-all duration-200"
+                            style={{
+                              border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
+                              background: category === cat ? 'rgba(196,103,74,0.08)' : 'white',
+                              color: category === cat ? 'var(--terra)' : undefined,
+                            }}
                           >
                             <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                             <span className={`text-[13px] font-semibold truncate ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>{cat}</span>

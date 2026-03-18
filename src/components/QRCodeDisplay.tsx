@@ -6,6 +6,7 @@ interface QRCodeDisplayProps {
   token: string;
   claimId: string;
   creatorCode: string;
+  size?: number;
 }
 
 function generateSecureToken(): string {
@@ -282,7 +283,7 @@ function getAlignmentPositions(ver: number, size: number): number[] {
 
 // ─── Component ────────────────────────────────────────────────────────────
 
-export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDisplayProps) {
+export default function QRCodeDisplay({ token, claimId, creatorCode, size: displaySize }: QRCodeDisplayProps) {
   const [currentToken, setCurrentToken] = useState(token);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -333,7 +334,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode }: QRCodeDis
           src={qrDataUrl}
           alt="QR Code"
           className="block"
-          style={{ width: '220px', height: '220px' }}
+          style={{ width: `${displaySize || 220}px`, height: `${displaySize || 220}px` }}
         />
       </div>
 

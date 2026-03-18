@@ -436,8 +436,8 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     className="flex flex-col items-center justify-center gap-[8px] rounded-[16px] min-h-[100px] transition-all"
                     style={{
                       padding: '20px 16px',
-                      border: offerType === t.key ? '2px solid var(--terra)' : '1.5px solid var(--faint)',
-                      background: offerType === t.key ? 'rgba(196,103,74,0.04)' : 'white',
+                      border: offerType === t.key ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
+                      background: offerType === t.key ? 'rgba(196,103,74,0.08)' : 'white',
                     }}
                   >
                     <t.icon className="w-[24px] h-[24px] text-[var(--near-black)]" />
