@@ -1447,15 +1447,15 @@ export default function CreatorApp() {
                                 width: '100%',
                                 flexShrink: 0,
                                 height: 200,
-                                borderRadius: 16,
-                                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
+                                borderRadius: 20,
+                                boxShadow: '0 2px 12px rgba(34,34,34,0.10)',
                                 background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
                               }}
                             >
                               {photoUrl && (
                                 <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                               )}
-                              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(34,34,34,0.6) 0%, rgba(34,34,34,0.2) 100%)' }} />
+                              <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)' }} />
 
                               <span className="absolute top-[14px] left-[16px] text-[12px] font-semibold text-white" style={{ opacity: 0.8 }}>
                                 {claim.businesses.name}
