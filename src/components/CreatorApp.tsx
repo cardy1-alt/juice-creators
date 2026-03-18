@@ -655,24 +655,11 @@ export default function CreatorApp() {
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
-  if (!userProfile?.approved) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-white">
-        <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-8 max-w-sm text-center">
-          <Clock className="w-8 h-8 text-[var(--soft)] mx-auto mb-4" />
-          <h2 className="text-[26px] font-extrabold mb-2 text-[var(--near-black)]">Pending Approval</h2>
-          <p className="text-[var(--mid)] text-[15px] mb-6">
-            Your creator account is under review. You'll be notified once approved!
-          </p>
-          <button
-            onClick={signOut}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-white font-medium bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors min-h-[48px]"
-          >
-            <LogOut className="w-4 h-4" /> Sign Out
-          </button>
-        </div>
-      </div>
-    );
+  const isPendingApproval = !userProfile?.approved;
+
+  // If pending approval and not on profile view, force to profile
+  if (isPendingApproval && view !== 'profile') {
+    setView('profile');
   }
 
   const getActiveUrgency = () => {
@@ -2212,6 +2199,13 @@ export default function CreatorApp() {
           {/* -- PROFILE -- */}
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
+              {isPendingApproval && (
+                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(196,103,74,0.08), rgba(200,184,240,0.12))' }}>
+                  <Clock className="w-7 h-7 text-[var(--terra)] mx-auto mb-2.5" />
+                  <h3 className="text-[17px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
+                  <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
+                </div>
+              )}
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
@@ -2712,9 +2706,9 @@ export default function CreatorApp() {
           {tabs.map(tab => (
             <button
               key={tab.key}
-              onClick={() => { setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
+              onClick={() => { if (isPendingApproval && tab.key !== 'profile') return; setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
               className={`flex-1 flex flex-col items-center gap-1 text-[11px] font-semibold transition-all relative min-h-[44px] ${
-                view === tab.key ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+                isPendingApproval && tab.key !== 'profile' ? 'text-[rgba(34,34,34,0.15)] pointer-events-none' : view === tab.key ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
               }`}
             >
               <div className="relative">

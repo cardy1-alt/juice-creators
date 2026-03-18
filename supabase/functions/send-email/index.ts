@@ -1,11 +1,6 @@
 // Supabase Edge Function: send-email
 // Triggered by DB webhook on notifications table INSERT
 // Uses Resend to deliver transactional emails for all platform events
-//
-// Required env vars (set via Supabase dashboard):
-//   RESEND_API_KEY — your Resend API key
-//   SUPABASE_URL — auto-set by Supabase
-//   SUPABASE_SERVICE_ROLE_KEY — auto-set by Supabase
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -20,13 +15,6 @@ function escapeHtml(str: string): string {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 }
-
-// ─── Email template types ─────────────────────────────────────────────────
-// email_type values stored in notifications.email_type:
-//   creator_welcome, business_welcome, offer_claimed_creator,
-//   visit_confirmed_creator, reel_due_reminder, new_claim_business,
-//   admin_signup, feedback
-// If email_type is null/empty, falls back to generic notification email.
 
 interface NotificationRecord {
   id: string;
@@ -44,19 +32,83 @@ interface WebhookPayload {
   record: Record<string, unknown>;
 }
 
-// ─── Nayba email wrapper ──────────────────────────────────────────────────
-function wrapEmail(body: string): string {
+// ─── Design system ────────────────────────────────────────────────────────
+const TERRA = '#C4674A';
+const TERRA_LIGHT = '#FFF5F0';
+const TERRA_BORDER = '#F5DDD5';
+const FOREST = '#1A3C34';
+const NEAR_BLACK = '#222222';
+const MID = '#666666';
+const SOFT = '#999999';
+const FAINT = '#F0F0F0';
+const LAVENDER = '#C8B8F0';
+const LAVENDER_LIGHT = '#F5F2FF';
+
+// ─── Branded email wrapper ────────────────────────────────────────────────
+function wrapEmail(body: string, accentColor = TERRA): string {
   return `
-    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 32px 24px; color: #222222;">
-      <div style="text-align: center; margin-bottom: 28px;">
-        <h2 style="margin: 0; color: #1A3C34; font-size: 22px; font-weight: 800; letter-spacing: -0.5px;">nayba</h2>
-      </div>
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin: 0; padding: 0; background-color: #F7F7F7; -webkit-font-smoothing: antialiased;">
+  <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+    <!-- Logo -->
+    <div style="text-align: center; margin-bottom: 32px;">
+      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 26px; font-weight: 800; color: ${FOREST}; letter-spacing: -1px;">nayba</span>
+    </div>
+    <!-- Card -->
+    <div style="background: #FFFFFF; border-radius: 20px; padding: 40px 32px; box-shadow: 0 2px 16px rgba(34,34,34,0.06);">
       ${body}
-      <p style="text-align: center; margin-top: 32px; color: #999; font-size: 12px;">
-        — The Nayba Team
+    </div>
+    <!-- Footer -->
+    <div style="text-align: center; padding: 28px 0 0;">
+      <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; color: ${SOFT};">
+        The Nayba Team &middot; Connecting creators with local businesses
+      </p>
+      <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; color: #BBBBBB;">
+        You're receiving this because you signed up for Nayba.
       </p>
     </div>
-  `;
+  </div>
+</body>
+</html>`;
+}
+
+function btn(text: string, href: string, bg = TERRA): string {
+  return `<div style="text-align: center; margin: 28px 0 0;">
+    <a href="${href}" style="display: inline-block; background: ${bg}; color: #FFFFFF; padding: 15px 36px; border-radius: 50px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.2px;">${text}</a>
+  </div>`;
+}
+
+function p(text: string): string {
+  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${NEAR_BLACK}; margin: 0 0 16px;">${text}</p>`;
+}
+
+function heading(text: string): string {
+  return `<h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0 0 8px; letter-spacing: -0.5px;">${text}</h1>`;
+}
+
+function subtext(text: string): string {
+  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: ${MID}; margin: 0 0 24px;">${text}</p>`;
+}
+
+function divider(): string {
+  return `<div style="height: 1px; background: ${FAINT}; margin: 24px 0;"></div>`;
+}
+
+function infoBox(content: string, bg = TERRA_LIGHT, border = TERRA_BORDER): string {
+  return `<div style="background: ${bg}; border-radius: 14px; padding: 18px 22px; margin: 20px 0; border: 1px solid ${border};">${content}</div>`;
+}
+
+function stepList(steps: string[]): string {
+  return `<div style="margin: 20px 0;">
+    ${steps.map((step, i) => `
+      <div style="display: flex; align-items: flex-start; margin-bottom: ${i < steps.length - 1 ? '14px' : '0'};">
+        <div style="flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%; background: ${TERRA_LIGHT}; color: ${TERRA}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px; margin-right: 14px;">${i + 1}</div>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; color: ${NEAR_BLACK}; margin: 2px 0 0;">${step}</p>
+      </div>
+    `).join('')}
+  </div>`;
 }
 
 // ─── Template builders ────────────────────────────────────────────────────
@@ -65,12 +117,25 @@ function creatorWelcomeEmail(name: string): { subject: string; html: string } {
   return {
     subject: 'Welcome to Nayba!',
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Welcome to Nayba — we're really glad you're here.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Nayba connects you with local businesses who want to work with creators like you. Browse offers from cafes, salons, gyms, and more in your area. Claim an offer, visit the business, and post an Instagram Reel — that's it.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Your account is being reviewed by our team. Once approved, you'll be able to start exploring offers and claiming your first one.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">In the meantime, make sure your profile is looking good — businesses will see it when you claim their offers.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Open Nayba</a>
+      ${heading(`Welcome, ${escapeHtml(name)}!`)}
+      ${subtext("We're really glad you're here.")}
+      ${p('Nayba connects you with local businesses who want to work with creators like you. Browse offers from cafes, salons, gyms, and more in your area.')}
+      ${p("<strong>Here's how it works:</strong>")}
+      ${stepList([
+        'Claim an offer from a local business',
+        'Visit in person and show your QR pass',
+        'Post an Instagram Reel within 48 hours',
+      ])}
+      ${divider()}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${TERRA}; font-weight: 600; margin: 0;">
+          Your account is being reviewed
+        </p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${MID}; margin: 6px 0 0;">
+          We'll email you once approved. In the meantime, make sure your profile is looking great!
+        </p>
+      `)}
+      ${btn('Complete Your Profile', APP_URL)}
     `),
   };
 }
@@ -79,12 +144,25 @@ function businessWelcomeEmail(name: string): { subject: string; html: string } {
   return {
     subject: 'Welcome to Nayba!',
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Welcome to Nayba — great to have you on board.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Nayba turns local creators into your marketing team — no budget required. You create an offer (a free coffee, a haircut, a discount — whatever feels right), local creators claim it, visit your business, and post an authentic Instagram Reel about the experience.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Your next step is to create your first offer. It only takes a minute, and once it's live, creators in your area will be able to discover and claim it right away.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">If you have any questions, just reply to this email — we're here to help.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Create your first offer</a>
+      ${heading(`Welcome, ${escapeHtml(name)}!`)}
+      ${subtext('Great to have you on board.')}
+      ${p("Nayba turns local creators into your marketing team — no budget required. Create an offer, local creators claim it, visit your business, and post an authentic Instagram Reel about the experience.")}
+      ${p("<strong>Getting started is simple:</strong>")}
+      ${stepList([
+        'Create your first offer (a free coffee, a discount — whatever feels right)',
+        'Creators discover and claim it',
+        'They visit, you scan their QR code, and they post a Reel',
+      ])}
+      ${divider()}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${TERRA}; font-weight: 600; margin: 0;">
+          Your account is being reviewed
+        </p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${MID}; margin: 6px 0 0;">
+          We'll email you once approved. Complete your profile while you wait!
+        </p>
+      `)}
+      ${btn('Set Up Your Profile', APP_URL)}
     `),
   };
 }
@@ -95,16 +173,19 @@ function offerClaimedCreatorEmail(name: string, meta: Record<string, string>): {
   return {
     subject: `You claimed ${offerTitle} from ${businessName}`,
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Nice one — you've just claimed <strong>${escapeHtml(offerTitle)}</strong> from <strong>${escapeHtml(businessName)}</strong>.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Here's what happens next:</p>
-      <ol style="font-size: 15px; line-height: 1.8; margin: 0 0 16px; padding-left: 20px;">
-        <li>Visit ${escapeHtml(businessName)} in person and show your QR pass</li>
-        <li>Enjoy the experience</li>
-        <li>Post an Instagram Reel within <strong>48 hours</strong> of your visit</li>
-      </ol>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">Your QR pass is ready in the app. Head over when you're ready!</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">View your pass</a>
+      ${heading('Offer Claimed!')}
+      ${subtext(`Nice one, ${escapeHtml(name)}.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">from ${escapeHtml(businessName)}</p>
+      `)}
+      ${p("<strong>What happens next:</strong>")}
+      ${stepList([
+        `Visit <strong>${escapeHtml(businessName)}</strong> and show your QR pass`,
+        'Enjoy the experience',
+        'Post an Instagram Reel within <strong>48 hours</strong> of your visit',
+      ])}
+      ${btn('View Your Pass', APP_URL)}
     `),
   };
 }
@@ -120,16 +201,19 @@ function visitConfirmedCreatorEmail(name: string, meta: Record<string, string>):
     } catch { deadlineStr = reelDueAt; }
   }
   return {
-    subject: `Visit confirmed — your 48hr Reel clock has started`,
+    subject: 'Visit confirmed — your 48hr Reel clock has started',
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">${escapeHtml(businessName)} has confirmed your visit — nice work!</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Your <strong>48-hour Reel clock has now started</strong>. Post your Instagram Reel and submit the link in the app before the deadline.</p>
-      ${deadlineStr ? `<div style="background: #FFF5F2; border-radius: 12px; padding: 16px 20px; margin: 0 0 16px; border: 1px solid #F5DDD5;">
-        <p style="margin: 0; font-size: 14px; color: #C4674A; font-weight: 600;">Deadline: ${escapeHtml(deadlineStr)}</p>
-      </div>` : ''}
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">Keep it authentic — just share your honest experience at ${escapeHtml(businessName)}. That's what makes Nayba work.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Submit your Reel</a>
+      ${heading('Visit Confirmed!')}
+      ${subtext(`${escapeHtml(businessName)} confirmed your visit — nice work, ${escapeHtml(name)}.`)}
+      ${infoBox(`
+        <div style="text-align: center;">
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: ${TERRA}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">48-Hour Reel Clock Started</p>
+          ${deadlineStr ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0;">${escapeHtml(deadlineStr)}</p>` : ''}
+        </div>
+      `)}
+      ${p('Post your Instagram Reel and submit the link in the app before the deadline.')}
+      ${p(`Keep it authentic — just share your honest experience at ${escapeHtml(businessName)}. That's what makes Nayba work.`)}
+      ${btn('Submit Your Reel', APP_URL)}
     `),
   };
 }
@@ -147,14 +231,17 @@ function reelDueReminderEmail(name: string, meta: Record<string, string>): { sub
   return {
     subject: `Reminder: Your Reel for ${businessName} is due soon`,
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Friendly reminder — your Reel for <strong>${escapeHtml(businessName)}</strong> is due in less than 24 hours.</p>
-      ${deadlineStr ? `<div style="background: #FFF5F2; border-radius: 12px; padding: 16px 20px; margin: 0 0 16px; border: 1px solid #F5DDD5;">
-        <p style="margin: 0; font-size: 14px; color: #C4674A; font-weight: 600;">Deadline: ${escapeHtml(deadlineStr)}</p>
-      </div>` : ''}
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Post your Instagram Reel and then paste the link in the Nayba app. It doesn't need to be perfect — just authentic.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">If you miss the deadline, the claim will be marked as overdue. Don't let a good experience go to waste!</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Submit your Reel now</a>
+      ${heading('Reel Due Soon')}
+      ${subtext(`Don't forget, ${escapeHtml(name)} — less than 24 hours left.`)}
+      ${infoBox(`
+        <div style="text-align: center;">
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(businessName)}</p>
+          ${deadlineStr ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 600; color: ${TERRA}; margin: 0;">Due by ${escapeHtml(deadlineStr)}</p>` : ''}
+        </div>
+      `)}
+      ${p("Post your Instagram Reel and paste the link in the Nayba app. It doesn't need to be perfect — just authentic.")}
+      ${p("If you miss the deadline, the claim will be marked as overdue. Don't let a good experience go to waste!")}
+      ${btn('Submit Your Reel Now', APP_URL)}
     `),
   };
 }
@@ -165,11 +252,19 @@ function newClaimBusinessEmail(name: string, meta: Record<string, string>): { su
   return {
     subject: `${creatorName} just claimed ${offerTitle}`,
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Good news — <strong>${escapeHtml(creatorName)}</strong> has just claimed <strong>${escapeHtml(offerTitle)}</strong>.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">They'll be visiting your business soon. When they arrive, open the Nayba app and scan their QR code to confirm the visit.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">After the visit, they have 48 hours to post an Instagram Reel about their experience. You'll be notified once it's submitted.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Open Nayba</a>
+      ${heading('New Claim!')}
+      ${subtext(`Good news, ${escapeHtml(name)}.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(creatorName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">claimed ${escapeHtml(offerTitle)}</p>
+      `)}
+      ${p("<strong>What happens next:</strong>")}
+      ${stepList([
+        "They'll visit your business soon",
+        'When they arrive, scan their QR code in the app to confirm',
+        "They post an Instagram Reel within 48 hours — you'll be notified",
+      ])}
+      ${btn('Open Nayba', APP_URL)}
     `),
   };
 }
@@ -178,16 +273,20 @@ function creatorApprovedEmail(name: string): { subject: string; html: string } {
   return {
     subject: "You're approved — welcome to Nayba!",
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Great news — your Nayba creator account has been approved! 🎉</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">You can now browse offers from local businesses in your area, claim the ones you like, and start creating. Here's how it works:</p>
-      <ol style="font-size: 15px; line-height: 1.8; margin: 0 0 16px; padding-left: 20px;">
-        <li>Browse and claim an offer</li>
-        <li>Visit the business and show your QR pass</li>
-        <li>Post an Instagram Reel within 48 hours</li>
-      </ol>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">Jump in and claim your first offer — there are businesses waiting to work with you.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Explore offers</a>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+      </div>
+      ${heading("You're Approved!")}
+      ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're all set.`)}
+      ${p('You can now browse offers from local businesses in your area, claim the ones you like, and start creating.')}
+      ${p("<strong>Here's how it works:</strong>")}
+      ${stepList([
+        'Browse and claim an offer',
+        'Visit the business and show your QR pass',
+        'Post an Instagram Reel within 48 hours',
+      ])}
+      ${p('Jump in and claim your first offer — there are businesses waiting to work with you.')}
+      ${btn('Explore Offers', APP_URL)}
     `),
   };
 }
@@ -196,11 +295,14 @@ function businessApprovedEmail(name: string): { subject: string; html: string } 
   return {
     subject: "You're approved — welcome to Nayba!",
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Great news — your Nayba business account has been approved! 🎉</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">You're now live on the platform. Create your first offer and local creators will be able to discover and claim it right away.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">If you need any help getting started, just reply to this email — we're here for you.</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Create your first offer</a>
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+      </div>
+      ${heading("You're Approved!")}
+      ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're live on the platform.`)}
+      ${p('Create your first offer and local creators will be able to discover and claim it right away.')}
+      ${p("If you need any help getting started, just reply to this email — we're here for you.")}
+      ${btn('Create Your First Offer', APP_URL)}
     `),
   };
 }
@@ -209,10 +311,16 @@ function creatorDeniedEmail(name: string): { subject: string; html: string } {
   return {
     subject: 'Update on your Nayba application',
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Thanks for your interest in Nayba. After reviewing your application, we're unable to approve your creator account at this time.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">This could be for a number of reasons — incomplete profile, follower count, or content fit. If you think this was a mistake, or if anything has changed, feel free to reply to this email and we'll take another look.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">We appreciate your time and hope to welcome you in the future.</p>
+      ${heading('Application Update')}
+      ${subtext(`Hi ${escapeHtml(name)}, thanks for your interest in Nayba.`)}
+      ${p("After reviewing your application, we're unable to approve your creator account at this time.")}
+      ${p('This could be for a number of reasons — incomplete profile, follower count, or content fit.')}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">
+          Think this was a mistake? Just reply to this email and we'll take another look.
+        </p>
+      `, FAINT, '#E0E0E0')}
+      ${p('We appreciate your time and hope to welcome you in the future.')}
     `),
   };
 }
@@ -221,10 +329,15 @@ function businessDeniedEmail(name: string): { subject: string; html: string } {
   return {
     subject: 'Update on your Nayba application',
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Thanks for your interest in Nayba. After reviewing your application, we're unable to approve your business account at this time.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">If you believe this was a mistake or would like more information, please reply to this email and we'll be happy to help.</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">We appreciate your interest and hope to work with you in the future.</p>
+      ${heading('Application Update')}
+      ${subtext(`Hi ${escapeHtml(name)}, thanks for your interest in Nayba.`)}
+      ${p("After reviewing your application, we're unable to approve your business account at this time.")}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">
+          If you believe this was a mistake, just reply to this email and we'll be happy to help.
+        </p>
+      `, FAINT, '#E0E0E0')}
+      ${p('We appreciate your interest and hope to work with you in the future.')}
     `),
   };
 }
@@ -233,34 +346,23 @@ function adminApprovalRequestEmail(meta: Record<string, string>): { subject: str
   const userType = meta.user_type || 'unknown';
   const displayName = meta.display_name || 'Unknown';
   const userEmail = meta.email || 'Unknown';
+  const timestamp = new Date().toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' });
   return {
-    subject: `Action required: New ${userType} awaiting approval — ${displayName}`,
-    html: `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
-        <h3 style="margin: 0 0 16px; color: #222;">New ${escapeHtml(userType)} awaiting approval</h3>
-        <table style="font-size: 14px; line-height: 1.6; color: #333; margin-bottom: 20px;">
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Type</td><td>${escapeHtml(userType)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Name</td><td>${escapeHtml(displayName)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Email</td><td>${escapeHtml(userEmail)}</td></tr>
-        </table>
-        <a href="${APP_URL}?demo=admin" style="display: inline-block; background: #1A3C34; color: white; padding: 12px 24px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 14px;">Review in Admin Dashboard</a>
-      </div>
-    `,
-  };
-}
-
-function genericNotificationEmail(name: string, message: string): { subject: string; html: string } {
-  return {
-    subject: `Nayba — ${message.slice(0, 60)}`,
+    subject: `New ${userType} awaiting approval — ${displayName}`,
     html: wrapEmail(`
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 16px;">Hi ${escapeHtml(name)},</p>
-      <p style="font-size: 15px; line-height: 1.7; margin: 0 0 24px;">${escapeHtml(message)}</p>
-      <a href="${APP_URL}" style="display: inline-block; background: #C4674A; color: white; padding: 14px 28px; border-radius: 50px; text-decoration: none; font-weight: 700; font-size: 15px;">Open Nayba</a>
-    `),
+      ${heading(`New ${escapeHtml(userType)} signup`)}
+      ${subtext('Awaiting your review.')}
+      <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse;">
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Type</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Name</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Email</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userEmail)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Time</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
+      </table>
+      ${btn('Review in Dashboard', `${APP_URL}?demo=admin`, FOREST)}
+    `, FOREST),
   };
 }
 
-// ─── Admin signup notification ────────────────────────────────────────────
 function adminSignupEmail(meta: Record<string, string>): { subject: string; html: string } {
   const userType = meta.user_type || 'unknown';
   const displayName = meta.display_name || 'Unknown';
@@ -268,21 +370,18 @@ function adminSignupEmail(meta: Record<string, string>): { subject: string; html
   const timestamp = meta.timestamp || new Date().toISOString();
   return {
     subject: `New ${userType} signup: ${displayName}`,
-    html: `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
-        <h3 style="margin: 0 0 16px; color: #222;">New ${escapeHtml(userType)} signup on Nayba</h3>
-        <table style="font-size: 14px; line-height: 1.6; color: #333;">
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">User type</td><td>${escapeHtml(userType)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Name</td><td>${escapeHtml(displayName)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Email</td><td>${escapeHtml(email)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Timestamp</td><td>${escapeHtml(timestamp)}</td></tr>
-        </table>
-      </div>
-    `,
+    html: wrapEmail(`
+      ${heading(`New ${escapeHtml(userType)} signup`)}
+      <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse;">
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Type</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Name</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Email</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(email)}</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Time</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
+      </table>
+    `, FOREST),
   };
 }
 
-// ─── Feedback email ───────────────────────────────────────────────────────
 function feedbackEmail(meta: Record<string, string>): { subject: string; html: string } {
   const userType = meta.user_type || 'unknown';
   const userId = meta.user_id || 'unknown';
@@ -290,19 +389,28 @@ function feedbackEmail(meta: Record<string, string>): { subject: string; html: s
   const feedbackText = meta.feedback || '';
   return {
     subject: `Feedback from ${userType} (${meta.display_name || userId})`,
-    html: `
-      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 520px; margin: 0 auto; padding: 24px;">
-        <h3 style="margin: 0 0 16px; color: #222;">New feedback on Nayba</h3>
-        <table style="font-size: 14px; line-height: 1.6; color: #333; margin-bottom: 16px;">
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">From</td><td>${escapeHtml(meta.display_name || userId)} (${escapeHtml(userType)})</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">User ID</td><td>${escapeHtml(userId)}</td></tr>
-          <tr><td style="padding: 4px 16px 4px 0; color: #999;">Page</td><td>${escapeHtml(page)}</td></tr>
-        </table>
-        <div style="background: #f5f5f5; border-radius: 8px; padding: 16px; font-size: 14px; line-height: 1.6; color: #222;">
-          ${escapeHtml(feedbackText)}
-        </div>
+    html: wrapEmail(`
+      ${heading('New Feedback')}
+      <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse; margin-bottom: 16px;">
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">From</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(meta.display_name || userId)} (${escapeHtml(userType)})</td></tr>
+        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Page</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(page)}</td></tr>
+      </table>
+      <div style="background: ${FAINT}; border-radius: 14px; padding: 20px 22px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${NEAR_BLACK};">
+        ${escapeHtml(feedbackText)}
       </div>
-    `,
+    `, FOREST),
+  };
+}
+
+function genericNotificationEmail(name: string, message: string): { subject: string; html: string } {
+  return {
+    subject: `Nayba — ${message.slice(0, 60)}`,
+    html: wrapEmail(`
+      ${heading('New Notification')}
+      ${subtext(`Hi ${escapeHtml(name)}`)}
+      ${p(escapeHtml(message))}
+      ${btn('Open Nayba', APP_URL)}
+    `),
   };
 }
 
@@ -313,7 +421,6 @@ Deno.serve(async (req: Request) => {
     const payload = (await req.json()) as WebhookPayload;
     console.log('[send-email] Payload received:', JSON.stringify(payload).slice(0, 500));
 
-    // Only process notification inserts
     if (payload.table !== 'notifications' || payload.type !== 'INSERT') {
       console.log('[send-email] Skipped: not a notifications INSERT', payload.type, payload.table);
       return new Response(JSON.stringify({ skipped: true, reason: 'not_insert' }), { status: 200 });
@@ -322,7 +429,6 @@ Deno.serve(async (req: Request) => {
     const notification = payload.record as NotificationRecord;
     console.log('[send-email] Notification:', JSON.stringify(notification).slice(0, 500));
 
-    // Skip if already sent
     if (notification.email_sent) {
       console.log('[send-email] Skipped: already sent');
       return new Response(JSON.stringify({ skipped: true, reason: 'already_sent' }), { status: 200 });
@@ -336,12 +442,10 @@ Deno.serve(async (req: Request) => {
     const emailType = notification.email_type || '';
     const meta = (notification.email_meta || {}) as Record<string, string>;
 
-    // Determine recipient
     let recipientEmail: string | null = null;
     let recipientName = '';
 
-    if (emailType === 'admin_signup' || emailType === 'feedback') {
-      // These go to the admin inbox
+    if (emailType === 'admin_signup' || emailType === 'feedback' || emailType === 'admin_approval_request') {
       recipientEmail = ADMIN_EMAIL;
       recipientName = 'Admin';
     } else if (notification.user_type === 'creator') {
@@ -376,7 +480,6 @@ Deno.serve(async (req: Request) => {
 
     console.log('[send-email] Sending', emailType, 'to', recipientEmail);
 
-    // Build email based on type
     let email: { subject: string; html: string };
 
     switch (emailType) {
@@ -423,7 +526,6 @@ Deno.serve(async (req: Request) => {
         email = genericNotificationEmail(recipientName, notification.message);
     }
 
-    // Send via Resend
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
       console.error('RESEND_API_KEY not set');
@@ -450,7 +552,6 @@ Deno.serve(async (req: Request) => {
       return new Response(JSON.stringify({ error: 'Email send failed' }), { status: 500 });
     }
 
-    // Mark as sent to prevent duplicates
     await supabase
       .from('notifications')
       .update({ email_sent: true })

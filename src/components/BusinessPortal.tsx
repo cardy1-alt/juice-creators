@@ -1321,19 +1321,11 @@ export default function BusinessPortal() {
   const unreadCount = notifications.filter(n => !n.read).length;
   const activeClaimsCount = claims.filter(c => c.status === 'active').length;
 
-  if (!userProfile?.approved) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-white">
-        <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-8 max-w-sm text-center border border-[var(--faint)]">
-          <Clock className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-          <h2 className="text-[18px] font-bold mb-1 text-[var(--near-black)]">Pending Approval</h2>
-          <p className="text-[14px] text-[var(--mid)] mb-6">Your business account is under review.</p>
-          <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-3 rounded-[50px] text-white font-bold text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors min-h-[48px]">
-            <LogOut className="w-4 h-4" /> Sign Out
-          </button>
-        </div>
-      </div>
-    );
+  const isPendingApproval = !userProfile?.approved;
+
+  // If pending approval and not on profile view, force to profile
+  if (isPendingApproval && view !== 'profile') {
+    setView('profile');
   }
 
   // Business onboarding — shown until onboarding_complete = true
@@ -2365,6 +2357,13 @@ export default function BusinessPortal() {
           {/* ═══ PROFILE ═══ */}
           {view === 'profile' && (
             <div className="pt-4">
+              {isPendingApproval && (
+                <div className="mx-[20px] mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(196,103,74,0.08), rgba(200,184,240,0.12))' }}>
+                  <Clock className="w-7 h-7 text-[var(--terra)] mx-auto mb-2.5" />
+                  <h3 className="text-[17px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
+                  <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We're reviewing your business — you'll get an email once approved. In the meantime, make sure your profile is complete!</p>
+                </div>
+              )}
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
@@ -2620,9 +2619,9 @@ export default function BusinessPortal() {
             return (
               <div key={tab.key} className="flex-1 flex items-center justify-center">
                 <button
-                  onClick={() => { setView('scan'); setScanResult(null); }}
-                  className="flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] bg-[var(--terra)] text-white"
-                  style={{ marginTop: '-8px', boxShadow: '0 4px 16px rgba(196,103,74,0.3)' }}
+                  onClick={() => { if (isPendingApproval) return; setView('scan'); setScanResult(null); }}
+                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'} text-white`}
+                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(196,103,74,0.3)' }}
                 >
                   <Icon className="w-[18px] h-[18px] text-white" />
                   <span className="text-[12px] font-bold text-white">Scan</span>
@@ -2631,14 +2630,15 @@ export default function BusinessPortal() {
             );
           }
 
+          const isDisabled = isPendingApproval && tab.key !== 'profile';
           return (
             <button
               key={tab.key}
-              onClick={() => { setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
+              onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
               className="flex-1 flex flex-col items-center gap-1"
             >
-              <Icon className={`w-5 h-5 ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-              <span className={`text-[10px] font-semibold ${isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+              <Icon className={`w-5 h-5 ${isDisabled ? 'text-[rgba(34,34,34,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-[10px] font-semibold ${isDisabled ? 'text-[rgba(34,34,34,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
                 {tab.label}
               </span>
             </button>

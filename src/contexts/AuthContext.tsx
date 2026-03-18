@@ -2,7 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, ReactNode } fro
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminSignupNotification, sendAdminApprovalRequest } from '../lib/notifications';
+import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminApprovalRequest } from '../lib/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -323,12 +323,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserRole('creator');
         setUserProfile(creatorProfile);
 
-        // Fire welcome email + admin notifications (non-blocking)
+        // Fire welcome email + admin approval request (non-blocking)
         if (creatorId) {
           sendCreatorWelcomeEmail(creatorId).catch(() => {});
           sendAdminApprovalRequest({ userType: 'creator', userId: creatorId, displayName: additionalData.name, email: normEmail }).catch(() => {});
         }
-        sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email: normEmail }).catch(() => {});
       } else if (role === 'business') {
         console.log('[AuthContext] Inserting business profile for:', data.user.id);
         const insertPayload = {
@@ -396,12 +395,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUserRole('business');
         setUserProfile(businessProfile);
 
-        // Fire welcome email + admin notifications (non-blocking)
+        // Fire welcome email + admin approval request (non-blocking)
         if (businessId) {
           sendBusinessWelcomeEmail(businessId).catch(() => {});
           sendAdminApprovalRequest({ userType: 'business', userId: businessId, displayName: additionalData.name, email: normEmail }).catch(() => {});
         }
-        sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email: normEmail }).catch(() => {});
       }
     } catch (err) {
       // If signup fails after onAuthStateChange has already set `user`,
