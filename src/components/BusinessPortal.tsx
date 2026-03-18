@@ -1422,7 +1422,7 @@ export default function BusinessPortal() {
                   {/* Logo */}
                   <div
                     className="w-[72px] h-[72px] rounded-[16px] flex items-center justify-center overflow-hidden flex-shrink-0"
-                    style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
+                    style={{ background: getCategoryGradient(biz.category) }}
                   >
                     {biz.logo_url ? (
                       <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1610,11 +1610,11 @@ export default function BusinessPortal() {
                         }}
                       />
                       {/* Photo-dominant hero */}
-                      <div className="relative h-[220px]">
+                      <div className="relative h-[220px]" style={{ background: getCategoryGradient(userProfile.category) }}>
                         {activeOffer.offer_photo_url ? (
                           <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
+                          <div className="w-full h-full flex items-center justify-center">
                             <button
                               onClick={() => offerPhotoInputRef.current?.click()}
                               disabled={offerPhotoUploading}
@@ -1738,7 +1738,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
-                            style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
+                            style={{ background: getCategoryGradient(biz.category) }}
                           >
                             {biz.logo_url ? (
                               <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1793,7 +1793,7 @@ export default function BusinessPortal() {
                   />
                   <div
                     className="w-full h-[200px] rounded-[16px] overflow-hidden relative mb-[20px] cursor-pointer"
-                    style={{ background: selectedOffer.offer_photo_url ? undefined : getCategoryGradient(userProfile.category) }}
+                    style={{ background: getCategoryGradient(userProfile.category) }}
                     onClick={() => document.getElementById('editOfferPhotoInput')?.click()}
                   >
                     {selectedOffer.offer_photo_url ? (

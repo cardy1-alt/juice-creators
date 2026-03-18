@@ -175,7 +175,7 @@ ON CONFLICT (id) DO UPDATE SET
 -- ============================================================
 -- BUSINESSES
 -- ============================================================
-INSERT INTO businesses (id, name, slug, owner_email, category, address, latitude, longitude, bio, approved, region, logo_url)
+INSERT INTO businesses (id, name, slug, owner_email, category, address, latitude, longitude, bio, approved, region, logo_url, onboarding_complete, onboarding_step)
 VALUES
   (
     'b1111111-1111-1111-1111-111111111111',
@@ -189,7 +189,9 @@ VALUES
     'Specialty coffee & brunch spot in the heart of town.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b2222222-2222-2222-2222-222222222222',
@@ -203,7 +205,9 @@ VALUES
     'Facials, lashes & nails — your local glow-up destination.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1560750588-73207b1ef5b8?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b3333333-3333-3333-3333-333333333333',
@@ -217,7 +221,9 @@ VALUES
     'Plant-forward kitchen serving seasonal bowls, juices & smoothies.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1512621776951-a57141f2eefd?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b4444444-4444-4444-4444-444444444444',
@@ -231,7 +237,9 @@ VALUES
     'Boutique strength & conditioning gym with personal training.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b5555555-5555-5555-5555-555555555555',
@@ -245,7 +253,9 @@ VALUES
     'Independent clothing & lifestyle store. Curated everyday essentials.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b6666666-6666-6666-6666-666666666666',
@@ -259,7 +269,9 @@ VALUES
     'Pet grooming, daycare & boutique treats for your furry friends.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=400&h=400&fit=crop',
+    true,
+    5
   ),
   (
     'b7777777-7777-7777-7777-777777777777',
@@ -273,9 +285,14 @@ VALUES
     'Art studio offering workshops, exhibitions & creative events.',
     true,
     'bury-st-edmunds',
-    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop'
+    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400&h=400&fit=crop',
+    true,
+    5
   )
-ON CONFLICT (id) DO UPDATE SET logo_url = EXCLUDED.logo_url;
+ON CONFLICT (id) DO UPDATE SET
+  logo_url = EXCLUDED.logo_url,
+  onboarding_complete = EXCLUDED.onboarding_complete,
+  onboarding_step = EXCLUDED.onboarding_step;
 
 -- ============================================================
 -- OFFERS
@@ -377,10 +394,10 @@ VALUES
     'a1111111-1111-1111-1111-111111111111',  -- Sophie Carter
     'c1111111-1111-1111-1111-111111111111',  -- Free coffee + pastry
     'b1111111-1111-1111-1111-111111111111',  -- Midgar Coffee
-    'active',
+    'expired',
     'QR-SOPHIE-MC1',
-    NOW() + interval '24 hours',
     NOW() - interval '2 hours',
+    NOW() - interval '3 hours',
     NULL,
     NULL,
     NULL,
