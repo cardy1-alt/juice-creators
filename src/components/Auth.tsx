@@ -21,6 +21,7 @@ function loadGoogleMaps(): Promise<void> {
       window._gmapsCallbacks = [];
       const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
       if (!apiKey || !/^AIza[a-zA-Z0-9_-]{31,}$/.test(apiKey)) {
+        console.warn('[GoogleMaps] No valid API key found. Set VITE_GOOGLE_MAPS_API_KEY in your .env file.');
         resolve();
         return;
       }
@@ -29,6 +30,11 @@ function loadGoogleMaps(): Promise<void> {
       script.async = true;
       script.onload = () => {
         window._gmapsLoaded = true;
+        window._gmapsCallbacks?.forEach(cb => cb());
+        window._gmapsCallbacks = [];
+      };
+      script.onerror = () => {
+        console.error('[GoogleMaps] Failed to load Google Maps script. Check your API key and allowed referrers.');
         window._gmapsCallbacks?.forEach(cb => cb());
         window._gmapsCallbacks = [];
       };
@@ -46,6 +52,7 @@ function AddressAutocomplete({ value, onChange }: {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [mapsReady, setMapsReady] = useState(false);
+  const [mapsError, setMapsError] = useState(false);
   const [focused, setFocused] = useState(false);
   const serviceRef = useRef<any>(null);
   const geocoderRef = useRef<any>(null);
@@ -53,14 +60,27 @@ function AddressAutocomplete({ value, onChange }: {
   const debounceRef = useRef<ReturnType<typeof setTimeout>>();
 
   useEffect(() => {
+    let mounted = true;
     loadGoogleMaps().then(async () => {
+      if (!mounted) return;
       if (window.google?.maps) {
-        await window.google.maps.importLibrary('places');
-        serviceRef.current = new window.google.maps.places.AutocompleteService();
-        geocoderRef.current = new window.google.maps.Geocoder();
-        setMapsReady(true);
+        try {
+          await window.google.maps.importLibrary('places');
+          serviceRef.current = new window.google.maps.places.AutocompleteService();
+          geocoderRef.current = new window.google.maps.Geocoder();
+          setMapsReady(true);
+        } catch (err) {
+          console.error('[AddressAutocomplete] Failed to initialize Places:', err);
+          setMapsError(true);
+        }
+      } else {
+        // Google Maps script didn't load — API key likely missing or invalid
+        setMapsError(true);
       }
+    }).catch(() => {
+      if (mounted) setMapsError(true);
     });
+    return () => { mounted = false; };
   }, []);
 
   useEffect(() => {
@@ -123,10 +143,12 @@ function AddressAutocomplete({ value, onChange }: {
       <div className={`relative rounded-[14px] border transition-all duration-200 ${
         focused
           ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
+          : mapsError
+          ? 'border-[rgba(196,103,74,0.3)] bg-[var(--bg)]'
           : 'border-[var(--faint)] bg-[var(--bg)]'
       }`}>
         <MapPin className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
-          focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+          focused ? 'text-[var(--terra)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
         }`} />
         <input
           type="text"
@@ -134,11 +156,14 @@ function AddressAutocomplete({ value, onChange }: {
           onChange={(e) => handleInput(e.target.value)}
           onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
           onBlur={() => setFocused(false)}
-          placeholder="Enter your address"
+          placeholder={mapsError ? 'Type your address manually' : 'Enter your address'}
           className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
-          autoComplete="off"
+          autoComplete={mapsError ? 'street-address' : 'off'}
         />
       </div>
+      {mapsError && (
+        <p className="text-[11px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
+      )}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(34,34,34,0.10)] overflow-hidden">
           {suggestions.map((s) => (

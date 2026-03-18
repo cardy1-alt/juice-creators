@@ -93,6 +93,9 @@ interface Claim {
   reel_due_at: string | null;
   offer_id: string;
   business_id: string;
+  snapshot_offer_item?: string | null;
+  snapshot_specific_ask?: string | null;
+  snapshot_generated_title?: string | null;
   offers: { description: string; generated_title?: string | null; offer_item?: string | null; specific_ask?: string | null; content_type?: string | null };
   businesses: { name: string; category: string; logo_url?: string | null };
 }
@@ -160,6 +163,7 @@ export default function CreatorApp() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [reelUrl, setReelUrl] = useState('');
   const [loading, setLoading] = useState(false);
+  const [offersLoading, setOffersLoading] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [collabsCompleted, setCollabsCompleted] = useState(0);
   const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
@@ -202,14 +206,29 @@ export default function CreatorApp() {
   }, []);
 
   const toggleSaved = (offerId: string) => {
+    const offer = offers.find(o => o.id === offerId);
     setSavedOffers(prev => {
       const next = new Set(prev);
       if (next.has(offerId)) {
         next.delete(offerId);
         setUndoToast('Removed from saved');
         setTimeout(() => setUndoToast(null), 3000);
+        // Remove from saved_businesses table
+        if (offer) {
+          supabase.from('saved_businesses').delete()
+            .eq('creator_id', userProfile.id)
+            .eq('business_id', offer.business_id)
+            .then(() => {});
+        }
       } else {
         next.add(offerId);
+        // Save to saved_businesses table for notification triggers
+        if (offer) {
+          supabase.from('saved_businesses').upsert({
+            creator_id: userProfile.id,
+            business_id: offer.business_id,
+          }, { onConflict: 'creator_id,business_id' }).then(() => {});
+        }
       }
       localStorage.setItem('nayba_saved_offers', JSON.stringify([...next]));
       return next;
@@ -385,6 +404,7 @@ export default function CreatorApp() {
   };
 
   const fetchOffers = async () => {
+    setOffersLoading(true);
     const { data, error } = await supabase
       .from('offers')
       .select('*, businesses(name, category, latitude, longitude, address, logo_url)')
@@ -392,6 +412,7 @@ export default function CreatorApp() {
 
     if (error) {
       console.error('Error fetching offers:', error);
+      setOffersLoading(false);
       return;
     }
 
@@ -417,6 +438,7 @@ export default function CreatorApp() {
       });
       setOffers(deduped as Offer[]);
     }
+    setOffersLoading(false);
   };
 
   const fetchClaims = async () => {
@@ -424,6 +446,7 @@ export default function CreatorApp() {
       .from('claims')
       .select('*, offers(description, generated_title, offer_item, specific_ask, content_type), businesses(name, category, logo_url)')
       .eq('creator_id', userProfile.id)
+      .not('status', 'in', '(expired)')
       .order('claimed_at', { ascending: false });
 
     if (error) {
@@ -446,7 +469,13 @@ export default function CreatorApp() {
       prevClaimStatusesRef.current = Object.fromEntries(newClaims.map(c => [c.id, c.status]));
 
       setClaims(newClaims);
-      const active = newClaims.filter(c => c.status === 'active' || (c.status === 'redeemed' && !c.reel_url));
+      const active = newClaims.filter(c =>
+        c.status === 'active' ||
+        c.status === 'claimed' ||
+        c.status === 'visited' ||
+        c.status === 'reel_due' ||
+        (c.status === 'redeemed' && !c.reel_url)
+      );
       setActiveClaims(active);
       if (selectedClaim && !active.find(c => c.id === selectedClaim.id)) {
         setSelectedClaim(active[0] || null);
@@ -777,9 +806,9 @@ export default function CreatorApp() {
             {/* Hero */}
             <div className="relative h-[200px] flex items-center justify-center" style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}>
               {offer.offer_photo_url ? (
-                <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ) : offer.businesses.logo_url ? (
-                <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ) : (
                 <div className="w-[64px] h-[64px] rounded-[16px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
                   <span className="text-[rgba(255,255,255,0.8)] text-[28px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
@@ -1136,7 +1165,7 @@ export default function CreatorApp() {
                       >
                         <span className="text-[20px] font-extrabold w-6 text-center" style={{ color: posColor }}>{idx + 1}</span>
                         {entry.avatar_url ? (
-                          <img src={entry.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                          <img src={entry.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getLevelColour(entry.level) }}>
                             <span className="text-white text-[12px] font-bold">{getInitials(entry.display_name || entry.name)}</span>
@@ -1176,7 +1205,42 @@ export default function CreatorApp() {
                 <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
-              {offers.length === 0 ? (
+              {offersLoading ? (
+                /* Skeleton loader while offers are loading */
+                <div className="px-[20px] space-y-[16px]">
+                  {/* Skeleton category pills */}
+                  <div className="flex gap-[8px] overflow-hidden">
+                    {[80, 60, 90, 70, 85].map((w, i) => (
+                      <div key={i} className="h-[32px] rounded-[50px] flex-shrink-0 skeleton-shimmer" style={{ width: w }} />
+                    ))}
+                  </div>
+                  {/* Skeleton offer cards */}
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="rounded-[16px] border border-[var(--faint)] overflow-hidden">
+                      <div className="h-[140px] skeleton-shimmer" />
+                      <div className="p-[16px] space-y-[10px]">
+                        <div className="h-[14px] rounded-[6px] skeleton-shimmer" style={{ width: '60%' }} />
+                        <div className="h-[12px] rounded-[6px] skeleton-shimmer" style={{ width: '40%' }} />
+                        <div className="flex justify-between">
+                          <div className="h-[12px] rounded-[6px] skeleton-shimmer" style={{ width: '30%' }} />
+                          <div className="h-[28px] w-[80px] rounded-[50px] skeleton-shimmer" />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <style>{`
+                    .skeleton-shimmer {
+                      background: linear-gradient(90deg, var(--bg) 25%, rgba(34,34,34,0.06) 50%, var(--bg) 75%);
+                      background-size: 200% 100%;
+                      animation: shimmer 1.5s infinite;
+                    }
+                    @keyframes shimmer {
+                      0% { background-position: 200% 0; }
+                      100% { background-position: -200% 0; }
+                    }
+                  `}</style>
+                </div>
+              ) : offers.length === 0 ? (
                 <div className="text-center py-16 px-6">
                   <p className="text-[16px] font-bold text-[var(--near-black)] mb-1">No offers yet</p>
                   <p className="text-[var(--soft)] text-[13px]">New offers from local businesses will appear here. Check back soon!</p>
@@ -1244,9 +1308,9 @@ export default function CreatorApp() {
                         style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
                       >
                         {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                          <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : offer.businesses.logo_url ? (
-                          <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" />
+                          <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="w-[44px] h-[44px] rounded-[10px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
                             <span className="text-[rgba(255,255,255,0.8)] text-[18px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
@@ -1263,7 +1327,7 @@ export default function CreatorApp() {
                         {/* Business logo overlay top-left */}
                         {!isLocked && (offer.offer_photo_url || offer.businesses.logo_url) && offer.businesses.logo_url && (
                           <div className="absolute top-[6px] left-[6px] w-[32px] h-[32px] rounded-[8px] overflow-hidden" style={{ border: '1.5px solid white' }}>
-                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
+                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                           </div>
                         )}
                         {/* Slots badge bottom-left or level requirement */}
@@ -1384,9 +1448,9 @@ export default function CreatorApp() {
                           style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
                         >
                           {offer.offer_photo_url ? (
-                            <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                            <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                           ) : offer.businesses.logo_url ? (
-                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" />
+                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                           ) : (
                             <span className="text-white text-[20px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
                           )}
@@ -1482,8 +1546,8 @@ export default function CreatorApp() {
                       const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
                       const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
 
-                      // Use generated_title if available, fall back to description truncation
-                      const desc = claim.offers.generated_title || claim.offers.description || '';
+                      // Use snapshot fields (frozen at claim time) if available, fall back to live offer data
+                      const desc = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                       const breakPoints = [' in exchange', ' for a', ' for an', ' when you', ' with your'];
                       let offerTitle = desc;
                       let foundBreak = false;
@@ -1755,7 +1819,7 @@ export default function CreatorApp() {
                           </div>
                         ) : avatarUrl ? (
                           <button onClick={() => avatarInputRef.current?.click()}>
-                            <img src={avatarUrl} alt="Avatar" className="w-[72px] h-[72px] rounded-full object-cover" />
+                            <img src={avatarUrl} alt="Avatar" className="w-[72px] h-[72px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                           </button>
                         ) : (
                           <button
@@ -1863,45 +1927,119 @@ export default function CreatorApp() {
                   <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
+                      const levelColours: Record<number, string> = {
+                        1: 'rgba(34,34,34,0.35)',
+                        2: '#6B8F84',
+                        3: '#3D6B5E',
+                        4: '#1A3C34',
+                        5: '#C4674A',
+                        6: '#222222',
+                      };
+                      const levels = [1, 2, 3, 4, 5, 6];
+                      const levelNames = ['Newcomer', 'Explorer', 'Regular', 'Local', 'Trusted', 'Nayba'];
+
                       return (
                         <>
-                          <div className="flex items-center justify-between mb-[8px]">
-                            <span className="text-[14px] font-bold text-[var(--near-black)]">Level {progress.currentLevel} · {progress.currentName}</span>
-                            {!progress.isMaxLevel && (
-                              <span className="text-[12px] text-[var(--mid)]">Level {progress.nextLevel} · {progress.nextName}</span>
-                            )}
+                          {/* Milestone badge row */}
+                          <div className="flex items-center justify-between mb-[12px]">
+                            {levels.map((lvl, idx) => {
+                              const isCompleted = lvl < (userProfile.level || 1);
+                              const isCurrent = lvl === (userProfile.level || 1);
+                              const isLocked = lvl > (userProfile.level || 1);
+                              const colour = levelColours[lvl];
+
+                              return (
+                                <span key={lvl} className="flex items-center">
+                                  {/* Badge circle */}
+                                  <span className="relative flex items-center justify-center">
+                                    {isCurrent && (
+                                      <span
+                                        className="absolute inset-[-3px] rounded-full"
+                                        style={{
+                                          border: '2px solid var(--terra)',
+                                          animation: 'levelPulse 2s ease-in-out infinite',
+                                        }}
+                                      />
+                                    )}
+                                    <span
+                                      className="w-[24px] h-[24px] rounded-full flex items-center justify-center text-[10px] font-bold"
+                                      style={{
+                                        background: isLocked ? 'transparent' : colour,
+                                        border: isLocked ? '1.5px solid var(--faint)' : 'none',
+                                        color: isLocked ? 'var(--faint)' : 'white',
+                                      }}
+                                    >
+                                      {lvl === 6 ? '✦' : lvl}
+                                    </span>
+                                  </span>
+                                  {/* Connecting bar */}
+                                  {idx < levels.length - 1 && (
+                                    <span
+                                      className="h-[3px] flex-1 mx-[2px] rounded-full"
+                                      style={{
+                                        width: '16px',
+                                        background: (lvl < (userProfile.level || 1))
+                                          ? levelColours[lvl]
+                                          : (isCurrent ? `linear-gradient(to right, var(--terra) ${progress.progressPercent}%, var(--faint) ${progress.progressPercent}%)` : 'var(--faint)'),
+                                      }}
+                                    />
+                                  )}
+                                </span>
+                              );
+                            })}
                           </div>
-                          <div className="h-[4px] rounded-[4px] mb-[8px]" style={{ background: 'rgba(196,103,74,0.1)' }}>
-                            <div className="h-full rounded-[4px] transition-all" style={{ width: `${progress.progressPercent}%`, background: 'var(--terra)' }} />
-                          </div>
-                          <p className="text-[12px] text-[var(--soft)] text-center">
+                          {/* Level label */}
+                          <p className="text-[14px] text-[var(--mid)] text-center" style={{ fontWeight: 500 }}>
                             {progress.isMaxLevel
-                              ? "You've reached the top. You're a Nayba."
-                              : progress.ratingNeeded
-                                ? `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} + ${progress.ratingNeeded}★ rating to reach ${progress.nextName}`
-                                : `${progress.reelsToNext} more reel${progress.reelsToNext !== 1 ? 's' : ''} to reach ${progress.nextName}`
+                              ? '✦ Nayba'
+                              : `${progress.currentName} · ${progress.reelsToNext} reel${progress.reelsToNext !== 1 ? 's' : ''} to ${progress.nextName}`
                             }
                           </p>
                         </>
                       );
                     })()}
 
-                    {/* Streak */}
-                    <div className="flex items-center justify-between mt-[14px] pt-[14px] border-t border-[var(--faint)]">
-                      <div className="flex items-center gap-[8px]">
-                        <FlameIcon active={(userProfile.current_streak || 0) > 0} />
-                        <span className="text-[14px] font-bold text-[var(--near-black)]">
-                          {(userProfile.current_streak || 0) > 0
-                            ? `${userProfile.current_streak} month streak`
-                            : 'Start your streak'
+                    {/* Streak — visual flame row */}
+                    <div className="flex items-center gap-[10px] mt-[14px] pt-[14px] border-t border-[var(--faint)]">
+                      <span className="text-[28px] font-extrabold text-[var(--near-black)]" style={{ lineHeight: 1 }}>
+                        {userProfile.current_streak || 0}
+                      </span>
+                      <div className="flex items-center gap-[3px]">
+                        {(() => {
+                          const streak = userProfile.current_streak || 0;
+                          const streakStatus = checkStreakStatus(userProfile.last_reel_month);
+                          const showMax = Math.min(streak > 0 ? streak : 1, 6);
+                          const flames = [];
+                          for (let i = 0; i < showMax; i++) {
+                            const isCurrentMonthPending = i === showMax - 1 && streakStatus === 'at_risk';
+                            flames.push(
+                              <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path
+                                  d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1ZM8 12.5C6.07 12.5 4.5 11.16 4.5 9.5C4.5 7.5 6.5 5 8 3.5C9.5 5 11.5 7.5 11.5 9.5C11.5 11.16 9.93 12.5 8 12.5Z"
+                                  fill={isCurrentMonthPending ? 'var(--peach)' : 'var(--terra)'}
+                                  stroke={isCurrentMonthPending ? 'var(--terra)' : 'none'}
+                                  strokeWidth={isCurrentMonthPending ? '0.5' : '0'}
+                                  strokeDasharray={isCurrentMonthPending ? '2 1' : 'none'}
+                                />
+                              </svg>
+                            );
                           }
-                        </span>
+                          if (streak > 6) {
+                            flames.push(
+                              <span key="more" className="text-[11px] text-[var(--soft)] font-semibold ml-[2px]">+{streak - 6} more</span>
+                            );
+                          }
+                          return flames;
+                        })()}
                       </div>
-                      {(userProfile.longest_streak || 0) > 0 && (
-                        <span className="text-[12px] text-[var(--soft)]">Best: {userProfile.longest_streak}</span>
-                      )}
+                      <span className="text-[12px] text-[var(--soft)] ml-auto">
+                        {(userProfile.current_streak || 0) > 0 ? 'month streak' : 'No streak yet'}
+                      </span>
                     </div>
                   </div>
+
+                  {/* Level pulse animation */}
+                  <style>{`@keyframes levelPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.15); } }`}</style>
 
                   {/* ═══ Settings ═══ */}
                   <div className="mt-[8px]">
@@ -1987,6 +2125,43 @@ export default function CreatorApp() {
                     <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
+                    {/* Avatar upload */}
+                    <div className="flex flex-col items-center mb-[8px]">
+                      <input
+                        ref={avatarInputRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleAvatarUpload}
+                      />
+                      <button
+                        onClick={() => avatarInputRef.current?.click()}
+                        className="relative"
+                        disabled={uploadingAvatar}
+                      >
+                        {uploadingAvatar ? (
+                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--bg)] flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                          </div>
+                        ) : avatarUrl ? (
+                          <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        ) : (
+                          <div
+                            className="w-[80px] h-[80px] rounded-full flex items-center justify-center"
+                            style={{ background: getCategoryGradient(null) }}
+                          >
+                            <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
+                          </div>
+                        )}
+                        <div
+                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
+                        >
+                          <Camera className="w-[13px] h-[13px] text-white" />
+                        </div>
+                      </button>
+                      <p className="text-[12px] text-[var(--soft)] mt-[8px]">Tap to change photo</p>
+                      {uploadError && <p className="text-[12px] text-[var(--terra)] mt-[4px]">{uploadError}</p>}
+                    </div>
                     <div>
                       <label className="block text-[13px] font-semibold text-[var(--mid)] mb-[6px]">Name</label>
                       <input
