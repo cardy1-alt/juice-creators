@@ -165,11 +165,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      // Skip profile fetch during signup — signUp() manages state directly
+      // Skip everything during signup — signUp() sets user/role/profile
+      // together in one batch. Setting user here prematurely causes an
+      // "Account Not Found" flash (user truthy, role still null).
       if (signingUpRef.current) {
-        if (session?.user) {
-          setUser(session.user);
-        }
         return;
       }
 
@@ -274,21 +273,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (insertError) {
           console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          // Try to recover — the profile may already exist from a previous
+          // attempt (23505) or the INSERT may have been blocked by RLS (42501).
+          // Either way, check if a profile row exists for this email.
+          const { data: existing } = await supabase
+            .from('creators')
+            .select('*')
+            .eq('email', normEmail)
+            .maybeSingle();
+          if (existing) {
+            console.log('[AuthContext] Recovered existing creator profile:', existing.id);
+            setUser(data.user);
+            setUserRole('creator');
+            setUserProfile(existing);
+            return;
+          }
+          // No recoverable row — surface the error
           if (insertError.code === '23505') {
-            // Profile already exists — ghost row from a previous failed signup.
-            // Recover by loading the existing profile directly.
-            console.log('[AuthContext] Creator profile already exists, recovering');
-            const { data: existing } = await supabase
-              .from('creators')
-              .select('*')
-              .eq('email', normEmail)
-              .maybeSingle();
-            if (existing) {
-              setUser(data.user);
-              setUserRole('creator');
-              setUserProfile(existing);
-              return; // Recovered — existing profile loaded
-            }
             throw new Error('An account with this email or Instagram handle already exists. Please sign in instead.');
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
@@ -346,20 +347,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (insertError) {
           console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          // Try to recover — the profile may already exist from a previous
+          // attempt (23505) or the INSERT may have been blocked by RLS (42501).
+          // Either way, check if a profile row exists for this email.
+          const { data: existing } = await supabase
+            .from('businesses')
+            .select('*')
+            .eq('owner_email', normEmail)
+            .maybeSingle();
+          if (existing) {
+            console.log('[AuthContext] Recovered existing business profile:', existing.id);
+            setUser(data.user);
+            setUserRole('business');
+            setUserProfile(existing);
+            return;
+          }
+          // No recoverable row — surface the error
           if (insertError.code === '23505') {
-            // Profile already exists — ghost row from a previous failed signup.
-            console.log('[AuthContext] Business profile already exists, recovering');
-            const { data: existing } = await supabase
-              .from('businesses')
-              .select('*')
-              .eq('owner_email', normEmail)
-              .maybeSingle();
-            if (existing) {
-              setUser(data.user);
-              setUserRole('business');
-              setUserProfile(existing);
-              return; // Recovered
-            }
             throw new Error('A business with this email or name already exists. Please sign in instead.');
           }
           throw new Error(`Failed to create business profile: ${insertError.message}`);
