@@ -60,13 +60,13 @@ interface Offer {
   businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
 }
 
-// ─── Flame SVG for streaks ────────────────────────────────────────────────
-function FlameIcon({ active, size = 16 }: { active: boolean; size?: number }) {
+// ─── Flame SVG for streaks (solid fill) ───────────────────────────────────
+function FlameIcon({ color, size = 16 }: { color: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
       <path
-        d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1ZM8 12.5C6.07 12.5 4.5 11.16 4.5 9.5C4.5 7.5 6.5 5 8 3.5C9.5 5 11.5 7.5 11.5 9.5C11.5 11.16 9.93 12.5 8 12.5Z"
-        fill={active ? 'var(--terra)' : 'rgba(34,34,34,0.28)'}
+        d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1Z"
+        fill={color}
       />
     </svg>
   );
@@ -704,22 +704,21 @@ export default function CreatorApp() {
 
   // Helper to render business avatar
   const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 44) => {
-    if (logoUrl) {
-      return (
-        <img
-          src={logoUrl}
-          alt={name}
-          className="object-cover rounded-full"
-          style={{ width: size, height: size }}
-        />
-      );
-    }
     return (
       <div
-        className="rounded-full flex items-center justify-center"
+        className="rounded-full flex items-center justify-center overflow-hidden"
         style={{ width: size, height: size, background: getCategorySolidColor(category) }}
       >
-        <span className="text-[rgba(255,255,255,0.8)] font-extrabold" style={{ fontSize: size * 0.4 }}>{name.charAt(0)}</span>
+        {logoUrl ? (
+          <img
+            src={logoUrl}
+            alt={name}
+            className="w-full h-full object-cover"
+            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+          />
+        ) : (
+          <span className="text-[rgba(255,255,255,0.8)] font-extrabold" style={{ fontSize: size * 0.4 }}>{name.charAt(0)}</span>
+        )}
       </div>
     );
   };
@@ -804,7 +803,7 @@ export default function CreatorApp() {
         return (
           <div className="fixed inset-0 z-50 bg-white flex flex-col">
             {/* Hero */}
-            <div className="relative h-[200px] flex items-center justify-center" style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}>
+            <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
               {offer.offer_photo_url ? (
                 <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ) : offer.businesses.logo_url ? (
@@ -1305,7 +1304,7 @@ export default function CreatorApp() {
                       {/* Image area */}
                       <div
                         className="w-full h-[130px] rounded-[16px] overflow-hidden relative flex items-center justify-center"
-                        style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
+                        style={{ background: getCategoryGradient(offer.businesses.category) }}
                       >
                         {offer.offer_photo_url ? (
                           <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1445,7 +1444,7 @@ export default function CreatorApp() {
                         {/* Business image/gradient */}
                         <div
                           className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
-                          style={{ background: (offer.offer_photo_url || offer.businesses.logo_url) ? undefined : getCategoryGradient(offer.businesses.category) }}
+                          style={{ background: getCategoryGradient(offer.businesses.category) }}
                         >
                           {offer.offer_photo_url ? (
                             <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1923,123 +1922,192 @@ export default function CreatorApp() {
                     );
                   })()}
 
-                  {/* ═══ Level + streak section ═══ */}
-                  <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                  {/* ═══ Level + streak section (Airbnb-style) ═══ */}
+                  <div className="rounded-[16px] border border-[var(--faint)] bg-white p-[20px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
                       const levelColours: Record<number, string> = {
-                        1: 'rgba(34,34,34,0.35)',
-                        2: '#6B8F84',
-                        3: '#3D6B5E',
+                        1: '#9E9E9E',
+                        2: '#8FAF8F',
+                        3: '#4CAF7D',
                         4: '#1A3C34',
                         5: '#C4674A',
                         6: '#222222',
                       };
                       const levels = [1, 2, 3, 4, 5, 6];
                       const levelNames = ['Newcomer', 'Explorer', 'Regular', 'Local', 'Trusted', 'Nayba'];
+                      const currentLvl = userProfile.level || 1;
 
                       return (
                         <>
-                          {/* Milestone badge row */}
-                          <div className="flex items-center justify-between mb-[12px]">
+                          {/* Level journey row */}
+                          <div className="flex items-center mb-[16px]">
                             {levels.map((lvl, idx) => {
-                              const isCompleted = lvl < (userProfile.level || 1);
-                              const isCurrent = lvl === (userProfile.level || 1);
-                              const isLocked = lvl > (userProfile.level || 1);
+                              const isCompleted = lvl < currentLvl;
+                              const isCurrent = lvl === currentLvl;
+                              const isLocked = lvl > currentLvl;
                               const colour = levelColours[lvl];
 
                               return (
-                                <span key={lvl} className="flex items-center">
-                                  {/* Badge circle */}
-                                  <span className="relative flex items-center justify-center">
+                                <div key={lvl} className="flex items-center" style={{ flex: idx < levels.length - 1 ? 1 : 'none' }}>
+                                  {/* Circle */}
+                                  <div className="relative flex items-center justify-center" style={{ width: 40, height: 40 }}>
+                                    {/* Glow ring for current level */}
                                     {isCurrent && (
-                                      <span
-                                        className="absolute inset-[-3px] rounded-full"
+                                      <div
+                                        className="absolute rounded-full"
                                         style={{
-                                          border: '2px solid var(--terra)',
-                                          animation: 'levelPulse 2s ease-in-out infinite',
+                                          width: 48,
+                                          height: 48,
+                                          border: '3px solid var(--terra)',
                                         }}
                                       />
                                     )}
-                                    <span
-                                      className="w-[24px] h-[24px] rounded-full flex items-center justify-center text-[10px] font-bold"
+                                    <div
+                                      className="rounded-full flex items-center justify-center"
                                       style={{
-                                        background: isLocked ? 'transparent' : colour,
+                                        width: 40,
+                                        height: 40,
+                                        background: isLocked ? '#FFFFFF' : colour,
                                         border: isLocked ? '1.5px solid var(--faint)' : 'none',
-                                        color: isLocked ? 'var(--faint)' : 'white',
                                       }}
                                     >
-                                      {lvl === 6 ? '✦' : lvl}
-                                    </span>
-                                  </span>
-                                  {/* Connecting bar */}
+                                      {isCompleted ? (
+                                        /* Checkmark for completed levels */
+                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                                          <path d="M4.5 9L7.5 12L13.5 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                                        </svg>
+                                      ) : (
+                                        /* Number for current + locked */
+                                        <span
+                                          style={{
+                                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                            fontWeight: isCurrent ? 700 : 500,
+                                            fontSize: 16,
+                                            color: isLocked ? 'var(--soft)' : 'white',
+                                          }}
+                                        >
+                                          {lvl === 6 ? '✦' : lvl}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                  {/* Connector line */}
                                   {idx < levels.length - 1 && (
-                                    <span
-                                      className="h-[3px] flex-1 mx-[2px] rounded-full"
+                                    <div
+                                      className="flex-1 mx-[4px]"
                                       style={{
-                                        width: '16px',
-                                        background: (lvl < (userProfile.level || 1))
+                                        height: 3,
+                                        borderRadius: 3,
+                                        background: isCompleted
                                           ? levelColours[lvl]
-                                          : (isCurrent ? `linear-gradient(to right, var(--terra) ${progress.progressPercent}%, var(--faint) ${progress.progressPercent}%)` : 'var(--faint)'),
+                                          : 'var(--faint)',
                                       }}
                                     />
                                   )}
-                                </span>
+                                </div>
                               );
                             })}
                           </div>
-                          {/* Level label */}
-                          <p className="text-[14px] text-[var(--mid)] text-center" style={{ fontWeight: 500 }}>
-                            {progress.isMaxLevel
-                              ? '✦ Nayba'
-                              : `${progress.currentName} · ${progress.reelsToNext} reel${progress.reelsToNext !== 1 ? 's' : ''} to ${progress.nextName}`
-                            }
-                          </p>
+                          {/* Level name pill + progress text */}
+                          <div className="flex items-center gap-[8px]">
+                            <span
+                              className="inline-block rounded-full px-[12px] py-[3px]"
+                              style={{
+                                background: currentLvl === 6 ? '#222222' : levelColours[currentLvl],
+                                color: 'white',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: 13,
+                              }}
+                            >
+                              {currentLvl === 6 ? '✦ Nayba' : levelNames[currentLvl - 1]}
+                            </span>
+                            {!progress.isMaxLevel && (
+                              <span
+                                style={{
+                                  color: 'var(--mid)',
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                  fontWeight: 400,
+                                  fontSize: 14,
+                                }}
+                              >
+                                · {progress.reelsToNext} reel{progress.reelsToNext !== 1 ? 's' : ''} to {progress.nextName}
+                              </span>
+                            )}
+                          </div>
                         </>
                       );
                     })()}
 
-                    {/* Streak — visual flame row */}
-                    <div className="flex items-center gap-[10px] mt-[14px] pt-[14px] border-t border-[var(--faint)]">
-                      <span className="text-[28px] font-extrabold text-[var(--near-black)]" style={{ lineHeight: 1 }}>
-                        {userProfile.current_streak || 0}
-                      </span>
-                      <div className="flex items-center gap-[3px]">
-                        {(() => {
-                          const streak = userProfile.current_streak || 0;
-                          const streakStatus = checkStreakStatus(userProfile.last_reel_month);
-                          const showMax = Math.min(streak > 0 ? streak : 1, 6);
-                          const flames = [];
-                          for (let i = 0; i < showMax; i++) {
-                            const isCurrentMonthPending = i === showMax - 1 && streakStatus === 'at_risk';
-                            flames.push(
-                              <svg key={i} width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                <path
-                                  d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1ZM8 12.5C6.07 12.5 4.5 11.16 4.5 9.5C4.5 7.5 6.5 5 8 3.5C9.5 5 11.5 7.5 11.5 9.5C11.5 11.16 9.93 12.5 8 12.5Z"
-                                  fill={isCurrentMonthPending ? 'var(--peach)' : 'var(--terra)'}
-                                  stroke={isCurrentMonthPending ? 'var(--terra)' : 'none'}
-                                  strokeWidth={isCurrentMonthPending ? '0.5' : '0'}
-                                  strokeDasharray={isCurrentMonthPending ? '2 1' : 'none'}
-                                />
-                              </svg>
-                            );
-                          }
-                          if (streak > 6) {
-                            flames.push(
-                              <span key="more" className="text-[11px] text-[var(--soft)] font-semibold ml-[2px]">+{streak - 6} more</span>
-                            );
-                          }
-                          return flames;
-                        })()}
+                    {/* Streak row */}
+                    <div className="mt-[20px] pt-[20px] border-t border-[var(--faint)]">
+                      <div className="flex items-center">
+                        <div className="flex items-center gap-[8px]">
+                          <span
+                            style={{
+                              fontFamily: "'Plus Jakarta Sans', sans-serif",
+                              fontWeight: 800,
+                              fontSize: 28,
+                              color: 'var(--near-black)',
+                              lineHeight: 1,
+                            }}
+                          >
+                            {userProfile.current_streak || 0}
+                          </span>
+                          <div className="flex items-center gap-[3px]">
+                            {(() => {
+                              const streak = userProfile.current_streak || 0;
+                              const streakStatus = checkStreakStatus(userProfile.last_reel_month);
+                              const showMax = Math.min(streak > 0 ? streak : 1, 6);
+                              const flames = [];
+                              for (let i = 0; i < showMax; i++) {
+                                const isCurrentMonthPending = i === showMax - 1 && streakStatus === 'at_risk';
+                                flames.push(
+                                  <FlameIcon
+                                    key={i}
+                                    color={isCurrentMonthPending ? '#F5C4A0' : '#C4674A'}
+                                    size={18}
+                                  />
+                                );
+                              }
+                              if (streak > 6) {
+                                flames.push(
+                                  <span key="more" className="text-[11px] font-semibold ml-[2px]" style={{ color: 'var(--soft)' }}>+{streak - 6}</span>
+                                );
+                              }
+                              return flames;
+                            })()}
+                          </div>
+                        </div>
+                        <span
+                          className="ml-auto"
+                          style={{
+                            fontFamily: "'Plus Jakarta Sans', sans-serif",
+                            fontWeight: 400,
+                            fontSize: 14,
+                            color: 'var(--soft)',
+                          }}
+                        >
+                          {(userProfile.current_streak || 0) > 0 ? 'month streak' : 'No streak yet'}
+                        </span>
                       </div>
-                      <span className="text-[12px] text-[var(--soft)] ml-auto">
-                        {(userProfile.current_streak || 0) > 0 ? 'month streak' : 'No streak yet'}
-                      </span>
+                      {/* Motivational subline */}
+                      <p
+                        className="mt-[6px]"
+                        style={{
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
+                          fontWeight: 400,
+                          fontSize: 13,
+                          color: 'var(--soft)',
+                        }}
+                      >
+                        {(userProfile.current_streak || 0) > 0
+                          ? 'Keep posting to protect your streak'
+                          : 'Post a reel this month to start your streak'}
+                      </p>
                     </div>
                   </div>
-
-                  {/* Level pulse animation */}
-                  <style>{`@keyframes levelPulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.15); } }`}</style>
 
                   {/* ═══ Settings ═══ */}
                   <div className="mt-[8px]">
