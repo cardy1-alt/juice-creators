@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, ReactNode } fro
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
+import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminSignupNotification } from '../lib/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -264,7 +265,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
 
-        const { error: insertError } = await supabase.from('creators').insert(insertPayload);
+        const { data: insertedCreator, error: insertError } = await supabase.from('creators').insert(insertPayload).select().single();
 
         if (insertError) {
           console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
@@ -273,24 +274,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Creator profile inserted successfully');
+        console.log('[AuthContext] Creator profile inserted successfully, id:', insertedCreator.id);
 
-        // Set state directly — no need to re-fetch, we know what we just inserted
+        // Set state from the returned row so we have the generated id
         setUser(data.user);
         setUserRole('creator');
-        setUserProfile({
-          email,
-          name: additionalData.name,
-          instagram_handle: additionalData.instagramHandle,
-          follower_count: additionalData.followerCount || null,
-          code: additionalData.code,
-          date_of_birth: additionalData.dateOfBirth || null,
-          address: additionalData.address || null,
-          latitude: additionalData.latitude || null,
-          longitude: additionalData.longitude || null,
-          approved: false,
-          onboarding_complete: false
-        });
+        setUserProfile(insertedCreator);
+
+        // Fire welcome email + admin signup notification (non-blocking)
+        sendCreatorWelcomeEmail(insertedCreator.id).catch(() => {});
+        sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email }).catch(() => {});
       } else if (role === 'business') {
         console.log('[AuthContext] Inserting business profile for:', data.user.id);
         const insertPayload = {
@@ -306,7 +299,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         console.log('[AuthContext] Business INSERT payload:', JSON.stringify(insertPayload));
 
-        const { error: insertError } = await supabase.from('businesses').insert(insertPayload);
+        const { data: insertedBusiness, error: insertError } = await supabase.from('businesses').insert(insertPayload).select().single();
 
         if (insertError) {
           console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
@@ -315,21 +308,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create business profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Business profile inserted successfully');
+        console.log('[AuthContext] Business profile inserted successfully, id:', insertedBusiness.id);
 
+        // Set state from the returned row so we have the generated id
         setUser(data.user);
         setUserRole('business');
-        setUserProfile({
-          owner_email: email,
-          name: additionalData.name,
-          slug: additionalData.slug,
-          category: additionalData.category || 'Food & Drink',
-          address: additionalData.address,
-          latitude: additionalData.latitude,
-          longitude: additionalData.longitude,
-          bio: additionalData.bio,
-          approved: false
-        });
+        setUserProfile(insertedBusiness);
+
+        // Fire welcome email + admin signup notification (non-blocking)
+        sendBusinessWelcomeEmail(insertedBusiness.id).catch(() => {});
+        sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email }).catch(() => {});
       }
     } finally {
       // Delay releasing the guard so queued onAuthStateChange events
