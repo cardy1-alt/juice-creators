@@ -265,7 +265,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
 
-        const { data: insertedCreator, error: insertError } = await supabase.from('creators').insert(insertPayload).select().single();
+        const { error: insertError } = await supabase.from('creators').insert(insertPayload);
 
         if (insertError) {
           console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
@@ -274,15 +274,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Creator profile inserted successfully, id:', insertedCreator.id);
+        console.log('[AuthContext] Creator profile inserted successfully');
 
-        // Set state from the returned row so we have the generated id
+        // Best-effort fetch to get the generated id — if RLS blocks the
+        // read (e.g. email case mismatch with JWT), fall back gracefully
+        let creatorId: string | undefined;
+        try {
+          const { data: row } = await supabase.from('creators').select('id').eq('email', email).maybeSingle();
+          creatorId = row?.id;
+        } catch { /* non-critical */ }
+
+        const creatorProfile = {
+          id: creatorId,
+          email,
+          name: additionalData.name,
+          instagram_handle: additionalData.instagramHandle,
+          follower_count: additionalData.followerCount || null,
+          code: additionalData.code,
+          date_of_birth: additionalData.dateOfBirth || null,
+          address: additionalData.address || null,
+          latitude: additionalData.latitude || null,
+          longitude: additionalData.longitude || null,
+          approved: false,
+          onboarding_complete: false
+        };
+
         setUser(data.user);
         setUserRole('creator');
-        setUserProfile(insertedCreator);
+        setUserProfile(creatorProfile);
 
         // Fire welcome email + admin signup notification (non-blocking)
-        sendCreatorWelcomeEmail(insertedCreator.id).catch(() => {});
+        if (creatorId) {
+          sendCreatorWelcomeEmail(creatorId).catch(() => {});
+        }
         sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email }).catch(() => {});
       } else if (role === 'business') {
         console.log('[AuthContext] Inserting business profile for:', data.user.id);
@@ -299,7 +323,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         };
         console.log('[AuthContext] Business INSERT payload:', JSON.stringify(insertPayload));
 
-        const { data: insertedBusiness, error: insertError } = await supabase.from('businesses').insert(insertPayload).select().single();
+        const { error: insertError } = await supabase.from('businesses').insert(insertPayload);
 
         if (insertError) {
           console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
@@ -308,15 +332,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create business profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Business profile inserted successfully, id:', insertedBusiness.id);
+        console.log('[AuthContext] Business profile inserted successfully');
 
-        // Set state from the returned row so we have the generated id
+        // Best-effort fetch to get the generated id
+        let businessId: string | undefined;
+        try {
+          const { data: row } = await supabase.from('businesses').select('id').eq('owner_email', email).maybeSingle();
+          businessId = row?.id;
+        } catch { /* non-critical */ }
+
+        const businessProfile = {
+          id: businessId,
+          owner_email: email,
+          name: additionalData.name,
+          slug: additionalData.slug,
+          category: additionalData.category || 'Food & Drink',
+          address: additionalData.address,
+          latitude: additionalData.latitude,
+          longitude: additionalData.longitude,
+          bio: additionalData.bio,
+          approved: false,
+          onboarding_complete: false
+        };
+
         setUser(data.user);
         setUserRole('business');
-        setUserProfile(insertedBusiness);
+        setUserProfile(businessProfile);
 
         // Fire welcome email + admin signup notification (non-blocking)
-        sendBusinessWelcomeEmail(insertedBusiness.id).catch(() => {});
+        if (businessId) {
+          sendBusinessWelcomeEmail(businessId).catch(() => {});
+        }
         sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email }).catch(() => {});
       }
     } finally {
