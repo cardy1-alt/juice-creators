@@ -12,7 +12,7 @@ import {
   Megaphone, PauseCircle, RefreshCw
 } from 'lucide-react';
 import BusinessOnboarding from './BusinessOnboarding';
-import { Html5Qrcode } from 'html5-qrcode';
+import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
@@ -179,7 +179,17 @@ function getOfferQuality(offerItem: string, specificAsk: string | null) {
 
 function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
-  const scannerRunningRef = useRef(false);
+
+  const safeStopScanner = async (scanner: Html5Qrcode) => {
+    try {
+      const state = scanner.getState();
+      if (state === Html5QrcodeScannerState.SCANNING || state === Html5QrcodeScannerState.PAUSED) {
+        await scanner.stop();
+      }
+    } catch {
+      // Already stopped or cleared
+    }
+  };
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const regionRef = useRef<HTMLDivElement>(null);
@@ -205,9 +215,8 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
     }
     try {
       // Stop any existing scanner first
-      if (scannerRef.current && scannerRunningRef.current) {
-        scannerRunningRef.current = false;
-        try { await scannerRef.current.stop(); } catch {}
+      if (scannerRef.current) {
+        await safeStopScanner(scannerRef.current);
       }
       scannerRef.current = null;
       const scanner = new Html5Qrcode('qr-scanner-region');
@@ -225,15 +234,12 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1 },
         (decodedText) => {
-          if (!scannerRunningRef.current) return;
-          scannerRunningRef.current = false;
           onScan(extractToken(decodedText));
-          scanner.stop().catch(() => {});
+          safeStopScanner(scanner);
           setScanning(false);
         },
         () => {}
       );
-      scannerRunningRef.current = true;
       setScanning(true);
     } catch (err: any) {
       const msg = String(err?.message || err);
@@ -250,9 +256,8 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
   };
 
   const stopScanner = () => {
-    if (scannerRef.current && scannerRunningRef.current) {
-      scannerRunningRef.current = false;
-      scannerRef.current.stop().catch(() => {});
+    if (scannerRef.current) {
+      safeStopScanner(scannerRef.current);
     }
     scannerRef.current = null;
     setScanning(false);
