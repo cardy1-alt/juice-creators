@@ -7,19 +7,21 @@ WHERE name IS NOT NULL
   AND address IS NOT NULL
   AND onboarding_complete = false;
 
--- Fix Issue B: Sophie Carter's ghost active claim blocking new claims
--- 1. Expire any 'active' claims whose QR token has already expired (stale from seeding/testing).
+-- Fix Issue B: Sophie Carter's ghost claims blocking new claims
+-- The claim_offer RPC blocks on status NOT IN ('expired', 'overdue') (line 36)
+-- and the unique index blocks on status NOT IN ('expired', 'overdue', 'completed').
+-- Clean up ALL of Sophie's non-terminal claims so she can claim fresh.
+
+-- 1. Expire any 'active' claims whose QR token has already expired (all creators).
 UPDATE claims
 SET status = 'expired'
 WHERE status = 'active'
   AND qr_expires_at < now();
 
--- 2. Also expire Sophie Carter's specific seed claim by ID regardless of QR expiry,
---    in case the seed was recently re-run (QR set to NOW()+24h on each seed run).
+-- 2. Expire ALL of Sophie Carter's blocking claims on Midgar Coffee offers,
+--    regardless of their current status (active, redeemed, reel_due).
 UPDATE claims
 SET status = 'expired'
-WHERE id = 'd1111111-1111-1111-1111-111111111111'
-  AND status = 'active';
-
--- Note: No 'available_slots' column exists — the system uses monthly_cap with
--- a count-based query in claim_offer RPC, so no slot restoration is needed.
+WHERE creator_id = 'a1111111-1111-1111-1111-111111111111'
+  AND business_id = 'b1111111-1111-1111-1111-111111111111'
+  AND status NOT IN ('expired', 'overdue', 'completed');

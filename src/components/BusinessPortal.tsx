@@ -990,11 +990,20 @@ export default function BusinessPortal() {
   const offerPhotoInputRef = useRef<HTMLInputElement>(null);
   const [offerPhotoUploading, setOfferPhotoUploading] = useState(false);
 
-  // Clean redeem param from URL after reading it
+  // Clean redeem param from URL after reading it — and auto-verify if present
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get('redeem')) {
-      window.history.replaceState({}, '', window.location.pathname);
+    const token = params.get('redeem');
+    if (token) {
+      // Clean URL first
+      const url = new URL(window.location.href);
+      url.searchParams.delete('redeem');
+      window.history.replaceState({}, '', url.pathname + url.search);
+      // Then auto-verify
+      if (!urlRedeemHandledRef.current) {
+        urlRedeemHandledRef.current = true;
+        verifyToken(token);
+      }
     }
   }, []);
 
@@ -1259,21 +1268,7 @@ export default function BusinessPortal() {
     await verifyToken(scanCode);
   };
 
-  // Auto-verify token from ?redeem= URL param on mount
-  useEffect(() => {
-    if (urlRedeemHandledRef.current) return;
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get('redeem');
-    if (token) {
-      urlRedeemHandledRef.current = true;
-      // Clean URL
-      const url = new URL(window.location.href);
-      url.searchParams.delete('redeem');
-      window.history.replaceState({}, '', url.pathname + url.search);
-      // Auto-verify
-      verifyToken(token);
-    }
-  }, []);
+  // Auto-verify from ?redeem= is now handled in the cleanup useEffect above
 
   const unreadCount = notifications.filter(n => !n.read).length;
   const activeClaimsCount = claims.filter(c => c.status === 'active').length;
