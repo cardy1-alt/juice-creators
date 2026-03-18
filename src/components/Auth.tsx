@@ -219,7 +219,7 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
+        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
         required={required}
         minLength={minLength}
       />
@@ -241,7 +241,12 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [followerCount, setFollowerCount] = useState('Under 1k');
-  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [dobDay, setDobDay] = useState('');
+  const [dobMonth, setDobMonth] = useState('');
+  const [dobYear, setDobYear] = useState('');
+  const dateOfBirth = dobDay && dobMonth && dobYear
+    ? `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`
+    : '';
   const [category, setCategory] = useState(CATEGORY_LIST[0]);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -575,17 +580,44 @@ export default function Auth() {
                   <div className="space-y-[12px]">
                     <div>
                       <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
-                      <div className={`relative rounded-[14px] border transition-all duration-200 border-[var(--faint)] bg-[var(--bg)] focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
-                        <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
-                        <input
-                          type="date"
-                          value={dateOfBirth}
-                          onChange={(e) => setDateOfBirth(e.target.value)}
-                          max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
-                          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
-                          style={{ colorScheme: 'light' }}
+                      <div className="flex items-center gap-[8px]">
+                        <Cake className="w-[16px] h-[16px] text-[var(--soft)] flex-shrink-0" />
+                        <select
+                          value={dobDay}
+                          onChange={(e) => setDobDay(e.target.value)}
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
-                        />
+                        >
+                          <option value="" disabled>Day</option>
+                          {Array.from({ length: 31 }, (_, i) => (
+                            <option key={i + 1} value={String(i + 1)}>{i + 1}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={dobMonth}
+                          onChange={(e) => setDobMonth(e.target.value)}
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+                          required
+                        >
+                          <option value="" disabled>Month</option>
+                          {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
+                            <option key={i + 1} value={String(i + 1)}>{m}</option>
+                          ))}
+                        </select>
+                        <select
+                          value={dobYear}
+                          onChange={(e) => setDobYear(e.target.value)}
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
+                          required
+                        >
+                          <option value="" disabled>Year</option>
+                          {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 13 - i).map((y) => (
+                            <option key={y} value={String(y)}>{y}</option>
+                          ))}
+                        </select>
                       </div>
                       <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
                     </div>
@@ -669,7 +701,7 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[11px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
