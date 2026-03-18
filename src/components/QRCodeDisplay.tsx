@@ -7,6 +7,7 @@ interface QRCodeDisplayProps {
   claimId: string;
   creatorCode: string;
   size?: number;
+  hideExtras?: boolean;
 }
 
 function generateSecureToken(): string {
@@ -283,7 +284,7 @@ function getAlignmentPositions(ver: number, size: number): number[] {
 
 // ─── Component ────────────────────────────────────────────────────────────
 
-export default function QRCodeDisplay({ token, claimId, creatorCode, size: displaySize }: QRCodeDisplayProps) {
+export default function QRCodeDisplay({ token, claimId, creatorCode, size: displaySize, hideExtras }: QRCodeDisplayProps) {
   const [currentToken, setCurrentToken] = useState(token);
   const [timeLeft, setTimeLeft] = useState(30);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -338,20 +339,24 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
         />
       </div>
 
-      {/* Creator code badge */}
-      <span
-        className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
-      >
-        {creatorCode}
-      </span>
+      {!hideExtras && (
+        <>
+          {/* Creator code badge */}
+          <span
+            className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
+          >
+            {creatorCode}
+          </span>
 
-      {/* Refresh timer */}
-      <div className="flex items-center gap-1.5">
-        <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-        <span className={`text-[12px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
-          Refreshes in {timeLeft}s
-        </span>
-      </div>
+          {/* Refresh timer */}
+          <div className="flex items-center gap-1.5">
+            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+            <span className={`text-[12px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+              Refreshes in {timeLeft}s
+            </span>
+          </div>
+        </>
+      )}
     </div>
   );
 }
