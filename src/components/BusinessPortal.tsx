@@ -179,6 +179,7 @@ function getOfferQuality(offerItem: string, specificAsk: string | null) {
 
 function QRScanner({ onScan, active }: { onScan: (token: string) => void; active: boolean }) {
   const scannerRef = useRef<Html5Qrcode | null>(null);
+  const scannerRunningRef = useRef(false);
   const [scanning, setScanning] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
   const regionRef = useRef<HTMLDivElement>(null);
@@ -204,10 +205,11 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
     }
     try {
       // Stop any existing scanner first
-      if (scannerRef.current) {
+      if (scannerRef.current && scannerRunningRef.current) {
+        scannerRunningRef.current = false;
         try { await scannerRef.current.stop(); } catch {}
-        scannerRef.current = null;
       }
+      scannerRef.current = null;
       const scanner = new Html5Qrcode('qr-scanner-region');
       scannerRef.current = scanner;
 
@@ -223,12 +225,15 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
         { facingMode: 'environment' },
         { fps: 10, qrbox: { width: 200, height: 200 }, aspectRatio: 1 },
         (decodedText) => {
+          if (!scannerRunningRef.current) return;
+          scannerRunningRef.current = false;
           onScan(extractToken(decodedText));
           scanner.stop().catch(() => {});
           setScanning(false);
         },
         () => {}
       );
+      scannerRunningRef.current = true;
       setScanning(true);
     } catch (err: any) {
       const msg = String(err?.message || err);
@@ -245,10 +250,11 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
   };
 
   const stopScanner = () => {
-    if (scannerRef.current) {
+    if (scannerRef.current && scannerRunningRef.current) {
+      scannerRunningRef.current = false;
       scannerRef.current.stop().catch(() => {});
-      scannerRef.current = null;
     }
+    scannerRef.current = null;
     setScanning(false);
   };
 
