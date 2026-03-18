@@ -1389,7 +1389,7 @@ export default function CreatorApp() {
                     </div>
                     {/* Slider container */}
                     <div
-                      style={{ overflow: 'hidden', position: 'relative', padding: '0 16px' }}
+                      style={{ overflow: 'hidden', position: 'relative', width: 'calc(100vw - 32px)', marginLeft: 16, marginRight: 16 }}
                       onTouchStart={(e) => {
                         passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
                       }}
@@ -1429,8 +1429,9 @@ export default function CreatorApp() {
                       <div
                         className="flex"
                         style={{
+                          width: `calc((100vw - 32px) * ${giftCardClaims.length})`,
                           transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                          transform: `translateX(-${activePassIdx * 100}%)`,
+                          transform: `translateX(calc(-${activePassIdx} * (100vw - 32px)))`,
                         }}
                       >
                         {giftCardClaims.map((claim) => {
@@ -1444,7 +1445,7 @@ export default function CreatorApp() {
                               key={claim.id}
                               className="relative overflow-hidden text-left"
                               style={{
-                                width: '100%',
+                                width: 'calc(100vw - 32px)',
                                 flexShrink: 0,
                                 height: 200,
                                 borderRadius: 16,
