@@ -157,6 +157,7 @@ export default function CreatorApp() {
   const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
   const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
   const [showQrFullscreen, setShowQrFullscreen] = useState(false);
+  const [activePassIdx, setActivePassIdx] = useState(0);
   const [showReelCelebration, setShowReelCelebration] = useState<{ offerName: string; businessName: string } | null>(null);
   const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
   const [editName, setEditName] = useState('');
@@ -789,7 +790,7 @@ export default function CreatorApp() {
       )}
 
       {/* Fullscreen QR Pass Overlay */}
-      {showQrFullscreen && selectedClaim && selectedClaim.status === 'active' && (() => {
+      {showQrFullscreen && selectedClaim && (() => {
         const qrClaim = selectedClaim;
         const qrOfferTitle = qrClaim.snapshot_generated_title || qrClaim.offers.generated_title || qrClaim.offers.description || '';
         return (
@@ -1210,7 +1211,7 @@ export default function CreatorApp() {
                 </div>
               </div>
 
-              {/* Your passes — gift card row (replaces old Active Claim Banner) */}
+              {/* Your passes — full-width swipeable card */}
               {activeClaims.length > 0 && activeClaims.some(c => c.businesses && c.offers) && (() => {
                 const giftCardClaims = activeClaims.filter(c => c.businesses && c.offers);
 
@@ -1226,30 +1227,40 @@ export default function CreatorApp() {
                     return { dotColor: 'var(--peach)', text: 'Show at the door' };
                   }
                   if (claim.redeemed_at && !claim.reel_url) {
-                    // Reel due — compute hours left
                     if (claim.reel_due_at) {
                       const hoursLeft = Math.max(0, Math.floor((new Date(claim.reel_due_at).getTime() - Date.now()) / (1000 * 60 * 60)));
                       return { dotColor: 'var(--terra)', text: `Reel due · ${hoursLeft}h left` };
                     }
                     return { dotColor: 'var(--terra)', text: 'Post your reel' };
                   }
-                  // Visited but not yet reel_due
                   return { dotColor: 'var(--terra)', text: 'Post your reel' };
                 };
 
                 return (
-                  <>
-                    <div className="flex items-center justify-between px-[20px] mt-[14px] mb-[10px]">
+                  <div style={{ marginBottom: 16 }}>
+                    <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[10px]">
                       <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
-                      {giftCardClaims.length >= 4 && (
+                      {giftCardClaims.length >= 2 && (
                         <button onClick={() => setView('active')} className="text-[13px] font-semibold text-[var(--terra)]">
                           View all
                         </button>
                       )}
                     </div>
-                    <div className="overflow-x-auto scrollbar-hide" style={{ WebkitOverflowScrolling: 'touch' }}>
-                      <div className="flex gap-[12px] px-[16px] pb-[4px]" style={{ width: 'max-content' }}>
-                        {giftCardClaims.map(claim => {
+                    {/* Swipeable scroll container */}
+                    <div
+                      className="overflow-x-scroll scrollbar-hide"
+                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
+                      onScroll={(e) => {
+                        const el = e.currentTarget;
+                        const cardWidth = el.clientWidth;
+                        const idx = Math.round(el.scrollLeft / cardWidth);
+                        if (idx !== activePassIdx && idx >= 0 && idx < giftCardClaims.length) {
+                          setActivePassIdx(idx);
+                        }
+                      }}
+                    >
+                      <div className="flex" style={{ gap: 12 }}>
+                        {giftCardClaims.map((claim, idx) => {
                           const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                           const matchedOffer = offers.find(o => o.id === claim.offer_id);
                           const photoUrl = matchedOffer?.offer_photo_url || null;
@@ -1259,43 +1270,41 @@ export default function CreatorApp() {
                             <button
                               key={claim.id}
                               onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); }}
-                              className="flex-shrink-0 relative overflow-hidden text-left"
+                              className="relative overflow-hidden text-left flex-shrink-0"
                               style={{
-                                width: 260,
-                                height: 140,
-                                borderRadius: 14,
-                                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.15)',
+                                width: 'calc(100vw - 32px)',
+                                maxWidth: 'calc(100% - 32px)',
+                                height: 160,
+                                borderRadius: 16,
+                                boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
                                 background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
+                                scrollSnapAlign: 'center',
+                                marginLeft: idx === 0 ? 16 : 0,
+                                marginRight: idx === giftCardClaims.length - 1 ? 16 : 0,
                               }}
                             >
-                              {/* Background image */}
                               {photoUrl && (
-                                <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                                <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                               )}
-                              {/* Gradient overlay */}
-                              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(34,34,34,0.55) 0%, rgba(34,34,34,0.15) 100%)' }} />
+                              <div className="absolute inset-0" style={{ background: 'linear-gradient(135deg, rgba(34,34,34,0.6) 0%, rgba(34,34,34,0.2) 100%)' }} />
 
-                              {/* Top-left: business name */}
-                              <span className="absolute top-[12px] left-[14px] text-[11px] font-semibold text-white" style={{ opacity: 0.8 }}>
+                              <span className="absolute top-[14px] left-[16px] text-[12px] font-semibold text-white" style={{ opacity: 0.8 }}>
                                 {claim.businesses.name}
                               </span>
 
-                              {/* Centre: offer title */}
                               <p
-                                className="absolute left-[14px] right-[14px] text-[18px] font-extrabold text-white"
-                                style={{ top: '50%', transform: 'translateY(-50%)', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}
+                                className="absolute left-[16px] text-[22px] font-extrabold text-white"
+                                style={{ top: '50%', transform: 'translateY(-50%)', right: 60, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}
                               >
                                 {offerTitle}
                               </p>
 
-                              {/* Bottom-left: status */}
-                              <div className="absolute bottom-[12px] left-[14px] flex items-center gap-[6px]">
-                                <span className="rounded-full flex-shrink-0" style={{ width: 6, height: 6, background: status.dotColor }} />
-                                <span className="text-[11px] font-medium text-white" style={{ opacity: 0.8 }}>{status.text}</span>
+                              <div className="absolute bottom-[14px] left-[16px] flex items-center gap-[6px]">
+                                <span className="rounded-full flex-shrink-0" style={{ width: 7, height: 7, background: status.dotColor }} />
+                                <span className="text-[12px] font-medium text-white" style={{ opacity: 0.8 }}>{status.text}</span>
                               </div>
 
-                              {/* Bottom-right: QR icon */}
-                              <svg className="absolute bottom-[12px] right-[14px]" width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.7 }}>
+                              <svg className="absolute bottom-[14px] right-[16px]" width="20" height="20" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.6 }}>
                                 <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
                                 <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
                                 <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
@@ -1310,7 +1319,24 @@ export default function CreatorApp() {
                         })}
                       </div>
                     </div>
-                  </>
+                    {/* Pagination dots */}
+                    {giftCardClaims.length > 1 && (
+                      <div className="flex items-center justify-center gap-[6px]" style={{ marginTop: 10 }}>
+                        {giftCardClaims.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-full"
+                            style={{
+                              width: 6,
+                              height: 6,
+                              background: idx === activePassIdx ? 'var(--terra)' : 'rgba(34,34,34,0.2)',
+                              transition: 'background 0.2s',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 );
               })()}
 
@@ -1399,7 +1425,7 @@ export default function CreatorApp() {
               )}
 
               {/* Section Header */}
-              <div className="flex items-center justify-between px-[20px] mt-4 mb-[14px]">
+              <div className="flex items-center justify-between px-[20px] mt-[4px] mb-[10px]">
                 <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
