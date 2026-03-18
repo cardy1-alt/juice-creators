@@ -834,7 +834,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 style={{ height: '120px', background: offerPhotoUrl ? undefined : getCategoryGradient(category) }}
               >
                 {offerPhotoUrl ? (
-                  <img src={offerPhotoUrl} alt="Offer" className="w-full h-full object-cover" />
+                  <img src={offerPhotoUrl} alt="Offer" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 ) : (
                   <span className="text-[28px] font-extrabold text-white/80">{getInitials('Offer')}</span>
                 )}
@@ -943,7 +943,8 @@ function timeAgo(dateStr: string): string {
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    return !userProfile?.onboarding_complete;
+    // Database-driven check: only show wizard if onboarding_complete is not true
+    return userProfile?.onboarding_complete !== true;
   });
   const [offers, setOffers] = useState<Offer[]>([]);
   const [claims, setClaims] = useState<ClaimWithDetails[]>([]);
@@ -1300,6 +1301,10 @@ export default function BusinessPortal() {
         onComplete={() => {
           setShowOnboarding(false);
           fetchOffers();
+          fetchClaims();
+        }}
+        onFinishLater={() => {
+          setShowOnboarding(false);
         }}
       />
     );
@@ -1335,9 +1340,16 @@ export default function BusinessPortal() {
     }
   };
 
-  // Filter claims
+  // Filter claims — exact rules per issue #6
   const filteredClaims = claims
-    .filter(c => claimsFilter === 'all' || c.status === claimsFilter)
+    .filter(c => {
+      if (claimsFilter === 'all') return true;
+      if (claimsFilter === 'active') return c.status === 'active' || c.status === 'claimed';
+      if (claimsFilter === 'redeemed') return (c.status === 'redeemed' || c.status === 'visited') && !c.reel_url;
+      if (claimsFilter === 'reel_due') return (c.status === 'redeemed' || c.status === 'visited') && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) > new Date();
+      if (claimsFilter === 'completed') return c.status === 'completed';
+      return c.status === claimsFilter;
+    })
     .filter(c => !creatorFilter || c.creator_id === creatorFilter);
 
   // Stats
@@ -1375,9 +1387,9 @@ export default function BusinessPortal() {
   const countBase = creatorFilter ? claims.filter(c => c.creator_id === creatorFilter) : claims;
   const filterCounts: Record<string, number> = {
     all: countBase.length,
-    active: countBase.filter(c => c.status === 'active').length,
-    redeemed: countBase.filter(c => c.status === 'redeemed').length,
-    reel_due: countBase.filter(c => c.status === 'reel_due').length,
+    active: countBase.filter(c => c.status === 'active' || c.status === 'claimed').length,
+    redeemed: countBase.filter(c => (c.status === 'redeemed' || c.status === 'visited') && !c.reel_url).length,
+    reel_due: countBase.filter(c => (c.status === 'redeemed' || c.status === 'visited') && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) > new Date()).length,
     completed: countBase.filter(c => c.status === 'completed').length,
   };
 
@@ -1413,7 +1425,7 @@ export default function BusinessPortal() {
                     style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
                   >
                     {biz.logo_url ? (
-                      <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                      <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
                       <span className="text-[26px] font-bold text-white">{biz.name.charAt(0)}</span>
                     )}
@@ -1535,6 +1547,17 @@ export default function BusinessPortal() {
           {/* ═══ HOME ═══ */}
           {view === 'home' && (
             <div>
+              {/* Setup incomplete banner */}
+              {userProfile?.onboarding_complete !== true && (
+                <button
+                  onClick={() => setShowOnboarding(true)}
+                  className="w-full flex items-center justify-between px-[16px] py-[12px] rounded-[12px] mb-[16px] text-left"
+                  style={{ background: 'rgba(196,103,74,0.08)', border: '1px solid rgba(196,103,74,0.15)' }}
+                >
+                  <span className="text-[14px] font-semibold text-[var(--terra)]">Complete your setup to go live →</span>
+                  <ChevronRight className="w-[16px] h-[16px] text-[var(--terra)]" />
+                </button>
+              )}
               {/* Greeting + compact stats banner */}
               <div className="flex items-start justify-between mb-2">
                 <div>
@@ -1589,7 +1612,7 @@ export default function BusinessPortal() {
                       {/* Photo-dominant hero */}
                       <div className="relative h-[220px]">
                         {activeOffer.offer_photo_url ? (
-                          <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                          <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
                             <button
@@ -1679,7 +1702,7 @@ export default function BusinessPortal() {
                         >
                           <div className="w-[40px] h-[40px] rounded-full overflow-hidden flex-shrink-0">
                             {claim.creators.avatar_url ? (
-                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-full h-full object-cover" />
+                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                             ) : (
                               <div className="w-full h-full flex items-center justify-center text-white font-bold text-[14px]" style={{ background: getCategoryGradient(userProfile.category) }}>
                                 {getInitials(claim.creators.name)}
@@ -1718,7 +1741,7 @@ export default function BusinessPortal() {
                             style={{ background: biz.logo_url ? undefined : getCategoryGradient(biz.category) }}
                           >
                             {biz.logo_url ? (
-                              <img src={biz.logo_url} alt="" className="w-full h-full object-cover" />
+                              <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                             ) : (
                               <span className="text-[14px] font-bold text-white">{biz.name.charAt(0)}</span>
                             )}
@@ -1775,7 +1798,7 @@ export default function BusinessPortal() {
                   >
                     {selectedOffer.offer_photo_url ? (
                       <>
-                        <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" />
+                        <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center group">
                           <span className="opacity-0 group-hover:opacity-100 transition-opacity px-[14px] py-[6px] rounded-[50px] text-[12px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]">
                             <Camera className="w-[13px] h-[13px]" /> Change photo
@@ -2220,7 +2243,7 @@ export default function BusinessPortal() {
                         <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-[16px]">
                           <div className="flex items-start gap-[12px]">
                             {claim.creators.avatar_url ? (
-                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" />
+                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                             ) : (
                               <div
                                 className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0"

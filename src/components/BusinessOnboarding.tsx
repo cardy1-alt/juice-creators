@@ -50,10 +50,15 @@ const onboardingStyles = `
 interface BusinessOnboardingProps {
   profile: any;
   onComplete: () => void;
+  onFinishLater?: () => void;
 }
 
-export default function BusinessOnboarding({ profile, onComplete }: BusinessOnboardingProps) {
-  const [screen, setScreen] = useState(1);
+export default function BusinessOnboarding({ profile, onComplete, onFinishLater }: BusinessOnboardingProps) {
+  // Resume from saved step if available
+  const [screen, setScreen] = useState(() => {
+    const saved = profile.onboarding_step;
+    return saved && saved >= 1 && saved <= 4 ? saved : 1;
+  });
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [animKey, setAnimKey] = useState(0);
 
@@ -77,16 +82,29 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
 
+  const saveStep = async (step: number) => {
+    await supabase.from('businesses').update({ onboarding_step: step }).eq('id', profile.id);
+  };
+
   const goForward = () => {
+    const nextScreen = screen + 1;
     setDirection('forward');
     setAnimKey(k => k + 1);
-    setScreen(s => s + 1);
+    setScreen(nextScreen);
+    saveStep(nextScreen);
   };
 
   const goBack = () => {
     setDirection('back');
     setAnimKey(k => k + 1);
     setScreen(s => s - 1);
+  };
+
+  const handleFinishLater = () => {
+    saveStep(screen);
+    if (onFinishLater) {
+      onFinishLater();
+    }
   };
 
   const handleLogoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,11 +126,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
         : `Free ${offerItem}`;
 
       // Update business profile — only new fields (name & category already set at signup)
-      await supabase.from('businesses').update({
+      const { error: updateError } = await supabase.from('businesses').update({
         instagram_handle: instagram || null,
         logo_url: logoUrl || null,
         onboarding_complete: true,
+        onboarding_step: 5,
       }).eq('id', profile.id);
+      if (updateError) throw updateError;
 
       // Deactivate any existing offers
       await supabase.from('offers').update({ is_live: false }).eq('business_id', profile.id);
@@ -176,7 +196,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
           ) : (
             <div className="w-[40px]" />
           )}
-          <span className="text-[18px] font-extrabold text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
+          <Logo variant="icon" size={32} color="var(--forest)" />
           {screen === 3 ? (
             <button onClick={goForward} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
           ) : (
@@ -240,6 +260,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
               Let's get started →
             </button>
             <p className="text-[12px] text-[var(--soft)] text-center mt-[10px]">Takes about 3 minutes</p>
+            <button
+              onClick={handleFinishLater}
+              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              style={{ fontWeight: 400 }}
+            >
+              Finish later
+            </button>
           </div>
         )}
 
@@ -286,6 +313,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
             >
               Sounds good →
             </button>
+            <button
+              onClick={handleFinishLater}
+              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              style={{ fontWeight: 400 }}
+            >
+              Finish later
+            </button>
           </div>
         )}
 
@@ -313,7 +347,7 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                     style={{ background: logoUrl ? undefined : getCategoryGradient(profile.category || 'Food & Drink') }}
                   >
                     {logoUrl ? (
-                      <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+                      <img src={logoUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
                       <span className="text-[28px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(profile.name || 'B')}
@@ -365,6 +399,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
               }}
             >
               Looking good →
+            </button>
+            <button
+              onClick={handleFinishLater}
+              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              style={{ fontWeight: 400 }}
+            >
+              Finish later
             </button>
           </div>
         )}
@@ -542,6 +583,13 @@ export default function BusinessOnboarding({ profile, onComplete }: BusinessOnbo
                   <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 </span>
               ) : 'Launch my campaign →'}
+            </button>
+            <button
+              onClick={handleFinishLater}
+              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              style={{ fontWeight: 400 }}
+            >
+              Finish later
             </button>
           </div>
         )}
