@@ -1,9 +1,47 @@
+import { Component, ReactNode } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import Auth from './components/Auth';
 import CreatorApp from './components/CreatorApp';
 import BusinessPortal from './components/BusinessPortal';
 import AdminDashboard from './components/AdminDashboard';
-import { AlertCircle, LogOut, QrCode } from 'lucide-react';
+import { AlertCircle, LogOut, QrCode, RefreshCw } from 'lucide-react';
+
+// ─── Error Boundary ──────────────────────────────────────────────────────
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('[ErrorBoundary]', error, info.componentStack);
+  }
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+          <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+              <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
+            </div>
+            <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">Something went wrong</h2>
+            <p className="text-[var(--mid)] text-sm mb-6">An unexpected error occurred. Please refresh the page.</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Refresh
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function DemoBanner() {
   if (import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
@@ -126,4 +164,12 @@ function App() {
   );
 }
 
-export default App;
+function AppWithBoundary() {
+  return (
+    <ErrorBoundary>
+      <App />
+    </ErrorBoundary>
+  );
+}
+
+export default AppWithBoundary;
