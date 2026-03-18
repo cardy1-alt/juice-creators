@@ -14,7 +14,7 @@ interface AuthContextType {
   signOut: () => Promise<void>;
 }
 
-const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'admin@juicecreators.com').toLowerCase();
+const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'hello@nayba.app').toLowerCase();
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -54,7 +54,7 @@ const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
   },
   admin: {
     role: 'admin',
-    profile: { email: 'admin@juicecreators.com', name: 'Admin' },
+    profile: { email: 'hello@nayba.app', name: 'Admin' },
   },
 };
 
