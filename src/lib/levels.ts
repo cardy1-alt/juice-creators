@@ -11,12 +11,12 @@ export const LEVEL_THRESHOLDS = [
 
 export const getLevelColour = (level: number): string => {
   switch (level) {
-    case 1: return 'rgba(34,34,34,0.3)';
-    case 2: return '#8B9E8A';
-    case 3: return '#6B8F71';
-    case 4: return '#1A3C34';
-    case 5: return '#C4674A';
-    case 6: return '#1A1A1A';
+    case 1: return 'rgba(34,34,34,0.3)';      // Newcomer – neutral fade
+    case 2: return '#6B8F84';                  // Explorer – light teal (forest family)
+    case 3: return '#3D6B5E';                  // Regular  – mid teal-green
+    case 4: return '#1A3C34';                  // Local    – forest (brand)
+    case 5: return '#C4674A';                  // Trusted  – terra  (brand)
+    case 6: return '#1A1A1A';                  // Nayba    – near-black
     default: return 'rgba(34,34,34,0.3)';
   }
 };

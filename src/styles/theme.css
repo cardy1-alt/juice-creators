@@ -1,6 +1,17 @@
 :root {
+  /* ── Neutrals ── */
   --white: #FFFFFF;
   --bg: #F7F7F7;
+  --elevated: #F3F3F3;
+  --pressed: #E8E8E8;
+  --near-black: #222222;
+
+  /* ── Neutral opacity scale (based on --near-black) ── */
+  --mid: rgba(34,34,34,0.68);
+  --soft: rgba(34,34,34,0.45);
+  --faint: rgba(34,34,34,0.1);
+
+  /* ── Brand: Terra ── */
   --terra: #C4674A;
   --terra-hover: #b35a3f;
   --terra-ring: rgba(196, 103, 74, 0.3);
@@ -9,14 +20,19 @@
   --terra-15: rgba(196, 103, 74, 0.15);
   --terra-20: rgba(196, 103, 74, 0.2);
   --terra-40: rgba(196, 103, 74, 0.4);
+
+  /* ── Brand: Forest ── */
   --forest: #1A3C34;
-  --near-black: #222222;
-  --mid: rgba(34,34,34,0.68);
-  --soft: rgba(34,34,34,0.45);
-  --faint: rgba(34,34,34,0.1);
+
+  /* ── Accents ── */
   --lavender: #C8B8F0;
   --peach: #F5C4A0;
   --pink: #F4A8C0;
+
+  /* ── Shadows (warm, not pure black) ── */
+  --shadow-sm: 0 1px 3px rgba(34,34,34,0.06);
+  --shadow-md: 0 2px 12px rgba(34,34,34,0.08);
+  --shadow-lg: 0 4px 16px rgba(34,34,34,0.12);
 }
 
 @layer base {

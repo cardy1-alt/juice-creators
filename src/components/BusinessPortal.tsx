@@ -157,12 +157,12 @@ function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
     return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: 'Last slot' };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(196,103,74,0.15)', color: '#C4674A', text: `${slotsLeft} left` };
+    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
-  return { background: '#F5C4A0', color: '#222222', text: `${slotsLeft} left` };
+  return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
 }
 
 // ─── Offer quality indicator ──────────────────────────────────────────────
@@ -283,7 +283,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
           style={{
             height: scanning ? 'auto' : '0',
             opacity: scanning ? 1 : 0,
-            background: '#222222',
+            background: 'var(--near-black)',
             transition: 'opacity 0.2s',
           }}
         />
@@ -319,7 +319,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {scanning && (
         <button
           onClick={stopScanner}
-          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[13px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[#ececec] transition-all border border-[var(--faint)] min-h-[44px]"
+          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[13px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)] transition-all border border-[var(--faint)] min-h-[44px]"
         >
           Stop Scanner
         </button>
@@ -360,7 +360,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   const [tipDismissed, setTipDismissed] = useState(false);
   const tipTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [offerPhotoUrl, setOfferPhotoUrl] = useState<string | null>(null);
-  const [minLevel, setMinLevel] = useState(1);
+
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoError, setPhotoError] = useState<string | null>(null);
   const [offerId] = useState(() => crypto.randomUUID());
@@ -393,7 +393,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
       generated_title: generatedTitle,
       content_type: 'reel',
       offer_photo_url: offerPhotoUrl,
-      min_level: minLevel,
+      min_level: 1,
     });
   };
 
@@ -401,7 +401,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
     return (
       <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6">
         <CheckCircle2 className="w-14 h-14 text-[var(--terra)] mb-4" />
-        <p className="text-[22px] font-extrabold text-[#222222] text-center" style={{ letterSpacing: '-0.4px' }}>Your offer is live!</p>
+        <p className="text-[22px] font-extrabold text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.4px' }}>Your offer is live!</p>
         <p className="text-[14px] text-[var(--mid)] text-center mt-2">Creators can now discover and claim it</p>
         <button
           onClick={onCancel}
@@ -420,7 +420,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-4 pb-2">
         <button onClick={screen === 1 ? onCancel : () => setScreen(screen - 1)} className="p-2 -ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
-          <ChevronLeft className="w-5 h-5 text-[#222222]" />
+          <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
         </button>
         {screen === 4 && (
           <button onClick={() => { setOfferPhotoUrl(null); setScreen(5); }} className="text-[14px] font-semibold text-[var(--mid)] min-h-[44px] flex items-center">
@@ -450,7 +450,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 1: What are you offering? ── */}
         {screen === 1 && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What are you offering?</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What are you offering?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>Choose the type of experience</p>
             <div className="grid grid-cols-2 gap-3">
               {tiles.map(t => (
@@ -473,9 +473,9 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     background: offerType === t.key ? 'rgba(196,103,74,0.04)' : 'white',
                   }}
                 >
-                  <t.icon className="w-7 h-7 text-[#222222]" />
+                  <t.icon className="w-7 h-7 text-[var(--near-black)]" />
                   <div className="text-center">
-                    <p className="text-[14px] font-bold text-[#222222]">{t.label}</p>
+                    <p className="text-[14px] font-bold text-[var(--near-black)]">{t.label}</p>
                     <p className="text-[12px] text-[var(--mid)] mt-0.5">{t.sub}</p>
                   </div>
                 </button>
@@ -487,11 +487,11 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2: Fill in the blank ── */}
         {screen === 2 && offerType !== 'discount' && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What exactly will you give?</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What exactly will you give?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>We'll use this to create your offer card</p>
 
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-[22px] font-extrabold text-[#222222]">Free</span>
+              <span className="text-[22px] font-extrabold text-[var(--near-black)]">Free</span>
               <input
                 type="text"
                 value={offerItem}
@@ -503,7 +503,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   }
                 }}
                 placeholder={getCategoryPlaceholder(category, offerType)}
-                className="flex-1 text-[22px] font-extrabold text-[#222222] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
+                className="flex-1 text-[22px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
                 autoFocus
               />
             </div>
@@ -527,7 +527,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               >
                 <Lightbulb className="w-4 h-4 text-[var(--terra)] flex-shrink-0 mt-[1px]" />
                 <div className="flex-1">
-                  <p className="text-[13px] font-bold text-[#222222]">{getScreen2Tip(category, offerType).title}</p>
+                  <p className="text-[13px] font-bold text-[var(--near-black)]">{getScreen2Tip(category, offerType).title}</p>
                   <p className="text-[12px] text-[var(--mid)] mt-[3px]" style={{ lineHeight: '1.6' }}>
                     {getScreen2Tip(category, offerType).body}
                   </p>
@@ -558,7 +558,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2 (Discount): Amount + unit toggle ── */}
         {screen === 2 && offerType === 'discount' && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What's the discount?</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>What's the discount?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Set the amount creators will receive</p>
 
             <div className="flex justify-center mb-4">
@@ -574,7 +574,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 }}
                 min={1}
                 max={discountUnit === '%' ? 100 : 999}
-                className="text-[48px] font-extrabold text-[#222222] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                className="text-[48px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
                 style={{ width: '120px' }}
                 autoFocus
               />
@@ -588,7 +588,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 }}
                 className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
                 style={{
-                  background: discountUnit === '%' ? '#222222' : 'var(--bg)',
+                  background: discountUnit === '%' ? 'var(--near-black)' : 'var(--bg)',
                   color: discountUnit === '%' ? 'white' : 'var(--mid)',
                 }}
               >
@@ -598,7 +598,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 onClick={() => setDiscountUnit('£')}
                 className="px-5 py-2 rounded-[50px] text-[15px] font-bold transition-all"
                 style={{
-                  background: discountUnit === '£' ? '#222222' : 'var(--bg)',
+                  background: discountUnit === '£' ? 'var(--near-black)' : 'var(--bg)',
                   color: discountUnit === '£' ? 'white' : 'var(--mid)',
                 }}
               >
@@ -627,7 +627,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 3: How many slots? ── */}
         {screen === 3 && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>How many creators?</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>How many creators?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-10" style={{ lineHeight: '1.6' }}>Each slot is one creator visit</p>
 
             {monthlyCap === null ? (
@@ -635,7 +635,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <div className="w-20 h-20 rounded-full bg-[var(--terra-10)] flex items-center justify-center mb-3">
                   <Infinity className="w-10 h-10 text-[var(--terra)]" />
                 </div>
-                <span className="text-[28px] font-extrabold text-[#222222]">Unlimited</span>
+                <span className="text-[28px] font-extrabold text-[var(--near-black)]">Unlimited</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-6 mb-4">
@@ -643,9 +643,9 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   onClick={() => setMonthlyCap(Math.max(1, monthlyCap - 1))}
                   className="w-14 h-14 rounded-full border-[1.5px] border-[var(--faint)] flex items-center justify-center bg-white min-h-[44px]"
                 >
-                  <Minus className="w-5 h-5 text-[#222222]" />
+                  <Minus className="w-5 h-5 text-[var(--near-black)]" />
                 </button>
-                <span className="text-[64px] font-extrabold text-[#222222] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
+                <span className="text-[64px] font-extrabold text-[var(--near-black)] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
                   {monthlyCap}
                 </span>
                 <button
@@ -669,7 +669,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             >
               <div className="flex items-center gap-[10px]">
                 <Infinity className="w-[18px] h-[18px]" style={{ color: monthlyCap === null ? 'var(--terra)' : 'var(--mid)' }} />
-                <span className="text-[14px] font-semibold text-[#222222]">Unlimited claims</span>
+                <span className="text-[14px] font-semibold text-[var(--near-black)]">Unlimited claims</span>
               </div>
               <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${monthlyCap === null ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--faint)] justify-start'}`}>
                 <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
@@ -679,31 +679,6 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-6">
               <Info className="w-[14px] h-[14px] text-[var(--soft)] mt-0.5 flex-shrink-0" />
               <p className="text-[12px] text-[var(--soft)]">Each creator visits in person and posts within 48 hours</p>
-            </div>
-
-            {/* Who can claim this? */}
-            <div className="mb-8">
-              <p className="text-[14px] font-bold text-[#222222] mb-3">Who can claim this?</p>
-              <div className="flex gap-2 flex-wrap">
-                {[
-                  { label: 'Everyone', value: 1 },
-                  { label: 'Level 3+', value: 3 },
-                  { label: 'Level 5+', value: 5 },
-                ].map(opt => (
-                  <button
-                    key={opt.value}
-                    onClick={() => setMinLevel(opt.value)}
-                    className="px-[14px] py-[7px] rounded-[50px] text-[12px] font-semibold transition-all"
-                    style={{
-                      background: minLevel === opt.value ? '#222222' : 'var(--bg)',
-                      color: minLevel === opt.value ? 'white' : 'var(--mid)',
-                    }}
-                  >
-                    {opt.label}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[12px] text-[var(--soft)] mt-2">Higher level creators have posted more reels and have better ratings</p>
             </div>
 
             <button
@@ -718,7 +693,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 4: Add a photo (optional) ── */}
         {screen === 4 && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Add a photo</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Add a photo</h2>
             <p className="text-[14px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Optional — helps your offer stand out</p>
 
             <div className="flex flex-col items-center mb-6">
@@ -812,14 +787,14 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 5: Any specific ask? ── */}
         {screen === 5 && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Anything specific?</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Anything specific?</h2>
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>Optional — most businesses skip this</p>
 
             <textarea
               value={specificAsk}
               onChange={e => setSpecificAsk(e.target.value.slice(0, 100))}
               placeholder="e.g. Please show the latte art, or mention our new seasonal menu"
-              className="w-full px-4 py-4 rounded-[12px] bg-[var(--bg)] border border-transparent focus:border-[var(--terra)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none resize-none"
+              className="w-full px-4 py-4 rounded-[12px] bg-[var(--bg)] border border-transparent focus:border-[var(--terra)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] outline-none resize-none"
               style={{ minHeight: '100px' }}
             />
             <p className="text-[11px] text-[var(--soft)] text-right mt-1 mb-4">{specificAsk.length}/100</p>
@@ -829,7 +804,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <button
                   key={i}
                   onClick={() => setSpecificAsk(chip.slice(0, 100))}
-                  className="px-3 py-1.5 rounded-[50px] bg-[var(--bg)] text-[var(--mid)] text-[12px] font-semibold hover:bg-[#ececec] transition-colors"
+                  className="px-3 py-1.5 rounded-[50px] bg-[var(--bg)] text-[var(--mid)] text-[12px] font-semibold hover:bg-[var(--pressed)] transition-colors"
                 >
                   {chip}
                 </button>
@@ -848,7 +823,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 6: Preview ── */}
         {screen === 6 && (
           <div>
-            <h2 className="text-[22px] font-extrabold text-[#222222] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Your offer</h2>
+            <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.4px' }}>Your offer</h2>
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
@@ -863,14 +838,14 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 ) : (
                   <span className="text-[28px] font-extrabold text-white/80">{getInitials('Offer')}</span>
                 )}
-                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[50px] text-[11px] font-bold text-[#222222]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
+                <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[50px] text-[11px] font-bold text-[var(--near-black)]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                   <Video className="w-[10px] h-[10px]" /> Reel
                 </span>
               </div>
               {/* Body */}
               <div className="p-4">
-                <p className="text-[15px] font-extrabold text-[#222222]">Your business</p>
-                <p className="text-[14px] font-semibold text-[#222222] mt-0.5">{generatedTitle}</p>
+                <p className="text-[15px] font-extrabold text-[var(--near-black)]">Your business</p>
+                <p className="text-[14px] font-semibold text-[var(--near-black)] mt-0.5">{generatedTitle}</p>
                 <div className="flex items-center gap-1 mt-1.5">
                   <Video className="w-[13px] h-[13px] text-[var(--terra)]" />
                   <span className="text-[13px] text-[var(--mid)]">Instagram Reel</span>
@@ -897,7 +872,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                         <span
                           key={i}
                           className="w-2 h-2 rounded-full"
-                          style={{ background: i <= dots ? '#C4674A' : 'rgba(34,34,34,0.12)' }}
+                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(34,34,34,0.12)' }}
                         />
                       ))}
                     </div>
@@ -1307,7 +1282,7 @@ export default function BusinessPortal() {
       <div className="min-h-screen flex items-center justify-center px-4 bg-white">
         <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-8 max-w-sm text-center border border-[var(--faint)]">
           <Clock className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
-          <h2 className="text-[18px] font-bold mb-1 text-[#222222]">Pending Approval</h2>
+          <h2 className="text-[18px] font-bold mb-1 text-[var(--near-black)]">Pending Approval</h2>
           <p className="text-[14px] text-[var(--mid)] mb-6">Your business account is under review.</p>
           <button onClick={signOut} className="inline-flex items-center gap-2 px-6 py-3 rounded-[50px] text-white font-bold text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors min-h-[48px]">
             <LogOut className="w-4 h-4" /> Sign Out
@@ -1342,7 +1317,7 @@ export default function BusinessPortal() {
     switch (status) {
       case 'active': return 'bg-[var(--terra)] text-white';
       case 'redeemed': return 'bg-[rgba(26,60,52,0.08)] text-[var(--forest)]';
-      case 'reel_due': return 'bg-[var(--peach)] text-[#222222]';
+      case 'reel_due': return 'bg-[var(--peach)] text-[var(--near-black)]';
       case 'completed': return 'bg-[var(--bg)] text-[var(--soft)]';
       case 'disputed': return 'bg-[var(--terra-15)] text-[var(--terra)]';
       default: return 'bg-[var(--bg)] text-[var(--soft)]';
@@ -1420,11 +1395,11 @@ export default function BusinessPortal() {
             <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
               <button
                 onClick={() => setExpandedNearbyBiz(null)}
-                className="w-[36px] h-[36px] rounded-full bg-[#F7F7F7] flex items-center justify-center"
+                className="w-[36px] h-[36px] rounded-full bg-[var(--bg)] flex items-center justify-center"
               >
-                <X className="w-[18px] h-[18px] text-[#222222]" />
+                <X className="w-[18px] h-[18px] text-[var(--near-black)]" />
               </button>
-              <span className="text-[15px] font-bold text-[#222222] flex-1 truncate">{biz.name}</span>
+              <span className="text-[15px] font-bold text-[var(--near-black)] flex-1 truncate">{biz.name}</span>
             </div>
 
             {/* Scrollable content */}
@@ -1445,7 +1420,7 @@ export default function BusinessPortal() {
                   </div>
                   {/* Name + meta */}
                   <div className="flex-1 min-w-0 pt-[2px]">
-                    <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{biz.name}</h2>
+                    <h2 className="text-[22px] font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{biz.name}</h2>
                     <p className="text-[14px] text-[var(--mid)] mt-[2px]">{biz.category}</p>
                     {biz.address && (
                       <p className="text-[12px] text-[var(--soft)] mt-[4px] flex items-center gap-[4px]">
@@ -1458,17 +1433,17 @@ export default function BusinessPortal() {
                 {/* Stats row inside card */}
                 <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
                   <div className="flex-1 text-center">
-                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.claim_count}</p>
+                    <p className="text-[22px] font-extrabold text-[var(--near-black)]">{biz.claim_count}</p>
                     <p className="text-[11px] text-[var(--soft)] font-semibold">Collabs</p>
                   </div>
                   <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                   <div className="flex-1 text-center">
-                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.creator_count}</p>
+                    <p className="text-[22px] font-extrabold text-[var(--near-black)]">{biz.creator_count}</p>
                     <p className="text-[11px] text-[var(--soft)] font-semibold">Creators</p>
                   </div>
                   <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                   <div className="flex-1 text-center">
-                    <p className="text-[22px] font-extrabold text-[#222222]">{biz.offer_count}</p>
+                    <p className="text-[22px] font-extrabold text-[var(--near-black)]">{biz.offer_count}</p>
                     <p className="text-[11px] text-[var(--soft)] font-semibold">Live offers</p>
                   </div>
                 </div>
@@ -1477,7 +1452,7 @@ export default function BusinessPortal() {
               {/* ═══ About card ═══ */}
               {biz.bio && (
                 <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
-                  <h3 className="text-[14px] font-bold text-[#222222] mb-[8px]">About</h3>
+                  <h3 className="text-[14px] font-bold text-[var(--near-black)] mb-[8px]">About</h3>
                   <p className="text-[14px] text-[var(--mid)] leading-[1.5]">{biz.bio}</p>
                 </div>
               )}
@@ -1487,14 +1462,14 @@ export default function BusinessPortal() {
                 {biz.address && (
                   <div className="flex items-center gap-[10px] py-[4px]">
                     <MapPin className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
-                    <p className="text-[14px] text-[#222222]">{biz.address}</p>
+                    <p className="text-[14px] text-[var(--near-black)]">{biz.address}</p>
                   </div>
                 )}
                 {biz.address && biz.latest_claim_at && <div className="border-t border-[var(--faint)] my-[10px]" />}
                 {biz.latest_claim_at && (
                   <div className="flex items-center gap-[10px] py-[4px]">
                     <Clock className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
-                    <p className="text-[14px] text-[#222222]">Last activity {timeAgo(biz.latest_claim_at)}</p>
+                    <p className="text-[14px] text-[var(--near-black)]">Last activity {timeAgo(biz.latest_claim_at)}</p>
                   </div>
                 )}
               </div>
@@ -1506,7 +1481,7 @@ export default function BusinessPortal() {
                     <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
                   </div>
                   <div>
-                    <p className="text-[14px] font-bold text-[#222222]">Verified on Nayba</p>
+                    <p className="text-[14px] font-bold text-[var(--near-black)]">Verified on Nayba</p>
                     <p className="text-[12px] text-[var(--mid)]">Approved by the Nayba team</p>
                   </div>
                 </div>
@@ -1542,7 +1517,7 @@ export default function BusinessPortal() {
           <div className="flex items-center justify-between">
             <Logo />
             <div className="text-right">
-              <p className="text-[13px] font-semibold text-[#222222]">{userProfile.name}</p>
+              <p className="text-[13px] font-semibold text-[var(--near-black)]">{userProfile.name}</p>
               <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[11px] font-bold rounded-[20px] px-[10px] py-[3px] mt-0.5">
                 Business
               </span>
@@ -1563,7 +1538,7 @@ export default function BusinessPortal() {
               {/* Greeting + compact stats banner */}
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h2 className="text-[20px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>
+                  <h2 className="text-[20px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.4px' }}>
                     {getGreeting()}, {userProfile.name}
                   </h2>
                   <p className="text-[13px] text-[var(--mid)]">
@@ -1579,18 +1554,18 @@ export default function BusinessPortal() {
                   <span className="text-[12px] font-semibold text-[var(--mid)]">active</span>
                 </span>
                 <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
-                  <span className="text-[13px] font-extrabold text-[#222222]">{reelsThisMonth}</span>
+                  <span className="text-[13px] font-extrabold text-[var(--near-black)]">{reelsThisMonth}</span>
                   <span className="text-[12px] font-semibold text-[var(--mid)]">reels</span>
                 </span>
                 <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
-                  <span className="text-[13px] font-extrabold text-[#222222]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
+                  <span className="text-[13px] font-extrabold text-[var(--near-black)]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
                   <span className="text-[12px] font-semibold text-[var(--mid)]">slots left</span>
                 </span>
               </div>
 
               {/* Your campaign — single active offer card */}
               <div className="mb-7">
-                <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Your campaign</h3>
+                <h3 className="text-[18px] font-extrabold text-[var(--near-black)] mb-[14px]">Your campaign</h3>
 
                 {activeOffer ? (() => {
                   const slotsUsed = activeOffer.slotsUsed || 0;
@@ -1678,7 +1653,7 @@ export default function BusinessPortal() {
               {/* Recent creator activity — vertical list */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-[14px]">
-                  <h3 className="text-[18px] font-extrabold text-[#222222]">Creator activity</h3>
+                  <h3 className="text-[18px] font-extrabold text-[var(--near-black)]">Creator activity</h3>
                   {recentActivity.length > 0 && (
                     <button onClick={() => setView('claims')} className="text-[13px] font-semibold text-[var(--terra)]">
                       View all
@@ -1729,7 +1704,7 @@ export default function BusinessPortal() {
               {/* ═══ Also on Nayba ═══ */}
               {nearbyBusinesses.length > 0 && (
                 <div className="mt-2">
-                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Also on Nayba</h3>
+                  <h3 className="text-[18px] font-extrabold text-[var(--near-black)] mb-[14px]">Also on Nayba</h3>
                   <div className="space-y-[8px]">
                     {nearbyBusinesses.map((biz) => (
                       <button
@@ -1749,7 +1724,7 @@ export default function BusinessPortal() {
                             )}
                           </div>
                           <div className="flex-1 min-w-0">
-                            <p className="text-[14px] font-bold text-[#222222] truncate">{biz.name}</p>
+                            <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{biz.name}</p>
                             <p className="text-[11px] text-[var(--mid)]">
                               {biz.claim_count > 0 ? (
                                 <>{biz.creator_count} creator{biz.creator_count !== 1 ? 's' : ''} · {biz.claim_count} claim{biz.claim_count !== 1 ? 's' : ''}{biz.latest_claim_at && <> · {timeAgo(biz.latest_claim_at)}</>}</>
@@ -1775,10 +1750,10 @@ export default function BusinessPortal() {
                 /* ── Offer detail / edit sub-view (inline editor) ── */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
+                    <h1 className="text-[22px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
                   </div>
 
                   {/* Hero image with upload */}
@@ -1829,16 +1804,16 @@ export default function BusinessPortal() {
                   {/* Edit fields */}
                   <div className="space-y-4 mb-6">
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Offer title</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Offer title</label>
                       <input
                         type="text"
                         value={editOfferTitle}
                         onChange={e => { setEditOfferTitle(e.target.value); setEditOfferDirty(true); setEditOfferSaved(false); }}
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] outline-none border-none"
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Monthly creators</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Monthly creators</label>
                       <div className="flex items-center gap-[12px]">
                         <input
                           type="number"
@@ -1851,18 +1826,18 @@ export default function BusinessPortal() {
                             setEditOfferSaved(false);
                           }}
                           placeholder="Unlimited"
-                          className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
+                          className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] outline-none border-none"
                         />
                         <span className="text-[12px] text-[var(--soft)] flex-shrink-0">{editOfferCap === null ? 'Unlimited' : `${editOfferCap}/mo`}</span>
                       </div>
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Content ask</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Content ask</label>
                       <textarea
                         value={editOfferAsk}
                         onChange={e => { setEditOfferAsk(e.target.value); setEditOfferDirty(true); setEditOfferSaved(false); }}
                         placeholder="e.g. Show the latte art in a reel"
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] outline-none border-none resize-none"
                         style={{ minHeight: '80px' }}
                       />
                     </div>
@@ -1897,7 +1872,7 @@ export default function BusinessPortal() {
               ) : (
                 /* ── Campaign view with active offer + history ── */
                 <>
-                  <h2 className="text-[22px] font-extrabold text-[#222222] mb-[20px]" style={{ letterSpacing: '-0.4px' }}>Your campaign</h2>
+                  <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mb-[20px]" style={{ letterSpacing: '-0.4px' }}>Your campaign</h2>
 
                   {/* Active offer section */}
                   {activeOffer ? (() => {
@@ -1976,7 +1951,7 @@ export default function BusinessPortal() {
                   )}
 
                   {/* Campaign history */}
-                  <h3 className="text-[18px] font-extrabold text-[#222222] mb-[14px]">Past campaigns</h3>
+                  <h3 className="text-[18px] font-extrabold text-[var(--near-black)] mb-[14px]">Past campaigns</h3>
                   {offers.filter(o => !o.is_live && o !== activeOffer).length === 0 ? (
                     <p className="text-[14px] text-[var(--mid)] text-center py-[24px]">Your campaign history will appear here</p>
                   ) : (
@@ -2031,13 +2006,13 @@ export default function BusinessPortal() {
                     <>
                       <CheckCircle2 className="w-16 h-16 text-[var(--terra)] mb-4" />
                       {scanResult.creatorName && (
-                        <p className="text-[20px] font-extrabold text-[#222222] mb-1">{scanResult.creatorName}</p>
+                        <p className="text-[20px] font-extrabold text-[var(--near-black)] mb-1">{scanResult.creatorName}</p>
                       )}
-                      <p className="text-[16px] font-semibold text-[#222222] mb-1">{scanResult.message}</p>
+                      <p className="text-[16px] font-semibold text-[var(--near-black)] mb-1">{scanResult.message}</p>
                       <p className="text-[12px] text-[var(--soft)] mb-6">{new Date().toLocaleString()}</p>
                       <button
                         onClick={() => setScanResult(null)}
-                        className="px-[28px] py-[13px] rounded-[50px] bg-[#222222] text-white font-bold text-[14px] hover:bg-[#333] transition-all min-h-[48px]"
+                        className="px-[28px] py-[13px] rounded-[50px] bg-[var(--near-black)] text-white font-bold text-[14px] hover:bg-[#333] transition-all min-h-[48px]"
                       >
                         Done
                       </button>
@@ -2045,7 +2020,7 @@ export default function BusinessPortal() {
                   ) : (
                     <>
                       <XCircle className="w-12 h-12 text-[var(--terra)] mb-4" />
-                      <p className="text-[16px] font-bold text-[#222222] mb-1 text-center">{scanResult.message}</p>
+                      <p className="text-[16px] font-bold text-[var(--near-black)] mb-1 text-center">{scanResult.message}</p>
                       <button
                         onClick={() => setScanResult(null)}
                         className="mt-4 px-[28px] py-[13px] rounded-[50px] bg-[var(--terra)] text-white font-bold text-[14px] hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
@@ -2063,7 +2038,7 @@ export default function BusinessPortal() {
                     <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--bg)' }}>
                       <QrCode className="w-8 h-8 text-[var(--terra)]" />
                     </div>
-                    <h2 className="text-[22px] font-extrabold text-[#222222] mb-1" style={{ letterSpacing: '-0.4px' }}>Scan creator pass</h2>
+                    <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mb-1" style={{ letterSpacing: '-0.4px' }}>Scan creator pass</h2>
                     <p className="text-[14px] text-[var(--mid)] text-center">Ask the creator to open their Active tab<br />and show their QR code</p>
                   </div>
 
@@ -2083,13 +2058,13 @@ export default function BusinessPortal() {
                       value={scanCode}
                       onChange={(e) => { setScanCode(e.target.value); setScanResult(null); }}
                       placeholder="e.g. SOPHIE101"
-                      className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
+                      className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
                       required
                     />
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[#222222] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2104,7 +2079,7 @@ export default function BusinessPortal() {
             <div>
               {/* Header row */}
               <div className="flex items-baseline justify-between mb-[16px]">
-                <h2 className="text-[22px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
+                <h2 className="text-[22px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.4px' }}>Claims</h2>
                 {creatorFilter ? (
                   <button
                     onClick={() => setCreatorFilter(null)}
@@ -2116,7 +2091,7 @@ export default function BusinessPortal() {
                 ) : (
                   <button
                     onClick={() => setClaimsSubView(claimsSubView === 'claims' ? 'content' : 'claims')}
-                    className={`text-[13px] font-semibold ${claimsSubView === 'content' ? 'text-[#222222] underline underline-offset-4' : 'text-[var(--mid)]'}`}
+                    className={`text-[13px] font-semibold ${claimsSubView === 'content' ? 'text-[var(--near-black)] underline underline-offset-4' : 'text-[var(--mid)]'}`}
                   >
                     {claimsSubView === 'claims' ? 'View reels' : 'View claims'}
                   </button>
@@ -2159,7 +2134,7 @@ export default function BusinessPortal() {
                       <div className="w-[56px] h-[56px] rounded-full bg-[var(--bg)] flex items-center justify-center mb-[16px]">
                         <ClipboardList className="w-6 h-6 text-[var(--soft)]" />
                       </div>
-                      <p className="text-[15px] font-bold text-[#222222] mb-[4px]">No claims yet</p>
+                      <p className="text-[15px] font-bold text-[var(--near-black)] mb-[4px]">No claims yet</p>
                       <p className="text-[13px] text-[var(--mid)] text-center">Creators will appear here once they claim your offers</p>
                     </div>
                   ) : filteredClaims.length === 0 ? (
@@ -2195,7 +2170,7 @@ export default function BusinessPortal() {
                           {/* Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-[6px]">
-                              <p className="text-[15px] font-semibold text-[#222222] truncate">{claim.creators.name}</p>
+                              <p className="text-[15px] font-semibold text-[var(--near-black)] truncate">{claim.creators.name}</p>
                               <span className="text-[11px] text-[var(--soft)] flex-shrink-0">{timeAgo(claim.claimed_at)}</span>
                             </div>
                             <p className="text-[13px] text-[var(--mid)] truncate mt-[1px]">
@@ -2208,12 +2183,12 @@ export default function BusinessPortal() {
                             {claim.status === 'active' ? (
                               <button
                                 onClick={() => { setView('scan'); setScanResult(null); }}
-                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[#222222] text-white text-[13px] font-semibold hover:bg-[#333333] transition-colors"
+                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--near-black)] text-white text-[13px] font-semibold hover:bg-[#333333] transition-colors"
                               >
                                 <ScanLine className="w-[14px] h-[14px]" /> Scan
                               </button>
                             ) : claim.status === 'completed' && claim.reel_url ? (
-                              <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[#222222] hover:bg-[#eee] transition-colors">
+                              <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors">
                                 <Video className="w-[14px] h-[14px]" /> Reel
                               </a>
                             ) : (
@@ -2236,7 +2211,7 @@ export default function BusinessPortal() {
                   {claims.filter(c => c.reel_url).length === 0 ? (
                     <div className="flex flex-col items-center py-16 px-6">
                       <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
-                      <p className="text-[16px] font-bold text-[#222222] mb-1">No content yet</p>
+                      <p className="text-[16px] font-bold text-[var(--near-black)] mb-1">No content yet</p>
                       <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
                     </div>
                   ) : (
@@ -2255,8 +2230,8 @@ export default function BusinessPortal() {
                               </div>
                             )}
                             <div className="flex-1 min-w-0">
-                              <p className="text-[15px] font-bold text-[#222222]">{claim.creators.name}</p>
-                              <p className="text-[14px] text-[#222222] font-semibold mt-[4px]">
+                              <p className="text-[15px] font-bold text-[var(--near-black)]">{claim.creators.name}</p>
+                              <p className="text-[14px] text-[var(--near-black)] font-semibold mt-[4px]">
                                 {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
                               </p>
                               <p className="text-[12px] text-[var(--soft)] mt-[4px]">{timeAgo(claim.claimed_at)}</p>
@@ -2264,7 +2239,7 @@ export default function BusinessPortal() {
                                 href={claim.reel_url!}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[#222222] hover:bg-[#eeeeee] transition-colors"
+                                className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[13px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors"
                               >
                                 <Video className="w-[14px] h-[14px]" /> View reel <ExternalLink className="w-3 h-3 text-[var(--soft)]" />
                               </a>
@@ -2282,12 +2257,12 @@ export default function BusinessPortal() {
           {/* ═══ NOTIFICATIONS ═══ */}
           {view === 'notifications' && (
             <div className="max-w-lg mx-auto">
-              <h2 className="text-[22px] font-extrabold text-[#222222] mb-5" style={{ letterSpacing: '-0.4px' }}>Alerts</h2>
+              <h2 className="text-[22px] font-extrabold text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.4px' }}>Alerts</h2>
 
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center py-16 px-6">
                   <Bell className="w-12 h-12 text-[var(--soft)] mb-4" />
-                  <p className="text-[16px] font-bold text-[#222222] mb-1">No notifications</p>
+                  <p className="text-[16px] font-bold text-[var(--near-black)] mb-1">No notifications</p>
                   <p className="text-[14px] text-[var(--mid)] text-center max-w-[260px]">You'll be notified when creators claim your offers</p>
                 </div>
               ) : (
@@ -2303,7 +2278,7 @@ export default function BusinessPortal() {
                       <div className="flex items-start gap-3">
                         <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[var(--faint)]' : 'bg-[var(--terra)]'}`} />
                         <div className="flex-1 min-w-0">
-                          <p className="text-[14px] text-[#222222]">{notif.message}</p>
+                          <p className="text-[14px] text-[var(--near-black)]">{notif.message}</p>
                           <p className="text-[13px] text-[var(--soft)] mt-1">{new Date(notif.created_at).toLocaleDateString()}</p>
                         </div>
                       </div>
@@ -2345,7 +2320,7 @@ export default function BusinessPortal() {
                           }}
                         />
                         {logoUploading ? (
-                          <div className="w-[72px] h-[72px] rounded-[16px] bg-[#F7F7F7] flex items-center justify-center">
+                          <div className="w-[72px] h-[72px] rounded-[16px] bg-[var(--bg)] flex items-center justify-center">
                             <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : logoUrl ? (
@@ -2371,7 +2346,7 @@ export default function BusinessPortal() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] font-extrabold text-[#222222] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[11px] font-bold rounded-full px-[10px] py-[3px]">
                             {userProfile.category}
@@ -2417,17 +2392,17 @@ export default function BusinessPortal() {
                     {/* Stats row inside card */}
                     <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{offers.filter(o => o.is_live).length}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{offers.filter(o => o.is_live).length}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Live offers</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.length}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{claims.length}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Claims</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[#222222]">{claims.filter(c => c.status === 'completed').length}</p>
+                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{claims.filter(c => c.status === 'completed').length}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Collabs</p>
                       </div>
                     </div>
@@ -2436,7 +2411,7 @@ export default function BusinessPortal() {
                   {/* ═══ About card ═══ */}
                   {userProfile.bio && (
                     <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
-                      <h3 className="text-[14px] font-bold text-[#222222] mb-[8px]">About</h3>
+                      <h3 className="text-[14px] font-bold text-[var(--near-black)] mb-[8px]">About</h3>
                       <p className="text-[14px] text-[var(--mid)] leading-[1.5]">{userProfile.bio}</p>
                     </div>
                   )}
@@ -2449,7 +2424,7 @@ export default function BusinessPortal() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <User className="w-[20px] h-[20px] text-[var(--mid)]" />
-                        <span className="text-[15px] font-semibold text-[#222222]">Edit profile</span>
+                        <span className="text-[15px] font-semibold text-[var(--near-black)]">Edit profile</span>
                       </div>
                       <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
                     </button>
@@ -2459,7 +2434,7 @@ export default function BusinessPortal() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
-                        <span className="text-[15px] font-semibold text-[#222222]">Notifications</span>
+                        <span className="text-[15px] font-semibold text-[var(--near-black)]">Notifications</span>
                       </div>
                       <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
                     </button>
@@ -2476,49 +2451,49 @@ export default function BusinessPortal() {
                 /* Edit profile sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[#F7F7F7] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[#222222]" />
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
+                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[26px] font-extrabold text-[#222222]">Edit profile</h1>
+                    <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Edit profile</h1>
                   </div>
 
                   {/* Edit fields */}
                   <div className="space-y-4 mb-6">
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Business name</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Business name</label>
                       <input
                         type="text"
                         value={profileName}
                         onChange={e => { setProfileName(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] outline-none border-none"
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Address / location</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Address / location</label>
                       <input
                         type="text"
                         value={profileAddress}
                         onChange={e => { setProfileAddress(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] outline-none border-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] outline-none border-none"
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Instagram handle</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Instagram handle</label>
                       <input
                         type="text"
                         value={profileInstagram}
                         onChange={e => { setProfileInstagram(e.target.value); setProfileDirty(true); setProfileSaved(false); }}
                         placeholder="@yourbusiness"
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] outline-none border-none"
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] font-semibold text-[#222222] block mb-1.5">Short bio</label>
+                      <label className="text-[12px] font-semibold text-[var(--near-black)] block mb-1.5">Short bio</label>
                       <textarea
                         value={profileBio}
                         onChange={e => { setProfileBio(e.target.value.slice(0, 120)); setProfileDirty(true); setProfileSaved(false); }}
                         placeholder="Tell creators what makes your business special"
-                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[#222222] placeholder:text-[var(--soft)] outline-none border-none resize-none"
+                        className="w-full px-4 py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] outline-none border-none resize-none"
                         style={{ minHeight: '80px' }}
                       />
                       <p className="text-[11px] text-[var(--soft)] text-right mt-1">{profileBio.length}/120</p>
