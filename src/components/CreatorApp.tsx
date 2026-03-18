@@ -526,19 +526,19 @@ export default function CreatorApp() {
     }
   };
 
-  const handleSubmitReel = async () => {
-    if (!reelUrl || !selectedClaim) return;
+  const handleSubmitReel = async (): Promise<boolean> => {
+    if (!reelUrl || !selectedClaim) return false;
     setReelError(null);
 
     if (selectedClaim.reel_due_at && new Date() > new Date(selectedClaim.reel_due_at)) {
       setReelError('The deadline for this reel has passed. Please contact support if you need an extension.');
-      return;
+      return false;
     }
 
     const instagramPattern = /^https:\/\/(www\.)?instagram\.com\//i;
     if (!instagramPattern.test(reelUrl)) {
       setReelError('Please enter a valid Instagram reel URL (https://instagram.com/reel/...)');
-      return;
+      return false;
     }
 
     setLoading(true);
@@ -576,8 +576,10 @@ export default function CreatorApp() {
       fetchCollabsCompleted();
 
       setShowReelCelebration({ offerName: celebOfferName, businessName: celebBizName });
+      return true;
     } catch (error: any) {
       setReelError(error.message || 'Failed to submit reel');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -793,17 +795,30 @@ export default function CreatorApp() {
       {showQrFullscreen && selectedClaim && (() => {
         const qrClaim = selectedClaim;
         const qrOfferTitle = qrClaim.snapshot_generated_title || qrClaim.offers.generated_title || qrClaim.offers.description || '';
+        const isReelDue = qrClaim.redeemed_at && !qrClaim.reel_url;
+        const reelDueTimeLeft = (() => {
+          if (!qrClaim.reel_due_at) return '';
+          const diff = new Date(qrClaim.reel_due_at).getTime() - Date.now();
+          if (diff <= 0) return 'Overdue';
+          const h = Math.floor(diff / (1000 * 60 * 60));
+          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+          return `${h}h ${m}m`;
+        })();
         return (
-          <div className="fixed top-0 left-0 right-0 bottom-0 bg-white flex flex-col items-center" style={{ zIndex: 9999 }}>
-            {/* Back button */}
+          <div
+            className="fixed top-0 left-0 right-0 bottom-0 bg-white"
+            style={{ zIndex: 9999, overflowY: isReelDue ? 'auto' : 'hidden' }}
+          >
+            {/* Back button — fixed so it stays visible when scrolling */}
             <button
-              onClick={() => setShowQrFullscreen(false)}
-              className="absolute top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px]"
+              onClick={() => { setShowQrFullscreen(false); setReelError(null); }}
+              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-white"
+              style={{ zIndex: 10000, borderRadius: 8 }}
             >
               ← Back
             </button>
-            {/* Content */}
-            <div className="flex flex-col items-center justify-center flex-1 w-full px-[20px]" style={{ paddingTop: 48 }}>
+            {/* QR Content */}
+            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 64, paddingBottom: isReelDue ? 40 : 0, minHeight: isReelDue ? undefined : '100%', justifyContent: isReelDue ? undefined : 'center' }}>
               <p className="text-[18px] font-semibold text-[var(--near-black)] text-center">{qrOfferTitle}</p>
               <p className="text-[14px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
               <div className="mt-[24px]">
@@ -822,6 +837,55 @@ export default function CreatorApp() {
               <div className="mt-[12px]">
                 <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
               </div>
+
+              {/* Reel submission section — only for reel_due status */}
+              {isReelDue && (
+                <>
+                  <div className="w-full mt-[24px] mb-[24px]" style={{ height: 1, background: 'rgba(34,34,34,0.1)' }} />
+                  <div className="w-full">
+                    <h3 className="text-[18px] font-extrabold text-[var(--near-black)]">Submit your reel</h3>
+                    <p className="text-[14px] text-[var(--mid)] mt-[8px]">
+                      {reelDueTimeLeft ? `You have ${reelDueTimeLeft} to post your reel.` : 'Post your reel now.'}
+                    </p>
+                    <p className="text-[14px] text-[var(--mid)] mt-[2px]">It must genuinely feature the business.</p>
+                    <input
+                      type="url"
+                      value={reelUrl}
+                      onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
+                      placeholder="https://instagram.com/reel/"
+                      className="w-full mt-[16px] px-[16px] py-[14px] rounded-[12px] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                      style={{ background: 'var(--bg)', border: '1px solid rgba(34,34,34,0.15)' }}
+                    />
+                    {reelError && (
+                      <p className="text-[13px] text-[var(--terra)] mt-[8px]">Please check the URL and try again.</p>
+                    )}
+                    <button
+                      onClick={async () => {
+                        const success = await handleSubmitReel();
+                        if (success) {
+                          setShowQrFullscreen(false);
+                        }
+                      }}
+                      disabled={loading || !reelUrl}
+                      className="w-full mt-[12px] rounded-[50px] text-white text-[16px] font-bold flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+                      style={{ background: 'var(--terra)', height: 52 }}
+                    >
+                      {loading ? (
+                        <>
+                          <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Submitting…
+                        </>
+                      ) : 'Submit reel'}
+                    </button>
+                    <button
+                      onClick={() => setDisputeClaimId(qrClaim.id)}
+                      className="w-full mt-[16px] text-center text-[13px] text-[var(--mid)] underline min-h-[44px]"
+                    >
+                      Report an issue
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </div>
         );
@@ -1249,7 +1313,7 @@ export default function CreatorApp() {
                     {/* Swipeable scroll container */}
                     <div
                       className="overflow-x-scroll scrollbar-hide"
-                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}
+                      style={{ scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', padding: '0 16px' }}
                       onScroll={(e) => {
                         const el = e.currentTarget;
                         const cardWidth = el.clientWidth;
@@ -1259,7 +1323,7 @@ export default function CreatorApp() {
                         }
                       }}
                     >
-                      <div className="flex" style={{ gap: 12 }}>
+                      <div className="flex" style={{ gap: 0 }}>
                         {giftCardClaims.map((claim, idx) => {
                           const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                           const matchedOffer = offers.find(o => o.id === claim.offer_id);
@@ -1273,14 +1337,11 @@ export default function CreatorApp() {
                               className="relative overflow-hidden text-left flex-shrink-0"
                               style={{
                                 width: 'calc(100vw - 32px)',
-                                maxWidth: 'calc(100% - 32px)',
-                                height: 160,
+                                height: 200,
                                 borderRadius: 16,
                                 boxShadow: 'inset 0 0 0 1px rgba(255,255,255,0.12)',
                                 background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
                                 scrollSnapAlign: 'center',
-                                marginLeft: idx === 0 ? 16 : 0,
-                                marginRight: idx === giftCardClaims.length - 1 ? 16 : 0,
                               }}
                             >
                               {photoUrl && (
