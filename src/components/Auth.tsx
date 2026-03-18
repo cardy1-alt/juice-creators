@@ -119,7 +119,7 @@ function AddressAutocomplete({ value, onChange }: {
 
   return (
     <div ref={wrapperRef} className="relative">
-      <label className="block text-[13px] font-semibold text-[#222222] mb-2">Address</label>
+      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-2">Address</label>
       <div className={`relative rounded-[14px] border transition-all duration-200 ${
         focused
           ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
@@ -135,7 +135,7 @@ function AddressAutocomplete({ value, onChange }: {
           onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
           onBlur={() => setFocused(false)}
           placeholder="Enter your address"
-          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none"
+          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
           autoComplete="off"
         />
       </div>
@@ -147,7 +147,7 @@ function AddressAutocomplete({ value, onChange }: {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[#222222] hover:bg-[#F7F7F7] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
+              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[var(--near-black)] hover:bg-[#F7F7F7] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
             >
               <MapPin className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
@@ -194,7 +194,7 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none`}
+        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
         required={required}
         minLength={minLength}
       />
@@ -315,7 +315,7 @@ export default function Auth() {
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -325,7 +325,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-white text-[#222222] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(0,0,0,0.08),0_1px_2px_rgba(0,0,0,0.06)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -398,7 +398,7 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => setForgotPassword(false)}
-              className="flex items-center gap-[6px] text-[13px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[#222222] transition-colors"
+              className="flex items-center gap-[6px] text-[13px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[var(--near-black)] transition-colors"
             >
               <ArrowLeft className="w-[14px] h-[14px]" /> Back to sign in
             </button>
@@ -408,13 +408,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail className="w-[24px] h-[24px] text-[var(--terra)]" />
                 </div>
-                <p className="text-[17px] font-bold text-[#222222] mb-[6px]">Check your email</p>
-                <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[#222222]">{resetEmail}</span></p>
+                <p className="text-[17px] font-bold text-[var(--near-black)] mb-[6px]">Check your email</p>
+                <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[17px] font-bold text-[#222222] mb-[4px]">Reset password</p>
+                  <p className="text-[17px] font-bold text-[var(--near-black)] mb-[4px]">Reset password</p>
                   <p className="text-[13px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -507,7 +507,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[19px] font-extrabold text-[#222222]" style={{ letterSpacing: '-0.3px' }}>
+              <h2 className="text-[19px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
@@ -523,7 +523,7 @@ export default function Auth() {
                     <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Follower Count</label>
+                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Follower Count</label>
                       <div className="flex gap-[8px]">
                         {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
                           <button
@@ -548,7 +548,7 @@ export default function Auth() {
                 {signupStep === 2 && (
                   <div className="space-y-[12px]">
                     <div>
-                      <label className="block text-[13px] font-semibold text-[#222222] mb-[8px]">Date of Birth</label>
+                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
                       <div className={`relative rounded-[14px] border transition-all duration-200 border-[var(--faint)] bg-[#F7F7F7] focus-within:border-[var(--terra)] focus-within:bg-white focus-within:shadow-[0_0_0_3px_var(--terra-ring)]`}>
                         <Cake className="absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] text-[var(--soft)]" />
                         <input
@@ -556,7 +556,7 @@ export default function Auth() {
                           value={dateOfBirth}
                           onChange={(e) => setDateOfBirth(e.target.value)}
                           max={new Date(new Date().setFullYear(new Date().getFullYear() - 13)).toISOString().split('T')[0]}
-                          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
+                          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none appearance-none"
                           style={{ colorScheme: 'light' }}
                           required
                         />
@@ -604,7 +604,7 @@ export default function Auth() {
                     <FloatingInput label="Business Name" icon={Building2} value={name} onChange={setName} placeholder="Juice Bar Co" required />
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-[#222222] mb-[10px]">Category</label>
+                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[10px]">Category</label>
                       <div className="grid grid-cols-2 gap-[8px]">
                         {CATEGORY_LIST.map((cat) => (
                           <button
@@ -634,7 +634,7 @@ export default function Auth() {
                       onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
                     <div>
-                      <label className="block text-[13px] font-semibold text-[#222222] mb-2">Bio</label>
+                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-2">Bio</label>
                       <div className="relative">
                         <textarea
                           value={bio}
@@ -642,7 +642,7 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[#222222] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[#F7F7F7] text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[11px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
@@ -692,7 +692,7 @@ export default function Auth() {
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                       className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
                     >
-                      <ArrowLeft className="w-[18px] h-[18px] text-[#222222]" />
+                      <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
                     </button>
                   )}
                   <button
@@ -729,7 +729,7 @@ export default function Auth() {
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                     className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[#F3F3F3] hover:bg-[#EAEAEA] transition-all active:scale-[0.96]"
                   >
-                    <ArrowLeft className="w-[18px] h-[18px] text-[#222222]" />
+                    <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
                   </button>
                   <button
                     type="submit"
