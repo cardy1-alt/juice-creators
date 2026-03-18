@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useRef, ReactNode } fro
 import { User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
+import { sendCreatorWelcomeEmail, sendBusinessWelcomeEmail, sendAdminSignupNotification } from '../lib/notifications';
 
 interface AuthContextType {
   user: User | null;
@@ -275,10 +276,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         console.log('[AuthContext] Creator profile inserted successfully');
 
-        // Set state directly — no need to re-fetch, we know what we just inserted
-        setUser(data.user);
-        setUserRole('creator');
-        setUserProfile({
+        // Best-effort fetch to get the generated id — if RLS blocks the
+        // read (e.g. email case mismatch with JWT), fall back gracefully
+        let creatorId: string | undefined;
+        try {
+          const { data: row } = await supabase.from('creators').select('id').eq('email', email).maybeSingle();
+          creatorId = row?.id;
+        } catch { /* non-critical */ }
+
+        const creatorProfile = {
+          id: creatorId,
           email,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
@@ -290,7 +297,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           longitude: additionalData.longitude || null,
           approved: false,
           onboarding_complete: false
-        });
+        };
+
+        setUser(data.user);
+        setUserRole('creator');
+        setUserProfile(creatorProfile);
+
+        // Fire welcome email + admin signup notification (non-blocking)
+        if (creatorId) {
+          sendCreatorWelcomeEmail(creatorId).catch(() => {});
+        }
+        sendAdminSignupNotification({ userType: 'creator', displayName: additionalData.name, email }).catch(() => {});
       } else if (role === 'business') {
         console.log('[AuthContext] Inserting business profile for:', data.user.id);
         const insertPayload = {
@@ -317,9 +334,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         console.log('[AuthContext] Business profile inserted successfully');
 
-        setUser(data.user);
-        setUserRole('business');
-        setUserProfile({
+        // Best-effort fetch to get the generated id
+        let businessId: string | undefined;
+        try {
+          const { data: row } = await supabase.from('businesses').select('id').eq('owner_email', email).maybeSingle();
+          businessId = row?.id;
+        } catch { /* non-critical */ }
+
+        const businessProfile = {
+          id: businessId,
           owner_email: email,
           name: additionalData.name,
           slug: additionalData.slug,
@@ -328,8 +351,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           latitude: additionalData.latitude,
           longitude: additionalData.longitude,
           bio: additionalData.bio,
-          approved: false
-        });
+          approved: false,
+          onboarding_complete: false
+        };
+
+        setUser(data.user);
+        setUserRole('business');
+        setUserProfile(businessProfile);
+
+        // Fire welcome email + admin signup notification (non-blocking)
+        if (businessId) {
+          sendBusinessWelcomeEmail(businessId).catch(() => {});
+        }
+        sendAdminSignupNotification({ userType: 'business', displayName: additionalData.name, email }).catch(() => {});
       }
     } finally {
       // Delay releasing the guard so queued onAuthStateChange events

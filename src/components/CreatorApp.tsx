@@ -8,6 +8,8 @@ import DisputeModal from './DisputeModal';
 import LevelBadge from './LevelBadge';
 import { getCategoryGradient, getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
+import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
+import FeedbackButton from './FeedbackButton';
 import { uploadAvatar } from '../lib/upload';
 import { Logo } from './Logo';
 import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
@@ -515,6 +517,12 @@ export default function CreatorApp() {
       setView('active');
       fetchOffers();
       fetchClaims();
+
+      // Send transactional emails (non-blocking)
+      const offerTitle = offer.generated_title || offer.description;
+      const businessName = offer.businesses?.name || 'a local business';
+      sendOfferClaimedCreatorEmail(userProfile.id, offerTitle, businessName).catch(() => {});
+      sendNewClaimBusinessEmail(offer.business_id, userProfile.display_name || userProfile.name, offerTitle).catch(() => {});
     } catch (error: any) {
       setClaimError(error.message || 'Failed to claim offer');
     } finally {
@@ -2739,6 +2747,12 @@ export default function CreatorApp() {
           ))}
         </div>
       </div>
+      <FeedbackButton
+        userId={userProfile.id}
+        userType="creator"
+        displayName={userProfile.display_name || userProfile.name}
+        currentPage={view}
+      />
     </div>
   );
 }

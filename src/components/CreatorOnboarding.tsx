@@ -129,7 +129,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           )}
           <span className="text-[18px] font-extrabold text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
           {screen === 3 ? (
-            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()); }} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
+            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}

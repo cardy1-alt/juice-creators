@@ -17,6 +17,8 @@ import { getCategoryGradient } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
 import { uploadAvatar, uploadOfferPhoto } from '../lib/upload';
+import { sendVisitConfirmedCreatorEmail } from '../lib/notifications';
+import FeedbackButton from './FeedbackButton';
 import { Logo } from './Logo';
 
 interface Offer {
@@ -1278,15 +1280,23 @@ export default function BusinessPortal() {
         return;
       }
 
-      // Fetch creator name for the success message
+      // Fetch creator details for the success message and email
       let creatorName = 'Creator';
       try {
         const { data: claim } = await supabase
           .from('claims')
-          .select('creators(name)')
+          .select('creator_id, reel_due_at, creators(name)')
           .eq('id', data.claim_id)
           .maybeSingle();
         creatorName = (claim as any)?.creators?.name || 'Creator';
+        // Send visit confirmed email to creator (non-blocking)
+        if (claim?.creator_id) {
+          sendVisitConfirmedCreatorEmail(
+            claim.creator_id,
+            userProfile.name,
+            claim.reel_due_at || '',
+          ).catch(() => {});
+        }
       } catch {
         // Non-critical — proceed with fallback name
       }
@@ -2635,6 +2645,12 @@ export default function BusinessPortal() {
           );
         })}
       </nav>
+      <FeedbackButton
+        userId={userProfile.id}
+        userType="business"
+        displayName={userProfile.name}
+        currentPage={view}
+      />
     </div>
   );
 }
