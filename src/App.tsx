@@ -27,7 +27,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+        <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F4F0]">
           <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
               <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
@@ -89,7 +89,7 @@ function DemoBanner() {
 
 function RedeemLanding() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F4F0]">
       <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <QrCode className="w-7 h-7 text-[var(--terra)]" />
@@ -118,7 +118,7 @@ function App() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F4F0]">
         <div className="text-center">
           <div className="w-12 h-12 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
           <p className="text-[var(--mid)] text-sm font-medium">Loading...</p>
@@ -150,7 +150,7 @@ function App() {
 
   // Fallback — user authenticated but no profile found
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-white">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F4F0]">
       <div className="bg-white rounded-[20px] shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)] p-8 max-w-md text-center border border-[var(--faint)]">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <AlertCircle className="w-7 h-7 text-[var(--terra)]" />

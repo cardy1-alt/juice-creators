@@ -328,7 +328,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[16px] bg-[var(--bg)] p-[16px]">
+    <div className="flex flex-col items-center gap-3 rounded-[16px] bg-[#F7F4F0] p-[16px]">
       {/* QR code — 220px */}
       <div className="inline-block rounded-[10px] overflow-hidden">
         <img

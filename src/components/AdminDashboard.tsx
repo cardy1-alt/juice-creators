@@ -200,10 +200,10 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#FFFFFF]">
+    <div className="min-h-screen bg-[#F7F4F0]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-[#FFFFFF] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
+        <div className="bg-[#F7F4F0] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -220,7 +220,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-[#FFFFFF] border-b border-[var(--faint)] overflow-x-auto">
+        <div className="flex bg-[#F7F4F0] border-b border-[var(--faint)] overflow-x-auto">
           {tabs.map(tab => (
             <button
               key={tab.key}
