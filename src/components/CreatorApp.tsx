@@ -1421,78 +1421,77 @@ export default function CreatorApp() {
                           return (
                             <div
                               key={claim.id}
-                              className="overflow-hidden text-left"
+                              className="relative overflow-hidden text-left"
                               style={{
                                 width: '100%',
                                 flexShrink: 0,
+                                height: 220,
                                 borderRadius: 16,
-                                background: '#FFFFFF',
+                                background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
                               }}
                             >
-                              {/* Photo section */}
-                              <div className="relative" style={{ height: 200, borderRadius: '16px 16px 0 0', overflow: 'hidden', background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category) }}>
-                                {photoUrl && (
-                                  <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                                )}
-                                {/* QR icon pill */}
-                                <div className="absolute bottom-[10px] right-[10px] flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: 50, background: 'rgba(0,0,0,0.35)', backdropFilter: 'blur(4px)' }}>
-                                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                    <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                    <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                    <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                    <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
-                                    <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
-                                    <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
-                                    <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
-                                    <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
-                                  </svg>
-                                </div>
-                              </div>
-
-                              {/* Pagination dots between photo and content */}
-                              {giftCardClaims.length > 1 && (
-                                <div className="flex items-center justify-center gap-[6px]" style={{ padding: '10px 0 0' }}>
-                                  {giftCardClaims.map((_, idx) => (
-                                    <div
-                                      key={idx}
-                                      className="rounded-full"
-                                      style={{
-                                        width: 6,
-                                        height: 6,
-                                        background: idx === activePassIdx ? 'var(--terra)' : 'rgba(34,34,34,0.2)',
-                                        transition: 'background 0.2s',
-                                      }}
-                                    />
-                                  ))}
-                                </div>
+                              {photoUrl && (
+                                <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                               )}
+                              {/* Gradient overlay — bottom 60% only */}
+                              <div className="absolute inset-x-0 bottom-0" style={{ top: '40%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.52) 100%)' }} />
 
-                              {/* Content panel */}
-                              <div style={{ padding: '12px 16px 16px' }}>
-                                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.5)', margin: 0, lineHeight: 1.3 }}>
+                              {/* Text overlay */}
+                              <div className="absolute bottom-[14px] left-[14px] right-[52px]">
+                                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>
                                   {claim.businesses.name}
                                 </p>
-                                <p style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 20, color: '#222222', margin: '4px 0 0', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
+                                <p style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 26, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
                                   {offerTitle}
                                 </p>
-                                <div className="flex items-center" style={{ marginTop: 10, gap: 6 }}>
-                                  <span className="rounded-full flex-shrink-0" style={{ width: 7, height: 7, background: status.dotColor }} />
-                                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.68)', lineHeight: 1 }}>
+                                <div className="flex items-center" style={{ gap: 6 }}>
+                                  <span className="rounded-full flex-shrink-0" style={{ width: 6, height: 6, background: status.dotColor }} />
+                                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 12, color: '#FFFFFF', lineHeight: 1 }}>
                                     {status.text}
                                   </span>
-                                  <span style={{ flex: 1 }} />
                                   {status.timerLabel && (
-                                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 12, color: 'var(--terra)', background: '#F5C4A0', borderRadius: 50, padding: '4px 10px', lineHeight: 1 }}>
+                                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: 11, color: '#FFFFFF', background: 'rgba(255,255,255,0.2)', borderRadius: 50, padding: '3px 10px', lineHeight: 1, marginLeft: 2 }}>
                                       {status.timerLabel}
                                     </span>
                                   )}
                                 </div>
+                              </div>
+
+                              {/* QR icon */}
+                              <div className="absolute bottom-[14px] right-[14px] flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: 50, background: 'rgba(255,255,255,0.15)' }}>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                  <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                  <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                  <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                  <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
+                                  <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
+                                  <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
+                                  <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
+                                  <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
+                                </svg>
                               </div>
                             </div>
                           );
                         })}
                       </div>
                     </div>
+                    {/* Pagination dots — outside the card */}
+                    {giftCardClaims.length > 1 && (
+                      <div className="flex items-center justify-center gap-[6px]" style={{ marginTop: 10 }}>
+                        {giftCardClaims.map((_, idx) => (
+                          <div
+                            key={idx}
+                            className="rounded-full"
+                            style={{
+                              width: 6,
+                              height: 6,
+                              background: idx === activePassIdx ? 'var(--terra)' : 'rgba(34,34,34,0.2)',
+                              transition: 'background 0.2s',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })()}
