@@ -731,7 +731,7 @@ export default function CreatorApp() {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-white">
+    <div className="h-[100dvh] flex flex-col bg-[#F7F4F0]">
       {showOnboarding && (
         <CreatorOnboarding
           profile={userProfile}
@@ -804,13 +804,13 @@ export default function CreatorApp() {
         const isSubmitEnabled = reelUrl.startsWith('http') && reelUrl.length > 4;
         return (
           <div
-            className="fixed top-0 left-0 right-0 bottom-0 bg-white"
+            className="fixed top-0 left-0 right-0 bottom-0 bg-[#F7F4F0]"
             style={{ zIndex: 9999, overflowY: 'auto' }}
           >
             {/* Back button — fixed so it stays visible when scrolling */}
             <button
               onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
-              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-white"
+              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[15px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-[#F7F4F0]"
               style={{ zIndex: 10000, borderRadius: 8 }}
             >
               ← Back
@@ -868,8 +868,8 @@ export default function CreatorApp() {
                   />
                   {/* Ref code pill — single instance */}
                   <span
-                    className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full px-[20px] py-[8px] mt-[16px]"
-                    style={{ background: 'var(--near-black)' }}
+                    className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#222222] inline-block rounded-full px-[20px] py-[8px] mt-[16px]"
+                    style={{ background: '#F0EDE8' }}
                   >
                     {userProfile.code}
                   </span>
@@ -1069,7 +1069,7 @@ export default function CreatorApp() {
         })();
 
         return (
-          <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col">
             {/* Hero */}
             <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
               {offer.offer_photo_url ? (
@@ -1100,7 +1100,7 @@ export default function CreatorApp() {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto bg-white">
+            <div className="flex-1 overflow-y-auto bg-[#F7F4F0]">
               <div className="p-[20px]">
                 {/* A) Business name + category */}
                 <h2 className="text-[22px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
@@ -1683,68 +1683,69 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[12px] overflow-hidden relative"
-                      style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category) }}
+                      className="text-left rounded-[12px] overflow-hidden bg-white shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]"
                     >
-                      {/* Full-bleed image */}
-                      {offer.offer_photo_url ? (
-                        <img src={offer.offer_photo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      ) : offer.businesses.logo_url ? (
-                        <img src={offer.businesses.logo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center">
-                          <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
-                        </div>
-                      )}
-
-                      {/* Locked overlay */}
-                      {isLocked && (
-                        <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
-                          <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                            <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
+                      {/* Photo area */}
+                      <div className="relative" style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category) }}>
+                        {offer.offer_photo_url ? (
+                          <img src={offer.offer_photo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        ) : offer.businesses.logo_url ? (
+                          <img src={offer.businesses.logo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
                           </div>
-                          <p className="text-[12px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
-                          {reelsAway !== null && reelsAway <= 5 && (
-                            <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                              {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
-                            </p>
-                          )}
-                        </div>
-                      )}
+                        )}
 
-                      {/* Slot badge — top-left */}
-                      {!isLocked && !isUnlimited && slotsLeft !== null && (
-                        <span
-                          className="absolute top-[8px] left-[8px] text-[12px] font-semibold rounded-full px-[8px] py-[5px]"
-                          style={{
-                            background: slotsLeft <= 2 ? 'var(--terra)' : 'var(--peach)',
-                            color: slotsLeft <= 2 ? 'white' : 'var(--near-black)',
-                          }}
-                        >
-                          {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
-                        </span>
-                      )}
+                        {/* Locked overlay */}
+                        {isLocked && (
+                          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
+                            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
+                              <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
+                            </div>
+                            <p className="text-[12px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
+                            {reelsAway !== null && reelsAway <= 5 && (
+                              <p className="text-[12px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                                {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
+                              </p>
+                            )}
+                          </div>
+                        )}
 
-                      {/* Heart — top-right */}
-                      {!isLocked && (
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                          className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
-                          style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
-                        >
-                          <Heart
-                            className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
-                            strokeWidth={2}
-                          />
-                        </button>
-                      )}
+                        {/* Slot badge — top-left */}
+                        {!isLocked && !isUnlimited && slotsLeft !== null && (
+                          <span
+                            className="absolute top-[8px] left-[8px] text-[12px] font-semibold rounded-full px-[8px] py-[5px]"
+                            style={{
+                              background: slotsLeft <= 2 ? 'var(--terra)' : 'var(--peach)',
+                              color: slotsLeft <= 2 ? 'white' : 'var(--near-black)',
+                            }}
+                          >
+                            {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
+                          </span>
+                        )}
 
-                      {/* Text overlay at bottom with gradient scrim */}
-                      <div className="absolute bottom-0 left-0 right-0 px-[10px] pb-[8px] pt-[24px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.55), transparent)' }}>
-                        <p className="text-[13px] font-bold text-white truncate leading-tight" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.3)' }}>
+                        {/* Heart — top-right */}
+                        {!isLocked && (
+                          <button
+                            onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                            className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
+                            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
+                          >
+                            <Heart
+                              className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
+                              strokeWidth={2}
+                            />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Card body */}
+                      <div className="px-[10px] py-[8px]">
+                        <p className="text-[13px] font-bold text-[var(--near-black)] truncate leading-tight">
                           {offerTitle || bizName}
                         </p>
-                        <p className="text-[11px] text-[rgba(255,255,255,0.8)] truncate mt-[1px]" style={{ fontWeight: 400 }}>
+                        <p className="text-[11px] text-[var(--mid)] truncate mt-[1px]">
                           {bizName}
                         </p>
                       </div>

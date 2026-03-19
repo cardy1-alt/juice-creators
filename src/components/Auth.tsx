@@ -328,14 +328,13 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#FFFFFF] overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#F7F4F0] overscroll-none">
       {/* Top section with branding */}
       <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
-        <Logo size={52} variant="icon" />
         <div className="mt-[10px]">
           <Logo size={24} variant="wordmark" />
         </div>
-        <p className="text-[var(--soft)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
+        <p className="text-[rgba(34,34,34,0.5)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">

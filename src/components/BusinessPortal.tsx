@@ -429,7 +429,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-white flex flex-col items-center justify-center px-6">
+      <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col items-center justify-center px-6">
         <CheckCircle2 className="w-14 h-14 text-[var(--terra)] mb-4" />
         <p className="text-[22px] font-display font-normal text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.4px' }}>Your offer is live!</p>
         <p className="text-[14px] text-[var(--mid)] text-center mt-2">Creators can now discover and claim it</p>
@@ -444,7 +444,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col overflow-y-auto">
       <style>{livePulseStyle}</style>
 
       {/* Top bar */}
@@ -1429,7 +1429,7 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-white" style={{ overscrollBehavior: 'none' }}>
+    <div className="h-[100dvh] flex flex-col bg-[#F7F4F0]" style={{ overscrollBehavior: 'none' }}>
       <style>{livePulseStyle}</style>
 
       {/* ═══ Business Profile Overlay ═══ */}
@@ -1437,7 +1437,7 @@ export default function BusinessPortal() {
         const biz = nearbyBusinesses.find(b => b.id === expandedNearbyBiz);
         if (!biz) return null;
         return (
-          <div className="fixed inset-0 z-50 bg-white flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col">
             {/* Header */}
             <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
               <button
@@ -1644,7 +1644,7 @@ export default function BusinessPortal() {
                           e.target.value = '';
                         }}
                       />
-                      {/* Photo-dominant hero */}
+                      {/* Photo hero */}
                       <div className="relative h-[220px]" style={{ background: getCategoryGradient(userProfile.category) }}>
                         {activeOffer.offer_photo_url ? (
                           <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1670,14 +1670,14 @@ export default function BusinessPortal() {
                         >
                           Edit
                         </button>
-                        {/* Bottom gradient overlay with info */}
-                        <div className="absolute bottom-0 left-0 right-0 px-[16px] pb-[14px] pt-[48px]" style={{ background: 'linear-gradient(to top, rgba(0,0,0,0.6) 0%, transparent 100%)' }}>
-                          <p className="text-[18px] font-display font-normal text-white leading-tight">{activeOffer.generated_title || activeOffer.description}</p>
-                          <p className="text-[13px] text-white/80 mt-[3px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`} · {slotsUsed} claimed</p>
-                        </div>
+                      </div>
+                      {/* Card body with title + stats */}
+                      <div className="px-[16px] py-[12px] bg-white">
+                        <p className="text-[18px] font-display font-normal text-[var(--near-black)] leading-tight">{activeOffer.generated_title || activeOffer.description}</p>
+                        <p className="text-[13px] text-[var(--mid)] mt-[3px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`} · {slotsUsed} claimed</p>
                       </div>
                       {/* Footer actions */}
-                      <div className="flex items-center justify-between px-[16px] py-[12px] bg-white">
+                      <div className="flex items-center justify-between px-[16px] py-[12px] bg-white border-t border-[var(--faint)]">
                         <button
                           onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
                           className="inline-flex items-center gap-[6px] text-[13px] font-medium text-[var(--soft)]"
