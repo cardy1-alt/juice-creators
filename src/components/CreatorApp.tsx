@@ -767,7 +767,7 @@ export default function CreatorApp() {
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[24px] font-extrabold text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.5px' }}>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.5px' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
             <p className="text-[14px] text-[var(--mid)] mb-6 leading-[1.5]">
@@ -1025,7 +1025,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[32px] font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.5px' }}>
+            <h2 className="text-[32px] font-display font-normal text-white text-center mt-[24px]" style={{ letterSpacing: '-0.5px' }}>
               Reel submitted!
             </h2>
             <p className="text-[16px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1103,7 +1103,7 @@ export default function CreatorApp() {
             <div className="flex-1 overflow-y-auto bg-white">
               <div className="p-[20px]">
                 {/* A) Business name + category */}
-                <h2 className="text-[22px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
+                <h2 className="text-[22px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
                 <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
 
                 {/* Level requirement banner */}
@@ -1118,7 +1118,7 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p className="text-[20px] font-extrabold text-[var(--near-black)] mt-3" style={{ letterSpacing: '-0.4px' }}>
+                <p className="text-[20px] font-display font-normal text-[var(--near-black)] mt-3" style={{ letterSpacing: '-0.4px' }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
@@ -1359,7 +1359,7 @@ export default function CreatorApp() {
                 return (
                   <div style={{ marginBottom: 16 }}>
                     <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[10px]">
-                      <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
+                      <h2 className="text-[18px] font-display font-normal text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
                       {giftCardClaims.length >= 2 && (
                         <button onClick={() => setView('active')} className="text-[13px] font-semibold text-[var(--terra)]">
                           View all
@@ -1441,7 +1441,7 @@ export default function CreatorApp() {
                               </span>
 
                               <p
-                                className="absolute left-[16px] text-[22px] font-extrabold text-white"
+                                className="absolute left-[16px] text-[22px] font-display font-normal text-white"
                                 style={{ top: '50%', transform: 'translateY(-50%)', right: 60, lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}
                               >
                                 {offerTitle}
@@ -1535,7 +1535,7 @@ export default function CreatorApp() {
                         key={entry.id}
                         className={`flex items-center gap-3 py-[10px] ${idx < Math.min(leaderboard.length, 5) - 1 ? 'border-b border-[var(--faint)]' : ''}`}
                       >
-                        <span className="text-[20px] font-extrabold w-6 text-center" style={{ color: posColor }}>{idx + 1}</span>
+                        <span className="text-[20px] font-display font-normal w-6 text-center" style={{ color: posColor }}>{idx + 1}</span>
                         {entry.avatar_url ? (
                           <img src={entry.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
@@ -1574,7 +1574,7 @@ export default function CreatorApp() {
 
               {/* Section Header */}
               <div className="flex items-center justify-between px-[20px] mt-[4px] mb-[10px]">
-                <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
+                <h2 className="text-[18px] font-display font-normal text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
               {offersLoading ? (
@@ -1763,7 +1763,7 @@ export default function CreatorApp() {
 
                     {/* Second section */}
                     <div className="flex items-center justify-between px-[20px] mt-2 mb-[14px]">
-                      <h2 className="text-[18px] font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
+                      <h2 className="text-[18px] font-display font-normal text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
                     <div className="px-[20px] pb-4">
@@ -1783,7 +1783,7 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Saved</h1>
+                <h1 className="text-[26px] font-display font-normal text-[var(--near-black)]">Saved</h1>
                 <span className="text-[13px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
@@ -1795,7 +1795,7 @@ export default function CreatorApp() {
                     <circle cx="40" cy="36" r="6" stroke="var(--peach)" strokeWidth="2" fill="none" />
                     <circle cx="40" cy="36" r="2" fill="var(--peach)" />
                   </svg>
-                  <p className="text-[18px] font-extrabold text-[var(--near-black)] mt-[16px]">Nothing saved yet</p>
+                  <p className="text-[18px] font-display font-normal text-[var(--near-black)] mt-[16px]">Nothing saved yet</p>
                   <p className="text-[15px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
@@ -2113,7 +2113,7 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[26px] font-extrabold text-[var(--near-black)] mb-5">Claims</h1>
+              <h1 className="text-[26px] font-display font-normal text-[var(--near-black)] mb-5">Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <Zap className="w-12 h-12 text-[var(--soft)] mx-auto mb-4" />
@@ -2226,7 +2226,7 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] font-display font-normal text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
@@ -2257,17 +2257,17 @@ export default function CreatorApp() {
                     {/* Stats row inside card */}
                     <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{claims.length}</p>
+                        <p className="text-[22px] font-display font-normal text-[var(--near-black)]">{claims.length}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Claimed</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{collabsCompleted}</p>
+                        <p className="text-[22px] font-display font-normal text-[var(--near-black)]">{collabsCompleted}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Posted</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[22px] font-extrabold text-[var(--near-black)]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[22px] font-display font-normal text-[var(--near-black)]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
                         <p className="text-[11px] text-[var(--soft)] font-semibold">Rating</p>
                       </div>
                     </div>
@@ -2368,7 +2368,6 @@ export default function CreatorApp() {
                                         /* Number for current + locked */
                                         <span
                                           style={{
-                                            fontFamily: "'Plus Jakarta Sans', sans-serif",
                                             fontWeight: isCurrent ? 700 : 500,
                                             fontSize: 16,
                                             color: isLocked ? 'var(--soft)' : isCurrent ? 'var(--terra)' : 'white',
@@ -2403,7 +2402,6 @@ export default function CreatorApp() {
                               style={{
                                 background: currentLvl === 6 ? '#222222' : levelColours[currentLvl],
                                 color: 'white',
-                                fontFamily: "'Plus Jakarta Sans', sans-serif",
                                 fontWeight: 600,
                                 fontSize: 13,
                               }}
@@ -2414,7 +2412,6 @@ export default function CreatorApp() {
                               <span
                                 style={{
                                   color: 'var(--mid)',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                                   fontWeight: 400,
                                   fontSize: 14,
                                 }}
@@ -2433,7 +2430,6 @@ export default function CreatorApp() {
                         <div className="flex items-center gap-[8px]">
                           <span
                             style={{
-                              fontFamily: "'Plus Jakarta Sans', sans-serif",
                               fontWeight: 800,
                               fontSize: 28,
                               color: 'var(--near-black)',
@@ -2470,7 +2466,6 @@ export default function CreatorApp() {
                         <span
                           className="ml-auto"
                           style={{
-                            fontFamily: "'Plus Jakarta Sans', sans-serif",
                             fontWeight: 400,
                             fontSize: 14,
                             color: 'var(--soft)',
@@ -2483,7 +2478,6 @@ export default function CreatorApp() {
                       <p
                         className="mt-[6px]"
                         style={{
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
                           fontWeight: 400,
                           fontSize: 13,
                           color: 'var(--soft)',
@@ -2539,7 +2533,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Notifications</h1>
+                    <h1 className="text-[26px] font-display font-normal text-[var(--near-black)]">Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2551,7 +2545,7 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[18px] font-extrabold text-[var(--near-black)] mt-[16px]">Nothing yet</p>
+                      <p className="text-[18px] font-display font-normal text-[var(--near-black)] mt-[16px]">Nothing yet</p>
                       <p className="text-[15px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>
@@ -2594,7 +2588,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[26px] font-extrabold text-[var(--near-black)]">Edit profile</h1>
+                    <h1 className="text-[26px] font-display font-normal text-[var(--near-black)]">Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}

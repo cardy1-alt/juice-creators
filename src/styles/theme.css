@@ -37,7 +37,6 @@
 
 @layer base {
   h1, h2, h3, h4, h5, body, p, span, button, input, label, select, textarea {
-    font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 15px;
   }
 }

@@ -32,7 +32,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
               <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
             </div>
-            <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">Something went wrong</h2>
+            <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">Something went wrong</h2>
             <p className="text-[var(--mid)] text-sm mb-4">An unexpected error occurred. Please refresh the page.</p>
             {this.state.errorMessage && (
               <p className="text-[var(--soft)] text-xs mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
@@ -94,7 +94,7 @@ function RedeemLanding() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <QrCode className="w-7 h-7 text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">
+        <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">
           Creator Pass
         </h2>
         <p className="text-[var(--mid)] text-sm mb-6">
@@ -155,7 +155,7 @@ function App() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-bold mb-2 text-[var(--near-black)]">
+        <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">
           Account Not Found
         </h2>
         <p className="text-[var(--mid)] text-sm mb-6">

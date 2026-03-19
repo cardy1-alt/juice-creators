@@ -127,7 +127,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           ) : (
             <div className="w-[40px]" />
           )}
-          <span className="text-[18px] font-extrabold text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
+          <span className="text-[18px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
           {screen === 3 ? (
             <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
           ) : (
@@ -168,7 +168,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               </div>
 
               <h1
-                className="text-[28px] font-extrabold text-[var(--near-black)] text-center"
+                className="text-[28px] font-display font-normal text-[var(--near-black)] text-center"
                 style={{ letterSpacing: '-0.5px' }}
               >
                 Welcome to nayba
@@ -199,7 +199,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                className="text-[24px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Here's how it works
@@ -245,7 +245,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                className="text-[24px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Complete your profile
@@ -373,7 +373,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             </div>
 
             <h1
-              className="text-[32px] font-extrabold text-[var(--near-black)] text-center mt-[28px]"
+              className="text-[32px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
               style={{ letterSpacing: '-0.8px' }}
             >
               You're in.
@@ -389,11 +389,11 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
               <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[28px] font-extrabold text-[var(--near-black)]">{businessCount}</p>
+                <p className="text-[28px] font-display font-normal text-[var(--near-black)]">{businessCount}</p>
                 <p className="text-[10px] font-medium text-[var(--mid)]">Businesses</p>
               </div>
               <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[28px] font-extrabold text-[var(--near-black)]">{offerCount}</p>
+                <p className="text-[28px] font-display font-normal text-[var(--near-black)]">{offerCount}</p>
                 <p className="text-[10px] font-medium text-[var(--mid)]">Live Offers</p>
               </div>
             </div>

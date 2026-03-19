@@ -45,7 +45,7 @@ function createMarkerIcon(name: string) {
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(34,34,34,0.2);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Inter', sans-serif;
     ">${initials}</div>`,
     className: 'marker-icon',
     iconSize: [40, 40],
@@ -256,7 +256,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
               }}
             >
               <Popup closeButton={true}>
-                <div className="min-w-[180px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <div className="min-w-[180px]">
                   <h4 className="font-bold text-[14px] text-[var(--near-black)] mb-1">{business.name}</h4>
                   <p className="text-[13px] text-[var(--mid)] mb-2">{business.category}</p>
                   {business.offers.length > 0 && (
@@ -279,7 +279,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       <div className="mt-4 space-y-[14px] overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-extrabold text-[15px] text-[var(--near-black)]">Nearby Businesses</h3>
+          <h3 className="font-display font-normal text-[15px] text-[var(--near-black)]">Nearby Businesses</h3>
           <span className="text-[13px] text-[var(--soft)]">{businessesWithDistance.length} found</span>
         </div>
 

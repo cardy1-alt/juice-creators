@@ -47,7 +47,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
             <div className="w-16 h-16 rounded-full bg-[var(--bg)] flex items-center justify-center mx-auto mb-4">
               <Check className="w-8 h-8 text-[var(--terra)]" />
             </div>
-            <h3 className="text-xl font-bold text-[var(--near-black)] mb-2">Report Submitted</h3>
+            <h3 className="text-xl font-display font-normal text-[var(--near-black)] mb-2">Report Submitted</h3>
             <p className="text-[var(--mid)] text-sm">
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
