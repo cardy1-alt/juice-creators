@@ -1357,7 +1357,7 @@ export default function CreatorApp() {
                 };
 
                 return (
-                  <div style={{ marginBottom: 16 }}>
+                  <div style={{ marginBottom: 24 }}>
                     <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[10px]">
                       <h2 className="text-[18px] font-display font-normal text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
                       {giftCardClaims.length >= 2 && (
@@ -1691,15 +1691,15 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[12px] overflow-hidden bg-white shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]"
+                      className="text-left rounded-[12px] bg-white shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]"
                       style={{ width: 160, flexShrink: 0 }}
                     >
                       {/* Photo area */}
-                      <div className="relative" style={{ height: 120, background: getCategoryGradient(offer.businesses.category) }}>
+                      <div className="relative overflow-hidden rounded-t-[12px]" style={{ height: 120, background: getCategoryGradient(offer.businesses.category) }}>
                         {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          <img src={offer.offer_photo_url} alt={bizName} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} className="absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : offer.businesses.logo_url ? (
-                          <img src={offer.businesses.logo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                          <img src={offer.businesses.logo_url} alt={bizName} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} className="absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
                           <div className="absolute inset-0 flex items-center justify-center">
                             <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{bizName.charAt(0)}</span>
@@ -1750,7 +1750,7 @@ export default function CreatorApp() {
                       </div>
 
                       {/* Card body */}
-                      <div className="px-[10px] py-[8px]">
+                      <div className="px-[10px] py-[8px]" style={{ height: 72, overflow: 'hidden' }}>
                         <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#222222', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
                           {offerTitle || bizName}
                         </p>
