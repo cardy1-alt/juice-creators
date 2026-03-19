@@ -1692,9 +1692,10 @@ export default function CreatorApp() {
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
                       className="text-left rounded-[12px] overflow-hidden bg-white shadow-[0_1px_4px_rgba(34,34,34,0.06),0_4px_16px_rgba(34,34,34,0.04)]"
+                      style={{ width: 160, flexShrink: 0 }}
                     >
                       {/* Photo area */}
-                      <div className="relative" style={{ aspectRatio: '3/2', background: getCategoryGradient(offer.businesses.category) }}>
+                      <div className="relative" style={{ height: 120, background: getCategoryGradient(offer.businesses.category) }}>
                         {offer.offer_photo_url ? (
                           <img src={offer.offer_photo_url} alt={bizName} className="absolute inset-0 w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : offer.businesses.logo_url ? (
@@ -1750,10 +1751,10 @@ export default function CreatorApp() {
 
                       {/* Card body */}
                       <div className="px-[10px] py-[8px]">
-                        <p className="text-[13px] font-bold text-[var(--near-black)] truncate leading-tight">
+                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 13, color: '#222222', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
                           {offerTitle || bizName}
                         </p>
-                        <p className="text-[11px] text-[var(--mid)] truncate mt-[1px]">
+                        <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 11, color: 'rgba(34,34,34,0.5)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
                       </div>
@@ -1763,9 +1764,9 @@ export default function CreatorApp() {
 
                 return (
                   <>
-                    {/* Near you offer cards grid */}
-                    <div className="px-[20px] pb-4">
-                      <div className="grid grid-cols-2 gap-[12px]">
+                    {/* Near you offer cards — horizontal scroll */}
+                    <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                      <div className="flex gap-[12px]" style={{ paddingLeft: 20, paddingRight: 8 }}>
                         {filteredOffers.map(renderOfferCard)}
                       </div>
                     </div>
@@ -1775,8 +1776,8 @@ export default function CreatorApp() {
                       <h2 className="text-[18px] font-display font-normal text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
-                    <div className="px-[20px] pb-4">
-                      <div className="grid grid-cols-2 gap-[12px]">
+                    <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                      <div className="flex gap-[12px]" style={{ paddingLeft: 20, paddingRight: 8 }}>
                         {filteredOffers.slice().reverse().map(renderOfferCard)}
                       </div>
                     </div>

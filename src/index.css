@@ -36,4 +36,8 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--mid);
   }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
 }
