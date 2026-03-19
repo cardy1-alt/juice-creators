@@ -237,7 +237,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               </div>
 
               <h1
-                className="text-[28px] font-extrabold text-[var(--near-black)] text-center"
+                className="text-[28px] font-display font-normal text-[var(--near-black)] text-center"
                 style={{ letterSpacing: '-0.5px' }}
               >
                 Welcome to nayba
@@ -275,7 +275,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                className="text-[24px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Here's how it works
@@ -328,7 +328,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                className="text-[24px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Polish your profile
@@ -415,7 +415,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-extrabold text-[var(--near-black)]"
+                className="text-[24px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Create your offer
@@ -453,13 +453,13 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               {offerType && offerType !== 'discount' && (
                 <div className="mt-[20px]">
                   <div className="flex items-baseline gap-[8px] mb-[4px]">
-                    <span className="text-[20px] font-extrabold text-[var(--near-black)]">Free</span>
+                    <span className="text-[20px] font-display font-normal text-[var(--near-black)]">Free</span>
                     <input
                       type="text"
                       value={offerItem}
                       onChange={e => setOfferItem(e.target.value.slice(0, 60))}
                       placeholder={getCategoryPlaceholder(profile.category, offerType)}
-                      className="flex-1 text-[20px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-extrabold"
+                      className="flex-1 text-[20px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-normal"
                       autoFocus
                     />
                   </div>
@@ -484,7 +484,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           setDiscountAmount(val);
                         }
                       }}
-                      className="text-[40px] font-extrabold text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                      className="text-[40px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
                       style={{ width: '100px' }}
                       autoFocus
                     />
@@ -533,7 +533,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                         >
                           <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
                         </button>
-                        <span className="text-[48px] font-extrabold text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
+                        <span className="text-[48px] font-display font-normal text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
                           {monthlySlots}
                         </span>
                         <button
@@ -617,7 +617,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             </div>
 
             <h1
-              className="text-[32px] font-extrabold text-[var(--near-black)] text-center mt-[28px]"
+              className="text-[32px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
               style={{ letterSpacing: '-0.8px' }}
             >
               You're live.

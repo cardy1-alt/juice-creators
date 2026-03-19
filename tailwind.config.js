@@ -4,7 +4,8 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        display: ['Fraunces', 'serif'],
+        sans: ['Inter', 'sans-serif'],
       },
       colors: {
         nayba: {

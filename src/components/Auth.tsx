@@ -537,7 +537,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[19px] font-extrabold text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
+              <h2 className="text-[19px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
