@@ -817,14 +817,14 @@ export default function CreatorApp() {
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p className="text-[18px] font-semibold text-[var(--near-black)] text-center">{qrOfferTitle}</p>
+              <p style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 22, color: '#222222', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
               <p className="text-[14px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
               {isReelDue && (
                 <div
                   className="relative flex items-center mt-[20px]"
-                  style={{ width: 240, height: 42, background: 'var(--bg)', borderRadius: 50, padding: 3 }}
+                  style={{ width: 240, height: 42, background: '#F0EDE8', borderRadius: 50, padding: 3 }}
                 >
                   {/* Sliding active indicator */}
                   <div
@@ -833,8 +833,7 @@ export default function CreatorApp() {
                       width: 'calc(50% - 3px)',
                       height: 36,
                       borderRadius: 50,
-                      background: 'white',
-                      boxShadow: '0 1px 3px rgba(34,34,34,0.12)',
+                      background: '#222222',
                       left: activeTab === 'pass' ? 3 : 'calc(50%)',
                       transition: 'all 0.2s ease',
                     }}
@@ -842,14 +841,14 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setQrScreenTab('pass')}
                     className="relative flex-1 text-center text-[14px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? 'var(--near-black)' : 'var(--mid)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(34,34,34,0.68)', borderRadius: 50 }}
                   >
                     Show pass
                   </button>
                   <button
                     onClick={() => setQrScreenTab('reel')}
                     className="relative flex-1 text-center text-[14px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? 'var(--near-black)' : 'var(--mid)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(34,34,34,0.68)', borderRadius: 50 }}
                   >
                     Submit reel
                   </button>
@@ -863,20 +862,20 @@ export default function CreatorApp() {
                     token={qrClaim.qr_token}
                     claimId={qrClaim.id}
                     creatorCode={userProfile.code}
-                    size={280}
+                    size={240}
                     hideExtras
                   />
                   {/* Ref code pill — single instance */}
                   <span
-                    className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#222222] inline-block rounded-full px-[20px] py-[8px] mt-[16px]"
-                    style={{ background: '#F0EDE8' }}
+                    className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[#222222] inline-block rounded-full mt-[20px]"
+                    style={{ background: '#F0EDE8', padding: '10px 20px' }}
                   >
                     {userProfile.code}
                   </span>
                   {/* Refresh countdown */}
-                  <p className="text-[13px] text-[var(--mid)] mt-[10px]">Auto-refreshes every 30s</p>
+                  <p className="text-[13px] text-[var(--mid)] mt-[12px]">Auto-refreshes every 30s</p>
                   {/* Level badge */}
-                  <div className="mt-[10px]">
+                  <div className="mt-[20px]">
                     <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
                   </div>
                 </div>
@@ -884,16 +883,16 @@ export default function CreatorApp() {
 
               {/* === SUBMIT REEL STATE === */}
               {activeTab === 'reel' && isReelDue && (
-                <div className="flex flex-col w-full" style={{ marginTop: 24 }}>
+                <div className="flex flex-col w-full" style={{ marginTop: 24, minHeight: '75vh' }}>
                   {/* Timer block */}
-                  <div style={{ background: 'var(--bg)', borderRadius: 12, padding: 16 }}>
+                  <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
                     <div className="flex items-center gap-[8px]">
                       <Clock className="w-[16px] h-[16px] text-[var(--mid)]" />
-                      <span className="text-[16px] font-semibold text-[var(--near-black)]">
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 16, color: '#222222' }}>
                         {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
                       </span>
                     </div>
-                    <p className="text-[14px] text-[var(--mid)] mt-[8px]" style={{ lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
                       Post your reel within this window — it must genuinely feature the business.
                     </p>
                   </div>
@@ -946,11 +945,14 @@ export default function CreatorApp() {
                     ) : 'Submit reel →'}
                   </button>
 
+                  {/* Spacer to fill remaining card height */}
+                  <div style={{ flexGrow: 1 }} />
+
                   {/* Report link */}
                   <button
                     onClick={() => setDisputeClaimId(qrClaim.id)}
                     className="w-full text-center text-[13px] text-[var(--mid)] underline min-h-[44px]"
-                    style={{ marginTop: 12 }}
+                    style={{ marginTop: 16 }}
                   >
                     Report an issue
                   </button>
@@ -1123,11 +1125,20 @@ export default function CreatorApp() {
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
-                {/* B) What you get */}
-                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
-                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 15, color: '#222222', lineHeight: 1.5, marginBottom: 20 }}>
-                  {offer.generated_title || offer.description}
-                </p>
+                {/* B) What you get — hidden when identical to offer title */}
+                {(() => {
+                  const offerHeadline = offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description);
+                  const whatYouGet = offer.generated_title || offer.description;
+                  if (offerHeadline === whatYouGet) return null;
+                  return (
+                    <>
+                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
+                      <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 15, color: '#222222', lineHeight: 1.5, marginBottom: 20 }}>
+                        {whatYouGet}
+                      </p>
+                    </>
+                  );
+                })()}
 
                 {/* C) What to post */}
                 <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
