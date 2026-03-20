@@ -1103,8 +1103,8 @@ export default function CreatorApp() {
             <div className="flex-1 overflow-y-auto bg-[#F7F4F0]">
               <div className="p-[20px]">
                 {/* A) Business name + category */}
-                <h2 className="text-[22px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.5px' }}>{offer.businesses.name}</h2>
-                <p className="text-[14px] text-[var(--mid)] mt-1">{offer.businesses.category}</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: 'rgba(34,34,34,0.68)', margin: 0 }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', marginTop: 4 }}>{offer.businesses.category}</p>
 
                 {/* Level requirement banner */}
                 {detailIsLocked && (
@@ -1118,24 +1118,24 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p className="text-[20px] font-display font-normal text-[var(--near-black)] mt-3" style={{ letterSpacing: '-0.4px' }}>
+                <p style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 28, color: '#222222', marginTop: 8, marginBottom: 8 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
                 {/* B) What you get */}
-                <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT YOU GET</p>
-                <p className="text-[16px] font-semibold text-[var(--near-black)] leading-[1.5] mb-5">
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 15, color: '#222222', lineHeight: 1.5, marginBottom: 20 }}>
                   {offer.generated_title || offer.description}
                 </p>
 
                 {/* C) What to post */}
-                <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">WHAT TO POST</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
                 <div className="flex items-center gap-2 mb-2">
                   <Video className="w-5 h-5 text-[var(--terra)]" />
-                  <span className="text-[15px] font-bold text-[var(--near-black)]">One Instagram Reel</span>
+                  <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 15, color: '#222222' }}>One Instagram Reel</span>
                 </div>
-                <p className="text-[13px] text-[var(--mid)] mb-3">Post within 48 hours of your visit</p>
+                <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)', marginBottom: 12 }}>Post within 48 hours of your visit</p>
                 <div className="flex flex-col gap-2.5 mb-5">
                   {[
                     'Post within 48 hours of your visit',
@@ -1144,7 +1144,7 @@ export default function CreatorApp() {
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
                       <Check className="w-[13px] h-[13px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
-                      <span className="text-[13px] text-[var(--mid)]">{item}</span>
+                      <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)' }}>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -1152,7 +1152,7 @@ export default function CreatorApp() {
                 {/* D) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
                   <div className="mb-5">
-                    <p className="text-[10px] font-bold text-[var(--soft)] uppercase tracking-[0.8px] mb-2">THEY'D LOVE IF YOU…</p>
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 11, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>THEY'D LOVE IF YOU…</p>
                     <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
                       <p className="text-[14px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
                     </div>
@@ -1163,13 +1163,13 @@ export default function CreatorApp() {
                 <div className="flex items-center justify-between rounded-[12px] bg-[var(--bg)] px-[16px] py-[12px]">
                   <div className="flex items-center gap-2">
                     <Users className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    <span className="text-[14px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--near-black)' }}>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#222222' }}>
                       {isUnlimited ? 'Open availability' : full ? 'Sold out' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Clock className="w-[14px] h-[14px] text-[var(--mid)]" />
-                    <span className="text-[14px] font-semibold text-[var(--near-black)]">48hrs to post</span>
+                    <span style={{ fontFamily: 'Inter, sans-serif', fontWeight: 500, fontSize: 14, color: '#222222' }}>48hrs to post</span>
                   </div>
                 </div>
               </div>
