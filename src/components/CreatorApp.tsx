@@ -2067,7 +2067,8 @@ export default function CreatorApp() {
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
-                                      className="px-4 py-2 rounded-full text-white text-[14px] font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
+                                      className="px-4 py-2 rounded-full text-white text-[14px] font-semibold hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
+                                      style={{ background: reelUrl ? '#B8523A' : 'rgba(196,103,74,0.4)' }}
                                     >
                                       Submit
                                     </button>
@@ -2085,8 +2086,29 @@ export default function CreatorApp() {
                                 </div>
                               )}
 
+                              {/* What makes a good reel? */}
+                              {claim.status === 'redeemed' && !claim.reel_url && (
+                                <div style={{ marginTop: 4 }}>
+                                  <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, color: '#222222', margin: 0 }}>
+                                    What makes a good reel?
+                                  </p>
+                                  <ul style={{ margin: '10px 0 0', padding: 0, listStyle: 'none' }}>
+                                    {[
+                                      'Show the space clearly',
+                                      'Tag the business',
+                                      'Post within 48 hours of your visit',
+                                    ].map((tip) => (
+                                      <li key={tip} className="flex items-start gap-2 text-[13px] text-[var(--mid)]" style={{ marginTop: 6, lineHeight: 1.5 }}>
+                                        <span style={{ color: 'var(--terra)', marginTop: 1 }}>•</span>
+                                        {tip}
+                                      </li>
+                                    ))}
+                                  </ul>
+                                </div>
+                              )}
+
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center text-[12px]" style={{ marginTop: 16, paddingBottom: 10 }}>
+                              <div className="flex items-center justify-center text-[12px]" style={{ borderTop: '1px solid rgba(34,34,34,0.08)', marginTop: 16, paddingTop: 12, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span className="text-[var(--mid)]">Release this slot?</span>
