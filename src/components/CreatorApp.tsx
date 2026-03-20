@@ -942,37 +942,18 @@ export default function CreatorApp() {
                         <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Submitting…
                       </>
-                    ) : 'Submit Now →'}
+                    ) : 'Submit'}
                   </button>
 
-                  {/* Report link — card footer */}
-                  <div style={{ borderTop: '1px solid rgba(34,34,34,0.08)', marginTop: 20, paddingTop: 12, textAlign: 'center' }}>
-                    <button
-                      onClick={() => setDisputeClaimId(qrClaim.id)}
-                      className="text-[12px] text-[var(--mid)] underline min-h-[44px]"
-                    >
-                      Report an issue
-                    </button>
-                  </div>
-
-                  {/* What makes a good reel? */}
-                  <div style={{ marginTop: 24 }}>
-                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, color: '#222222', margin: 0 }}>
-                      What makes a good reel?
-                    </p>
-                    <ul style={{ margin: '10px 0 0', padding: 0, listStyle: 'none' }}>
-                      {[
-                        'Show the space clearly',
-                        'Tag the business',
-                        'Post within 48 hours of your visit',
-                      ].map((tip) => (
-                        <li key={tip} className="flex items-start gap-2 text-[13px] text-[var(--mid)]" style={{ marginTop: 6, lineHeight: 1.5 }}>
-                          <span style={{ color: 'var(--terra)', marginTop: 1 }}>•</span>
-                          {tip}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  {/* Spacer + report link */}
+                  <div style={{ flexGrow: 1 }} />
+                  <button
+                    onClick={() => setDisputeClaimId(qrClaim.id)}
+                    className="w-full text-center text-[12px] text-[var(--soft)] min-h-[44px]"
+                    style={{ marginTop: 24 }}
+                  >
+                    Report an issue
+                  </button>
                 </div>
               )}
             </div>
@@ -2053,9 +2034,12 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-white border border-[var(--faint)]">
-                                  <label className="block mb-2" style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 22, color: '#222222' }}>
+                                  <label className="block mb-1" style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 22, color: '#222222' }}>
                                     Submit Your Reel
                                   </label>
+                                  <p className="text-[13px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>
+                                    Show the space, tag the business, and post within 48 h.
+                                  </p>
                                   <div className="flex gap-2">
                                     <input
                                       type="url"
@@ -2067,8 +2051,8 @@ export default function CreatorApp() {
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
-                                      className="px-4 py-2 rounded-full text-white text-[14px] font-semibold hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
-                                      style={{ background: reelUrl ? '#B8523A' : 'rgba(196,103,74,0.4)' }}
+                                      className="px-5 py-2 rounded-full text-white text-[14px] font-semibold disabled:opacity-40 transition-all min-h-[48px]"
+                                      style={{ background: '#B8523A' }}
                                     >
                                       Submit
                                     </button>
@@ -2086,29 +2070,8 @@ export default function CreatorApp() {
                                 </div>
                               )}
 
-                              {/* What makes a good reel? */}
-                              {claim.status === 'redeemed' && !claim.reel_url && (
-                                <div style={{ marginTop: 4 }}>
-                                  <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, color: '#222222', margin: 0 }}>
-                                    What makes a good reel?
-                                  </p>
-                                  <ul style={{ margin: '10px 0 0', padding: 0, listStyle: 'none' }}>
-                                    {[
-                                      'Show the space clearly',
-                                      'Tag the business',
-                                      'Post within 48 hours of your visit',
-                                    ].map((tip) => (
-                                      <li key={tip} className="flex items-start gap-2 text-[13px] text-[var(--mid)]" style={{ marginTop: 6, lineHeight: 1.5 }}>
-                                        <span style={{ color: 'var(--terra)', marginTop: 1 }}>•</span>
-                                        {tip}
-                                      </li>
-                                    ))}
-                                  </ul>
-                                </div>
-                              )}
-
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center text-[12px]" style={{ borderTop: '1px solid rgba(34,34,34,0.08)', marginTop: 16, paddingTop: 12, paddingBottom: 10 }}>
+                              <div className="flex items-center justify-center text-[12px]" style={{ marginTop: 16, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span className="text-[var(--mid)]">Release this slot?</span>
