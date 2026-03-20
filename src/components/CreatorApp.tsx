@@ -1907,9 +1907,10 @@ export default function CreatorApp() {
                           }}
                           className={`whitespace-nowrap text-[12px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
                             isSelected
-                              ? 'bg-[var(--near-black)] text-white'
-                              : 'bg-[#F0EFED] text-[var(--mid)]'
+                              ? 'bg-[#222222] text-[#FFFFFF]'
+                              : 'text-[rgba(34,34,34,0.68)]'
                           }`}
+                          style={!isSelected ? { background: '#F0EDE8' } : undefined}
                           style={{ height: '32px' }}
                         >
                           {claim.businesses.name}
@@ -1962,7 +1963,7 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] px-5 pt-4 pb-2">
+                            <div className="bg-white rounded-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
 
                               {/* Offer title — one line */}
                               <p className="text-[14px] font-semibold text-[#1A1A1A] truncate mb-[10px]">{offerTitle}</p>
@@ -2005,7 +2006,7 @@ export default function CreatorApp() {
                                     claimId={claim.id}
                                     creatorCode={userProfile.code}
                                   />
-                                  <div className="flex items-center justify-center gap-2 mt-3">
+                                  <div className="flex items-center justify-center gap-2" style={{ marginTop: 20 }}>
                                     <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
                                     {userProfile.profile_complete && (
                                       <BadgeCheck className="w-[14px] h-[14px] text-[var(--forest)]" title="Verified creator" />
@@ -2016,18 +2017,17 @@ export default function CreatorApp() {
 
                               {/* Reel Countdown/Prompt */}
                               {claim.redeemed_at && !claim.reel_url && (
-                                <div className={`p-4 rounded-[12px] border ${
-                                  isOverdue
-                                    ? 'bg-[var(--terra-10)] border-[var(--terra-20)]'
-                                    : 'bg-amber-50/60 border-amber-200'
-                                }`}>
+                                <div className="p-4 rounded-[12px]" style={{
+                                  border: isOverdue ? '1.5px solid var(--terra-20)' : '1.5px solid #F5C4A0',
+                                  background: isOverdue ? 'var(--terra-10)' : 'rgba(245,196,160,0.12)',
+                                }}>
                                   <div className="flex items-center gap-2 mb-2">
                                     <Clock className={`w-4 h-4 ${isOverdue ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-                                    <p className={`text-[14px] font-bold ${isOverdue ? 'text-[var(--terra)]' : 'text-[var(--near-black)]'}`}>
+                                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 16, color: isOverdue ? 'var(--terra)' : '#222222', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
-                                  <p className="text-[13px] text-[var(--mid)]">
+                                  <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)', margin: 0 }}>
                                     You have 48 hours to post your reel — it must genuinely feature the business.
                                   </p>
                                 </div>
@@ -2036,7 +2036,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-white border border-[var(--faint)]">
-                                  <label className="block text-[14px] font-semibold text-[var(--near-black)] mb-2">
+                                  <label className="block mb-2" style={{ fontFamily: 'Fraunces, serif', fontWeight: 400, fontSize: 22, color: '#222222' }}>
                                     Submit Your Reel
                                   </label>
                                   <div className="flex gap-2">
@@ -2069,7 +2069,7 @@ export default function CreatorApp() {
                               )}
 
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center py-[10px] text-[12px]">
+                              <div className="flex items-center justify-center text-[12px]" style={{ marginTop: 16, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span className="text-[var(--mid)]">Release this slot?</span>

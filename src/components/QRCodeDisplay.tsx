@@ -328,14 +328,14 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-3 rounded-[16px] bg-[#F7F4F0] p-[16px]">
-      {/* QR code — 220px */}
+    <div className="flex flex-col items-center gap-[20px] rounded-[16px] bg-[#F7F4F0] p-[16px]">
+      {/* QR code — 240px */}
       <div className="inline-block rounded-[10px] overflow-hidden">
         <img
           src={qrDataUrl}
           alt="QR Code"
           className="block"
-          style={{ width: `${displaySize || 220}px`, height: `${displaySize || 220}px` }}
+          style={{ width: `${displaySize || 240}px`, height: `${displaySize || 240}px` }}
         />
       </div>
 
@@ -343,13 +343,14 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
         <>
           {/* Creator code badge */}
           <span
-            className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)] px-[20px] py-[8px]"
+            className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)]"
+            style={{ padding: '10px 20px' }}
           >
             {creatorCode}
           </span>
 
           {/* Refresh timer */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" style={{ marginTop: 12 }}>
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
             <span className={`text-[12px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
               Refreshes in {timeLeft}s
