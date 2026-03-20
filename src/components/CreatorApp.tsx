@@ -841,14 +841,14 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setQrScreenTab('pass')}
                     className="relative flex-1 text-center text-[14px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(34,34,34,0.68)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(34,34,34,0.88)', borderRadius: 50 }}
                   >
                     Show pass
                   </button>
                   <button
                     onClick={() => setQrScreenTab('reel')}
                     className="relative flex-1 text-center text-[14px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(34,34,34,0.68)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(34,34,34,0.88)', borderRadius: 50 }}
                   >
                     Submit reel
                   </button>
@@ -893,7 +893,7 @@ export default function CreatorApp() {
                       </span>
                     </div>
                     <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
-                      Post your reel within this window — it must genuinely feature the business.
+                      Post your reel within this window — it must clearly feature the business.
                     </p>
                   </div>
 
@@ -930,7 +930,7 @@ export default function CreatorApp() {
                     disabled={loading || !isSubmitEnabled}
                     className="w-full text-white text-[16px] font-bold flex items-center justify-center gap-2 transition-all"
                     style={{
-                      background: isSubmitEnabled ? 'var(--terra)' : 'rgba(196,103,74,0.4)',
+                      background: isSubmitEnabled ? '#B8523A' : 'rgba(196,103,74,0.4)',
                       height: 52,
                       borderRadius: 50,
                       marginTop: 16,
@@ -942,20 +942,37 @@ export default function CreatorApp() {
                         <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Submitting…
                       </>
-                    ) : 'Submit reel →'}
+                    ) : 'Submit Now →'}
                   </button>
 
-                  {/* Spacer to fill remaining card height */}
-                  <div style={{ flexGrow: 1 }} />
+                  {/* Report link — card footer */}
+                  <div style={{ borderTop: '1px solid rgba(34,34,34,0.08)', marginTop: 20, paddingTop: 12, textAlign: 'center' }}>
+                    <button
+                      onClick={() => setDisputeClaimId(qrClaim.id)}
+                      className="text-[12px] text-[var(--mid)] underline min-h-[44px]"
+                    >
+                      Report an issue
+                    </button>
+                  </div>
 
-                  {/* Report link */}
-                  <button
-                    onClick={() => setDisputeClaimId(qrClaim.id)}
-                    className="w-full text-center text-[13px] text-[var(--mid)] underline min-h-[44px]"
-                    style={{ marginTop: 16 }}
-                  >
-                    Report an issue
-                  </button>
+                  {/* What makes a good reel? */}
+                  <div style={{ marginTop: 24 }}>
+                    <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 600, fontSize: 14, color: '#222222', margin: 0 }}>
+                      What makes a good reel?
+                    </p>
+                    <ul style={{ margin: '10px 0 0', padding: 0, listStyle: 'none' }}>
+                      {[
+                        'Show the space clearly',
+                        'Tag the business',
+                        'Post within 48 hours of your visit',
+                      ].map((tip) => (
+                        <li key={tip} className="flex items-start gap-2 text-[13px] text-[var(--mid)]" style={{ marginTop: 6, lineHeight: 1.5 }}>
+                          <span style={{ color: 'var(--terra)', marginTop: 1 }}>•</span>
+                          {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               )}
             </div>
@@ -2028,7 +2045,7 @@ export default function CreatorApp() {
                                     </p>
                                   </div>
                                   <p style={{ fontFamily: 'Inter, sans-serif', fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.68)', margin: 0 }}>
-                                    You have 48 hours to post your reel — it must genuinely feature the business.
+                                    You have 48 hours to post your reel — it must clearly feature the business.
                                   </p>
                                 </div>
                               )}
