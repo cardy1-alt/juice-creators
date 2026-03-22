@@ -73,10 +73,10 @@ const ICON_COMPONENTS: Record<string, any> = {
   UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Coffee, Palette, Flower2, PawPrint, GraduationCap, Wrench, Store
 };
 
-export function CategoryIcon({ category, className = "w-4 h-4" }: { category: string | undefined | null; className?: string }) {
+export function CategoryIcon({ category, className = "w-4 h-4", style }: { category: string | undefined | null; className?: string; style?: React.CSSProperties }) {
   const iconName = getCategoryIconName(category);
   const IconComponent = ICON_COMPONENTS[iconName] || Store;
-  return <IconComponent className={className} />;
+  return <IconComponent className={className} style={style} />;
 }
 
 // Category-specific dark gradients for placeholder images
@@ -112,4 +112,39 @@ export function getCategoryGradient(category: string | undefined | null): string
 
 export function getCategorySolidColor(category: string | undefined | null): string {
   return CATEGORY_SOLID_COLORS[category || ''] || '#1A4A2E';
+}
+
+// Muted pastel card backgrounds — warm tones that sit well on cream (#FFFDF8)
+const CATEGORY_PASTEL_BG: Record<string, string> = {
+  'Food & Drink': '#F5E6D8',
+  'Cafe & Coffee': '#F0E4D4',
+  'Hair & Beauty': '#F2E2EA',
+  'Wellness & Spa': '#E8E4F0',
+  'Health & Fitness': '#DEE8E4',
+  'Retail': '#E0E4EE',
+  'Arts & Entertainment': '#EDE6DA',
+  'Education': '#DDE8E0',
+  'Pets': '#EDE4D6',
+  'Services': '#E8E6E2',
+};
+
+const CATEGORY_PASTEL_ICON: Record<string, string> = {
+  'Food & Drink': '#9E7A5A',
+  'Cafe & Coffee': '#9E7A5A',
+  'Hair & Beauty': '#A06A82',
+  'Wellness & Spa': '#7A6A98',
+  'Health & Fitness': '#5A8A72',
+  'Retail': '#5A6A8E',
+  'Arts & Entertainment': '#8E7A52',
+  'Education': '#4A7A5E',
+  'Pets': '#8E7244',
+  'Services': '#6E6A62',
+};
+
+export function getCategoryPastelBg(category: string | undefined | null): string {
+  return CATEGORY_PASTEL_BG[category || ''] || '#E8E6E2';
+}
+
+export function getCategoryPastelIcon(category: string | undefined | null): string {
+  return CATEGORY_PASTEL_ICON[category || ''] || '#6E6A62';
 }
