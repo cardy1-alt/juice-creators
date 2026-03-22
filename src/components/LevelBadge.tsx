@@ -8,9 +8,9 @@ interface LevelBadgeProps {
 
 export default function LevelBadge({ level, levelName, size = 'sm' }: LevelBadgeProps) {
   const sizeStyles = {
-    sm: { fontSize: '10px', padding: '2px 8px' },
-    md: { fontSize: '12px', padding: '4px 12px' },
-    lg: { fontSize: '14px', padding: '6px 16px' },
+    sm: { fontSize: '12px', padding: '3px 10px' },
+    md: { fontSize: '14px', padding: '5px 14px' },
+    lg: { fontSize: '16px', padding: '7px 18px' },
   };
 
   return (

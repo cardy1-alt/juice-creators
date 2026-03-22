@@ -14,20 +14,20 @@ import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedE
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
-      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]">Pending</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
+      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Live</span>
-      : <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]">Paused</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Live</span>
+      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]">Paused</span>;
   }
   const styles: Record<string, string> = {
     active: 'bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]',
     redeemed: 'bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]',
     expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
   };
-  return <span className={`text-[11px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]'}`}>{status}</span>;
+  return <span className={`text-[13px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]'}`}>{status}</span>;
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
@@ -210,7 +210,7 @@ export default function AdminDashboard() {
                 <Logo size={24} />
               </div>
               <div>
-                <p className="text-xs text-[var(--mid)]">Admin Dashboard</p>
+                <p className="text-sm text-[var(--mid)]">Admin Dashboard</p>
               </div>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
@@ -225,14 +225,14 @@ export default function AdminDashboard() {
             <button
               key={tab.key}
               onClick={() => setView(tab.key)}
-              className={`flex items-center gap-2 px-5 py-3.5 text-sm font-semibold whitespace-nowrap transition-all relative ${
+              className={`flex items-center gap-2 px-5 py-3.5 text-base font-semibold whitespace-nowrap transition-all relative ${
                 view === tab.key ? 'text-[var(--near-black)]' : 'text-[var(--soft)] hover:text-[var(--mid)]'
               }`}
             >
               <div className="relative">
                 <tab.icon className="w-4 h-4" />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[8px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[12px] font-bold flex items-center justify-center">
                     {tab.badge}
                   </span>
                 ) : null}
@@ -245,12 +245,12 @@ export default function AdminDashboard() {
 
         <div className="p-6">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[13px] text-[var(--terra)] font-medium">
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[15px] text-[var(--terra)] font-medium">
               {fetchError}
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] border text-[13px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,74,46,0.06)] border-[rgba(26,74,46,0.12)] text-[var(--forest)]'}`}>
+            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,74,46,0.06)] border-[rgba(26,74,46,0.12)] text-[var(--forest)]'}`}>
               {actionFeedback.text}
             </div>
           )}
@@ -259,7 +259,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[16px] p-5 border border-[var(--terra-20)]">
-                  <h3 className="text-sm font-bold text-[var(--near-black)] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base font-bold text-[var(--near-black)] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
                         <Users className="w-6 h-6" />
                         <div className="text-left">
                           <p className="text-lg font-bold text-[var(--near-black)]">{stats.pendingCreators}</p>
-                          <p className="text-[10px] text-[var(--mid)] font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
                         </div>
                       </button>
                     )}
@@ -281,7 +281,7 @@ export default function AdminDashboard() {
                         <Store className="w-6 h-6" />
                         <div className="text-left">
                           <p className="text-lg font-bold text-[var(--near-black)]">{stats.pendingBusinesses}</p>
-                          <p className="text-[10px] text-[var(--mid)] font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
                         </div>
                       </button>
                     )}
@@ -293,7 +293,7 @@ export default function AdminDashboard() {
                   <div key={i} className="bg-white rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
                     <div className="mb-3"><stat.icon className="w-6 h-6 text-[var(--mid)]" /></div>
                     <p className="text-3xl font-bold text-[var(--near-black)]">{stat.value}</p>
-                    <p className="text-xs text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
+                    <p className="text-sm text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -304,46 +304,46 @@ export default function AdminDashboard() {
           {view === 'creators' && (
             <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {creators.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No creators yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No creators yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Name</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Handle</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Followers</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Code</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Name</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Handle</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Followers</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Code</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[var(--near-black)]">
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]">
                             <span className="mr-2">{creator.name}</span>
                             {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)]">{creator.instagram_handle}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {creator.follower_count ? (
-                              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]">{creator.follower_count}</span>
+                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]">{creator.follower_count}</span>
                             ) : (
-                              <span className="text-xs text-[var(--soft)]">—</span>
+                              <span className="text-sm text-[var(--soft)]">—</span>
                             )}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[#FFFFFF]">{creator.code}</span></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)]">{creator.email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-sm font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[#FFFFFF]">{creator.code}</span></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{creator.email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
+                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Revoke
                               </button>
                             )}
@@ -361,17 +361,17 @@ export default function AdminDashboard() {
           {view === 'businesses' && (
             <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No businesses yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No businesses yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Slug</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Slug</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
@@ -380,19 +380,19 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
                               <CategoryIcon category={business.category} className="w-5 h-5" />
-                              <span className="text-sm font-medium text-[var(--near-black)]">{business.name}</span>
+                              <span className="text-base font-medium text-[var(--near-black)]">{business.name}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)] font-mono">{business.slug}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)]">{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{business.owner_email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <CheckCircle2 className="w-3 h-3" /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
+                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Revoke
                               </button>
                             )}
@@ -410,7 +410,7 @@ export default function AdminDashboard() {
           {view === 'offers' && (
             <>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Package className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Package className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
@@ -419,11 +419,11 @@ export default function AdminDashboard() {
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="font-bold text-sm text-[var(--near-black)]">{offer.businesses.name}</h3>
+                            <h3 className="font-bold text-base text-[var(--near-black)]">{offer.businesses.name}</h3>
                             <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
-                          <p className="text-[var(--mid)] text-sm mt-1">{offer.description}</p>
-                          <p className="text-xs text-[var(--soft)] mt-1">Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
+                          <p className="text-[var(--mid)] text-base mt-1">{offer.description}</p>
+                          <p className="text-sm text-[var(--soft)] mt-1">Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
                         </div>
                       </div>
                     </div>
@@ -437,35 +437,35 @@ export default function AdminDashboard() {
           {view === 'claims' && (
             <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {claims.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No claims yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No claims yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Creator</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Claimed</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Creator</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Claimed</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[var(--near-black)]">{claim.creators.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]">{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <CategoryIcon category={claim.businesses.category} className="w-4 h-4" />
-                              <span className="text-sm text-[var(--mid)]">{claim.businesses.name}</span>
+                              <span className="text-base text-[var(--mid)]">{claim.businesses.name}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-sm text-[var(--mid)]">{new Date(claim.claimed_at).toLocaleDateString()}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{new Date(claim.claimed_at).toLocaleDateString()}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-[12px] text-xs font-semibold border border-[var(--faint)] text-[var(--near-black)] bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              className="px-2.5 py-1 rounded-[12px] text-sm font-semibold border border-[var(--faint)] text-[var(--near-black)] bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
@@ -474,7 +474,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {claim.status === 'active' && (
-                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-xs bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
+                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
                                 <XCircle className="w-3 h-3" /> Expire
                               </button>
                             )}
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
                 <h2 className="text-lg font-bold text-[var(--near-black)] mb-5">Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
-                    <label htmlFor="currentPassword" className="block text-sm font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
                       Current Password
                     </label>
                     <input
@@ -504,12 +504,12 @@ export default function AdminDashboard() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Enter current password"
                     />
                   </div>
                   <div>
-                    <label htmlFor="newPassword" className="block text-sm font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="newPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
                       New Password
                     </label>
                     <input
@@ -519,12 +519,12 @@ export default function AdminDashboard() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Enter new password (min 8 characters)"
                     />
                   </div>
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="confirmPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
                       Confirm New Password
                     </label>
                     <input
@@ -534,13 +534,13 @@ export default function AdminDashboard() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-sm bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Confirm new password"
                     />
                   </div>
                   {passwordMessage && (
                     <div
-                      className={`p-3 rounded-[12px] text-[13px] font-medium ${
+                      className={`p-3 rounded-[12px] text-[15px] font-medium ${
                         passwordMessage.type === 'success'
                           ? 'bg-[rgba(26,74,46,0.06)] text-[var(--forest)] border border-[rgba(26,74,46,0.12)]'
                           : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
@@ -551,7 +551,7 @@ export default function AdminDashboard() {
                   )}
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-[var(--terra)] text-[#FFFFFF] rounded-full font-semibold text-sm hover:bg-[var(--terra-hover)] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[var(--terra)] text-[#FFFFFF] rounded-full font-semibold text-base hover:bg-[var(--terra-hover)] transition-colors"
                   >
                     Update Password
                   </button>
