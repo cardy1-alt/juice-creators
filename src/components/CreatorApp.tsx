@@ -6,7 +6,7 @@ import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import LevelBadge from './LevelBadge';
-import { getCategoryGradient, getCategorySolidColor, CategoryIcon } from '../lib/categories';
+import { getCategoryGradient, getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
 import { uploadAvatar } from '../lib/upload';
@@ -109,16 +109,16 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[var(--terra)] text-white',
-    claimed: 'bg-[var(--terra)] text-white',
+    active: 'bg-[var(--near-black)] text-white',
+    claimed: 'bg-[var(--near-black)] text-white',
     redeemed: 'bg-[var(--bg)] text-[var(--near-black)]',
     visited: 'bg-[var(--bg)] text-[var(--near-black)]',
-    reel_due: 'bg-[var(--terra)] text-white',
+    reel_due: 'bg-[var(--near-black)] text-white',
     submitted: 'bg-emerald-500 text-white',
-    expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
+    expired: 'bg-[rgba(26,26,26,0.06)] text-[var(--soft)] border border-[rgba(26,26,26,0.1)]',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
     completed: 'bg-[var(--bg)] text-[var(--mid)]',
-    disputed: 'bg-[var(--terra-10)] text-[var(--terra)]',
+    disputed: 'bg-[rgba(26,26,26,0.06)] text-[var(--soft)]',
   };
   return (
     <span className={`text-[13px] px-2.5 py-1 rounded-[6px] font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
@@ -134,17 +134,17 @@ function formatDate(dateStr: string): string {
 }
 
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
-function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
+function getSlotsBadgeStyle(slotsLeft: number, _totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(26,26,26,0.07)', color: 'rgba(26,26,26,0.4)', text: 'Full' };
+    return { background: 'rgba(26,26,26,0.06)', color: 'rgba(26,26,26,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: 'Last slot' };
+    return { background: 'rgba(26,26,26,0.08)', color: 'var(--near-black)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
+    return { background: 'rgba(26,26,26,0.08)', color: 'var(--near-black)', text: `${slotsLeft} left` };
   }
-  return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
+  return { background: 'rgba(26,26,26,0.06)', color: 'var(--mid)', text: `${slotsLeft} left` };
 }
 
 export default function CreatorApp() {
@@ -679,10 +679,10 @@ export default function CreatorApp() {
 
   const activeUrgency = getActiveUrgency();
   const activeBadgeColor = activeUrgency === 'overdue'
-    ? 'bg-[var(--terra)]'
+    ? 'bg-[var(--near-black)]'
     : activeUrgency === 'soon'
     ? 'bg-amber-500'
-    : 'bg-[var(--terra)]';
+    : 'bg-[var(--near-black)]';
 
   const foodCategories = ['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'];
   const beautyCategories = ['salon', 'spa', 'beauty', 'nails', 'hair', 'skincare', 'barbershop', 'wellness'];
@@ -754,7 +754,7 @@ export default function CreatorApp() {
       )}
 
       {redeemToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--terra)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--near-black)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
           <Check className="w-4 h-4" />
           {redeemToast}
         </div>
@@ -779,7 +779,7 @@ export default function CreatorApp() {
             </p>
             <button
               onClick={() => setShowLevelUpOverlay(null)}
-              className="w-full py-[14px] rounded-[50px] font-bold text-[18px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
+              className="w-full py-[14px] rounded-[50px] font-bold text-[18px] bg-[var(--near-black)] text-white hover:opacity-90 transition-all min-h-[48px]"
             >
               Keep going →
             </button>
@@ -909,11 +909,11 @@ export default function CreatorApp() {
                       placeholder="https://instagram.com/reel/"
                       className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
                       style={{ background: 'white', border: '1.5px solid rgba(26,26,26,0.15)', borderRadius: 12, padding: '14px 16px', ...(reelUrl ? {} : {}), }}
-                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--terra)'; }}
+                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--near-black)'; }}
                       onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(26,26,26,0.15)'; }}
                     />
                     {reelError ? (
-                      <p className="text-[15px] text-[var(--terra)] mt-[8px]">Please check the URL and try again.</p>
+                      <p className="text-[15px] text-[var(--mid)] mt-[8px]">Please check the URL and try again.</p>
                     ) : (
                       <p className="text-[14px] text-[var(--soft)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
                     )}
@@ -930,7 +930,7 @@ export default function CreatorApp() {
                     disabled={loading || !isSubmitEnabled}
                     className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all"
                     style={{
-                      background: isSubmitEnabled ? '#B8523A' : 'rgba(222,78,12,0.4)',
+                      background: isSubmitEnabled ? '#1A1A1A' : 'rgba(26,26,26,0.3)',
                       height: 52,
                       borderRadius: 50,
                       marginTop: 16,
@@ -976,7 +976,7 @@ export default function CreatorApp() {
             .confetti-piece { animation: none !important; display: none; }
           }
         `;
-        const confettiColors = ['#CB4A2F', '#F5C4A0', '#C8B8F0', '#F4A8C0'];
+        const confettiColors = ['#1A4A2E', '#F5C4A0', '#C8B8F0', '#F4A8C0'];
         const confettiPieces = Array.from({ length: 30 }, (_, i) => ({
           id: i,
           left: Math.random() * 100,
@@ -1040,7 +1040,7 @@ export default function CreatorApp() {
             <button
               onClick={() => { setShowReelCelebration(null); setView('offers'); }}
               className="mt-[32px] px-[32px] py-[14px] rounded-full text-white text-[17px] font-bold min-h-[48px]"
-              style={{ background: 'var(--terra)' }}
+              style={{ background: 'var(--near-black)' }}
             >
               Back to explore
             </button>
@@ -1141,7 +1141,7 @@ export default function CreatorApp() {
                 {/* C) What to post */}
                 <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 13, color: 'rgba(26,26,26,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
                 <div className="flex items-center gap-2 mb-2">
-                  <Video className="w-5 h-5 text-[var(--terra)]" />
+                  <Video className="w-5 h-5 text-[var(--near-black)]" />
                   <span style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 17, color: '#1A1A1A' }}>One Instagram Reel</span>
                 </div>
                 <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 400, fontSize: 16, color: 'rgba(26,26,26,0.68)', marginBottom: 12 }}>Post within 48 hours of your visit</p>
@@ -1152,7 +1152,7 @@ export default function CreatorApp() {
                     'Submit your reel link in the app',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
-                      <Check className="w-[13px] h-[13px] text-[var(--terra)] mt-[2px] flex-shrink-0" />
+                      <Check className="w-[13px] h-[13px] text-[var(--mid)] mt-[2px] flex-shrink-0" />
                       <span style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 400, fontSize: 16, color: 'rgba(26,26,26,0.68)' }}>{item}</span>
                     </div>
                   ))}
@@ -1162,7 +1162,7 @@ export default function CreatorApp() {
                 {offer.specific_ask && (
                   <div className="mb-5">
                     <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 13, color: 'rgba(26,26,26,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>THEY'D LOVE IF YOU…</p>
-                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(222,78,12,0.06)' }}>
+                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(26,26,26,0.04)' }}>
                       <p className="text-[18px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
                     </div>
                   </div>
@@ -1234,7 +1234,7 @@ export default function CreatorApp() {
                       <button
                         onClick={() => setWaitlistConfirmLeave(offer.id)}
                         className="px-[22px] py-[12px] rounded-full text-[18px] font-semibold min-h-[48px] flex items-center gap-1"
-                        style={{ border: '1.5px solid var(--terra)', color: 'var(--terra)', background: 'rgba(222,78,12,0.04)' }}
+                        style={{ border: '1.5px solid var(--near-black)', color: 'var(--near-black)', background: 'rgba(26,26,26,0.03)' }}
                       >
                         On waitlist <Check className="w-4 h-4" />
                       </button>
@@ -1283,8 +1283,8 @@ export default function CreatorApp() {
           {view === 'offers' && (
             <>
               {claimError && (
-                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] flex items-center justify-between">
-                  <p className="text-[15px] text-[var(--terra)]">{claimError}</p>
+                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(26,26,26,0.05)] border border-[rgba(26,26,26,0.1)] flex items-center justify-between">
+                  <p className="text-[15px] text-[var(--near-black)]">{claimError}</p>
                   <button onClick={() => setClaimError(null)} className="text-[var(--soft)] hover:text-[var(--mid)] text-[15px] font-semibold ml-3">Dismiss</button>
                 </div>
               )}
@@ -1325,7 +1325,7 @@ export default function CreatorApp() {
                         key={tab.key}
                         onClick={() => setSelectedCategory(tab.key)}
                         className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all min-h-[44px] rounded-full ${
-                          isActive ? 'bg-[var(--terra)] text-white' : 'text-[#1A1A1A]'
+                          isActive ? 'bg-[var(--near-black)] text-white' : 'text-[var(--soft)]'
                         }`}
                       >
                         <tab.icon className="w-[20px] h-[20px]" />
@@ -1349,24 +1349,24 @@ export default function CreatorApp() {
 
                 const getGiftCardStatus = (claim: Claim): { dotColor: string; text: string; timerLabel?: string } => {
                   if (claim.status === 'active') {
-                    return { dotColor: 'var(--terra)', text: 'Show at the door' };
+                    return { dotColor: 'var(--near-black)', text: 'Show at the door' };
                   }
                   if (claim.redeemed_at && !claim.reel_url) {
                     if (claim.reel_due_at) {
                       const hoursLeft = Math.max(0, Math.floor((new Date(claim.reel_due_at).getTime() - Date.now()) / (1000 * 60 * 60)));
-                      return { dotColor: 'var(--terra)', text: 'Reel due', timerLabel: `${hoursLeft}h left` };
+                      return { dotColor: 'var(--near-black)', text: 'Reel due', timerLabel: `${hoursLeft}h left` };
                     }
-                    return { dotColor: 'var(--terra)', text: 'Post your reel' };
+                    return { dotColor: 'var(--near-black)', text: 'Post your reel' };
                   }
-                  return { dotColor: 'var(--terra)', text: 'Post your reel' };
+                  return { dotColor: 'var(--near-black)', text: 'Post your reel' };
                 };
 
                 return (
                   <div style={{ marginBottom: 24 }}>
                     <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[10px]">
-                      <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
+                      <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
                       {giftCardClaims.length >= 2 && (
-                        <button onClick={() => setView('active')} className="text-[15px] font-semibold text-[var(--terra)]">
+                        <button onClick={() => setView('active')} className="text-[15px] font-semibold text-[var(--mid)]">
                           View all
                         </button>
                       )}
@@ -1450,7 +1450,7 @@ export default function CreatorApp() {
                                   {offerTitle}
                                 </p>
                                 <div className="flex items-center" style={{ gap: 6 }}>
-                                  <span className="rounded-full flex-shrink-0" style={{ background: 'var(--terra)', borderRadius: 50, padding: '4px 12px', fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 14, color: '#FFFFFF', lineHeight: 1 }}>
+                                  <span className="rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.22)', borderRadius: 50, padding: '4px 12px', fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 14, color: '#FFFFFF', lineHeight: 1 }}>
                                     {status.text}
                                   </span>
                                   {status.timerLabel && (
@@ -1489,7 +1489,7 @@ export default function CreatorApp() {
                             style={{
                               width: 6,
                               height: 6,
-                              background: idx === activePassIdx ? 'var(--terra)' : 'rgba(26,26,26,0.2)',
+                              background: idx === activePassIdx ? 'var(--near-black)' : 'rgba(26,26,26,0.2)',
                               transition: 'background 0.2s',
                             }}
                           />
@@ -1504,7 +1504,7 @@ export default function CreatorApp() {
               {!streakWarningDismissed && userProfile.current_streak > 0 && isStreakWarningPeriod(userProfile.last_reel_month) && (
                 <div
                   className="mx-[20px] mt-[14px] flex items-center gap-[10px] rounded-[12px] p-[12px_16px]"
-                  style={{ background: 'rgba(222,78,12,0.06)', border: '1px solid rgba(222,78,12,0.15)' }}
+                  style={{ background: 'rgba(26,26,26,0.04)', border: '1px solid rgba(26,26,26,0.08)' }}
                 >
                   <FlameIcon active size={16} />
                   <p className="flex-1 text-[15px] text-[var(--near-black)]">
@@ -1512,7 +1512,7 @@ export default function CreatorApp() {
                   </p>
                   <button
                     onClick={() => setView('offers')}
-                    className="text-[14px] font-semibold text-[var(--terra)] whitespace-nowrap"
+                    className="text-[14px] font-semibold text-[var(--near-black)] whitespace-nowrap"
                   >
                     Browse →
                   </button>
@@ -1541,7 +1541,7 @@ export default function CreatorApp() {
                     </span>
                   </div>
                   {leaderboard.slice(0, 5).map((entry, idx) => {
-                    const posColor = idx === 0 ? 'var(--terra)' : idx === 1 ? 'var(--near-black)' : idx === 2 ? 'var(--mid)' : 'var(--soft)';
+                    const posColor = idx === 0 ? 'var(--near-black)' : idx === 1 ? 'var(--mid)' : idx === 2 ? 'var(--soft)' : 'var(--soft)';
                     return (
                       <div
                         key={entry.id}
@@ -1585,8 +1585,8 @@ export default function CreatorApp() {
               )}
 
               {/* Section Header */}
-              <div className="flex items-center justify-between px-[20px] mt-[4px] mb-[10px]">
-                <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
+              <div className="flex items-center justify-between px-[20px] mt-[16px] mb-[10px]">
+                <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
               {offersLoading ? (
@@ -1662,7 +1662,7 @@ export default function CreatorApp() {
                       <p className="text-[var(--soft)] text-[17px]">No offers found</p>
                       <button
                         onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                        className="mt-2 text-[var(--terra)] text-[15px] font-semibold hover:underline"
+                        className="mt-2 text-[var(--mid)] text-[15px] font-semibold hover:underline"
                       >
                         Clear filters
                       </button>
@@ -1691,76 +1691,62 @@ export default function CreatorApp() {
                   const offerTitle = offer.generated_title || offer.description.slice(0, 35);
                   const bizName = offer.businesses.name;
 
+                  const pastelBg = getCategoryPastelBg(offer.businesses.category);
+                  const pastelIcon = getCategoryPastelIcon(offer.businesses.category);
+
                   return (
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[16px] bg-white border border-[#E0E0E0]"
-                      style={{ width: 160, flexShrink: 0 }}
+                      className="text-left rounded-[16px] overflow-hidden"
+                      style={{ width: 164, flexShrink: 0, background: pastelBg }}
                     >
-                      {/* Photo area */}
-                      <div className="relative overflow-hidden rounded-t-[16px]" style={{ height: 120, background: getCategoryGradient(offer.businesses.category) }}>
-                        {offer.offer_photo_url ? (
-                          <img src={offer.offer_photo_url} alt={bizName} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} className="absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : offer.businesses.logo_url ? (
-                          <img src={offer.businesses.logo_url} alt={bizName} style={{ display: 'block', width: '100%', height: '100%', objectFit: 'cover' }} className="absolute inset-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-[rgba(255,255,255,0.8)] text-[36px] font-extrabold">{bizName.charAt(0)}</span>
-                          </div>
-                        )}
+                      {/* Top area — icon + slots badge */}
+                      <div className="relative" style={{ padding: '14px 12px 0' }}>
+                        <div className="flex items-center justify-between">
+                          <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
+                          {!isLocked && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                              className="w-[28px] h-[28px] flex items-center justify-center"
+                            >
+                              <Heart
+                                className={`w-[16px] h-[16px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-[var(--soft)]'}`}
+                                strokeWidth={2}
+                              />
+                            </button>
+                          )}
+                        </div>
 
                         {/* Locked overlay */}
                         {isLocked && (
-                          <div className="absolute inset-0 flex flex-col items-center justify-center" style={{ background: 'rgba(26,26,26,0.45)' }}>
-                            <div className="w-7 h-7 rounded-full bg-white flex items-center justify-center">
-                              <Lock className="w-3.5 h-3.5 text-[var(--near-black)]" />
-                            </div>
-                            <p className="text-[14px] text-white font-semibold mt-2">Unlocks at {lockedLevelName}</p>
-                            {reelsAway !== null && reelsAway <= 5 && (
-                              <p className="text-[14px] mt-1" style={{ color: 'rgba(255,255,255,0.7)' }}>
-                                {reelsAway === 1 ? '1 reel away' : `${reelsAway} reels away`}
-                              </p>
-                            )}
+                          <div className="flex items-center gap-1.5 mt-2">
+                            <Lock className="w-[12px] h-[12px] text-[var(--soft)]" />
+                            <span className="text-[13px] font-medium text-[var(--soft)]">Unlocks at {lockedLevelName}</span>
                           </div>
-                        )}
-
-                        {/* Slot badge — top-left */}
-                        {!isLocked && !isUnlimited && slotsLeft !== null && (
-                          <span
-                            className="absolute top-[8px] left-[8px] text-[14px] font-semibold rounded-full px-[8px] py-[5px]"
-                            style={{
-                              background: 'var(--terra)',
-                              color: 'white',
-                            }}
-                          >
-                            {slotsLeft === 1 ? 'Last slot!' : `${slotsLeft} left`}
-                          </span>
-                        )}
-
-                        {/* Heart — top-right */}
-                        {!isLocked && (
-                          <button
-                            onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                            className="absolute top-[8px] right-[8px] w-[44px] h-[44px] flex items-center justify-center"
-                            style={{ filter: 'drop-shadow(0 1px 3px rgba(0,0,0,0.4))' }}
-                          >
-                            <Heart
-                              className={`w-[20px] h-[20px] ${savedOffers.has(offer.id) ? 'text-[var(--terra)] fill-[var(--terra)]' : 'text-white'}`}
-                              strokeWidth={2}
-                            />
-                          </button>
                         )}
                       </div>
 
-                      {/* Card body */}
-                      <div className="px-[10px] py-[8px]" style={{ height: 72, overflow: 'hidden' }}>
-                        <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 15, color: '#1A1A1A', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
+                      {/* Headline — the hero element */}
+                      <div style={{ padding: '10px 12px 6px' }}>
+                        <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 800, fontSize: 17, color: '#1A1A1A', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0, letterSpacing: '-0.2px' }}>
                           {offerTitle || bizName}
                         </p>
-                        <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 400, fontSize: 13, color: 'rgba(26,26,26,0.5)', marginTop: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      </div>
+
+                      {/* Footer — business name + slots */}
+                      <div style={{ padding: '0 12px 12px' }}>
+                        <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 450, fontSize: 13, color: 'rgba(26,26,26,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
+                        {!isLocked && !isUnlimited && slotsLeft !== null && (
+                          <span
+                            className="text-[12px] font-semibold rounded-full px-[8px] py-[3px]"
+                            style={{ background: 'rgba(26,26,26,0.07)', color: 'var(--mid)' }}
+                          >
+                            {slotsLeft === 0 ? 'Full' : slotsLeft === 1 ? 'Last slot' : `${slotsLeft} left`}
+                          </span>
+                        )}
                       </div>
                     </button>
                   );
@@ -1776,8 +1762,8 @@ export default function CreatorApp() {
                     </div>
 
                     {/* Second section */}
-                    <div className="flex items-center justify-between px-[20px] mt-2 mb-[14px]">
-                      <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
+                    <div className="flex items-center justify-between px-[20px] mt-[8px] mb-[10px]">
+                      <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
                     <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
@@ -1816,7 +1802,7 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setView('offers')}
                     className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                    style={{ background: 'var(--terra)' }}
+                    style={{ background: 'var(--near-black)' }}
                   >
                     Find offers
                   </button>
@@ -1849,7 +1835,7 @@ export default function CreatorApp() {
                         <div className="flex-1 min-w-0">
                           <p className="text-[17px] font-bold text-[var(--near-black)] truncate">{offer.businesses.name}</p>
                           <p className="text-[15px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
-                          <p className="text-[15px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--terra)' }}>
+                          <p className="text-[15px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--mid)' }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                           </p>
                         </div>
@@ -1878,7 +1864,7 @@ export default function CreatorApp() {
                   <p className="text-[18px] text-[var(--mid)] mb-5">Claim an offer to get started</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="bg-[var(--terra)] text-white text-[18px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:bg-[var(--terra-hover)] transition-all"
+                    className="bg-[var(--near-black)] text-white text-[18px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:opacity-90 transition-all"
                   >
                     Browse offers
                   </button>
@@ -1970,7 +1956,7 @@ export default function CreatorApp() {
                                   return (
                                     <span key={label} className="flex items-center">
                                       {idx === 0 && (
-                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--terra)] mr-1.5" />
+                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--near-black)] mr-1.5" />
                                       )}
                                       <span className={`text-[15px] ${
                                         isCurrent ? 'font-bold text-[#1A1A1A]'
@@ -2015,8 +2001,8 @@ export default function CreatorApp() {
                                   background: isOverdue ? 'var(--terra-10)' : 'rgba(245,196,160,0.12)',
                                 }}>
                                   <div className="flex items-center gap-2 mb-2">
-                                    <Clock className={`w-4 h-4 ${isOverdue ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-                                    <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 18, color: isOverdue ? 'var(--terra)' : '#1A1A1A', margin: 0 }}>
+                                    <Clock className={`w-4 h-4 ${isOverdue ? 'text-amber-600' : 'text-[var(--soft)]'}`} />
+                                    <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : '#1A1A1A', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
@@ -2041,26 +2027,26 @@ export default function CreatorApp() {
                                       value={reelUrl}
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="https://instagram.com/reel/..."
-                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] min-h-[52px]"
+                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[rgba(26,26,26,0.15)] focus:border-[var(--near-black)] min-h-[52px]"
                                     />
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
                                       className="px-5 py-2 rounded-full text-white text-[18px] font-semibold disabled:opacity-40 transition-all min-h-[48px]"
-                                      style={{ background: '#B8523A' }}
+                                      style={{ background: '#1A1A1A' }}
                                     >
                                       Submit
                                     </button>
                                   </div>
                                   {reelError && (
-                                    <p className="text-[15px] text-[var(--terra)] mt-2">{reelError}</p>
+                                    <p className="text-[15px] text-[var(--mid)] mt-2">{reelError}</p>
                                   )}
                                 </div>
                               )}
 
                               {claim.reel_url && (
                                 <div className="flex items-center gap-2 p-3 rounded-[12px] bg-white border border-[var(--faint)]">
-                                  <Check className="w-4 h-4 text-[var(--terra)] flex-shrink-0" />
+                                  <Check className="w-4 h-4 text-[var(--forest)] flex-shrink-0" />
                                   <span className="text-[18px] text-[var(--near-black)] font-medium">Reel submitted!</span>
                                 </div>
                               )}
@@ -2073,7 +2059,7 @@ export default function CreatorApp() {
                                     <button
                                       onClick={() => handleReleaseOffer(claim.id)}
                                       disabled={releasingClaim}
-                                      className="font-bold text-[var(--terra)]"
+                                      className="font-bold text-[var(--near-black)]"
                                     >
                                       {releasingClaim ? '...' : 'Confirm'}
                                     </button>
@@ -2102,7 +2088,7 @@ export default function CreatorApp() {
                                             <button
                                               onClick={() => setReleaseConfirmId(claim.id)}
                                               className="flex items-center gap-1 font-medium transition-colors"
-                                              style={{ color: 'rgba(222,78,12,0.65)' }}
+                                              style={{ color: 'rgba(26,26,26,0.45)' }}
                                             >
                                               <X className="w-[11px] h-[11px]" /> Release offer
                                             </button>
@@ -2115,7 +2101,7 @@ export default function CreatorApp() {
                                 )}
                               </div>
                               {releaseError && (
-                                <p className="text-[15px] text-[var(--terra)] text-center pb-2">{releaseError}</p>
+                                <p className="text-[15px] text-[var(--mid)] text-center pb-2">{releaseError}</p>
                               )}
                             </div>
                           </div>
@@ -2178,7 +2164,7 @@ export default function CreatorApp() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-1 text-[15px] font-semibold text-[var(--terra)] hover:underline"
+                                className="flex items-center gap-1 text-[15px] font-semibold text-[var(--mid)] hover:underline"
                               >
                                 View Reel <ExternalLink className="w-3 h-3" />
                               </a>
@@ -2197,8 +2183,8 @@ export default function CreatorApp() {
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
               {isPendingApproval && (
-                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(222,78,12,0.08), rgba(200,184,240,0.12))' }}>
-                  <Clock className="w-7 h-7 text-[var(--terra)] mx-auto mb-2.5" />
+                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'rgba(26,26,26,0.04)' }}>
+                  <Clock className="w-7 h-7 text-[var(--mid)] mx-auto mb-2.5" />
                   <h3 className="text-[19px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
                   <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
                 </div>
@@ -2219,7 +2205,7 @@ export default function CreatorApp() {
                         />
                         {uploadingAvatar ? (
                           <div className="w-[72px] h-[72px] rounded-full bg-[var(--bg)] flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                            <div className="w-6 h-6 border-2 border-[var(--near-black)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : avatarUrl ? (
                           <button onClick={() => avatarInputRef.current?.click()}>
@@ -2236,7 +2222,7 @@ export default function CreatorApp() {
                         )}
                         <button
                           onClick={() => avatarInputRef.current?.click()}
-                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
+                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--near-black)] flex items-center justify-center border-2 border-white"
                         >
                           <Camera className="w-[11px] h-[11px] text-white" />
                         </button>
@@ -2257,7 +2243,7 @@ export default function CreatorApp() {
                           <button onClick={copyCode} className="flex items-center gap-1 text-[14px] font-semibold text-[var(--soft)]">
                             {userProfile.code}
                             {copiedCode ? (
-                              <span className="text-[var(--terra)] text-[13px]">Copied!</span>
+                              <span className="text-[var(--near-black)] text-[13px]">Copied!</span>
                             ) : (
                               <Copy className="w-3 h-3" />
                             )}
@@ -2270,7 +2256,7 @@ export default function CreatorApp() {
                         </div>
                       </div>
                     </div>
-                    {uploadError && <p className="text-[15px] text-[var(--terra)] mt-2">{uploadError}</p>}
+                    {uploadError && <p className="text-[15px] text-[var(--mid)] mt-2">{uploadError}</p>}
 
                     {/* Stats row inside card */}
                     <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
@@ -2311,10 +2297,10 @@ export default function CreatorApp() {
                       <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
                         <div className="flex items-center justify-between mb-[10px]">
                           <span className="text-[18px] font-bold text-[var(--near-black)]">Complete your profile</span>
-                          <span className="text-[14px] font-semibold text-[var(--terra)]">{completeness.score}%</span>
+                          <span className="text-[14px] font-semibold text-[var(--near-black)]">{completeness.score}%</span>
                         </div>
                         <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: 'var(--bg)' }}>
-                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
+                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--near-black)' }} />
                         </div>
                         <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
@@ -2364,7 +2350,7 @@ export default function CreatorApp() {
                                         style={{
                                           width: 48,
                                           height: 48,
-                                          border: '3px solid var(--terra)',
+                                          border: '3px solid var(--near-black)',
                                         }}
                                       />
                                     )}
@@ -2388,7 +2374,7 @@ export default function CreatorApp() {
                                           style={{
                                             fontWeight: isCurrent ? 700 : 500,
                                             fontSize: 18,
-                                            color: isLocked ? 'var(--soft)' : isCurrent ? 'var(--terra)' : 'white',
+                                            color: isLocked ? 'var(--soft)' : isCurrent ? 'var(--near-black)' : 'white',
                                           }}
                                         >
                                           {lvl === 6 ? '✦' : lvl}
@@ -2528,7 +2514,7 @@ export default function CreatorApp() {
                         <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
                         <span className="text-[17px] font-semibold text-[var(--near-black)]">Notifications</span>
                         {unreadCount > 0 && (
-                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-bold flex items-center justify-center">
+                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--near-black)] text-white text-[13px] font-bold flex items-center justify-center">
                             {unreadCount}
                           </span>
                         )}
@@ -2539,8 +2525,8 @@ export default function CreatorApp() {
                       onClick={signOut}
                       className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
-                      <LogOut className="w-[20px] h-[20px] text-[var(--terra)]" />
-                      <span className="text-[17px] font-semibold text-[var(--terra)]">Sign out</span>
+                      <LogOut className="w-[20px] h-[20px] text-[var(--soft)]" />
+                      <span className="text-[17px] font-semibold text-[var(--soft)]">Sign out</span>
                     </button>
                   </div>
                 </>
@@ -2570,7 +2556,7 @@ export default function CreatorApp() {
                       <button
                         onClick={() => setView('offers')}
                         className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                        style={{ background: 'var(--terra)' }}
+                        style={{ background: 'var(--near-black)' }}
                       >
                         Browse offers
                       </button>
@@ -2586,7 +2572,7 @@ export default function CreatorApp() {
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(26,26,26,0.1)]' : 'bg-[var(--terra)]'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(26,26,26,0.1)]' : 'bg-[var(--near-black)]'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] text-[var(--near-black)]">{notif.message}</p>
                               <p className="text-[15px] text-[var(--soft)] mt-1">
@@ -2625,7 +2611,7 @@ export default function CreatorApp() {
                       >
                         {uploadingAvatar ? (
                           <div className="w-[80px] h-[80px] rounded-full bg-[var(--bg)] flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                            <div className="w-6 h-6 border-2 border-[var(--near-black)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : avatarUrl ? (
                           <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -2638,13 +2624,13 @@ export default function CreatorApp() {
                           </div>
                         )}
                         <div
-                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
+                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--near-black)] flex items-center justify-center border-2 border-white"
                         >
                           <Camera className="w-[13px] h-[13px] text-white" />
                         </div>
                       </button>
                       <p className="text-[14px] text-[var(--soft)] mt-[8px]">Tap to change photo</p>
-                      {uploadError && <p className="text-[14px] text-[var(--terra)] mt-[4px]">{uploadError}</p>}
+                      {uploadError && <p className="text-[14px] text-[var(--mid)] mt-[4px]">{uploadError}</p>}
                     </div>
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--mid)] mb-[6px]">Name</label>
@@ -2652,7 +2638,7 @@ export default function CreatorApp() {
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)]"
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)]"
                       />
                     </div>
                     <div>
@@ -2662,7 +2648,7 @@ export default function CreatorApp() {
                         value={editHandle}
                         onChange={(e) => setEditHandle(e.target.value)}
                         placeholder="@yourhandle"
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)]"
+                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)]"
                       />
                     </div>
                     <button
@@ -2677,7 +2663,7 @@ export default function CreatorApp() {
                         setProfileSubView('main');
                         window.location.reload();
                       }}
-                      className="w-full py-[14px] rounded-[50px] bg-[var(--terra)] text-white text-[17px] font-semibold disabled:opacity-50"
+                      className="w-full py-[14px] rounded-[50px] bg-[var(--near-black)] text-white text-[17px] font-semibold disabled:opacity-50"
                     >
                       {editSaving ? 'Saving...' : 'Save changes'}
                     </button>
@@ -2699,7 +2685,7 @@ export default function CreatorApp() {
               key={tab.key}
               onClick={() => { if (isPendingApproval && tab.key !== 'profile') return; setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
               className={`flex-1 flex flex-col items-center gap-1 text-[13px] font-semibold transition-all relative min-h-[44px] ${
-                isPendingApproval && tab.key !== 'profile' ? 'text-[rgba(26,26,26,0.15)] pointer-events-none' : view === tab.key ? 'text-[var(--terra)]' : 'text-[#9E9E9E]'
+                isPendingApproval && tab.key !== 'profile' ? 'text-[rgba(26,26,26,0.15)] pointer-events-none' : view === tab.key ? 'text-[var(--near-black)]' : 'text-[#9E9E9E]'
               }`}
             >
               <div className="relative">
@@ -2707,10 +2693,10 @@ export default function CreatorApp() {
                   <tab.icon className="w-[22px] h-[22px]" />
                 ) : (
                   avatarUrl ? (
-                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${view === tab.key ? 'ring-1.5 ring-[var(--terra)]' : ''}`} />
+                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${view === tab.key ? 'ring-1.5 ring-[var(--near-black)]' : ''}`} />
                   ) : (
                     <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[12px] font-bold ${
-                      view === tab.key ? 'bg-[var(--terra)] text-white' : 'bg-[rgba(26,26,26,0.1)] text-[var(--mid)]'
+                      view === tab.key ? 'bg-[var(--near-black)] text-white' : 'bg-[rgba(26,26,26,0.1)] text-[var(--mid)]'
                     }`}>
                       {userProfile.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
@@ -2718,7 +2704,7 @@ export default function CreatorApp() {
                 )}
                 {tab.badge ? (
                   <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[12px] font-bold flex items-center justify-center ${
-                    tab.badgeColor || 'bg-[var(--terra)]'
+                    tab.badgeColor || 'bg-[var(--near-black)]'
                   }`}>
                     {tab.badge}
                   </span>
@@ -2726,7 +2712,7 @@ export default function CreatorApp() {
               </div>
               {tab.label}
               {view === tab.key && (
-                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[var(--terra)] rounded-full" />
+                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[var(--near-black)] rounded-full" />
               )}
             </button>
           ))}
