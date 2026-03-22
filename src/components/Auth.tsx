@@ -144,7 +144,7 @@ function AddressAutocomplete({ value, onChange }: {
         focused
           ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
           : mapsError
-          ? 'border-[rgba(196,103,74,0.3)] bg-[var(--bg)]'
+          ? 'border-[rgba(222,78,12,0.3)] bg-[var(--bg)]'
           : 'border-[var(--faint)] bg-[var(--bg)]'
       }`}>
         <MapPin className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
@@ -165,7 +165,7 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[11px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(34,34,34,0.10)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(26,26,26,0.10)] overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.place_id}
@@ -334,7 +334,7 @@ export default function Auth() {
         <div className="mt-[10px]">
           <Logo size={24} variant="wordmark" />
         </div>
-        <p className="text-[rgba(34,34,34,0.5)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
+        <p className="text-[rgba(26,26,26,0.5)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
@@ -344,7 +344,7 @@ export default function Auth() {
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(34,34,34,0.06),0_1px_2px_rgba(34,34,34,0.04)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -354,7 +354,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(34,34,34,0.06),0_1px_2px_rgba(34,34,34,0.04)]'
+                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -402,7 +402,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
+              className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -464,7 +464,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
+                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -671,7 +671,7 @@ export default function Auth() {
                             className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] text-left transition-all duration-200"
                             style={{
                               border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
-                              background: category === cat ? 'rgba(196,103,74,0.08)' : 'white',
+                              background: category === cat ? 'rgba(222,78,12,0.08)' : 'white',
                               color: category === cat ? 'var(--terra)' : undefined,
                             }}
                           >
@@ -775,7 +775,7 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(196,103,74,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(222,78,12,0.3)] inline-flex items-center justify-center gap-[6px]"
                   >
                     Continue <ArrowRight className="w-[16px] h-[16px]" />
                   </button>
@@ -792,7 +792,7 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(196,103,74,0.3)]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">

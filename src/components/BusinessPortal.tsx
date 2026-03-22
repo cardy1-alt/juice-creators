@@ -156,13 +156,13 @@ function getScreen2Tip(category: string | undefined | null, offerType: string): 
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
 function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(34,34,34,0.07)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
+    return { background: 'rgba(26,26,26,0.07)', color: 'rgba(26,26,26,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: 'Last slot' };
+    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(196,103,74,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
+    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
   return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
 }
@@ -500,7 +500,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   }`}
                   style={{
                     padding: '24px 20px',
-                    background: offerType === t.key ? 'rgba(196,103,74,0.04)' : 'white',
+                    background: offerType === t.key ? 'rgba(222,78,12,0.04)' : 'white',
                   }}
                 >
                   <t.icon className="w-7 h-7 text-[var(--near-black)]" />
@@ -548,8 +548,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               <div
                 className="relative mt-5 flex gap-[10px] items-start"
                 style={{
-                  background: 'rgba(196,103,74,0.05)',
-                  border: '1px solid rgba(196,103,74,0.12)',
+                  background: 'rgba(222,78,12,0.05)',
+                  border: '1px solid rgba(222,78,12,0.12)',
                   borderRadius: '14px',
                   padding: '12px 14px',
                   animation: 'tipFadeIn 300ms ease forwards',
@@ -749,7 +749,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     className="w-[160px] h-[120px] rounded-[16px] flex flex-col items-center justify-center gap-2"
                     style={{
                       background: getCategoryGradient(category),
-                      border: '1.5px dashed rgba(34,34,34,0.15)',
+                      border: '1.5px dashed rgba(26,26,26,0.15)',
                     }}
                   >
                     {photoUploading ? (
@@ -857,7 +857,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[14px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
-            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] mb-6">
+            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] mb-6">
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
@@ -882,7 +882,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 </div>
                 <p className="text-[13px] text-[var(--mid)] mt-1">{monthlyCap === null ? 'Unlimited slots' : `${monthlyCap} slots available`}</p>
                 {specificAsk.trim() && (
-                  <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
+                  <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(222,78,12,0.06)' }}>
                     <p className="text-[14px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
                   </div>
                 )}
@@ -902,7 +902,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                         <span
                           key={i}
                           className="w-2 h-2 rounded-full"
-                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(34,34,34,0.12)' }}
+                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(26,26,26,0.12)' }}
                         />
                       ))}
                     </div>
@@ -938,7 +938,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               }}
               disabled={isSubmitting}
               className="w-full py-[14px] rounded-[50px] font-bold text-[15px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all min-h-[52px]"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.3)' }}
+              style={{ boxShadow: '0 4px 16px rgba(222,78,12,0.3)' }}
             >
               {isSubmitting ? 'Publishing...' : 'Go live'}
             </button>
@@ -1356,7 +1356,7 @@ export default function BusinessPortal() {
   const claimStatusStyle = (status: string) => {
     switch (status) {
       case 'active': return 'bg-[var(--terra)] text-white';
-      case 'redeemed': return 'bg-[rgba(26,60,52,0.08)] text-[var(--forest)]';
+      case 'redeemed': return 'bg-[rgba(26,74,46,0.08)] text-[var(--forest)]';
       case 'reel_due': return 'bg-[var(--peach)] text-[var(--near-black)]';
       case 'completed': return 'bg-[var(--bg)] text-[var(--soft)]';
       case 'disputed': return 'bg-[var(--terra-15)] text-[var(--terra)]';
@@ -1452,7 +1452,7 @@ export default function BusinessPortal() {
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-[20px] pt-[24px]">
               {/* ═══ Profile card (matches creator profile DNA) ═══ */}
-              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
                 <div className="flex items-start gap-[16px]">
                   {/* Logo */}
                   <div
@@ -1524,7 +1524,7 @@ export default function BusinessPortal() {
               {/* ═══ Verified badge card ═══ */}
               <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[32px]">
                 <div className="flex items-center gap-[10px]">
-                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
+                  <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,74,46,0.06)] flex items-center justify-center flex-shrink-0">
                     <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
                   </div>
                   <div>
@@ -1587,7 +1587,7 @@ export default function BusinessPortal() {
                 <button
                   onClick={() => setShowOnboarding(true)}
                   className="w-full flex items-center justify-between px-[16px] py-[12px] rounded-[12px] mb-[16px] text-left"
-                  style={{ background: 'rgba(196,103,74,0.08)', border: '1px solid rgba(196,103,74,0.15)' }}
+                  style={{ background: 'rgba(222,78,12,0.08)', border: '1px solid rgba(222,78,12,0.15)' }}
                 >
                   <span className="text-[14px] font-semibold text-[var(--terra)]">Complete your setup to go live →</span>
                   <ChevronRight className="w-[16px] h-[16px] text-[var(--terra)]" />
@@ -1607,15 +1607,15 @@ export default function BusinessPortal() {
 
               {/* Compact inline stats */}
               <div className="flex items-center gap-[6px] mb-7 flex-wrap">
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(196,103,74,0.08)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(222,78,12,0.08)]">
                   <span className="text-[13px] font-extrabold text-[var(--terra)]">{activeClaimsCount}</span>
                   <span className="text-[12px] font-semibold text-[var(--mid)]">active</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(26,26,26,0.04)]">
                   <span className="text-[13px] font-extrabold text-[var(--near-black)]">{reelsThisMonth}</span>
                   <span className="text-[12px] font-semibold text-[var(--mid)]">reels</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(34,34,34,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(26,26,26,0.04)]">
                   <span className="text-[13px] font-extrabold text-[var(--near-black)]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
                   <span className="text-[12px] font-semibold text-[var(--mid)]">slots left</span>
                 </span>
@@ -1631,7 +1631,7 @@ export default function BusinessPortal() {
                   const isUnlimited = slotCap === null;
                   const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
-                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(34,34,34,0.10)' }}>
+                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,26,26,0.10)' }}>
                       {/* Hidden file input for offer photo */}
                       <input
                         ref={offerPhotoInputRef}
@@ -1694,7 +1694,7 @@ export default function BusinessPortal() {
                     </div>
                   );
                 })() : (
-                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
                     <p className="text-[15px] font-semibold text-[var(--mid)]">No active campaign</p>
                     <p className="text-[13px] text-[var(--mid)] mt-[4px]">Create your first offer to start getting creator visits</p>
                     <button
@@ -1770,7 +1770,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: getCategoryGradient(biz.category) }}
@@ -1939,7 +1939,7 @@ export default function BusinessPortal() {
                     const isUnlimited = slotCap === null;
                     const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                     return (
-                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
                         <div className="relative h-[120px]">
                           {activeOffer.offer_photo_url ? (
                             <img
@@ -1973,7 +1973,7 @@ export default function BusinessPortal() {
                           <p className="text-[13px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                           <p className="text-[13px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
                           {!isUnlimited && (
-                            <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(196,103,74,0.1)' }}>
+                            <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(222,78,12,0.1)' }}>
                               <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
                             </div>
                           )}
@@ -1995,7 +1995,7 @@ export default function BusinessPortal() {
                       </div>
                     );
                   })() : (
-                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(34,34,34,0.05)' }}>
+                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
                       <p className="text-[15px] font-semibold text-[var(--mid)]">No active campaign</p>
                       <p className="text-[13px] text-[var(--mid)] mt-[4px]">Create your first offer</p>
                       <button
@@ -2122,7 +2122,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#222222] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[14px] transition-all min-h-[48px] border-2 border-[#1A1A1A] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2275,7 +2275,7 @@ export default function BusinessPortal() {
                   ) : (
                     <div className="space-y-[12px]">
                       {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-[16px]">
+                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] p-[16px]">
                           <div className="flex items-start gap-[12px]">
                             {claim.creators.avatar_url ? (
                               <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -2336,7 +2336,7 @@ export default function BusinessPortal() {
                     <button
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
-                      className={`w-full text-left bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(34,34,34,0.08)] transition-all ${
+                      className={`w-full text-left bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(26,26,26,0.08)] transition-all ${
                         notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)] bg-[var(--terra-5)]'
                       }`}
                     >
@@ -2358,7 +2358,7 @@ export default function BusinessPortal() {
           {view === 'profile' && (
             <div className="pt-4">
               {isPendingApproval && (
-                <div className="mx-[20px] mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(196,103,74,0.08), rgba(200,184,240,0.12))' }}>
+                <div className="mx-[20px] mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(222,78,12,0.08), rgba(200,184,240,0.12))' }}>
                   <Clock className="w-7 h-7 text-[var(--terra)] mx-auto mb-2.5" />
                   <h3 className="text-[17px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
                   <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We're reviewing your business — you'll get an email once approved. In the meantime, make sure your profile is complete!</p>
@@ -2367,7 +2367,7 @@ export default function BusinessPortal() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(34,34,34,0.08)' }}>
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(26,26,26,0.08)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Logo */}
                       <div className="relative flex-shrink-0">
@@ -2620,8 +2620,8 @@ export default function BusinessPortal() {
               <div key={tab.key} className="flex-1 flex items-center justify-center">
                 <button
                   onClick={() => { if (isPendingApproval) return; setView('scan'); setScanResult(null); }}
-                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'} text-white`}
-                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(196,103,74,0.3)' }}
+                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(26,26,26,0.1)]' : 'bg-[var(--terra)]'} text-white`}
+                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(222,78,12,0.3)' }}
                 >
                   <Icon className="w-[18px] h-[18px] text-white" />
                   <span className="text-[12px] font-bold text-white">Scan</span>
@@ -2637,8 +2637,8 @@ export default function BusinessPortal() {
               onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
               className="flex-1 flex flex-col items-center gap-1"
             >
-              <Icon className={`w-5 h-5 ${isDisabled ? 'text-[rgba(34,34,34,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-              <span className={`text-[10px] font-semibold ${isDisabled ? 'text-[rgba(34,34,34,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+              <Icon className={`w-5 h-5 ${isDisabled ? 'text-[rgba(26,26,26,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+              <span className={`text-[10px] font-semibold ${isDisabled ? 'text-[rgba(26,26,26,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
                 {tab.label}
               </span>
             </button>

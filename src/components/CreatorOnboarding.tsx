@@ -186,7 +186,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Let's get started →
             </button>
@@ -233,7 +233,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Got it →
             </button>
@@ -261,7 +261,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 >
                   <div
                     className="w-[80px] h-[80px] rounded-full flex items-center justify-center overflow-hidden"
-                    style={{ background: avatarUrl ? undefined : 'linear-gradient(135deg, #C4674A 0%, #E8956D 100%)' }}
+                    style={{ background: avatarUrl ? undefined : 'linear-gradient(135deg, #DE4E0C 0%, #E8956D 100%)' }}
                   >
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
@@ -339,7 +339,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               onClick={handleSaveProfile}
               disabled={saving}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               {saving ? (
                 <span className="inline-flex items-center gap-2">
@@ -403,7 +403,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <button
               onClick={onComplete}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Start exploring →
             </button>

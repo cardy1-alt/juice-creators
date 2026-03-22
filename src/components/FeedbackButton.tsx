@@ -46,7 +46,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
         <button
           onClick={() => setOpen(true)}
           className="fixed bottom-[90px] right-[16px] z-[100] w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{ background: 'var(--forest)', boxShadow: '0 2px 12px rgba(26,60,52,0.25)' }}
+          style={{ background: 'var(--forest)', boxShadow: '0 2px 12px rgba(26,74,46,0.25)' }}
           aria-label="Send feedback"
         >
           <MessageSquare className="w-[18px] h-[18px] text-white" />
@@ -59,7 +59,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
           <div className="absolute inset-0 bg-black/30" />
           <div
             className="relative w-full max-w-md mx-4 mb-4 bg-white rounded-[20px] overflow-hidden"
-            style={{ boxShadow: '0 4px 24px rgba(34,34,34,0.15)' }}
+            style={{ boxShadow: '0 4px 24px rgba(26,26,26,0.15)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}

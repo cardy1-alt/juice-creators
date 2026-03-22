@@ -107,9 +107,9 @@ const CATEGORY_SOLID_COLORS: Record<string, string> = {
 };
 
 export function getCategoryGradient(category: string | undefined | null): string {
-  return CATEGORY_GRADIENTS[category || ''] || 'linear-gradient(135deg, #1A3C34, #2C4A3E)';
+  return CATEGORY_GRADIENTS[category || ''] || 'linear-gradient(135deg, #1A4A2E, #2C4A3E)';
 }
 
 export function getCategorySolidColor(category: string | undefined | null): string {
-  return CATEGORY_SOLID_COLORS[category || ''] || '#1A3C34';
+  return CATEGORY_SOLID_COLORS[category || ''] || '#1A4A2E';
 }

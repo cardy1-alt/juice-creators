@@ -1,42 +1,53 @@
 :root {
   /* ── Neutrals ── */
-  --white: #F7F4F0;
-  --bg: #F7F7F7;
-  --elevated: #F3F3F3;
-  --pressed: #E8E8E8;
-  --near-black: #222222;
+  --white: #F7F3EE;
+  --bg: #F7F3EE;
+  --elevated: #FFFFFF;
+  --pressed: #E0E0E0;
+  --near-black: #1A1A1A;
 
   /* ── Neutral opacity scale (based on --near-black) ── */
-  --mid: rgba(34,34,34,0.68);
-  --soft: rgba(34,34,34,0.45);
-  --faint: rgba(34,34,34,0.1);
+  --mid: rgba(26,26,26,0.68);
+  --soft: rgba(26,26,26,0.45);
+  --faint: rgba(26,26,26,0.1);
+  --warm-mid-grey: #9E9E9E;
 
-  /* ── Brand: Terra ── */
-  --terra: #C4674A;
-  --terra-hover: #b35a3f;
-  --terra-ring: rgba(196, 103, 74, 0.3);
-  --terra-5: rgba(196, 103, 74, 0.05);
-  --terra-10: rgba(196, 103, 74, 0.1);
-  --terra-15: rgba(196, 103, 74, 0.15);
-  --terra-20: rgba(196, 103, 74, 0.2);
-  --terra-40: rgba(196, 103, 74, 0.4);
+  /* ── Brand: Primary (Orange) ── */
+  --terra: #DE4E0C;
+  --terra-hover: #C44509;
+  --terra-ring: rgba(222, 78, 12, 0.3);
+  --terra-5: rgba(222, 78, 12, 0.05);
+  --terra-10: rgba(222, 78, 12, 0.1);
+  --terra-15: rgba(222, 78, 12, 0.15);
+  --terra-20: rgba(222, 78, 12, 0.2);
+  --terra-40: rgba(222, 78, 12, 0.4);
 
-  /* ── Brand: Forest ── */
-  --forest: #1A3C34;
+  /* ── Brand: Secondary ── */
+  --forest: #1A4A2E;
+  --ochre: #E8A020;
 
-  /* ── Accents ── */
+  /* ── Cards ── */
+  --card-bg: #FFFFFF;
+  --card-border: #E0E0E0;
+
+  /* ── Accents (kept for category variety) ── */
   --lavender: #C8B8F0;
   --peach: #F5C4A0;
   --pink: #F4A8C0;
 
-  /* ── Shadows (warm, not pure black) ── */
-  --shadow-sm: 0 1px 3px rgba(34,34,34,0.06);
-  --shadow-md: 0 2px 12px rgba(34,34,34,0.08);
-  --shadow-lg: 0 4px 16px rgba(34,34,34,0.12);
+  /* ── Shadows (removed from cards, kept for rare use) ── */
+  --shadow-sm: 0 1px 3px rgba(26,26,26,0.06);
+  --shadow-md: 0 2px 12px rgba(26,26,26,0.08);
+  --shadow-lg: 0 4px 16px rgba(26,26,26,0.12);
 }
 
 @layer base {
-  h1, h2, h3, h4, h5, body, p, span, button, input, label, select, textarea {
+  h1, h2, h3, h4, h5 {
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+  }
+  body, p, span, button, input, label, select, textarea {
+    font-family: 'Figtree', sans-serif;
     font-size: 15px;
   }
 }
