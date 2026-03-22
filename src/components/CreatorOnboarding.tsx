@@ -261,7 +261,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 >
                   <div
                     className="w-[80px] h-[80px] rounded-full flex items-center justify-center overflow-hidden"
-                    style={{ background: avatarUrl ? undefined : 'linear-gradient(135deg, #DE4E0C 0%, #E8956D 100%)' }}
+                    style={{ background: avatarUrl ? undefined : 'linear-gradient(135deg, #CB4A2F 0%, #E0896A 100%)' }}
                   >
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />

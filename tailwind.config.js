@@ -4,15 +4,15 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Nunito', 'sans-serif'],
+        display: ['Anybody', 'sans-serif'],
         sans: ['Figtree', 'sans-serif'],
       },
       colors: {
         nayba: {
-          white: '#F7F3EE',
-          bg: '#F7F3EE',
-          terra: '#DE4E0C',
-          'terra-hover': '#C44509',
+          white: '#FFFDF8',
+          bg: '#FFFDF8',
+          terra: '#CB4A2F',
+          'terra-hover': '#B5422A',
           forest: '#1A4A2E',
           ochre: '#E8A020',
           'near-black': '#1A1A1A',

@@ -1,26 +1,26 @@
 :root {
   /* ── Neutrals ── */
-  --white: #F7F3EE;
-  --bg: #F7F3EE;
+  --white: #FFFDF8;
+  --bg: #FFFDF8;
   --elevated: #FFFFFF;
   --pressed: #E0E0E0;
   --near-black: #1A1A1A;
 
   /* ── Neutral opacity scale (based on --near-black) ── */
-  --mid: rgba(26,26,26,0.68);
-  --soft: rgba(26,26,26,0.45);
-  --faint: rgba(26,26,26,0.1);
+  --mid: rgba(26,26,26,0.78);
+  --soft: rgba(26,26,26,0.58);
+  --faint: rgba(26,26,26,0.12);
   --warm-mid-grey: #9E9E9E;
 
   /* ── Brand: Primary (Orange) ── */
-  --terra: #DE4E0C;
-  --terra-hover: #C44509;
-  --terra-ring: rgba(222, 78, 12, 0.3);
-  --terra-5: rgba(222, 78, 12, 0.05);
-  --terra-10: rgba(222, 78, 12, 0.1);
-  --terra-15: rgba(222, 78, 12, 0.15);
-  --terra-20: rgba(222, 78, 12, 0.2);
-  --terra-40: rgba(222, 78, 12, 0.4);
+  --terra: #CB4A2F;
+  --terra-hover: #B5422A;
+  --terra-ring: rgba(203, 74, 47, 0.3);
+  --terra-5: rgba(203, 74, 47, 0.05);
+  --terra-10: rgba(203, 74, 47, 0.1);
+  --terra-15: rgba(203, 74, 47, 0.15);
+  --terra-20: rgba(203, 74, 47, 0.2);
+  --terra-40: rgba(203, 74, 47, 0.4);
 
   /* ── Brand: Secondary ── */
   --forest: #1A4A2E;
@@ -43,12 +43,14 @@
 
 @layer base {
   h1, h2, h3, h4, h5 {
-    font-family: 'Nunito', sans-serif;
+    font-family: 'Anybody', sans-serif;
     font-weight: 800;
+    letter-spacing: -0.01em;
   }
   body, p, span, button, input, label, select, textarea {
     font-family: 'Figtree', sans-serif;
     font-size: 15px;
+    font-weight: 450;
   }
 }
 

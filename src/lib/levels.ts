@@ -15,7 +15,7 @@ export const getLevelColour = (level: number): string => {
     case 2: return '#8FAF8F';                  // Explorer – soft sage
     case 3: return '#4CAF7D';                  // Regular  – green
     case 4: return '#1A4A2E';                  // Local    – forest (brand)
-    case 5: return '#DE4E0C';                  // Trusted  – terra  (brand)
+    case 5: return '#CB4A2F';                  // Trusted  – terra  (brand)
     case 6: return '#1A1A1A';                  // Nayba    – near-black
     default: return '#9E9E9E';
   }
