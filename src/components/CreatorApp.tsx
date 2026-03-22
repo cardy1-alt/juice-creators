@@ -817,7 +817,7 @@ export default function CreatorApp() {
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: 'Anybody, sans-serif', fontWeight: 800, fontSize: 22, color: '#1A1A1A', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 900, fontSize: 22, color: '#1A1A1A', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
               <p className="text-[14px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
@@ -1118,7 +1118,7 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p style={{ fontFamily: 'Anybody, sans-serif', fontWeight: 800, fontSize: 28, color: '#1A1A1A', marginTop: 8, marginBottom: 8 }}>
+                <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 900, fontSize: 28, color: '#1A1A1A', marginTop: 8, marginBottom: 8 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
@@ -1446,7 +1446,7 @@ export default function CreatorApp() {
                                 <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>
                                   {claim.businesses.name}
                                 </p>
-                                <p style={{ fontFamily: 'Anybody, sans-serif', fontWeight: 800, fontSize: 26, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
+                                <p style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 900, fontSize: 26, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
                                   {offerTitle}
                                 </p>
                                 <div className="flex items-center" style={{ gap: 6 }}>
@@ -2029,7 +2029,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-white border border-[var(--faint)]">
-                                  <label className="block mb-1" style={{ fontFamily: 'Anybody, sans-serif', fontWeight: 800, fontSize: 22, color: '#1A1A1A' }}>
+                                  <label className="block mb-1" style={{ fontFamily: 'Figtree, sans-serif', fontWeight: 900, fontSize: 22, color: '#1A1A1A' }}>
                                     Submit Your Reel
                                   </label>
                                   <p className="text-[13px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>

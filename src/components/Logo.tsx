@@ -14,7 +14,7 @@ function LogoIcon({ size, color }: { size: number; color: string }) {
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      {/* Geometric 'n' lettermark — wide strokes to match Anybody's bold weight */}
+      {/* Geometric 'n' lettermark */}
       <rect x="6" y="14" width="8" height="28" rx="2" fill={color} />
       <path
         d="M14 26C14 19.373 19.373 14 26 14H34V42H26V26H14Z"
@@ -29,9 +29,9 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   return (
     <span
       style={{
-        fontFamily: 'Anybody, sans-serif',
+        fontFamily: 'Figtree, sans-serif',
         fontSize: size,
-        fontWeight: 800,
+        fontWeight: 900,
         color,
         lineHeight: 1.1,
         letterSpacing: '-0.02em',

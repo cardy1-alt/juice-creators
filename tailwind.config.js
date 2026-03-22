@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Anybody', 'sans-serif'],
+        display: ['Figtree', 'sans-serif'],
         sans: ['Figtree', 'sans-serif'],
       },
       colors: {
