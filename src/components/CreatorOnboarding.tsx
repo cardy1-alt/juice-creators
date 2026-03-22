@@ -127,9 +127,9 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           ) : (
             <div className="w-[40px]" />
           )}
-          <span className="text-[18px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
+          <span className="text-[20px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.3px' }}>nayba</span>
           {screen === 3 ? (
-            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
+            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[15px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}
@@ -168,13 +168,13 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               </div>
 
               <h1
-                className="text-[28px] font-display font-normal text-[var(--near-black)] text-center"
+                className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
                 style={{ letterSpacing: '-0.5px' }}
               >
                 Welcome to nayba
               </h1>
               <p
-                className="text-[16px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
+                className="text-[18px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
                 style={{ fontWeight: 400, lineHeight: 1.6 }}
               >
                 Discover local businesses, claim&nbsp;offers, and create authentic&nbsp;content.
@@ -185,12 +185,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Let's get started →
             </button>
-            <p className="text-[12px] text-[var(--soft)] text-center mt-[10px]">Takes about 1 minute</p>
+            <p className="text-[14px] text-[var(--soft)] text-center mt-[10px]">Takes about 1 minute</p>
           </div>
         )}
 
@@ -199,12 +199,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-display font-normal text-[var(--near-black)]"
+                className="text-[26px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Here's how it works
               </h1>
-              <p className="text-[15px] text-[var(--mid)] mt-[6px]">Claim. Visit. Post. Get rewarded.</p>
+              <p className="text-[17px] text-[var(--mid)] mt-[6px]">Claim. Visit. Post. Get rewarded.</p>
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
@@ -217,11 +217,11 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                       className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: step.bg }}
                     >
-                      <span className="text-[15px] font-bold text-white">{step.num}</span>
+                      <span className="text-[17px] font-bold text-white">{step.num}</span>
                     </div>
                     <div className="flex-1 pt-[2px]">
-                      <p className="text-[15px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
-                      <p className="text-[13px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
+                      <p className="text-[17px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
+                      <p className="text-[15px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -232,7 +232,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Got it →
@@ -245,12 +245,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-display font-normal text-[var(--near-black)]"
+                className="text-[26px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Complete your profile
               </h1>
-              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[28px]">Businesses will see this when you claim their offers</p>
+              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[28px]">Businesses will see this when you claim their offers</p>
 
               {/* Avatar upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -266,7 +266,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-[28px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                      <span className="text-[32px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(displayName || profile.name || 'C')}
                       </span>
                     )}
@@ -285,7 +285,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                   className="hidden"
                   onChange={handleAvatarUpload}
                 />
-                <p className="text-[12px] text-[var(--soft)] mt-[10px] text-center">
+                <p className="text-[14px] text-[var(--soft)] mt-[10px] text-center">
                   {avatarUploading ? 'Uploading...' : 'Add a profile photo'}
                 </p>
               </div>
@@ -294,34 +294,34 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               <div className="flex flex-col gap-[14px]">
                 {/* Display name */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Display name</label>
+                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]">Display name</label>
                   <input
                     type="text"
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
                     placeholder="How you want to be known"
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
                   />
                 </div>
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Bio</label>
+                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]">Bio</label>
                   <textarea
                     value={bio}
                     onChange={e => setBio(e.target.value.slice(0, 150))}
                     placeholder="Tell businesses a little about yourself..."
                     rows={3}
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
+                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
                   />
-                  <p className="text-[11px] text-[var(--soft)] text-right mt-[2px]">{bio.length}/150</p>
+                  <p className="text-[13px] text-[var(--soft)] text-right mt-[2px]">{bio.length}/150</p>
                 </div>
 
                 {/* Instagram (read-only, already collected at signup) */}
                 {profile.instagram_handle && (
                   <div>
-                    <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram</label>
-                    <div className="px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--mid)]">
+                    <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram</label>
+                    <div className="px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--mid)]">
                       {profile.instagram_handle}
                     </div>
                   </div>
@@ -332,13 +332,13 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-1 min-h-[24px]" />
 
             {error && (
-              <p className="text-[13px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
+              <p className="text-[15px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
             )}
 
             <button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               {saving ? (
@@ -373,14 +373,14 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             </div>
 
             <h1
-              className="text-[32px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
+              className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
               style={{ letterSpacing: '-0.8px' }}
             >
               You're in.
             </h1>
 
             <p
-              className="text-[15px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
+              className="text-[17px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
               style={{ fontWeight: 400, lineHeight: 1.7 }}
             >
               {businessCount} local businesses with {offerCount} live offers are waiting for you to explore.
@@ -389,12 +389,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
               <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[28px] font-display font-normal text-[var(--near-black)]">{businessCount}</p>
-                <p className="text-[10px] font-medium text-[var(--mid)]">Businesses</p>
+                <p className="text-[32px] font-display font-normal text-[var(--near-black)]">{businessCount}</p>
+                <p className="text-[12px] font-medium text-[var(--mid)]">Businesses</p>
               </div>
               <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[28px] font-display font-normal text-[var(--near-black)]">{offerCount}</p>
-                <p className="text-[10px] font-medium text-[var(--mid)]">Live Offers</p>
+                <p className="text-[32px] font-display font-normal text-[var(--near-black)]">{offerCount}</p>
+                <p className="text-[12px] font-medium text-[var(--mid)]">Live Offers</p>
               </div>
             </div>
 
@@ -402,7 +402,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={onComplete}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Start exploring →

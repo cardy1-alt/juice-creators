@@ -139,7 +139,7 @@ function AddressAutocomplete({ value, onChange }: {
 
   return (
     <div ref={wrapperRef} className="relative">
-      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-2">Address</label>
+      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">Address</label>
       <div className={`relative rounded-[14px] border transition-all duration-200 ${
         focused
           ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
@@ -157,12 +157,12 @@ function AddressAutocomplete({ value, onChange }: {
           onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
           onBlur={() => setFocused(false)}
           placeholder={mapsError ? 'Type your address manually' : 'Enter your address'}
-          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
+          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
           autoComplete={mapsError ? 'street-address' : 'off'}
         />
       </div>
       {mapsError && (
-        <p className="text-[11px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
+        <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
         <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(26,26,26,0.10)] overflow-hidden">
@@ -172,7 +172,7 @@ function AddressAutocomplete({ value, onChange }: {
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[14px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
+              className="w-full text-left px-[14px] py-[12px] text-[18px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
             >
               <MapPin className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
@@ -219,7 +219,7 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
+        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
         required={required}
         minLength={minLength}
       />
@@ -334,7 +334,7 @@ export default function Auth() {
         <div className="mt-[10px]">
           <Logo size={24} variant="wordmark" />
         </div>
-        <p className="text-[rgba(26,26,26,0.5)] mt-[6px] text-[13px] tracking-[0.2px]">Hyperlocal creator network</p>
+        <p className="text-[rgba(26,26,26,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
@@ -342,7 +342,7 @@ export default function Auth() {
         <div className="flex gap-[4px] mb-[28px] p-[3px] bg-[var(--elevated)] rounded-[14px]">
           <button
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-            className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
+            className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signin'
                 ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
@@ -352,7 +352,7 @@ export default function Auth() {
           </button>
           <button
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-            className={`flex-1 py-[11px] rounded-[11px] text-[14px] font-semibold transition-all duration-200 ${
+            className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signup'
                 ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
@@ -393,7 +393,7 @@ export default function Auth() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium">
+              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
                 <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                 {error}
               </div>
@@ -402,7 +402,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+              className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -414,7 +414,7 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[13px] font-medium text-[var(--soft)] text-center mt-[16px] hover:text-[var(--terra)] transition-colors mx-auto"
+              className="block text-[15px] font-medium text-[var(--soft)] text-center mt-[16px] hover:text-[var(--terra)] transition-colors mx-auto"
             >
               Forgot password?
             </button>
@@ -427,7 +427,7 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => setForgotPassword(false)}
-              className="flex items-center gap-[6px] text-[13px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[var(--near-black)] transition-colors"
+              className="flex items-center gap-[6px] text-[15px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[var(--near-black)] transition-colors"
             >
               <ArrowLeft className="w-[14px] h-[14px]" /> Back to sign in
             </button>
@@ -437,14 +437,14 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail className="w-[24px] h-[24px] text-[var(--terra)]" />
                 </div>
-                <p className="text-[17px] font-bold text-[var(--near-black)] mb-[6px]">Check your email</p>
-                <p className="text-[13px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
+                <p className="text-[19px] font-bold text-[var(--near-black)] mb-[6px]">Check your email</p>
+                <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[17px] font-bold text-[var(--near-black)] mb-[4px]">Reset password</p>
-                  <p className="text-[13px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
+                  <p className="text-[19px] font-bold text-[var(--near-black)] mb-[4px]">Reset password</p>
+                  <p className="text-[15px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
                   label="Email"
@@ -456,7 +456,7 @@ export default function Auth() {
                   required
                 />
                 {resetError && (
-                  <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium">
+                  <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
                     <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                     {resetError}
                   </div>
@@ -464,7 +464,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+                  className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -492,7 +492,7 @@ export default function Auth() {
                 }`}>
                   <Sparkles className={`w-[18px] h-[18px] ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
-                <span className={`text-[13px] font-bold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                <span className={`text-[15px] font-bold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                   Creator
                 </span>
               </button>
@@ -510,7 +510,7 @@ export default function Auth() {
                 }`}>
                   <Building2 className={`w-[18px] h-[18px] ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
-                <span className={`text-[13px] font-bold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                <span className={`text-[15px] font-bold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                   Business
                 </span>
               </button>
@@ -520,7 +520,7 @@ export default function Auth() {
             <div className="flex items-center gap-[6px] mb-[20px]">
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center gap-[6px]">
-                  <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[11px] font-bold transition-all duration-300 ${
+                  <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300 ${
                     signupStep > step
                       ? 'bg-[var(--terra)] text-white'
                       : signupStep === step
@@ -536,10 +536,10 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[19px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
+              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
-              <p className="text-[13px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
+              <p className="text-[15px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
             </div>
 
             {/* ── Creator signup (multi-step) ── */}
@@ -552,14 +552,14 @@ export default function Auth() {
                     <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Follower Count</label>
+                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Follower Count</label>
                       <div className="flex gap-[8px]">
                         {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
                           <button
                             key={opt}
                             type="button"
                             onClick={() => setFollowerCount(opt)}
-                            className="flex-1 py-[10px] rounded-[10px] text-[12px] font-semibold transition-all"
+                            className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
                             style={{
                               background: followerCount === opt ? 'var(--terra)' : 'white',
                               color: followerCount === opt ? 'white' : 'var(--near-black)',
@@ -578,13 +578,13 @@ export default function Auth() {
                 {signupStep === 2 && (
                   <div className="space-y-[12px]">
                     <div>
-                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
+                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
                       <div className="flex items-center gap-[8px]">
                         <Cake className="w-[16px] h-[16px] text-[var(--soft)] flex-shrink-0" />
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -596,7 +596,7 @@ export default function Auth() {
                         <select
                           value={dobMonth}
                           onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -608,7 +608,7 @@ export default function Auth() {
                         <select
                           value={dobYear}
                           onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -618,7 +618,7 @@ export default function Auth() {
                           ))}
                         </select>
                       </div>
-                      <p className="text-[11px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
+                      <p className="text-[13px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
                     </div>
 
                     <AddressAutocomplete
@@ -661,7 +661,7 @@ export default function Auth() {
                     <FloatingInput label="Business Name" icon={Building2} value={name} onChange={setName} placeholder="Juice Bar Co" required />
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[10px]">Category</label>
+                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[10px]">Category</label>
                       <div className="grid grid-cols-2 gap-[8px]">
                         {CATEGORY_LIST.map((cat) => (
                           <button
@@ -676,7 +676,7 @@ export default function Auth() {
                             }}
                           >
                             <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-                            <span className={`text-[13px] font-semibold truncate ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>{cat}</span>
+                            <span className={`text-[15px] font-semibold truncate ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>{cat}</span>
                           </button>
                         ))}
                       </div>
@@ -692,7 +692,7 @@ export default function Auth() {
                       onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
                     <div>
-                      <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-2">Bio</label>
+                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">Bio</label>
                       <div className="relative">
                         <textarea
                           value={bio}
@@ -700,10 +700,10 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[16px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
                           required
                         />
-                        <span className={`absolute bottom-[10px] right-[12px] text-[11px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
+                        <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
                       </div>
                     </div>
                   </div>
@@ -734,7 +734,7 @@ export default function Auth() {
             )}
 
             {error && (
-              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[13px] font-medium mt-[14px]">
+              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium mt-[14px]">
                 <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                 {error}
               </div>
@@ -775,7 +775,7 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(222,78,12,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(222,78,12,0.3)] inline-flex items-center justify-center gap-[6px]"
                   >
                     Continue <ArrowRight className="w-[16px] h-[16px]" />
                   </button>
@@ -792,7 +792,7 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[15px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
@@ -804,7 +804,7 @@ export default function Auth() {
               )}
             </div>
 
-            <p className="text-[12px] text-[var(--soft)] text-center mt-[20px] leading-[1.5]">
+            <p className="text-[14px] text-[var(--soft)] text-center mt-[20px] leading-[1.5]">
               By signing up you agree to our terms. Your account will be reviewed by our team.
             </p>
           </form>

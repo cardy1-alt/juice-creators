@@ -198,7 +198,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           )}
           <Logo variant="icon" size={32} color="var(--forest)" />
           {screen === 3 ? (
-            <button onClick={goForward} className="text-[13px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
+            <button onClick={goForward} className="text-[15px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}
@@ -237,13 +237,13 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               </div>
 
               <h1
-                className="text-[28px] font-display font-normal text-[var(--near-black)] text-center"
+                className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
                 style={{ letterSpacing: '-0.5px' }}
               >
                 Welcome to nayba
               </h1>
               <p
-                className="text-[16px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
+                className="text-[18px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
                 style={{ fontWeight: 400, lineHeight: 1.6 }}
               >
                 Turn local creators into your marketing&nbsp;team — no&nbsp;budget&nbsp;required.
@@ -254,15 +254,15 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Let's get started →
             </button>
-            <p className="text-[12px] text-[var(--soft)] text-center mt-[10px]">Takes about 3 minutes</p>
+            <p className="text-[14px] text-[var(--soft)] text-center mt-[10px]">Takes about 3 minutes</p>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
               style={{ fontWeight: 400 }}
             >
               Finish later
@@ -275,12 +275,12 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-display font-normal text-[var(--near-black)]"
+                className="text-[26px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Here's how it works
               </h1>
-              <p className="text-[15px] text-[var(--mid)] mt-[6px]">Creators visit. They post. You grow.</p>
+              <p className="text-[17px] text-[var(--mid)] mt-[6px]">Creators visit. They post. You grow.</p>
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
@@ -293,11 +293,11 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: step.bg }}
                     >
-                      <span className="text-[15px] font-bold text-white">{step.num}</span>
+                      <span className="text-[17px] font-bold text-white">{step.num}</span>
                     </div>
                     <div className="flex-1 pt-[2px]">
-                      <p className="text-[15px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
-                      <p className="text-[13px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
+                      <p className="text-[17px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
+                      <p className="text-[15px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -308,14 +308,14 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Sounds good →
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
               style={{ fontWeight: 400 }}
             >
               Finish later
@@ -328,12 +328,12 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-display font-normal text-[var(--near-black)]"
+                className="text-[26px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Polish your profile
               </h1>
-              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[28px]">Add a logo and Instagram so creators can find you</p>
+              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[28px]">Add a logo and Instagram so creators can find you</p>
 
               {/* Logo upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -349,7 +349,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     {logoUrl ? (
                       <img src={logoUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
-                      <span className="text-[28px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                      <span className="text-[32px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(profile.name || 'B')}
                       </span>
                     )}
@@ -368,22 +368,22 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   className="hidden"
                   onChange={handleLogoUpload}
                 />
-                <p className="text-[12px] text-[var(--soft)] mt-[10px] text-center">
+                <p className="text-[14px] text-[var(--soft)] mt-[10px] text-center">
                   {logoUploading ? 'Uploading...' : 'Add your logo or a photo of your business'}
                 </p>
               </div>
 
               {/* Instagram */}
               <div>
-                <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
+                <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
                 <input
                   type="text"
                   value={instagram}
                   onChange={e => setInstagram(e.target.value)}
                   placeholder="@yourbusiness"
-                  className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
                 />
-                <p className="text-[12px] text-[var(--soft)] mt-[4px]">Optional — add later if you prefer</p>
+                <p className="text-[14px] text-[var(--soft)] mt-[4px]">Optional — add later if you prefer</p>
               </div>
             </div>
 
@@ -391,7 +391,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-[17px] font-bold min-h-[52px] transition-all"
               style={{
                 background: 'var(--terra)',
                 color: 'white',
@@ -402,7 +402,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
               style={{ fontWeight: 400 }}
             >
               Finish later
@@ -415,12 +415,12 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1
-                className="text-[24px] font-display font-normal text-[var(--near-black)]"
+                className="text-[26px] font-display font-normal text-[var(--near-black)]"
                 style={{ letterSpacing: '-0.4px' }}
               >
                 Create your offer
               </h1>
-              <p className="text-[14px] text-[var(--mid)] mt-[6px] mb-[24px]">This is what you'll give creators in exchange for a reel</p>
+              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[24px]">This is what you'll give creators in exchange for a reel</p>
 
               {/* DECISION 1 — Offer type tiles */}
               <div className="grid grid-cols-2 gap-[10px]">
@@ -442,8 +442,8 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   >
                     <t.icon className="w-[24px] h-[24px] text-[var(--near-black)]" />
                     <div className="text-center">
-                      <p className="text-[13px] font-bold text-[var(--near-black)]">{t.label}</p>
-                      <p className="text-[11px] text-[var(--mid)] mt-[2px]">{t.sub}</p>
+                      <p className="text-[15px] font-bold text-[var(--near-black)]">{t.label}</p>
+                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{t.sub}</p>
                     </div>
                   </button>
                 ))}
@@ -453,18 +453,18 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               {offerType && offerType !== 'discount' && (
                 <div className="mt-[20px]">
                   <div className="flex items-baseline gap-[8px] mb-[4px]">
-                    <span className="text-[20px] font-display font-normal text-[var(--near-black)]">Free</span>
+                    <span className="text-[22px] font-display font-normal text-[var(--near-black)]">Free</span>
                     <input
                       type="text"
                       value={offerItem}
                       onChange={e => setOfferItem(e.target.value.slice(0, 60))}
                       placeholder={getCategoryPlaceholder(profile.category, offerType)}
-                      className="flex-1 text-[20px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-normal"
+                      className="flex-1 text-[22px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-normal"
                       autoFocus
                     />
                   </div>
-                  <p className="text-[11px] text-[var(--soft)] text-right">{offerItem.length}/60</p>
-                  <p className="text-[13px] text-[var(--mid)] mt-[4px]">
+                  <p className="text-[13px] text-[var(--soft)] text-right">{offerItem.length}/60</p>
+                  <p className="text-[15px] text-[var(--mid)] mt-[4px]">
                     Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(profile.category, offerType)}</span>
                   </p>
                 </div>
@@ -484,7 +484,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           setDiscountAmount(val);
                         }
                       }}
-                      className="text-[40px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                      className="text-[44px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
                       style={{ width: '100px' }}
                       autoFocus
                     />
@@ -492,16 +492,16 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   <div className="flex justify-center gap-[8px] mb-[8px]">
                     <button
                       onClick={() => { setDiscountUnit('%'); if (parseInt(discountAmount) > 100) setDiscountAmount('100'); }}
-                      className="px-[20px] py-[8px] rounded-[50px] text-[14px] font-bold transition-all"
+                      className="px-[20px] py-[8px] rounded-[50px] text-[18px] font-bold transition-all"
                       style={{ background: discountUnit === '%' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '%' ? 'white' : 'var(--mid)' }}
                     >%</button>
                     <button
                       onClick={() => setDiscountUnit('£')}
-                      className="px-[20px] py-[8px] rounded-[50px] text-[14px] font-bold transition-all"
+                      className="px-[20px] py-[8px] rounded-[50px] text-[18px] font-bold transition-all"
                       style={{ background: discountUnit === '£' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '£' ? 'white' : 'var(--mid)' }}
                     >£</button>
                   </div>
-                  <p className="text-[13px] text-[var(--mid)] text-center">
+                  <p className="text-[15px] text-[var(--mid)] text-center">
                     Creators will see: <span className="font-semibold">{discountAmount}{discountUnit} off</span>
                   </p>
                 </div>
@@ -510,15 +510,15 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               {/* DECISION 2 — Monthly creators */}
               {offerType && (
                 <div className="mt-[24px]">
-                  <label className="block text-[11px] font-semibold text-[var(--near-black)] mb-[12px]">Monthly creators</label>
+                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[12px]">Monthly creators</label>
 
                   {!hasCap ? (
                     <div className="text-center">
-                      <p className="text-[15px] font-bold text-[var(--near-black)]">Unlimited</p>
-                      <p className="text-[12px] text-[var(--soft)] mt-[4px]">Accept as many creators as you like each month</p>
+                      <p className="text-[17px] font-bold text-[var(--near-black)]">Unlimited</p>
+                      <p className="text-[14px] text-[var(--soft)] mt-[4px]">Accept as many creators as you like each month</p>
                       <button
                         onClick={() => setHasCap(true)}
-                        className="mt-[12px] text-[13px] font-semibold text-[var(--terra)]"
+                        className="mt-[12px] text-[15px] font-semibold text-[var(--terra)]"
                       >
                         Set a monthly cap instead
                       </button>
@@ -533,7 +533,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                         >
                           <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
                         </button>
-                        <span className="text-[48px] font-display font-normal text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
+                        <span className="text-[52px] font-display font-normal text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
                           {monthlySlots}
                         </span>
                         <button
@@ -544,12 +544,12 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           <Plus className="w-[18px] h-[18px] text-white" />
                         </button>
                       </div>
-                      <p className="text-[12px] text-[var(--soft)] text-center mt-[8px]">
+                      <p className="text-[14px] text-[var(--soft)] text-center mt-[8px]">
                         {monthlySlots} creator{monthlySlots === 1 ? '' : 's'} per month
                       </p>
                       <button
                         onClick={() => setHasCap(false)}
-                        className="block mx-auto mt-[8px] text-[13px] font-semibold text-[var(--terra)]"
+                        className="block mx-auto mt-[8px] text-[15px] font-semibold text-[var(--terra)]"
                       >
                         Remove cap
                       </button>
@@ -562,13 +562,13 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-1 min-h-[24px]" />
 
             {error && (
-              <p className="text-[13px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
+              <p className="text-[15px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
             )}
 
             <button
               onClick={handleLaunch}
               disabled={saving || !offerType || (offerType !== 'discount' && offerItem.trim().length < 3) || (offerType === 'discount' && !discountAmount)}
-              className="w-full py-[16px] rounded-[50px] text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-[17px] font-bold min-h-[52px] transition-all"
               style={{
                 background: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
                   ? 'var(--terra)' : 'var(--bg)',
@@ -586,7 +586,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[14px] text-[var(--soft)]"
+              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
               style={{ fontWeight: 400 }}
             >
               Finish later
@@ -617,14 +617,14 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             </div>
 
             <h1
-              className="text-[32px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
+              className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
               style={{ letterSpacing: '-0.8px' }}
             >
               You're live.
             </h1>
 
             <p
-              className="text-[15px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
+              className="text-[17px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
               style={{ fontWeight: 400, lineHeight: 1.7 }}
             >
               Your offer for {generatedTitle} is now live on nayba.
@@ -643,11 +643,11 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 <CategoryIcon category={profile.category} className="w-[18px] h-[18px] text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[14px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>
-                <p className="text-[12px] text-[var(--mid)]">{hasCap ? `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month` : 'Unlimited creators'}</p>
+                <p className="text-[18px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>
+                <p className="text-[14px] text-[var(--mid)]">{hasCap ? `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month` : 'Unlimited creators'}</p>
               </div>
               <span
-                className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold flex-shrink-0"
+                className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[12px] font-bold flex-shrink-0"
                 style={{ background: 'rgba(26,74,46,0.08)', color: 'var(--forest)' }}
               >
                 <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
@@ -659,7 +659,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={onComplete}
-              className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
+              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
               style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Go to my dashboard →
@@ -671,7 +671,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 setLinkCopied(true);
                 setTimeout(() => setLinkCopied(false), 2000);
               }}
-              className="text-[12px] text-[var(--soft)] text-center mt-[10px] py-[8px]"
+              className="text-[14px] text-[var(--soft)] text-center mt-[10px] py-[8px]"
             >
               {linkCopied ? 'Link copied \u2713' : 'Share nayba with another local business'}
             </button>

@@ -343,7 +343,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
         <>
           {/* Creator code badge */}
           <span
-            className="font-mono text-[15px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)]"
+            className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)]"
             style={{ padding: '10px 20px' }}
           >
             {creatorCode}
@@ -352,7 +352,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
           {/* Refresh timer */}
           <div className="flex items-center gap-1.5" style={{ marginTop: 12 }}>
             <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-            <span className={`text-[12px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+            <span className={`text-[14px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
               Refreshes in {timeLeft}s
             </span>
           </div>

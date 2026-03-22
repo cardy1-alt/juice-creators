@@ -64,7 +64,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
           >
             {/* Header */}
             <div className="flex items-center justify-between px-[20px] pt-[18px] pb-[10px]">
-              <h3 className="text-[16px] font-bold text-[var(--near-black)]">Send feedback</h3>
+              <h3 className="text-[18px] font-bold text-[var(--near-black)]">Send feedback</h3>
               <button
                 onClick={() => { setOpen(false); setSent(false); }}
                 className="w-[32px] h-[32px] flex items-center justify-center rounded-full hover:bg-[var(--bg)] transition-colors"
@@ -75,8 +75,8 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
 
             {sent ? (
               <div className="px-[20px] pb-[20px] text-center py-[24px]">
-                <p className="text-[15px] font-semibold text-[var(--forest)]">Thanks for your feedback!</p>
-                <p className="text-[13px] text-[var(--mid)] mt-[4px]">We'll take a look.</p>
+                <p className="text-[17px] font-semibold text-[var(--forest)]">Thanks for your feedback!</p>
+                <p className="text-[15px] text-[var(--mid)] mt-[4px]">We'll take a look.</p>
               </div>
             ) : (
               <div className="px-[20px] pb-[20px]">
@@ -87,14 +87,14 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                   rows={4}
                   maxLength={500}
                   autoFocus
-                  className="w-full px-[14px] py-[12px] rounded-[12px] bg-[var(--bg)] text-[14px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
+                  className="w-full px-[14px] py-[12px] rounded-[12px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
                 />
                 <div className="flex items-center justify-between mt-[12px]">
-                  <span className="text-[11px] text-[var(--soft)]">{text.length}/500</span>
+                  <span className="text-[13px] text-[var(--soft)]">{text.length}/500</span>
                   <button
                     onClick={handleSubmit}
                     disabled={!text.trim() || sending}
-                    className="px-[20px] py-[10px] rounded-[50px] text-[13px] font-bold text-white transition-all disabled:opacity-40"
+                    className="px-[20px] py-[10px] rounded-[50px] text-[15px] font-bold text-white transition-all disabled:opacity-40"
                     style={{ background: 'var(--terra)' }}
                   >
                     {sending ? 'Sending...' : 'Send'}

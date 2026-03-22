@@ -33,9 +33,9 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
               <AlertCircle className="w-7 h-7 text-[var(--terra)]" />
             </div>
             <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">Something went wrong</h2>
-            <p className="text-[var(--mid)] text-sm mb-4">An unexpected error occurred. Please refresh the page.</p>
+            <p className="text-[var(--mid)] text-base mb-4">An unexpected error occurred. Please refresh the page.</p>
             {this.state.errorMessage && (
-              <p className="text-[var(--soft)] text-xs mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
+              <p className="text-[var(--soft)] text-sm mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
             )}
             <button
               onClick={() => window.location.reload()}
@@ -60,7 +60,7 @@ function DemoBanner() {
 
   const roles = ['creator', 'business', 'admin'] as const;
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--near-black)] text-white px-4 py-2 flex items-center justify-between text-xs">
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--near-black)] text-white px-4 py-2 flex items-center justify-between text-sm">
       <span className="font-semibold">DEMO MODE</span>
       <div className="flex gap-2">
         {roles.map((r) => (
@@ -97,7 +97,7 @@ function RedeemLanding() {
         <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">
           Creator Pass
         </h2>
-        <p className="text-[var(--mid)] text-sm mb-6">
+        <p className="text-[var(--mid)] text-base mb-6">
           This QR code is for the business to scan. Ask the business to open their app and use the Scan tab to verify your visit.
         </p>
         <a
@@ -121,7 +121,7 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-[#F7F4F0]">
         <div className="text-center">
           <div className="w-12 h-12 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[var(--mid)] text-sm font-medium">Loading...</p>
+          <p className="text-[var(--mid)] text-base font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -158,7 +158,7 @@ function App() {
         <h2 className="text-xl font-display font-normal mb-2 text-[var(--near-black)]">
           Account Not Found
         </h2>
-        <p className="text-[var(--mid)] text-sm mb-6">
+        <p className="text-[var(--mid)] text-base mb-6">
           Your account profile could not be found. Please sign out and try again, or contact support.
         </p>
         <button
