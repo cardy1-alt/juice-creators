@@ -250,7 +250,7 @@ export default function AdminDashboard() {
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] border text-[13px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,60,52,0.06)] border-[rgba(26,60,52,0.12)] text-[var(--forest)]'}`}>
+            <div className={`mb-4 p-3 rounded-[12px] border text-[13px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,74,46,0.06)] border-[rgba(26,74,46,0.12)] text-[var(--forest)]'}`}>
               {actionFeedback.text}
             </div>
           )}
@@ -290,7 +290,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCards.map((stat, i) => (
-                  <div key={i} className="bg-white rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                  <div key={i} className="bg-white rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
                     <div className="mb-3"><stat.icon className="w-6 h-6 text-[var(--mid)]" /></div>
                     <p className="text-3xl font-bold text-[var(--near-black)]">{stat.value}</p>
                     <p className="text-xs text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
@@ -302,7 +302,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No creators yet.</p></div>
               ) : (
@@ -319,7 +319,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
+                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[var(--near-black)]">
@@ -359,7 +359,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No businesses yet.</p></div>
               ) : (
@@ -374,7 +374,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
+                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
                       {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
                         <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
@@ -414,7 +414,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-white rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
+                    <div key={offer.id} className="bg-white rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -435,7 +435,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] overflow-hidden">
+            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-sm">No claims yet.</p></div>
               ) : (
@@ -450,7 +450,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[11px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(34,34,34,0.05)]">
+                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
                           <td className="px-5 py-3.5 whitespace-nowrap text-sm font-medium text-[var(--near-black)]">{claim.creators.name}</td>
@@ -491,7 +491,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
+              <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] p-6">
                 <h2 className="text-lg font-bold text-[var(--near-black)] mb-5">Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -542,7 +542,7 @@ export default function AdminDashboard() {
                     <div
                       className={`p-3 rounded-[12px] text-[13px] font-medium ${
                         passwordMessage.type === 'success'
-                          ? 'bg-[rgba(26,60,52,0.06)] text-[var(--forest)] border border-[rgba(26,60,52,0.12)]'
+                          ? 'bg-[rgba(26,74,46,0.06)] text-[var(--forest)] border border-[rgba(26,74,46,0.12)]'
                           : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
                       }`}
                     >

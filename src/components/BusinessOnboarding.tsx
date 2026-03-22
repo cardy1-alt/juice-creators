@@ -255,7 +255,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Let's get started →
             </button>
@@ -309,7 +309,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Sounds good →
             </button>
@@ -395,7 +395,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               style={{
                 background: 'var(--terra)',
                 color: 'white',
-                boxShadow: '0 4px 16px rgba(196,103,74,0.25)',
+                boxShadow: '0 4px 16px rgba(222,78,12,0.25)',
               }}
             >
               Looking good →
@@ -437,7 +437,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     style={{
                       padding: '20px 16px',
                       border: offerType === t.key ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
-                      background: offerType === t.key ? 'rgba(196,103,74,0.08)' : 'white',
+                      background: offerType === t.key ? 'rgba(222,78,12,0.08)' : 'white',
                     }}
                   >
                     <t.icon className="w-[24px] h-[24px] text-[var(--near-black)]" />
@@ -575,7 +575,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 color: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
                   ? 'white' : 'var(--soft)',
                 boxShadow: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
-                  ? '0 4px 16px rgba(196,103,74,0.25)' : 'none',
+                  ? '0 4px 16px rgba(222,78,12,0.25)' : 'none',
               }}
             >
               {saving ? (
@@ -648,7 +648,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               </div>
               <span
                 className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[10px] font-bold flex-shrink-0"
-                style={{ background: 'rgba(26,60,52,0.08)', color: 'var(--forest)' }}
+                style={{ background: 'rgba(26,74,46,0.08)', color: 'var(--forest)' }}
               >
                 <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                 Live
@@ -660,7 +660,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={onComplete}
               className="w-full py-[16px] rounded-[50px] text-white text-[15px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(196,103,74,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
             >
               Go to my dashboard →
             </button>

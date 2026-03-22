@@ -28,7 +28,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   const margin = 4;
   const cellSize = size / (n + margin * 2);
 
-  ctx.fillStyle = '#222222';
+  ctx.fillStyle = '#1A1A1A';
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       if (modules[r][c]) {
