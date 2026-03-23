@@ -1,16 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import {
-  LogOut, Plus, ExternalLink, Camera, Bell,
-  Package, Users, Film, LayoutDashboard,
-  CheckCircle2, XCircle, VideoOff, Flag,
-  Sparkles, ClipboardList, Clock, ScanLine,
-  Gift, Tag, Star, ChevronLeft, Minus, Info, Video,
-  Check, Lightbulb, ArrowRight, X, User, Lock, ChevronRight, FileText,
-  MoreHorizontal, QrCode, Eye, MapPin, BadgeCheck, Instagram, Copy, Infinity,
-  Megaphone, PauseCircle, RefreshCw
-} from 'lucide-react';
+import { DoodleIcon } from '../lib/doodle-icons';
 import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 import { getCategoryGradient } from '../lib/categories';
@@ -156,13 +147,13 @@ function getScreen2Tip(category: string | undefined | null, offerType: string): 
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
 function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(26,26,26,0.07)', color: 'rgba(26,26,26,0.4)', text: 'Full' };
+    return { background: 'rgba(28,18,8,0.07)', color: 'rgba(28,18,8,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: 'Last slot' };
+    return { background: 'rgba(212,71,12,0.15)', color: 'var(--terra)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(222,78,12,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
+    return { background: 'rgba(212,71,12,0.15)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
   return { background: 'var(--peach)', color: 'var(--near-black)', text: `${slotsLeft} left` };
 }
@@ -294,7 +285,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
     <div>
       {cameraError && (
         <div className="p-4 rounded-[16px] bg-amber-50 border border-amber-100 text-center mb-4">
-          <VideoOff className="w-5 h-5 text-amber-500 mx-auto mb-2" />
+          <DoodleIcon name="video" size={20} className="text-amber-500 mx-auto mb-2" />
           <p className="text-[15px] text-amber-700 mb-3">{cameraError}</p>
           <button
             onClick={() => { setCameraError(null); startScanner(); }}
@@ -343,7 +334,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
           onClick={startScanner}
           className="w-full flex items-center justify-center gap-2 py-[14px] rounded-[50px] font-bold text-[18px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
         >
-          <Camera className="w-[18px] h-[18px]" /> Open Camera
+          <DoodleIcon name="camera" size={18} className="" /> Open Camera
         </button>
       )}
       {scanning && (
@@ -401,10 +392,10 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
     : `Free ${offerItem}`;
 
   const tiles = [
-    { key: 'product', label: 'Free Product', icon: Gift, sub: 'Coffee, meal, item' },
-    { key: 'service', label: 'Free Service', icon: Sparkles, sub: 'Haircut, facial, class' },
-    { key: 'discount', label: 'Discount', icon: Tag, sub: '% off or £ off' },
-    { key: 'experience', label: 'Experience', icon: Star, sub: 'Tasting, tour, event' },
+    { key: 'product', label: 'Free Product', icon: 'gift', sub: 'Coffee, meal, item' },
+    { key: 'service', label: 'Free Service', icon: 'sparkles', sub: 'Haircut, facial, class' },
+    { key: 'discount', label: 'Discount', icon: 'tag', sub: '% off or £ off' },
+    { key: 'experience', label: 'Experience', icon: 'star', sub: 'Tasting, tour, event' },
   ];
 
   const exampleChips = [
@@ -429,8 +420,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col items-center justify-center px-6">
-        <CheckCircle2 className="w-14 h-14 text-[var(--terra)] mb-4" />
+      <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col items-center justify-center px-6">
+        <DoodleIcon name="check" size={56} className="text-[var(--terra)] mb-4" />
         <p className="text-[24px] font-display font-normal text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.4px' }}>Your offer is live!</p>
         <p className="text-[18px] text-[var(--mid)] text-center mt-2">Creators can now discover and claim it</p>
         <button
@@ -444,13 +435,13 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col overflow-y-auto">
       <style>{livePulseStyle}</style>
 
       {/* Top bar */}
       <div className="flex items-center justify-between px-5 pt-4 pb-2">
         <button onClick={screen === 1 ? onCancel : () => setScreen(screen - 1)} className="p-2 -ml-2 min-h-[44px] min-w-[44px] flex items-center justify-center">
-          <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
+          <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
         </button>
         {screen === 4 && (
           <button onClick={() => { setOfferPhotoUrl(null); setScreen(5); }} className="text-[18px] font-semibold text-[var(--mid)] min-h-[44px] flex items-center">
@@ -500,10 +491,10 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   }`}
                   style={{
                     padding: '24px 20px',
-                    background: offerType === t.key ? 'rgba(222,78,12,0.04)' : 'white',
+                    background: offerType === t.key ? 'rgba(212,71,12,0.04)' : '#EDE8DC',
                   }}
                 >
-                  <t.icon className="w-7 h-7 text-[var(--near-black)]" />
+                  <DoodleIcon name={t.icon} size={24} className="w-7 h-7 text-[var(--near-black)]" />
                   <div className="text-center">
                     <p className="text-[18px] font-bold text-[var(--near-black)]">{t.label}</p>
                     <p className="text-[14px] text-[var(--mid)] mt-0.5">{t.sub}</p>
@@ -548,14 +539,14 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               <div
                 className="relative mt-5 flex gap-[10px] items-start"
                 style={{
-                  background: 'rgba(222,78,12,0.05)',
-                  border: '1px solid rgba(222,78,12,0.12)',
+                  background: 'rgba(212,71,12,0.05)',
+                  border: '1px solid rgba(212,71,12,0.12)',
                   borderRadius: '14px',
                   padding: '12px 14px',
                   animation: 'tipFadeIn 300ms ease forwards',
                 }}
               >
-                <Lightbulb className="w-4 h-4 text-[var(--terra)] flex-shrink-0 mt-[1px]" />
+                <DoodleIcon name="lightbulb" size={16} className="text-[var(--terra)] flex-shrink-0 mt-[1px]" />
                 <div className="flex-1">
                   <p className="text-[15px] font-bold text-[var(--near-black)]">{getScreen2Tip(category, offerType).title}</p>
                   <p className="text-[14px] text-[var(--mid)] mt-[3px]" style={{ lineHeight: '1.6' }}>
@@ -566,7 +557,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   onClick={() => { setTipDismissed(true); setShowTip(false); }}
                   className="flex-shrink-0 p-1"
                 >
-                  <X className="w-3 h-3 text-[var(--soft)]" />
+                  <DoodleIcon name="x" size={12} className="text-[var(--soft)]" />
                 </button>
               </div>
             )}
@@ -663,7 +654,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             {monthlyCap === null ? (
               <div className="flex flex-col items-center mb-4">
                 <div className="w-20 h-20 rounded-full bg-[var(--terra-10)] flex items-center justify-center mb-3">
-                  <Infinity className="w-10 h-10 text-[var(--terra)]" />
+                  <DoodleIcon name="infinity" size={40} className="text-[var(--terra)]" />
                 </div>
                 <span className="text-[32px] font-display font-normal text-[var(--near-black)]">Unlimited</span>
               </div>
@@ -671,9 +662,9 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               <div className="flex items-center justify-center gap-6 mb-4">
                 <button
                   onClick={() => setMonthlyCap(Math.max(1, monthlyCap - 1))}
-                  className="w-14 h-14 rounded-full border-[1.5px] border-[var(--faint)] flex items-center justify-center bg-white min-h-[44px]"
+                  className="w-14 h-14 rounded-full border-[1.5px] border-[var(--faint)] flex items-center justify-center bg-[#EDE8DC] min-h-[44px]"
                 >
-                  <Minus className="w-5 h-5 text-[var(--near-black)]" />
+                  <DoodleIcon name="minus" size={20} className="text-[var(--near-black)]" />
                 </button>
                 <span className="text-[68px] font-display font-normal text-[var(--near-black)] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
                   {monthlyCap}
@@ -682,7 +673,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   onClick={() => setMonthlyCap(Math.min(20, monthlyCap + 1))}
                   className="w-14 h-14 rounded-full bg-[var(--terra)] flex items-center justify-center min-h-[44px]"
                 >
-                  <Plus className="w-5 h-5 text-white" />
+                  <DoodleIcon name="plus" size={20} className="text-white" />
                 </button>
               </div>
             )}
@@ -698,16 +689,16 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               }`}
             >
               <div className="flex items-center gap-[10px]">
-                <Infinity className="w-[18px] h-[18px]" style={{ color: monthlyCap === null ? 'var(--terra)' : 'var(--mid)' }} />
+                <DoodleIcon name="infinity" size={18} className="" style={{ color: monthlyCap === null ? 'var(--terra)' : 'var(--mid)' }} />
                 <span className="text-[18px] font-semibold text-[var(--near-black)]">Unlimited claims</span>
               </div>
               <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${monthlyCap === null ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--faint)] justify-start'}`}>
-                <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                <div className="w-[22px] h-[22px] rounded-full bg-[#EDE8DC] mx-[2px] shadow-sm" />
               </div>
             </button>
 
             <div className="bg-[var(--bg)] rounded-[12px] p-[14px] flex items-start gap-2.5 mb-6">
-              <Info className="w-[14px] h-[14px] text-[var(--soft)] mt-0.5 flex-shrink-0" />
+              <DoodleIcon name="info" size={14} className="text-[var(--soft)] mt-0.5 flex-shrink-0" />
               <p className="text-[14px] text-[var(--soft)]">Each creator visits in person and posts within 48 hours</p>
             </div>
 
@@ -740,7 +731,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                       className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full flex items-center justify-center"
                       style={{ background: 'rgba(0,0,0,0.4)' }}
                     >
-                      <X className="w-3 h-3 text-white" />
+                      <DoodleIcon name="x" size={12} className="text-white" />
                     </button>
                   </div>
                 ) : (
@@ -749,7 +740,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     className="w-[160px] h-[120px] rounded-[16px] flex flex-col items-center justify-center gap-2"
                     style={{
                       background: getCategoryGradient(category),
-                      border: '1.5px dashed rgba(26,26,26,0.15)',
+                      border: '1.5px dashed rgba(28,18,8,0.15)',
                     }}
                   >
                     {photoUploading ? (
@@ -757,7 +748,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     ) : (
                       <>
                         <span className="text-[26px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials('Offer')}</span>
-                        <Camera className="w-5 h-5 text-[var(--soft)]" />
+                        <DoodleIcon name="camera" size={20} className="text-[var(--soft)]" />
                         <span className="text-[14px] text-[var(--soft)]">Tap to add photo</span>
                       </>
                     )}
@@ -857,7 +848,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
-            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] mb-6">
+            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] mb-6">
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
@@ -869,7 +860,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   <span className="text-[32px] font-extrabold text-white/80">{getInitials('Offer')}</span>
                 )}
                 <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[50px] text-[13px] font-bold text-[var(--near-black)]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
-                  <Video className="w-[10px] h-[10px]" /> Reel
+                  <DoodleIcon name="video" size={10} className="" /> Reel
                 </span>
               </div>
               {/* Body */}
@@ -877,13 +868,13 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <p className="text-[17px] font-extrabold text-[var(--near-black)]">Your business</p>
                 <p className="text-[18px] font-semibold text-[var(--near-black)] mt-0.5">{generatedTitle}</p>
                 <div className="flex items-center gap-1 mt-1.5">
-                  <Video className="w-[13px] h-[13px] text-[var(--terra)]" />
+                  <DoodleIcon name="video" size={13} className="text-[var(--terra)]" />
                   <span className="text-[15px] text-[var(--mid)]">Instagram Reel</span>
                 </div>
                 <p className="text-[15px] text-[var(--mid)] mt-1">{monthlyCap === null ? 'Unlimited slots' : `${monthlyCap} slots available`}</p>
                 {specificAsk.trim() && (
-                  <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(222,78,12,0.06)' }}>
-                    <p className="text-[18px] text-[rgba(26,26,26,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
+                  <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(212,71,12,0.06)' }}>
+                    <p className="text-[18px] text-[rgba(28,18,8,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
                   </div>
                 )}
               </div>
@@ -902,7 +893,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                         <span
                           key={i}
                           className="w-2 h-2 rounded-full"
-                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(26,26,26,0.12)' }}
+                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(28,18,8,0.12)' }}
                         />
                       ))}
                     </div>
@@ -917,7 +908,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                       onClick={() => setScreen(5)}
                       className="flex items-center gap-1 mt-1 text-[14px] font-semibold text-[var(--terra)]"
                     >
-                      Add a specific ask <ArrowRight className="w-[11px] h-[11px]" />
+                      Add a specific ask <DoodleIcon name="arrow-right" size={11} className="" />
                     </button>
                   )}
                 </div>
@@ -928,7 +919,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               onClick={() => setScreen(1)}
               className="text-[15px] font-semibold text-[var(--mid)] mb-6 flex items-center gap-1"
             >
-              <ChevronLeft className="w-3.5 h-3.5" /> Edit offer
+              <DoodleIcon name="chevron-left" size={12} className="w-3.5 h-3.5" /> Edit offer
             </button>
 
             <button
@@ -938,7 +929,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               }}
               disabled={isSubmitting}
               className="w-full py-[14px] rounded-[50px] font-bold text-[17px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all min-h-[52px]"
-              style={{ boxShadow: '0 4px 16px rgba(222,78,12,0.3)' }}
+              style={{ boxShadow: '0 4px 16px rgba(212,71,12,0.3)' }}
             >
               {isSubmitting ? 'Publishing...' : 'Go live'}
             </button>
@@ -1346,11 +1337,11 @@ export default function BusinessPortal() {
   }
 
   const bottomTabs: { key: 'home' | 'offers' | 'scan' | 'claims' | 'profile'; label: string; icon: any }[] = [
-    { key: 'home', label: 'Home', icon: LayoutDashboard },
-    { key: 'offers', label: 'Campaign', icon: Megaphone },
-    { key: 'scan', label: 'Scan', icon: ScanLine },
-    { key: 'claims', label: 'Claims', icon: FileText },
-    { key: 'profile', label: 'Profile', icon: User },
+    { key: 'home', label: 'Home', icon: 'dashboard' },
+    { key: 'offers', label: 'Campaign', icon: 'megaphone' },
+    { key: 'scan', label: 'Scan', icon: 'scan' },
+    { key: 'claims', label: 'Claims', icon: 'doc' },
+    { key: 'profile', label: 'Profile', icon: 'user' },
   ];
 
   const claimStatusStyle = (status: string) => {
@@ -1429,7 +1420,7 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[#F7F4F0]" style={{ overscrollBehavior: 'none' }}>
+    <div className="h-[100dvh] flex flex-col bg-[#F5F0E8]" style={{ overscrollBehavior: 'none' }}>
       <style>{livePulseStyle}</style>
 
       {/* ═══ Business Profile Overlay ═══ */}
@@ -1437,14 +1428,14 @@ export default function BusinessPortal() {
         const biz = nearbyBusinesses.find(b => b.id === expandedNearbyBiz);
         if (!biz) return null;
         return (
-          <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
             {/* Header */}
             <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
               <button
                 onClick={() => setExpandedNearbyBiz(null)}
                 className="w-[36px] h-[36px] rounded-full bg-[var(--bg)] flex items-center justify-center"
               >
-                <X className="w-[18px] h-[18px] text-[var(--near-black)]" />
+                <DoodleIcon name="x" size={18} className="text-[var(--near-black)]" />
               </button>
               <span className="text-[17px] font-bold text-[var(--near-black)] flex-1 truncate">{biz.name}</span>
             </div>
@@ -1452,7 +1443,7 @@ export default function BusinessPortal() {
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-[20px] pt-[24px]">
               {/* ═══ Profile card (matches creator profile DNA) ═══ */}
-              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
+              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
                 <div className="flex items-start gap-[16px]">
                   {/* Logo */}
                   <div
@@ -1471,7 +1462,7 @@ export default function BusinessPortal() {
                     <p className="text-[18px] text-[var(--mid)] mt-[2px]">{biz.category}</p>
                     {biz.address && (
                       <p className="text-[14px] text-[var(--soft)] mt-[4px] flex items-center gap-[4px]">
-                        <MapPin className="w-[12px] h-[12px]" /> {biz.address}
+                        <DoodleIcon name="map-pin" size={12} className="" /> {biz.address}
                       </p>
                     )}
                   </div>
@@ -1508,14 +1499,14 @@ export default function BusinessPortal() {
               <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
                 {biz.address && (
                   <div className="flex items-center gap-[10px] py-[4px]">
-                    <MapPin className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
+                    <DoodleIcon name="map-pin" size={18} className="text-[var(--mid)] flex-shrink-0" />
                     <p className="text-[18px] text-[var(--near-black)]">{biz.address}</p>
                   </div>
                 )}
                 {biz.address && biz.latest_claim_at && <div className="border-t border-[var(--faint)] my-[10px]" />}
                 {biz.latest_claim_at && (
                   <div className="flex items-center gap-[10px] py-[4px]">
-                    <Clock className="w-[18px] h-[18px] text-[var(--mid)] flex-shrink-0" />
+                    <DoodleIcon name="clock" size={18} className="text-[var(--mid)] flex-shrink-0" />
                     <p className="text-[18px] text-[var(--near-black)]">Last activity {timeAgo(biz.latest_claim_at)}</p>
                   </div>
                 )}
@@ -1525,7 +1516,7 @@ export default function BusinessPortal() {
               <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[32px]">
                 <div className="flex items-center gap-[10px]">
                   <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,74,46,0.06)] flex items-center justify-center flex-shrink-0">
-                    <BadgeCheck className="w-[18px] h-[18px] text-[var(--forest)]" />
+                    <DoodleIcon name="badge-check" size={18} className="text-[var(--forest)]" />
                   </div>
                   <div>
                     <p className="text-[18px] font-bold text-[var(--near-black)]">Verified on Nayba</p>
@@ -1560,7 +1551,7 @@ export default function BusinessPortal() {
       <div className="flex-1 overflow-y-auto">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="bg-white border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
+        <div className="bg-[#EDE8DC] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <Logo />
             <div className="text-right">
@@ -1587,10 +1578,10 @@ export default function BusinessPortal() {
                 <button
                   onClick={() => setShowOnboarding(true)}
                   className="w-full flex items-center justify-between px-[16px] py-[12px] rounded-[12px] mb-[16px] text-left"
-                  style={{ background: 'rgba(222,78,12,0.08)', border: '1px solid rgba(222,78,12,0.15)' }}
+                  style={{ background: 'rgba(212,71,12,0.08)', border: '1px solid rgba(212,71,12,0.15)' }}
                 >
                   <span className="text-[18px] font-semibold text-[var(--terra)]">Complete your setup to go live →</span>
-                  <ChevronRight className="w-[16px] h-[16px] text-[var(--terra)]" />
+                  <DoodleIcon name="chevron-right" size={16} className="text-[var(--terra)]" />
                 </button>
               )}
               {/* Greeting + compact stats banner */}
@@ -1607,15 +1598,15 @@ export default function BusinessPortal() {
 
               {/* Compact inline stats */}
               <div className="flex items-center gap-[6px] mb-7 flex-wrap">
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(222,78,12,0.08)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(212,71,12,0.08)]">
                   <span className="text-[15px] font-extrabold text-[var(--terra)]">{activeClaimsCount}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">active</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(26,26,26,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(28,18,8,0.04)]">
                   <span className="text-[15px] font-extrabold text-[var(--near-black)]">{reelsThisMonth}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">reels</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(26,26,26,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(28,18,8,0.04)]">
                   <span className="text-[15px] font-extrabold text-[var(--near-black)]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">slots left</span>
                 </span>
@@ -1631,7 +1622,7 @@ export default function BusinessPortal() {
                   const isUnlimited = slotCap === null;
                   const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
-                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(26,26,26,0.10)' }}>
+                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(28,18,8,0.10)' }}>
                       {/* Hidden file input for offer photo */}
                       <input
                         ref={offerPhotoInputRef}
@@ -1653,48 +1644,48 @@ export default function BusinessPortal() {
                             <button
                               onClick={() => offerPhotoInputRef.current?.click()}
                               disabled={offerPhotoUploading}
-                              className="px-[16px] py-[8px] rounded-[50px] text-[15px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
+                              className="px-[16px] py-[8px] rounded-[50px] text-[15px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] flex items-center gap-[6px]"
                             >
-                              <Camera className="w-[14px] h-[14px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add a photo'}
+                              <DoodleIcon name="camera" size={14} className="" /> {offerPhotoUploading ? 'Uploading…' : 'Add a photo'}
                             </button>
                           </div>
                         )}
                         {/* Top badges */}
-                        <span className="absolute top-[12px] left-[12px] inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-[50px] text-[13px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm">
+                        <span className="absolute top-[12px] left-[12px] inline-flex items-center gap-[4px] px-[10px] py-[4px] rounded-[50px] text-[13px] font-bold bg-[#EDE8DC]/90 text-[var(--forest)] backdrop-blur-sm">
                           <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                           Live
                         </span>
                         <button
                           onClick={() => { openOfferDetail(activeOffer); setView('offers'); }}
-                          className="absolute top-[12px] right-[12px] px-[14px] py-[5px] rounded-[50px] text-[14px] font-semibold bg-white/90 text-[var(--near-black)] backdrop-blur-sm"
+                          className="absolute top-[12px] right-[12px] px-[14px] py-[5px] rounded-[50px] text-[14px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] backdrop-blur-sm"
                         >
                           Edit
                         </button>
                       </div>
                       {/* Card body with title + stats */}
-                      <div className="px-[16px] py-[12px] bg-white">
+                      <div className="px-[16px] py-[12px] bg-[#EDE8DC]">
                         <p className="text-[20px] font-display font-normal text-[var(--near-black)] leading-tight">{activeOffer.generated_title || activeOffer.description}</p>
                         <p className="text-[15px] text-[var(--mid)] mt-[3px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`} · {slotsUsed} claimed</p>
                       </div>
                       {/* Footer actions */}
-                      <div className="flex items-center justify-between px-[16px] py-[12px] bg-white border-t border-[var(--faint)]">
+                      <div className="flex items-center justify-between px-[16px] py-[12px] bg-[#EDE8DC] border-t border-[var(--faint)]">
                         <button
                           onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
                           className="inline-flex items-center gap-[6px] text-[15px] font-medium text-[var(--soft)]"
                         >
-                          <PauseCircle className="w-[14px] h-[14px]" /> Pause campaign
+                          <DoodleIcon name="pause-circle" size={14} className="" /> Pause campaign
                         </button>
                         <button
                           onClick={() => { setView('offers'); }}
                           className="inline-flex items-center gap-[6px] text-[15px] font-semibold text-[var(--terra)]"
                         >
-                          <RefreshCw className="w-[14px] h-[14px]" /> Change offer
+                          <DoodleIcon name="refresh-cw" size={14} className="" /> Change offer
                         </button>
                       </div>
                     </div>
                   );
                 })() : (
-                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
+                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
                     <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                     <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer to start getting creator visits</p>
                     <button
@@ -1720,7 +1711,7 @@ export default function BusinessPortal() {
                 </div>
                 {recentActivity.length === 0 ? (
                   <div className="flex flex-col items-center py-8 px-4">
-                    <Sparkles className="w-10 h-10 text-[var(--soft)] mb-3" />
+                    <DoodleIcon name="sparkles" size={40} className="text-[var(--soft)] mb-3" />
                     <p className="text-[18px] text-[var(--mid)] text-center">Your first creator visit will appear here</p>
                   </div>
                 ) : (
@@ -1751,7 +1742,7 @@ export default function BusinessPortal() {
                             </p>
                             <p className="text-[14px] text-[var(--mid)]">{activityText} · {timeAgo(claim.claimed_at)}{count > 1 ? ` · ${count} claims` : ''}</p>
                           </div>
-                          <ChevronRight className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
+                          <DoodleIcon name="chevron-right" size={14} className="text-[var(--soft)] flex-shrink-0" />
                         </button>
                       );
                     })}
@@ -1770,7 +1761,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-white border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-[#EDE8DC] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: getCategoryGradient(biz.category) }}
@@ -1791,7 +1782,7 @@ export default function BusinessPortal() {
                               )}
                             </p>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-[var(--soft)] flex-shrink-0" />
+                          <DoodleIcon name="chevron-right" size={16} className="text-[var(--soft)] flex-shrink-0" />
                         </div>
                       </button>
                     ))}
@@ -1809,7 +1800,7 @@ export default function BusinessPortal() {
                 <>
                   <div className="flex items-center gap-3 mb-5">
                     <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
+                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
                     <h1 className="text-[24px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>Edit offer</h1>
                   </div>
@@ -1834,26 +1825,26 @@ export default function BusinessPortal() {
                     {selectedOffer.offer_photo_url ? (
                       <>
                         <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        <div className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-center justify-center group">
-                          <span className="opacity-0 group-hover:opacity-100 transition-opacity px-[14px] py-[6px] rounded-[50px] text-[14px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]">
-                            <Camera className="w-[13px] h-[13px]" /> Change photo
+                        <div className="absolute inset-0 bg-[#1C1208]/0 hover:bg-[#1C1208]/20 transition-colors flex items-center justify-center group">
+                          <span className="opacity-0 group-hover:opacity-100 transition-opacity px-[14px] py-[6px] rounded-[50px] text-[14px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] flex items-center gap-[6px]">
+                            <DoodleIcon name="camera" size={13} className="" /> Change photo
                           </span>
                         </div>
                       </>
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <span className="px-[16px] py-[8px] rounded-[50px] text-[15px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]">
-                          <Camera className="w-[14px] h-[14px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
+                        <span className="px-[16px] py-[8px] rounded-[50px] text-[15px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] flex items-center gap-[6px]">
+                          <DoodleIcon name="camera" size={14} className="" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
                         </span>
                       </div>
                     )}
                     {selectedOffer.is_live ? (
-                      <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[14px] font-bold bg-white/90 text-[var(--forest)] backdrop-blur-sm pointer-events-none">
+                      <span className="absolute top-[12px] right-[12px] inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-[50px] text-[14px] font-bold bg-[#EDE8DC]/90 text-[var(--forest)] backdrop-blur-sm pointer-events-none">
                         <span className="w-[6px] h-[6px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                         Live
                       </span>
                     ) : (
-                      <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[14px] font-bold bg-white/90 text-[var(--soft)] backdrop-blur-sm pointer-events-none">
+                      <span className="absolute top-[12px] right-[12px] px-[10px] py-[5px] rounded-[50px] text-[14px] font-bold bg-[#EDE8DC]/90 text-[var(--soft)] backdrop-blur-sm pointer-events-none">
                         Paused
                       </span>
                     )}
@@ -1939,7 +1930,7 @@ export default function BusinessPortal() {
                     const isUnlimited = slotCap === null;
                     const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                     return (
-                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
+                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
                         <div className="relative h-[120px]">
                           {activeOffer.offer_photo_url ? (
                             <img
@@ -1951,19 +1942,19 @@ export default function BusinessPortal() {
                               <button
                                 onClick={() => offerPhotoInputRef.current?.click()}
                                 disabled={offerPhotoUploading}
-                                className="px-[14px] py-[6px] rounded-[50px] text-[14px] font-semibold bg-white/90 text-[var(--near-black)] flex items-center gap-[6px]"
+                                className="px-[14px] py-[6px] rounded-[50px] text-[14px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] flex items-center gap-[6px]"
                               >
-                                <Camera className="w-[13px] h-[13px]" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
+                                <DoodleIcon name="camera" size={13} className="" /> {offerPhotoUploading ? 'Uploading…' : 'Add offer photo'}
                               </button>
                             </div>
                           )}
-                          <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[12px] font-bold bg-white/90 text-[var(--forest)]">
+                          <span className="absolute top-[10px] left-[10px] inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[12px] font-bold bg-[#EDE8DC]/90 text-[var(--forest)]">
                             <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
                             Live
                           </span>
                           <button
                             onClick={() => openOfferDetail(activeOffer)}
-                            className="absolute top-[10px] right-[10px] px-[14px] py-[5px] rounded-[50px] text-[14px] font-semibold bg-white text-[var(--near-black)]"
+                            className="absolute top-[10px] right-[10px] px-[14px] py-[5px] rounded-[50px] text-[14px] font-semibold bg-[#EDE8DC] text-[var(--near-black)]"
                           >
                             Edit
                           </button>
@@ -1973,7 +1964,7 @@ export default function BusinessPortal() {
                           <p className="text-[15px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                           <p className="text-[15px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
                           {!isUnlimited && (
-                            <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(222,78,12,0.1)' }}>
+                            <div className="mt-[8px] h-[3px] rounded-full" style={{ background: 'rgba(212,71,12,0.1)' }}>
                               <div className="h-full rounded-full" style={{ width: `${progress * 100}%`, background: 'var(--terra)', transition: 'width 300ms ease' }} />
                             </div>
                           )}
@@ -1983,19 +1974,19 @@ export default function BusinessPortal() {
                             onClick={() => handleToggleOffer(activeOffer.id, activeOffer.is_live)}
                             className="inline-flex items-center gap-[6px] text-[15px] font-medium text-[var(--soft)]"
                           >
-                            <PauseCircle className="w-[14px] h-[14px]" /> Pause campaign
+                            <DoodleIcon name="pause-circle" size={14} className="" /> Pause campaign
                           </button>
                           <button
                             onClick={() => setShowOfferBuilder(true)}
                             className="inline-flex items-center gap-[6px] text-[15px] font-semibold text-[var(--terra)]"
                           >
-                            <RefreshCw className="w-[14px] h-[14px]" /> Change offer
+                            <DoodleIcon name="refresh-cw" size={14} className="" /> Change offer
                           </button>
                         </div>
                       </div>
                     );
                   })() : (
-                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(26,26,26,0.05)' }}>
+                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
                       <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                       <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer</p>
                       <button
@@ -2024,7 +2015,7 @@ export default function BusinessPortal() {
                               className="w-[44px] h-[44px] rounded-[8px] flex items-center justify-center flex-shrink-0"
                               style={{ background: getCategoryGradient(userProfile.category) }}
                             >
-                              <Gift className="w-[18px] h-[18px] text-white/60" />
+                              <DoodleIcon name="gift" size={18} className="text-white/60" />
                             </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[18px] font-bold text-[var(--near-black)] truncate">{offer.generated_title || offer.description}</p>
@@ -2062,7 +2053,7 @@ export default function BusinessPortal() {
                 <div className="flex flex-col items-center py-8">
                   {scanResult.type === 'success' ? (
                     <>
-                      <CheckCircle2 className="w-16 h-16 text-[var(--terra)] mb-4" />
+                      <DoodleIcon name="check" size={64} className="text-[var(--terra)] mb-4" />
                       {scanResult.creatorName && (
                         <p className="text-[22px] font-display font-normal text-[var(--near-black)] mb-1">{scanResult.creatorName}</p>
                       )}
@@ -2077,7 +2068,7 @@ export default function BusinessPortal() {
                     </>
                   ) : (
                     <>
-                      <XCircle className="w-12 h-12 text-[var(--terra)] mb-4" />
+                      <DoodleIcon name="x" size={48} className="text-[var(--terra)] mb-4" />
                       <p className="text-[18px] font-bold text-[var(--near-black)] mb-1 text-center">{scanResult.message}</p>
                       <button
                         onClick={() => setScanResult(null)}
@@ -2094,7 +2085,7 @@ export default function BusinessPortal() {
                   {/* Visual header */}
                   <div className="flex flex-col items-center mb-8">
                     <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--bg)' }}>
-                      <QrCode className="w-8 h-8 text-[var(--terra)]" />
+                      <DoodleIcon name="qr-code" size={32} className="text-[var(--terra)]" />
                     </div>
                     <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-1" style={{ letterSpacing: '-0.4px' }}>Scan creator pass</h2>
                     <p className="text-[18px] text-[var(--mid)] text-center">Ask the creator to open their Active tab<br />and show their QR code</p>
@@ -2107,7 +2098,7 @@ export default function BusinessPortal() {
 
                   <div className="mt-6 mb-4 relative">
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--faint)]" /></div>
-                    <div className="relative flex justify-center"><span className="bg-white px-3 text-[14px] text-[var(--soft)]">or enter code manually</span></div>
+                    <div className="relative flex justify-center"><span className="bg-[#EDE8DC] px-3 text-[14px] text-[var(--soft)]">or enter code manually</span></div>
                   </div>
 
                   <form onSubmit={handleScanCode} className="space-y-3">
@@ -2122,7 +2113,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#1A1A1A] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#1C1208] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2144,7 +2135,7 @@ export default function BusinessPortal() {
                     className="inline-flex items-center gap-1 text-[15px] font-semibold text-[var(--terra)]"
                   >
                     {claims.find(c => c.creator_id === creatorFilter)?.creators?.name || 'Creator'}
-                    <X className="w-3.5 h-3.5" />
+                    <DoodleIcon name="x" size={12} className="w-3.5 h-3.5" />
                   </button>
                 ) : (
                   <button
@@ -2190,7 +2181,7 @@ export default function BusinessPortal() {
                   {filteredClaims.length === 0 && claims.length === 0 ? (
                     <div className="flex flex-col items-center py-20 px-6">
                       <div className="w-[56px] h-[56px] rounded-full bg-[var(--bg)] flex items-center justify-center mb-[16px]">
-                        <ClipboardList className="w-6 h-6 text-[var(--soft)]" />
+                        <DoodleIcon name="clipboard-list" size={24} className="text-[var(--soft)]" />
                       </div>
                       <p className="text-[17px] font-bold text-[var(--near-black)] mb-[4px]">No claims yet</p>
                       <p className="text-[15px] text-[var(--mid)] text-center">Creators will appear here once they claim your offers</p>
@@ -2243,11 +2234,11 @@ export default function BusinessPortal() {
                                 onClick={() => { setView('scan'); setScanResult(null); }}
                                 className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--near-black)] text-white text-[15px] font-semibold hover:bg-[#333333] transition-colors"
                               >
-                                <ScanLine className="w-[14px] h-[14px]" /> Scan
+                                <DoodleIcon name="scan" size={14} className="" /> Scan
                               </button>
                             ) : claim.status === 'completed' && claim.reel_url ? (
                               <a href={claim.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[15px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors">
-                                <Video className="w-[14px] h-[14px]" /> Reel
+                                <DoodleIcon name="video" size={14} className="" /> Reel
                               </a>
                             ) : (
                               <span className={`text-[13px] font-semibold px-[10px] py-[5px] rounded-[50px] ${claimStatusStyle(claim.status)}`}>
@@ -2268,14 +2259,14 @@ export default function BusinessPortal() {
                 <>
                   {claims.filter(c => c.reel_url).length === 0 ? (
                     <div className="flex flex-col items-center py-16 px-6">
-                      <Film className="w-12 h-12 text-[var(--soft)] mb-4" />
+                      <DoodleIcon name="film" size={48} className="text-[var(--soft)] mb-4" />
                       <p className="text-[18px] font-bold text-[var(--near-black)] mb-1">No content yet</p>
                       <p className="text-[18px] text-[var(--mid)] text-center max-w-[260px]">Reels will appear here once creators post and submit their links</p>
                     </div>
                   ) : (
                     <div className="space-y-[12px]">
                       {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] p-[16px]">
+                        <div key={claim.id} className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] p-[16px]">
                           <div className="flex items-start gap-[12px]">
                             {claim.creators.avatar_url ? (
                               <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -2299,7 +2290,7 @@ export default function BusinessPortal() {
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-[6px] mt-[10px] px-[14px] py-[8px] rounded-[50px] bg-[var(--bg)] text-[15px] font-semibold text-[var(--near-black)] hover:bg-[var(--pressed)] transition-colors"
                               >
-                                <Video className="w-[14px] h-[14px]" /> View reel <ExternalLink className="w-3 h-3 text-[var(--soft)]" />
+                                <DoodleIcon name="video" size={14} className="" /> View reel <DoodleIcon name="external-link" size={12} className="text-[var(--soft)]" />
                               </a>
                             </div>
                           </div>
@@ -2336,7 +2327,7 @@ export default function BusinessPortal() {
                     <button
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
-                      className={`w-full text-left bg-white rounded-[16px] p-4 shadow-[0_2px_12px_rgba(26,26,26,0.08)] transition-all ${
+                      className={`w-full text-left bg-[#EDE8DC] rounded-[16px] p-4 shadow-[0_2px_12px_rgba(28,18,8,0.08)] transition-all ${
                         notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)] bg-[var(--terra-5)]'
                       }`}
                     >
@@ -2358,8 +2349,8 @@ export default function BusinessPortal() {
           {view === 'profile' && (
             <div className="pt-4">
               {isPendingApproval && (
-                <div className="mx-[20px] mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(222,78,12,0.08), rgba(200,184,240,0.12))' }}>
-                  <Clock className="w-7 h-7 text-[var(--terra)] mx-auto mb-2.5" />
+                <div className="mx-[20px] mb-6 rounded-[16px] p-5 text-center" style={{ background: 'linear-gradient(135deg, rgba(212,71,12,0.08), rgba(200,184,240,0.12))' }}>
+                  <DoodleIcon name="clock" size={28} className="text-[var(--terra)] mx-auto mb-2.5" />
                   <h3 className="text-[19px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
                   <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We're reviewing your business — you'll get an email once approved. In the meantime, make sure your profile is complete!</p>
                 </div>
@@ -2367,7 +2358,7 @@ export default function BusinessPortal() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(26,26,26,0.08)' }}>
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(28,18,8,0.08)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Logo */}
                       <div className="relative flex-shrink-0">
@@ -2412,7 +2403,7 @@ export default function BusinessPortal() {
                           onClick={() => logoInputRef.current?.click()}
                           className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white"
                         >
-                          <Camera className="w-[11px] h-[11px] text-white" />
+                          <DoodleIcon name="camera" size={11} className="text-white" />
                         </button>
                       </div>
 
@@ -2425,13 +2416,13 @@ export default function BusinessPortal() {
                           </span>
                           {userProfile.approved && (
                             <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--forest)]">
-                              <BadgeCheck className="w-[13px] h-[13px]" /> Verified
+                              <DoodleIcon name="badge-check" size={13} className="" /> Verified
                             </span>
                           )}
                         </div>
                         {userProfile.address && (
                           <div className="flex items-start gap-[6px] mt-[6px]">
-                            <MapPin className="w-[13px] h-[13px] text-[var(--soft)] flex-shrink-0 mt-[1px]" />
+                            <DoodleIcon name="map-pin" size={13} className="text-[var(--soft)] flex-shrink-0 mt-[1px]" />
                             <button
                               onClick={() => { navigator.clipboard.writeText(userProfile.address || ''); setCopiedCode(true); setTimeout(() => setCopiedCode(false), 1500); }}
                               className="text-[14px] text-[var(--soft)] text-left leading-[1.4]"
@@ -2445,7 +2436,7 @@ export default function BusinessPortal() {
                               {copiedCode ? (
                                 <span className="text-[var(--terra)] text-[13px] font-semibold">Copied!</span>
                               ) : (
-                                <Copy className="w-[12px] h-[12px] text-[var(--soft)]" />
+                                <DoodleIcon name="copy" size={12} className="text-[var(--soft)]" />
                               )}
                             </button>
                           </div>
@@ -2453,7 +2444,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-[10px] mt-[4px]">
                           {userProfile.instagram_handle && (
                             <span className="flex items-center gap-1 text-[14px] text-[var(--soft)]">
-                              <Instagram className="w-3 h-3" /> {userProfile.instagram_handle}
+                              <DoodleIcon name="instagram" size={12} className="" /> {userProfile.instagram_handle}
                             </span>
                           )}
                         </div>
@@ -2495,26 +2486,26 @@ export default function BusinessPortal() {
                       className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <User className="w-[20px] h-[20px] text-[var(--mid)]" />
+                        <DoodleIcon name="user" size={20} className="text-[var(--mid)]" />
                         <span className="text-[17px] font-semibold text-[var(--near-black)]">Edit profile</span>
                       </div>
-                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
+                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--soft)]" />
                     </button>
                     <button
                       onClick={() => setView('notifications')}
                       className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <Bell className="w-[20px] h-[20px] text-[var(--mid)]" />
+                        <DoodleIcon name="bell" size={20} className="text-[var(--mid)]" />
                         <span className="text-[17px] font-semibold text-[var(--near-black)]">Notifications</span>
                       </div>
-                      <ChevronRight className="w-[18px] h-[18px] text-[var(--soft)]" />
+                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--soft)]" />
                     </button>
                     <button
                       onClick={signOut}
                       className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
-                      <LogOut className="w-[20px] h-[20px] text-[var(--terra)]" />
+                      <DoodleIcon name="logout" size={20} className="text-[var(--terra)]" />
                       <span className="text-[17px] font-semibold text-[var(--terra)]">Sign out</span>
                     </button>
                   </div>
@@ -2524,7 +2515,7 @@ export default function BusinessPortal() {
                 <>
                   <div className="flex items-center gap-3 mb-5">
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                      <ChevronLeft className="w-5 h-5 text-[var(--near-black)]" />
+                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
                     <h1 className="text-[28px] font-display font-normal text-[var(--near-black)]">Edit profile</h1>
                   </div>
@@ -2608,23 +2599,21 @@ export default function BusinessPortal() {
 
       {/* ═══ Bottom Nav ═══ */}
       <nav
-        className="bg-white flex items-end justify-around flex-shrink-0"
+        className="bg-[#EDE8DC] flex items-end justify-around flex-shrink-0"
         style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 max(16px, env(safe-area-inset-bottom))' }}
       >
         {bottomTabs.map((tab) => {
           const isActive = view === tab.key;
-          const Icon = tab.icon;
-
           if (tab.key === 'scan') {
             return (
               <div key={tab.key} className="flex-1 flex items-center justify-center">
                 <button
                   onClick={() => { if (isPendingApproval) return; setView('scan'); setScanResult(null); }}
-                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(26,26,26,0.1)]' : 'bg-[var(--terra)]'} text-white`}
-                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(222,78,12,0.3)' }}
+                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(28,18,8,0.1)]' : 'bg-[var(--terra)]'} text-white`}
+                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(212,71,12,0.3)' }}
                 >
-                  <Icon className="w-[18px] h-[18px] text-white" />
-                  <span className="text-[14px] font-bold text-white">Scan</span>
+                  <DoodleIcon name={tab.icon} size={18} className="text-[#F5F0E8]" />
+                  <span className="text-[14px] font-bold text-[#F5F0E8]">Scan</span>
                 </button>
               </div>
             );
@@ -2637,8 +2626,8 @@ export default function BusinessPortal() {
               onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
               className="flex-1 flex flex-col items-center gap-1"
             >
-              <Icon className={`w-5 h-5 ${isDisabled ? 'text-[rgba(26,26,26,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-              <span className={`text-[12px] font-semibold ${isDisabled ? 'text-[rgba(26,26,26,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+              <DoodleIcon name={tab.icon} size={20} className={isDisabled ? 'text-[rgba(28,18,8,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'} />
+              <span className={`text-[12px] font-semibold ${isDisabled ? 'text-[rgba(28,18,8,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
                 {tab.label}
               </span>
             </button>

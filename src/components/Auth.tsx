@@ -2,8 +2,8 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { Building2, Eye, EyeOff, MapPin, Sparkles, Check, ArrowLeft, ArrowRight, Mail, Lock, User, Instagram, Users, ChevronRight, Cake } from 'lucide-react';
-import { CATEGORY_ICONS, CATEGORY_LIST, CategoryIcon } from '../lib/categories';
+import { DoodleIcon } from '../lib/doodle-icons';
+import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
 declare global {
@@ -142,12 +142,12 @@ function AddressAutocomplete({ value, onChange }: {
       <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">Address</label>
       <div className={`relative rounded-[14px] border transition-all duration-200 ${
         focused
-          ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
+          ? 'border-[var(--terra)] bg-[#EDE8DC] shadow-[0_0_0_3px_var(--terra-ring)]'
           : mapsError
-          ? 'border-[rgba(222,78,12,0.3)] bg-[var(--bg)]'
+          ? 'border-[rgba(212,71,12,0.3)] bg-[var(--bg)]'
           : 'border-[var(--faint)] bg-[var(--bg)]'
       }`}>
-        <MapPin className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
+        <DoodleIcon name="map-pin" size={16} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--terra)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
         }`} />
         <input
@@ -165,7 +165,7 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-white rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(26,26,26,0.10)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(28,18,8,0.10)] overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.place_id}
@@ -174,7 +174,7 @@ function AddressAutocomplete({ value, onChange }: {
               onClick={() => handleSelect(s)}
               className="w-full text-left px-[14px] py-[12px] text-[18px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
             >
-              <MapPin className="w-[14px] h-[14px] text-[var(--soft)] flex-shrink-0" />
+              <DoodleIcon name="map-pin" size={14} className="text-[var(--soft)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
             </button>
           ))}
@@ -185,9 +185,9 @@ function AddressAutocomplete({ value, onChange }: {
 }
 
 /* Floating label input component */
-function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, placeholder, required, minLength, rightElement }: {
+function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, placeholder, required, minLength, rightElement }: {
   label: string;
-  icon?: any;
+  icon?: string;
   type?: string;
   value: string;
   onChange: (v: string) => void;
@@ -202,15 +202,17 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
   return (
     <div className={`relative rounded-[14px] border transition-all duration-200 ${
       focused
-        ? 'border-[var(--terra)] bg-white shadow-[0_0_0_3px_var(--terra-ring)]'
+        ? 'border-[var(--terra)] bg-[#EDE8DC] shadow-[0_0_0_3px_var(--terra-ring)]'
         : hasValue
           ? 'border-[var(--faint)] bg-[var(--bg)]'
           : 'border-[var(--faint)] bg-[var(--bg)]'
     }`}>
-      {Icon && (
-        <Icon className={`absolute left-[14px] top-1/2 -translate-y-1/2 w-[16px] h-[16px] transition-colors ${
+      {iconName && (
+        <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
-        }`} />
+        }`}>
+          <DoodleIcon name={iconName} size={16} />
+        </span>
       )}
       <input
         type={type}
@@ -219,7 +221,7 @@ function FloatingInput({ label, icon: Icon, type = 'text', value, onChange, plac
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${Icon ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
+        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
         required={required}
         minLength={minLength}
       />
@@ -328,13 +330,13 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F4F0] overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#F5F0E8] overscroll-none">
       {/* Top section with branding */}
       <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
         <div className="mt-[10px]">
           <Logo size={24} variant="wordmark" />
         </div>
-        <p className="text-[rgba(26,26,26,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
+        <p className="text-[rgba(28,18,8,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
@@ -344,7 +346,7 @@ export default function Auth() {
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
+                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(28,18,8,0.06),0_1px_2px_rgba(28,18,8,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -354,7 +356,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-white text-[var(--near-black)] shadow-[0_1px_3px_rgba(26,26,26,0.06),0_1px_2px_rgba(26,26,26,0.04)]'
+                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(28,18,8,0.06),0_1px_2px_rgba(28,18,8,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -368,7 +370,7 @@ export default function Auth() {
             <div className="space-y-[12px]">
               <FloatingInput
                 label="Email"
-                icon={Mail}
+                icon="mail"
                 type="email"
                 value={email}
                 onChange={setEmail}
@@ -377,7 +379,7 @@ export default function Auth() {
               />
               <FloatingInput
                 label="Password"
-                icon={Lock}
+                icon="lock"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={setPassword}
@@ -386,7 +388,7 @@ export default function Auth() {
                 minLength={8}
                 rightElement={
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
-                    {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                    {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
                   </button>
                 }
               />
@@ -402,7 +404,7 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+              className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -429,13 +431,13 @@ export default function Auth() {
               onClick={() => setForgotPassword(false)}
               className="flex items-center gap-[6px] text-[15px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[var(--near-black)] transition-colors"
             >
-              <ArrowLeft className="w-[14px] h-[14px]" /> Back to sign in
+              <DoodleIcon name="arrow-left" size={14} className="" /> Back to sign in
             </button>
 
             {resetSent ? (
               <div className="text-center py-[32px]">
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
-                  <Mail className="w-[24px] h-[24px] text-[var(--terra)]" />
+                  <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
                 </div>
                 <p className="text-[19px] font-bold text-[var(--near-black)] mb-[6px]">Check your email</p>
                 <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
@@ -448,7 +450,7 @@ export default function Auth() {
                 </div>
                 <FloatingInput
                   label="Email"
-                  icon={Mail}
+                  icon="mail"
                   type="email"
                   value={resetEmail}
                   onChange={setResetEmail}
@@ -464,7 +466,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+                  className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -484,13 +486,13 @@ export default function Auth() {
                 className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
                   role === 'creator'
                     ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
-                    : 'border-[var(--faint)] bg-white hover:border-[var(--soft)]'
+                    : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
                   role === 'creator' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
                 }`}>
-                  <Sparkles className={`w-[18px] h-[18px] ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
                 <span className={`text-[15px] font-bold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                   Creator
@@ -502,13 +504,13 @@ export default function Auth() {
                 className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
                   role === 'business'
                     ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
-                    : 'border-[var(--faint)] bg-white hover:border-[var(--soft)]'
+                    : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
                   role === 'business' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
                 }`}>
-                  <Building2 className={`w-[18px] h-[18px] ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
                 </div>
                 <span className={`text-[15px] font-bold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
                   Business
@@ -527,7 +529,7 @@ export default function Auth() {
                         ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
                         : 'bg-[var(--elevated)] text-[var(--soft)]'
                   }`}>
-                    {signupStep > step ? <Check className="w-[13px] h-[13px]" /> : step}
+                    {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
                   </div>
                   {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[var(--elevated)]'}`} />}
                 </div>
@@ -548,8 +550,8 @@ export default function Auth() {
                 {/* Step 1: Name, Instagram, Follower Count */}
                 {signupStep === 1 && (
                   <div className="space-y-[12px]">
-                    <FloatingInput label="Full Name" icon={User} value={name} onChange={setName} placeholder="Sophie Taylor" required />
-                    <FloatingInput label="Instagram Handle" icon={Instagram} value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
+                    <FloatingInput label="Full Name" icon="user" value={name} onChange={setName} placeholder="Sophie Taylor" required />
+                    <FloatingInput label="Instagram Handle" icon="instagram" value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
 
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Follower Count</label>
@@ -561,7 +563,7 @@ export default function Auth() {
                             onClick={() => setFollowerCount(opt)}
                             className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
                             style={{
-                              background: followerCount === opt ? 'var(--terra)' : 'white',
+                              background: followerCount === opt ? 'var(--terra)' : '#EDE8DC',
                               color: followerCount === opt ? 'white' : 'var(--near-black)',
                               border: followerCount === opt ? 'none' : '0.5px solid var(--near-black)',
                             }}
@@ -580,11 +582,11 @@ export default function Auth() {
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
                       <div className="flex items-center gap-[8px]">
-                        <Cake className="w-[16px] h-[16px] text-[var(--soft)] flex-shrink-0" />
+                        <DoodleIcon name="cake" size={16} className="text-[var(--soft)] flex-shrink-0" />
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -596,7 +598,7 @@ export default function Auth() {
                         <select
                           value={dobMonth}
                           onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -608,7 +610,7 @@ export default function Auth() {
                         <select
                           value={dobYear}
                           onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-white focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -631,10 +633,10 @@ export default function Auth() {
                 {/* Step 3: Email & Password */}
                 {signupStep === 3 && (
                   <div className="space-y-[12px]">
-                    <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
+                    <FloatingInput label="Email" icon="mail" type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
                     <FloatingInput
                       label="Password"
-                      icon={Lock}
+                      icon="lock"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={setPassword}
@@ -643,7 +645,7 @@ export default function Auth() {
                       minLength={8}
                       rightElement={
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
-                          {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                          {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
                         </button>
                       }
                     />
@@ -658,7 +660,7 @@ export default function Auth() {
                 {/* Step 1: Name & Category */}
                 {signupStep === 1 && (
                   <div className="space-y-[16px]">
-                    <FloatingInput label="Business Name" icon={Building2} value={name} onChange={setName} placeholder="Juice Bar Co" required />
+                    <FloatingInput label="Business Name" icon="shop" value={name} onChange={setName} placeholder="Juice Bar Co" required />
 
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[10px]">Category</label>
@@ -671,7 +673,7 @@ export default function Auth() {
                             className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] text-left transition-all duration-200"
                             style={{
                               border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
-                              background: category === cat ? 'rgba(222,78,12,0.08)' : 'white',
+                              background: category === cat ? 'rgba(212,71,12,0.08)' : '#EDE8DC',
                               color: category === cat ? 'var(--terra)' : undefined,
                             }}
                           >
@@ -700,7 +702,7 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-white transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-[#EDE8DC] transition-all resize-none"
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
@@ -712,10 +714,10 @@ export default function Auth() {
                 {/* Step 3: Email & Password */}
                 {signupStep === 3 && (
                   <div className="space-y-[12px]">
-                    <FloatingInput label="Email" icon={Mail} type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
+                    <FloatingInput label="Email" icon="mail" type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
                     <FloatingInput
                       label="Password"
-                      icon={Lock}
+                      icon="lock"
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={setPassword}
@@ -724,7 +726,7 @@ export default function Auth() {
                       minLength={8}
                       rightElement={
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
-                          {showPassword ? <EyeOff className="w-[16px] h-[16px]" /> : <Eye className="w-[16px] h-[16px]" />}
+                          {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
                         </button>
                       }
                     />
@@ -750,7 +752,7 @@ export default function Auth() {
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                       className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
                     >
-                      <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
+                      <DoodleIcon name="arrow-left" size={18} className="text-[var(--near-black)]" />
                     </button>
                   )}
                   <button
@@ -775,9 +777,9 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(222,78,12,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
                   >
-                    Continue <ArrowRight className="w-[16px] h-[16px]" />
+                    Continue <DoodleIcon name="arrow-right" size={16} className="" />
                   </button>
                 </div>
               ) : (
@@ -787,12 +789,12 @@ export default function Auth() {
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                     className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
                   >
-                    <ArrowLeft className="w-[18px] h-[18px] text-[var(--near-black)]" />
+                    <DoodleIcon name="arrow-left" size={18} className="text-[var(--near-black)]" />
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(222,78,12,0.3)]"
+                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">

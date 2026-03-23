@@ -4,23 +4,23 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        display: ['Figtree', 'sans-serif'],
-        sans: ['Figtree', 'sans-serif'],
+        display: ['Corben', 'serif'],
+        sans: ['DM Sans', 'sans-serif'],
       },
       colors: {
         nayba: {
-          white: '#FFFDF8',
-          bg: '#FFFDF8',
-          terra: '#CB4A2F',
-          'terra-hover': '#B5422A',
+          white: '#F5F0E8',
+          bg: '#F5F0E8',
+          terra: '#D4470C',
+          'terra-hover': '#B93D0A',
           forest: '#1A4A2E',
           ochre: '#E8A020',
-          'near-black': '#1A1A1A',
-          card: '#FFFFFF',
-          'card-border': '#E0E0E0',
-          lavender: '#C8B8F0',
-          peach: '#F5C4A0',
-          pink: '#F4A8C0',
+          'near-black': '#1C1208',
+          card: '#EDE8DC',
+          'card-border': '#DDD8CC',
+          sage: '#E8EEE7',
+          'dusty-blue': '#E4EAED',
+          peach: '#F2E8E0',
         },
       },
       borderRadius: {

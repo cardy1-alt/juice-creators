@@ -21,9 +21,9 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   return (
     <span
       style={{
-        fontFamily: 'Figtree, sans-serif',
+        fontFamily: "'Corben', serif",
         fontSize: size,
-        fontWeight: 900,
+        fontWeight: 400,
         color,
         lineHeight: 1.1,
         letterSpacing: '-0.02em',
@@ -34,7 +34,7 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   );
 }
 
-export function Logo({ size = 40, color = "#CB4A2F", variant = 'icon-word' }: LogoProps) {
+export function Logo({ size = 40, color = "#D4470C", variant = 'icon-word' }: LogoProps) {
   if (variant === 'icon') {
     return <LogoIcon size={size} />;
   }
