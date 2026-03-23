@@ -1960,7 +1960,7 @@ export default function BusinessPortal() {
                           </button>
                         </div>
                         <div className="px-[16px] py-[14px]">
-                          <p className="text-[18px] font-extrabold text-[var(--near-black)]">{activeOffer.generated_title || activeOffer.description}</p>
+                          <p className="font-display text-[var(--near-black)]" style={{ fontSize: 18 }}>{activeOffer.generated_title || activeOffer.description}</p>
                           <p className="text-[15px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                           <p className="text-[15px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
                           {!isUnlimited && (
@@ -2018,7 +2018,7 @@ export default function BusinessPortal() {
                               <DoodleIcon name="gift" size={18} className="text-white/60" />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="text-[18px] font-bold text-[var(--near-black)] truncate">{offer.generated_title || offer.description}</p>
+                              <p className="font-display text-[var(--near-black)] truncate" style={{ fontSize: 16 }}>{offer.generated_title || offer.description}</p>
                               <p className="text-[14px] text-[var(--soft)]">
                                 {createdDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
                               </p>
@@ -2280,7 +2280,7 @@ export default function BusinessPortal() {
                             )}
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] font-bold text-[var(--near-black)]">{claim.creators.name}</p>
-                              <p className="text-[18px] text-[var(--near-black)] font-semibold mt-[4px]">
+                              <p className="font-display text-[var(--near-black)] mt-[4px]" style={{ fontSize: 16 }}>
                                 {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
                               </p>
                               <p className="text-[14px] text-[var(--soft)] mt-[4px]">{timeAgo(claim.claimed_at)}</p>

@@ -1325,7 +1325,7 @@ export default function CreatorApp() {
                         key={tab.key}
                         onClick={() => setSelectedCategory(tab.key)}
                         className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all min-h-[44px] rounded-full ${
-                          isActive ? 'bg-[var(--near-black)] text-white' : 'text-[var(--soft)]'
+                          isActive ? 'bg-[rgba(212,71,12,0.10)] text-[var(--terra)]' : 'text-[var(--soft)]'
                         }`}
                       >
                         <DoodleIcon name={tab.icon} size={20} />
@@ -1432,8 +1432,12 @@ export default function CreatorApp() {
                                 background: '#D4470C',
                               }}
                             >
+                              {/* Decorative wavy watermark */}
+                              <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(255,255,255,0.15)" strokeWidth="40" fill="none" strokeLinecap="round" />
+                              </svg>
                               {/* Solid branded card — no photo */}
-                              <div className="flex flex-col justify-between h-full" style={{ padding: '20px 20px 18px' }}>
+                              <div className="relative flex flex-col justify-between h-full" style={{ padding: '20px 20px 18px' }}>
                                 <div>
                                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>
                                     {claim.businesses.name}
@@ -1692,10 +1696,10 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[16px] overflow-hidden"
-                      style={{ width: 164, flexShrink: 0, background: pastelBg }}
+                      className="text-left rounded-[16px] overflow-hidden flex flex-col"
+                      style={{ width: 164, height: 192, flexShrink: 0, background: pastelBg }}
                     >
-                      {/* Top area — icon + slots badge */}
+                      {/* Top area — icon + heart */}
                       <div className="relative" style={{ padding: '14px 12px 0' }}>
                         <div className="flex items-center justify-between">
                           <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
@@ -1718,15 +1722,15 @@ export default function CreatorApp() {
                         )}
                       </div>
 
-                      {/* Headline — the hero element */}
-                      <div style={{ padding: '10px 12px 6px' }}>
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 17, color: '#2C2420', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0, letterSpacing: '-0.2px' }}>
+                      {/* Headline — Corben, fixed 2-line reserve */}
+                      <div style={{ padding: '8px 12px 0', minHeight: 48 }}>
+                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 15, color: '#2C2420', lineHeight: 1.3, height: '2.6em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
                           {offerTitle || bizName}
                         </p>
                       </div>
 
-                      {/* Footer — business name + slots */}
-                      <div style={{ padding: '0 12px 12px' }}>
+                      {/* Footer — business name + slots, pushed to bottom */}
+                      <div className="mt-auto" style={{ padding: '4px 12px 12px' }}>
                         <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(44,36,32,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
@@ -1935,7 +1939,7 @@ export default function CreatorApp() {
                             <div className="bg-[#EDE8DC] rounded-[16px] border-[1.5px] border-[#E0E0E0] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
 
                               {/* Offer title — one line */}
-                              <p className="text-[18px] font-semibold text-[#2C2420] truncate mb-[10px]">{offerTitle}</p>
+                              <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420' }}>{offerTitle}</p>
 
                               {/* Breadcrumb stepper — one line */}
                               <div className="flex items-center flex-nowrap mb-4">

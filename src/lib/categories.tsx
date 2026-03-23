@@ -128,17 +128,17 @@ export function getCategorySolidColor(category: string | undefined | null): stri
   return CATEGORY_SOLID_COLORS[category || ''] || '#1A4A2E';
 }
 
-// Muted pastel card backgrounds
+// Muted pastel card backgrounds — visually distinct per category
 const CATEGORY_PASTEL_BG: Record<string, string> = {
-  'Food & Drink': '#F2E8E0',
-  'Cafe & Coffee': '#F2E8E0',
-  'Hair & Beauty': '#F2E2EA',
-  'Wellness & Spa': '#E8EEE7',
-  'Health & Fitness': '#E4EAED',
-  'Retail': '#E4EAED',
-  'Arts & Entertainment': '#F2E8E0',
-  'Education': '#E8EEE7',
-  'Pets': '#F2E8E0',
+  'Food & Drink': '#EDE8D0',
+  'Cafe & Coffee': '#EDE8D0',
+  'Hair & Beauty': '#EDD4D4',
+  'Wellness & Spa': '#D4E8D0',
+  'Health & Fitness': '#D4E0ED',
+  'Retail': '#D4E0ED',
+  'Arts & Entertainment': '#EDD4D4',
+  'Education': '#D4E8D0',
+  'Pets': '#EDE8D0',
   'Services': '#EDE8DC',
 };
 
