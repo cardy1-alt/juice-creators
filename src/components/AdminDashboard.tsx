@@ -255,7 +255,7 @@ export default function AdminDashboard() {
           {view === 'stats' && (
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
-                <div className="bg-[var(--terra-10)] rounded-[16px] p-5 border border-[var(--terra-20)]">
+                <div className="bg-[var(--terra-10)] rounded-[18px] p-5 border border-[var(--terra-20)]">
                   <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCardData.map((stat, i) => (
-                  <div key={i} className="bg-[#EDE8DC] rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+                  <div key={i} className="bg-[#EDE8DC] rounded-[18px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                     <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--mid)]" /></div>
                     <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stat.value}</p>
                     <p className="text-sm text-[var(--mid)] mt-1 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>{stat.label}</p>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="users" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="store" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[18px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="clipboard-list" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
+              <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
                 <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -502,7 +502,7 @@ export default function AdminDashboard() {
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
                       required
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(44,36,32,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[#EDE8DC] text-[var(--near-black)] placeholder:text-[#2C2420]/40"
                       placeholder="Enter current password"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />
@@ -518,7 +518,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setNewPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(44,36,32,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[#EDE8DC] text-[var(--near-black)] placeholder:text-[#2C2420]/40"
                       placeholder="Enter new password (min 8 characters)"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />
@@ -534,7 +534,7 @@ export default function AdminDashboard() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       minLength={8}
-                      className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
+                      className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(44,36,32,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[#EDE8DC] text-[var(--near-black)] placeholder:text-[#2C2420]/40"
                       placeholder="Confirm new password"
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />

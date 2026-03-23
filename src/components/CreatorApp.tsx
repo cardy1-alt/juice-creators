@@ -114,9 +114,9 @@ function StatusPill({ status }: { status: string }) {
     redeemed: 'bg-[var(--bg)] text-[var(--near-black)]',
     visited: 'bg-[var(--bg)] text-[var(--near-black)]',
     reel_due: 'bg-[var(--near-black)] text-white',
-    submitted: 'bg-emerald-500 text-white',
+    submitted: 'bg-[var(--forest)] text-white',
     expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)] border border-[rgba(44,36,32,0.1)]',
-    overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
+    overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)]',
     completed: 'bg-[var(--bg)] text-[var(--mid)]',
     disputed: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
   };
@@ -682,7 +682,7 @@ export default function CreatorApp() {
   const activeBadgeColor = activeUrgency === 'overdue'
     ? 'bg-[var(--near-black)]'
     : activeUrgency === 'soon'
-    ? 'bg-amber-500'
+    ? 'bg-[var(--terra)]'
     : 'bg-[var(--near-black)]';
 
   const foodCategories = ['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'];
@@ -764,11 +764,11 @@ export default function CreatorApp() {
       {/* Level Up Overlay */}
       {showLevelUpOverlay && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(44,36,32,0.85)' }}>
-          <div className="bg-[#EDE8DC] rounded-[16px] p-[36px_28px] text-center max-w-[320px] mx-4">
+          <div className="bg-[#EDE8DC] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.025em' }}>
+            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.01em' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
             <p className="text-[18px] text-[var(--mid)] mb-6 leading-[1.5]">
@@ -818,7 +818,7 @@ export default function CreatorApp() {
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.01em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
               <p className="text-[18px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
@@ -908,8 +908,8 @@ export default function CreatorApp() {
                       value={reelUrl}
                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                       placeholder="https://instagram.com/reel/"
-                      className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
-                      style={{ background: 'white', border: '1.5px solid rgba(44,36,32,0.15)', borderRadius: 12, padding: '14px 16px', ...(reelUrl ? {} : {}), }}
+                      className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
+                      style={{ background: '#EDE8DC', border: '1.5px solid rgba(44,36,32,0.08)', borderRadius: 50, padding: '14px 16px', fontSize: '16px' }}
                       onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--near-black)'; }}
                       onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(44,36,32,0.15)'; }}
                     />
@@ -1026,7 +1026,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[36px] font-display font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.5px' }}>
+            <h2 className="text-[36px] font-display font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.01em' }}>
               Reel submitted!
             </h2>
             <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1078,7 +1078,7 @@ export default function CreatorApp() {
               ) : offer.businesses.logo_url ? (
                 <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
               ) : (
-                <div className="w-[64px] h-[64px] rounded-[16px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
+                <div className="w-[64px] h-[64px] rounded-[18px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
                   <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
                 </div>
               )}
@@ -1119,7 +1119,7 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', marginTop: 8, marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', letterSpacing: '-0.01em', marginTop: 8, marginBottom: 8 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
@@ -1255,7 +1255,7 @@ export default function CreatorApp() {
                     <DoodleIcon name="check" size={16} /> Claimed
                   </button>
                 ) : hasActiveBusiness ? (
-                  <button disabled className="px-[22px] py-[12px] rounded-full text-[18px] font-bold bg-amber-50 text-amber-700 border border-amber-200 cursor-not-allowed min-h-[48px]">
+                  <button disabled className="px-[22px] py-[12px] rounded-full text-[18px] font-bold bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)] cursor-not-allowed min-h-[48px]">
                     Active
                   </button>
                 ) : (
@@ -1345,11 +1345,11 @@ export default function CreatorApp() {
                         key={tab.key}
                         onClick={() => setSelectedCategory(tab.key)}
                         className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all min-h-[44px] rounded-full ${
-                          isActive ? 'bg-[rgba(212,71,12,0.10)] text-[var(--terra)]' : 'text-[var(--soft)]'
+                          isActive ? 'bg-[var(--peach)] text-[var(--terra)]' : 'text-[var(--soft)]'
                         }`}
                       >
                         <DoodleIcon name={tab.icon} size={20} />
-                        <span className="text-[13px] font-semibold">{tab.label}</span>
+                        <span className="text-[13px] font-semibold" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tab.label}</span>
                       </button>
                     );
                   })}
@@ -1542,9 +1542,9 @@ export default function CreatorApp() {
 
               {/* Weekly Leaderboard */}
               {leaderboard.length >= 1 && (
-                <div className="mx-[20px] mt-[14px] bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] p-[16px_18px]">
+                <div className="mx-[20px] mt-[14px] bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] p-[16px_18px]">
                   <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[17px] font-extrabold text-[var(--near-black)]">This week's top creators</h3>
+                    <h3 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 17, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>This week's top creators</h3>
                     <span className="text-[13px] text-[var(--soft)]">
                       Resets in {(() => {
                         const now = new Date();
@@ -1618,7 +1618,7 @@ export default function CreatorApp() {
                   </div>
                   {/* Skeleton offer cards */}
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="rounded-[16px] border border-[var(--faint)] overflow-hidden">
+                    <div key={i} className="rounded-[18px] border border-[var(--faint)] overflow-hidden">
                       <div className="h-[140px] skeleton-shimmer" />
                       <div className="p-[16px] space-y-[10px]">
                         <div className="h-[14px] rounded-[6px] skeleton-shimmer" style={{ width: '60%' }} />
@@ -1716,7 +1716,7 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[16px] overflow-hidden flex flex-col justify-between"
+                      className="text-left rounded-[18px] overflow-hidden flex flex-col justify-between"
                       style={{ width: 160, minHeight: 200, flexShrink: 0, background: pastelBg }}
                     >
                       {/* Top: icon + title */}
@@ -1804,7 +1804,7 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Saved</h1>
+                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Saved</h1>
                 <span className="text-[15px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
@@ -1838,7 +1838,7 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(offer.id)}
-                        className="w-full bg-[#EDE8DC] rounded-[16px] p-[16px] flex items-center gap-4 text-left border-[1.5px] border-[#E0E0E0]"
+                        className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] flex items-center gap-4 text-left border-[1.5px] border-[rgba(44,36,32,0.08)]"
                       >
                         {/* Business image/gradient */}
                         <div
@@ -1962,7 +1962,7 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="bg-[#EDE8DC] rounded-[16px] border-[1.5px] border-[#E0E0E0] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
+                            <div className="bg-[#EDE8DC] rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
 
                               {/* Offer title — one line */}
                               <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420' }}>{offerTitle}</p>
@@ -2035,7 +2035,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-[#EDE8DC] border border-[var(--faint)]">
-                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420' }}>
+                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.01em' }}>
                                     Submit Your Reel
                                   </label>
                                   <p className="text-[15px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>
@@ -2047,7 +2047,7 @@ export default function CreatorApp() {
                                       value={reelUrl}
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="https://instagram.com/reel/..."
-                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[rgba(44,36,32,0.15)] focus:border-[var(--near-black)] min-h-[52px]"
+                                      className="flex-1 px-4 py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] min-h-[52px]"
                                     />
                                     <button
                                       onClick={handleSubmitReel}
@@ -2137,7 +2137,7 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.025em' }}>Claims</h1>
+              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.01em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <DoodleIcon name="zap" size={48} className="text-[var(--soft)] mx-auto mb-4" />
@@ -2155,7 +2155,7 @@ export default function CreatorApp() {
                           setView('active');
                         }
                       }}
-                      className="w-full bg-[#EDE8DC] rounded-[16px] p-[16px] border border-[#E0E0E0] text-left"
+                      className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] border border-[rgba(44,36,32,0.08)] text-left"
                     >
                       <div className="flex items-start gap-3">
                         {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 36)}
@@ -2203,7 +2203,7 @@ export default function CreatorApp() {
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
               {isPendingApproval && (
-                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'rgba(44,36,32,0.04)' }}>
+                <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(44,36,32,0.04)' }}>
                   <DoodleIcon name="clock" size={28} className="text-[var(--mid)] mx-auto mb-2.5" />
                   <h3 className="text-[19px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
                   <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
@@ -2212,7 +2212,7 @@ export default function CreatorApp() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[16px] border-[1.5px] border-[#E0E0E0] p-[24px] mb-[24px]">
+                  <div className="rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] p-[24px] mb-[24px]">
                     <div className="flex items-start gap-[16px]">
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
@@ -2250,7 +2250,7 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.3px' }}>{userProfile.name}</h2>
+                        <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.01em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
@@ -2302,7 +2302,7 @@ export default function CreatorApp() {
                     const completeness = getProfileCompleteness(userProfile);
                     if (completeness.score === 100) {
                       return (
-                        <div className="flex items-center gap-[10px] rounded-[16px] border border-[var(--faint)] p-[14px_16px] mb-[16px]">
+                        <div className="flex items-center gap-[10px] rounded-[18px] border border-[var(--faint)] p-[14px_16px] mb-[16px]">
                           <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
                             <DoodleIcon name="badge-check" size={18} className="text-[var(--forest)]" />
                           </div>
@@ -2314,7 +2314,7 @@ export default function CreatorApp() {
                       );
                     }
                     return (
-                      <div className="rounded-[16px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                      <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
                         <div className="flex items-center justify-between mb-[10px]">
                           <span className="text-[18px] font-bold text-[var(--near-black)]">Complete your profile</span>
                           <span className="text-[14px] font-semibold text-[var(--near-black)]">{completeness.score}%</span>
@@ -2334,7 +2334,7 @@ export default function CreatorApp() {
                   })()}
 
                   {/* ═══ Level + streak section (Airbnb-style) ═══ */}
-                  <div className="rounded-[16px] border border-[var(--faint)] bg-[#EDE8DC] p-[20px] mb-[16px]">
+                  <div className="rounded-[18px] border border-[var(--faint)] bg-[#EDE8DC] p-[20px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
                       const levelColours: Record<number, string> = {
@@ -2557,7 +2557,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Notifications</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2587,7 +2587,7 @@ export default function CreatorApp() {
                         <button
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className={`w-full text-left bg-[#EDE8DC] rounded-[16px] p-4 border-[1.5px] border-[#E0E0E0] transition-all ${
+                          className={`w-full text-left bg-[#EDE8DC] rounded-[18px] p-4 border-[1.5px] border-[rgba(44,36,32,0.08)] transition-all ${
                             notif.read ? 'opacity-50' : ''
                           }`}
                         >
@@ -2612,7 +2612,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
@@ -2658,7 +2658,7 @@ export default function CreatorApp() {
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)]"
+                        className="w-full px-[16px] py-[12px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
                       />
                     </div>
                     <div>
@@ -2668,7 +2668,7 @@ export default function CreatorApp() {
                         value={editHandle}
                         onChange={(e) => setEditHandle(e.target.value)}
                         placeholder="@yourhandle"
-                        className="w-full px-[14px] py-[12px] rounded-[12px] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)]"
+                        className="w-full px-[16px] py-[12px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
                       />
                     </div>
                     <button

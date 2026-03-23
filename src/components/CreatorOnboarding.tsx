@@ -127,7 +127,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           ) : (
             <div className="w-[40px]" />
           )}
-          <span className="text-[20px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.3px', fontFamily: "'Corben', serif" }}>nayba</span>
+          <span className="text-[20px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif" }}>nayba</span>
           {screen === 3 ? (
             <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[15px] text-[var(--soft)] font-medium w-[40px] text-right" style={{ fontFamily: "'DM Sans', sans-serif" }}>Skip</button>
           ) : (
@@ -169,7 +169,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
               <h1
                 className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.5px', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Welcome to nayba
               </h1>
@@ -200,7 +200,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.4px', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Here's how it works
               </h1>
@@ -246,7 +246,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.4px', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Complete your profile
               </h1>
@@ -300,7 +300,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
                     placeholder="How you want to be known"
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    className="w-full px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   />
                 </div>
@@ -313,7 +313,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     onChange={e => setBio(e.target.value.slice(0, 150))}
                     placeholder="Tell businesses a little about yourself..."
                     rows={3}
-                    className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
+                    className="w-full px-[16px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] resize-none"
                     style={{ fontFamily: "'DM Sans', sans-serif" }}
                   />
                   <p className="text-[13px] text-[var(--soft)] text-right mt-[2px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{bio.length}/150</p>
@@ -323,7 +323,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 {profile.instagram_handle && (
                   <div>
                     <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Instagram</label>
-                    <div className="px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    <div className="px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                       {profile.instagram_handle}
                     </div>
                   </div>
@@ -376,7 +376,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <h1
               className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.8px', fontFamily: "'Corben', serif", fontWeight: 400 }}
+              style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
             >
               You're in.
             </h1>
@@ -390,11 +390,11 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
-              <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
+              <div className="rounded-[18px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
                 <p className="text-[32px] font-display font-normal text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{businessCount}</p>
                 <p className="text-[12px] font-medium text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Businesses</p>
               </div>
-              <div className="rounded-[16px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
+              <div className="rounded-[18px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
                 <p className="text-[32px] font-display font-normal text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{offerCount}</p>
                 <p className="text-[12px] font-medium text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Live Offers</p>
               </div>

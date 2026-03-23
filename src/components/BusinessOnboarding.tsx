@@ -238,7 +238,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
               <h1
                 className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.5px' }}
+                style={{ letterSpacing: '-0.01em' }}
               >
                 Welcome to nayba
               </h1>
@@ -276,7 +276,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.4px' }}
+                style={{ letterSpacing: '-0.01em' }}
               >
                 Here's how it works
               </h1>
@@ -329,7 +329,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.4px' }}
+                style={{ letterSpacing: '-0.01em' }}
               >
                 Polish your profile
               </h1>
@@ -343,7 +343,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   disabled={logoUploading}
                 >
                   <div
-                    className="w-[80px] h-[80px] rounded-[16px] flex items-center justify-center overflow-hidden"
+                    className="w-[80px] h-[80px] rounded-[18px] flex items-center justify-center overflow-hidden"
                     style={{ background: logoUrl ? undefined : getCategoryGradient(profile.category || 'Food & Drink') }}
                   >
                     {logoUrl ? (
@@ -381,7 +381,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   value={instagram}
                   onChange={e => setInstagram(e.target.value)}
                   placeholder="@yourbusiness"
-                  className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--bg)] text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  className="w-full px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
                 />
                 <p className="text-[14px] text-[var(--soft)] mt-[4px]">Optional — add later if you prefer</p>
               </div>
@@ -416,7 +416,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.4px' }}
+                style={{ letterSpacing: '-0.01em' }}
               >
                 Create your offer
               </h1>
@@ -433,7 +433,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       setDiscountAmount('20');
                       setDiscountUnit('%');
                     }}
-                    className="flex flex-col items-center justify-center gap-[8px] rounded-[16px] min-h-[100px] transition-all"
+                    className="flex flex-col items-center justify-center gap-[8px] rounded-[18px] min-h-[100px] transition-all"
                     style={{
                       padding: '20px 16px',
                       border: offerType === t.key ? '1.5px solid #D4470C' : '1.5px solid var(--faint)',
@@ -618,7 +618,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <h1
               className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.8px' }}
+              style={{ letterSpacing: '-0.01em' }}
             >
               You're live.
             </h1>

@@ -87,7 +87,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                   rows={4}
                   maxLength={500}
                   autoFocus
-                  className="w-full px-[14px] py-[12px] rounded-[12px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] resize-none"
+                  className="w-full px-[14px] py-[12px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] resize-none"
                 />
                 <div className="flex items-center justify-between mt-[12px]">
                   <span className="text-[13px] text-[var(--soft)]">{text.length}/500</span>
