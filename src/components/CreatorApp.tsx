@@ -1696,41 +1696,43 @@ export default function CreatorApp() {
                     <button
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[16px] overflow-hidden flex flex-col"
-                      style={{ width: 164, minHeight: 192, flexShrink: 0, background: pastelBg }}
+                      className="text-left rounded-[16px] overflow-hidden flex flex-col justify-between"
+                      style={{ width: 160, height: 180, flexShrink: 0, background: pastelBg }}
                     >
-                      {/* Top area — icon + heart */}
-                      <div className="relative" style={{ padding: '14px 12px 0' }}>
-                        <div className="flex items-center justify-between">
-                          <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
-                          {!isLocked && (
-                            <button
-                              onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                              className="w-[28px] h-[28px] flex items-center justify-center"
-                            >
-                              <DoodleIcon name="heart" size={16} />
-                            </button>
+                      {/* Top: icon + title */}
+                      <div>
+                        <div className="relative" style={{ padding: '14px 12px 0' }}>
+                          <div className="flex items-center justify-between">
+                            <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
+                            {!isLocked && (
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                                className="w-[28px] h-[28px] flex items-center justify-center"
+                              >
+                                <DoodleIcon name="heart" size={16} />
+                              </button>
+                            )}
+                          </div>
+
+                          {/* Locked overlay */}
+                          {isLocked && (
+                            <div className="flex items-center gap-1.5 mt-2">
+                              <DoodleIcon name="lock" size={12} className="text-[var(--soft)]" />
+                              <span className="text-[13px] font-medium text-[var(--soft)]">Unlocks at {lockedLevelName}</span>
+                            </div>
                           )}
                         </div>
 
-                        {/* Locked overlay */}
-                        {isLocked && (
-                          <div className="flex items-center gap-1.5 mt-2">
-                            <DoodleIcon name="lock" size={12} className="text-[var(--soft)]" />
-                            <span className="text-[13px] font-medium text-[var(--soft)]">Unlocks at {lockedLevelName}</span>
-                          </div>
-                        )}
+                        {/* Headline — Corben 18px, max 2 lines */}
+                        <div style={{ padding: '8px 12px 0' }}>
+                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
+                            {offerTitle || bizName}
+                          </p>
+                        </div>
                       </div>
 
-                      {/* Headline — Corben 18px, 2-line clamp */}
-                      <div style={{ padding: '8px 12px 0' }}>
-                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
-                          {offerTitle || bizName}
-                        </p>
-                      </div>
-
-                      {/* Footer — business name + slots */}
-                      <div style={{ padding: '8px 12px 12px' }}>
+                      {/* Footer — pushed to bottom via space-between */}
+                      <div style={{ padding: '0 12px 12px' }}>
                         <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(44,36,32,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
