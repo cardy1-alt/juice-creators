@@ -1292,23 +1292,29 @@ export default function CreatorApp() {
               {/* Search bar */}
               <div className="px-[20px] pt-[20px] pb-3">
                 <div
-                  className="w-full rounded-full bg-[#EDE8DC] flex items-center gap-3 px-[16px] py-[14px]"
+                  className="w-full flex items-center gap-3 px-[16px] py-[14px]"
                   style={{
-                    border: '2px solid #E0E0E0',
+                    background: '#EDE8DC',
+                    border: '1.5px solid rgba(44, 36, 32, 0.08)',
+                    borderRadius: 50,
                   }}
                 >
-                  <DoodleIcon name="search" size={15} className="text-[var(--soft)] flex-shrink-0" />
+                  <DoodleIcon name="search" size={15} className="flex-shrink-0" style={{ color: 'rgba(44, 36, 32, 0.4)' }} />
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Find local offers..."
-                    className="w-full bg-transparent text-[17px] font-semibold text-[var(--near-black)] placeholder:text-[#9E9E9E] focus:outline-none"
+                    className="w-full bg-transparent text-[17px] font-semibold text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
                     style={{ minHeight: '24px' }}
                   />
                   <div
-                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ border: '1px solid rgba(44,36,32,0.15)' }}
+                    className="w-[30px] h-[30px] flex items-center justify-center flex-shrink-0"
+                    style={{
+                      background: '#EDE8DC',
+                      border: '1.5px solid rgba(44, 36, 32, 0.08)',
+                      borderRadius: 50,
+                    }}
                   >
                     <DoodleIcon name="filter" size={12} className="text-[var(--near-black)]" />
                   </div>
