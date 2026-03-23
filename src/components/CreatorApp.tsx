@@ -115,7 +115,7 @@ function StatusPill({ status }: { status: string }) {
     visited: 'bg-[var(--bg)] text-[var(--near-black)]',
     reel_due: 'bg-[#D4470C] text-white',
     submitted: 'bg-[var(--forest)] text-white',
-    expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)] border border-[rgba(44,36,32,0.1)]',
+    expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
     overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)]',
     completed: 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]',
     disputed: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
@@ -795,27 +795,27 @@ export default function CreatorApp() {
         const isSubmitEnabled = reelUrl.startsWith('http') && reelUrl.length > 4;
         return (
           <div
-            className="fixed top-0 left-0 right-0 bottom-0 bg-[#F7F6F3]"
-            style={{ zIndex: 9999, overflowY: 'auto' }}
+            className="fixed top-0 left-0 right-0 bottom-0"
+            style={{ zIndex: 9999, overflowY: 'auto', background: activeTab === 'pass' ? '#D4470C' : '#F7F6F3' }}
           >
             {/* Back button — fixed so it stays visible when scrolling */}
             <button
               onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
-              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-[#F7F6F3]"
-              style={{ zIndex: 10000, borderRadius: 8 }}
+              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px]"
+              style={{ zIndex: 10000, borderRadius: 8, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--near-black)' }}
             >
               ← Back
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
-              <p className="text-[18px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
+              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p className="text-[18px] text-center mt-[4px]" style={{ color: activeTab === 'pass' ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
               {isReelDue && (
                 <div
                   className="relative flex items-center mt-[20px]"
-                  style={{ width: 240, height: 42, background: '#EDE8DC', borderRadius: 50, padding: 3 }}
+                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : '#EDE8DC', borderRadius: 50, padding: 3 }}
                 >
                   {/* Sliding active indicator */}
                   <div
@@ -824,7 +824,7 @@ export default function CreatorApp() {
                       width: 'calc(50% - 3px)',
                       height: 36,
                       borderRadius: 50,
-                      background: '#2C2420',
+                      background: activeTab === 'pass' ? '#FFFFFF' : '#2C2420',
                       left: activeTab === 'pass' ? 3 : 'calc(50%)',
                       transition: 'all 0.2s ease',
                     }}
@@ -832,14 +832,14 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setQrScreenTab('pass')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#D4470C' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
                   >
                     Show pass
                   </button>
                   <button
                     onClick={() => setQrScreenTab('reel')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(255,255,255,0.7)', borderRadius: 50 }}
                   >
                     Submit reel
                   </button>
@@ -856,18 +856,18 @@ export default function CreatorApp() {
                     size={240}
                     hideExtras
                   />
-                  {/* Ref code pill — single instance */}
+                  {/* Ref code pill — white with low opacity background */}
                   <span
-                    className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[#2C2420] inline-block rounded-full mt-[20px]"
-                    style={{ background: '#EDE8DC', padding: '10px 20px' }}
+                    className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full mt-[20px]"
+                    style={{ background: 'rgba(255,255,255,0.2)', padding: '10px 20px' }}
                   >
                     {userProfile.code}
                   </span>
                   {/* Refresh countdown */}
-                  <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(44,36,32,0.5)' }}>Auto-refreshes every 30s</p>
-                  {/* Level badge */}
-                  <div className="mt-[20px]">
-                    <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
+                  <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
+                  {/* Level badge — white with low opacity background */}
+                  <div className="mt-[20px] rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                    <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
                   </div>
                 </div>
               )}
@@ -1175,7 +1175,7 @@ export default function CreatorApp() {
             </div>
 
             {/* Sticky bottom bar */}
-            <div className="border-t border-[var(--faint)] bg-[#EDE8DC] px-[20px] py-[14px]">
+            <div className="bg-[#EDE8DC] px-[20px] py-[14px]">
               {detailIsLocked ? (
                 <div
                   className="w-full py-[14px] rounded-[50px] text-center text-[14px] text-[var(--soft)]"
@@ -1273,7 +1273,7 @@ export default function CreatorApp() {
           {view === 'offers' && (
             <>
               {claimError && (
-                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(44,36,32,0.05)] border border-[rgba(44,36,32,0.1)] flex items-center justify-between">
+                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(44,36,32,0.05)] flex items-center justify-between">
                   <p className="text-[15px] text-[var(--near-black)]">{claimError}</p>
                   <button onClick={() => setClaimError(null)} className="text-[var(--soft)] hover:text-[var(--mid)] text-[15px] font-semibold ml-3">Dismiss</button>
                 </div>
@@ -1511,7 +1511,7 @@ export default function CreatorApp() {
               {!streakWarningDismissed && userProfile.current_streak > 0 && isStreakWarningPeriod(userProfile.last_reel_month) && (
                 <div
                   className="mx-[20px] mt-[14px] flex items-center gap-[10px] rounded-[12px] p-[12px_16px]"
-                  style={{ background: 'rgba(44,36,32,0.04)', border: '1px solid rgba(44,36,32,0.08)' }}
+                  style={{ background: 'rgba(44,36,32,0.04)' }}
                 >
                   <FlameIcon color="var(--terra)" size={16} />
                   <p className="flex-1 text-[15px] text-[var(--near-black)]">
@@ -1531,7 +1531,7 @@ export default function CreatorApp() {
 
               {/* Weekly Leaderboard */}
               {leaderboard.length >= 1 && (
-                <div className="mx-[20px] mt-[14px] bg-[var(--sage)] rounded-[18px] border border-[var(--faint)] p-[16px_18px]">
+                <div className="mx-[20px] mt-[14px] bg-[var(--sage)] rounded-[18px] p-[16px_18px]">
                   <div className="flex items-center justify-between mb-3">
                     <h3 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 17, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>This week's top creators</h3>
                     <span className="text-[13px] text-[var(--soft)]">
@@ -1607,7 +1607,7 @@ export default function CreatorApp() {
                   </div>
                   {/* Skeleton offer cards */}
                   {[1, 2, 3].map(i => (
-                    <div key={i} className="rounded-[18px] border border-[var(--faint)] overflow-hidden">
+                    <div key={i} className="rounded-[18px] overflow-hidden">
                       <div className="h-[140px] skeleton-shimmer" />
                       <div className="p-[16px] space-y-[10px]">
                         <div className="h-[14px] rounded-[6px] skeleton-shimmer" style={{ width: '60%' }} />
@@ -1827,7 +1827,7 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(offer.id)}
-                        className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] flex items-center gap-4 text-left border-[1.5px] border-[rgba(44,36,32,0.08)]"
+                        className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] flex items-center gap-4 text-left"
                       >
                         {/* Category icon square */}
                         <div
@@ -1945,7 +1945,7 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: getCardColor(claimIdx) }}>
+                            <div className="rounded-[18px] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: getCardColor(claimIdx) }}>
 
                               {/* Offer title — one line */}
                               <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420' }}>{offerTitle}</p>
@@ -2017,7 +2017,7 @@ export default function CreatorApp() {
 
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
-                                <div className="p-4 rounded-[12px] bg-[#EDE8DC] border border-[var(--faint)]">
+                                <div className="p-4 rounded-[12px] bg-[#EDE8DC]">
                                   <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.025em' }}>
                                     Submit Your Reel
                                   </label>
@@ -2048,7 +2048,7 @@ export default function CreatorApp() {
                               )}
 
                               {claim.reel_url && (
-                                <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[#EDE8DC] border border-[var(--faint)]">
+                                <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[#EDE8DC]">
                                   <DoodleIcon name="check" size={16} className="text-[var(--forest)] flex-shrink-0" />
                                   <span className="text-[18px] text-[var(--near-black)] font-medium">Reel submitted!</span>
                                 </div>
@@ -2138,7 +2138,7 @@ export default function CreatorApp() {
                           setView('active');
                         }
                       }}
-                      className="w-full rounded-[18px] p-[16px] border border-[rgba(44,36,32,0.08)] text-left"
+                      className="w-full rounded-[18px] p-[16px] text-left"
                       style={{ background: getCardColor(claimCardIdx) }}
                     >
                       <div className="flex items-start gap-3">
@@ -2196,7 +2196,7 @@ export default function CreatorApp() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] p-[24px] mb-[24px]">
+                  <div className="rounded-[18px] p-[24px] mb-[24px]" style={{ background: '#EDE8DC' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
@@ -2286,7 +2286,7 @@ export default function CreatorApp() {
                     const completeness = getProfileCompleteness(userProfile);
                     if (completeness.score === 100) {
                       return (
-                        <div className="flex items-center gap-[10px] rounded-[18px] border border-[var(--faint)] p-[14px_16px] mb-[16px]">
+                        <div className="flex items-center gap-[10px] rounded-[18px] p-[14px_16px] mb-[16px]" style={{ background: '#EDE8DC' }}>
                           <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
                             <DoodleIcon name="badge-check" size={18} className="text-[var(--forest)]" />
                           </div>
@@ -2298,7 +2298,7 @@ export default function CreatorApp() {
                       );
                     }
                     return (
-                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ border: '1.5px solid rgba(44,36,32,0.08)' }}>
+                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ background: '#EDE8DC' }}>
                         <div className="flex items-center justify-between mb-[10px]">
                           <span className="text-[18px] font-bold text-[var(--near-black)]">Complete your profile</span>
                           <span className="text-[14px] font-semibold text-[var(--near-black)]">{completeness.score}%</span>
@@ -2318,7 +2318,7 @@ export default function CreatorApp() {
                   })()}
 
                   {/* ═══ Level + streak section (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] border border-[var(--faint)] bg-[var(--dusty-blue)] p-[20px] mb-[16px]">
+                  <div className="rounded-[18px] bg-[var(--dusty-blue)] p-[20px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
                       const levelColours: Record<number, string> = {
@@ -2571,7 +2571,7 @@ export default function CreatorApp() {
                         <button
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className={`w-full text-left rounded-[18px] p-4 border-[1.5px] border-[rgba(44,36,32,0.08)] transition-all ${
+                          className={`w-full text-left rounded-[18px] p-4 transition-all ${
                             notif.read ? 'opacity-50' : ''
                           }`}
                           style={{ background: getCardColor(notifIdx) }}

@@ -323,7 +323,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 {profile.instagram_handle && (
                   <div>
                     <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Instagram</label>
-                    <div className="px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    <div className="px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] text-[16px] text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                       {profile.instagram_handle}
                     </div>
                   </div>

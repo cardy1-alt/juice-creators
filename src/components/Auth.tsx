@@ -165,7 +165,7 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(44,36,32,0.10)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] shadow-[0_4px_16px_rgba(44,36,32,0.10)] overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.place_id}

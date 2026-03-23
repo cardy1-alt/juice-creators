@@ -10,20 +10,20 @@ import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedE
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[#EDE8DC] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Approved</span>
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[#EDE8DC] text-[var(--near-black)]"><DoodleIcon name="check" size={12} /> Approved</span>
       : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[#D4470C] text-white">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Live</span>
-      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]">Paused</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)]"><DoodleIcon name="check" size={12} /> Live</span>
+      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--mid)]">Paused</span>;
   }
   const styles: Record<string, string> = {
     active: 'bg-[#D4470C] text-white',
     redeemed: 'bg-[#EDE8DC] text-[var(--near-black)]',
-    expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
+    expired: 'bg-[var(--terra-10)] text-[var(--terra)]',
   };
-  return <span className={`text-[13px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]'}`}>{status}</span>;
+  return <span className={`text-[13px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--mid)]'}`}>{status}</span>;
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
@@ -242,12 +242,12 @@ export default function AdminDashboard() {
 
         <div className="p-6">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[15px] text-[var(--terra)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] text-[15px] text-[var(--terra)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {fetchError}
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(44,36,32,0.06)] border-[rgba(44,36,32,0.12)] text-[var(--forest)]'}`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <div className={`mb-4 p-3 rounded-[12px] text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] text-[var(--terra)]' : 'bg-[rgba(44,36,32,0.06)] text-[var(--forest)]'}`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {actionFeedback.text}
             </div>
           )}
@@ -255,13 +255,13 @@ export default function AdminDashboard() {
           {view === 'stats' && (
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
-                <div className="bg-[var(--terra-10)] rounded-[18px] p-5 border border-[var(--terra-20)]">
+                <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
                   <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] transition-all"
                       >
                         <DoodleIcon name="users" size={24} />
                         <div className="text-left">
@@ -273,7 +273,7 @@ export default function AdminDashboard() {
                     {stats.pendingBusinesses > 0 && (
                       <button
                         onClick={() => setView('businesses')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] transition-all"
                       >
                         <DoodleIcon name="store" size={24} />
                         <div className="text-left">
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCardData.map((stat, i) => (
-                  <div key={i} className="bg-[#EDE8DC] rounded-[18px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+                  <div key={i} className="bg-[#EDE8DC] rounded-[18px] p-6 shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                     <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--mid)]" /></div>
                     <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>{stat.value}</p>
                     <p className="text-sm text-[var(--mid)] mt-1 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>{stat.label}</p>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="users" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="store" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
@@ -413,7 +413,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[18px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[18px] p-5 shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <div className="w-[46px] h-[46px] rounded-[12px] bg-[#EDE8DC] flex items-center justify-center flex-shrink-0">
                           <CategoryIcon category={offer.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
@@ -436,7 +436,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="clipboard-list" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
+              <div className="bg-[#EDE8DC] rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
                 <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -549,8 +549,8 @@ export default function AdminDashboard() {
                     <div
                       className={`p-3 rounded-[12px] text-[15px] font-medium ${
                         passwordMessage.type === 'success'
-                          ? 'bg-[rgba(44,36,32,0.06)] text-[var(--forest)] border border-[rgba(44,36,32,0.12)]'
-                          : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
+                          ? 'bg-[rgba(44,36,32,0.06)] text-[var(--forest)]'
+                          : 'bg-[var(--terra-10)] text-[var(--terra)]'
                       }`}
                       style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
