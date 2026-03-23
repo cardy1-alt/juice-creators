@@ -1738,7 +1738,7 @@ export default function CreatorApp() {
 
                         {/* Headline — Corben 18px, max 2 lines with ellipsis */}
                         <div style={{ padding: '8px 12px 6px' }}>
-                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
+                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.25, letterSpacing: '-0.025em', paddingBottom: 3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
                             {offerTitle || bizName}
                           </p>
                         </div>
