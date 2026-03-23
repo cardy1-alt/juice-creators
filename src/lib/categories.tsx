@@ -96,9 +96,9 @@ export function CategoryIcon({ category, className = "w-4 h-4", style }: { categ
 // Category-specific dark gradients for placeholder images
 const CATEGORY_GRADIENTS: Record<string, string> = {
   'Food & Drink': 'linear-gradient(135deg, #3D2314, #6B3A1F)',
-  'Cafe & Coffee': 'linear-gradient(135deg, #3D2314, #6B3A1F)',
+  'Cafe & Coffee': 'linear-gradient(135deg, #2E1A0A, #5C3818)',
   'Hair & Beauty': 'linear-gradient(135deg, #2D1F2E, #5C3A5A)',
-  'Wellness & Spa': 'linear-gradient(135deg, #2D1F2E, #5C3A5A)',
+  'Wellness & Spa': 'linear-gradient(135deg, #1A2E2A, #2E5A52)',
   'Health & Fitness': 'linear-gradient(135deg, #0F1F2E, #1A3A5C)',
   'Retail': 'linear-gradient(135deg, #1A1F3A, #2D3561)',
   'Arts & Entertainment': 'linear-gradient(135deg, #1F1A0F, #4A3A1A)',
@@ -109,9 +109,9 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
 
 const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Food & Drink': '#3D2314',
-  'Cafe & Coffee': '#3D2314',
+  'Cafe & Coffee': '#2E1A0A',
   'Hair & Beauty': '#2D1F2E',
-  'Wellness & Spa': '#2D1F2E',
+  'Wellness & Spa': '#1A2E2A',
   'Health & Fitness': '#0F1F2E',
   'Retail': '#1A1F3A',
   'Arts & Entertainment': '#1F1A0F',
@@ -131,25 +131,25 @@ export function getCategorySolidColor(category: string | undefined | null): stri
 // Muted pastel card backgrounds — visually distinct per category
 const CATEGORY_PASTEL_BG: Record<string, string> = {
   'Food & Drink': '#EDE8D0',
-  'Cafe & Coffee': '#EDE8D0',
+  'Cafe & Coffee': '#F0E4D0',
   'Hair & Beauty': '#EDD4D4',
-  'Wellness & Spa': '#D4E8D0',
+  'Wellness & Spa': '#D0E8E4',
   'Health & Fitness': '#D4E0ED',
-  'Retail': '#D4E0ED',
-  'Arts & Entertainment': '#EDD4D4',
+  'Retail': '#D4D8ED',
+  'Arts & Entertainment': '#E8D8ED',
   'Education': '#D4E8D0',
-  'Pets': '#EDE8D0',
+  'Pets': '#F0E6D4',
   'Services': '#EDE8DC',
 };
 
 const CATEGORY_PASTEL_ICON: Record<string, string> = {
   'Food & Drink': '#9E7A5A',
-  'Cafe & Coffee': '#9E7A5A',
+  'Cafe & Coffee': '#8A6842',
   'Hair & Beauty': '#A06A82',
-  'Wellness & Spa': '#7A6A98',
+  'Wellness & Spa': '#5A8A82',
   'Health & Fitness': '#5A8A72',
   'Retail': '#5A6A8E',
-  'Arts & Entertainment': '#8E7A52',
+  'Arts & Entertainment': '#8A6A9E',
   'Education': '#4A7A5E',
   'Pets': '#8E7244',
   'Services': '#6E6A62',
