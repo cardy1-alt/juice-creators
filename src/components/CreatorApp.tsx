@@ -1945,10 +1945,10 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="rounded-[18px] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: getCardColor(claimIdx) }}>
+                            <div className="rounded-[18px] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: '#D4470C' }}>
 
                               {/* Offer title — one line */}
-                              <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420' }}>{offerTitle}</p>
+                              <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#FFFFFF', letterSpacing: '-0.025em' }}>{offerTitle}</p>
 
                               {/* Breadcrumb stepper — one line */}
                               <div className="flex items-center flex-nowrap mb-4">
@@ -1959,17 +1959,17 @@ export default function CreatorApp() {
                                   return (
                                     <span key={label} className="flex items-center">
                                       {idx === 0 && (
-                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[#D4470C] mr-1.5" />
+                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-white mr-1.5" />
                                       )}
                                       <span className={`text-[15px] ${
-                                        isCurrent ? 'font-bold text-[#2C2420]'
-                                        : isDone ? 'font-bold text-[#2C2420]'
+                                        isCurrent ? 'font-bold'
+                                        : isDone ? 'font-bold'
                                         : 'font-medium'
-                                      }`} style={isFuture ? { color: 'rgba(44,36,32,0.3)' } : undefined}>
+                                      }`} style={{ color: isFuture ? 'rgba(255,255,255,0.4)' : '#FFFFFF' }}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span className="text-[15px] mx-1" style={{ color: 'rgba(44,36,32,0.25)' }}>→</span>
+                                        <span className="text-[15px] mx-1" style={{ color: 'rgba(255,255,255,0.35)' }}>→</span>
                                       )}
                                     </span>
                                   );
@@ -1982,17 +1982,25 @@ export default function CreatorApp() {
                                   onClick={() => { setQrOpenSource('active'); setQrScreenTab('pass'); setShowQrFullscreen(true); }}
                                   className="w-full text-left"
                                 >
-                                  <p className="text-[15px] font-semibold text-center mb-[10px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'rgba(44,36,32,0.5)' }}>Tap to show pass</p>
+                                  <p className="text-[15px] font-semibold text-center mb-[10px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'rgba(255,255,255,0.5)' }}>Tap to show pass</p>
                                   <QRCodeDisplay
                                     token={claim.qr_token}
                                     claimId={claim.id}
                                     creatorCode={userProfile.code}
                                   />
-                                  <div className="flex items-center justify-center gap-2" style={{ marginTop: 20 }}>
-                                    <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
-                                    {userProfile.profile_complete && (
-                                      <DoodleIcon name="badge-check" size={14} className="text-[var(--forest)]" />
-                                    )}
+                                  <div className="flex items-center justify-center gap-2 mt-[16px]">
+                                    <span
+                                      className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full"
+                                      style={{ background: 'rgba(255,255,255,0.2)', padding: '10px 20px' }}
+                                    >
+                                      {userProfile.code}
+                                    </span>
+                                  </div>
+                                  <p className="text-[15px] mt-[12px] text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
+                                  <div className="flex items-center justify-center gap-2 mt-[16px]">
+                                    <div className="rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                                      <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
+                                    </div>
                                   </div>
                                 </button>
                               )}
@@ -2000,16 +2008,15 @@ export default function CreatorApp() {
                               {/* Reel Countdown/Prompt */}
                               {claim.redeemed_at && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px]" style={{
-                                  border: isOverdue ? '1.5px solid var(--terra-20)' : '1.5px solid #F5C4A0',
-                                  background: isOverdue ? 'var(--terra-10)' : 'rgba(245,196,160,0.12)',
+                                  background: isOverdue ? 'rgba(255,255,255,0.15)' : 'rgba(255,255,255,0.1)',
                                 }}>
                                   <div className="flex items-center gap-2 mb-2">
-                                    <DoodleIcon name="clock" size={16} />
-                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : '#2C2420', margin: 0 }}>
+                                    <DoodleIcon name="clock" size={16} className="text-white" />
+                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#FFD666' : '#FFFFFF', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
-                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', margin: 0 }}>
+                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(255,255,255,0.7)', margin: 0 }}>
                                     You have 48 hours to post your reel — it must clearly feature the business.
                                   </p>
                                 </div>
@@ -2017,40 +2024,42 @@ export default function CreatorApp() {
 
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
-                                <div className="p-4 rounded-[12px] bg-[#EDE8DC]">
-                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.025em' }}>
+                                <div className="mt-2">
+                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#FFFFFF', letterSpacing: '-0.025em' }}>
                                     Submit Your Reel
                                   </label>
-                                  <p className="text-[15px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>
+                                  <p className="text-[15px] mb-3" style={{ lineHeight: 1.4, color: 'rgba(255,255,255,0.6)' }}>
                                     Show the space, tag the business, and post within 48 h.
                                   </p>
-                                  <div className="flex gap-2">
+                                  <div>
                                     <input
                                       type="url"
                                       value={reelUrl}
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="https://instagram.com/reel/..."
-                                      className="flex-1 px-4 py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] min-h-[52px]"
+                                      className="w-full px-4 py-[14px] rounded-[50px] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] min-h-[52px]"
+                                      style={{ background: '#EDE8DC', border: '1.5px solid rgba(44,36,32,0.08)' }}
                                     />
+                                    <p className="text-[14px] mt-[8px] mb-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Paste the link from Instagram after you've posted.</p>
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
-                                      className="px-5 py-2 rounded-full text-white text-[18px] font-semibold disabled:opacity-40 transition-all min-h-[48px]"
-                                      style={{ background: '#D4470C' }}
+                                      className="w-full py-[14px] rounded-full text-white text-[18px] font-bold disabled:opacity-40 transition-all min-h-[52px]"
+                                      style={{ background: reelUrl ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)' }}
                                     >
                                       Submit
                                     </button>
                                   </div>
                                   {reelError && (
-                                    <p className="text-[15px] text-[var(--mid)] mt-2">{reelError}</p>
+                                    <p className="text-[15px] mt-2" style={{ color: 'rgba(255,255,255,0.7)' }}>{reelError}</p>
                                   )}
                                 </div>
                               )}
 
                               {claim.reel_url && (
-                                <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[#EDE8DC]">
-                                  <DoodleIcon name="check" size={16} className="text-[var(--forest)] flex-shrink-0" />
-                                  <span className="text-[18px] text-[var(--near-black)] font-medium">Reel submitted!</span>
+                                <div className="flex items-center gap-2 p-3 rounded-[12px]" style={{ background: 'rgba(255,255,255,0.15)' }}>
+                                  <DoodleIcon name="check" size={16} className="text-white flex-shrink-0" />
+                                  <span className="text-[18px] text-white font-medium">Reel submitted!</span>
                                 </div>
                               )}
 
@@ -2058,17 +2067,18 @@ export default function CreatorApp() {
                               <div className="flex items-center justify-center text-[14px]" style={{ marginTop: 16, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
-                                    <span className="text-[var(--mid)]">Release this slot?</span>
+                                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>Release this slot?</span>
                                     <button
                                       onClick={() => handleReleaseOffer(claim.id)}
                                       disabled={releasingClaim}
-                                      className="font-bold text-[var(--near-black)]"
+                                      className="font-bold text-white"
                                     >
                                       {releasingClaim ? '...' : 'Confirm'}
                                     </button>
                                     <button
                                       onClick={() => setReleaseConfirmId(null)}
-                                      className="font-semibold text-[var(--soft)]"
+                                      className="font-semibold"
+                                      style={{ color: 'rgba(255,255,255,0.5)' }}
                                     >
                                       Cancel
                                     </button>
@@ -2078,7 +2088,7 @@ export default function CreatorApp() {
                                     <button
                                       onClick={() => setDisputeClaimId(claim.id)}
                                       className="flex items-center gap-1 font-medium transition-colors"
-                                      style={{ color: 'rgba(44,36,32,0.35)' }}
+                                      style={{ color: 'rgba(255,255,255,0.45)' }}
                                     >
                                       <DoodleIcon name="flag" size={11} /> Report an issue
                                     </button>
@@ -2087,11 +2097,11 @@ export default function CreatorApp() {
                                       if (releaseStatus.allowed) {
                                         return (
                                           <>
-                                            <span className="mx-2" style={{ color: 'rgba(44,36,32,0.2)' }}>·</span>
+                                            <span className="mx-2" style={{ color: 'rgba(255,255,255,0.3)' }}>·</span>
                                             <button
                                               onClick={() => setReleaseConfirmId(claim.id)}
                                               className="flex items-center gap-1 font-medium transition-colors"
-                                              style={{ color: 'rgba(44,36,32,0.45)' }}
+                                              style={{ color: 'rgba(255,255,255,0.5)' }}
                                             >
                                               <DoodleIcon name="x" size={11} /> Release offer
                                             </button>
@@ -2104,7 +2114,7 @@ export default function CreatorApp() {
                                 )}
                               </div>
                               {releaseError && (
-                                <p className="text-[15px] text-[var(--mid)] text-center pb-2">{releaseError}</p>
+                                <p className="text-[15px] text-center pb-2" style={{ color: 'rgba(255,255,255,0.7)' }}>{releaseError}</p>
                               )}
                             </div>
                           </div>
