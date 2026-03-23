@@ -1061,13 +1061,8 @@ export default function CreatorApp() {
 
         return (
           <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
-            {/* Hero — category colour + wavy SVG texture */}
+            {/* Hero — category colour */}
             <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryPastelBg(offer.businesses.category) }}>
-              {/* Wavy texture — 20% opacity */}
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(44,36,32,0.20)" strokeWidth="50" fill="none" strokeLinecap="round" />
-                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(44,36,32,0.20)" strokeWidth="30" fill="none" strokeLinecap="round" />
-              </svg>
               {/* Back button — 40% opacity */}
               <button
                 onClick={() => setExpandedOffer(null)}
