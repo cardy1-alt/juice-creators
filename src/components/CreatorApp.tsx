@@ -1704,14 +1704,18 @@ export default function CreatorApp() {
                         <div className="relative" style={{ padding: '14px 12px 0' }}>
                           <div className="flex items-center justify-between">
                             <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
-                            {!isLocked && (
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                                className="w-[28px] h-[28px] flex items-center justify-center"
-                              >
-                                <DoodleIcon name="heart" size={16} />
-                              </button>
-                            )}
+                            {!isLocked && (() => {
+                              const isSaved = savedOffers.has(offer.id);
+                              return (
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
+                                  className="w-[24px] h-[24px] flex items-center justify-center"
+                                  style={isSaved ? { color: '#D4470C' } : { opacity: 0.35 }}
+                                >
+                                  <DoodleIcon name="heart" size={11} />
+                                </button>
+                              );
+                            })()}
                           </div>
 
                           {/* Locked overlay */}
@@ -1723,9 +1727,9 @@ export default function CreatorApp() {
                           )}
                         </div>
 
-                        {/* Headline — Corben 18px, max 2 lines */}
-                        <div style={{ padding: '8px 12px 0' }}>
-                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
+                        {/* Headline — Corben 18px, max 2 lines with ellipsis */}
+                        <div style={{ padding: '8px 12px 6px' }}>
+                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
                             {offerTitle || bizName}
                           </p>
                         </div>
