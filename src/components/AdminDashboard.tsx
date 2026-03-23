@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import {
-  LogOut, Users, Store,
-  CheckCircle2, XCircle, BarChart3, Package, ClipboardList, Settings,
-  Film, AlertTriangle
-} from 'lucide-react';
+import { DoodleIcon } from '../lib/doodle-icons';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
@@ -14,12 +10,12 @@ import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedE
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Approved</span>
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Approved</span>
       : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><CheckCircle2 className="w-3 h-3" /> Live</span>
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Live</span>
       : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]">Paused</span>;
   }
   const styles: Record<string, string> = {
@@ -183,56 +179,57 @@ export default function AdminDashboard() {
     }
   };
 
-  const statCards = [
-    { icon: Users, value: stats.totalCreators, label: 'Total Creators' },
-    { icon: Store, value: stats.totalBusinesses, label: 'Total Businesses' },
-    { icon: ClipboardList, value: stats.totalClaims, label: 'Claims This Month' },
-    { icon: Film, value: stats.totalReels, label: 'Reels Posted' },
+  const statCardData = [
+    { iconName: 'users' as const, value: stats.totalCreators, label: 'Total Creators' },
+    { iconName: 'store' as const, value: stats.totalBusinesses, label: 'Total Businesses' },
+    { iconName: 'clipboard-list' as const, value: stats.totalClaims, label: 'Claims This Month' },
+    { iconName: 'film' as const, value: stats.totalReels, label: 'Reels Posted' },
   ];
 
-  const tabs = [
-    { key: 'stats' as const, label: 'Overview', icon: BarChart3 },
-    { key: 'creators' as const, label: 'Creators', icon: Users, badge: stats.pendingCreators },
-    { key: 'businesses' as const, label: 'Businesses', icon: Store, badge: stats.pendingBusinesses },
-    { key: 'offers' as const, label: 'Offers', icon: Package },
-    { key: 'claims' as const, label: 'Claims', icon: ClipboardList },
-    { key: 'settings' as const, label: 'Settings', icon: Settings },
+  const tabData = [
+    { key: 'stats' as const, label: 'Overview', iconName: 'bar-chart' as const },
+    { key: 'creators' as const, label: 'Creators', iconName: 'users' as const, badge: stats.pendingCreators },
+    { key: 'businesses' as const, label: 'Businesses', iconName: 'store' as const, badge: stats.pendingBusinesses },
+    { key: 'offers' as const, label: 'Offers', iconName: 'bag' as const },
+    { key: 'claims' as const, label: 'Claims', iconName: 'clipboard-list' as const },
+    { key: 'settings' as const, label: 'Settings', iconName: 'settings' as const },
   ];
 
   return (
-    <div className="min-h-screen bg-[#F7F4F0]">
+    <div className="min-h-screen bg-[#F5F0E8]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-[#F7F4F0] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
+        <div className="bg-[#F5F0E8] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Logo size={24} />
               </div>
               <div>
-                <p className="text-sm text-[var(--mid)]">Admin Dashboard</p>
+                <p className="text-sm text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Admin Dashboard</p>
               </div>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
-              <LogOut className="w-4.5 h-4.5 text-[var(--soft)]" />
+              <DoodleIcon name="logout" size={18} className="text-[var(--soft)]" />
             </button>
           </div>
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-[#F7F4F0] border-b border-[var(--faint)] overflow-x-auto">
-          {tabs.map(tab => (
+        <div className="flex bg-[#F5F0E8] border-b border-[var(--faint)] overflow-x-auto">
+          {tabData.map(tab => (
             <button
               key={tab.key}
               onClick={() => setView(tab.key)}
               className={`flex items-center gap-2 px-5 py-3.5 text-base font-semibold whitespace-nowrap transition-all relative ${
                 view === tab.key ? 'text-[var(--near-black)]' : 'text-[var(--soft)] hover:text-[var(--mid)]'
               }`}
+              style={{ fontFamily: "'DM Sans', sans-serif" }}
             >
               <div className="relative">
-                <tab.icon className="w-4 h-4" />
+                <DoodleIcon name={tab.iconName} size={16} />
                 {tab.badge ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[12px] font-bold flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-[#EDE8DC] text-[12px] font-bold flex items-center justify-center">
                     {tab.badge}
                   </span>
                 ) : null}
@@ -245,12 +242,12 @@ export default function AdminDashboard() {
 
         <div className="p-6">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[15px] text-[var(--terra)] font-medium">
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)] text-[15px] text-[var(--terra)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {fetchError}
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(26,74,46,0.06)] border-[rgba(26,74,46,0.12)] text-[var(--forest)]'}`}>
+            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(28,18,8,0.06)] border-[rgba(28,18,8,0.12)] text-[var(--forest)]'}`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {actionFeedback.text}
             </div>
           )}
@@ -259,29 +256,29 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[16px] p-5 border border-[var(--terra-20)]">
-                  <h3 className="text-base font-bold text-[var(--near-black)] mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
-                        <Users className="w-6 h-6" />
+                        <DoodleIcon name="users" size={24} />
                         <div className="text-left">
-                          <p className="text-lg font-bold text-[var(--near-black)]">{stats.pendingCreators}</p>
-                          <p className="text-[12px] text-[var(--mid)] font-medium">Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stats.pendingCreators}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
                         </div>
                       </button>
                     )}
                     {stats.pendingBusinesses > 0 && (
                       <button
                         onClick={() => setView('businesses')}
-                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#FFFFFF] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
+                        className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[#EDE8DC] border border-[var(--terra-20)] hover:border-[var(--terra-40)] transition-all"
                       >
-                        <Store className="w-6 h-6" />
+                        <DoodleIcon name="store" size={24} />
                         <div className="text-left">
-                          <p className="text-lg font-bold text-[var(--near-black)]">{stats.pendingBusinesses}</p>
-                          <p className="text-[12px] text-[var(--mid)] font-medium">Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stats.pendingBusinesses}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
                         </div>
                       </button>
                     )}
@@ -289,11 +286,11 @@ export default function AdminDashboard() {
                 </div>
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                {statCards.map((stat, i) => (
-                  <div key={i} className="bg-white rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
-                    <div className="mb-3"><stat.icon className="w-6 h-6 text-[var(--mid)]" /></div>
-                    <p className="text-3xl font-bold text-[var(--near-black)]">{stat.value}</p>
-                    <p className="text-sm text-[var(--mid)] mt-1 font-medium">{stat.label}</p>
+                {statCardData.map((stat, i) => (
+                  <div key={i} className="bg-[#EDE8DC] rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
+                    <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--mid)]" /></div>
+                    <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stat.value}</p>
+                    <p className="text-sm text-[var(--mid)] mt-1 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -302,49 +299,49 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
               {creators.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No creators yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="users" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Name</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Handle</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Followers</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Code</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                      <tr className="bg-[#EDE8DC] border-b border-[var(--faint)]">
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Name</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Handle</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Followers</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Code</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
+                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]">
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                             <span className="mr-2">{creator.name}</span>
                             {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{creator.instagram_handle}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {creator.follower_count ? (
-                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]">{creator.follower_count}</span>
+                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{creator.follower_count}</span>
                             ) : (
                               <span className="text-sm text-[var(--soft)]">—</span>
                             )}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-sm font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[#FFFFFF]">{creator.code}</span></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{creator.email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-sm font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[#EDE8DC]">{creator.code}</span></td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{creator.email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
-                                <CheckCircle2 className="w-3 h-3" /> Approve
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#EDE8DC] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                <DoodleIcon name="check" size={12} /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
-                                <XCircle className="w-3 h-3" /> Revoke
+                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#EDE8DC] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                <DoodleIcon name="x" size={12} /> Revoke
                               </button>
                             )}
                           </td>
@@ -359,41 +356,41 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No businesses yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="store" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Slug</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Email</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                      <tr className="bg-[#EDE8DC] border-b border-[var(--faint)]">
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Business</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Slug</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
+                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
                       {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
                         <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
                               <CategoryIcon category={business.category} className="w-5 h-5" />
-                              <span className="text-base font-medium text-[var(--near-black)]">{business.name}</span>
+                              <span className="text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{business.name}</span>
                             </div>
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{business.owner_email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
-                                <CheckCircle2 className="w-3 h-3" /> Approve
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#EDE8DC] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                <DoodleIcon name="check" size={12} /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
-                                <XCircle className="w-3 h-3" /> Revoke
+                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#EDE8DC] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                <DoodleIcon name="x" size={12} /> Revoke
                               </button>
                             )}
                           </td>
@@ -410,20 +407,20 @@ export default function AdminDashboard() {
           {view === 'offers' && (
             <>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Package className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="bag" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-white rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]">
+                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="font-bold text-base text-[var(--near-black)]">{offer.businesses.name}</h3>
+                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{offer.businesses.name}</h3>
                             <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
-                          <p className="text-[var(--mid)] text-base mt-1">{offer.description}</p>
-                          <p className="text-sm text-[var(--soft)] mt-1">Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
+                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>{offer.description}</p>
+                          <p className="text-sm text-[var(--soft)] mt-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
                         </div>
                       </div>
                     </div>
@@ -435,37 +432,38 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
               {claims.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList className="w-8 h-8 text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base">No claims yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="clipboard-list" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
-                      <tr className="bg-white border-b border-[var(--faint)]">
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Creator</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Business</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Claimed</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Status</th>
-                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider">Action</th>
+                      <tr className="bg-[#EDE8DC] border-b border-[var(--faint)]">
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Creator</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Business</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Claimed</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(26,26,26,0.05)]">
+                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]">{claim.creators.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <CategoryIcon category={claim.businesses.category} className="w-4 h-4" />
-                              <span className="text-base text-[var(--mid)]">{claim.businesses.name}</span>
+                              <span className="text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{claim.businesses.name}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]">{new Date(claim.claimed_at).toLocaleDateString()}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{new Date(claim.claimed_at).toLocaleDateString()}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
                               className="px-2.5 py-1 rounded-[12px] text-sm font-semibold border border-[var(--faint)] text-[var(--near-black)] bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              style={{ fontFamily: "'DM Sans', sans-serif" }}
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
@@ -474,8 +472,8 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {claim.status === 'active' && (
-                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#FFFFFF] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all">
-                                <XCircle className="w-3 h-3" /> Expire
+                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-[#EDE8DC] font-semibold text-sm bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                                <DoodleIcon name="x" size={12} /> Expire
                               </button>
                             )}
                           </td>
@@ -491,11 +489,11 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-white rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)] p-6">
-                <h2 className="text-lg font-bold text-[var(--near-black)] mb-5">Change Password</h2>
+              <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] p-6">
+                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
-                    <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                       Current Password
                     </label>
                     <input
@@ -506,10 +504,11 @@ export default function AdminDashboard() {
                       required
                       className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Enter current password"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="newPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="newPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                       New Password
                     </label>
                     <input
@@ -521,10 +520,11 @@ export default function AdminDashboard() {
                       minLength={8}
                       className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Enter new password (min 8 characters)"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2">
+                    <label htmlFor="confirmPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
                       Confirm New Password
                     </label>
                     <input
@@ -536,22 +536,25 @@ export default function AdminDashboard() {
                       minLength={8}
                       className="w-full px-4 py-2.5 rounded-[12px] border border-[var(--faint)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)] text-base bg-[var(--bg)] text-[var(--near-black)]"
                       placeholder="Confirm new password"
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
                     />
                   </div>
                   {passwordMessage && (
                     <div
                       className={`p-3 rounded-[12px] text-[15px] font-medium ${
                         passwordMessage.type === 'success'
-                          ? 'bg-[rgba(26,74,46,0.06)] text-[var(--forest)] border border-[rgba(26,74,46,0.12)]'
+                          ? 'bg-[rgba(28,18,8,0.06)] text-[var(--forest)] border border-[rgba(28,18,8,0.12)]'
                           : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
                       }`}
+                      style={{ fontFamily: "'DM Sans', sans-serif" }}
                     >
                       {passwordMessage.text}
                     </div>
                   )}
                   <button
                     type="submit"
-                    className="w-full px-4 py-2.5 bg-[var(--terra)] text-[#FFFFFF] rounded-full font-semibold text-base hover:bg-[var(--terra-hover)] transition-colors"
+                    className="w-full px-4 py-2.5 bg-[var(--terra)] text-[#EDE8DC] rounded-full font-semibold text-base hover:bg-[var(--terra-hover)] transition-colors"
+                    style={{ fontFamily: "'DM Sans', sans-serif" }}
                   >
                     Update Password
                   </button>

@@ -1,56 +1,56 @@
 :root {
   /* ── Neutrals ── */
-  --white: #FFFDF8;
-  --bg: #FFFDF8;
-  --elevated: #FFFFFF;
-  --pressed: #E0E0E0;
-  --near-black: #1A1A1A;
+  --white: #F5F0E8;
+  --bg: #F5F0E8;
+  --elevated: #EDE8DC;
+  --pressed: #DDD8CC;
+  --near-black: #1C1208;
 
   /* ── Neutral opacity scale (based on --near-black) ── */
-  --mid: rgba(26,26,26,0.78);
-  --soft: rgba(26,26,26,0.58);
-  --faint: rgba(26,26,26,0.12);
+  --mid: rgba(28,18,8,0.78);
+  --soft: rgba(28,18,8,0.58);
+  --faint: rgba(28,18,8,0.12);
   --warm-mid-grey: #9E9E9E;
 
-  /* ── Brand: Primary (Orange) ── */
-  --terra: #CB4A2F;
-  --terra-hover: #B5422A;
-  --terra-ring: rgba(203, 74, 47, 0.3);
-  --terra-5: rgba(203, 74, 47, 0.05);
-  --terra-10: rgba(203, 74, 47, 0.1);
-  --terra-15: rgba(203, 74, 47, 0.15);
-  --terra-20: rgba(203, 74, 47, 0.2);
-  --terra-40: rgba(203, 74, 47, 0.4);
+  /* ── Brand: Primary (Burnt Orange) ── */
+  --terra: #D4470C;
+  --terra-hover: #B93D0A;
+  --terra-ring: rgba(212, 71, 12, 0.3);
+  --terra-5: rgba(212, 71, 12, 0.05);
+  --terra-10: rgba(212, 71, 12, 0.1);
+  --terra-15: rgba(212, 71, 12, 0.15);
+  --terra-20: rgba(212, 71, 12, 0.2);
+  --terra-40: rgba(212, 71, 12, 0.4);
 
   /* ── Brand: Secondary ── */
   --forest: #1A4A2E;
   --ochre: #E8A020;
 
   /* ── Cards ── */
-  --card-bg: #FFFFFF;
-  --card-border: #E0E0E0;
+  --card-bg: #EDE8DC;
+  --card-border: #DDD8CC;
 
-  /* ── Accents (kept for category variety) ── */
-  --lavender: #C8B8F0;
-  --peach: #F5C4A0;
-  --pink: #F4A8C0;
+  /* ── Accents (tinted card surfaces) ── */
+  --sage: #E8EEE7;
+  --dusty-blue: #E4EAED;
+  --peach: #F2E8E0;
 
   /* ── Shadows (removed from cards, kept for rare use) ── */
-  --shadow-sm: 0 1px 3px rgba(26,26,26,0.06);
-  --shadow-md: 0 2px 12px rgba(26,26,26,0.08);
-  --shadow-lg: 0 4px 16px rgba(26,26,26,0.12);
+  --shadow-sm: 0 1px 3px rgba(28,18,8,0.06);
+  --shadow-md: 0 2px 12px rgba(28,18,8,0.08);
+  --shadow-lg: 0 4px 16px rgba(28,18,8,0.12);
 }
 
 @layer base {
   h1, h2, h3, h4, h5 {
-    font-family: 'Figtree', sans-serif;
-    font-weight: 900;
-    letter-spacing: -0.01em;
+    font-family: 'Corben', serif;
+    font-weight: 400;
+    letter-spacing: -0.025em;
   }
   body, p, span, button, input, label, select, textarea {
-    font-family: 'Figtree', sans-serif;
+    font-family: 'DM Sans', sans-serif;
     font-size: 17px;
-    font-weight: 450;
+    font-weight: 400;
   }
 }
 

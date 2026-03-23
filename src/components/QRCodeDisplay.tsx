@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { RefreshCw } from 'lucide-react';
+import { DoodleIcon } from '../lib/doodle-icons';
 
 interface QRCodeDisplayProps {
   token: string;
@@ -20,7 +20,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#ffffff';
+  ctx.fillStyle = '#F5F0E8';
   ctx.fillRect(0, 0, size, size);
 
   const modules = encodeQR(text);
@@ -28,7 +28,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   const margin = 4;
   const cellSize = size / (n + margin * 2);
 
-  ctx.fillStyle = '#1A1A1A';
+  ctx.fillStyle = '#1C1208';
   for (let r = 0; r < n; r++) {
     for (let c = 0; c < n; c++) {
       if (modules[r][c]) {
@@ -328,7 +328,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-[20px] rounded-[16px] bg-[#F7F4F0] p-[16px]">
+    <div className="flex flex-col items-center gap-[20px] rounded-[16px] bg-[#F5F0E8] p-[16px]">
       {/* QR code — 240px */}
       <div className="inline-block rounded-[10px] overflow-hidden">
         <img
@@ -343,7 +343,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
         <>
           {/* Creator code badge */}
           <span
-            className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-white border border-[var(--faint)]"
+            className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-[#EDE8DC] border border-[var(--faint)]"
             style={{ padding: '10px 20px' }}
           >
             {creatorCode}
@@ -351,7 +351,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
 
           {/* Refresh timer */}
           <div className="flex items-center gap-1.5" style={{ marginTop: 12 }}>
-            <RefreshCw className={`w-3 h-3 ${isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+            <DoodleIcon name="sync" size={12} className={isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'} />
             <span className={`text-[14px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
               Refreshes in {timeLeft}s
             </span>

@@ -1,16 +1,20 @@
 import React from 'react';
-import { UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Coffee, Palette, Flower2, PawPrint, GraduationCap, Wrench, Store } from 'lucide-react';
+import {
+  DoodleCutlery, DoodleScissors, DoodleDumbbell, DoodleBag,
+  DoodleCoffee, DoodlePaintBrush, DoodleFlower, DoodlePawPrint,
+  DoodleGradCap, DoodleWrench, DoodleShop,
+} from './doodle-icons';
 
 export const CATEGORY_ICONS: Record<string, string> = {
-  'Food & Drink': 'UtensilsCrossed',
+  'Food & Drink': 'Cutlery',
   'Hair & Beauty': 'Scissors',
   'Health & Fitness': 'Dumbbell',
-  'Retail': 'ShoppingBag',
+  'Retail': 'Bag',
   'Cafe & Coffee': 'Coffee',
-  'Arts & Entertainment': 'Palette',
-  'Wellness & Spa': 'Flower2',
+  'Arts & Entertainment': 'PaintBrush',
+  'Wellness & Spa': 'Flower',
   'Pets': 'PawPrint',
-  'Education': 'GraduationCap',
+  'Education': 'GradCap',
   'Services': 'Wrench',
 };
 
@@ -30,7 +34,7 @@ export const CATEGORY_COLORS: Record<string, string> = {
 export const CATEGORY_LIST = Object.keys(CATEGORY_ICONS);
 
 export function getCategoryIconName(category: string | undefined | null): string {
-  return CATEGORY_ICONS[category || ''] || 'Store';
+  return CATEGORY_ICONS[category || ''] || 'Shop';
 }
 
 export function getCategoryColor(category: string | undefined | null): string {
@@ -69,13 +73,23 @@ export function getCategoryBorderColor(category: string | undefined | null): str
   return borderMap[category || ''] || 'border-gray-100/50';
 }
 
-const ICON_COMPONENTS: Record<string, any> = {
-  UtensilsCrossed, Scissors, Dumbbell, ShoppingBag, Coffee, Palette, Flower2, PawPrint, GraduationCap, Wrench, Store
+const ICON_COMPONENTS: Record<string, React.FC<any>> = {
+  Cutlery: DoodleCutlery,
+  Scissors: DoodleScissors,
+  Dumbbell: DoodleDumbbell,
+  Bag: DoodleBag,
+  Coffee: DoodleCoffee,
+  PaintBrush: DoodlePaintBrush,
+  Flower: DoodleFlower,
+  PawPrint: DoodlePawPrint,
+  GradCap: DoodleGradCap,
+  Wrench: DoodleWrench,
+  Shop: DoodleShop,
 };
 
 export function CategoryIcon({ category, className = "w-4 h-4", style }: { category: string | undefined | null; className?: string; style?: React.CSSProperties }) {
   const iconName = getCategoryIconName(category);
-  const IconComponent = ICON_COMPONENTS[iconName] || Store;
+  const IconComponent = ICON_COMPONENTS[iconName] || DoodleShop;
   return <IconComponent className={className} style={style} />;
 }
 
@@ -90,7 +104,7 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   'Arts & Entertainment': 'linear-gradient(135deg, #1F1A0F, #4A3A1A)',
   'Education': 'linear-gradient(135deg, #0F2318, #1A4A2E)',
   'Pets': 'linear-gradient(135deg, #2A1A0F, #5C3D1A)',
-  'Services': 'linear-gradient(135deg, #1A1A1A, #3A3A3A)',
+  'Services': 'linear-gradient(135deg, #1C1208, #3A3A3A)',
 };
 
 const CATEGORY_SOLID_COLORS: Record<string, string> = {
@@ -103,7 +117,7 @@ const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Arts & Entertainment': '#1F1A0F',
   'Education': '#0F2318',
   'Pets': '#2A1A0F',
-  'Services': '#1A1A1A',
+  'Services': '#1C1208',
 };
 
 export function getCategoryGradient(category: string | undefined | null): string {
@@ -114,18 +128,18 @@ export function getCategorySolidColor(category: string | undefined | null): stri
   return CATEGORY_SOLID_COLORS[category || ''] || '#1A4A2E';
 }
 
-// Muted pastel card backgrounds — warm tones that sit well on cream (#FFFDF8)
+// Muted pastel card backgrounds
 const CATEGORY_PASTEL_BG: Record<string, string> = {
-  'Food & Drink': '#F5E6D8',
-  'Cafe & Coffee': '#F0E4D4',
+  'Food & Drink': '#F2E8E0',
+  'Cafe & Coffee': '#F2E8E0',
   'Hair & Beauty': '#F2E2EA',
-  'Wellness & Spa': '#E8E4F0',
-  'Health & Fitness': '#DEE8E4',
-  'Retail': '#E0E4EE',
-  'Arts & Entertainment': '#EDE6DA',
-  'Education': '#DDE8E0',
-  'Pets': '#EDE4D6',
-  'Services': '#E8E6E2',
+  'Wellness & Spa': '#E8EEE7',
+  'Health & Fitness': '#E4EAED',
+  'Retail': '#E4EAED',
+  'Arts & Entertainment': '#F2E8E0',
+  'Education': '#E8EEE7',
+  'Pets': '#F2E8E0',
+  'Services': '#EDE8DC',
 };
 
 const CATEGORY_PASTEL_ICON: Record<string, string> = {
@@ -142,7 +156,7 @@ const CATEGORY_PASTEL_ICON: Record<string, string> = {
 };
 
 export function getCategoryPastelBg(category: string | undefined | null): string {
-  return CATEGORY_PASTEL_BG[category || ''] || '#E8E6E2';
+  return CATEGORY_PASTEL_BG[category || ''] || '#EDE8DC';
 }
 
 export function getCategoryPastelIcon(category: string | undefined | null): string {

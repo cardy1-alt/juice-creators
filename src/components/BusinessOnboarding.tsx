@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { ChevronLeft, Camera, Gift, Sparkles, Tag, Star, Minus, Plus, CheckCircle } from 'lucide-react';
+import { DoodleIcon } from '../lib/doodle-icons';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
 import { CategoryIcon, getCategoryGradient } from '../lib/categories';
@@ -97,7 +97,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
   const goBack = () => {
     setDirection('back');
     setAnimKey(k => k + 1);
-    setScreen(s => s - 1);
+    setScreen((s: number) => s - 1);
   };
 
   const handleFinishLater = () => {
@@ -176,14 +176,14 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
   const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
 
   const offerTiles = [
-    { key: 'product', label: 'Free Product', icon: Gift, sub: 'Coffee, meal, item' },
-    { key: 'service', label: 'Free Service', icon: Sparkles, sub: 'Haircut, facial, class' },
-    { key: 'discount', label: 'Discount', icon: Tag, sub: '% off or £ off' },
-    { key: 'experience', label: 'Experience', icon: Star, sub: 'Tasting, tour, event' },
+    { key: 'product', label: 'Free Product', icon: 'gift', sub: 'Coffee, meal, item' },
+    { key: 'service', label: 'Free Service', icon: 'sparkles', sub: 'Haircut, facial, class' },
+    { key: 'discount', label: 'Discount', icon: 'tag', sub: '% off or £ off' },
+    { key: 'experience', label: 'Experience', icon: 'star', sub: 'Tasting, tour, event' },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F4F0] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
       <style>{onboardingStyles}</style>
 
       {/* ─── Top bar ─── */}
@@ -191,7 +191,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
         <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
           {screen > 1 ? (
             <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
-              <ChevronLeft className="w-[20px] h-[20px] text-[var(--soft)]" />
+              <DoodleIcon name="chevron-left" size={20} className="text-[var(--soft)]" />
             </button>
           ) : (
             <div className="w-[40px]" />
@@ -255,7 +255,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
             >
               Let's get started →
             </button>
@@ -309,7 +309,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={goForward}
               className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
             >
               Sounds good →
             </button>
@@ -358,7 +358,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     className="absolute -bottom-[4px] -right-[4px] w-[24px] h-[24px] rounded-full flex items-center justify-center"
                     style={{ background: 'var(--terra)' }}
                   >
-                    <Camera className="w-[12px] h-[12px] text-white" />
+                    <DoodleIcon name="camera" size={12} className="text-white" />
                   </div>
                 </button>
                 <input
@@ -395,7 +395,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               style={{
                 background: 'var(--terra)',
                 color: 'white',
-                boxShadow: '0 4px 16px rgba(222,78,12,0.25)',
+                boxShadow: '0 4px 16px rgba(212,71,12,0.25)',
               }}
             >
               Looking good →
@@ -436,11 +436,11 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     className="flex flex-col items-center justify-center gap-[8px] rounded-[16px] min-h-[100px] transition-all"
                     style={{
                       padding: '20px 16px',
-                      border: offerType === t.key ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
-                      background: offerType === t.key ? 'rgba(222,78,12,0.08)' : 'white',
+                      border: offerType === t.key ? '1.5px solid #D4470C' : '1.5px solid var(--faint)',
+                      background: offerType === t.key ? 'rgba(212,71,12,0.08)' : '#EDE8DC',
                     }}
                   >
-                    <t.icon className="w-[24px] h-[24px] text-[var(--near-black)]" />
+                    <DoodleIcon name={t.icon} size={24} className="text-[#1C1208]" />
                     <div className="text-center">
                       <p className="text-[15px] font-bold text-[var(--near-black)]">{t.label}</p>
                       <p className="text-[13px] text-[var(--mid)] mt-[2px]">{t.sub}</p>
@@ -531,7 +531,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
                           style={{ border: '1.5px solid var(--faint)' }}
                         >
-                          <Minus className="w-[18px] h-[18px] text-[var(--mid)]" />
+                          <DoodleIcon name="minus" size={18} className="text-[var(--mid)]" />
                         </button>
                         <span className="text-[52px] font-display font-normal text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
                           {monthlySlots}
@@ -541,7 +541,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
                           style={{ background: 'var(--terra)' }}
                         >
-                          <Plus className="w-[18px] h-[18px] text-white" />
+                          <DoodleIcon name="plus" size={18} className="text-white" />
                         </button>
                       </div>
                       <p className="text-[14px] text-[var(--soft)] text-center mt-[8px]">
@@ -575,7 +575,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 color: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
                   ? 'white' : 'var(--soft)',
                 boxShadow: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
-                  ? '0 4px 16px rgba(222,78,12,0.25)' : 'none',
+                  ? '0 4px 16px rgba(212,71,12,0.25)' : 'none',
               }}
             >
               {saving ? (
@@ -612,7 +612,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 style={{ background: 'var(--lavender)', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
               />
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <CheckCircle className="w-[48px] h-[48px] text-[var(--terra)]" />
+                <DoodleIcon name="check" size={48} className="text-[var(--terra)]" />
               </div>
             </div>
 
@@ -634,7 +634,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             {/* Offer summary card */}
             <div
               className="mt-[24px] w-full max-w-[260px] rounded-[20px] p-[16px] flex items-center gap-[12px]"
-              style={{ background: 'white', border: '1px solid var(--faint)' }}
+              style={{ background: '#EDE8DC', border: '1px solid var(--faint)' }}
             >
               <div
                 className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0"
@@ -660,7 +660,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <button
               onClick={onComplete}
               className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(222,78,12,0.25)' }}
+              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
             >
               Go to my dashboard →
             </button>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { X, AlertTriangle, Check } from 'lucide-react';
+import { DoodleIcon } from '../lib/doodle-icons';
 
 interface DisputeModalProps {
   claimId: string;
@@ -40,12 +40,12 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-white rounded-[16px] max-w-md w-full p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(26,26,26,0.08)]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-[#1C1208]/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
+      <div className="bg-[#EDE8DC] rounded-[16px] max-w-md w-full p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]" onClick={(e) => e.stopPropagation()}>
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full bg-[var(--bg)] flex items-center justify-center mx-auto mb-4">
-              <Check className="w-8 h-8 text-[var(--terra)]" />
+              <DoodleIcon name="check" size={32} className="text-[var(--terra)]" />
             </div>
             <h3 className="text-xl font-display font-normal text-[var(--near-black)] mb-2">Report Submitted</h3>
             <p className="text-[var(--mid)] text-base">
@@ -57,12 +57,12 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
-                  <AlertTriangle className="w-5 h-5 text-[var(--terra)]" />
+                  <DoodleIcon name="alert-triangle" size={20} className="text-[var(--terra)]" />
                 </div>
                 <h3 className="text-lg font-bold text-[var(--near-black)]">Report an Issue</h3>
               </div>
               <button onClick={onClose} className="p-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                <X className="w-5 h-5 text-[var(--soft)]" />
+                <DoodleIcon name="x" size={20} className="text-[var(--soft)]" />
               </button>
             </div>
 
