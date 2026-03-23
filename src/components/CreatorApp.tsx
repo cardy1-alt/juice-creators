@@ -1697,7 +1697,7 @@ export default function CreatorApp() {
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
                       className="text-left rounded-[16px] overflow-hidden flex flex-col"
-                      style={{ width: 164, height: 192, flexShrink: 0, background: pastelBg }}
+                      style={{ width: 164, minHeight: 192, flexShrink: 0, background: pastelBg }}
                     >
                       {/* Top area — icon + heart */}
                       <div className="relative" style={{ padding: '14px 12px 0' }}>
@@ -1722,15 +1722,15 @@ export default function CreatorApp() {
                         )}
                       </div>
 
-                      {/* Headline — Corben, fixed 2-line reserve */}
-                      <div style={{ padding: '8px 12px 0', minHeight: 48 }}>
-                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 15, color: '#2C2420', lineHeight: 1.3, height: '2.6em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
+                      {/* Headline — Corben 18px, 2-line clamp */}
+                      <div style={{ padding: '8px 12px 0' }}>
+                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0 }}>
                           {offerTitle || bizName}
                         </p>
                       </div>
 
-                      {/* Footer — business name + slots, pushed to bottom */}
-                      <div className="mt-auto" style={{ padding: '4px 12px 12px' }}>
+                      {/* Footer — business name + slots */}
+                      <div style={{ padding: '8px 12px 12px' }}>
                         <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(44,36,32,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
