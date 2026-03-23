@@ -183,7 +183,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
   ];
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
       <style>{onboardingStyles}</style>
 
       {/* ─── Top bar ─── */}
@@ -440,7 +440,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       background: offerType === t.key ? 'rgba(212,71,12,0.08)' : '#EDE8DC',
                     }}
                   >
-                    <DoodleIcon name={t.icon} size={24} className="text-[#1C1208]" />
+                    <DoodleIcon name={t.icon} size={24} className="text-[#2C2420]" />
                     <div className="text-center">
                       <p className="text-[15px] font-bold text-[var(--near-black)]">{t.label}</p>
                       <p className="text-[13px] text-[var(--mid)] mt-[2px]">{t.sub}</p>

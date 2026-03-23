@@ -49,14 +49,14 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
           style={{ background: 'var(--forest)', boxShadow: '0 2px 12px rgba(26,74,46,0.25)' }}
           aria-label="Send feedback"
         >
-          <DoodleIcon name="message" size={18} className="text-[#F5F0E8]" />
+          <DoodleIcon name="message" size={18} className="text-[#F7F6F3]" />
         </button>
       )}
 
       {/* Feedback modal */}
       {open && (
         <div className="fixed inset-0 z-[200] flex items-end justify-center" onClick={() => { setOpen(false); setSent(false); }}>
-          <div className="absolute inset-0 bg-[#1C1208]/30" />
+          <div className="absolute inset-0 bg-[#2C2420]/30" />
           <div
             className="relative w-full max-w-md mx-4 mb-4 bg-[#EDE8DC] rounded-[20px] overflow-hidden"
             style={{ boxShadow: '0 4px 24px rgba(26,26,26,0.15)' }}

@@ -196,10 +196,10 @@ export default function AdminDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F5F0E8]">
+    <div className="min-h-screen bg-[#F7F6F3]">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="bg-[#F5F0E8] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
+        <div className="bg-[#F7F6F3] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -216,7 +216,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Tab bar */}
-        <div className="flex bg-[#F5F0E8] border-b border-[var(--faint)] overflow-x-auto">
+        <div className="flex bg-[#F7F6F3] border-b border-[var(--faint)] overflow-x-auto">
           {tabData.map(tab => (
             <button
               key={tab.key}
@@ -247,7 +247,7 @@ export default function AdminDashboard() {
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(28,18,8,0.06)] border-[rgba(28,18,8,0.12)] text-[var(--forest)]'}`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
+            <div className={`mb-4 p-3 rounded-[12px] border text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] border-[var(--terra-20)] text-[var(--terra)]' : 'bg-[rgba(44,36,32,0.06)] border-[rgba(44,36,32,0.12)] text-[var(--forest)]'}`} style={{ fontFamily: "'DM Sans', sans-serif" }}>
               {actionFeedback.text}
             </div>
           )}
@@ -287,7 +287,7 @@ export default function AdminDashboard() {
               )}
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCardData.map((stat, i) => (
-                  <div key={i} className="bg-[#EDE8DC] rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
+                  <div key={i} className="bg-[#EDE8DC] rounded-[16px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                     <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--mid)]" /></div>
                     <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stat.value}</p>
                     <p className="text-sm text-[var(--mid)] mt-1 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>{stat.label}</p>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="users" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
@@ -316,7 +316,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,36,32,0.05)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
@@ -356,7 +356,7 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="store" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
@@ -371,7 +371,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,36,32,0.05)]">
                       {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
                         <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
@@ -411,7 +411,7 @@ export default function AdminDashboard() {
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
-                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
+                    <div key={offer.id} className="bg-[#EDE8DC] rounded-[16px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
                         <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
                         <div className="flex-1 min-w-0">
@@ -432,7 +432,7 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] overflow-hidden">
+            <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] overflow-hidden">
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="clipboard-list" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'DM Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
@@ -447,7 +447,7 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[13px] font-semibold text-[var(--mid)] uppercase tracking-wider" style={{ fontFamily: "'DM Sans', sans-serif" }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[rgba(28,18,8,0.05)]">
+                    <tbody className="divide-y divide-[rgba(44,36,32,0.05)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
                           <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{claim.creators.name}</td>
@@ -489,7 +489,7 @@ export default function AdminDashboard() {
           {/* SETTINGS */}
           {view === 'settings' && (
             <div className="max-w-2xl">
-              <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] p-6">
+              <div className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
                 <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
@@ -543,7 +543,7 @@ export default function AdminDashboard() {
                     <div
                       className={`p-3 rounded-[12px] text-[15px] font-medium ${
                         passwordMessage.type === 'success'
-                          ? 'bg-[rgba(28,18,8,0.06)] text-[var(--forest)] border border-[rgba(28,18,8,0.12)]'
+                          ? 'bg-[rgba(44,36,32,0.06)] text-[var(--forest)] border border-[rgba(44,36,32,0.12)]'
                           : 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]'
                       }`}
                       style={{ fontFamily: "'DM Sans', sans-serif" }}

@@ -1,15 +1,15 @@
 :root {
   /* ── Neutrals ── */
-  --white: #F5F0E8;
-  --bg: #F5F0E8;
+  --white: #F7F6F3;
+  --bg: #F7F6F3;
   --elevated: #EDE8DC;
   --pressed: #DDD8CC;
-  --near-black: #1C1208;
+  --near-black: #2C2420;
 
   /* ── Neutral opacity scale (based on --near-black) ── */
-  --mid: rgba(28,18,8,0.78);
-  --soft: rgba(28,18,8,0.58);
-  --faint: rgba(28,18,8,0.12);
+  --mid: rgba(44,36,32,0.72);
+  --soft: rgba(44,36,32,0.48);
+  --faint: rgba(44,36,32,0.10);
   --warm-mid-grey: #9E9E9E;
 
   /* ── Brand: Primary (Burnt Orange) ── */
@@ -36,9 +36,9 @@
   --peach: #F2E8E0;
 
   /* ── Shadows (removed from cards, kept for rare use) ── */
-  --shadow-sm: 0 1px 3px rgba(28,18,8,0.06);
-  --shadow-md: 0 2px 12px rgba(28,18,8,0.08);
-  --shadow-lg: 0 4px 16px rgba(28,18,8,0.12);
+  --shadow-sm: 0 1px 3px rgba(44,36,32,0.05);
+  --shadow-md: 0 2px 12px rgba(44,36,32,0.06);
+  --shadow-lg: 0 4px 16px rgba(44,36,32,0.10);
 }
 
 @layer base {
@@ -51,6 +51,7 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 17px;
     font-weight: 400;
+    color: rgba(44,36,32,0.85);
   }
 }
 

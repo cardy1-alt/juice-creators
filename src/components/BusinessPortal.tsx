@@ -147,7 +147,7 @@ function getScreen2Tip(category: string | undefined | null, offerType: string): 
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
 function getSlotsBadgeStyle(slotsLeft: number, totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(28,18,8,0.07)', color: 'rgba(28,18,8,0.4)', text: 'Full' };
+    return { background: 'rgba(44,36,32,0.07)', color: 'rgba(44,36,32,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
     return { background: 'rgba(212,71,12,0.15)', color: 'var(--terra)', text: 'Last slot' };
@@ -420,7 +420,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
 
   if (showSuccess) {
     return (
-      <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col items-center justify-center px-6">
+      <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col items-center justify-center px-6">
         <DoodleIcon name="check" size={56} className="text-[var(--terra)] mb-4" />
         <p className="text-[24px] font-display font-normal text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.4px' }}>Your offer is live!</p>
         <p className="text-[18px] text-[var(--mid)] text-center mt-2">Creators can now discover and claim it</p>
@@ -435,7 +435,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col overflow-y-auto">
+    <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col overflow-y-auto">
       <style>{livePulseStyle}</style>
 
       {/* Top bar */}
@@ -740,7 +740,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     className="w-[160px] h-[120px] rounded-[16px] flex flex-col items-center justify-center gap-2"
                     style={{
                       background: getCategoryGradient(category),
-                      border: '1.5px dashed rgba(28,18,8,0.15)',
+                      border: '1.5px dashed rgba(44,36,32,0.15)',
                     }}
                   >
                     {photoUploading ? (
@@ -848,7 +848,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
-            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] mb-6">
+            <div className="rounded-[16px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] mb-6">
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
@@ -874,7 +874,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <p className="text-[15px] text-[var(--mid)] mt-1">{monthlyCap === null ? 'Unlimited slots' : `${monthlyCap} slots available`}</p>
                 {specificAsk.trim() && (
                   <div className="mt-3 p-3 rounded-[12px]" style={{ background: 'rgba(212,71,12,0.06)' }}>
-                    <p className="text-[18px] text-[rgba(28,18,8,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
+                    <p className="text-[18px] text-[rgba(44,36,32,0.75)]" style={{ lineHeight: '1.6' }}>{specificAsk}</p>
                   </div>
                 )}
               </div>
@@ -893,7 +893,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                         <span
                           key={i}
                           className="w-2 h-2 rounded-full"
-                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(28,18,8,0.12)' }}
+                          style={{ background: i <= dots ? 'var(--terra)' : 'rgba(44,36,32,0.12)' }}
                         />
                       ))}
                     </div>
@@ -1420,7 +1420,7 @@ export default function BusinessPortal() {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[#F5F0E8]" style={{ overscrollBehavior: 'none' }}>
+    <div className="h-[100dvh] flex flex-col bg-[#F7F6F3]" style={{ overscrollBehavior: 'none' }}>
       <style>{livePulseStyle}</style>
 
       {/* ═══ Business Profile Overlay ═══ */}
@@ -1428,7 +1428,7 @@ export default function BusinessPortal() {
         const biz = nearbyBusinesses.find(b => b.id === expandedNearbyBiz);
         if (!biz) return null;
         return (
-          <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
             {/* Header */}
             <div className="flex items-center gap-3 px-[20px] pt-[20px] pb-[14px] border-b border-[var(--faint)] flex-shrink-0">
               <button
@@ -1443,7 +1443,7 @@ export default function BusinessPortal() {
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-[20px] pt-[24px]">
               {/* ═══ Profile card (matches creator profile DNA) ═══ */}
-              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
+              <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                 <div className="flex items-start gap-[16px]">
                   {/* Logo */}
                   <div
@@ -1602,11 +1602,11 @@ export default function BusinessPortal() {
                   <span className="text-[15px] font-extrabold text-[var(--terra)]">{activeClaimsCount}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">active</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(28,18,8,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(44,36,32,0.04)]">
                   <span className="text-[15px] font-extrabold text-[var(--near-black)]">{reelsThisMonth}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">reels</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(28,18,8,0.04)]">
+                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[rgba(44,36,32,0.04)]">
                   <span className="text-[15px] font-extrabold text-[var(--near-black)]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
                   <span className="text-[14px] font-semibold text-[var(--mid)]">slots left</span>
                 </span>
@@ -1622,7 +1622,7 @@ export default function BusinessPortal() {
                   const isUnlimited = slotCap === null;
                   const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                   return (
-                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(28,18,8,0.10)' }}>
+                    <div className="rounded-[20px] overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(44,36,32,0.10)' }}>
                       {/* Hidden file input for offer photo */}
                       <input
                         ref={offerPhotoInputRef}
@@ -1685,7 +1685,7 @@ export default function BusinessPortal() {
                     </div>
                   );
                 })() : (
-                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
+                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                     <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                     <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer to start getting creator visits</p>
                     <button
@@ -1761,7 +1761,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-[#EDE8DC] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[16px] bg-[#EDE8DC] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                           <div
                             className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
                             style={{ background: getCategoryGradient(biz.category) }}
@@ -1825,7 +1825,7 @@ export default function BusinessPortal() {
                     {selectedOffer.offer_photo_url ? (
                       <>
                         <img src={selectedOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        <div className="absolute inset-0 bg-[#1C1208]/0 hover:bg-[#1C1208]/20 transition-colors flex items-center justify-center group">
+                        <div className="absolute inset-0 bg-[#2C2420]/0 hover:bg-[#2C2420]/20 transition-colors flex items-center justify-center group">
                           <span className="opacity-0 group-hover:opacity-100 transition-opacity px-[14px] py-[6px] rounded-[50px] text-[14px] font-semibold bg-[#EDE8DC]/90 text-[var(--near-black)] flex items-center gap-[6px]">
                             <DoodleIcon name="camera" size={13} className="" /> Change photo
                           </span>
@@ -1930,7 +1930,7 @@ export default function BusinessPortal() {
                     const isUnlimited = slotCap === null;
                     const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                     return (
-                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
+                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                         <div className="relative h-[120px]">
                           {activeOffer.offer_photo_url ? (
                             <img
@@ -1986,7 +1986,7 @@ export default function BusinessPortal() {
                       </div>
                     );
                   })() : (
-                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(28,18,8,0.05)' }}>
+                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                       <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                       <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer</p>
                       <button
@@ -2113,7 +2113,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#1C1208] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#2C2420] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2266,7 +2266,7 @@ export default function BusinessPortal() {
                   ) : (
                     <div className="space-y-[12px]">
                       {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(28,18,8,0.08)] p-[16px]">
+                        <div key={claim.id} className="bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-[16px]">
                           <div className="flex items-start gap-[12px]">
                             {claim.creators.avatar_url ? (
                               <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -2327,7 +2327,7 @@ export default function BusinessPortal() {
                     <button
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
-                      className={`w-full text-left bg-[#EDE8DC] rounded-[16px] p-4 shadow-[0_2px_12px_rgba(28,18,8,0.08)] transition-all ${
+                      className={`w-full text-left bg-[#EDE8DC] rounded-[16px] p-4 shadow-[0_2px_12px_rgba(44,36,32,0.08)] transition-all ${
                         notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)] bg-[var(--terra-5)]'
                       }`}
                     >
@@ -2358,7 +2358,7 @@ export default function BusinessPortal() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(28,18,8,0.08)' }}>
+                  <div className="rounded-[16px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(44,36,32,0.08)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Logo */}
                       <div className="relative flex-shrink-0">
@@ -2599,8 +2599,8 @@ export default function BusinessPortal() {
 
       {/* ═══ Bottom Nav ═══ */}
       <nav
-        className="bg-[#EDE8DC] flex items-end justify-around flex-shrink-0"
-        style={{ borderTop: '1px solid var(--faint)', padding: '10px 0 max(16px, env(safe-area-inset-bottom))' }}
+        className="bg-[#F7F6F3] flex items-end justify-around flex-shrink-0"
+        style={{ borderTop: '1px solid rgba(44,36,32,0.08)', padding: '8px 0 max(10px, env(safe-area-inset-bottom))' }}
       >
         {bottomTabs.map((tab) => {
           const isActive = view === tab.key;
@@ -2609,11 +2609,11 @@ export default function BusinessPortal() {
               <div key={tab.key} className="flex-1 flex items-center justify-center">
                 <button
                   onClick={() => { if (isPendingApproval) return; setView('scan'); setScanResult(null); }}
-                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(28,18,8,0.1)]' : 'bg-[var(--terra)]'} text-white`}
+                  className={`flex items-center gap-[6px] px-5 py-[10px] rounded-[50px] ${isPendingApproval ? 'bg-[rgba(44,36,32,0.1)]' : 'bg-[var(--terra)]'} text-white`}
                   style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : '0 4px 16px rgba(212,71,12,0.3)' }}
                 >
-                  <DoodleIcon name={tab.icon} size={18} className="text-[#F5F0E8]" />
-                  <span className="text-[14px] font-bold text-[#F5F0E8]">Scan</span>
+                  <DoodleIcon name={tab.icon} size={18} className="text-[#F7F6F3]" />
+                  <span className="text-[14px] font-bold text-[#F7F6F3]">Scan</span>
                 </button>
               </div>
             );
@@ -2624,10 +2624,12 @@ export default function BusinessPortal() {
             <button
               key={tab.key}
               onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
-              className="flex-1 flex flex-col items-center gap-1"
+              className={`flex-1 flex flex-col items-center gap-[2px] transition-all ${isDisabled ? 'text-[rgba(44,36,32,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[rgba(44,36,32,0.40)]'}`}
             >
-              <DoodleIcon name={tab.icon} size={20} className={isDisabled ? 'text-[rgba(28,18,8,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'} />
-              <span className={`text-[12px] font-semibold ${isDisabled ? 'text-[rgba(28,18,8,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
+              <div className={`flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[rgba(212,71,12,0.10)]' : ''}`} style={{ width: 36, height: 28 }}>
+                <DoodleIcon name={tab.icon} size={20} />
+              </div>
+              <span className="text-[12px] font-semibold">
                 {tab.label}
               </span>
             </button>

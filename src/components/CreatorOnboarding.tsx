@@ -114,7 +114,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
   const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
 
   return (
-    <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
+    <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
       <style>{onboardingStyles}</style>
 
       {/* ─── Top bar ─── */}
