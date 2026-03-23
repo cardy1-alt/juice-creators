@@ -175,6 +175,7 @@ export default function CreatorApp() {
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearchBar, setShowSearchBar] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
   const [releaseConfirmId, setReleaseConfirmId] = useState<string | null>(null);
   const [releaseError, setReleaseError] = useState<string | null>(null);
@@ -767,7 +768,7 @@ export default function CreatorApp() {
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[26px] font-display font-extrabold text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.5px' }}>
+            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.025em' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
             <p className="text-[18px] text-[var(--mid)] mb-6 leading-[1.5]">
@@ -1289,36 +1290,49 @@ export default function CreatorApp() {
                 </div>
               )}
 
-              {/* Search bar */}
-              <div className="px-[20px] pt-[20px] pb-3">
-                <div
-                  className="w-full flex items-center gap-3 px-[16px] py-[14px]"
-                  style={{
-                    background: '#EDE8DC',
-                    border: '1.5px solid rgba(44, 36, 32, 0.08)',
-                    borderRadius: 50,
-                  }}
-                >
-                  <DoodleIcon name="search" size={15} className="flex-shrink-0" style={{ color: 'rgba(44, 36, 32, 0.4)' }} />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Find local offers..."
-                    className="w-full bg-transparent text-[17px] font-semibold text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
-                    style={{ minHeight: '24px' }}
-                  />
-                  <div
-                    className="w-[30px] h-[30px] flex items-center justify-center flex-shrink-0"
-                    style={{
-                      background: '#EDE8DC',
-                      border: '1.5px solid rgba(44, 36, 32, 0.08)',
-                      borderRadius: 50,
-                    }}
-                  >
-                    <DoodleIcon name="filter" size={12} className="text-[var(--near-black)]" />
+              {/* Greeting header + search icon */}
+              <div className="px-[20px] pt-[24px] pb-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.2, margin: 0 }}>
+                      {(() => {
+                        const hour = new Date().getHours();
+                        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+                        const firstName = (userProfile?.display_name || userProfile?.name || '').split(' ')[0];
+                        return `${greeting}, ${firstName}`;
+                      })()}
+                    </h1>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44, 36, 32, 0.5)', margin: 0, marginTop: 4 }}>
+                      Your area · {offers.length} offer{offers.length !== 1 ? 's' : ''} near you today
+                    </p>
                   </div>
+                  <button
+                    onClick={() => setShowSearchBar(!showSearchBar)}
+                    className="flex items-center justify-center mt-[4px]"
+                  >
+                    <DoodleIcon name="search" size={22} className="flex-shrink-0" style={{ color: 'rgba(44, 36, 32, 0.5)' }} />
+                  </button>
                 </div>
+
+                {/* Collapsible search bar */}
+                {showSearchBar && (
+                  <div className="mt-3">
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search offers..."
+                      autoFocus
+                      className="w-full bg-transparent text-[15px] font-medium text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
+                      style={{
+                        background: '#EDE8DC',
+                        border: '1.5px solid rgba(44, 36, 32, 0.08)',
+                        borderRadius: 50,
+                        padding: '10px 16px',
+                      }}
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Category Tabs */}
@@ -1367,9 +1381,9 @@ export default function CreatorApp() {
                 return (
                   <div style={{ marginBottom: 8 }}>
                     <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[12px]">
-                      <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
+                      <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>Your passes</h2>
                       {giftCardClaims.length >= 2 && (
-                        <button onClick={() => setView('active')} className="text-[15px] font-semibold text-[var(--mid)]">
+                        <button onClick={() => setView('active')} style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 15, color: '#D4470C' }}>
                           View all
                         </button>
                       )}
@@ -1590,7 +1604,7 @@ export default function CreatorApp() {
 
               {/* Section Header */}
               <div className="flex items-center justify-between px-[20px] mt-[28px] mb-[12px]">
-                <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
+                <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>Near you</h2>
               </div>
 
               {offersLoading ? (
@@ -1770,7 +1784,7 @@ export default function CreatorApp() {
 
                     {/* Second section */}
                     <div className="flex items-center justify-between px-[20px] mt-[24px] mb-[12px]">
-                      <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
+                      <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>New this week</h2>
                     </div>
 
                     <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
@@ -1790,7 +1804,7 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] font-display font-extrabold text-[var(--near-black)]">Saved</h1>
+                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Saved</h1>
                 <span className="text-[15px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
@@ -1802,7 +1816,7 @@ export default function CreatorApp() {
                     <circle cx="40" cy="36" r="6" stroke="var(--peach)" strokeWidth="2" fill="none" />
                     <circle cx="40" cy="36" r="2" fill="var(--peach)" />
                   </svg>
-                  <p className="text-[20px] font-display font-extrabold text-[var(--near-black)] mt-[16px]">Nothing saved yet</p>
+                  <p className="text-[20px] font-display text-[var(--near-black)] mt-[16px]" style={{ letterSpacing: '-0.025em' }}>Nothing saved yet</p>
                   <p className="text-[17px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
@@ -2123,7 +2137,7 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[28px] font-display font-extrabold text-[var(--near-black)] mb-5">Claims</h1>
+              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.025em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <DoodleIcon name="zap" size={48} className="text-[var(--soft)] mx-auto mb-4" />
@@ -2543,7 +2557,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display font-extrabold text-[var(--near-black)]">Notifications</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2555,7 +2569,7 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[20px] font-display font-extrabold text-[var(--near-black)] mt-[16px]">Nothing yet</p>
+                      <p className="text-[20px] font-display text-[var(--near-black)] mt-[16px]" style={{ letterSpacing: '-0.025em' }}>Nothing yet</p>
                       <p className="text-[17px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>
@@ -2598,7 +2612,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display font-extrabold text-[var(--near-black)]">Edit profile</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
