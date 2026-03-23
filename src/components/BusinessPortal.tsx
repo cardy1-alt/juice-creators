@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { DoodleIcon } from '../lib/doodle-icons';
 import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
-import { getCategoryGradient, CategoryIcon } from '../lib/categories';
+import { getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
 import { uploadAvatar, uploadOfferPhoto } from '../lib/upload';
@@ -739,7 +739,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                     onClick={() => photoInputRef.current?.click()}
                     className="w-[160px] h-[120px] rounded-[18px] flex flex-col items-center justify-center gap-2"
                     style={{
-                      background: getCategoryGradient(category),
+                      background: getCategorySolidColor(category),
                       border: '1.5px dashed rgba(44,36,32,0.15)',
                     }}
                   >
@@ -852,7 +852,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
-                style={{ height: '120px', background: offerPhotoUrl ? undefined : getCategoryGradient(category) }}
+                style={{ height: '120px', background: offerPhotoUrl ? undefined : getCategorySolidColor(category) }}
               >
                 {offerPhotoUrl ? (
                   <img src={offerPhotoUrl} alt="Offer" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1451,7 +1451,7 @@ export default function BusinessPortal() {
                   {/* Logo */}
                   <div
                     className="w-[72px] h-[72px] rounded-[18px] flex items-center justify-center overflow-hidden flex-shrink-0"
-                    style={{ background: getCategoryGradient(biz.category) }}
+                    style={{ background: getCategorySolidColor(biz.category) }}
                   >
                     {biz.logo_url ? (
                       <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -1639,7 +1639,7 @@ export default function BusinessPortal() {
                         }}
                       />
                       {/* Photo hero */}
-                      <div className="relative h-[220px]" style={{ background: getCategoryGradient(userProfile.category) }}>
+                      <div className="relative h-[220px]" style={{ background: getCategorySolidColor(userProfile.category) }}>
                         {activeOffer.offer_photo_url ? (
                           <img src={activeOffer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                         ) : (
@@ -1815,7 +1815,7 @@ export default function BusinessPortal() {
                   />
                   <div
                     className="w-full h-[200px] rounded-[18px] overflow-hidden relative mb-[20px] cursor-pointer"
-                    style={{ background: getCategoryGradient(userProfile.category) }}
+                    style={{ background: getCategorySolidColor(userProfile.category) }}
                     onClick={() => document.getElementById('editOfferPhotoInput')?.click()}
                   >
                     {selectedOffer.offer_photo_url ? (
@@ -1934,7 +1934,7 @@ export default function BusinessPortal() {
                               onClick={() => offerPhotoInputRef.current?.click()}
                             />
                           ) : (
-                            <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryGradient(userProfile.category) }}>
+                            <div className="w-full h-full flex items-center justify-center" style={{ background: getCategorySolidColor(userProfile.category) }}>
                               <button
                                 onClick={() => offerPhotoInputRef.current?.click()}
                                 disabled={offerPhotoUploading}
@@ -2379,7 +2379,7 @@ export default function BusinessPortal() {
                           <button
                             onClick={() => logoInputRef.current?.click()}
                             className="w-[72px] h-[72px] rounded-[18px] flex items-center justify-center"
-                            style={{ background: getCategoryGradient(userProfile.category) }}
+                            style={{ background: getCategorySolidColor(userProfile.category) }}
                           >
                             <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
                           </button>

@@ -93,20 +93,6 @@ export function CategoryIcon({ category, className = "w-4 h-4", style }: { categ
   return <IconComponent className={className} style={style} />;
 }
 
-// Category-specific dark gradients for placeholder images
-const CATEGORY_GRADIENTS: Record<string, string> = {
-  'Food & Drink': 'linear-gradient(135deg, #3D2314, #6B3A1F)',
-  'Cafe & Coffee': 'linear-gradient(135deg, #2E1A0A, #5C3818)',
-  'Hair & Beauty': 'linear-gradient(135deg, #2D1F2E, #5C3A5A)',
-  'Wellness & Spa': 'linear-gradient(135deg, #1A2E2A, #2E5A52)',
-  'Health & Fitness': 'linear-gradient(135deg, #0F1F2E, #1A3A5C)',
-  'Retail': 'linear-gradient(135deg, #1A1F3A, #2D3561)',
-  'Arts & Entertainment': 'linear-gradient(135deg, #1F1A0F, #4A3A1A)',
-  'Education': 'linear-gradient(135deg, #0F2318, #1A4A2E)',
-  'Pets': 'linear-gradient(135deg, #2A1A0F, #5C3D1A)',
-  'Services': 'linear-gradient(135deg, #2C2420, #3A3A3A)',
-};
-
 const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Food & Drink': '#3D2314',
   'Cafe & Coffee': '#2E1A0A',
@@ -119,10 +105,6 @@ const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Pets': '#2A1A0F',
   'Services': '#2C2420',
 };
-
-export function getCategoryGradient(category: string | undefined | null): string {
-  return CATEGORY_GRADIENTS[category || ''] || 'linear-gradient(135deg, #1A4A2E, #2C4A3E)';
-}
 
 export function getCategorySolidColor(category: string | undefined | null): string {
   return CATEGORY_SOLID_COLORS[category || ''] || '#1A4A2E';

@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { DoodleIcon } from '../lib/doodle-icons';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
-import { CategoryIcon, getCategoryGradient } from '../lib/categories';
+import { CategoryIcon, getCategorySolidColor } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { Logo } from './Logo';
 
@@ -344,7 +344,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 >
                   <div
                     className="w-[80px] h-[80px] rounded-[18px] flex items-center justify-center overflow-hidden"
-                    style={{ background: logoUrl ? undefined : getCategoryGradient(profile.category || 'Food & Drink') }}
+                    style={{ background: logoUrl ? undefined : getCategorySolidColor(profile.category || 'Food & Drink') }}
                   >
                     {logoUrl ? (
                       <img src={logoUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -638,7 +638,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             >
               <div
                 className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0"
-                style={{ background: getCategoryGradient(profile.category) }}
+                style={{ background: getCategorySolidColor(profile.category) }}
               >
                 <CategoryIcon category={profile.category} className="w-[18px] h-[18px] text-white" />
               </div>

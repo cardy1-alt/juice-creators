@@ -6,7 +6,7 @@ import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import LevelBadge from './LevelBadge';
-import { getCategoryGradient, getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
+import { getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
 import { uploadAvatar } from '../lib/upload';
@@ -1062,7 +1062,7 @@ export default function CreatorApp() {
         return (
           <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
             {/* Hero — solid category colour + wavy SVG texture */}
-            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryGradient(offer.businesses.category) }}>
+            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategorySolidColor(offer.businesses.category) }}>
               {/* Wavy texture */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(255,255,255,0.12)" strokeWidth="50" fill="none" strokeLinecap="round" />
@@ -2236,7 +2236,7 @@ export default function CreatorApp() {
                           <button
                             onClick={() => avatarInputRef.current?.click()}
                             className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
-                            style={{ background: getCategoryGradient(null) }}
+                            style={{ background: getCategorySolidColor(null) }}
                           >
                             <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
                           </button>
@@ -2640,7 +2640,7 @@ export default function CreatorApp() {
                         ) : (
                           <div
                             className="w-[80px] h-[80px] rounded-full flex items-center justify-center"
-                            style={{ background: getCategoryGradient(null) }}
+                            style={{ background: getCategorySolidColor(null) }}
                           >
                             <span className="text-white text-[32px] font-extrabold">{getInitials(userProfile.name)}</span>
                           </div>
