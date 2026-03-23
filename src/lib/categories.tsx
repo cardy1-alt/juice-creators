@@ -100,7 +100,7 @@ const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Wellness & Spa': '#1A2E2A',
   'Health & Fitness': '#0F1F2E',
   'Retail': '#1A1F3A',
-  'Arts & Entertainment': '#1F1A0F',
+  'Arts & Entertainment': '#2A1F2E',
   'Education': '#0F2318',
   'Pets': '#2A1A0F',
   'Services': '#2C2420',
