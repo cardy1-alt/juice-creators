@@ -57,7 +57,7 @@ interface Offer {
   specific_ask?: string | null;
   generated_title?: string | null;
   offer_photo_url?: string | null;
-  businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
+  businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string; bio?: string | null };
 }
 
 // ─── Star SVG for streaks (solid fill) ───────────────────────────────────
@@ -417,7 +417,7 @@ export default function CreatorApp() {
     setOffersLoading(true);
     const { data, error } = await supabase
       .from('offers')
-      .select('*, businesses(name, category, latitude, longitude, address, logo_url)')
+      .select('*, businesses(name, category, latitude, longitude, address, logo_url, bio)')
       .eq('is_live', true);
 
     if (error) {
@@ -1083,6 +1083,7 @@ export default function CreatorApp() {
               </button>
               {/* Text overlay */}
               <div className="relative px-[20px] pb-[20px] pt-[56px]">
+                <CategoryIcon category={offer.businesses.category} className="w-[44px] h-[44px] mb-[10px]" style={{ color: 'rgba(44,36,32,0.4)' }} />
                 <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
@@ -1145,6 +1146,22 @@ export default function CreatorApp() {
                     <div className="rounded-[12px] p-[14px]" style={{ background: '#EDE8DC' }}>
                       <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.7)', lineHeight: 1.55, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
+                  </div>
+                )}
+
+                {/* F) About business */}
+                {(offer.businesses.bio || offer.businesses.address) && (
+                  <div className="mb-[24px]">
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>ABOUT</p>
+                    {offer.businesses.bio && (
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.8)', lineHeight: 1.55, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
+                    )}
+                    {offer.businesses.address && (
+                      <div className="flex items-center gap-2">
+                        <DoodleIcon name="location-pin" size={15} style={{ color: 'rgba(44,36,32,0.6)', flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.6)' }}>{offer.businesses.address}</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
