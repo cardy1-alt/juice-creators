@@ -1061,37 +1061,37 @@ export default function CreatorApp() {
 
         return (
           <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
-            {/* Hero — pastel category colour + wavy SVG texture */}
+            {/* Hero — category colour + wavy SVG texture */}
             <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryPastelBg(offer.businesses.category) }}>
-              {/* Wavy texture */}
+              {/* Wavy texture — 20% opacity */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(44,36,32,0.06)" strokeWidth="50" fill="none" strokeLinecap="round" />
-                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(44,36,32,0.04)" strokeWidth="30" fill="none" strokeLinecap="round" />
+                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(44,36,32,0.20)" strokeWidth="50" fill="none" strokeLinecap="round" />
+                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(44,36,32,0.20)" strokeWidth="30" fill="none" strokeLinecap="round" />
               </svg>
-              {/* Back button */}
+              {/* Back button — 40% opacity */}
               <button
                 onClick={() => setExpandedOffer(null)}
-                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(44,36,32,0.08)] flex items-center justify-center"
+                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="chevron-left" size={18} className="text-[#2C2420]" />
+                <DoodleIcon name="chevron-left" size={18} style={{ color: 'rgba(44,36,32,0.4)' }} />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
                 <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.25)' }} />
               )}
-              {/* Save button */}
+              {/* Save button — 40% opacity */}
               <button
                 onClick={() => toggleSaved(offer.id)}
-                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(44,36,32,0.08)] flex items-center justify-center"
+                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="heart" size={16} className="text-[#2C2420]" />
+                <DoodleIcon name="heart" size={16} style={{ color: 'rgba(44,36,32,0.4)' }} />
               </button>
               {/* Text overlay */}
               <div className="relative px-[20px] pb-[20px] pt-[56px]">
                 <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'rgba(44,36,32,0.5)', marginTop: 6, margin: '6px 0 0' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
               </div>
             </div>
 
@@ -1100,159 +1100,146 @@ export default function CreatorApp() {
               <div className="p-[20px]">
                 {/* Level requirement banner */}
                 {detailIsLocked && (
-                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-4" style={{ background: 'rgba(44,36,32,0.04)' }}>
+                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(44,36,32,0.04)' }}>
                     <DoodleIcon name="lock" size={14} className="text-[var(--mid)] mt-0.5 flex-shrink-0" />
                     <div>
-                      <p className="text-[15px] font-semibold text-[var(--near-black)]">{detailLockedName} creators only</p>
-                      <p className="text-[14px] text-[var(--mid)] mt-0.5">You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 15, color: '#2C2420', margin: 0 }}>{detailLockedName} creators only</p>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
                     </div>
                   </div>
                 )}
 
-                {/* B) What you get — hidden when identical to offer title */}
-                {(() => {
-                  const offerHeadline = offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description);
-                  const whatYouGet = offer.generated_title || offer.description;
-                  if (offerHeadline === whatYouGet) return null;
-                  return (
-                    <>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 17, color: '#2C2420', lineHeight: 1.5, marginBottom: 20 }}>
-                        {whatYouGet}
-                      </p>
-                    </>
-                  );
-                })()}
-
-                {/* C) What to post */}
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
-                <div className="flex items-center gap-2 mb-2">
-                  <DoodleIcon name="video" size={20} className="text-[var(--near-black)]" />
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 17, color: '#2C2420' }}>One Instagram Reel</span>
+                {/* A) Scarcity / urgency row */}
+                <div className="flex items-center gap-[20px] mb-[20px]">
+                  <div className="flex items-center gap-1.5">
+                    <DoodleIcon name="users" size={14} style={{ color: 'rgba(44,36,32,0.5)' }} />
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)' }}>
+                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <DoodleIcon name="clock" size={14} style={{ color: 'rgba(44,36,32,0.5)' }} />
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)' }}>48hrs to post</span>
+                  </div>
                 </div>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', marginBottom: 12 }}>Post within 48 hours of your visit</p>
-                <div className="flex flex-col gap-2.5 mb-5">
+
+                {/* B) WHAT TO POST label */}
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 10, margin: '0 0 10px' }}>WHAT TO POST</p>
+
+                {/* C) Primary post requirement — Corben */}
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
+
+                {/* D) Checklist items — no duplicates */}
+                <div className="flex flex-col gap-[10px] mb-[24px]">
                   {[
                     'Post within 48 hours of your visit',
                     'Tag the business in your reel',
                     'Submit your reel link in the app',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
-                      <DoodleIcon name="check" size={13} className="text-[var(--mid)] mt-[2px] flex-shrink-0" />
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)' }}>{item}</span>
+                      <DoodleIcon name="check" size={13} style={{ color: 'rgba(44,36,32,0.5)', marginTop: 3, flexShrink: 0 }} />
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.7)' }}>{item}</span>
                     </div>
                   ))}
                 </div>
 
-                {/* D) They'd love if you… (only if specific_ask exists) */}
+                {/* E) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
-                  <div className="mb-5">
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>THEY'D LOVE IF YOU…</p>
-                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(44,36,32,0.04)' }}>
-                      <p className="text-[18px] text-[rgba(44,36,32,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
+                  <div className="mb-[24px]">
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>THEY'D LOVE IF YOU…</p>
+                    <div className="rounded-[12px] p-[14px]" style={{ background: '#EDE8DC' }}>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.7)', lineHeight: 1.55, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
                   </div>
                 )}
-
-                {/* D) Availability row */}
-                <div className="flex items-center justify-between rounded-[12px] bg-[var(--bg)] px-[16px] py-[12px]">
-                  <div className="flex items-center gap-2">
-                    <DoodleIcon name="users" size={14} className="text-[var(--mid)]" />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#2C2420' }}>
-                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <DoodleIcon name="clock" size={14} className="text-[var(--mid)]" />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: '#2C2420' }}>48hrs to post</span>
-                  </div>
-                </div>
               </div>
             </div>
 
             {/* Sticky bottom bar */}
-            <div className="bg-[#EDE8DC] px-[20px] py-[14px]">
+            <div className="px-[20px] py-[14px] bg-[#F7F6F3]" style={{ boxShadow: '0 -1px 0 rgba(44,36,32,0.06)' }}>
               {detailIsLocked ? (
                 <div
-                  className="w-full py-[14px] rounded-[50px] text-center text-[14px] text-[var(--soft)]"
-                  style={{ background: 'var(--bg)' }}
+                  className="w-full py-[14px] rounded-[50px] text-center"
+                  style={{ background: 'rgba(44,36,32,0.04)', fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.5)' }}
                 >
                   Unlocks at {detailLockedName}
                 </div>
-              ) : (
-              <div className="flex items-center justify-between">
+              ) : full && waitlistedOffers[offer.id] ? (
                 <div>
-                  {full && waitlistedOffers[offer.id] ? (
-                    <>
-                      <p className="text-[18px] font-semibold text-[var(--near-black)]">You're on the waitlist</p>
-                      {waitlistedOffers[offer.id].position && (
-                        <p className="text-[14px] text-[var(--soft)]">You're #{waitlistedOffers[offer.id].position} on the waitlist</p>
-                      )}
-                    </>
-                  ) : full ? (
-                    <p className="text-[18px] text-[var(--mid)]">All slots taken</p>
-                  ) : (
-                    <>
-                      <p className="text-[17px] font-extrabold text-[var(--near-black)]">Free visit</p>
-                      <p className="text-[14px] text-[var(--mid)]">Post reel within 48hrs</p>
-                    </>
-                  )}
-                </div>
-                {full ? (
-                  waitlistedOffers[offer.id] ? (
-                    waitlistConfirmLeave === offer.id ? (
-                      <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => leaveWaitlist(offer.id)}
-                          disabled={waitlistLoading === offer.id}
-                          className="px-[18px] py-[10px] rounded-full text-[15px] font-semibold border border-[rgba(44,36,32,0.15)] text-[var(--near-black)] min-h-[44px]"
-                        >
-                          {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
-                        </button>
-                        <button
-                          onClick={() => setWaitlistConfirmLeave(null)}
-                          className="px-[18px] py-[10px] rounded-full text-[15px] font-semibold text-[var(--mid)] min-h-[44px]"
-                        >
-                          Cancel
-                        </button>
-                      </div>
-                    ) : (
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
+                    You're #{waitlistedOffers[offer.id].position || '—'} on the waitlist
+                  </p>
+                  {waitlistConfirmLeave === offer.id ? (
+                    <div className="flex items-center gap-2">
                       <button
-                        onClick={() => setWaitlistConfirmLeave(offer.id)}
-                        className="px-[22px] py-[12px] rounded-full text-[18px] font-semibold min-h-[48px] flex items-center gap-1"
-                        style={{ border: '1.5px solid var(--near-black)', color: 'var(--near-black)', background: 'rgba(44,36,32,0.03)' }}
+                        onClick={() => leaveWaitlist(offer.id)}
+                        disabled={waitlistLoading === offer.id}
+                        className="flex-1 py-[14px] rounded-[50px] text-center"
+                        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, color: '#2C2420', border: '1.5px solid rgba(44,36,32,0.15)', background: 'transparent' }}
                       >
-                        On waitlist <DoodleIcon name="check" size={16} />
+                        {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                       </button>
-                    )
+                      <button
+                        onClick={() => setWaitlistConfirmLeave(null)}
+                        className="flex-1 py-[14px] rounded-[50px] text-center"
+                        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(44,36,32,0.5)', background: 'transparent' }}
+                      >
+                        Cancel
+                      </button>
+                    </div>
                   ) : (
                     <button
-                      onClick={() => joinWaitlist(offer.id)}
-                      disabled={waitlistLoading === offer.id}
-                      className="px-[22px] py-[12px] rounded-full text-[18px] font-semibold text-[var(--near-black)] min-h-[48px] disabled:opacity-40"
-                      style={{ border: '1.5px solid rgba(44,36,32,0.15)', background: 'transparent' }}
+                      onClick={() => setWaitlistConfirmLeave(offer.id)}
+                      className="w-full py-[14px] rounded-[50px] text-center flex items-center justify-center gap-1"
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid #2C2420', color: '#2C2420', background: 'transparent' }}
                     >
-                      {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
+                      On waitlist <DoodleIcon name="check" size={16} />
                     </button>
-                  )
-                ) : alreadyClaimed ? (
-                  <button disabled className="px-[22px] py-[12px] rounded-full text-[18px] font-bold bg-[var(--bg)] text-[var(--soft)] cursor-not-allowed flex items-center gap-1 min-h-[48px]">
-                    <DoodleIcon name="check" size={16} /> Claimed
-                  </button>
-                ) : hasActiveBusiness ? (
-                  <button disabled className="px-[22px] py-[12px] rounded-full text-[18px] font-bold bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)] cursor-not-allowed min-h-[48px]">
-                    Active
-                  </button>
-                ) : (
+                  )}
+                </div>
+              ) : full ? (
+                <div>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>All slots taken this month</p>
                   <button
-                    onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
-                    disabled={loading}
-                    className="px-[22px] py-[12px] rounded-full text-[18px] font-bold bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-40 transition-all min-h-[48px]"
+                    onClick={() => joinWaitlist(offer.id)}
+                    disabled={waitlistLoading === offer.id}
+                    className="w-full py-[14px] rounded-[50px] text-center disabled:opacity-40"
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid rgba(44,36,32,0.15)', color: '#2C2420', background: 'transparent' }}
                   >
-                    Claim
+                    {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
                   </button>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div>
+                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
+                    {alreadyClaimed ? 'You claimed this offer' : hasActiveBusiness ? 'You have an active visit here' : 'Post a reel within 48hrs'}
+                  </p>
+                  {alreadyClaimed ? (
+                    <button
+                      className="w-full py-[14px] rounded-[50px] text-center flex items-center justify-center gap-1.5"
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF' }}
+                    >
+                      <DoodleIcon name="check" size={16} className="text-white" /> Claimed
+                    </button>
+                  ) : hasActiveBusiness ? (
+                    <button
+                      disabled
+                      className="w-full py-[14px] rounded-[50px] text-center cursor-not-allowed"
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF', opacity: 0.5 }}
+                    >
+                      Active
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
+                      disabled={loading}
+                      className="w-full py-[14px] rounded-[50px] text-center disabled:opacity-40 transition-all"
+                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF' }}
+                    >
+                      Claim
+                    </button>
+                  )}
+                </div>
               )}
             </div>
           </div>
