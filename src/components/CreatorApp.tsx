@@ -1697,7 +1697,7 @@ export default function CreatorApp() {
                       key={offer.id}
                       onClick={() => setExpandedOffer(offer.id)}
                       className="text-left rounded-[16px] overflow-hidden flex flex-col justify-between"
-                      style={{ width: 160, height: 180, flexShrink: 0, background: pastelBg }}
+                      style={{ width: 160, minHeight: 200, flexShrink: 0, background: pastelBg }}
                     >
                       {/* Top: icon + title */}
                       <div>
