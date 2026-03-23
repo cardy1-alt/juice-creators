@@ -340,7 +340,7 @@ function QRScanner({ onScan, active }: { onScan: (token: string) => void; active
       {scanning && (
         <button
           onClick={stopScanner}
-          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[15px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)] transition-all border border-[var(--faint)] min-h-[44px]"
+          className="w-full mt-3 py-[10px] rounded-[50px] font-semibold text-[15px] bg-[var(--bg)] text-[var(--mid)] hover:bg-[var(--pressed)] transition-all min-h-[44px]"
         >
           Stop Scanner
         </button>
@@ -487,7 +487,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   className={`flex flex-col items-center justify-center gap-2.5 rounded-[18px] min-h-[110px] transition-all ${
                     offerType === t.key
                       ? 'border-2 border-[#D4470C]'
-                      : 'border-[1.5px] border-[rgba(44,36,32,0.08)]'
+                      : ''
                   }`}
                   style={{
                     padding: '24px 20px',
@@ -848,7 +848,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
-            <div className="rounded-[18px] overflow-hidden border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] mb-6">
+            <div className="rounded-[18px] overflow-hidden shadow-[0_2px_12px_rgba(44,36,32,0.08)] mb-6">
               {/* Image area */}
               <div
                 className="relative flex items-center justify-center overflow-hidden"
@@ -1492,14 +1492,14 @@ export default function BusinessPortal() {
 
               {/* ═══ About card ═══ */}
               {biz.bio && (
-                <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                <div className="rounded-[18px] p-[16px] mb-[16px]">
                   <h3 className="text-[18px] font-display font-normal text-[var(--near-black)] mb-[8px]" style={{ letterSpacing: '-0.025em' }}>About</h3>
                   <p className="text-[18px] text-[var(--mid)] leading-[1.5]">{biz.bio}</p>
                 </div>
               )}
 
               {/* ═══ Details card ═══ */}
-              <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
+              <div className="rounded-[18px] p-[16px] mb-[16px]">
                 {biz.address && (
                   <div className="flex items-center gap-[10px] py-[4px]">
                     <DoodleIcon name="map-pin" size={18} className="text-[var(--mid)] flex-shrink-0" />
@@ -1516,7 +1516,7 @@ export default function BusinessPortal() {
               </div>
 
               {/* ═══ Verified badge card ═══ */}
-              <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[32px]">
+              <div className="rounded-[18px] p-[16px] mb-[32px]">
                 <div className="flex items-center gap-[10px]">
                   <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,74,46,0.06)] flex items-center justify-center flex-shrink-0">
                     <DoodleIcon name="badge-check" size={18} className="text-[var(--forest)]" />
@@ -1688,7 +1688,7 @@ export default function BusinessPortal() {
                     </div>
                   );
                 })() : (
-                  <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
+                  <div className="rounded-[20px] overflow-hidden py-[32px] px-[20px] text-center" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                     <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                     <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer to start getting creator visits</p>
                     <button
@@ -1761,7 +1761,7 @@ export default function BusinessPortal() {
                         onClick={() => setExpandedNearbyBiz(biz.id)}
                         className="w-full text-left"
                       >
-                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[18px] bg-[#EDE8DC] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+                        <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[18px] bg-[#EDE8DC] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                           <div
                             className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
                             style={{ background: '#EDE8DC' }}
@@ -1926,7 +1926,7 @@ export default function BusinessPortal() {
                     const isUnlimited = slotCap === null;
                     const progress = isUnlimited ? 0 : Math.min(1, slotsUsed / slotCap);
                     return (
-                      <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
+                      <div className="rounded-[20px] overflow-hidden mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                         <div className="relative h-[120px]">
                           {activeOffer.offer_photo_url ? (
                             <img
@@ -1982,7 +1982,7 @@ export default function BusinessPortal() {
                       </div>
                     );
                   })() : (
-                    <div className="rounded-[20px] border border-[var(--faint)] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
+                    <div className="rounded-[20px] overflow-hidden py-[32px] px-[20px] text-center mb-[32px]" style={{ boxShadow: '0 1px 4px rgba(44,36,32,0.05)' }}>
                       <p className="text-[17px] font-semibold text-[var(--mid)]">No active campaign</p>
                       <p className="text-[15px] text-[var(--mid)] mt-[4px]">Create your first offer</p>
                       <button
@@ -2006,7 +2006,7 @@ export default function BusinessPortal() {
                         const completedReels = offerClaims.filter(c => c.reel_url).length;
                         const createdDate = new Date(offer.created_at);
                         return (
-                          <div key={offer.id} className="rounded-[18px] border border-[var(--faint)] p-[14px] flex items-center gap-[12px]" style={{ paddingRight: 16 }}>
+                          <div key={offer.id} className="rounded-[18px] p-[14px] flex items-center gap-[12px]" style={{ paddingRight: 16 }}>
                             <div
                               className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
                               style={{ background: '#EDE8DC' }}
@@ -2254,7 +2254,7 @@ export default function BusinessPortal() {
                   ) : (
                     <div className="space-y-[12px]">
                       {claims.filter(c => c.reel_url).map((claim, idx) => (
-                        <div key={claim.id} className="rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-[16px]" style={{ background: getCardColor(idx) }}>
+                        <div key={claim.id} className="rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-[16px]" style={{ background: getCardColor(idx) }}>
                           <div className="flex items-start gap-[12px]">
                             <div
                               className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
@@ -2312,7 +2312,7 @@ export default function BusinessPortal() {
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
                       className={`w-full text-left rounded-[18px] p-4 shadow-[0_2px_12px_rgba(44,36,32,0.08)] transition-all ${
-                        notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)]'
+                        notif.read ? 'opacity-50' : ''
                       }`}
                       style={{ background: notif.read ? getCardColor(idx) : 'var(--terra-5, rgba(212,71,12,0.05))' }}
                     >
@@ -2458,7 +2458,7 @@ export default function BusinessPortal() {
 
                   {/* ═══ About card ═══ */}
                   {userProfile.bio && (
-                    <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                    <div className="rounded-[18px] p-[16px] mb-[16px]">
                       <h3 className="text-[18px] font-display font-normal text-[var(--near-black)] mb-[8px]" style={{ letterSpacing: '-0.025em' }}>About</h3>
                       <p className="text-[18px] text-[var(--mid)] leading-[1.5]">{userProfile.bio}</p>
                     </div>

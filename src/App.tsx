@@ -28,7 +28,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F6F3]">
-          <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
+          <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-sm text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
               <DoodleIcon name="alert-circle" size={28} className="text-[var(--terra)]" />
             </div>
@@ -90,7 +90,7 @@ function DemoBanner() {
 function RedeemLanding() {
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F6F3]">
-      <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-sm text-center border border-[var(--faint)]">
+      <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-sm text-center">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <DoodleIcon name="qr-code" size={28} className="text-[var(--terra)]" />
         </div>
@@ -151,7 +151,7 @@ function App() {
   // Fallback — user authenticated but no profile found
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[#F7F6F3]">
-      <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-md text-center border border-[var(--faint)]">
+      <div className="bg-[#EDE8DC] rounded-[20px] shadow-[0_1px_4px_rgba(44,36,32,0.06),0_4px_16px_rgba(44,36,32,0.04)] p-8 max-w-md text-center">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <DoodleIcon name="alert-circle" size={28} className="text-[var(--terra)]" />
         </div>

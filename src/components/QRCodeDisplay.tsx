@@ -20,7 +20,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#EDE8DC';
+  ctx.fillStyle = '#FFFFFF';
   ctx.fillRect(0, 0, size, size);
 
   const modules = encodeQR(text);
@@ -328,13 +328,13 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-[20px] rounded-[18px] bg-[#EDE8DC] p-[16px]">
-      {/* QR code — 240px */}
-      <div className="inline-block rounded-[10px] overflow-hidden">
+    <div className="flex flex-col items-center">
+      {/* QR code in white rounded card */}
+      <div className="rounded-[20px] bg-white p-[20px] inline-block">
         <img
           src={qrDataUrl}
           alt="QR Code"
-          className="block"
+          className="block rounded-[10px]"
           style={{ width: `${displaySize || 240}px`, height: `${displaySize || 240}px` }}
         />
       </div>
@@ -343,8 +343,8 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
         <>
           {/* Creator code badge */}
           <span
-            className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-[#EDE8DC] border border-[var(--faint)]"
-            style={{ padding: '10px 20px' }}
+            className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[var(--near-black)] inline-block rounded-full bg-[#EDE8DC]"
+            style={{ padding: '10px 20px', marginTop: 20 }}
           >
             {creatorCode}
           </span>
