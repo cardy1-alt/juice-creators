@@ -1061,37 +1061,37 @@ export default function CreatorApp() {
 
         return (
           <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
-            {/* Hero — solid category colour + wavy SVG texture */}
-            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategorySolidColor(offer.businesses.category) }}>
+            {/* Hero — pastel category colour + wavy SVG texture */}
+            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryPastelBg(offer.businesses.category) }}>
               {/* Wavy texture */}
               <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(255,255,255,0.12)" strokeWidth="50" fill="none" strokeLinecap="round" />
-                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(255,255,255,0.07)" strokeWidth="30" fill="none" strokeLinecap="round" />
+                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(44,36,32,0.06)" strokeWidth="50" fill="none" strokeLinecap="round" />
+                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(44,36,32,0.04)" strokeWidth="30" fill="none" strokeLinecap="round" />
               </svg>
               {/* Back button */}
               <button
                 onClick={() => setExpandedOffer(null)}
-                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.18)] flex items-center justify-center"
+                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(44,36,32,0.08)] flex items-center justify-center"
               >
-                <DoodleIcon name="chevron-left" size={18} className="text-white" />
+                <DoodleIcon name="chevron-left" size={18} className="text-[#2C2420]" />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
-                <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.45)' }} />
+                <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.25)' }} />
               )}
               {/* Save button */}
               <button
                 onClick={() => toggleSaved(offer.id)}
-                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.15)] flex items-center justify-center"
+                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(44,36,32,0.08)] flex items-center justify-center"
               >
-                <DoodleIcon name="heart" size={16} className="text-white" />
+                <DoodleIcon name="heart" size={16} className="text-[#2C2420]" />
               </button>
               {/* Text overlay */}
               <div className="relative px-[20px] pb-[20px] pt-[56px]">
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#FFFFFF', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'rgba(255,255,255,0.7)', marginTop: 6, margin: '6px 0 0' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'rgba(44,36,32,0.5)', marginTop: 6, margin: '6px 0 0' }}>{offer.businesses.name}</p>
               </div>
             </div>
 
