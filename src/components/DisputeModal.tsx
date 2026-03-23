@@ -80,7 +80,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-[14px] py-3 rounded-[12px] bg-[var(--bg)] text-[15px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] transition-all resize-none"
+                  className="w-full px-[16px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] transition-all resize-none"
                   required
                 />
               </div>

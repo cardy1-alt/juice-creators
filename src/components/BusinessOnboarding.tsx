@@ -238,7 +238,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
               <h1
                 className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.01em' }}
+                style={{ letterSpacing: '-0.025em' }}
               >
                 Welcome to nayba
               </h1>
@@ -276,7 +276,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.01em' }}
+                style={{ letterSpacing: '-0.025em' }}
               >
                 Here's how it works
               </h1>
@@ -329,7 +329,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.01em' }}
+                style={{ letterSpacing: '-0.025em' }}
               >
                 Polish your profile
               </h1>
@@ -416,7 +416,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.01em' }}
+                style={{ letterSpacing: '-0.025em' }}
               >
                 Create your offer
               </h1>
@@ -618,7 +618,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <h1
               className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.01em' }}
+              style={{ letterSpacing: '-0.025em' }}
             >
               You're live.
             </h1>

@@ -169,7 +169,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
               <h1
                 className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Welcome to nayba
               </h1>
@@ -200,7 +200,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Here's how it works
               </h1>
@@ -246,7 +246,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-shrink-0 pt-[24px]">
               <h1
                 className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
+                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
               >
                 Complete your profile
               </h1>
@@ -376,7 +376,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <h1
               className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.01em', fontFamily: "'Corben', serif", fontWeight: 400 }}
+              style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
             >
               You're in.
             </h1>

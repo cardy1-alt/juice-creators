@@ -60,12 +60,12 @@ interface Offer {
   businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string };
 }
 
-// ─── Flame SVG for streaks (solid fill) ───────────────────────────────────
+// ─── Star SVG for streaks (solid fill) ───────────────────────────────────
 function FlameIcon({ color, size = 16 }: { color: string; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
       <path
-        d="M8 1C8 1 3 5.5 3 9.5C3 12 5.24 14 8 14C10.76 14 13 12 13 9.5C13 5.5 8 1 8 1Z"
+        d="M8 1L9.79 5.36L14.5 5.95L11.1 9.12L11.95 13.78L8 11.54L4.05 13.78L4.9 9.12L1.5 5.95L6.21 5.36L8 1Z"
         fill={color}
       />
     </svg>
@@ -109,19 +109,19 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[var(--near-black)] text-white',
-    claimed: 'bg-[var(--near-black)] text-white',
-    redeemed: 'bg-[var(--bg)] text-[var(--near-black)]',
+    active: 'bg-[#D4470C] text-white',
+    claimed: 'bg-[#D4470C] text-white',
+    redeemed: 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]',
     visited: 'bg-[var(--bg)] text-[var(--near-black)]',
-    reel_due: 'bg-[var(--near-black)] text-white',
+    reel_due: 'bg-[#D4470C] text-white',
     submitted: 'bg-[var(--forest)] text-white',
     expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)] border border-[rgba(44,36,32,0.1)]',
     overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)]',
-    completed: 'bg-[var(--bg)] text-[var(--mid)]',
+    completed: 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]',
     disputed: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
   };
   return (
-    <span className={`text-[13px] px-2.5 py-1 rounded-[6px] font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
+    <span className={`text-[13px] px-2.5 py-1 rounded-[50px] font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
       {status}
     </span>
   );
@@ -146,6 +146,9 @@ function getSlotsBadgeStyle(slotsLeft: number, _totalSlots: number) {
   }
   return { background: 'rgba(44,36,32,0.06)', color: 'var(--mid)', text: `${slotsLeft} left` };
 }
+
+const cardPalette = ['#EDE8DC', '#E8EEE7', '#E4EAED', '#F2E8E0', '#EDE8D0'];
+const getCardColor = (index: number) => cardPalette[index % cardPalette.length];
 
 export default function CreatorApp() {
   const { userProfile, signOut } = useAuth();
@@ -679,11 +682,7 @@ export default function CreatorApp() {
   };
 
   const activeUrgency = getActiveUrgency();
-  const activeBadgeColor = activeUrgency === 'overdue'
-    ? 'bg-[var(--near-black)]'
-    : activeUrgency === 'soon'
-    ? 'bg-[var(--terra)]'
-    : 'bg-[var(--near-black)]';
+  const activeBadgeColor = 'bg-[#D4470C]';
 
   const foodCategories = ['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'];
   const beautyCategories = ['salon', 'spa', 'beauty', 'nails', 'hair', 'skincare', 'barbershop', 'wellness'];
@@ -711,22 +710,13 @@ export default function CreatorApp() {
   ];
 
   // Helper to render business avatar
-  const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 44) => {
+  const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 46) => {
     return (
       <div
-        className="rounded-full flex items-center justify-center overflow-hidden"
-        style={{ width: size, height: size, background: getCategorySolidColor(category) }}
+        className="rounded-[12px] flex items-center justify-center"
+        style={{ width: size, height: size, background: '#EDE8DC' }}
       >
-        {logoUrl ? (
-          <img
-            src={logoUrl}
-            alt={name}
-            className="w-full h-full object-cover"
-            onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-          />
-        ) : (
-          <span className="text-[rgba(255,255,255,0.8)] font-extrabold" style={{ fontSize: size * 0.4 }}>{name.charAt(0)}</span>
-        )}
+        <CategoryIcon category={category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
       </div>
     );
   };
@@ -768,7 +758,7 @@ export default function CreatorApp() {
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.01em' }}>
+            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.025em' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
             <p className="text-[18px] text-[var(--mid)] mb-6 leading-[1.5]">
@@ -780,7 +770,7 @@ export default function CreatorApp() {
             </p>
             <button
               onClick={() => setShowLevelUpOverlay(null)}
-              className="w-full py-[14px] rounded-[50px] font-bold text-[18px] bg-[var(--near-black)] text-white hover:opacity-90 transition-all min-h-[48px]"
+              className="w-full py-[14px] rounded-[50px] font-bold text-[18px] bg-[#D4470C] text-white hover:bg-[#B93D0A] transition-all min-h-[48px]"
             >
               Keep going →
             </button>
@@ -818,7 +808,7 @@ export default function CreatorApp() {
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.01em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
               <p className="text-[18px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
@@ -874,7 +864,7 @@ export default function CreatorApp() {
                     {userProfile.code}
                   </span>
                   {/* Refresh countdown */}
-                  <p className="text-[15px] text-[var(--mid)] mt-[12px]">Auto-refreshes every 30s</p>
+                  <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(44,36,32,0.5)' }}>Auto-refreshes every 30s</p>
                   {/* Level badge */}
                   <div className="mt-[20px]">
                     <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="md" />
@@ -931,7 +921,7 @@ export default function CreatorApp() {
                     disabled={loading || !isSubmitEnabled}
                     className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all"
                     style={{
-                      background: isSubmitEnabled ? '#2C2420' : 'rgba(44,36,32,0.3)',
+                      background: isSubmitEnabled ? '#D4470C' : 'rgba(212,71,12,0.3)',
                       height: 52,
                       borderRadius: 50,
                       marginTop: 16,
@@ -1026,7 +1016,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[36px] font-display font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.01em' }}>
+            <h2 className="text-[36px] font-display font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.025em' }}>
               Reel submitted!
             </h2>
             <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1041,7 +1031,7 @@ export default function CreatorApp() {
             <button
               onClick={() => { setShowReelCelebration(null); setView('offers'); }}
               className="mt-[32px] px-[32px] py-[14px] rounded-full text-white text-[17px] font-bold min-h-[48px]"
-              style={{ background: 'var(--near-black)' }}
+              style={{ background: '#D4470C' }}
             >
               Back to explore
             </button>
@@ -1119,10 +1109,9 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', letterSpacing: '-0.01em', marginTop: 8, marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', letterSpacing: '-0.025em', marginTop: 8, marginBottom: 8 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
 
                 {/* B) What you get — hidden when identical to offer title */}
                 {(() => {
@@ -1294,7 +1283,7 @@ export default function CreatorApp() {
               <div className="px-[20px] pt-[24px] pb-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
+                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.2, margin: 0 }}>
                       {(() => {
                         const hour = new Date().getHours();
                         const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
@@ -1462,7 +1451,7 @@ export default function CreatorApp() {
                                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>
                                     {claim.businesses.name}
                                   </p>
-                                  <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#FFFFFF', margin: 0, lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
+                                  <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#FFFFFF', margin: 0, lineHeight: 1.2, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
                                     {offerTitle}
                                   </p>
                                 </div>
@@ -1542,7 +1531,7 @@ export default function CreatorApp() {
 
               {/* Weekly Leaderboard */}
               {leaderboard.length >= 1 && (
-                <div className="mx-[20px] mt-[14px] bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] p-[16px_18px]">
+                <div className="mx-[20px] mt-[14px] bg-[var(--sage)] rounded-[18px] border border-[var(--faint)] p-[16px_18px]">
                   <div className="flex items-center justify-between mb-3">
                     <h3 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 17, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>This week's top creators</h3>
                     <span className="text-[13px] text-[var(--soft)]">
@@ -1749,7 +1738,7 @@ export default function CreatorApp() {
 
                         {/* Headline — Corben 18px, max 2 lines with ellipsis */}
                         <div style={{ padding: '8px 12px 6px' }}>
-                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.35, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
+                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.35, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
                             {offerTitle || bizName}
                           </p>
                         </div>
@@ -1804,7 +1793,7 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Saved</h1>
+                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Saved</h1>
                 <span className="text-[15px] text-[var(--mid)]">{matchedSaved.length} saved</span>
               </div>
 
@@ -1823,7 +1812,7 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setView('offers')}
                     className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                    style={{ background: 'var(--near-black)' }}
+                    style={{ background: '#D4470C' }}
                   >
                     Find offers
                   </button>
@@ -1840,21 +1829,15 @@ export default function CreatorApp() {
                         onClick={() => setExpandedOffer(offer.id)}
                         className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] flex items-center gap-4 text-left border-[1.5px] border-[rgba(44,36,32,0.08)]"
                       >
-                        {/* Business image/gradient */}
+                        {/* Category icon square */}
                         <div
-                          className="w-[56px] h-[56px] rounded-[10px] flex-shrink-0 flex items-center justify-center overflow-hidden"
-                          style={{ background: getCategoryGradient(offer.businesses.category) }}
+                          className="rounded-[12px] flex-shrink-0 flex items-center justify-center"
+                          style={{ width: 46, height: 46, background: '#EDE8DC' }}
                         >
-                          {offer.offer_photo_url ? (
-                            <img src={offer.offer_photo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                          ) : offer.businesses.logo_url ? (
-                            <img src={offer.businesses.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                          ) : (
-                            <span className="text-white text-[22px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
-                          )}
+                          <CategoryIcon category={offer.businesses.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[17px] font-bold text-[var(--near-black)] truncate">{offer.businesses.name}</p>
+                          <p className="text-[17px] font-bold text-[var(--near-black)] truncate" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.025em' }}>{offer.businesses.name}</p>
                           <p className="text-[15px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
                           <p className="text-[15px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--mid)' }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
@@ -1885,7 +1868,7 @@ export default function CreatorApp() {
                   <p className="text-[18px] text-[var(--mid)] mb-5">Claim an offer to get started</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="bg-[var(--near-black)] text-white text-[18px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:opacity-90 transition-all"
+                    className="bg-[#D4470C] text-white text-[18px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:opacity-90 transition-all"
                   >
                     Browse offers
                   </button>
@@ -1934,7 +1917,7 @@ export default function CreatorApp() {
                       }
                     }}
                   >
-                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
+                    {activeClaims.filter(c => c.businesses && c.offers).map((claim, claimIdx) => {
                       const currentStage = claim.reel_url
                         ? 'submitted'
                         : claim.redeemed_at
@@ -1962,7 +1945,7 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="bg-[#EDE8DC] rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
+                            <div className="rounded-[18px] border-[1.5px] border-[rgba(44,36,32,0.08)] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: getCardColor(claimIdx) }}>
 
                               {/* Offer title — one line */}
                               <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420' }}>{offerTitle}</p>
@@ -1976,7 +1959,7 @@ export default function CreatorApp() {
                                   return (
                                     <span key={label} className="flex items-center">
                                       {idx === 0 && (
-                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--near-black)] mr-1.5" />
+                                        <span className="inline-block w-[7px] h-[7px] rounded-full bg-[#D4470C] mr-1.5" />
                                       )}
                                       <span className={`text-[15px] ${
                                         isCurrent ? 'font-bold text-[#2C2420]'
@@ -1999,7 +1982,7 @@ export default function CreatorApp() {
                                   onClick={() => { setQrOpenSource('active'); setQrScreenTab('pass'); setShowQrFullscreen(true); }}
                                   className="w-full text-left"
                                 >
-                                  <p className="text-[15px] font-semibold text-[#2C2420] text-center mb-[10px]">Tap to show pass</p>
+                                  <p className="text-[15px] font-semibold text-center mb-[10px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'rgba(44,36,32,0.5)' }}>Tap to show pass</p>
                                   <QRCodeDisplay
                                     token={claim.qr_token}
                                     claimId={claim.id}
@@ -2035,7 +2018,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-[#EDE8DC] border border-[var(--faint)]">
-                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.01em' }}>
+                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', letterSpacing: '-0.025em' }}>
                                     Submit Your Reel
                                   </label>
                                   <p className="text-[15px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>
@@ -2053,7 +2036,7 @@ export default function CreatorApp() {
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
                                       className="px-5 py-2 rounded-full text-white text-[18px] font-semibold disabled:opacity-40 transition-all min-h-[48px]"
-                                      style={{ background: '#2C2420' }}
+                                      style={{ background: '#D4470C' }}
                                     >
                                       Submit
                                     </button>
@@ -2137,7 +2120,7 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.01em' }}>Claims</h1>
+              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.025em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <DoodleIcon name="zap" size={48} className="text-[var(--soft)] mx-auto mb-4" />
@@ -2146,7 +2129,7 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[14px]">
-                  {claims.filter(c => c.businesses && c.offers).map((claim) => (
+                  {claims.filter(c => c.businesses && c.offers).map((claim, claimCardIdx) => (
                     <button
                       key={claim.id}
                       onClick={() => {
@@ -2155,14 +2138,15 @@ export default function CreatorApp() {
                           setView('active');
                         }
                       }}
-                      className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] border border-[rgba(44,36,32,0.08)] text-left"
+                      className="w-full rounded-[18px] p-[16px] border border-[rgba(44,36,32,0.08)] text-left"
+                      style={{ background: getCardColor(claimCardIdx) }}
                     >
                       <div className="flex items-start gap-3">
                         {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 36)}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-[17px] text-[var(--near-black)]">{claim.businesses.name}</h3>
+                              <h3 className="font-semibold text-[17px] text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.025em' }}>{claim.businesses.name}</h3>
                               <p className="text-[15px] text-[var(--mid)] mt-0.5">{claim.businesses.category}</p>
                               <p className="text-[15px] text-[var(--mid)] mt-0.5 leading-[1.4]" style={{
                                 display: '-webkit-box',
@@ -2242,7 +2226,7 @@ export default function CreatorApp() {
                         )}
                         <button
                           onClick={() => avatarInputRef.current?.click()}
-                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--near-black)] flex items-center justify-center border-2 border-white"
+                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[#D4470C] flex items-center justify-center border-2 border-[#F7F6F3]"
                         >
                           <DoodleIcon name="camera" size={11} className="text-white" />
                         </button>
@@ -2250,7 +2234,7 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.01em' }}>{userProfile.name}</h2>
+                        <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.025em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
@@ -2314,13 +2298,13 @@ export default function CreatorApp() {
                       );
                     }
                     return (
-                      <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
+                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ border: '1.5px solid rgba(44,36,32,0.08)' }}>
                         <div className="flex items-center justify-between mb-[10px]">
                           <span className="text-[18px] font-bold text-[var(--near-black)]">Complete your profile</span>
                           <span className="text-[14px] font-semibold text-[var(--near-black)]">{completeness.score}%</span>
                         </div>
-                        <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: 'var(--bg)' }}>
-                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--near-black)' }} />
+                        <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: '#EDE8DC' }}>
+                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: '#D4470C' }} />
                         </div>
                         <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
@@ -2334,7 +2318,7 @@ export default function CreatorApp() {
                   })()}
 
                   {/* ═══ Level + streak section (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] border border-[var(--faint)] bg-[#EDE8DC] p-[20px] mb-[16px]">
+                  <div className="rounded-[18px] border border-[var(--faint)] bg-[var(--dusty-blue)] p-[20px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
                       const levelColours: Record<number, string> = {
@@ -2370,7 +2354,7 @@ export default function CreatorApp() {
                                         style={{
                                           width: 48,
                                           height: 48,
-                                          border: '3px solid var(--near-black)',
+                                          border: '3px solid #D4470C',
                                         }}
                                       />
                                     )}
@@ -2379,7 +2363,7 @@ export default function CreatorApp() {
                                       style={{
                                         width: 40,
                                         height: 40,
-                                        background: isCompleted ? 'var(--forest)' : isCurrent ? '#F2E8E0' : '#EDE8DC',
+                                        background: isCompleted ? 'var(--forest)' : isCurrent ? 'rgba(212,71,12,0.1)' : '#EDE8DC',
                                         border: isLocked ? '1.5px solid var(--faint)' : 'none',
                                       }}
                                     >
@@ -2394,7 +2378,7 @@ export default function CreatorApp() {
                                           style={{
                                             fontWeight: isCurrent ? 700 : 500,
                                             fontSize: 18,
-                                            color: isLocked ? 'var(--soft)' : isCurrent ? 'var(--near-black)' : 'white',
+                                            color: isLocked ? 'var(--soft)' : isCurrent ? '#D4470C' : 'white',
                                           }}
                                         >
                                           {lvl === 6 ? '✦' : lvl}
@@ -2424,7 +2408,7 @@ export default function CreatorApp() {
                             <span
                               className="inline-block rounded-full px-[12px] py-[3px]"
                               style={{
-                                background: currentLvl === 6 ? '#2C2420' : levelColours[currentLvl],
+                                background: currentLvl === 6 ? '#2C2420' : '#D4470C',
                                 color: 'white',
                                 fontWeight: 600,
                                 fontSize: 15,
@@ -2534,7 +2518,7 @@ export default function CreatorApp() {
                         <DoodleIcon name="bell" size={20} className="text-[var(--mid)]" />
                         <span className="text-[17px] font-semibold text-[var(--near-black)]">Notifications</span>
                         {unreadCount > 0 && (
-                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--near-black)] text-white text-[13px] font-bold flex items-center justify-center">
+                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#D4470C] text-white text-[13px] font-bold flex items-center justify-center">
                             {unreadCount}
                           </span>
                         )}
@@ -2557,7 +2541,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Notifications</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2576,23 +2560,24 @@ export default function CreatorApp() {
                       <button
                         onClick={() => setView('offers')}
                         className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                        style={{ background: 'var(--near-black)' }}
+                        style={{ background: '#D4470C' }}
                       >
                         Browse offers
                       </button>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {notifications.map((notif) => (
+                      {notifications.map((notif, notifIdx) => (
                         <button
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className={`w-full text-left bg-[#EDE8DC] rounded-[18px] p-4 border-[1.5px] border-[rgba(44,36,32,0.08)] transition-all ${
+                          className={`w-full text-left rounded-[18px] p-4 border-[1.5px] border-[rgba(44,36,32,0.08)] transition-all ${
                             notif.read ? 'opacity-50' : ''
                           }`}
+                          style={{ background: getCardColor(notifIdx) }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(44,36,32,0.1)]' : 'bg-[var(--near-black)]'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(44,36,32,0.1)]' : 'bg-[#D4470C]'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] text-[var(--near-black)]">{notif.message}</p>
                               <p className="text-[15px] text-[var(--soft)] mt-1">
@@ -2612,7 +2597,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
@@ -2644,7 +2629,7 @@ export default function CreatorApp() {
                           </div>
                         )}
                         <div
-                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--near-black)] flex items-center justify-center border-2 border-white"
+                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[#D4470C] flex items-center justify-center border-2 border-[#F7F6F3]"
                         >
                           <DoodleIcon name="camera" size={13} className="text-white" />
                         </div>
@@ -2683,7 +2668,7 @@ export default function CreatorApp() {
                         setProfileSubView('main');
                         window.location.reload();
                       }}
-                      className="w-full py-[14px] rounded-[50px] bg-[var(--near-black)] text-white text-[17px] font-semibold disabled:opacity-50"
+                      className="w-full py-[14px] rounded-[50px] bg-[#D4470C] text-white text-[17px] font-semibold disabled:opacity-50"
                     >
                       {editSaving ? 'Saving...' : 'Save changes'}
                     </button>
@@ -2711,7 +2696,7 @@ export default function CreatorApp() {
                 isDisabled ? 'text-[rgba(44,36,32,0.15)] pointer-events-none' : isActive ? 'text-[var(--terra)]' : 'text-[rgba(44,36,32,0.40)]'
               }`}
             >
-              <div className={`relative flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[rgba(212,71,12,0.10)]' : ''}`} style={{ width: 36, height: 28 }}>
+              <div className={`relative flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[var(--peach)]' : ''}`} style={{ width: 36, height: 28 }}>
                 {tab.icon ? (
                   <DoodleIcon name={tab.icon} size={20} />
                 ) : (

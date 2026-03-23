@@ -346,7 +346,7 @@ export default function Auth() {
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
+                ? 'bg-[#EDE8DC] text-[#D4470C] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -356,7 +356,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
+                ? 'bg-[#EDE8DC] text-[#D4470C] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -439,13 +439,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[6px]">Check your email</p>
+                <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[6px]" style={{ letterSpacing: '-0.025em' }}>Check your email</p>
                 <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[4px]">Reset password</p>
+                  <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[4px]" style={{ letterSpacing: '-0.025em' }}>Reset password</p>
                   <p className="text-[15px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -538,7 +538,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>
+              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p className="text-[15px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
@@ -670,7 +670,7 @@ export default function Auth() {
                             key={cat}
                             type="button"
                             onClick={() => setCategory(cat)}
-                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[12px] text-left transition-all duration-200"
+                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[18px] text-left transition-all duration-200"
                             style={{
                               border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
                               background: category === cat ? 'rgba(212,71,12,0.08)' : '#EDE8DC',

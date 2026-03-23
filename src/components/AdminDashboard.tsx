@@ -10,8 +10,8 @@ import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedE
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Approved</span>
-      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]">Pending</span>;
+      ? <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[#EDE8DC] text-[var(--near-black)] border border-[var(--faint)]"><DoodleIcon name="check" size={12} /> Approved</span>
+      : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[#D4470C] text-white">Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
@@ -19,8 +19,8 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
       : <span className="px-2.5 py-1 rounded-full text-[13px] font-semibold bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]">Paused</span>;
   }
   const styles: Record<string, string> = {
-    active: 'bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]',
-    redeemed: 'bg-[var(--bg)] text-[var(--near-black)] border border-[var(--faint)]',
+    active: 'bg-[#D4470C] text-white',
+    redeemed: 'bg-[#EDE8DC] text-[var(--near-black)]',
     expired: 'bg-[var(--terra-10)] text-[var(--terra)] border border-[var(--terra-20)]',
   };
   return <span className={`text-[13px] px-2.5 py-1 rounded-full font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--mid)] border border-[var(--faint)]'}`}>{status}</span>;
@@ -256,7 +256,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5 border border-[var(--terra-20)]">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -265,7 +265,7 @@ export default function AdminDashboard() {
                       >
                         <DoodleIcon name="users" size={24} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stats.pendingCreators}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>{stats.pendingCreators}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
                         </div>
                       </button>
@@ -277,7 +277,7 @@ export default function AdminDashboard() {
                       >
                         <DoodleIcon name="store" size={24} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stats.pendingBusinesses}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>{stats.pendingBusinesses}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
                         </div>
                       </button>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
                 {statCardData.map((stat, i) => (
                   <div key={i} className="bg-[#EDE8DC] rounded-[18px] p-6 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                     <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--mid)]" /></div>
-                    <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{stat.value}</p>
+                    <p className="text-3xl text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>{stat.value}</p>
                     <p className="text-sm text-[var(--mid)] mt-1 font-medium" style={{ fontFamily: "'DM Sans', sans-serif" }}>{stat.label}</p>
                   </div>
                 ))}
@@ -376,7 +376,9 @@ export default function AdminDashboard() {
                         <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
-                              <CategoryIcon category={business.category} className="w-5 h-5" />
+                              <div className="w-[46px] h-[46px] rounded-[12px] bg-[#EDE8DC] flex items-center justify-center flex-shrink-0">
+                                <CategoryIcon category={business.category} className="w-5 h-5 text-[var(--mid)]" />
+                              </div>
                               <span className="text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{business.name}</span>
                             </div>
                           </td>
@@ -413,10 +415,12 @@ export default function AdminDashboard() {
                   {offers.map((offer) => (
                     <div key={offer.id} className="bg-[#EDE8DC] rounded-[18px] p-5 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                       <div className="flex items-start gap-3 mb-2">
-                        <CategoryIcon category={offer.businesses.category} className="w-5 h-5 flex-shrink-0" />
+                        <div className="w-[46px] h-[46px] rounded-[12px] bg-[#EDE8DC] flex items-center justify-center flex-shrink-0">
+                          <CategoryIcon category={offer.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{offer.businesses.name}</h3>
+                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>{offer.businesses.name}</h3>
                             <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
                           <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'DM Sans', sans-serif" }}>{offer.description}</p>
@@ -453,7 +457,9 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
-                              <CategoryIcon category={claim.businesses.category} className="w-4 h-4" />
+                              <div className="w-[46px] h-[46px] rounded-[12px] bg-[#EDE8DC] flex items-center justify-center flex-shrink-0">
+                                <CategoryIcon category={claim.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
+                              </div>
                               <span className="text-base text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{claim.businesses.name}</span>
                             </div>
                           </td>
@@ -490,7 +496,7 @@ export default function AdminDashboard() {
           {view === 'settings' && (
             <div className="max-w-2xl">
               <div className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-6">
-                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>Change Password</h2>
+                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.025em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'DM Sans', sans-serif" }}>
