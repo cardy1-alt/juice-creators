@@ -195,7 +195,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       )}
 
       {showLocationInput && (
-        <div className="mb-3 bg-[#EDE8DC] rounded-[16px] p-4 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] relative">
+        <div className="mb-3 bg-[#EDE8DC] rounded-[18px] p-4 border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] relative">
           <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">
             Enter address or postcode
           </label>
@@ -208,7 +208,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           />
           {/* Autocomplete dropdown */}
           {searchResults.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-[#EDE8DC] rounded-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] z-20 overflow-hidden">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] z-20 overflow-hidden">
               {searchResults.map((result, idx) => (
                 <button
                   key={idx}
@@ -223,10 +223,10 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </div>
       )}
 
-      <div className="relative bg-[var(--bg)] rounded-[16px] overflow-hidden" style={{ height: '400px' }}>
+      <div className="relative bg-[var(--bg)] rounded-[18px] overflow-hidden" style={{ height: '400px' }}>
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="text-center bg-[#EDE8DC]/95 backdrop-blur-sm p-6 rounded-[16px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] border border-[var(--faint)]">
+            <div className="text-center bg-[#EDE8DC]/95 backdrop-blur-sm p-6 rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] border border-[var(--faint)]">
               <DoodleIcon name="map-pin" size={48} className="text-[var(--soft)] mx-auto mb-2" />
               <p className="text-[var(--mid)] text-[17px] font-semibold">No businesses near you yet</p>
               <p className="text-[var(--soft)] text-[15px] mt-1">Check back soon!</p>
@@ -286,7 +286,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         {businessesWithDistance.map((business) => (
           <div
             key={business.id}
-            className="bg-[#EDE8DC] rounded-[16px] p-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] cursor-pointer hover:shadow-[0_4px_20px_rgba(44,36,32,0.12)] transition-all"
+            className="bg-[#EDE8DC] rounded-[18px] p-[16px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] cursor-pointer hover:shadow-[0_4px_20px_rgba(44,36,32,0.12)] transition-all"
             onClick={() => setSelectedBusiness(business)}
           >
             <div className="flex items-start gap-3">
@@ -321,13 +321,13 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           onClick={() => setSelectedBusiness(null)}
         >
           <div
-            className="bg-[#EDE8DC] rounded-[16px] w-full max-w-md shadow-[0_4px_24px_rgba(44,36,32,0.12)] overflow-hidden animate-slide-up"
+            className="bg-[#EDE8DC] rounded-[18px] w-full max-w-md shadow-[0_4px_24px_rgba(44,36,32,0.12)] overflow-hidden animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-12 h-12 rounded-[16px] bg-[var(--bg)] flex items-center justify-center flex-shrink-0">
+                  <div className="w-12 h-12 rounded-[18px] bg-[var(--bg)] flex items-center justify-center flex-shrink-0">
                     <CategoryIcon category={selectedBusiness.category} className="w-6 h-6 text-[var(--mid)]" />
                   </div>
                   <div>

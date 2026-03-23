@@ -21,11 +21,12 @@ export default {
           sage: '#E8EEE7',
           'dusty-blue': '#E4EAED',
           peach: '#F2E8E0',
+          butter: '#EDE8D0',
         },
       },
       borderRadius: {
         'pill': '999px',
-        'card': '16px',
+        'card': '18px',
       },
       borderWidth: {
         '1.5': '1.5px',

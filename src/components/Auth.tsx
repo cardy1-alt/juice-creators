@@ -157,7 +157,7 @@ function AddressAutocomplete({ value, onChange }: {
           onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
           onBlur={() => setFocused(false)}
           placeholder={mapsError ? 'Type your address manually' : 'Enter your address'}
-          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
+          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
           autoComplete={mapsError ? 'street-address' : 'off'}
         />
       </div>
@@ -204,8 +204,8 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
       focused
         ? 'border-[var(--terra)] bg-[#EDE8DC] shadow-[0_0_0_3px_var(--terra-ring)]'
         : hasValue
-          ? 'border-[var(--faint)] bg-[var(--bg)]'
-          : 'border-[var(--faint)] bg-[var(--bg)]'
+          ? 'border-[rgba(44,36,32,0.08)] bg-[#EDE8DC]'
+          : 'border-[rgba(44,36,32,0.08)] bg-[#EDE8DC]'
     }`}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
@@ -221,7 +221,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none`}
+        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none`}
         required={required}
         minLength={minLength}
       />
@@ -483,7 +483,7 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border-[1.5px] transition-all duration-200 ${
                   role === 'creator'
                     ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
                     : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
@@ -501,7 +501,7 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[16px] border-[1.5px] transition-all duration-200 ${
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border-[1.5px] transition-all duration-200 ${
                   role === 'business'
                     ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
                     : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
@@ -538,7 +538,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.3px' }}>
+              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p className="text-[15px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
@@ -586,7 +586,7 @@ export default function Auth() {
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -598,7 +598,7 @@ export default function Auth() {
                         <select
                           value={dobMonth}
                           onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -610,7 +610,7 @@ export default function Auth() {
                         <select
                           value={dobYear}
                           onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border border-[var(--faint)] bg-[var(--bg)] text-[18px] text-[var(--near-black)] focus:outline-none focus:border-[var(--terra)] focus:bg-[#EDE8DC] focus:shadow-[0_0_0_3px_var(--terra-ring)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -702,7 +702,7 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[14px] bg-[var(--bg)] text-[18px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:bg-[#EDE8DC] transition-all resize-none"
+                          className="w-full px-[14px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] transition-all resize-none"
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
