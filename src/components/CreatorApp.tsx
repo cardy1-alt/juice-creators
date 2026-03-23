@@ -1061,45 +1061,46 @@ export default function CreatorApp() {
 
         return (
           <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
-            {/* Hero */}
-            <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
-              {offer.offer_photo_url ? (
-                <img src={offer.offer_photo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              ) : offer.businesses.logo_url ? (
-                <img src={offer.businesses.logo_url} alt={offer.businesses.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              ) : (
-                <div className="w-[64px] h-[64px] rounded-[18px] bg-[rgba(255,255,255,0.15)] flex items-center justify-center">
-                  <span className="text-[rgba(255,255,255,0.8)] text-[32px] font-extrabold">{offer.businesses.name.charAt(0)}</span>
-                </div>
-              )}
+            {/* Hero — solid category colour + wavy SVG texture */}
+            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryGradient(offer.businesses.category) }}>
+              {/* Wavy texture */}
+              <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(255,255,255,0.12)" strokeWidth="50" fill="none" strokeLinecap="round" />
+                <path d="M-20 180 Q 80 150, 160 180 T 320 180 T 480 180" stroke="rgba(255,255,255,0.07)" strokeWidth="30" fill="none" strokeLinecap="round" />
+              </svg>
+              {/* Back button */}
               <button
                 onClick={() => setExpandedOffer(null)}
-                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[#EDE8DC] flex items-center justify-center shadow-[0_2px_8px_rgba(44,36,32,0.1)]"
+                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.18)] flex items-center justify-center"
               >
-                <DoodleIcon name="chevron-left" size={18} className="text-[var(--near-black)]" />
+                <DoodleIcon name="chevron-left" size={18} className="text-white" />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
                 <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.45)' }} />
               )}
+              {/* Save button */}
               <button
                 onClick={() => toggleSaved(offer.id)}
                 className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full bg-[rgba(255,255,255,0.15)] flex items-center justify-center"
               >
-                <DoodleIcon name="heart" size={16} />
+                <DoodleIcon name="heart" size={16} className="text-white" />
               </button>
+              {/* Text overlay */}
+              <div className="relative px-[20px] pb-[20px] pt-[56px]">
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#FFFFFF', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
+                  {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
+                </p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'rgba(255,255,255,0.7)', marginTop: 6, margin: '6px 0 0' }}>{offer.businesses.name}</p>
+              </div>
             </div>
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto bg-[#F7F6F3]">
               <div className="p-[20px]">
-                {/* A) Business name + category */}
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: 'rgba(44,36,32,0.68)', margin: 0 }}>{offer.businesses.name}</p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.45)', marginTop: 4 }}>{offer.businesses.category}</p>
-
                 {/* Level requirement banner */}
                 {detailIsLocked && (
-                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mt-3" style={{ background: 'rgba(44,36,32,0.04)' }}>
+                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-4" style={{ background: 'rgba(44,36,32,0.04)' }}>
                     <DoodleIcon name="lock" size={14} className="text-[var(--mid)] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-[15px] font-semibold text-[var(--near-black)]">{detailLockedName} creators only</p>
@@ -1107,11 +1108,6 @@ export default function CreatorApp() {
                     </div>
                   </div>
                 )}
-
-                {/* Offer headline */}
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', letterSpacing: '-0.025em', marginTop: 8, marginBottom: 8 }}>
-                  {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
-                </p>
 
                 {/* B) What you get — hidden when identical to offer title */}
                 {(() => {
