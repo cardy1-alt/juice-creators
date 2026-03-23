@@ -404,11 +404,11 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+              className="w-full py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <span className="w-[18px] h-[18px] border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8] rounded-full animate-spin" />
                 </span>
               ) : 'Sign In'}
             </button>
@@ -439,13 +439,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] font-bold text-[var(--near-black)] mb-[6px]">Check your email</p>
+                <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[6px]">Check your email</p>
                 <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] font-bold text-[var(--near-black)] mb-[4px]">Reset password</p>
+                  <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[4px]">Reset password</p>
                   <p className="text-[15px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -466,7 +466,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                  className="w-full py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -524,9 +524,9 @@ export default function Auth() {
                 <div key={step} className="flex items-center gap-[6px]">
                   <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300 ${
                     signupStep > step
-                      ? 'bg-[var(--terra)] text-white'
+                      ? 'bg-[var(--terra)] text-[#F5F0E8]'
                       : signupStep === step
-                        ? 'bg-[var(--terra)] text-white shadow-[0_0_0_3px_var(--terra-ring)]'
+                        ? 'bg-[var(--terra)] text-[#F5F0E8] shadow-[0_0_0_3px_var(--terra-ring)]'
                         : 'bg-[var(--elevated)] text-[var(--soft)]'
                   }`}>
                     {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
@@ -564,7 +564,7 @@ export default function Auth() {
                             className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
                             style={{
                               background: followerCount === opt ? 'var(--terra)' : '#EDE8DC',
-                              color: followerCount === opt ? 'white' : 'var(--near-black)',
+                              color: followerCount === opt ? '#F5F0E8' : 'var(--near-black)',
                               border: followerCount === opt ? 'none' : '0.5px solid var(--near-black)',
                             }}
                           >
@@ -777,7 +777,7 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
                   >
                     Continue <DoodleIcon name="arrow-right" size={16} className="" />
                   </button>
@@ -794,11 +794,11 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-white text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                    className="flex-1 py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
-                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <span className="w-[18px] h-[18px] border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8] rounded-full animate-spin" />
                       </span>
                     ) : 'Create Account'}
                   </button>
