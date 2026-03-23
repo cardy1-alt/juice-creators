@@ -104,7 +104,7 @@ const CATEGORY_GRADIENTS: Record<string, string> = {
   'Arts & Entertainment': 'linear-gradient(135deg, #1F1A0F, #4A3A1A)',
   'Education': 'linear-gradient(135deg, #0F2318, #1A4A2E)',
   'Pets': 'linear-gradient(135deg, #2A1A0F, #5C3D1A)',
-  'Services': 'linear-gradient(135deg, #1C1208, #3A3A3A)',
+  'Services': 'linear-gradient(135deg, #2C2420, #3A3A3A)',
 };
 
 const CATEGORY_SOLID_COLORS: Record<string, string> = {
@@ -117,7 +117,7 @@ const CATEGORY_SOLID_COLORS: Record<string, string> = {
   'Arts & Entertainment': '#1F1A0F',
   'Education': '#0F2318',
   'Pets': '#2A1A0F',
-  'Services': '#1C1208',
+  'Services': '#2C2420',
 };
 
 export function getCategoryGradient(category: string | undefined | null): string {

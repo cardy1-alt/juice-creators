@@ -9,13 +9,13 @@ export default {
       },
       colors: {
         nayba: {
-          white: '#F5F0E8',
-          bg: '#F5F0E8',
+          white: '#F7F6F3',
+          bg: '#F7F6F3',
           terra: '#D4470C',
           'terra-hover': '#B93D0A',
           forest: '#1A4A2E',
           ochre: '#E8A020',
-          'near-black': '#1C1208',
+          'near-black': '#2C2420',
           card: '#EDE8DC',
           'card-border': '#DDD8CC',
           sage: '#E8EEE7',

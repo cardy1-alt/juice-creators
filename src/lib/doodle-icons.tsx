@@ -160,12 +160,12 @@ export function DoodleIcon({ name, size = 24, className, style, ...rest }: Doodl
   const IconComponent = ICON_MAP[name.toLowerCase()];
   if (!IconComponent) {
     return (
-      <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={style} {...rest}>
+      <svg width={size} height={size} viewBox="0 0 24 24" className={className} style={{ fill: 'currentColor', ...style }} {...rest}>
         <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" strokeWidth="2" />
       </svg>
     );
   }
-  return <IconComponent width={size} height={size} className={className} style={style} {...rest} />;
+  return <IconComponent width={size} height={size} className={className} style={{ fill: 'currentColor', ...style }} {...rest} />;
 }
 
 // ─── Direct component re-exports for category system ────────────────────────

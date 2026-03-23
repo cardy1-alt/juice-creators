@@ -165,7 +165,7 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(28,18,8,0.10)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] border border-[var(--faint)] shadow-[0_4px_16px_rgba(44,36,32,0.10)] overflow-hidden">
           {suggestions.map((s) => (
             <button
               key={s.place_id}
@@ -330,13 +330,13 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F5F0E8] overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#F7F6F3] overscroll-none">
       {/* Top section with branding */}
       <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
         <div className="mt-[10px]">
           <Logo size={24} variant="wordmark" />
         </div>
-        <p className="text-[rgba(28,18,8,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
+        <p className="text-[rgba(44,36,32,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
       </div>
 
       <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
@@ -346,7 +346,7 @@ export default function Auth() {
             onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signin'
-                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(28,18,8,0.06),0_1px_2px_rgba(28,18,8,0.04)]'
+                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -356,7 +356,7 @@ export default function Auth() {
             onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
             className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
               mode === 'signup'
-                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(28,18,8,0.06),0_1px_2px_rgba(28,18,8,0.04)]'
+                ? 'bg-[#EDE8DC] text-[var(--near-black)] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
                 : 'text-[var(--soft)] hover:text-[var(--mid)]'
             }`}
           >
@@ -404,11 +404,11 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+              className="w-full py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8] rounded-full animate-spin" />
+                  <span className="w-[18px] h-[18px] border-2 border-[#F7F6F3]/30 border-t-[#F7F6F3] rounded-full animate-spin" />
                 </span>
               ) : 'Sign In'}
             </button>
@@ -466,7 +466,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                  className="w-full py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -524,9 +524,9 @@ export default function Auth() {
                 <div key={step} className="flex items-center gap-[6px]">
                   <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300 ${
                     signupStep > step
-                      ? 'bg-[var(--terra)] text-[#F5F0E8]'
+                      ? 'bg-[var(--terra)] text-[#F7F6F3]'
                       : signupStep === step
-                        ? 'bg-[var(--terra)] text-[#F5F0E8] shadow-[0_0_0_3px_var(--terra-ring)]'
+                        ? 'bg-[var(--terra)] text-[#F7F6F3] shadow-[0_0_0_3px_var(--terra-ring)]'
                         : 'bg-[var(--elevated)] text-[var(--soft)]'
                   }`}>
                     {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
@@ -564,7 +564,7 @@ export default function Auth() {
                             className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
                             style={{
                               background: followerCount === opt ? 'var(--terra)' : '#EDE8DC',
-                              color: followerCount === opt ? '#F5F0E8' : 'var(--near-black)',
+                              color: followerCount === opt ? '#F7F6F3' : 'var(--near-black)',
                               border: followerCount === opt ? 'none' : '0.5px solid var(--near-black)',
                             }}
                           >
@@ -777,7 +777,7 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
                   >
                     Continue <DoodleIcon name="arrow-right" size={16} className="" />
                   </button>
@@ -794,11 +794,11 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-[#F5F0E8] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                    className="flex-1 py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
-                        <span className="w-[18px] h-[18px] border-2 border-[#F5F0E8]/30 border-t-[#F5F0E8] rounded-full animate-spin" />
+                        <span className="w-[18px] h-[18px] border-2 border-[#F7F6F3]/30 border-t-[#F7F6F3] rounded-full animate-spin" />
                       </span>
                     ) : 'Create Account'}
                   </button>

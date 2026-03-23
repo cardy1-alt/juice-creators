@@ -115,10 +115,10 @@ function StatusPill({ status }: { status: string }) {
     visited: 'bg-[var(--bg)] text-[var(--near-black)]',
     reel_due: 'bg-[var(--near-black)] text-white',
     submitted: 'bg-emerald-500 text-white',
-    expired: 'bg-[rgba(28,18,8,0.06)] text-[var(--soft)] border border-[rgba(28,18,8,0.1)]',
+    expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)] border border-[rgba(44,36,32,0.1)]',
     overdue: 'bg-orange-50 text-orange-600 border border-orange-100',
     completed: 'bg-[var(--bg)] text-[var(--mid)]',
-    disputed: 'bg-[rgba(28,18,8,0.06)] text-[var(--soft)]',
+    disputed: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
   };
   return (
     <span className={`text-[13px] px-2.5 py-1 rounded-[6px] font-bold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
@@ -136,15 +136,15 @@ function formatDate(dateStr: string): string {
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
 function getSlotsBadgeStyle(slotsLeft: number, _totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(28,18,8,0.06)', color: 'rgba(28,18,8,0.4)', text: 'Full' };
+    return { background: 'rgba(44,36,32,0.06)', color: 'rgba(44,36,32,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(28,18,8,0.08)', color: 'var(--near-black)', text: 'Last slot' };
+    return { background: 'rgba(44,36,32,0.08)', color: 'var(--near-black)', text: 'Last slot' };
   }
   if (slotsLeft <= 2) {
-    return { background: 'rgba(28,18,8,0.08)', color: 'var(--near-black)', text: `${slotsLeft} left` };
+    return { background: 'rgba(44,36,32,0.08)', color: 'var(--near-black)', text: `${slotsLeft} left` };
   }
-  return { background: 'rgba(28,18,8,0.06)', color: 'var(--mid)', text: `${slotsLeft} left` };
+  return { background: 'rgba(44,36,32,0.06)', color: 'var(--mid)', text: `${slotsLeft} left` };
 }
 
 export default function CreatorApp() {
@@ -731,7 +731,7 @@ export default function CreatorApp() {
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[#F5F0E8]">
+    <div className="h-[100dvh] flex flex-col bg-[#F7F6F3]">
       {showOnboarding && (
         <CreatorOnboarding
           profile={userProfile}
@@ -762,7 +762,7 @@ export default function CreatorApp() {
 
       {/* Level Up Overlay */}
       {showLevelUpOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(28,18,8,0.85)' }}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(44,36,32,0.85)' }}>
           <div className="bg-[#EDE8DC] rounded-[16px] p-[36px_28px] text-center max-w-[320px] mx-4">
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
@@ -804,20 +804,20 @@ export default function CreatorApp() {
         const isSubmitEnabled = reelUrl.startsWith('http') && reelUrl.length > 4;
         return (
           <div
-            className="fixed top-0 left-0 right-0 bottom-0 bg-[#F5F0E8]"
+            className="fixed top-0 left-0 right-0 bottom-0 bg-[#F7F6F3]"
             style={{ zIndex: 9999, overflowY: 'auto' }}
           >
             {/* Back button — fixed so it stays visible when scrolling */}
             <button
               onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
-              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-[#F5F0E8]"
+              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[var(--near-black)] text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px] bg-[#F7F6F3]"
               style={{ zIndex: 10000, borderRadius: 8 }}
             >
               ← Back
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#1C1208', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
               <p className="text-[18px] text-[var(--mid)] text-center mt-[4px]">{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
@@ -833,7 +833,7 @@ export default function CreatorApp() {
                       width: 'calc(50% - 3px)',
                       height: 36,
                       borderRadius: 50,
-                      background: '#1C1208',
+                      background: '#2C2420',
                       left: activeTab === 'pass' ? 3 : 'calc(50%)',
                       transition: 'all 0.2s ease',
                     }}
@@ -841,14 +841,14 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setQrScreenTab('pass')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(28,18,8,0.88)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#FFFFFF' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
                   >
                     Show pass
                   </button>
                   <button
                     onClick={() => setQrScreenTab('reel')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(28,18,8,0.88)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
                   >
                     Submit reel
                   </button>
@@ -867,7 +867,7 @@ export default function CreatorApp() {
                   />
                   {/* Ref code pill — single instance */}
                   <span
-                    className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[#1C1208] inline-block rounded-full mt-[20px]"
+                    className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-[#2C2420] inline-block rounded-full mt-[20px]"
                     style={{ background: '#EDE8DC', padding: '10px 20px' }}
                   >
                     {userProfile.code}
@@ -888,11 +888,11 @@ export default function CreatorApp() {
                   <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
                     <div className="flex items-center gap-[8px]">
                       <DoodleIcon name="clock" size={16} className="text-[var(--mid)]" />
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: '#1C1208' }}>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: '#2C2420' }}>
                         {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
                       </span>
                     </div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(28,18,8,0.68)', marginTop: 8, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', marginTop: 8, lineHeight: 1.6 }}>
                       Post your reel within this window — it must clearly feature the business.
                     </p>
                   </div>
@@ -908,9 +908,9 @@ export default function CreatorApp() {
                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                       placeholder="https://instagram.com/reel/"
                       className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[var(--soft)] focus:outline-none"
-                      style={{ background: 'white', border: '1.5px solid rgba(28,18,8,0.15)', borderRadius: 12, padding: '14px 16px', ...(reelUrl ? {} : {}), }}
+                      style={{ background: 'white', border: '1.5px solid rgba(44,36,32,0.15)', borderRadius: 12, padding: '14px 16px', ...(reelUrl ? {} : {}), }}
                       onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--near-black)'; }}
-                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(28,18,8,0.15)'; }}
+                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(44,36,32,0.15)'; }}
                     />
                     {reelError ? (
                       <p className="text-[15px] text-[var(--mid)] mt-[8px]">Please check the URL and try again.</p>
@@ -930,7 +930,7 @@ export default function CreatorApp() {
                     disabled={loading || !isSubmitEnabled}
                     className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all"
                     style={{
-                      background: isSubmitEnabled ? '#1C1208' : 'rgba(28,18,8,0.3)',
+                      background: isSubmitEnabled ? '#2C2420' : 'rgba(44,36,32,0.3)',
                       height: 52,
                       borderRadius: 50,
                       marginTop: 16,
@@ -1069,7 +1069,7 @@ export default function CreatorApp() {
         })();
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F5F0E8] flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
             {/* Hero */}
             <div className="relative h-[200px] flex items-center justify-center" style={{ background: getCategoryGradient(offer.businesses.category) }}>
               {offer.offer_photo_url ? (
@@ -1083,13 +1083,13 @@ export default function CreatorApp() {
               )}
               <button
                 onClick={() => setExpandedOffer(null)}
-                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[#EDE8DC] flex items-center justify-center shadow-[0_2px_8px_rgba(28,18,8,0.1)]"
+                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full bg-[#EDE8DC] flex items-center justify-center shadow-[0_2px_8px_rgba(44,36,32,0.1)]"
               >
                 <DoodleIcon name="chevron-left" size={18} className="text-[var(--near-black)]" />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
-                <div className="absolute inset-0" style={{ background: 'rgba(28,18,8,0.45)' }} />
+                <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.45)' }} />
               )}
               <button
                 onClick={() => toggleSaved(offer.id)}
@@ -1100,15 +1100,15 @@ export default function CreatorApp() {
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto bg-[#F5F0E8]">
+            <div className="flex-1 overflow-y-auto bg-[#F7F6F3]">
               <div className="p-[20px]">
                 {/* A) Business name + category */}
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: 'rgba(28,18,8,0.68)', margin: 0 }}>{offer.businesses.name}</p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(28,18,8,0.45)', marginTop: 4 }}>{offer.businesses.category}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: 'rgba(44,36,32,0.68)', margin: 0 }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.45)', marginTop: 4 }}>{offer.businesses.category}</p>
 
                 {/* Level requirement banner */}
                 {detailIsLocked && (
-                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mt-3" style={{ background: 'rgba(28,18,8,0.04)' }}>
+                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mt-3" style={{ background: 'rgba(44,36,32,0.04)' }}>
                     <DoodleIcon name="lock" size={14} className="text-[var(--mid)] mt-0.5 flex-shrink-0" />
                     <div>
                       <p className="text-[15px] font-semibold text-[var(--near-black)]">{detailLockedName} creators only</p>
@@ -1118,7 +1118,7 @@ export default function CreatorApp() {
                 )}
 
                 {/* Offer headline */}
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#1C1208', marginTop: 8, marginBottom: 8 }}>
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: '#2C2420', marginTop: 8, marginBottom: 8 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
                 <div className="h-[1px] bg-[var(--faint)] my-[14px]" />
@@ -1130,8 +1130,8 @@ export default function CreatorApp() {
                   if (offerHeadline === whatYouGet) return null;
                   return (
                     <>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(28,18,8,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 17, color: '#1C1208', lineHeight: 1.5, marginBottom: 20 }}>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.8px', marginBottom: 8 }}>WHAT YOU GET</p>
+                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 17, color: '#2C2420', lineHeight: 1.5, marginBottom: 20 }}>
                         {whatYouGet}
                       </p>
                     </>
@@ -1139,12 +1139,12 @@ export default function CreatorApp() {
                 })()}
 
                 {/* C) What to post */}
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(28,18,8,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>WHAT TO POST</p>
                 <div className="flex items-center gap-2 mb-2">
                   <DoodleIcon name="video" size={20} className="text-[var(--near-black)]" />
-                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 17, color: '#1C1208' }}>One Instagram Reel</span>
+                  <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 17, color: '#2C2420' }}>One Instagram Reel</span>
                 </div>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(28,18,8,0.68)', marginBottom: 12 }}>Post within 48 hours of your visit</p>
+                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', marginBottom: 12 }}>Post within 48 hours of your visit</p>
                 <div className="flex flex-col gap-2.5 mb-5">
                   {[
                     'Post within 48 hours of your visit',
@@ -1153,7 +1153,7 @@ export default function CreatorApp() {
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
                       <DoodleIcon name="check" size={13} className="text-[var(--mid)] mt-[2px] flex-shrink-0" />
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(28,18,8,0.68)' }}>{item}</span>
+                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)' }}>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -1161,9 +1161,9 @@ export default function CreatorApp() {
                 {/* D) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
                   <div className="mb-5">
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(28,18,8,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>THEY'D LOVE IF YOU…</p>
-                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(28,18,8,0.04)' }}>
-                      <p className="text-[18px] text-[rgba(28,18,8,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase', letterSpacing: '0.8px', marginBottom: 8 }}>THEY'D LOVE IF YOU…</p>
+                    <div className="rounded-[12px] p-[14px]" style={{ background: 'rgba(44,36,32,0.04)' }}>
+                      <p className="text-[18px] text-[rgba(44,36,32,0.75)]" style={{ lineHeight: '1.6' }}>{offer.specific_ask}</p>
                     </div>
                   </div>
                 )}
@@ -1172,13 +1172,13 @@ export default function CreatorApp() {
                 <div className="flex items-center justify-between rounded-[12px] bg-[var(--bg)] px-[16px] py-[12px]">
                   <div className="flex items-center gap-2">
                     <DoodleIcon name="users" size={14} className="text-[var(--mid)]" />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#1C1208' }}>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : '#2C2420' }}>
                       {isUnlimited ? 'Open availability' : full ? 'Sold out' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
                     <DoodleIcon name="clock" size={14} className="text-[var(--mid)]" />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: '#1C1208' }}>48hrs to post</span>
+                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 16, color: '#2C2420' }}>48hrs to post</span>
                   </div>
                 </div>
               </div>
@@ -1219,7 +1219,7 @@ export default function CreatorApp() {
                         <button
                           onClick={() => leaveWaitlist(offer.id)}
                           disabled={waitlistLoading === offer.id}
-                          className="px-[18px] py-[10px] rounded-full text-[15px] font-semibold border border-[rgba(28,18,8,0.15)] text-[var(--near-black)] min-h-[44px]"
+                          className="px-[18px] py-[10px] rounded-full text-[15px] font-semibold border border-[rgba(44,36,32,0.15)] text-[var(--near-black)] min-h-[44px]"
                         >
                           {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                         </button>
@@ -1234,7 +1234,7 @@ export default function CreatorApp() {
                       <button
                         onClick={() => setWaitlistConfirmLeave(offer.id)}
                         className="px-[22px] py-[12px] rounded-full text-[18px] font-semibold min-h-[48px] flex items-center gap-1"
-                        style={{ border: '1.5px solid var(--near-black)', color: 'var(--near-black)', background: 'rgba(28,18,8,0.03)' }}
+                        style={{ border: '1.5px solid var(--near-black)', color: 'var(--near-black)', background: 'rgba(44,36,32,0.03)' }}
                       >
                         On waitlist <DoodleIcon name="check" size={16} />
                       </button>
@@ -1244,7 +1244,7 @@ export default function CreatorApp() {
                       onClick={() => joinWaitlist(offer.id)}
                       disabled={waitlistLoading === offer.id}
                       className="px-[22px] py-[12px] rounded-full text-[18px] font-semibold text-[var(--near-black)] min-h-[48px] disabled:opacity-40"
-                      style={{ border: '1.5px solid rgba(28,18,8,0.15)', background: 'transparent' }}
+                      style={{ border: '1.5px solid rgba(44,36,32,0.15)', background: 'transparent' }}
                     >
                       {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
                     </button>
@@ -1283,7 +1283,7 @@ export default function CreatorApp() {
           {view === 'offers' && (
             <>
               {claimError && (
-                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(28,18,8,0.05)] border border-[rgba(28,18,8,0.1)] flex items-center justify-between">
+                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(44,36,32,0.05)] border border-[rgba(44,36,32,0.1)] flex items-center justify-between">
                   <p className="text-[15px] text-[var(--near-black)]">{claimError}</p>
                   <button onClick={() => setClaimError(null)} className="text-[var(--soft)] hover:text-[var(--mid)] text-[15px] font-semibold ml-3">Dismiss</button>
                 </div>
@@ -1308,7 +1308,7 @@ export default function CreatorApp() {
                   />
                   <div
                     className="w-[30px] h-[30px] rounded-full flex items-center justify-center flex-shrink-0"
-                    style={{ border: '1px solid rgba(28,18,8,0.15)' }}
+                    style={{ border: '1px solid rgba(44,36,32,0.15)' }}
                   >
                     <DoodleIcon name="filter" size={12} className="text-[var(--near-black)]" />
                   </div>
@@ -1359,8 +1359,8 @@ export default function CreatorApp() {
                 };
 
                 return (
-                  <div style={{ marginBottom: 24 }}>
-                    <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[10px]">
+                  <div style={{ marginBottom: 8 }}>
+                    <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[12px]">
                       <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Your passes</h2>
                       {giftCardClaims.length >= 2 && (
                         <button onClick={() => setView('active')} className="text-[15px] font-semibold text-[var(--mid)]">
@@ -1428,48 +1428,45 @@ export default function CreatorApp() {
                                 width: '100%',
                                 flexShrink: 0,
                                 height: 220,
-                                borderRadius: 16,
-                                background: photoUrl ? undefined : getGiftCardBg(claim.businesses.category),
+                                borderRadius: 20,
+                                background: '#D4470C',
                               }}
                             >
-                              {photoUrl && (
-                                <img src={photoUrl} alt="" className="absolute inset-0 w-full h-full object-cover object-center" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                              )}
-                              {/* Gradient overlay — bottom 60% only */}
-                              <div className="absolute inset-x-0 bottom-0" style={{ top: '40%', background: 'linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.52) 100%)' }} />
-
-                              {/* Text overlay */}
-                              <div className="absolute bottom-[14px] left-[14px] right-[52px]">
-                                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>
-                                  {claim.businesses.name}
-                                </p>
-                                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#FFFFFF', margin: '0 0 8px', lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
-                                  {offerTitle}
-                                </p>
-                                <div className="flex items-center" style={{ gap: 6 }}>
-                                  <span className="rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.22)', borderRadius: 50, padding: '4px 12px', fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 14, color: '#FFFFFF', lineHeight: 1 }}>
-                                    {status.text}
-                                  </span>
-                                  {status.timerLabel && (
-                                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF', background: 'rgba(255,255,255,0.2)', borderRadius: 50, padding: '3px 10px', lineHeight: 1, marginLeft: 2 }}>
-                                      {status.timerLabel}
-                                    </span>
-                                  )}
+                              {/* Solid branded card — no photo */}
+                              <div className="flex flex-col justify-between h-full" style={{ padding: '20px 20px 18px' }}>
+                                <div>
+                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>
+                                    {claim.businesses.name}
+                                  </p>
+                                  <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#FFFFFF', margin: 0, lineHeight: 1.2, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
+                                    {offerTitle}
+                                  </p>
                                 </div>
-                              </div>
-
-                              {/* QR icon */}
-                              <div className="absolute bottom-[14px] right-[14px] flex items-center justify-center" style={{ width: 32, height: 32, borderRadius: 50, background: 'rgba(255,255,255,0.15)' }}>
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                  <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                  <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                  <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                  <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
-                                  <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
-                                  <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
-                                  <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
-                                  <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
-                                </svg>
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center" style={{ gap: 6 }}>
+                                    <span className="rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.22)', borderRadius: 50, padding: '5px 14px', fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 14, color: '#FFFFFF', lineHeight: 1 }}>
+                                      {status.text}
+                                    </span>
+                                    {status.timerLabel && (
+                                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF', background: 'rgba(255,255,255,0.2)', borderRadius: 50, padding: '4px 12px', lineHeight: 1 }}>
+                                        {status.timerLabel}
+                                      </span>
+                                    )}
+                                  </div>
+                                  {/* QR icon */}
+                                  <div className="flex items-center justify-center flex-shrink-0" style={{ width: 34, height: 34, borderRadius: 50, background: 'rgba(255,255,255,0.18)' }}>
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                      <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                      <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                      <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
+                                      <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
+                                      <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
+                                      <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
+                                      <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
+                                      <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
+                                    </svg>
+                                  </div>
+                                </div>
                               </div>
                             </div>
                           );
@@ -1486,7 +1483,7 @@ export default function CreatorApp() {
                             style={{
                               width: 6,
                               height: 6,
-                              background: idx === activePassIdx ? 'var(--near-black)' : 'rgba(28,18,8,0.2)',
+                              background: idx === activePassIdx ? 'var(--near-black)' : 'rgba(44,36,32,0.2)',
                               transition: 'background 0.2s',
                             }}
                           />
@@ -1501,7 +1498,7 @@ export default function CreatorApp() {
               {!streakWarningDismissed && userProfile.current_streak > 0 && isStreakWarningPeriod(userProfile.last_reel_month) && (
                 <div
                   className="mx-[20px] mt-[14px] flex items-center gap-[10px] rounded-[12px] p-[12px_16px]"
-                  style={{ background: 'rgba(28,18,8,0.04)', border: '1px solid rgba(28,18,8,0.08)' }}
+                  style={{ background: 'rgba(44,36,32,0.04)', border: '1px solid rgba(44,36,32,0.08)' }}
                 >
                   <FlameIcon color="var(--terra)" size={16} />
                   <p className="flex-1 text-[15px] text-[var(--near-black)]">
@@ -1582,7 +1579,7 @@ export default function CreatorApp() {
               )}
 
               {/* Section Header */}
-              <div className="flex items-center justify-between px-[20px] mt-[16px] mb-[10px]">
+              <div className="flex items-center justify-between px-[20px] mt-[28px] mb-[12px]">
                 <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">Near you</h2>
               </div>
 
@@ -1611,7 +1608,7 @@ export default function CreatorApp() {
                   ))}
                   <style>{`
                     .skeleton-shimmer {
-                      background: linear-gradient(90deg, var(--bg) 25%, rgba(28,18,8,0.06) 50%, var(--bg) 75%);
+                      background: linear-gradient(90deg, var(--bg) 25%, rgba(44,36,32,0.06) 50%, var(--bg) 75%);
                       background-size: 200% 100%;
                       animation: shimmer 1.5s infinite;
                     }
@@ -1723,20 +1720,20 @@ export default function CreatorApp() {
 
                       {/* Headline — the hero element */}
                       <div style={{ padding: '10px 12px 6px' }}>
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 17, color: '#1C1208', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0, letterSpacing: '-0.2px' }}>
+                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 800, fontSize: 17, color: '#2C2420', lineHeight: 1.25, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', whiteSpace: 'normal', margin: 0, letterSpacing: '-0.2px' }}>
                           {offerTitle || bizName}
                         </p>
                       </div>
 
                       {/* Footer — business name + slots */}
                       <div style={{ padding: '0 12px 12px' }}>
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(28,18,8,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(44,36,32,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                           {bizName}
                         </p>
                         {!isLocked && !isUnlimited && slotsLeft !== null && (
                           <span
                             className="text-[12px] font-semibold rounded-full px-[8px] py-[3px]"
-                            style={{ background: 'rgba(28,18,8,0.07)', color: 'var(--mid)' }}
+                            style={{ background: 'rgba(44,36,32,0.07)', color: 'var(--mid)' }}
                           >
                             {slotsLeft === 0 ? 'Full' : slotsLeft === 1 ? 'Last slot' : `${slotsLeft} left`}
                           </span>
@@ -1756,7 +1753,7 @@ export default function CreatorApp() {
                     </div>
 
                     {/* Second section */}
-                    <div className="flex items-center justify-between px-[20px] mt-[8px] mb-[10px]">
+                    <div className="flex items-center justify-between px-[20px] mt-[24px] mb-[12px]">
                       <h2 className="text-[20px] font-display font-extrabold text-[var(--near-black)] tracking-[-0.3px]">New this week</h2>
                     </div>
 
@@ -1880,8 +1877,8 @@ export default function CreatorApp() {
                           }}
                           className={`whitespace-nowrap text-[14px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
                             isSelected
-                              ? 'bg-[#1C1208] text-[#FFFFFF]'
-                              : 'text-[rgba(28,18,8,0.68)]'
+                              ? 'bg-[#2C2420] text-[#FFFFFF]'
+                              : 'text-[rgba(44,36,32,0.68)]'
                           }`}
                           style={!isSelected ? { background: '#EDE8DC', height: '32px' } : { height: '32px' }}
                         >
@@ -1938,7 +1935,7 @@ export default function CreatorApp() {
                             <div className="bg-[#EDE8DC] rounded-[16px] border-[1.5px] border-[#E0E0E0] px-5 pt-4 pb-2" style={{ minHeight: '75vh' }}>
 
                               {/* Offer title — one line */}
-                              <p className="text-[18px] font-semibold text-[#1C1208] truncate mb-[10px]">{offerTitle}</p>
+                              <p className="text-[18px] font-semibold text-[#2C2420] truncate mb-[10px]">{offerTitle}</p>
 
                               {/* Breadcrumb stepper — one line */}
                               <div className="flex items-center flex-nowrap mb-4">
@@ -1952,14 +1949,14 @@ export default function CreatorApp() {
                                         <span className="inline-block w-[7px] h-[7px] rounded-full bg-[var(--near-black)] mr-1.5" />
                                       )}
                                       <span className={`text-[15px] ${
-                                        isCurrent ? 'font-bold text-[#1C1208]'
-                                        : isDone ? 'font-bold text-[#1C1208]'
+                                        isCurrent ? 'font-bold text-[#2C2420]'
+                                        : isDone ? 'font-bold text-[#2C2420]'
                                         : 'font-medium'
-                                      }`} style={isFuture ? { color: 'rgba(28,18,8,0.3)' } : undefined}>
+                                      }`} style={isFuture ? { color: 'rgba(44,36,32,0.3)' } : undefined}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span className="text-[15px] mx-1" style={{ color: 'rgba(28,18,8,0.25)' }}>→</span>
+                                        <span className="text-[15px] mx-1" style={{ color: 'rgba(44,36,32,0.25)' }}>→</span>
                                       )}
                                     </span>
                                   );
@@ -1972,7 +1969,7 @@ export default function CreatorApp() {
                                   onClick={() => { setQrOpenSource('active'); setQrScreenTab('pass'); setShowQrFullscreen(true); }}
                                   className="w-full text-left"
                                 >
-                                  <p className="text-[15px] font-semibold text-[#1C1208] text-center mb-[10px]">Tap to show pass</p>
+                                  <p className="text-[15px] font-semibold text-[#2C2420] text-center mb-[10px]">Tap to show pass</p>
                                   <QRCodeDisplay
                                     token={claim.qr_token}
                                     claimId={claim.id}
@@ -1995,11 +1992,11 @@ export default function CreatorApp() {
                                 }}>
                                   <div className="flex items-center gap-2 mb-2">
                                     <DoodleIcon name="clock" size={16} />
-                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : '#1C1208', margin: 0 }}>
+                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : '#2C2420', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
-                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(28,18,8,0.68)', margin: 0 }}>
+                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', margin: 0 }}>
                                     You have 48 hours to post your reel — it must clearly feature the business.
                                   </p>
                                 </div>
@@ -2008,7 +2005,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div className="p-4 rounded-[12px] bg-[#EDE8DC] border border-[var(--faint)]">
-                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#1C1208' }}>
+                                  <label className="block mb-1" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: '#2C2420' }}>
                                     Submit Your Reel
                                   </label>
                                   <p className="text-[15px] text-[var(--soft)] mb-3" style={{ lineHeight: 1.4 }}>
@@ -2020,13 +2017,13 @@ export default function CreatorApp() {
                                       value={reelUrl}
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="https://instagram.com/reel/..."
-                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[rgba(28,18,8,0.15)] focus:border-[var(--near-black)] min-h-[52px]"
+                                      className="flex-1 px-4 py-[14px] rounded-[12px] bg-[var(--bg)] border border-[var(--faint)] text-[17px] text-[var(--near-black)] focus:outline-none focus:ring-2 focus:ring-[rgba(44,36,32,0.15)] focus:border-[var(--near-black)] min-h-[52px]"
                                     />
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
                                       className="px-5 py-2 rounded-full text-white text-[18px] font-semibold disabled:opacity-40 transition-all min-h-[48px]"
-                                      style={{ background: '#1C1208' }}
+                                      style={{ background: '#2C2420' }}
                                     >
                                       Submit
                                     </button>
@@ -2068,7 +2065,7 @@ export default function CreatorApp() {
                                     <button
                                       onClick={() => setDisputeClaimId(claim.id)}
                                       className="flex items-center gap-1 font-medium transition-colors"
-                                      style={{ color: 'rgba(28,18,8,0.35)' }}
+                                      style={{ color: 'rgba(44,36,32,0.35)' }}
                                     >
                                       <DoodleIcon name="flag" size={11} /> Report an issue
                                     </button>
@@ -2077,11 +2074,11 @@ export default function CreatorApp() {
                                       if (releaseStatus.allowed) {
                                         return (
                                           <>
-                                            <span className="mx-2" style={{ color: 'rgba(28,18,8,0.2)' }}>·</span>
+                                            <span className="mx-2" style={{ color: 'rgba(44,36,32,0.2)' }}>·</span>
                                             <button
                                               onClick={() => setReleaseConfirmId(claim.id)}
                                               className="flex items-center gap-1 font-medium transition-colors"
-                                              style={{ color: 'rgba(28,18,8,0.45)' }}
+                                              style={{ color: 'rgba(44,36,32,0.45)' }}
                                             >
                                               <DoodleIcon name="x" size={11} /> Release offer
                                             </button>
@@ -2176,7 +2173,7 @@ export default function CreatorApp() {
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
               {isPendingApproval && (
-                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'rgba(28,18,8,0.04)' }}>
+                <div className="mb-6 rounded-[16px] p-5 text-center" style={{ background: 'rgba(44,36,32,0.04)' }}>
                   <DoodleIcon name="clock" size={28} className="text-[var(--mid)] mx-auto mb-2.5" />
                   <h3 className="text-[19px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
                   <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
@@ -2316,7 +2313,7 @@ export default function CreatorApp() {
                         3: '#4CAF7D',
                         4: '#1A4A2E',
                         5: '#D4470C',
-                        6: '#1C1208',
+                        6: '#2C2420',
                       };
                       const levels = [1, 2, 3, 4, 5, 6];
                       const levelNames = ['Newcomer', 'Explorer', 'Regular', 'Local', 'Trusted', 'Nayba'];
@@ -2397,7 +2394,7 @@ export default function CreatorApp() {
                             <span
                               className="inline-block rounded-full px-[12px] py-[3px]"
                               style={{
-                                background: currentLvl === 6 ? '#1C1208' : levelColours[currentLvl],
+                                background: currentLvl === 6 ? '#2C2420' : levelColours[currentLvl],
                                 color: 'white',
                                 fontWeight: 600,
                                 fontSize: 15,
@@ -2565,7 +2562,7 @@ export default function CreatorApp() {
                           }`}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(28,18,8,0.1)]' : 'bg-[var(--near-black)]'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(44,36,32,0.1)]' : 'bg-[var(--near-black)]'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] text-[var(--near-black)]">{notif.message}</p>
                               <p className="text-[15px] text-[var(--soft)] mt-1">
@@ -2671,44 +2668,45 @@ export default function CreatorApp() {
       </div>{/* end scroll container */}
 
       {/* Bottom Navigation Bar */}
-      <div className="bg-[#EDE8DC] flex-shrink-0" style={{ borderTop: '1px solid #E0E0E0' }}>
-        <div className="max-w-md mx-auto flex pt-[10px]" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
-          {tabs.map(tab => (
+      <div className="bg-[#F7F6F3] flex-shrink-0" style={{ borderTop: '1px solid rgba(44,36,32,0.08)' }}>
+        <div className="max-w-md mx-auto flex pt-[8px]" style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))' }}>
+          {tabs.map(tab => {
+            const isActive = view === tab.key;
+            const isDisabled = isPendingApproval && tab.key !== 'profile';
+            return (
             <button
               key={tab.key}
-              onClick={() => { if (isPendingApproval && tab.key !== 'profile') return; setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
-              className={`flex-1 flex flex-col items-center gap-1 text-[13px] font-semibold transition-all relative min-h-[44px] ${
-                isPendingApproval && tab.key !== 'profile' ? 'text-[rgba(28,18,8,0.15)] pointer-events-none' : view === tab.key ? 'text-[var(--near-black)]' : 'text-[#9E9E9E]'
+              onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
+              className={`flex-1 flex flex-col items-center gap-[2px] text-[12px] font-semibold transition-all relative min-h-[44px] ${
+                isDisabled ? 'text-[rgba(44,36,32,0.15)] pointer-events-none' : isActive ? 'text-[var(--terra)]' : 'text-[rgba(44,36,32,0.40)]'
               }`}
             >
-              <div className="relative">
+              <div className={`relative flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[rgba(212,71,12,0.10)]' : ''}`} style={{ width: 36, height: 28 }}>
                 {tab.icon ? (
-                  <DoodleIcon name={tab.icon} size={22} />
+                  <DoodleIcon name={tab.icon} size={20} />
                 ) : (
                   avatarUrl ? (
-                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${view === tab.key ? 'ring-1.5 ring-[var(--near-black)]' : ''}`} />
+                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${isActive ? 'ring-2 ring-[var(--terra)]' : ''}`} />
                   ) : (
                     <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[12px] font-bold ${
-                      view === tab.key ? 'bg-[var(--near-black)] text-white' : 'bg-[rgba(28,18,8,0.1)] text-[var(--mid)]'
+                      isActive ? 'bg-[var(--terra)] text-white' : 'bg-[rgba(44,36,32,0.08)] text-[var(--mid)]'
                     }`}>
                       {userProfile.name?.charAt(0)?.toUpperCase() || '?'}
                     </div>
                   )
                 )}
                 {tab.badge ? (
-                  <span className={`absolute -top-1 -right-2.5 min-w-[16px] h-4 px-1 rounded-full text-white text-[12px] font-bold flex items-center justify-center ${
-                    tab.badgeColor || 'bg-[var(--near-black)]'
+                  <span className={`absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-white text-[11px] font-bold flex items-center justify-center ${
+                    tab.badgeColor || 'bg-[var(--terra)]'
                   }`}>
                     {tab.badge}
                   </span>
                 ) : null}
               </div>
               {tab.label}
-              {view === tab.key && (
-                <div className="absolute bottom-0 left-3 right-3 h-[2px] bg-[var(--near-black)] rounded-full" />
-              )}
             </button>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
