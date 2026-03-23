@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { DoodleIcon } from '../lib/doodle-icons';
 import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
-import { getCategoryGradient } from '../lib/categories';
+import { getCategoryGradient, CategoryIcon } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import DisputeModal from './DisputeModal';
 import { uploadAvatar, uploadOfferPhoto } from '../lib/upload';
@@ -422,7 +422,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
     return (
       <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col items-center justify-center px-6">
         <DoodleIcon name="check" size={56} className="text-[var(--terra)] mb-4" />
-        <p className="text-[24px] font-display font-normal text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.01em' }}>Your offer is live!</p>
+        <p className="text-[24px] font-display font-normal text-[var(--near-black)] text-center" style={{ letterSpacing: '-0.025em' }}>Your offer is live!</p>
         <p className="text-[18px] text-[var(--mid)] text-center mt-2">Creators can now discover and claim it</p>
         <button
           onClick={onCancel}
@@ -471,7 +471,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 1: What are you offering? ── */}
         {screen === 1 && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>What are you offering?</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>What are you offering?</h2>
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>Choose the type of experience</p>
             <div className="grid grid-cols-2 gap-3">
               {tiles.map(t => (
@@ -486,8 +486,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   }}
                   className={`flex flex-col items-center justify-center gap-2.5 rounded-[18px] min-h-[110px] transition-all ${
                     offerType === t.key
-                      ? 'border-2 border-[var(--terra)]'
-                      : 'border-[1.5px] border-[var(--faint)]'
+                      ? 'border-2 border-[#D4470C]'
+                      : 'border-[1.5px] border-[rgba(44,36,32,0.08)]'
                   }`}
                   style={{
                     padding: '24px 20px',
@@ -508,7 +508,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2: Fill in the blank ── */}
         {screen === 2 && offerType !== 'discount' && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>What exactly will you give?</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>What exactly will you give?</h2>
             <p className="text-[18px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>We'll use this to create your offer card</p>
 
             <div className="flex items-baseline gap-2 mb-2">
@@ -579,7 +579,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2 (Discount): Amount + unit toggle ── */}
         {screen === 2 && offerType === 'discount' && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>What's the discount?</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>What's the discount?</h2>
             <p className="text-[18px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Set the amount creators will receive</p>
 
             <div className="flex justify-center mb-4">
@@ -648,7 +648,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 3: How many slots? ── */}
         {screen === 3 && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>How many creators?</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>How many creators?</h2>
             <p className="text-[18px] text-[var(--mid)] mb-10" style={{ lineHeight: '1.6' }}>Each slot is one creator visit</p>
 
             {monthlyCap === null ? (
@@ -714,7 +714,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 4: Add a photo (optional) ── */}
         {screen === 4 && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>Add a photo</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>Add a photo</h2>
             <p className="text-[18px] text-[var(--mid)] mb-8" style={{ lineHeight: '1.6' }}>Optional — helps your offer stand out</p>
 
             <div className="flex flex-col items-center mb-6">
@@ -808,7 +808,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 5: Any specific ask? ── */}
         {screen === 5 && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>Anything specific?</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>Anything specific?</h2>
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>Optional — most businesses skip this</p>
 
             <textarea
@@ -844,7 +844,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 6: Preview ── */}
         {screen === 6 && (
           <div>
-            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.01em' }}>Your offer</h2>
+            <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mt-4 mb-1" style={{ letterSpacing: '-0.025em' }}>Your offer</h2>
             <p className="text-[18px] text-[var(--mid)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
@@ -865,8 +865,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               </div>
               {/* Body */}
               <div className="p-4">
-                <p className="text-[17px] font-extrabold text-[var(--near-black)]">Your business</p>
-                <p className="text-[18px] font-semibold text-[var(--near-black)] mt-0.5">{generatedTitle}</p>
+                <p className="text-[17px] font-extrabold text-[var(--near-black)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Your business</p>
+                <p className="text-[18px] font-display font-normal text-[var(--near-black)] mt-0.5" style={{ letterSpacing: '-0.025em' }}>{generatedTitle}</p>
                 <div className="flex items-center gap-1 mt-1.5">
                   <DoodleIcon name="video" size={13} className="text-[var(--terra)]" />
                   <span className="text-[15px] text-[var(--mid)]">Instagram Reel</span>
@@ -928,7 +928,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 setShowSuccess(true);
               }}
               disabled={isSubmitting}
-              className="w-full py-[14px] rounded-[50px] font-bold text-[17px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all min-h-[52px]"
+              className="w-full py-[14px] rounded-[50px] font-bold text-[17px] bg-[#D4470C] text-white hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all min-h-[52px]"
               style={{ boxShadow: '0 4px 16px rgba(212,71,12,0.3)' }}
             >
               {isSubmitting ? 'Publishing...' : 'Go live'}
@@ -960,6 +960,9 @@ function timeAgo(dateStr: string): string {
 }
 
 // ─── Main Component ──────────────────────────────────────────────────────
+
+const cardPalette = ['#EDE8DC', '#E8EEE7', '#E4EAED', '#F2E8E0', '#EDE8D0'];
+const getCardColor = (index: number) => cardPalette[index % cardPalette.length];
 
 export default function BusinessPortal() {
   const { userProfile, signOut } = useAuth();
@@ -1346,10 +1349,10 @@ export default function BusinessPortal() {
 
   const claimStatusStyle = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-[var(--terra)] text-white';
-      case 'redeemed': return 'bg-[rgba(26,74,46,0.08)] text-[var(--forest)]';
+      case 'active': return 'bg-[#D4470C] text-white';
+      case 'redeemed': return 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]';
       case 'reel_due': return 'bg-[var(--peach)] text-[var(--near-black)]';
-      case 'completed': return 'bg-[var(--bg)] text-[var(--soft)]';
+      case 'completed': return 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]';
       case 'disputed': return 'bg-[var(--terra-15)] text-[var(--terra)]';
       default: return 'bg-[var(--bg)] text-[var(--soft)]';
     }
@@ -1443,7 +1446,7 @@ export default function BusinessPortal() {
             {/* Scrollable content */}
             <div className="flex-1 overflow-y-auto px-[20px] pt-[24px]">
               {/* ═══ Profile card (matches creator profile DNA) ═══ */}
-              <div className="rounded-[18px] border border-[var(--faint)] p-[24px] mb-[16px] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+              <div className="rounded-[18px] p-[24px] mb-[16px]" style={{ border: '1.5px solid rgba(44,36,32,0.08)' }}>
                 <div className="flex items-start gap-[16px]">
                   {/* Logo */}
                   <div
@@ -1458,7 +1461,7 @@ export default function BusinessPortal() {
                   </div>
                   {/* Name + meta */}
                   <div className="flex-1 min-w-0 pt-[2px]">
-                    <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.01em' }}>{biz.name}</h2>
+                    <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.025em' }}>{biz.name}</h2>
                     <p className="text-[18px] text-[var(--mid)] mt-[2px]">{biz.category}</p>
                     {biz.address && (
                       <p className="text-[14px] text-[var(--soft)] mt-[4px] flex items-center gap-[4px]">
@@ -1490,7 +1493,7 @@ export default function BusinessPortal() {
               {/* ═══ About card ═══ */}
               {biz.bio && (
                 <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
-                  <h3 className="text-[18px] font-bold text-[var(--near-black)] mb-[8px]">About</h3>
+                  <h3 className="text-[18px] font-display font-normal text-[var(--near-black)] mb-[8px]" style={{ letterSpacing: '-0.025em' }}>About</h3>
                   <p className="text-[18px] text-[var(--mid)] leading-[1.5]">{biz.bio}</p>
                 </div>
               )}
@@ -1587,7 +1590,7 @@ export default function BusinessPortal() {
               {/* Greeting + compact stats banner */}
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: '#2C2420', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
+                  <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.2, margin: 0 }}>
                     {getGreeting()}, {userProfile.name}
                   </h2>
                   <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44, 36, 32, 0.5)', margin: 0, marginTop: 4 }}>
@@ -1691,7 +1694,7 @@ export default function BusinessPortal() {
                     <button
                       onClick={() => { setView('offers'); setShowOfferBuilder(true); }}
                       className="mt-[16px] px-[24px] py-[12px] rounded-[50px] text-white text-[18px] font-bold transition-all"
-                      style={{ background: 'var(--terra)' }}
+                      style={{ background: '#D4470C' }}
                     >
                       Launch a campaign →
                     </button>
@@ -1726,14 +1729,11 @@ export default function BusinessPortal() {
                           className="w-full flex items-center gap-[12px] py-[10px] px-[2px] text-left"
                           onClick={() => { setCreatorFilter(claim.creator_id); setClaimsFilter('all'); setView('claims'); }}
                         >
-                          <div className="w-[40px] h-[40px] rounded-full overflow-hidden flex-shrink-0">
-                            {claim.creators.avatar_url ? (
-                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                            ) : (
-                              <div className="w-full h-full flex items-center justify-center text-white font-bold text-[18px]" style={{ background: getCategoryGradient(userProfile.category) }}>
-                                {getInitials(claim.creators.name)}
-                              </div>
-                            )}
+                          <div
+                            className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#EDE8DC' }}
+                          >
+                            <CategoryIcon category={userProfile.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[18px] font-semibold text-[var(--near-black)] truncate">
@@ -1763,14 +1763,10 @@ export default function BusinessPortal() {
                       >
                         <div className="flex items-center gap-[12px] py-[12px] px-[14px] rounded-[18px] bg-[#EDE8DC] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
                           <div
-                            className="w-[40px] h-[40px] rounded-[10px] flex items-center justify-center flex-shrink-0 overflow-hidden"
-                            style={{ background: getCategoryGradient(biz.category) }}
+                            className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#EDE8DC' }}
                           >
-                            {biz.logo_url ? (
-                              <img src={biz.logo_url} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                            ) : (
-                              <span className="text-[18px] font-bold text-white">{biz.name.charAt(0)}</span>
-                            )}
+                            <CategoryIcon category={biz.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className="text-[18px] font-bold text-[var(--near-black)] truncate">{biz.name}</p>
@@ -1802,7 +1798,7 @@ export default function BusinessPortal() {
                     <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[24px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Edit offer</h1>
+                    <h1 className="text-[24px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit offer</h1>
                   </div>
 
                   {/* Hero image with upload */}
@@ -1898,7 +1894,7 @@ export default function BusinessPortal() {
                     disabled={!editOfferDirty || editOfferSaving}
                     className={`w-full py-[14px] rounded-[50px] font-bold text-[18px] transition-all min-h-[52px] ${
                       editOfferDirty
-                        ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                        ? 'bg-[#D4470C] text-white hover:bg-[var(--terra-hover)]'
                         : 'bg-[var(--bg)] text-[var(--soft)]'
                     }`}
                   >
@@ -1921,7 +1917,7 @@ export default function BusinessPortal() {
               ) : (
                 /* ── Campaign view with active offer + history ── */
                 <>
-                  <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-[20px]" style={{ letterSpacing: '-0.01em' }}>Your campaign</h2>
+                  <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-[20px]" style={{ letterSpacing: '-0.025em' }}>Your campaign</h2>
 
                   {/* Active offer section */}
                   {activeOffer ? (() => {
@@ -1960,7 +1956,7 @@ export default function BusinessPortal() {
                           </button>
                         </div>
                         <div className="px-[16px] py-[14px]">
-                          <p className="font-display text-[var(--near-black)]" style={{ fontSize: 18 }}>{activeOffer.generated_title || activeOffer.description}</p>
+                          <p className="font-display text-[var(--near-black)]" style={{ fontSize: 18, letterSpacing: '-0.025em' }}>{activeOffer.generated_title || activeOffer.description}</p>
                           <p className="text-[15px] text-[var(--mid)] mt-[2px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`}</p>
                           <p className="text-[15px] text-[var(--mid)] mt-[4px]">{slotsUsed} claimed this month</p>
                           {!isUnlimited && (
@@ -2012,13 +2008,13 @@ export default function BusinessPortal() {
                         return (
                           <div key={offer.id} className="rounded-[18px] border border-[var(--faint)] p-[14px] flex items-center gap-[12px]" style={{ paddingRight: 16 }}>
                             <div
-                              className="w-[44px] h-[44px] rounded-[8px] flex items-center justify-center flex-shrink-0"
-                              style={{ background: getCategoryGradient(userProfile.category) }}
+                              className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
+                              style={{ background: '#EDE8DC' }}
                             >
-                              <DoodleIcon name="gift" size={18} className="text-white/60" />
+                              <CategoryIcon category={userProfile.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
                             </div>
                             <div className="flex-1 min-w-0">
-                              <p className="font-display text-[var(--near-black)] truncate" style={{ fontSize: 16 }}>{offer.generated_title || offer.description}</p>
+                              <p className="font-display text-[var(--near-black)] truncate" style={{ fontSize: 16, letterSpacing: '-0.025em' }}>{offer.generated_title || offer.description}</p>
                               <p className="text-[14px] text-[var(--soft)]">
                                 {createdDate.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
                               </p>
@@ -2055,13 +2051,13 @@ export default function BusinessPortal() {
                     <>
                       <DoodleIcon name="check" size={64} className="text-[var(--terra)] mb-4" />
                       {scanResult.creatorName && (
-                        <p className="text-[22px] font-display font-normal text-[var(--near-black)] mb-1">{scanResult.creatorName}</p>
+                        <p className="text-[22px] font-display font-normal text-[var(--near-black)] mb-1" style={{ letterSpacing: '-0.025em' }}>{scanResult.creatorName}</p>
                       )}
                       <p className="text-[18px] font-semibold text-[var(--near-black)] mb-1">{scanResult.message}</p>
                       <p className="text-[14px] text-[var(--soft)] mb-6">{new Date().toLocaleString()}</p>
                       <button
                         onClick={() => setScanResult(null)}
-                        className="px-[28px] py-[13px] rounded-[50px] bg-[var(--near-black)] text-white font-bold text-[18px] hover:bg-[#333] transition-all min-h-[48px]"
+                        className="px-[28px] py-[13px] rounded-[50px] bg-[#D4470C] text-white font-bold text-[18px] hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
                       >
                         Done
                       </button>
@@ -2087,7 +2083,7 @@ export default function BusinessPortal() {
                     <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--bg)' }}>
                       <DoodleIcon name="qr-code" size={32} className="text-[var(--terra)]" />
                     </div>
-                    <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-1" style={{ letterSpacing: '-0.01em' }}>Scan creator pass</h2>
+                    <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-1" style={{ letterSpacing: '-0.025em' }}>Scan creator pass</h2>
                     <p className="text-[18px] text-[var(--mid)] text-center">Ask the creator to open their Active tab<br />and show their QR code</p>
                   </div>
 
@@ -2098,7 +2094,7 @@ export default function BusinessPortal() {
 
                   <div className="mt-6 mb-4 relative">
                     <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-[var(--faint)]" /></div>
-                    <div className="relative flex justify-center"><span className="bg-[#EDE8DC] px-3 text-[14px] text-[var(--soft)]">or enter code manually</span></div>
+                    <div className="relative flex justify-center"><span className="bg-[#F7F6F3] px-3 text-[14px] text-[var(--soft)]">or enter code manually</span></div>
                   </div>
 
                   <form onSubmit={handleScanCode} className="space-y-3">
@@ -2113,7 +2109,7 @@ export default function BusinessPortal() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#2C2420] bg-[var(--near-black)] text-white hover:bg-[#333] disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[50px] font-bold text-[18px] transition-all min-h-[48px] border-2 border-[#D4470C] bg-[#D4470C] text-white hover:bg-[var(--terra-hover)] disabled:opacity-50"
                     >
                       {loading ? 'Verifying...' : 'Verify'}
                     </button>
@@ -2128,7 +2124,7 @@ export default function BusinessPortal() {
             <div>
               {/* Header row */}
               <div className="flex items-baseline justify-between mb-[16px]">
-                <h2 className="text-[24px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Claims</h2>
+                <h2 className="text-[24px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Claims</h2>
                 {creatorFilter ? (
                   <button
                     onClick={() => setCreatorFilter(null)}
@@ -2201,20 +2197,12 @@ export default function BusinessPortal() {
                           className="flex items-center gap-[14px] py-[14px] border-b border-[var(--faint)] last:border-b-0"
                         >
                           {/* Avatar */}
-                          {claim.creators.avatar_url ? (
-                            <img
-                              src={claim.creators.avatar_url}
-                              alt={claim.creators.name}
-                              className="w-[44px] h-[44px] rounded-full object-cover flex-shrink-0"
-                            />
-                          ) : (
-                            <div
-                              className="w-[44px] h-[44px] rounded-full flex items-center justify-center text-white font-bold text-[18px] flex-shrink-0"
-                              style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                            >
-                              {getInitials(claim.creators.name)}
-                            </div>
-                          )}
+                          <div
+                            className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
+                            style={{ background: '#EDE8DC' }}
+                          >
+                            <CategoryIcon category={userProfile.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
+                          </div>
 
                           {/* Info */}
                           <div className="flex-1 min-w-0">
@@ -2232,7 +2220,7 @@ export default function BusinessPortal() {
                             {claim.status === 'active' ? (
                               <button
                                 onClick={() => { setView('scan'); setScanResult(null); }}
-                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[var(--near-black)] text-white text-[15px] font-semibold hover:bg-[#333333] transition-colors"
+                                className="flex items-center gap-[5px] px-[14px] py-[8px] rounded-[50px] bg-[#D4470C] text-white text-[15px] font-semibold hover:bg-[var(--terra-hover)] transition-colors"
                               >
                                 <DoodleIcon name="scan" size={14} className="" /> Scan
                               </button>
@@ -2265,22 +2253,18 @@ export default function BusinessPortal() {
                     </div>
                   ) : (
                     <div className="space-y-[12px]">
-                      {claims.filter(c => c.reel_url).map((claim) => (
-                        <div key={claim.id} className="bg-[#EDE8DC] rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-[16px]">
+                      {claims.filter(c => c.reel_url).map((claim, idx) => (
+                        <div key={claim.id} className="rounded-[18px] border border-[var(--faint)] shadow-[0_2px_12px_rgba(44,36,32,0.08)] p-[16px]" style={{ background: getCardColor(idx) }}>
                           <div className="flex items-start gap-[12px]">
-                            {claim.creators.avatar_url ? (
-                              <img src={claim.creators.avatar_url} alt={claim.creators.name} className="w-[48px] h-[48px] rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                            ) : (
-                              <div
-                                className="w-[48px] h-[48px] rounded-full flex items-center justify-center text-white font-bold text-[17px] flex-shrink-0"
-                                style={{ background: getCategoryGradient(userProfile.category || 'Cafe & Coffee') }}
-                              >
-                                {getInitials(claim.creators.name)}
-                              </div>
-                            )}
+                            <div
+                              className="w-[46px] h-[46px] rounded-[12px] flex items-center justify-center flex-shrink-0"
+                              style={{ background: '#EDE8DC' }}
+                            >
+                              <CategoryIcon category={userProfile.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
+                            </div>
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] font-bold text-[var(--near-black)]">{claim.creators.name}</p>
-                              <p className="font-display text-[var(--near-black)] mt-[4px]" style={{ fontSize: 16 }}>
+                              <p className="font-display text-[var(--near-black)] mt-[4px]" style={{ fontSize: 16, letterSpacing: '-0.025em' }}>
                                 {claim.offers?.generated_title || claim.offers?.description || 'Offer'}
                               </p>
                               <p className="text-[14px] text-[var(--soft)] mt-[4px]">{timeAgo(claim.claimed_at)}</p>
@@ -2306,7 +2290,7 @@ export default function BusinessPortal() {
           {/* ═══ NOTIFICATIONS ═══ */}
           {view === 'notifications' && (
             <div className="max-w-lg mx-auto">
-              <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.01em' }}>Alerts</h2>
+              <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.025em' }}>Alerts</h2>
 
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2323,13 +2307,14 @@ export default function BusinessPortal() {
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {notifications.map((notif) => (
+                  {notifications.map((notif, idx) => (
                     <button
                       key={notif.id}
                       onClick={() => !notif.read && markNotificationRead(notif.id)}
-                      className={`w-full text-left bg-[#EDE8DC] rounded-[18px] p-4 shadow-[0_2px_12px_rgba(44,36,32,0.08)] transition-all ${
-                        notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)] bg-[var(--terra-5)]'
+                      className={`w-full text-left rounded-[18px] p-4 shadow-[0_2px_12px_rgba(44,36,32,0.08)] transition-all ${
+                        notif.read ? 'border border-[var(--faint)] opacity-50' : 'border border-[var(--terra-20)]'
                       }`}
+                      style={{ background: notif.read ? getCardColor(idx) : 'var(--terra-5, rgba(212,71,12,0.05))' }}
                     >
                       <div className="flex items-start gap-3">
                         <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[var(--faint)]' : 'bg-[var(--terra)]'}`} />
@@ -2358,7 +2343,7 @@ export default function BusinessPortal() {
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] border border-[var(--faint)] p-[24px] mb-[24px]" style={{ boxShadow: '0 2px 12px rgba(44,36,32,0.08)' }}>
+                  <div className="rounded-[18px] p-[24px] mb-[24px]" style={{ border: '1.5px solid rgba(44,36,32,0.08)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Logo */}
                       <div className="relative flex-shrink-0">
@@ -2409,7 +2394,7 @@ export default function BusinessPortal() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.01em' }}>{userProfile.name}</h2>
+                        <h2 className="text-[24px] font-display font-normal text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.025em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <span className="inline-block bg-[var(--bg)] text-[var(--mid)] text-[13px] font-bold rounded-full px-[10px] py-[3px]">
                             {userProfile.category}
@@ -2474,7 +2459,7 @@ export default function BusinessPortal() {
                   {/* ═══ About card ═══ */}
                   {userProfile.bio && (
                     <div className="rounded-[18px] border border-[var(--faint)] p-[16px] mb-[16px]">
-                      <h3 className="text-[18px] font-bold text-[var(--near-black)] mb-[8px]">About</h3>
+                      <h3 className="text-[18px] font-display font-normal text-[var(--near-black)] mb-[8px]" style={{ letterSpacing: '-0.025em' }}>About</h3>
                       <p className="text-[18px] text-[var(--mid)] leading-[1.5]">{userProfile.bio}</p>
                     </div>
                   )}
@@ -2517,7 +2502,7 @@ export default function BusinessPortal() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
                       <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
                     </button>
-                    <h1 className="text-[28px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.01em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit profile</h1>
                   </div>
 
                   {/* Edit fields */}
@@ -2582,7 +2567,7 @@ export default function BusinessPortal() {
                     disabled={!profileDirty || profileSaving}
                     className={`w-full py-[14px] rounded-[50px] font-bold text-[18px] transition-all min-h-[52px] ${
                       profileDirty
-                        ? 'bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)]'
+                        ? 'bg-[#D4470C] text-white hover:bg-[var(--terra-hover)]'
                         : 'bg-[var(--bg)] text-[var(--soft)]'
                     }`}
                   >
@@ -2626,7 +2611,7 @@ export default function BusinessPortal() {
               onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
               className={`flex-1 flex flex-col items-center gap-[2px] transition-all ${isDisabled ? 'text-[rgba(44,36,32,0.15)]' : isActive ? 'text-[var(--terra)]' : 'text-[rgba(44,36,32,0.40)]'}`}
             >
-              <div className={`flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[rgba(212,71,12,0.10)]' : ''}`} style={{ width: 36, height: 28 }}>
+              <div className={`flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[var(--peach)]' : ''}`} style={{ width: 36, height: 28 }}>
                 <DoodleIcon name={tab.icon} size={20} />
               </div>
               <span className="text-[12px] font-semibold">

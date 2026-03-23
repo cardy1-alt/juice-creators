@@ -20,7 +20,7 @@ function generateQRDataUrl(text: string, size: number = 280): string {
   canvas.width = size;
   canvas.height = size;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#F7F6F3';
+  ctx.fillStyle = '#EDE8DC';
   ctx.fillRect(0, 0, size, size);
 
   const modules = encodeQR(text);
@@ -328,7 +328,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
   const isUrgent = timeLeft <= 5;
 
   return (
-    <div className="flex flex-col items-center gap-[20px] rounded-[18px] bg-[#F7F6F3] p-[16px]">
+    <div className="flex flex-col items-center gap-[20px] rounded-[18px] bg-[#EDE8DC] p-[16px]">
       {/* QR code — 240px */}
       <div className="inline-block rounded-[10px] overflow-hidden">
         <img
