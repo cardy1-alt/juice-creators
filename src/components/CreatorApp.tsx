@@ -1278,7 +1278,7 @@ export default function CreatorApp() {
               <div className="px-[20px] pt-[24px] pb-2">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.2, margin: 0 }}>
+                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
                       {(() => {
                         const hour = new Date().getHours();
                         const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
