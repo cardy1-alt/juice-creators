@@ -1,45 +1,53 @@
 :root {
-  /* ── Neutrals ── */
-  --white: #F7F6F3;
-  --bg: #F7F6F3;
-  --elevated: #EDE8DC;
-  --pressed: #DDD8CC;
-  --near-black: #2C2420;
+  /* ── New Nayba design tokens (Chunk 1) ── */
+  --shell:   #F8F6F1;
+  --card:    #F0ECE4;
+  --border:  #E4DDD4;
+  --ink:     #28201A;
+  --ink-60:  rgba(40,32,26,0.60);
+  --ink-35:  rgba(40,32,26,0.35);
+  --ink-15:  rgba(40,32,26,0.15);
+  --ink-08:  rgba(40,32,26,0.08);
+  --terra:   #C4674A;
+  --terra-10: rgba(196,103,74,0.10);
+  --terra-20: rgba(196,103,74,0.20);
+  --r-card:  20px;
+  --r-pill:  999px;
 
-  /* ── Neutral opacity scale (based on --near-black) ── */
-  --mid: rgba(44,36,32,0.72);
-  --soft: rgba(44,36,32,0.48);
-  --faint: rgba(44,36,32,0.10);
-  --warm-mid-grey: #9E9E9E;
+  /* ── Category gradients (offer card image zones) ── */
+  --grad-food:      linear-gradient(160deg, #C07858, #9A5C40);
+  --grad-beauty:    linear-gradient(160deg, #5A9470, #3E7254);
+  --grad-cafe:      linear-gradient(160deg, #C09840, #8C6E20);
+  --grad-wellness:  linear-gradient(160deg, #6A8EAE, #4A6E8E);
+  --grad-experience:linear-gradient(160deg, #9068A8, #6A4880);
 
-  /* ── Brand: Primary (Burnt Orange) ── */
-  --terra: #D4470C;
-  --terra-hover: #B93D0A;
-  --terra-ring: rgba(212, 71, 12, 0.3);
-  --terra-5: rgba(212, 71, 12, 0.05);
-  --terra-10: rgba(212, 71, 12, 0.1);
-  --terra-15: rgba(212, 71, 12, 0.15);
-  --terra-20: rgba(212, 71, 12, 0.2);
-  --terra-40: rgba(212, 71, 12, 0.4);
-
-  /* ── Brand: Secondary ── */
+  /* REVIEW: Legacy aliases — kept so existing components don't break until
+     Chunks 2-7 migrate each screen. Remove once all chunks are complete. */
+  --white: var(--shell);
+  --bg: var(--shell);
+  --elevated: var(--card);
+  --pressed: var(--border);
+  --near-black: var(--ink);
+  --mid: var(--ink-60);
+  --soft: var(--ink-35);
+  --faint: var(--ink-08);
+  --warm-mid-grey: var(--ink-35);
+  --terra-hover: #A8573E;
+  --terra-ring: rgba(196,103,74,0.30);
+  --terra-5: rgba(196,103,74,0.05);
+  --terra-15: rgba(196,103,74,0.15);
+  --terra-40: rgba(196,103,74,0.40);
   --forest: #1A4A2E;
   --ochre: #E8A020;
-
-  /* ── Cards ── */
-  --card-bg: #EDE8DC;
-  --card-border: #DDD8CC;
-
-  /* ── Accents (tinted card surfaces) ── */
+  --card-bg: var(--card);
+  --card-border: var(--border);
   --sage: #E8EEE7;
   --dusty-blue: #E4EAED;
   --peach: #F2E8E0;
   --butter: #EDE8D0;
-
-  /* ── Shadows (removed from cards, kept for rare use) ── */
-  --shadow-sm: 0 1px 3px rgba(44,36,32,0.05);
-  --shadow-md: 0 2px 12px rgba(44,36,32,0.06);
-  --shadow-lg: 0 4px 16px rgba(44,36,32,0.10);
+  --shadow-sm: 0 1px 3px rgba(40,32,26,0.05);
+  --shadow-md: 0 2px 12px rgba(40,32,26,0.06);
+  --shadow-lg: 0 4px 16px rgba(40,32,26,0.10);
 }
 
 @layer base {
@@ -52,7 +60,7 @@
     font-family: 'DM Sans', sans-serif;
     font-size: 17px;
     font-weight: 400;
-    color: #2C2420;
+    color: var(--ink);
   }
 }
 

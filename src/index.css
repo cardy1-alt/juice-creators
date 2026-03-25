@@ -14,8 +14,8 @@
   body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: var(--white);
-    color: var(--near-black);
+    background-color: var(--shell);
+    color: var(--ink);
   }
 
   /* Custom scrollbar */
@@ -29,12 +29,12 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--soft);
+    background: var(--ink-35);
     border-radius: 3px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--mid);
+    background: var(--ink-60);
   }
 
   .hide-scrollbar::-webkit-scrollbar {

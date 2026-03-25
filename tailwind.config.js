@@ -9,15 +9,20 @@ export default {
       },
       colors: {
         nayba: {
-          white: '#F7F6F3',
-          bg: '#F7F6F3',
-          terra: '#D4470C',
-          'terra-hover': '#B93D0A',
+          shell:   '#F8F6F1',
+          card:    '#F0ECE4',
+          border:  '#E4DDD4',
+          ink:     '#28201A',
+          terra:   '#C4674A',
+          /* REVIEW: Legacy colour aliases — remove once Chunks 2-7 migrate all components */
+          white: '#F8F6F1',
+          bg: '#F8F6F1',
+          'terra-hover': '#A8573E',
           forest: '#1A4A2E',
           ochre: '#E8A020',
-          'near-black': '#2C2420',
-          card: '#EDE8DC',
-          'card-border': '#DDD8CC',
+          'near-black': '#28201A',
+          card: '#F0ECE4',
+          'card-border': '#E4DDD4',
           sage: '#E8EEE7',
           'dusty-blue': '#E4EAED',
           peach: '#F2E8E0',
@@ -26,7 +31,8 @@ export default {
       },
       borderRadius: {
         'pill': '999px',
-        'card': '18px',
+        'card': '20px',
+        'card-sm': '14px',
       },
       borderWidth: {
         '1.5': '1.5px',
