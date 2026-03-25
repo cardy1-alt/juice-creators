@@ -1856,7 +1856,7 @@ export default function CreatorApp() {
                                 textTransform: 'uppercase' as const,
                                 letterSpacing: '1.2px',
                                 color: 'var(--ink-35)',
-                                marginBottom: 8,
+                                marginBottom: 6,
                               }}>{offer.businesses.category}</span>
 
                               {/* Offer title */}
@@ -1867,7 +1867,7 @@ export default function CreatorApp() {
                                 letterSpacing: '-0.4px',
                                 color: 'var(--ink)',
                                 lineHeight: 1.12,
-                                marginBottom: 16,
+                                marginBottom: 14,
                               }}>{offerTitle}</span>
 
                               {/* Business row */}
@@ -1875,9 +1875,9 @@ export default function CreatorApp() {
                                 <div style={{ minWidth: 0, flex: 1 }}>
                                   <span style={{
                                     fontFamily: "'DM Sans', sans-serif",
-                                    fontWeight: 600,
+                                    fontWeight: 500,
                                     fontSize: 14,
-                                    color: 'var(--ink)',
+                                    color: 'var(--ink-60)',
                                     display: 'block',
                                     marginBottom: 2,
                                   }}>{offer.businesses.name}</span>
