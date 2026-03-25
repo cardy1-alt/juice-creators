@@ -384,6 +384,17 @@ ON CONFLICT (id) DO UPDATE SET
   generated_title = EXCLUDED.generated_title,
   offer_photo_url = EXCLUDED.offer_photo_url;
 
+-- Seed specific_ask for all offers
+UPDATE offers SET specific_ask = 'Show the latte art and mention our new seasonal menu' WHERE id = 'c1111111-1111-1111-1111-111111111111';
+UPDATE offers SET specific_ask = 'Film the full table spread and tag @midgarcoffee' WHERE id = 'c2222222-2222-2222-2222-222222222222';
+UPDATE offers SET specific_ask = 'Show the before and after glow — natural lighting please' WHERE id = 'c3333333-3333-3333-3333-333333333333';
+UPDATE offers SET specific_ask = 'Close-up of the finished nails with our branding visible' WHERE id = 'c4444444-4444-4444-4444-444444444444';
+UPDATE offers SET specific_ask = 'Film the bowl being made and mention our açaí range' WHERE id = 'c5555555-5555-5555-5555-555555555555';
+UPDATE offers SET specific_ask = 'Film a short workout clip and tag @ironoakgym' WHERE id = 'c6666666-6666-6666-6666-666666666666';
+UPDATE offers SET specific_ask = 'Try on at least 3 outfits and mention our styling service' WHERE id = 'c7777777-7777-7777-7777-777777777777';
+UPDATE offers SET specific_ask = 'Cute before and after shots — bonus if the dog looks happy' WHERE id = 'c8888888-8888-8888-8888-888888888888';
+UPDATE offers SET specific_ask = 'Film the painting process and the final reveal' WHERE id = 'c9999999-9999-9999-9999-999999999999';
+
 -- ============================================================
 -- CLAIMS  (demo activity for Midgar Coffee)
 -- ============================================================
