@@ -12,7 +12,7 @@ Status: In progress
 |-----|------------------------------|------|
 |1    |Design tokens + fonts         |✅     |
 |2    |Auth screen                   |✅     |
-|3    |Bottom navigation             |⬜     |
+|3    |Bottom navigation             |✅     |
 |4    |Discover screen — swipe stack |⬜     |
 |5    |Claims screen                 |⬜     |
 |6    |All Offers screen             |⬜     |
