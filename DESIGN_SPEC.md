@@ -10,7 +10,7 @@ Status: In progress
 
 |Chunk|Task                          |Status|
 |-----|------------------------------|------|
-|1    |Design tokens + fonts         |⬜     |
+|1    |Design tokens + fonts         |✅     |
 |2    |Auth screen                   |⬜     |
 |3    |Bottom navigation             |⬜     |
 |4    |Discover screen — swipe stack |⬜     |
