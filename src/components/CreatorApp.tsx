@@ -806,9 +806,9 @@ export default function CreatorApp() {
             >
               ← Back
             </button>
-            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
+            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 28, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0 }}>{qrOfferTitle}</p>
+              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0, lineHeight: 1.2 }}>{qrOfferTitle}</p>
               <p className="text-[18px] text-center mt-[4px]" style={{ color: activeTab === 'pass' ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
@@ -1738,7 +1738,7 @@ export default function CreatorApp() {
 
                         {/* Headline — Corben 18px, max 2 lines with ellipsis */}
                         <div style={{ padding: '8px 12px 6px' }}>
-                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.35, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
+                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.2, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
                             {offerTitle || bizName}
                           </p>
                         </div>
@@ -1993,6 +1993,7 @@ export default function CreatorApp() {
                                     token={claim.qr_token}
                                     claimId={claim.id}
                                     creatorCode={userProfile.code}
+                                    hideExtras
                                   />
                                   <div className="flex items-center justify-center gap-2 mt-[16px]">
                                     <span
