@@ -202,6 +202,15 @@ export default function CreatorApp() {
   const prevClaimStatusesRef = useRef<Record<string, string>>({});
   const passTouchRef = useRef<{ startX: number; startY: number } | null>(null);
 
+  // ─── Chunk 4: Swipe stack state ─────────────────────────────────────────
+  const [dismissedOfferIds, setDismissedOfferIds] = useState<Set<string>>(new Set());
+  const [showClaimSuccess, setShowClaimSuccess] = useState<{ offerTitle: string; businessName: string } | null>(null);
+  const [cardDragX, setCardDragX] = useState(0);
+  const [cardDragY, setCardDragY] = useState(0);
+  const [isDraggingCard, setIsDraggingCard] = useState(false);
+  const [swipeExiting, setSwipeExiting] = useState<'left' | 'right' | null>(null);
+  const cardDragStartRef = useRef<{ x: number; y: number } | null>(null);
+
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
   // Load saved offers from localStorage
@@ -495,7 +504,7 @@ export default function CreatorApp() {
     }
   };
 
-  const handleClaim = async (offer: Offer) => {
+  const handleClaim = async (offer: Offer): Promise<boolean> => {
     setLoading(true);
     setClaimError(null);
     try {
@@ -513,7 +522,7 @@ export default function CreatorApp() {
           'offer_not_live': 'This offer is no longer available.',
         };
         setClaimError(errorMessages[data.error] || data.error);
-        return;
+        return false;
       }
 
       setView('active');
@@ -525,8 +534,10 @@ export default function CreatorApp() {
       const businessName = offer.businesses?.name || 'a local business';
       sendOfferClaimedCreatorEmail(userProfile.id, offerTitle, businessName).catch(() => {});
       sendNewClaimBusinessEmail(offer.business_id, userProfile.display_name || userProfile.name, offerTitle).catch(() => {});
+      return true;
     } catch (error: any) {
       setClaimError(error.message || 'Failed to claim offer');
+      return false;
     } finally {
       setLoading(false);
     }
@@ -707,6 +718,109 @@ export default function CreatorApp() {
     { key: 'all_offers' as const, label: 'All offers', icon: 'all_offers' as const },
   ];
 
+  // ─── Chunk 4: Swipe stack helpers ────────────────────────────────────────
+
+  const getCategoryGradient = (category: string): string => {
+    const lower = (category || '').toLowerCase();
+    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('bar') || lower.includes('pizza') || lower.includes('brunch') || lower.includes('dessert') || lower.includes('juice')) return 'var(--grad-food)';
+    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails') || lower.includes('barbershop') || lower.includes('skincare')) return 'var(--grad-beauty)';
+    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return 'var(--grad-cafe)';
+    if (lower.includes('wellness') || lower.includes('spa') || lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return 'var(--grad-wellness)';
+    return 'var(--grad-experience)';
+  };
+
+  const getCategoryEmoji = (category: string): string => {
+    const lower = (category || '').toLowerCase();
+    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('pizza') || lower.includes('brunch')) return '🍽️';
+    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return '☕';
+    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails')) return '✂️';
+    if (lower.includes('wellness') || lower.includes('spa')) return '🧖';
+    if (lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return '💪';
+    if (lower.includes('retail') || lower.includes('shop')) return '🛍️';
+    if (lower.includes('art') || lower.includes('entertainment')) return '🎨';
+    if (lower.includes('education')) return '📚';
+    if (lower.includes('pet')) return '🐾';
+    return '✨';
+  };
+
+  const handleSwipeClaim = async (offer: Offer) => {
+    const offerTitle = offer.generated_title || offer.description;
+    const businessName = offer.businesses?.name || '';
+    const success = await handleClaim(offer);
+    if (success) {
+      // Override handleClaim's navigation to 'active' — stay on discover, show overlay
+      setView('offers');
+      setShowClaimSuccess({ offerTitle, businessName });
+    }
+  };
+
+  const startCardDrag = (startX: number, startY: number, offer: Offer, isTouch: boolean) => {
+    if (swipeExiting) return;
+    let dx = 0;
+    let dy = 0;
+    setIsDraggingCard(true);
+    setCardDragX(0);
+    setCardDragY(0);
+
+    const handleMove = (clientX: number, clientY: number) => {
+      dx = clientX - startX;
+      dy = clientY - startY;
+      setCardDragX(dx);
+      setCardDragY(dy);
+    };
+
+    const handleEnd = () => {
+      cleanup();
+      setIsDraggingCard(false);
+
+      if (dx > 85) {
+        setSwipeExiting('right');
+        setTimeout(() => {
+          setDismissedOfferIds(prev => new Set([...prev, offer.id]));
+          setSwipeExiting(null);
+          setCardDragX(0);
+          setCardDragY(0);
+          handleSwipeClaim(offer);
+        }, 280);
+      } else if (dx < -85) {
+        setSwipeExiting('left');
+        setTimeout(() => {
+          setDismissedOfferIds(prev => new Set([...prev, offer.id]));
+          setSwipeExiting(null);
+          setCardDragX(0);
+          setCardDragY(0);
+        }, 280);
+      } else {
+        setCardDragX(0);
+        setCardDragY(0);
+      }
+    };
+
+    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
+    const onMouseUp = () => handleEnd();
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
+    };
+    const onTouchEnd = () => handleEnd();
+
+    const cleanup = () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      window.removeEventListener('touchmove', onTouchMove);
+      window.removeEventListener('touchend', onTouchEnd);
+      window.removeEventListener('touchcancel', onTouchEnd);
+    };
+
+    if (isTouch) {
+      window.addEventListener('touchmove', onTouchMove, { passive: true });
+      window.addEventListener('touchend', onTouchEnd);
+      window.addEventListener('touchcancel', onTouchEnd);
+    } else {
+      window.addEventListener('mousemove', onMouseMove);
+      window.addEventListener('mouseup', onMouseUp);
+    }
+  };
+
   // Helper to render business avatar
   const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 46) => {
     return (
@@ -772,6 +886,80 @@ export default function CreatorApp() {
             >
               Keep going →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Claim Success Overlay (Chunk 4 — swipe stack) */}
+      {showClaimSuccess && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center"
+          style={{ background: 'rgba(40,32,26,0.48)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+          onClick={() => setShowClaimSuccess(null)}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: 22,
+              padding: '28px 24px',
+              maxWidth: 320,
+              width: 'calc(100% - 48px)',
+              textAlign: 'center' as const,
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Checkmark circle */}
+            <div style={{
+              width: 46,
+              height: 46,
+              borderRadius: '50%',
+              background: 'var(--ink)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: '0 auto 16px',
+            }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+
+            <h3 style={{
+              fontFamily: "'Corben', serif",
+              fontWeight: 400,
+              fontSize: 21,
+              color: 'var(--ink)',
+              margin: '0 0 8px',
+              letterSpacing: '-0.3px',
+            }}>{showClaimSuccess.offerTitle}</h3>
+
+            <p style={{
+              fontFamily: "'DM Sans', sans-serif",
+              fontWeight: 400,
+              fontSize: 13,
+              color: 'var(--ink-60)',
+              margin: '0 0 20px',
+              lineHeight: 1.5,
+            }}>Show your QR code at the door. Post your reel within 48 hours of visiting.</p>
+
+            <button
+              onClick={() => {
+                setShowClaimSuccess(null);
+                setView('claims');
+              }}
+              style={{
+                width: '100%',
+                padding: '13px 0',
+                borderRadius: 999,
+                border: 'none',
+                background: 'var(--terra)',
+                color: 'var(--shell)',
+                fontFamily: "'DM Sans', sans-serif",
+                fontWeight: 600,
+                fontSize: 15,
+                cursor: 'pointer',
+              }}
+            >View my claims →</button>
           </div>
         </div>
       )}
@@ -1256,529 +1444,631 @@ export default function CreatorApp() {
         );
       })()}
 
-      <div className="flex-1 overflow-y-auto">
-      <div className="max-w-md mx-auto">
+      <div className={`flex-1 ${view === 'offers' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
+      <div className={`max-w-md mx-auto ${view === 'offers' ? 'h-full' : ''}`}>
 
         {/* Content */}
-        <div className="pb-6">
+        <div className={view === 'offers' ? 'h-full' : 'pb-6'}>
 
-          {/* -- EXPLORE FEED -- */}
-          {view === 'offers' && (
-            <>
-              {claimError && (
-                <div className="mx-[20px] mt-3 p-3 rounded-[12px] bg-[rgba(44,36,32,0.05)] flex items-center justify-between">
-                  <p className="text-[15px] text-[var(--near-black)]">{claimError}</p>
-                  <button onClick={() => setClaimError(null)} className="text-[var(--soft)] hover:text-[var(--mid)] text-[15px] font-semibold ml-3">Dismiss</button>
-                </div>
-              )}
+          {/* -- DISCOVER SWIPE STACK (Chunk 4) -- */}
+          {view === 'offers' && (() => {
+            // Filter stack: exclude dismissed, already claimed, and full offers
+            const stackOffers = offers.filter(o => {
+              if (dismissedOfferIds.has(o.id)) return false;
+              if (claims.some(c => c.offer_id === o.id && c.status !== 'expired')) return false;
+              const isUnlimited = o.monthly_cap === null;
+              if (!isUnlimited) {
+                const slotsLeft = Math.max(0, (o.monthly_cap as number) - (o.slotsUsed || 0));
+                if (slotsLeft === 0) return false;
+              }
+              return true;
+            });
 
-              {/* Greeting header + search icon */}
-              <div className="px-[20px] pt-[24px] pb-2">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#2C2420', letterSpacing: '-0.01em', lineHeight: 1.2, margin: 0 }}>
-                      {(() => {
-                        const hour = new Date().getHours();
-                        const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
-                        const firstName = (userProfile?.display_name || userProfile?.name || '').split(' ')[0];
-                        return `${greeting}, ${firstName}`;
-                      })()}
-                    </h1>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44, 36, 32, 0.5)', margin: 0, marginTop: 4 }}>
-                      Your area · {offers.length} offer{offers.length !== 1 ? 's' : ''} near you today
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowSearchBar(!showSearchBar)}
-                    className="flex items-center justify-center mt-[4px]"
-                  >
-                    <DoodleIcon name="search" size={22} className="flex-shrink-0" style={{ color: 'rgba(44, 36, 32, 0.5)' }} />
-                  </button>
-                </div>
+            const isEmpty = stackOffers.length === 0;
+            const totalCardCount = offers.filter(o => {
+              if (claims.some(c => c.offer_id === o.id && c.status !== 'expired')) return false;
+              const isUnlimited = o.monthly_cap === null;
+              if (!isUnlimited && Math.max(0, (o.monthly_cap as number) - (o.slotsUsed || 0)) === 0) return false;
+              return true;
+            }).length;
+            const viewedCount = totalCardCount - stackOffers.length;
 
-                {/* Collapsible search bar */}
-                {showSearchBar && (
-                  <div className="mt-3">
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search offers..."
-                      autoFocus
-                      className="w-full bg-transparent text-[16px] font-medium text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
-                      style={{
-                        background: '#EDE8DC',
-                        border: '1.5px solid rgba(44, 36, 32, 0.08)',
-                        borderRadius: 50,
-                        padding: '10px 16px',
-                      }}
-                    />
-                  </div>
-                )}
-              </div>
+            return (
+              <div className="flex flex-col h-full" style={{ background: 'var(--shell)' }}>
+                {/* 1. Fixed header */}
+                <div style={{
+                  background: 'var(--shell)',
+                  borderBottom: '1px solid var(--border)',
+                  padding: '12px 16px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexShrink: 0,
+                }}>
+                  <span style={{
+                    fontFamily: "'Corben', serif",
+                    fontWeight: 400,
+                    fontSize: 24,
+                    color: 'var(--ink)',
+                    letterSpacing: '-0.4px',
+                  }}>nayba</span>
 
-              {/* Category Tabs */}
-              <div className="px-[20px]">
-                <div className="flex">
-                  {categoryTabs.map(tab => {
-                    const isActive = selectedCategory === tab.key;
-                    return (
-                      <button
-                        key={tab.key}
-                        onClick={() => setSelectedCategory(tab.key)}
-                        className={`flex-1 flex flex-col items-center gap-1 py-3 transition-all min-h-[44px] rounded-full ${
-                          isActive ? 'bg-[var(--peach)] text-[var(--terra)]' : 'text-[var(--soft)]'
-                        }`}
-                      >
-                        <DoodleIcon name={tab.icon} size={20} />
-                        <span className="text-[13px] font-semibold" style={{ fontFamily: "'DM Sans', sans-serif" }}>{tab.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Your passes — JS-controlled slider */}
-              {activeClaims.length > 0 && activeClaims.some(c => c.businesses && c.offers) && (() => {
-                const giftCardClaims = activeClaims.filter(c => c.businesses && c.offers);
-
-                const getGiftCardBg = (_category: string): string => {
-                  return '#D4470C';
-                };
-
-                const getGiftCardStatus = (claim: Claim): { dotColor: string; text: string; timerLabel?: string } => {
-                  if (claim.status === 'active') {
-                    return { dotColor: 'var(--near-black)', text: 'Show at the door' };
-                  }
-                  if (claim.redeemed_at && !claim.reel_url) {
-                    if (claim.reel_due_at) {
-                      const hoursLeft = Math.max(0, Math.floor((new Date(claim.reel_due_at).getTime() - Date.now()) / (1000 * 60 * 60)));
-                      return { dotColor: 'var(--near-black)', text: 'Reel due', timerLabel: `${hoursLeft}h left` };
-                    }
-                    return { dotColor: 'var(--near-black)', text: 'Post your reel' };
-                  }
-                  return { dotColor: 'var(--near-black)', text: 'Post your reel' };
-                };
-
-                return (
-                  <div style={{ marginBottom: 8 }}>
-                    <div className="flex items-center justify-between px-[20px] mt-[12px] mb-[12px]">
-                      <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>Your passes</h2>
-                      {giftCardClaims.length >= 2 && (
-                        <button onClick={() => setView('active')} style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 15, color: '#D4470C' }}>
-                          View all
-                        </button>
-                      )}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                    {/* Location pill */}
+                    <div style={{
+                      background: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 999,
+                      padding: '5px 10px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 4,
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 500,
+                      fontSize: 12,
+                      color: 'var(--ink-60)',
+                    }}>
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                        <circle cx="12" cy="10" r="3"/>
+                      </svg>
+                      Your area
                     </div>
-                    {/* Slider container */}
-                    <div
-                      style={{ overflow: 'hidden', position: 'relative', marginLeft: 16, marginRight: 16 }}
-                      onTouchStart={(e) => {
-                        passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY };
-                      }}
-                      onTouchEnd={(e) => {
-                        if (!passTouchRef.current) return;
-                        const endX = e.changedTouches[0].clientX;
-                        const endY = e.changedTouches[0].clientY;
-                        const deltaX = passTouchRef.current.startX - endX;
-                        const deltaY = passTouchRef.current.startY - endY;
-                        const absDeltaX = Math.abs(deltaX);
-                        const absDeltaY = Math.abs(deltaY);
 
-                        // Tap detection: very small movement
-                        if (absDeltaX < 10 && absDeltaY < 10) {
-                          const claim = giftCardClaims[activePassIdx];
-                          if (claim) {
-                            setSelectedClaim(claim);
-                            setQrOpenSource('home');
-                            setQrScreenTab(claim.redeemed_at && !claim.reel_url ? 'reel' : 'pass');
-                            setShowQrFullscreen(true);
-                          }
-                          passTouchRef.current = null;
-                          return;
-                        }
-
-                        // Swipe detection: horizontal threshold > 50px
-                        if (absDeltaX > 50 && absDeltaX > absDeltaY) {
-                          if (deltaX > 0 && activePassIdx < giftCardClaims.length - 1) {
-                            setActivePassIdx(activePassIdx + 1);
-                          } else if (deltaX < 0 && activePassIdx > 0) {
-                            setActivePassIdx(activePassIdx - 1);
-                          }
-                        }
-                        passTouchRef.current = null;
-                      }}
-                    >
-                      <div
-                        className="flex"
-                        style={{
-                          transition: 'transform 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-                          transform: `translateX(-${activePassIdx * 100}%)`,
-                        }}
-                      >
-                        {giftCardClaims.map((claim) => {
-                          const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
-                          const matchedOffer = offers.find(o => o.id === claim.offer_id);
-                          const photoUrl = matchedOffer?.offer_photo_url || null;
-                          const status = getGiftCardStatus(claim);
-
-                          return (
-                            <div
-                              key={claim.id}
-                              className="relative overflow-hidden text-left"
-                              style={{
-                                width: '100%',
-                                flexShrink: 0,
-                                height: 220,
-                                borderRadius: 20,
-                                background: '#D4470C',
-                              }}
-                            >
-                              {/* Decorative wavy watermark */}
-                              <svg className="absolute inset-0 w-full h-full pointer-events-none" preserveAspectRatio="none" viewBox="0 0 400 220" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M-20 130 Q 60 90, 120 130 T 260 130 T 400 130 T 540 130" stroke="rgba(255,255,255,0.15)" strokeWidth="40" fill="none" strokeLinecap="round" />
-                              </svg>
-                              {/* Solid branded card — no photo */}
-                              <div className="relative flex flex-col justify-between h-full" style={{ padding: '20px 20px 18px' }}>
-                                <div>
-                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 8px' }}>
-                                    {claim.businesses.name}
-                                  </p>
-                                  <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: '#FFFFFF', margin: 0, lineHeight: 1.2, letterSpacing: '-0.025em', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', wordBreak: 'break-word' }}>
-                                    {offerTitle}
-                                  </p>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center" style={{ gap: 6 }}>
-                                    <span className="rounded-full flex-shrink-0" style={{ background: 'rgba(255,255,255,0.22)', borderRadius: 50, padding: '5px 14px', fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 14, color: '#FFFFFF', lineHeight: 1 }}>
-                                      {status.text}
-                                    </span>
-                                    {status.timerLabel && (
-                                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: 13, color: '#FFFFFF', background: 'rgba(255,255,255,0.2)', borderRadius: 50, padding: '4px 12px', lineHeight: 1 }}>
-                                        {status.timerLabel}
-                                      </span>
-                                    )}
-                                  </div>
-                                  {/* QR icon */}
-                                  <div className="flex items-center justify-center flex-shrink-0" style={{ width: 34, height: 34, borderRadius: 50, background: 'rgba(255,255,255,0.18)' }}>
-                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                      <rect x="1" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                      <rect x="10" y="1" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                      <rect x="1" y="10" width="5" height="5" rx="0.5" stroke="white" strokeWidth="1.2" />
-                                      <rect x="3" y="3" width="1.5" height="1.5" fill="white" />
-                                      <rect x="12" y="3" width="1.5" height="1.5" fill="white" />
-                                      <rect x="3" y="12" width="1.5" height="1.5" fill="white" />
-                                      <rect x="10.5" y="10.5" width="2" height="2" stroke="white" strokeWidth="1" />
-                                      <rect x="13" y="13" width="1.5" height="1.5" fill="white" />
-                                    </svg>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                    {/* Avatar initials */}
+                    <div style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: '50%',
+                      background: 'var(--card)',
+                      border: '1px solid var(--border)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 600,
+                      fontSize: 10,
+                      color: 'var(--ink-60)',
+                    }}>
+                      {getInitials(userProfile?.display_name || userProfile?.name || '')}
                     </div>
-                    {/* Pagination dots — outside the card */}
-                    {giftCardClaims.length > 1 && (
-                      <div className="flex items-center justify-center gap-[6px]" style={{ marginTop: 10 }}>
-                        {giftCardClaims.map((_, idx) => (
-                          <div
-                            key={idx}
-                            className="rounded-full"
-                            style={{
-                              width: 6,
-                              height: 6,
-                              background: idx === activePassIdx ? 'var(--near-black)' : 'rgba(44,36,32,0.2)',
-                              transition: 'background 0.2s',
-                            }}
-                          />
-                        ))}
-                      </div>
-                    )}
                   </div>
-                );
-              })()}
-
-              {/* Streak Warning Banner */}
-              {!streakWarningDismissed && userProfile.current_streak > 0 && isStreakWarningPeriod(userProfile.last_reel_month) && (
-                <div
-                  className="mx-[20px] mt-[14px] flex items-center gap-[10px] rounded-[12px] p-[12px_16px]"
-                  style={{ background: 'rgba(44,36,32,0.04)' }}
-                >
-                  <FlameIcon color="var(--terra)" size={16} />
-                  <p className="flex-1 text-[15px] text-[var(--near-black)]">
-                    Your streak ends in {new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate() - new Date().getDate()} days — claim an offer to keep it
-                  </p>
-                  <button
-                    onClick={() => setView('offers')}
-                    className="text-[14px] font-semibold text-[var(--near-black)] whitespace-nowrap"
-                  >
-                    Browse →
-                  </button>
-                  <button onClick={dismissStreakWarning} className="ml-1 text-[var(--soft)]">
-                    <DoodleIcon name="x" size={14} />
-                  </button>
                 </div>
-              )}
 
-              {/* Weekly Leaderboard */}
-              {leaderboard.length >= 1 && (
-                <div className="mx-[20px] mt-[14px] bg-[var(--sage)] rounded-[18px] p-[16px_18px]">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 17, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>This week's top creators</h3>
-                    <span className="text-[13px] text-[var(--soft)]">
-                      Resets in {(() => {
-                        const now = new Date();
-                        const nextMonday = new Date(now);
-                        nextMonday.setDate(now.getDate() + ((8 - now.getDay()) % 7 || 7));
-                        nextMonday.setHours(0, 0, 0, 0);
-                        const diff = nextMonday.getTime() - now.getTime();
-                        const d = Math.floor(diff / 86400000);
-                        const h = Math.floor((diff % 86400000) / 3600000);
-                        return `${d}d ${h}h`;
-                      })()}
-                    </span>
-                  </div>
-                  {leaderboard.slice(0, 5).map((entry, idx) => {
-                    const posColor = idx === 0 ? 'var(--near-black)' : idx === 1 ? 'var(--mid)' : idx === 2 ? 'var(--soft)' : 'var(--soft)';
-                    return (
-                      <div
-                        key={entry.id}
-                        className={`flex items-center gap-3 py-[10px] ${idx < Math.min(leaderboard.length, 5) - 1 ? 'border-b border-[var(--faint)]' : ''}`}
-                      >
-                        <span className="text-[22px] font-display font-extrabold w-6 text-center" style={{ color: posColor }}>{idx + 1}</span>
-                        {entry.avatar_url ? (
-                          <img src={entry.avatar_url} alt="" className="w-9 h-9 rounded-full object-cover flex-shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : (
-                          <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getLevelColour(entry.level) }}>
-                            <span className="text-white text-[14px] font-bold">{getInitials(entry.display_name || entry.name)}</span>
-                          </div>
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-1.5">
-                            <span className="text-[18px] font-bold text-[var(--near-black)] truncate">{entry.display_name || entry.name}</span>
-                            <LevelBadge level={entry.level} levelName={entry.level_name} size="sm" />
-                          </div>
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          <p className="text-[17px] font-extrabold text-[var(--near-black)]">{entry.reels_this_week}</p>
-                          <p className="text-[13px] text-[var(--soft)]">reels</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                  {/* Your position if not in top 5 */}
-                  {!leaderboard.slice(0, 5).some(e => e.id === userProfile.id) && (() => {
-                    const myIdx = leaderboard.findIndex(e => e.id === userProfile.id);
-                    const myEntry = myIdx >= 0 ? leaderboard[myIdx] : null;
-                    if (myIdx < 0 && (userProfile.total_reels || 0) === 0) return null;
-                    return (
-                      <div className="pt-2 mt-1 border-t border-[var(--faint)]">
-                        <p className="text-[15px] text-[var(--mid)] text-center">
-                          You · {myIdx >= 0 ? `${myIdx + 1}${myIdx === 0 ? 'st' : myIdx === 1 ? 'nd' : myIdx === 2 ? 'rd' : 'th'} this week · ${myEntry!.reels_this_week} reels` : '0 reels this week'}
-                        </p>
-                      </div>
-                    );
-                  })()}
-                </div>
-              )}
-
-              {/* Section Header */}
-              <div className="flex items-center justify-between px-[20px] mt-[28px] mb-[12px]">
-                <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>Near you</h2>
-              </div>
-
-              {offersLoading ? (
-                /* Skeleton loader while offers are loading */
-                <div className="px-[20px] space-y-[16px]">
-                  {/* Skeleton category pills */}
-                  <div className="flex gap-[8px] overflow-hidden">
-                    {[80, 60, 90, 70, 85].map((w, i) => (
-                      <div key={i} className="h-[32px] rounded-[50px] flex-shrink-0 skeleton-shimmer" style={{ width: w }} />
-                    ))}
-                  </div>
-                  {/* Skeleton offer cards */}
-                  {[1, 2, 3].map(i => (
-                    <div key={i} className="rounded-[18px] overflow-hidden">
-                      <div className="h-[140px] skeleton-shimmer" />
-                      <div className="p-[16px] space-y-[10px]">
-                        <div className="h-[14px] rounded-[6px] skeleton-shimmer" style={{ width: '60%' }} />
-                        <div className="h-[12px] rounded-[6px] skeleton-shimmer" style={{ width: '40%' }} />
-                        <div className="flex justify-between">
-                          <div className="h-[12px] rounded-[6px] skeleton-shimmer" style={{ width: '30%' }} />
-                          <div className="h-[28px] w-[80px] rounded-[50px] skeleton-shimmer" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                  <style>{`
-                    .skeleton-shimmer {
-                      background: linear-gradient(90deg, var(--bg) 25%, rgba(44,36,32,0.06) 50%, var(--bg) 75%);
-                      background-size: 200% 100%;
-                      animation: shimmer 1.5s infinite;
+                {/* 2. Active claim bar (conditional) */}
+                {activeClaims.length > 0 && activeClaims[0]?.businesses && activeClaims[0]?.offers && (() => {
+                  const topClaim = activeClaims[0];
+                  const claimTitle = topClaim.snapshot_generated_title || topClaim.offers.generated_title || topClaim.offers.description || '';
+                  const claimBiz = topClaim.businesses?.name || '';
+                  const claimTimer = (() => {
+                    if (topClaim.reel_due_at) {
+                      const diff = new Date(topClaim.reel_due_at).getTime() - Date.now();
+                      if (diff <= 0) return 'Overdue';
+                      const h = Math.floor(diff / (1000 * 60 * 60));
+                      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                      return `${h}h ${m}m`;
                     }
-                    @keyframes shimmer {
-                      0% { background-position: 200% 0; }
-                      100% { background-position: -200% 0; }
+                    if (topClaim.qr_expires_at) {
+                      const diff = new Date(topClaim.qr_expires_at).getTime() - Date.now();
+                      if (diff <= 0) return 'Expired';
+                      const h = Math.floor(diff / (1000 * 60 * 60));
+                      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                      return `${h}h ${m}m`;
                     }
-                  `}</style>
-                </div>
-              ) : offers.length === 0 ? (
-                <div className="text-center py-16 px-6">
-                  <p className="text-[18px] font-bold text-[var(--near-black)] mb-1">No offers yet</p>
-                  <p className="text-[var(--soft)] text-[15px]">New offers from local businesses will appear here. Check back soon!</p>
-                </div>
-              ) : (() => {
-                const filteredOffers = offers
-                  .filter(o => {
-                    let matchesCategory = true;
-                    if (selectedCategory === 'food') {
-                      matchesCategory = getCategoryGroup(o.businesses.category) === 'food';
-                    } else if (selectedCategory === 'beauty') {
-                      matchesCategory = getCategoryGroup(o.businesses.category) === 'beauty';
-                    } else if (selectedCategory === 'more') {
-                      matchesCategory = getCategoryGroup(o.businesses.category) === 'more';
-                    }
-                    const matchesSearch = searchQuery === '' ||
-                      o.businesses.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                      o.description.toLowerCase().includes(searchQuery.toLowerCase());
-                    return matchesCategory && matchesSearch;
-                  })
-                  .sort((a, b) => {
-                    if (sortBy === 'name') return a.businesses.name.localeCompare(b.businesses.name);
-                    if (sortBy === 'slots') {
-                      const aSlots = a.monthly_cap === null ? Infinity : (a.monthly_cap - (a.slotsUsed || 0));
-                      const bSlots = b.monthly_cap === null ? Infinity : (b.monthly_cap - (b.slotsUsed || 0));
-                      return bSlots - aSlots;
-                    }
-                    return 0;
-                  });
-
-                if (filteredOffers.length === 0) {
-                  return (
-                    <div className="text-center py-16">
-                      <DoodleIcon name="search" size={32} className="text-[var(--soft)] mx-auto mb-3" />
-                      <p className="text-[var(--soft)] text-[17px]">No offers found</p>
-                      <button
-                        onClick={() => { setSelectedCategory('all'); setSearchQuery(''); }}
-                        className="mt-2 text-[var(--mid)] text-[15px] font-semibold hover:underline"
-                      >
-                        Clear filters
-                      </button>
-                    </div>
-                  );
-                }
-
-                const renderOfferCard = (offer: Offer) => {
-                  const isUnlimited = offer.monthly_cap === null;
-                  const slotsUsed = offer.slotsUsed || 0;
-                  const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                  const creatorLevel = userProfile.level || 1;
-                  const offerMinLevel = offer.min_level || 1;
-                  const isLocked = creatorLevel < offerMinLevel;
-                  const lockedLevelName = offerMinLevel === 2 ? 'Explorer' : offerMinLevel === 3 ? 'Regular' : offerMinLevel === 4 ? 'Local' : offerMinLevel === 5 ? 'Trusted' : offerMinLevel === 6 ? 'Nayba' : 'Newcomer';
-
-                  // Change 5: Calculate reels away for locked cards
-                  const reelsAway = (() => {
-                    if (!isLocked) return null;
-                    const thresholds = [0, 1, 3, 6, 11, 21];
-                    const needed = thresholds[offerMinLevel - 1] || 0;
-                    const current = userProfile.total_reels || 0;
-                    return Math.max(0, needed - current);
+                    return 'Active';
                   })();
-
-                  const offerTitle = offer.generated_title || offer.description.slice(0, 35);
-                  const bizName = offer.businesses.name;
-
-                  const pastelBg = getCategoryPastelBg(offer.businesses.category);
-                  const pastelIcon = getCategoryPastelIcon(offer.businesses.category);
 
                   return (
                     <button
-                      key={offer.id}
-                      onClick={() => setExpandedOffer(offer.id)}
-                      className="text-left rounded-[18px] overflow-hidden flex flex-col justify-between"
-                      style={{ width: 160, minHeight: 200, flexShrink: 0, background: pastelBg }}
+                      onClick={() => setView('claims')}
+                      style={{
+                        width: '100%',
+                        background: 'var(--ink)',
+                        padding: '10px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        flexShrink: 0,
+                        border: 'none',
+                        cursor: 'pointer',
+                        textAlign: 'left' as const,
+                      }}
                     >
-                      {/* Top: icon + title */}
                       <div>
-                        <div className="relative" style={{ padding: '14px 12px 0' }}>
-                          <div className="flex items-center justify-between">
-                            <CategoryIcon category={offer.businesses.category} className="w-[18px] h-[18px]" style={{ color: pastelIcon }} />
-                            {!isLocked && (() => {
-                              const isSaved = savedOffers.has(offer.id);
-                              return (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                                  className="w-[24px] h-[24px] flex items-center justify-center"
-                                  style={isSaved ? { color: '#D4470C' } : { opacity: 0.35 }}
-                                >
-                                  <DoodleIcon name="heart" size={11} />
-                                </button>
-                              );
-                            })()}
-                          </div>
-
-                          {/* Locked overlay */}
-                          {isLocked && (
-                            <div className="flex items-center gap-1.5 mt-2">
-                              <DoodleIcon name="lock" size={12} className="text-[var(--soft)]" />
-                              <span className="text-[13px] font-medium text-[var(--soft)]">Unlocks at {lockedLevelName}</span>
-                            </div>
-                          )}
-                        </div>
-
-                        {/* Headline — Corben 18px, max 2 lines with ellipsis */}
-                        <div style={{ padding: '8px 12px 6px' }}>
-                          <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: '#2C2420', lineHeight: 1.25, letterSpacing: '-0.025em', paddingBottom: 3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'normal', margin: 0 }}>
-                            {offerTitle || bizName}
-                          </p>
+                        <div style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 600,
+                          fontSize: 9,
+                          textTransform: 'uppercase' as const,
+                          letterSpacing: '1px',
+                          color: 'rgba(248,246,241,0.4)',
+                          marginBottom: 2,
+                        }}>ACTIVE CLAIM</div>
+                        <div style={{
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 500,
+                          fontSize: 13,
+                          color: 'rgba(248,246,241,0.92)',
+                        }}>
+                          {claimTitle} · {claimBiz}
                         </div>
                       </div>
-
-                      {/* Footer — pushed to bottom via space-between */}
-                      <div style={{ padding: '0 12px 12px' }}>
-                        <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 450, fontSize: 13, color: 'rgba(44,36,32,0.5)', marginBottom: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                          {bizName}
-                        </p>
-                        {!isLocked && !isUnlimited && slotsLeft !== null && (
-                          <span
-                            className="text-[12px] font-semibold rounded-full px-[8px] py-[3px]"
-                            style={{ background: 'rgba(44,36,32,0.07)', color: 'var(--mid)' }}
-                          >
-                            {slotsLeft === 0 ? 'Full' : slotsLeft === 1 ? 'Last slot' : `${slotsLeft} left`}
-                          </span>
-                        )}
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                        <span style={{
+                          background: 'var(--terra)',
+                          borderRadius: 999,
+                          padding: '3px 8px',
+                          fontFamily: "'DM Sans', sans-serif",
+                          fontWeight: 600,
+                          fontSize: 10,
+                          color: 'var(--shell)',
+                        }}>{claimTimer}</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(248,246,241,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M9 18l6-6-6-6"/>
+                        </svg>
                       </div>
                     </button>
                   );
-                };
+                })()}
 
-                return (
+                {/* Claim error toast */}
+                {claimError && (
+                  <div style={{
+                    margin: '8px 14px 0',
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    background: 'rgba(40,32,26,0.05)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexShrink: 0,
+                  }}>
+                    <p style={{ fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
+                    <button onClick={() => setClaimError(null)} style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
+                  </div>
+                )}
+
+                {/* 3. Card stack OR loading OR empty state */}
+                {offersLoading ? (
+                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <p style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
+                  </div>
+                ) : isEmpty ? (
+                  /* Empty state */
+                  <div style={{
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column' as const,
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: 'var(--shell)',
+                    padding: '0 32px',
+                    gap: 8,
+                  }}>
+                    <h2 style={{
+                      fontFamily: "'Corben', serif",
+                      fontWeight: 400,
+                      fontSize: 24,
+                      color: 'var(--ink)',
+                      margin: 0,
+                    }}>All caught up</h2>
+                    <p style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 400,
+                      fontSize: 14,
+                      color: 'var(--ink-60)',
+                      textAlign: 'center' as const,
+                      lineHeight: 1.5,
+                      margin: '0 0 16px',
+                    }}>New offers drop every Tuesday. Browse everything live below.</p>
+                    <button
+                      onClick={() => setView('all_offers')}
+                      style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: 14,
+                        color: 'var(--shell)',
+                        background: 'var(--ink)',
+                        border: 'none',
+                        borderRadius: 999,
+                        padding: '12px 24px',
+                        cursor: 'pointer',
+                      }}
+                    >Browse all offers</button>
+                  </div>
+                ) : (
                   <>
-                    {/* Near you offer cards — horizontal scroll */}
-                    <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                      <div className="flex gap-[12px]" style={{ paddingLeft: 20, paddingRight: 8 }}>
-                        {filteredOffers.map(renderOfferCard)}
-                      </div>
+                    {/* Card stack area */}
+                    <div style={{ flex: 1, position: 'relative' as const, overflow: 'hidden' }}>
+                      {stackOffers.slice(0, 3).map((offer, idx) => {
+                        const isTop = idx === 0;
+
+                        const isUnlimited = offer.monthly_cap === null;
+                        const slotsUsed = offer.slotsUsed || 0;
+                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+
+                        let transform = '';
+                        let transition = 'transform 0.28s ease';
+                        const zIndex = idx === 0 ? 10 : idx === 1 ? 1 : 0;
+
+                        if (isTop) {
+                          if (swipeExiting === 'right') {
+                            transform = `translateX(${window.innerWidth}px) rotate(20deg)`;
+                          } else if (swipeExiting === 'left') {
+                            transform = `translateX(-${window.innerWidth}px) rotate(-20deg)`;
+                          } else if (isDraggingCard) {
+                            transform = `translateX(${cardDragX}px) translateY(${cardDragY * 0.12}px) rotate(${cardDragX * 0.04}deg)`;
+                            transition = 'none';
+                          }
+                        } else if (idx === 1) {
+                          const progress = isDraggingCard ? Math.min(Math.abs(cardDragX) / 85, 1) : 0;
+                          const scale = 0.96 + (0.04 * progress);
+                          const ty = 10 - (10 * progress);
+                          transform = `scale(${scale}) translateY(${ty}px)`;
+                          if (isDraggingCard) transition = 'none';
+                        } else if (idx === 2) {
+                          const progress = isDraggingCard ? Math.min(Math.abs(cardDragX) / 85, 1) : 0;
+                          const scale = 0.92 + (0.04 * progress);
+                          const ty = 20 - (10 * progress);
+                          transform = `scale(${scale}) translateY(${ty}px)`;
+                          if (isDraggingCard) transition = 'none';
+                        }
+
+                        const defaultTransform = idx === 1 ? 'scale(0.96) translateY(10px)' : idx === 2 ? 'scale(0.92) translateY(20px)' : 'none';
+                        const categoryGradient = getCategoryGradient(offer.businesses.category);
+                        const categoryEmoji = getCategoryEmoji(offer.businesses.category);
+                        const offerTitle = offer.generated_title || offer.description;
+                        const bizAddress = offer.businesses.address || '';
+                        const streetName = bizAddress.split(',')[0] || '';
+                        const hintOpacity = isTop && isDraggingCard ? Math.min(Math.abs(cardDragX) / 60, 1) : 0;
+
+                        return (
+                          <div
+                            key={offer.id}
+                            style={{
+                              position: 'absolute' as const,
+                              top: 12,
+                              left: 14,
+                              right: 14,
+                              bottom: 0,
+                              zIndex,
+                              transform: transform || defaultTransform,
+                              transition,
+                              borderRadius: 20,
+                              border: '1px solid var(--border)',
+                              boxShadow: '0 4px 24px rgba(40,32,26,0.09)',
+                              background: 'var(--shell)',
+                              display: 'flex',
+                              flexDirection: 'column' as const,
+                              overflow: 'hidden',
+                              touchAction: isTop ? 'none' as const : 'auto' as const,
+                              userSelect: 'none' as const,
+                              WebkitUserSelect: 'none' as const,
+                            }}
+                            onMouseDown={isTop ? (e: React.MouseEvent) => {
+                              e.preventDefault();
+                              startCardDrag(e.clientX, e.clientY, offer, false);
+                            } : undefined}
+                            onTouchStart={isTop ? (e: React.TouchEvent) => {
+                              startCardDrag(e.touches[0].clientX, e.touches[0].clientY, offer, true);
+                            } : undefined}
+                          >
+                            {/* Swipe hint labels */}
+                            {isTop && (
+                              <>
+                                <div style={{
+                                  position: 'absolute' as const,
+                                  left: 14,
+                                  top: 20,
+                                  zIndex: 20,
+                                  transform: 'rotate(-10deg)',
+                                  opacity: cardDragX > 0 ? hintOpacity : 0,
+                                  border: '2px solid #4E9468',
+                                  borderRadius: 999,
+                                  padding: '4px 12px',
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: 12,
+                                  textTransform: 'uppercase' as const,
+                                  letterSpacing: '1px',
+                                  color: '#4E9468',
+                                  pointerEvents: 'none' as const,
+                                }}>CLAIM</div>
+                                <div style={{
+                                  position: 'absolute' as const,
+                                  right: 14,
+                                  top: 20,
+                                  zIndex: 20,
+                                  transform: 'rotate(10deg)',
+                                  opacity: cardDragX < 0 ? hintOpacity : 0,
+                                  border: '2px solid var(--terra)',
+                                  borderRadius: 999,
+                                  padding: '4px 12px',
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontWeight: 700,
+                                  fontSize: 12,
+                                  textTransform: 'uppercase' as const,
+                                  letterSpacing: '1px',
+                                  color: 'var(--terra)',
+                                  pointerEvents: 'none' as const,
+                                }}>PASS</div>
+                              </>
+                            )}
+
+                            {/* Image zone — 52% of card height */}
+                            <div style={{ flex: '0 0 52%', position: 'relative' as const, overflow: 'hidden' }}>
+                              {offer.offer_photo_url ? (
+                                <img
+                                  src={offer.offer_photo_url}
+                                  alt=""
+                                  style={{ width: '100%', height: '100%', objectFit: 'cover' as const }}
+                                  draggable={false}
+                                />
+                              ) : (
+                                <div style={{
+                                  width: '100%',
+                                  height: '100%',
+                                  background: categoryGradient,
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                }}>
+                                  <span style={{ fontSize: 72, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>
+                                    {categoryEmoji}
+                                  </span>
+                                </div>
+                              )}
+
+                              {/* Slot badge */}
+                              {!isUnlimited && slotsLeft !== null && (
+                                <span style={{
+                                  position: 'absolute' as const,
+                                  top: 12,
+                                  right: 12,
+                                  borderRadius: 999,
+                                  padding: '4px 10px',
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontWeight: 600,
+                                  fontSize: 11,
+                                  ...(slotsLeft <= 2 ? {
+                                    background: 'var(--terra)',
+                                    color: 'var(--shell)',
+                                  } : {
+                                    background: 'rgba(248,246,241,0.82)',
+                                    color: 'var(--ink)',
+                                  }),
+                                }}>
+                                  {slotsLeft <= 2 ? `🔥 ${slotsLeft} left` : `${slotsLeft} left`}
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Info panel */}
+                            <div style={{
+                              flex: 1,
+                              background: 'var(--shell)',
+                              borderTop: '1px solid var(--border)',
+                              padding: '13px 16px 12px',
+                              display: 'flex',
+                              flexDirection: 'column' as const,
+                              gap: 6,
+                              overflow: 'hidden',
+                            }}>
+                              {/* Category label */}
+                              <span style={{
+                                fontFamily: "'DM Sans', sans-serif",
+                                fontWeight: 600,
+                                fontSize: 10,
+                                textTransform: 'uppercase' as const,
+                                letterSpacing: '1px',
+                                color: 'var(--ink-35)',
+                              }}>{offer.businesses.category}</span>
+
+                              {/* Offer title */}
+                              <span style={{
+                                fontFamily: "'Corben', serif",
+                                fontWeight: 400,
+                                fontSize: 24,
+                                letterSpacing: '-0.5px',
+                                color: 'var(--ink)',
+                                lineHeight: 1.15,
+                              }}>{offerTitle}</span>
+
+                              {/* Business row */}
+                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                  <span style={{
+                                    fontFamily: "'DM Sans', sans-serif",
+                                    fontWeight: 600,
+                                    fontSize: 13,
+                                    color: 'var(--ink)',
+                                    display: 'block',
+                                  }}>{offer.businesses.name}</span>
+                                  {streetName && (
+                                    <span style={{
+                                      fontFamily: "'DM Sans', sans-serif",
+                                      fontWeight: 400,
+                                      fontSize: 12,
+                                      color: 'var(--ink-60)',
+                                    }}>{streetName}</span>
+                                  )}
+                                </div>
+                                {/* REVIEW: Distance pill shows static "Nearby" — wire to geolocation if available */}
+                                <div style={{
+                                  background: 'var(--card)',
+                                  border: '1px solid var(--border)',
+                                  borderRadius: 999,
+                                  padding: '3px 8px',
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontWeight: 500,
+                                  fontSize: 11,
+                                  color: 'var(--ink-60)',
+                                  flexShrink: 0,
+                                  marginLeft: 8,
+                                }}>Nearby</div>
+                              </div>
+
+                              {/* Divider */}
+                              <div style={{ height: 1, background: 'var(--border)', margin: '2px 0' }} />
+
+                              {/* Ask copy — one line max, ellipsis truncated */}
+                              {offer.specific_ask && (
+                                <span style={{
+                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontWeight: 400,
+                                  fontSize: 12,
+                                  color: 'var(--ink-60)',
+                                  lineHeight: 1.5,
+                                  overflow: 'hidden',
+                                  textOverflow: 'ellipsis',
+                                  whiteSpace: 'nowrap' as const,
+                                }}>{offer.specific_ask}</span>
+                              )}
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    {/* Second section */}
-                    <div className="flex items-center justify-between px-[20px] mt-[24px] mb-[12px]">
-                      <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', letterSpacing: '-0.025em', margin: 0 }}>New this week</h2>
-                    </div>
-
-                    <div className="pb-4 hide-scrollbar" style={{ overflowX: 'auto', scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                      <div className="flex gap-[12px]" style={{ paddingLeft: 20, paddingRight: 8 }}>
-                        {filteredOffers.slice().reverse().map(renderOfferCard)}
+                    {/* 4. Progress dots */}
+                    {totalCardCount > 0 && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: 4,
+                        padding: '6px 0',
+                        flexShrink: 0,
+                      }}>
+                        {totalCardCount <= 20 ? Array.from({ length: totalCardCount }, (_, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              width: 5,
+                              height: 5,
+                              borderRadius: '50%',
+                              background: i === viewedCount ? 'var(--ink-60)' : 'var(--border)',
+                              transform: i === viewedCount ? 'scale(1.2)' : 'none',
+                              transition: 'background 0.2s, transform 0.2s',
+                            }}
+                          />
+                        )) : (
+                          /* Too many dots — show count instead */
+                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: 'var(--ink-35)' }}>
+                            {viewedCount + 1} / {totalCardCount}
+                          </span>
+                        )}
                       </div>
-                    </div>
+                    )}
                   </>
-                );
-              })()}
-            </>
-          )}
+                )}
+
+                {/* 5. Action buttons — only when cards exist */}
+                {!isEmpty && !offersLoading && (
+                  <div style={{
+                    background: 'rgba(248,246,241,0.95)',
+                    backdropFilter: 'blur(16px)',
+                    WebkitBackdropFilter: 'blur(16px)',
+                    borderTop: '1px solid var(--border)',
+                    padding: '10px 0 28px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: 18,
+                    flexShrink: 0,
+                  }}>
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 500,
+                      fontSize: 10,
+                      color: 'var(--ink-35)',
+                      width: 42,
+                      textAlign: 'center' as const,
+                    }}>pass</span>
+
+                    {/* Pass button */}
+                    <button
+                      onClick={() => {
+                        if (stackOffers.length === 0 || swipeExiting) return;
+                        setSwipeExiting('left');
+                        setTimeout(() => {
+                          setDismissedOfferIds(prev => new Set([...prev, stackOffers[0].id]));
+                          setSwipeExiting(null);
+                          setCardDragX(0);
+                          setCardDragY(0);
+                        }, 280);
+                      }}
+                      style={{
+                        width: 52,
+                        height: 52,
+                        borderRadius: '50%',
+                        background: 'var(--card)',
+                        border: '1px solid var(--border)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        transition: 'transform 0.12s',
+                      }}
+                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
+                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                    >
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                      </svg>
+                    </button>
+
+                    {/* Claim button */}
+                    <button
+                      onClick={() => {
+                        if (stackOffers.length === 0 || swipeExiting) return;
+                        const topOffer = stackOffers[0];
+                        setSwipeExiting('right');
+                        setTimeout(() => {
+                          setDismissedOfferIds(prev => new Set([...prev, topOffer.id]));
+                          setSwipeExiting(null);
+                          setCardDragX(0);
+                          setCardDragY(0);
+                          handleSwipeClaim(topOffer);
+                        }, 280);
+                      }}
+                      style={{
+                        width: 64,
+                        height: 64,
+                        borderRadius: '50%',
+                        background: 'var(--terra)',
+                        border: 'none',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 16px rgba(196,103,74,0.28)',
+                        transition: 'transform 0.12s',
+                      }}
+                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
+                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                      </svg>
+                    </button>
+
+                    <span style={{
+                      fontFamily: "'DM Sans', sans-serif",
+                      fontWeight: 500,
+                      fontSize: 10,
+                      color: 'var(--ink-35)',
+                      width: 42,
+                      textAlign: 'center' as const,
+                    }}>claim</span>
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* -- SAVED TAB -- */}
           {view === 'saved' && (() => {
