@@ -1731,7 +1731,7 @@ export default function CreatorApp() {
                               top: 12,
                               left: 14,
                               right: 14,
-                              bottom: 0,
+                              bottom: 6,
                               zIndex,
                               transform: transform || defaultTransform,
                               transition,
@@ -1759,66 +1759,59 @@ export default function CreatorApp() {
                               <>
                                 <div style={{
                                   position: 'absolute' as const,
-                                  left: 14,
-                                  top: 20,
+                                  left: 16,
+                                  top: 16,
                                   zIndex: 20,
-                                  transform: 'rotate(-10deg)',
+                                  transform: 'rotate(-8deg)',
                                   opacity: cardDragX > 0 ? hintOpacity : 0,
-                                  border: '2px solid #4E9468',
+                                  background: '#4E9468',
                                   borderRadius: 999,
-                                  padding: '4px 12px',
+                                  padding: '6px 16px',
                                   fontFamily: "'DM Sans', sans-serif",
                                   fontWeight: 700,
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   textTransform: 'uppercase' as const,
-                                  letterSpacing: '1px',
-                                  color: '#4E9468',
+                                  letterSpacing: '1.2px',
+                                  color: '#fff',
                                   pointerEvents: 'none' as const,
+                                  boxShadow: '0 2px 8px rgba(78,148,104,0.35)',
                                 }}>CLAIM</div>
                                 <div style={{
                                   position: 'absolute' as const,
-                                  right: 14,
-                                  top: 20,
+                                  right: 16,
+                                  top: 16,
                                   zIndex: 20,
-                                  transform: 'rotate(10deg)',
+                                  transform: 'rotate(8deg)',
                                   opacity: cardDragX < 0 ? hintOpacity : 0,
-                                  border: '2px solid var(--terra)',
+                                  background: 'var(--terra)',
                                   borderRadius: 999,
-                                  padding: '4px 12px',
+                                  padding: '6px 16px',
                                   fontFamily: "'DM Sans', sans-serif",
                                   fontWeight: 700,
-                                  fontSize: 12,
+                                  fontSize: 14,
                                   textTransform: 'uppercase' as const,
-                                  letterSpacing: '1px',
-                                  color: 'var(--terra)',
+                                  letterSpacing: '1.2px',
+                                  color: '#fff',
                                   pointerEvents: 'none' as const,
+                                  boxShadow: '0 2px 8px rgba(196,103,74,0.35)',
                                 }}>PASS</div>
                               </>
                             )}
 
-                            {/* Emoji zone — 110px fixed height, flat category colour */}
-                            <div style={{ flex: '0 0 110px', position: 'relative' as const, overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img
-                                  src={offer.offer_photo_url}
-                                  alt=""
-                                  style={{ width: '100%', height: '100%', objectFit: 'cover' as const }}
-                                  draggable={false}
-                                />
-                              ) : (
-                                <div style={{
-                                  width: '100%',
-                                  height: '100%',
-                                  background: categoryColour,
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                }}>
-                                  <span style={{ fontSize: 72, filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }}>
-                                    {categoryEmoji}
-                                  </span>
-                                </div>
-                              )}
+                            {/* Emoji zone — proportional, flat category colour */}
+                            <div style={{ flex: '2 0 0', position: 'relative' as const, overflow: 'hidden', minHeight: 120 }}>
+                              <div style={{
+                                width: '100%',
+                                height: '100%',
+                                background: categoryColour,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                              }}>
+                                <span style={{ fontSize: 64, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.10))', lineHeight: 1 }}>
+                                  {categoryEmoji}
+                                </span>
+                              </div>
 
                               {/* Slot badge */}
                               {!isUnlimited && slotsLeft !== null && (
@@ -1846,12 +1839,13 @@ export default function CreatorApp() {
 
                             {/* Info panel — Card Design Reference typography */}
                             <div style={{
-                              flex: 1,
+                              flex: '3 0 0',
                               background: 'var(--shell)',
                               borderTop: '1px solid var(--border)',
-                              padding: 20,
+                              padding: '24px 20px 20px',
                               display: 'flex',
                               flexDirection: 'column' as const,
+                              justifyContent: 'center',
                               overflow: 'hidden',
                             }}>
                               {/* Category label */}
@@ -1862,22 +1856,22 @@ export default function CreatorApp() {
                                 textTransform: 'uppercase' as const,
                                 letterSpacing: '1.1px',
                                 color: 'var(--ink-35)',
-                                marginBottom: 10,
+                                marginBottom: 8,
                               }}>{offer.businesses.category}</span>
 
                               {/* Offer title */}
                               <span style={{
                                 fontFamily: "'Corben', serif",
                                 fontWeight: 400,
-                                fontSize: 28,
-                                letterSpacing: '-0.5px',
+                                fontSize: 24,
+                                letterSpacing: '-0.4px',
                                 color: 'var(--ink)',
-                                lineHeight: 1.05,
-                                marginBottom: 20,
+                                lineHeight: 1.12,
+                                marginBottom: 16,
                               }}>{offerTitle}</span>
 
                               {/* Divider */}
-                              <div style={{ height: 1, background: 'var(--border)', marginBottom: 16 }} />
+                              <div style={{ height: 1, background: 'var(--border)', marginBottom: 14 }} />
 
                               {/* Business row */}
                               <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
@@ -1940,16 +1934,16 @@ export default function CreatorApp() {
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
-                        gap: 4,
-                        padding: '6px 0',
+                        gap: 5,
+                        padding: '10px 0',
                         flexShrink: 0,
                       }}>
                         {totalCardCount <= 20 ? Array.from({ length: totalCardCount }, (_, i) => (
                           <div
                             key={i}
                             style={{
-                              width: 5,
-                              height: 5,
+                              width: 6,
+                              height: 6,
                               borderRadius: '50%',
                               background: i === viewedCount ? 'var(--ink-60)' : 'var(--border)',
                               transform: i === viewedCount ? 'scale(1.2)' : 'none',
@@ -1974,100 +1968,100 @@ export default function CreatorApp() {
                     backdropFilter: 'blur(16px)',
                     WebkitBackdropFilter: 'blur(16px)',
                     borderTop: '1px solid var(--border)',
-                    padding: '10px 0 28px',
+                    padding: '14px 0 28px',
                     display: 'flex',
-                    alignItems: 'center',
+                    alignItems: 'flex-start',
                     justifyContent: 'center',
-                    gap: 18,
+                    gap: 40,
                     flexShrink: 0,
                   }}>
-                    <span style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 500,
-                      fontSize: 10,
-                      color: 'var(--ink-35)',
-                      width: 42,
-                      textAlign: 'center' as const,
-                    }}>pass</span>
+                    {/* Pass column */}
+                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 8 }}>
+                      <button
+                        onClick={() => {
+                          if (stackOffers.length === 0 || swipeExiting) return;
+                          setSwipeExiting('left');
+                          setTimeout(() => {
+                            setDismissedOfferIds(prev => new Set([...prev, stackOffers[0].id]));
+                            setSwipeExiting(null);
+                            setCardDragX(0);
+                            setCardDragY(0);
+                          }, 280);
+                        }}
+                        style={{
+                          width: 56,
+                          height: 56,
+                          borderRadius: '50%',
+                          background: 'var(--card)',
+                          border: '1px solid var(--border)',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          transition: 'transform 0.12s',
+                        }}
+                        onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
+                        onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                      >
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="18" y1="6" x2="6" y2="18"/>
+                          <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                      </button>
+                      <span style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 500,
+                        fontSize: 12,
+                        color: 'var(--ink-35)',
+                        letterSpacing: '0.3px',
+                      }}>Pass</span>
+                    </div>
 
-                    {/* Pass button */}
-                    <button
-                      onClick={() => {
-                        if (stackOffers.length === 0 || swipeExiting) return;
-                        setSwipeExiting('left');
-                        setTimeout(() => {
-                          setDismissedOfferIds(prev => new Set([...prev, stackOffers[0].id]));
-                          setSwipeExiting(null);
-                          setCardDragX(0);
-                          setCardDragY(0);
-                        }, 280);
-                      }}
-                      style={{
-                        width: 52,
-                        height: 52,
-                        borderRadius: '50%',
-                        background: 'var(--card)',
-                        border: '1px solid var(--border)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.12s',
-                      }}
-                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
-                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                      </svg>
-                    </button>
-
-                    {/* Claim button */}
-                    <button
-                      onClick={() => {
-                        if (stackOffers.length === 0 || swipeExiting) return;
-                        const topOffer = stackOffers[0];
-                        setSwipeExiting('right');
-                        setTimeout(() => {
-                          setDismissedOfferIds(prev => new Set([...prev, topOffer.id]));
-                          setSwipeExiting(null);
-                          setCardDragX(0);
-                          setCardDragY(0);
-                          handleSwipeClaim(topOffer);
-                        }, 280);
-                      }}
-                      style={{
-                        width: 64,
-                        height: 64,
-                        borderRadius: '50%',
-                        background: 'var(--terra)',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 16px rgba(196,103,74,0.28)',
-                        transition: 'transform 0.12s',
-                      }}
-                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
-                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                    >
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    </button>
-
-                    <span style={{
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 500,
-                      fontSize: 10,
-                      color: 'var(--ink-35)',
-                      width: 42,
-                      textAlign: 'center' as const,
-                    }}>claim</span>
+                    {/* Claim column */}
+                    <div style={{ display: 'flex', flexDirection: 'column' as const, alignItems: 'center', gap: 8 }}>
+                      <button
+                        onClick={() => {
+                          if (stackOffers.length === 0 || swipeExiting) return;
+                          const topOffer = stackOffers[0];
+                          setSwipeExiting('right');
+                          setTimeout(() => {
+                            setDismissedOfferIds(prev => new Set([...prev, topOffer.id]));
+                            setSwipeExiting(null);
+                            setCardDragX(0);
+                            setCardDragY(0);
+                            handleSwipeClaim(topOffer);
+                          }, 280);
+                        }}
+                        style={{
+                          width: 64,
+                          height: 64,
+                          borderRadius: '50%',
+                          background: 'var(--terra)',
+                          border: 'none',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 16px rgba(196,103,74,0.28)',
+                          transition: 'transform 0.12s',
+                        }}
+                        onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
+                        onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                        onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
+                      >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                      </button>
+                      <span style={{
+                        fontFamily: "'DM Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: 12,
+                        color: 'var(--terra)',
+                        letterSpacing: '0.3px',
+                      }}>Claim</span>
+                    </div>
                   </div>
                 )}
               </div>
