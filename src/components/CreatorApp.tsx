@@ -1921,7 +1921,7 @@ export default function CreatorApp() {
                                     WebkitLineClamp: 2,
                                     WebkitBoxOrient: 'vertical' as const,
                                     overflow: 'hidden',
-                                  }}><span style={{ fontWeight: 600, color: 'var(--ink)' }}>Brief:</span> {offer.specific_ask}</span>
+                                  }}><span style={{ fontWeight: 600, fontSize: 11, letterSpacing: '0.3px', color: 'var(--ink-35)' }}>Brief:</span> {offer.specific_ask}</span>
                                 </div>
                               )}
                             </div>
