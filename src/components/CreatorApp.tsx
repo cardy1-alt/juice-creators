@@ -158,7 +158,7 @@ export default function CreatorApp() {
   const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
-  const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile'>('offers');
+  const [view, setView] = useState<'offers' | 'saved' | 'active' | 'claims' | 'profile' | 'all_offers'>('offers');
   const [showQrFullscreen, setShowQrFullscreen] = useState(false);
   const [qrScreenTab, setQrScreenTab] = useState<'pass' | 'reel'>('pass');
   const [qrOpenSource, setQrOpenSource] = useState<'home' | 'active'>('home');
@@ -702,11 +702,9 @@ export default function CreatorApp() {
   ];
 
   const tabs = [
-    { key: 'offers' as const, label: 'Explore', icon: 'search' as const },
-    { key: 'saved' as const, label: 'Saved', icon: 'heart' as const },
-    { key: 'active' as const, label: 'Active', icon: 'zap' as const, badge: activeClaims.length || undefined, badgeColor: activeBadgeColor },
-    { key: 'claims' as const, label: 'Claims', icon: 'doc' as const },
-    { key: 'profile' as const, label: 'Profile', icon: null as any },
+    { key: 'offers' as const, label: 'Discover', icon: 'discover' as const },
+    { key: 'claims' as const, label: 'Claims', icon: 'claims' as const, pip: activeClaims.length > 0 },
+    { key: 'all_offers' as const, label: 'All offers', icon: 'all_offers' as const },
   ];
 
   // Helper to render business avatar
@@ -2199,6 +2197,21 @@ export default function CreatorApp() {
             </div>
           )}
 
+          {/* -- ALL OFFERS (placeholder — Chunk 6 builds full screen) -- */}
+          {view === 'all_offers' && (
+            <div className="px-[20px] pt-5">
+              <h1 className="text-[26px] font-display text-[var(--ink)]" style={{ letterSpacing: '-0.5px' }}>All offers</h1>
+              <p className="text-[12px] mt-1" style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-35)' }}>
+                {offers.length} live this week
+              </p>
+              <div className="text-center py-20">
+                <p className="text-[14px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-60)' }}>
+                  Full list coming in Chunk 6.
+                </p>
+              </div>
+            </div>
+          )}
+
           {/* -- PROFILE -- */}
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
@@ -2699,43 +2712,73 @@ export default function CreatorApp() {
       </div>{/* end scroll container */}
 
       {/* Bottom Navigation Bar */}
-      <div className="bg-[#F7F6F3] flex-shrink-0" style={{ borderTop: '1px solid rgba(44,36,32,0.08)' }}>
-        <div className="max-w-md mx-auto flex pt-[8px]" style={{ paddingBottom: 'max(10px, env(safe-area-inset-bottom))' }}>
+      <div
+        className="flex-shrink-0"
+        style={{
+          background: 'rgba(248,246,241,0.95)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid var(--border)',
+          paddingBottom: 'env(safe-area-inset-bottom, 28px)',
+        }}
+      >
+        <div className="max-w-md mx-auto flex pt-[10px] pb-[6px]">
           {tabs.map(tab => {
             const isActive = view === tab.key;
-            const isDisabled = isPendingApproval && tab.key !== 'profile';
+            const iconColor = isActive ? 'var(--terra)' : 'var(--ink-35)';
             return (
-            <button
-              key={tab.key}
-              onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'profile') setProfileSubView('main'); }}
-              className={`flex-1 flex flex-col items-center gap-[2px] text-[12px] font-semibold transition-all relative min-h-[44px] ${
-                isDisabled ? 'text-[rgba(44,36,32,0.15)] pointer-events-none' : isActive ? 'text-[var(--terra)]' : 'text-[rgba(44,36,32,0.40)]'
-              }`}
-            >
-              <div className={`relative flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[var(--peach)]' : ''}`} style={{ width: 36, height: 28 }}>
-                {tab.icon ? (
-                  <DoodleIcon name={tab.icon} size={20} />
-                ) : (
-                  avatarUrl ? (
-                    <img src={avatarUrl} alt="" className={`w-[22px] h-[22px] rounded-full object-cover ${isActive ? 'ring-2 ring-[var(--terra)]' : ''}`} />
-                  ) : (
-                    <div className={`w-[22px] h-[22px] rounded-full flex items-center justify-center text-[12px] font-bold ${
-                      isActive ? 'bg-[var(--terra)] text-white' : 'bg-[rgba(44,36,32,0.08)] text-[var(--mid)]'
-                    }`}>
-                      {userProfile.name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                  )
-                )}
-                {tab.badge ? (
-                  <span className={`absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full text-white text-[11px] font-bold flex items-center justify-center ${
-                    tab.badgeColor || 'bg-[var(--terra)]'
-                  }`}>
-                    {tab.badge}
-                  </span>
-                ) : null}
-              </div>
-              {tab.label}
-            </button>
+              <button
+                key={tab.key}
+                onClick={() => setView(tab.key)}
+                className="flex-1 flex flex-col items-center gap-[3px] min-h-[44px]"
+                style={{
+                  fontFamily: "'DM Sans', sans-serif",
+                  fontWeight: 500,
+                  fontSize: 10,
+                  color: isActive ? 'var(--terra)' : 'var(--ink-35)',
+                }}
+              >
+                <div className="relative flex items-center justify-center" style={{ width: 24, height: 24 }}>
+                  {tab.icon === 'discover' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <rect x="3" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="3" width="7" height="7" rx="1.5" />
+                      <rect x="3" y="14" width="7" height="7" rx="1.5" />
+                      <rect x="14" y="14" width="7" height="7" rx="1.5" />
+                    </svg>
+                  )}
+                  {tab.icon === 'claims' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 12v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h3" />
+                      <path d="M14 2h6v6" />
+                      <path d="M10 14L20 4" />
+                    </svg>
+                  )}
+                  {tab.icon === 'all_offers' && (
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="4" y1="6" x2="20" y2="6" />
+                      <line x1="4" y1="12" x2="20" y2="12" />
+                      <line x1="4" y1="18" x2="20" y2="18" />
+                    </svg>
+                  )}
+                  {/* Notification pip for Claims when active claims exist */}
+                  {'pip' in tab && tab.pip && (
+                    <span
+                      style={{
+                        position: 'absolute',
+                        top: 0,
+                        right: -1,
+                        width: 6,
+                        height: 6,
+                        borderRadius: '50%',
+                        background: 'var(--terra)',
+                        border: '1.5px solid var(--shell)',
+                      }}
+                    />
+                  )}
+                </div>
+                {tab.label}
+              </button>
             );
           })}
         </div>
