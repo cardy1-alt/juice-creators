@@ -534,6 +534,50 @@ Keep the route but replace the screen content with a simple placeholder:
 
 -----
 
+## Card Design Reference
+
+Reference file: `/nayba-card-final.html`
+
+The swipe card uses Variation 2 layout with Oliver Bonas dusted pastel category colours.
+
+### Card structure
+- Emoji zone: 110px tall, full width, flat category colour (no gradient)
+- Info panel: --shell background, hard 1px --border top edge, padding 20px all sides
+- Border radius: 18px
+- Border: 1px solid --border
+- Box shadow: 0 2px 16px rgba(40,32,26,0.07)
+
+### Typography hierarchy — info panel
+- Category label: DM Sans 600, 10px, uppercase, letter-spacing 1.1px, --ink-35. Margin-bottom 10px.
+- Offer title: Corben Regular 400, 28px, letter-spacing -0.5px, --ink, line-height 1.05. Margin-bottom 20px.
+- Divider: 1px --border. Margin-bottom 16px.
+- Business name: DM Sans 600, 13px, --ink-60. Margin-bottom 4px.
+- Address: DM Sans 400, 11px, --ink-35.
+- Distance pill: --card bg, 1px --border border, pill radius, DM Sans 500 10px --ink-35.
+- Ask copy: DM Sans 400, 12px, --ink-35, line-height 1.6. Bold label DM Sans 500 --ink-60.
+
+### Slot badge — on emoji zone, top-right
+- 3+ slots: rgba(248,246,241,0.55) background, rgba(40,32,26,0.75) text
+- 1-2 slots: --terra background, --shell text, prepend 🔥
+
+### Category colours — flat, no gradient
+- Food & Drink:    #D4897A  (Dusted Rose)
+- Beauty:          #7AAE8C  (Faded Sage)
+- Café:            #C9A96E  (Warm Straw)
+- Wellness:        #7A9EBE  (Washed Blue)
+- Health & Fitness:#A888BE  (Dusty Lilac)
+
+Add these to src/styles/theme.css:
+```css
+--cat-food:     #D4897A;
+--cat-beauty:   #7AAE8C;
+--cat-cafe:     #C9A96E;
+--cat-wellness: #7A9EBE;
+--cat-fitness:  #A888BE;
+```
+
+-----
+
 ## Session instructions
 
 Start every Claude Code session with this exact prompt:
