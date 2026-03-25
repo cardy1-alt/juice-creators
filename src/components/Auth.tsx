@@ -4,7 +4,6 @@ import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
 import { DoodleIcon } from '../lib/doodle-icons';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
-import { Logo } from './Logo';
 
 declare global {
   interface Window {
@@ -139,16 +138,16 @@ function AddressAutocomplete({ value, onChange }: {
 
   return (
     <div ref={wrapperRef} className="relative">
-      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">Address</label>
-      <div className={`relative rounded-[14px] border transition-all duration-200 ${
+      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Address</label>
+      <div className={`relative rounded-[12px] border transition-all duration-200 ${
         focused
-          ? 'border-[var(--terra)] bg-[#EDE8DC] shadow-[0_0_0_3px_var(--terra-ring)]'
+          ? 'border-[var(--ink)] bg-[var(--card)]'
           : mapsError
-          ? 'border-[rgba(212,71,12,0.3)] bg-[var(--bg)]'
-          : 'border-[var(--faint)] bg-[var(--bg)]'
+          ? 'border-[var(--terra)] bg-[var(--card)]'
+          : 'border-[var(--border)] bg-[var(--card)]'
       }`}>
         <DoodleIcon name="map-pin" size={16} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
-          focused ? 'text-[var(--terra)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+          focused ? 'text-[var(--ink-60)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'
         }`} />
         <input
           type="text"
@@ -157,7 +156,7 @@ function AddressAutocomplete({ value, onChange }: {
           onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
           onBlur={() => setFocused(false)}
           placeholder={mapsError ? 'Type your address manually' : 'Enter your address'}
-          className="w-full pl-[40px] pr-[14px] py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
+          className="w-full pl-[40px] pr-[16px] py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none"
           autoComplete={mapsError ? 'street-address' : 'off'}
         />
       </div>
@@ -165,16 +164,16 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[#EDE8DC] rounded-[14px] shadow-[0_4px_16px_rgba(44,36,32,0.10)] overflow-hidden">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[var(--card)] rounded-[12px] shadow-[0_4px_16px_rgba(40,32,26,0.10)] overflow-hidden border border-[var(--border)]">
           {suggestions.map((s) => (
             <button
               key={s.place_id}
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[18px] text-[var(--near-black)] hover:bg-[var(--bg)] transition-colors flex items-center gap-[10px] border-b border-[#f7f7f7] last:border-b-0"
+              className="w-full text-left px-[14px] py-[12px] text-[15px] text-[var(--ink)] hover:bg-[var(--shell)] transition-colors flex items-center gap-[10px] border-b border-[var(--border)] last:border-b-0"
             >
-              <DoodleIcon name="map-pin" size={14} className="text-[var(--soft)] flex-shrink-0" />
+              <DoodleIcon name="map-pin" size={14} className="text-[var(--ink-35)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
             </button>
           ))}
@@ -200,16 +199,14 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative rounded-[14px] border transition-all duration-200 ${
+    <div className={`relative rounded-[12px] border transition-all duration-200 ${
       focused
-        ? 'border-[var(--terra)] bg-[#EDE8DC] shadow-[0_0_0_3px_var(--terra-ring)]'
-        : hasValue
-          ? 'border-[rgba(44,36,32,0.08)] bg-[#EDE8DC]'
-          : 'border-[rgba(44,36,32,0.08)] bg-[#EDE8DC]'
+        ? 'border-[var(--ink)] bg-[var(--card)]'
+        : 'border-[var(--border)] bg-[var(--card)]'
     }`}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
-          focused ? 'text-[var(--terra)]' : 'text-[var(--soft)]'
+          focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
         }`}>
           <DoodleIcon name={iconName} size={16} />
         </span>
@@ -221,7 +218,8 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[14px]'} ${rightElement ? 'pr-[44px]' : 'pr-[14px]'} py-[15px] bg-transparent text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none`}
+        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
+        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
         required={required}
         minLength={minLength}
       />
@@ -330,69 +328,53 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F7F6F3] overscroll-none">
-      {/* Top section with branding */}
-      <div className="flex flex-col items-center pt-[52px] pb-[32px] px-6">
-        <div className="mt-[10px]">
-          <Logo size={24} variant="wordmark" />
-        </div>
-        <p className="text-[rgba(44,36,32,0.5)] mt-[6px] text-[15px] tracking-[0.2px]">Hyperlocal creator network</p>
-      </div>
+    <div className="min-h-screen flex flex-col bg-[var(--shell)] overscroll-none">
+      {mode === 'signin' ? (
+        /* ─── SIGN IN: vertically centred brand + hero + form ─── */
+        <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
+          {/* Brand section */}
+          <div className="flex flex-col items-center mb-[32px]">
+            <span style={{ fontFamily: "'Corben', serif", fontSize: 38, fontWeight: 400, color: 'var(--ink)', letterSpacing: '-1px', lineHeight: 1.1 }}>
+              nayba
+            </span>
+            <div style={{ width: 32, height: 2, background: 'var(--terra)', borderRadius: 2, marginTop: 10 }} />
+          </div>
 
-      <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
-        {/* Sign In / Sign Up toggle — pill style */}
-        <div className="flex gap-[4px] mb-[28px] p-[3px] bg-[var(--elevated)] rounded-[14px]">
-          <button
-            onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-            className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
-              mode === 'signin'
-                ? 'bg-[#EDE8DC] text-[#D4470C] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
-                : 'text-[var(--soft)] hover:text-[var(--mid)]'
-            }`}
-          >
-            Sign In
-          </button>
-          <button
-            onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-            className={`flex-1 py-[11px] rounded-[11px] text-[18px] font-semibold transition-all duration-200 ${
-              mode === 'signup'
-                ? 'bg-[#EDE8DC] text-[#D4470C] shadow-[0_1px_3px_rgba(44,36,32,0.06),0_1px_2px_rgba(44,36,32,0.04)]'
-                : 'text-[var(--soft)] hover:text-[var(--mid)]'
-            }`}
-          >
-            Sign Up
-          </button>
-        </div>
+          {/* Hero copy */}
+          <div className="text-center mb-[32px]">
+            <h1 style={{ fontFamily: "'Corben', serif", fontSize: 28, fontWeight: 400, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-0.6px', margin: 0 }}>
+              Local offers.<br />Yours to claim.
+            </h1>
+            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.7, marginTop: 12 }}>
+              Vetted creators only. Claim offers from local businesses, visit in person, post your Reel.
+            </p>
+          </div>
 
         {/* ─── SIGN IN ─── */}
-        {mode === 'signin' && !forgotPassword && (
-          <form onSubmit={handleSubmit} className="space-y-[14px]">
-            <div className="space-y-[12px]">
-              <FloatingInput
-                label="Email"
-                icon="mail"
-                type="email"
-                value={email}
-                onChange={setEmail}
-                placeholder="you@example.com"
-                required
-              />
-              <FloatingInput
-                label="Password"
-                icon="lock"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={setPassword}
-                placeholder="Enter your password"
-                required
-                minLength={8}
-                rightElement={
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
-                    {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
-                  </button>
-                }
-              />
-            </div>
+        {!forgotPassword && (
+          <form onSubmit={handleSubmit} className="space-y-[12px]">
+            <FloatingInput
+              label="Email"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="you@example.com"
+              required
+            />
+            <FloatingInput
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={setPassword}
+              placeholder="Enter your password"
+              required
+              minLength={8}
+              rightElement={
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
+                  {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
+                </button>
+              }
+            />
 
             {error && (
               <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
@@ -404,11 +386,12 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+              className="w-full py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
+              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, marginTop: 2 }}
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-[#F7F6F3]/30 border-t-[#F7F6F3] rounded-full animate-spin" />
+                  <span className="w-[18px] h-[18px] border-2 border-[var(--shell)]/30 border-t-[var(--shell)] rounded-full animate-spin" />
                 </span>
               ) : 'Sign In'}
             </button>
@@ -416,20 +399,33 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[15px] font-medium text-[var(--soft)] text-center mt-[16px] hover:text-[var(--terra)] transition-colors mx-auto"
+              className="block text-[13px] text-[var(--ink-35)] text-center mt-[8px] hover:text-[var(--ink-60)] transition-colors mx-auto"
+              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
             >
               Forgot password?
             </button>
+
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)' }}>
+              Not a member?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+                className="underline hover:text-[var(--ink)] transition-colors"
+                style={{ color: 'var(--ink-60)', textUnderlineOffset: 3, fontWeight: 400, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+              >
+                Apply for access
+              </button>
+            </p>
           </form>
         )}
 
         {/* ─── FORGOT PASSWORD ─── */}
-        {mode === 'signin' && forgotPassword && (
+        {forgotPassword && (
           <div>
             <button
               type="button"
               onClick={() => setForgotPassword(false)}
-              className="flex items-center gap-[6px] text-[15px] font-semibold text-[var(--mid)] mb-[20px] hover:text-[var(--near-black)] transition-colors"
+              className="flex items-center gap-[6px] text-[13px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
             >
               <DoodleIcon name="arrow-left" size={14} className="" /> Back to sign in
             </button>
@@ -439,18 +435,17 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[6px]" style={{ letterSpacing: '-0.025em' }}>Check your email</p>
-                <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--near-black)]">{resetEmail}</span></p>
+                <p className="font-display text-[19px] text-[var(--ink)] mb-[6px]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>Check your email</p>
+                <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] font-display font-normal text-[var(--near-black)] mb-[4px]" style={{ letterSpacing: '-0.025em' }}>Reset password</p>
-                  <p className="text-[15px] text-[var(--mid)]">Enter your email and we'll send a reset link.</p>
+                  <p className="font-display text-[19px] text-[var(--ink)] mb-[4px]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>Reset password</p>
+                  <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
                   label="Email"
-                  icon="mail"
                   type="email"
                   value={resetEmail}
                   onChange={setResetEmail}
@@ -466,7 +461,8 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                  className="w-full py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
+                  style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -474,45 +470,55 @@ export default function Auth() {
             )}
           </div>
         )}
+        </div>
+      ) : (
+        /* ─── SIGN UP: scrollable form ─── */
+        <div className="flex-1 flex flex-col">
+          {/* Signup header */}
+          <div className="flex flex-col items-center pt-[44px] pb-[24px] px-6">
+            <span style={{ fontFamily: "'Corben', serif", fontSize: 28, fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.6px', lineHeight: 1.1 }}>
+              nayba
+            </span>
+            <div style={{ width: 24, height: 2, background: 'var(--terra)', borderRadius: 2, marginTop: 8 }} />
+          </div>
 
-        {/* ─── SIGN UP ─── */}
-        {mode === 'signup' && (
+          <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
           <form onSubmit={handleSubmit}>
             {/* Role selector cards */}
             <div className="flex gap-[10px] mb-[24px]">
               <button
                 type="button"
                 onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border-[1.5px] transition-all duration-200 ${
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border transition-all duration-200 ${
                   role === 'creator'
-                    ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
-                    : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
+                    ? 'border-[var(--ink)] bg-[var(--card)]'
+                    : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--ink-35)]'
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'creator' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
+                  role === 'creator' ? 'bg-[var(--ink-08)]' : 'bg-[var(--shell)]'
                 }`}>
-                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
-                <span className={`text-[15px] font-bold ${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                <span className={`text-[15px] font-bold ${role === 'creator' ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>
                   Creator
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border-[1.5px] transition-all duration-200 ${
+                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border transition-all duration-200 ${
                   role === 'business'
-                    ? 'border-[var(--terra)] bg-[var(--terra-5)] shadow-[0_0_0_3px_var(--terra-ring)]'
-                    : 'border-[var(--faint)] bg-[#EDE8DC] hover:border-[var(--soft)]'
+                    ? 'border-[var(--ink)] bg-[var(--card)]'
+                    : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--ink-35)]'
                 }`}
               >
                 <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'business' ? 'bg-[var(--terra-15)]' : 'bg-[var(--bg)]'
+                  role === 'business' ? 'bg-[var(--ink-08)]' : 'bg-[var(--shell)]'
                 }`}>
-                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
+                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
-                <span className={`text-[15px] font-bold ${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>
+                <span className={`text-[15px] font-bold ${role === 'business' ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>
                   Business
                 </span>
               </button>
@@ -524,24 +530,24 @@ export default function Auth() {
                 <div key={step} className="flex items-center gap-[6px]">
                   <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300 ${
                     signupStep > step
-                      ? 'bg-[var(--terra)] text-[#F7F6F3]'
+                      ? 'bg-[var(--ink)] text-[var(--shell)]'
                       : signupStep === step
-                        ? 'bg-[var(--terra)] text-[#F7F6F3] shadow-[0_0_0_3px_var(--terra-ring)]'
-                        : 'bg-[var(--elevated)] text-[var(--soft)]'
+                        ? 'bg-[var(--ink)] text-[var(--shell)]'
+                        : 'bg-[var(--card)] text-[var(--ink-35)]'
                   }`}>
                     {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
                   </div>
-                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--terra)]' : 'bg-[var(--elevated)]'}`} />}
+                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--ink)]' : 'bg-[var(--card)]'}`} />}
                 </div>
               ))}
             </div>
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="text-[21px] font-display font-normal text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>
+              <h2 className="font-display text-[21px] text-[var(--ink)]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
-              <p className="text-[15px] text-[var(--mid)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
+              <p className="text-[14px] text-[var(--ink-60)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
             </div>
 
             {/* ── Creator signup (multi-step) ── */}
@@ -554,7 +560,7 @@ export default function Auth() {
                     <FloatingInput label="Instagram Handle" icon="instagram" value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
 
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Follower Count</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Follower Count</label>
                       <div className="flex gap-[8px]">
                         {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
                           <button
@@ -563,9 +569,9 @@ export default function Auth() {
                             onClick={() => setFollowerCount(opt)}
                             className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
                             style={{
-                              background: followerCount === opt ? 'var(--terra)' : '#EDE8DC',
-                              color: followerCount === opt ? '#F7F6F3' : 'var(--near-black)',
-                              border: followerCount === opt ? 'none' : '0.5px solid var(--near-black)',
+                              background: followerCount === opt ? 'var(--ink)' : 'var(--card)',
+                              color: followerCount === opt ? 'var(--shell)' : 'var(--ink)',
+                              border: followerCount === opt ? '1px solid var(--ink)' : '1px solid var(--border)',
                             }}
                           >
                             {opt}
@@ -580,13 +586,13 @@ export default function Auth() {
                 {signupStep === 2 && (
                   <div className="space-y-[12px]">
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[8px]">Date of Birth</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Date of Birth</label>
                       <div className="flex items-center gap-[8px]">
-                        <DoodleIcon name="cake" size={16} className="text-[var(--soft)] flex-shrink-0" />
+                        <DoodleIcon name="cake" size={16} className="text-[var(--ink-35)] flex-shrink-0" />
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -598,7 +604,7 @@ export default function Auth() {
                         <select
                           value={dobMonth}
                           onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -610,7 +616,7 @@ export default function Auth() {
                         <select
                           value={dobYear}
                           onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[14px] border-[1.5px] border-[rgba(44,36,32,0.08)] bg-[#EDE8DC] text-[16px] text-[var(--near-black)] focus:outline-none focus:border-[var(--near-black)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -620,7 +626,7 @@ export default function Auth() {
                           ))}
                         </select>
                       </div>
-                      <p className="text-[13px] text-[var(--soft)] mt-[6px]">You must be at least 13 years old</p>
+                      <p className="text-[13px] text-[var(--ink-35)] mt-[6px]">You must be at least 13 years old</p>
                     </div>
 
                     <AddressAutocomplete
@@ -663,22 +669,21 @@ export default function Auth() {
                     <FloatingInput label="Business Name" icon="shop" value={name} onChange={setName} placeholder="Juice Bar Co" required />
 
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-[10px]">Category</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[10px]">Category</label>
                       <div className="grid grid-cols-2 gap-[8px]">
                         {CATEGORY_LIST.map((cat) => (
                           <button
                             key={cat}
                             type="button"
                             onClick={() => setCategory(cat)}
-                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[18px] text-left transition-all duration-200"
+                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[14px] text-left transition-all duration-200"
                             style={{
-                              border: category === cat ? '1.5px solid var(--terra)' : '1.5px solid var(--faint)',
-                              background: category === cat ? 'rgba(212,71,12,0.08)' : '#EDE8DC',
-                              color: category === cat ? 'var(--terra)' : undefined,
+                              border: category === cat ? '1px solid var(--ink)' : '1px solid var(--border)',
+                              background: category === cat ? 'var(--ink-08)' : 'var(--card)',
                             }}
                           >
-                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`} />
-                            <span className={`text-[15px] font-semibold truncate ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--mid)]'}`}>{cat}</span>
+                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
+                            <span className={`text-[15px] font-semibold truncate ${category === cat ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>{cat}</span>
                           </button>
                         ))}
                       </div>
@@ -694,7 +699,7 @@ export default function Auth() {
                       onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
                     />
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">Bio</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Bio</label>
                       <div className="relative">
                         <textarea
                           value={bio}
@@ -702,10 +707,10 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[14px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] transition-all resize-none"
+                          className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--ink)] transition-all resize-none"
                           required
                         />
-                        <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>{bio.length}/150</span>
+                        <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/150</span>
                       </div>
                     </div>
                   </div>
@@ -750,9 +755,9 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                      className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
+                      className="w-[52px] h-[52px] rounded-[12px] flex items-center justify-center bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--border)] transition-all active:scale-[0.96]"
                     >
-                      <DoodleIcon name="arrow-left" size={18} className="text-[var(--near-black)]" />
+                      <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
                     </button>
                   )}
                   <button
@@ -777,7 +782,8 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all shadow-[0_2px_8px_rgba(212,71,12,0.3)] inline-flex items-center justify-center gap-[6px]"
+                    className="flex-1 py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all inline-flex items-center justify-center gap-[6px]"
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
                   >
                     Continue <DoodleIcon name="arrow-right" size={16} className="" />
                   </button>
@@ -787,18 +793,19 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                    className="w-[52px] h-[52px] rounded-[14px] flex items-center justify-center bg-[var(--elevated)] hover:bg-[var(--pressed)] transition-all active:scale-[0.96]"
+                    className="w-[52px] h-[52px] rounded-[12px] flex items-center justify-center bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--border)] transition-all active:scale-[0.96]"
                   >
-                    <DoodleIcon name="arrow-left" size={18} className="text-[var(--near-black)]" />
+                    <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-[14px] text-[#F7F6F3] text-[17px] font-bold bg-[var(--terra)] hover:bg-[var(--terra-hover)] active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50 shadow-[0_2px_8px_rgba(212,71,12,0.3)]"
+                    className="flex-1 py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
+                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
-                        <span className="w-[18px] h-[18px] border-2 border-[#F7F6F3]/30 border-t-[#F7F6F3] rounded-full animate-spin" />
+                        <span className="w-[18px] h-[18px] border-2 border-[var(--shell)]/30 border-t-[var(--shell)] rounded-full animate-spin" />
                       </span>
                     ) : 'Create Account'}
                   </button>
@@ -806,12 +813,24 @@ export default function Auth() {
               )}
             </div>
 
-            <p className="text-[14px] text-[var(--soft)] text-center mt-[20px] leading-[1.5]">
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
+              Already have an account?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+                className="underline hover:text-[var(--ink)] transition-colors"
+                style={{ color: 'var(--ink-60)', textUnderlineOffset: 3, fontWeight: 400, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+              >
+                Sign in
+              </button>
+            </p>
+            <p className="text-[13px] text-[var(--ink-35)] text-center mt-[8px] leading-[1.5]">
               By signing up you agree to our terms. Your account will be reviewed by our team.
             </p>
           </form>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
