@@ -21,6 +21,13 @@
   --grad-wellness:  linear-gradient(160deg, #6A8EAE, #4A6E8E);
   --grad-experience:linear-gradient(160deg, #9068A8, #6A4880);
 
+  /* ── Flat category colours — Oliver Bonas dusted pastels (Card Design Ref) ── */
+  --cat-food:     #D4897A;
+  --cat-beauty:   #7AAE8C;
+  --cat-cafe:     #C9A96E;
+  --cat-wellness: #7A9EBE;
+  --cat-fitness:  #A888BE;
+
   /* REVIEW: Legacy aliases — kept so existing components don't break until
      Chunks 2-7 migrate each screen. Remove once all chunks are complete. */
   --white: var(--shell);

@@ -720,13 +720,14 @@ export default function CreatorApp() {
 
   // ─── Chunk 4: Swipe stack helpers ────────────────────────────────────────
 
-  const getCategoryGradient = (category: string): string => {
+  const getCategoryColour = (category: string): string => {
     const lower = (category || '').toLowerCase();
-    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('bar') || lower.includes('pizza') || lower.includes('brunch') || lower.includes('dessert') || lower.includes('juice')) return 'var(--grad-food)';
-    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails') || lower.includes('barbershop') || lower.includes('skincare')) return 'var(--grad-beauty)';
-    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return 'var(--grad-cafe)';
-    if (lower.includes('wellness') || lower.includes('spa') || lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return 'var(--grad-wellness)';
-    return 'var(--grad-experience)';
+    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('bar') || lower.includes('pizza') || lower.includes('brunch') || lower.includes('dessert') || lower.includes('juice')) return 'var(--cat-food)';
+    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails') || lower.includes('barbershop') || lower.includes('skincare')) return 'var(--cat-beauty)';
+    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return 'var(--cat-cafe)';
+    if (lower.includes('wellness') || lower.includes('spa')) return 'var(--cat-wellness)';
+    if (lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return 'var(--cat-fitness)';
+    return 'var(--cat-fitness)';
   };
 
   const getCategoryEmoji = (category: string): string => {
@@ -1715,7 +1716,7 @@ export default function CreatorApp() {
                         }
 
                         const defaultTransform = idx === 1 ? 'scale(0.96) translateY(10px)' : idx === 2 ? 'scale(0.92) translateY(20px)' : 'none';
-                        const categoryGradient = getCategoryGradient(offer.businesses.category);
+                        const categoryColour = getCategoryColour(offer.businesses.category);
                         const categoryEmoji = getCategoryEmoji(offer.businesses.category);
                         const offerTitle = offer.generated_title || offer.description;
                         const bizAddress = offer.businesses.address || '';
@@ -1734,9 +1735,9 @@ export default function CreatorApp() {
                               zIndex,
                               transform: transform || defaultTransform,
                               transition,
-                              borderRadius: 20,
+                              borderRadius: 18,
                               border: '1px solid var(--border)',
-                              boxShadow: '0 4px 24px rgba(40,32,26,0.09)',
+                              boxShadow: '0 2px 16px rgba(40,32,26,0.07)',
                               background: 'var(--shell)',
                               display: 'flex',
                               flexDirection: 'column' as const,
@@ -1795,8 +1796,8 @@ export default function CreatorApp() {
                               </>
                             )}
 
-                            {/* Image zone — 52% of card height */}
-                            <div style={{ flex: '0 0 52%', position: 'relative' as const, overflow: 'hidden' }}>
+                            {/* Emoji zone — 110px fixed height, flat category colour */}
+                            <div style={{ flex: '0 0 110px', position: 'relative' as const, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img
                                   src={offer.offer_photo_url}
@@ -1808,7 +1809,7 @@ export default function CreatorApp() {
                                 <div style={{
                                   width: '100%',
                                   height: '100%',
-                                  background: categoryGradient,
+                                  background: categoryColour,
                                   display: 'flex',
                                   alignItems: 'center',
                                   justifyContent: 'center',
@@ -1834,8 +1835,8 @@ export default function CreatorApp() {
                                     background: 'var(--terra)',
                                     color: 'var(--shell)',
                                   } : {
-                                    background: 'rgba(248,246,241,0.82)',
-                                    color: 'var(--ink)',
+                                    background: 'rgba(248,246,241,0.55)',
+                                    color: 'rgba(40,32,26,0.75)',
                                   }),
                                 }}>
                                   {slotsLeft <= 2 ? `🔥 ${slotsLeft} left` : `${slotsLeft} left`}
@@ -1843,15 +1844,14 @@ export default function CreatorApp() {
                               )}
                             </div>
 
-                            {/* Info panel */}
+                            {/* Info panel — Card Design Reference typography */}
                             <div style={{
                               flex: 1,
                               background: 'var(--shell)',
                               borderTop: '1px solid var(--border)',
-                              padding: '13px 16px 12px',
+                              padding: 20,
                               display: 'flex',
                               flexDirection: 'column' as const,
-                              gap: 6,
                               overflow: 'hidden',
                             }}>
                               {/* Category label */}
@@ -1860,36 +1860,42 @@ export default function CreatorApp() {
                                 fontWeight: 600,
                                 fontSize: 10,
                                 textTransform: 'uppercase' as const,
-                                letterSpacing: '1px',
+                                letterSpacing: '1.1px',
                                 color: 'var(--ink-35)',
+                                marginBottom: 10,
                               }}>{offer.businesses.category}</span>
 
                               {/* Offer title */}
                               <span style={{
                                 fontFamily: "'Corben', serif",
                                 fontWeight: 400,
-                                fontSize: 24,
+                                fontSize: 28,
                                 letterSpacing: '-0.5px',
                                 color: 'var(--ink)',
-                                lineHeight: 1.15,
+                                lineHeight: 1.05,
+                                marginBottom: 20,
                               }}>{offerTitle}</span>
 
+                              {/* Divider */}
+                              <div style={{ height: 1, background: 'var(--border)', marginBottom: 16 }} />
+
                               {/* Business row */}
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                              <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                                 <div style={{ minWidth: 0, flex: 1 }}>
                                   <span style={{
                                     fontFamily: "'DM Sans', sans-serif",
                                     fontWeight: 600,
                                     fontSize: 13,
-                                    color: 'var(--ink)',
+                                    color: 'var(--ink-60)',
                                     display: 'block',
+                                    marginBottom: 4,
                                   }}>{offer.businesses.name}</span>
                                   {streetName && (
                                     <span style={{
                                       fontFamily: "'DM Sans', sans-serif",
                                       fontWeight: 400,
-                                      fontSize: 12,
-                                      color: 'var(--ink-60)',
+                                      fontSize: 11,
+                                      color: 'var(--ink-35)',
                                     }}>{streetName}</span>
                                   )}
                                 </div>
@@ -1901,15 +1907,12 @@ export default function CreatorApp() {
                                   padding: '3px 8px',
                                   fontFamily: "'DM Sans', sans-serif",
                                   fontWeight: 500,
-                                  fontSize: 11,
-                                  color: 'var(--ink-60)',
+                                  fontSize: 10,
+                                  color: 'var(--ink-35)',
                                   flexShrink: 0,
                                   marginLeft: 8,
                                 }}>Nearby</div>
                               </div>
-
-                              {/* Divider */}
-                              <div style={{ height: 1, background: 'var(--border)', margin: '2px 0' }} />
 
                               {/* Ask copy — one line max, ellipsis truncated */}
                               {offer.specific_ask && (
@@ -1917,12 +1920,13 @@ export default function CreatorApp() {
                                   fontFamily: "'DM Sans', sans-serif",
                                   fontWeight: 400,
                                   fontSize: 12,
-                                  color: 'var(--ink-60)',
-                                  lineHeight: 1.5,
+                                  color: 'var(--ink-35)',
+                                  lineHeight: 1.6,
                                   overflow: 'hidden',
                                   textOverflow: 'ellipsis',
                                   whiteSpace: 'nowrap' as const,
-                                }}>{offer.specific_ask}</span>
+                                  marginTop: 12,
+                                }}><span style={{ fontWeight: 500, color: 'var(--ink-60)' }}>They'd love:</span> {offer.specific_ask}</span>
                               )}
                             </div>
                           </div>
