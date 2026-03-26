@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Settings, Store, Tag, Users, X } from 'lucide-react';
-import { CategoryIcon } from '../lib/categories';
+import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
+import { CategoryIcon, CATEGORY_LIST } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
 import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedEmail, sendBusinessDeniedEmail } from '../lib/notifications';
+import { uploadAvatar } from '../lib/upload';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   const badgeBase = "inline-flex items-center gap-1 text-[11px] rounded-[999px]" as const;
@@ -29,7 +30,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
-interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; is_live: boolean; region: string; instagram_handle: string | null; address: string | null; bio: string | null; logo_url: string | null; latitude: number | null; longitude: number | null; onboarding_complete: boolean; created_at: string; }
 interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
@@ -48,6 +49,19 @@ export default function AdminDashboard() {
 
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  // Create Business modal state
+  const REGIONS = ['bury-st-edmunds', 'ipswich', 'norwich', 'cambridge'];
+  const [showCreateBusiness, setShowCreateBusiness] = useState(false);
+  const [bizSubmitting, setBizSubmitting] = useState(false);
+  const [bizErrors, setBizErrors] = useState<Record<string, string>>({});
+  const [bizForm, setBizForm] = useState({
+    name: '', slug: '', owner_email: '', category: CATEGORY_LIST[0] || 'Food & Drink',
+    region: 'bury-st-edmunds', address: '', latitude: '', longitude: '',
+    instagram_handle: '', bio: '', approved: true, is_live: false, onboarding_complete: true,
+  });
+  const [bizLogoFile, setBizLogoFile] = useState<File | null>(null);
+  const [bizLogoPreview, setBizLogoPreview] = useState<string | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -178,6 +192,82 @@ export default function AdminDashboard() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+    }
+  };
+
+  const slugify = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+
+  const updateBizField = (field: string, value: string | boolean) => {
+    setBizForm(prev => {
+      const next = { ...prev, [field]: value };
+      if (field === 'name' && !prev.slug || field === 'name' && prev.slug === slugify(prev.name)) {
+        next.slug = slugify(value as string);
+      }
+      return next;
+    });
+    if (bizErrors[field]) setBizErrors(prev => { const n = { ...prev }; delete n[field]; return n; });
+  };
+
+  const resetBizForm = () => {
+    setBizForm({
+      name: '', slug: '', owner_email: '', category: CATEGORY_LIST[0] || 'Food & Drink',
+      region: 'bury-st-edmunds', address: '', latitude: '', longitude: '',
+      instagram_handle: '', bio: '', approved: true, is_live: false, onboarding_complete: true,
+    });
+    setBizLogoFile(null);
+    setBizLogoPreview(null);
+    setBizErrors({});
+  };
+
+  const handleCreateBusiness = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!bizForm.name.trim()) errors.name = 'Required';
+    if (!bizForm.slug.trim()) errors.slug = 'Required';
+    if (!bizForm.owner_email.trim()) errors.owner_email = 'Required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bizForm.owner_email)) errors.owner_email = 'Invalid email';
+    if (!bizForm.category) errors.category = 'Required';
+    if (Object.keys(errors).length > 0) { setBizErrors(errors); return; }
+
+    setBizSubmitting(true);
+    try {
+      // Check slug uniqueness
+      const { data: existing } = await supabase.from('businesses').select('id').eq('slug', bizForm.slug.trim()).limit(1);
+      if (existing && existing.length > 0) { setBizErrors({ slug: 'Slug already taken' }); setBizSubmitting(false); return; }
+
+      const insertData: any = {
+        name: bizForm.name.trim(),
+        slug: bizForm.slug.trim(),
+        owner_email: bizForm.owner_email.trim().toLowerCase(),
+        category: bizForm.category,
+        region: bizForm.region,
+        approved: bizForm.approved,
+        is_live: bizForm.is_live,
+        onboarding_complete: bizForm.onboarding_complete,
+        onboarding_step: 4,
+      };
+      if (bizForm.address.trim()) insertData.address = bizForm.address.trim();
+      if (bizForm.latitude) insertData.latitude = parseFloat(bizForm.latitude);
+      if (bizForm.longitude) insertData.longitude = parseFloat(bizForm.longitude);
+      if (bizForm.instagram_handle.trim()) insertData.instagram_handle = bizForm.instagram_handle.trim().replace(/^@/, '');
+      if (bizForm.bio.trim()) insertData.bio = bizForm.bio.trim();
+
+      const { data: newBiz, error } = await supabase.from('businesses').insert(insertData).select().single();
+      if (error) throw error;
+
+      // Upload logo if provided
+      if (bizLogoFile && newBiz) {
+        await uploadAvatar(bizLogoFile, newBiz.id, 'businesses');
+      }
+
+      setActionFeedback({ type: 'success', text: 'Business created' });
+      setShowCreateBusiness(false);
+      resetBizForm();
+      fetchAll();
+    } catch (err: any) {
+      setBizErrors({ _form: err.message || 'Failed to create business' });
+    } finally {
+      setBizSubmitting(false);
     }
   };
 
@@ -359,6 +449,16 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
+            <>
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => { resetBizForm(); setShowCreateBusiness(true); }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px' }}
+              >
+                <Plus size={16} strokeWidth={2} /> Add business
+              </button>
+            </div>
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No businesses yet.</p></div>
@@ -406,6 +506,144 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
+
+            {/* Create Business Modal */}
+            {showCreateBusiness && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <div className="absolute inset-0 bg-[rgba(34,34,34,0.45)]" onClick={() => setShowCreateBusiness(false)} />
+                <div className="relative bg-[var(--shell)] rounded-[24px] p-7 w-full max-w-[560px] max-h-[90vh] overflow-y-auto border border-[var(--ink-08)]" style={{ boxShadow: '0 8px 40px rgba(34,34,34,0.18)' }}>
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-lg text-[var(--near-black)]" style={{ fontWeight: 800, letterSpacing: '-0.03em' }}>Add business</h2>
+                    <button onClick={() => setShowCreateBusiness(false)} className="p-1.5 rounded-[10px] hover:bg-[var(--ink-08)] transition-colors"><X size={18} strokeWidth={1.5} className="text-[var(--soft)]" /></button>
+                  </div>
+
+                  {bizErrors._form && (
+                    <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] text-[13px] text-[var(--terra)]" style={{ fontWeight: 500 }}>{bizErrors._form}</div>
+                  )}
+
+                  <form onSubmit={handleCreateBusiness} className="space-y-5">
+                    {/* BUSINESS DETAILS */}
+                    <p className="text-[13px] text-[var(--ink-35)] uppercase" style={{ fontWeight: 700, letterSpacing: '1px' }}>Business details</p>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Business name <span className="text-[var(--terra)]">*</span></label>
+                      <input value={bizForm.name} onChange={e => updateBizField('name', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="e.g. Wildcraft Coffee" />
+                      {bizErrors.name && <p className="mt-1 text-[13px] text-[var(--terra)]" style={{ fontWeight: 400 }}>{bizErrors.name}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Slug <span className="text-[var(--terra)]">*</span></label>
+                      <input value={bizForm.slug} onChange={e => updateBizField('slug', slugify(e.target.value))} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] font-mono placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" placeholder="wildcraft-coffee" />
+                      {bizErrors.slug && <p className="mt-1 text-[13px] text-[var(--terra)]" style={{ fontWeight: 400 }}>{bizErrors.slug}</p>}
+                    </div>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Owner email <span className="text-[var(--terra)]">*</span></label>
+                      <input type="email" value={bizForm.owner_email} onChange={e => updateBizField('owner_email', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="owner@business.com" />
+                      {bizErrors.owner_email && <p className="mt-1 text-[13px] text-[var(--terra)]" style={{ fontWeight: 400 }}>{bizErrors.owner_email}</p>}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Category <span className="text-[var(--terra)]">*</span></label>
+                        <select value={bizForm.category} onChange={e => updateBizField('category', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }}>
+                          {CATEGORY_LIST.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Region</label>
+                        <select value={bizForm.region} onChange={e => updateBizField('region', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }}>
+                          {REGIONS.map(r => <option key={r} value={r}>{r.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</option>)}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* LOCATION */}
+                    <p className="text-[13px] text-[var(--ink-35)] uppercase pt-2" style={{ fontWeight: 700, letterSpacing: '1px' }}>Location</p>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Address</label>
+                      <input value={bizForm.address} onChange={e => updateBizField('address', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="123 High Street, Bury St Edmunds" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div>
+                        <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Latitude</label>
+                        <input type="number" step="any" value={bizForm.latitude} onChange={e => updateBizField('latitude', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="52.2405" />
+                      </div>
+                      <div>
+                        <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Longitude</label>
+                        <input type="number" step="any" value={bizForm.longitude} onChange={e => updateBizField('longitude', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="0.7177" />
+                      </div>
+                    </div>
+
+                    {/* PROFILE */}
+                    <p className="text-[13px] text-[var(--ink-35)] uppercase pt-2" style={{ fontWeight: 700, letterSpacing: '1px' }}>Profile</p>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Instagram handle</label>
+                      <input value={bizForm.instagram_handle} onChange={e => updateBizField('instagram_handle', e.target.value)} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]" style={{ fontWeight: 400 }} placeholder="@wildcraftcoffee" />
+                    </div>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Bio <span className="text-[12px] text-[var(--ink-35)]">({bizForm.bio.length}/200)</span></label>
+                      <textarea value={bizForm.bio} onChange={e => { if (e.target.value.length <= 200) updateBizField('bio', e.target.value); }} rows={3} className="w-full bg-[var(--card)] border-[1.5px] border-[var(--ink-08)] rounded-[14px] px-4 py-3.5 text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] resize-none" style={{ fontWeight: 400 }} placeholder="Short description of the business" />
+                    </div>
+
+                    <div>
+                      <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontWeight: 600 }}>Logo</label>
+                      {bizLogoPreview ? (
+                        <div className="flex items-center gap-3">
+                          <img src={bizLogoPreview} alt="Logo preview" className="w-14 h-14 rounded-[12px] object-cover" />
+                          <button type="button" onClick={() => { setBizLogoFile(null); setBizLogoPreview(null); }} className="text-[13px] text-[var(--terra)] hover:underline" style={{ fontWeight: 600 }}>Remove</button>
+                        </div>
+                      ) : (
+                        <label className="flex flex-col items-center justify-center gap-2 py-6 border-[1.5px] border-dashed border-[var(--ink-15)] rounded-[12px] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
+                          <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                          <span className="text-[13px] text-[var(--ink-35)]" style={{ fontWeight: 500 }}>Upload photo</span>
+                          <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) { setBizLogoFile(file); setBizLogoPreview(URL.createObjectURL(file)); }
+                          }} />
+                        </label>
+                      )}
+                    </div>
+
+                    {/* SETTINGS */}
+                    <p className="text-[13px] text-[var(--ink-35)] uppercase pt-2" style={{ fontWeight: 700, letterSpacing: '1px' }}>Settings</p>
+
+                    <div className="space-y-3">
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-[14px] text-[var(--ink)]" style={{ fontWeight: 500 }}>Approved</span>
+                        <button type="button" onClick={() => updateBizField('approved', !bizForm.approved)} className={`relative w-11 h-6 rounded-full transition-colors ${bizForm.approved ? 'bg-[var(--terra)]' : 'bg-[var(--ink-15)]'}`}>
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${bizForm.approved ? 'translate-x-5' : ''}`} />
+                        </button>
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-[14px] text-[var(--ink)]" style={{ fontWeight: 500 }}>Is live</span>
+                        <button type="button" onClick={() => updateBizField('is_live', !bizForm.is_live)} className={`relative w-11 h-6 rounded-full transition-colors ${bizForm.is_live ? 'bg-[var(--terra)]' : 'bg-[var(--ink-15)]'}`}>
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${bizForm.is_live ? 'translate-x-5' : ''}`} />
+                        </button>
+                      </label>
+                      <label className="flex items-center justify-between cursor-pointer">
+                        <span className="text-[14px] text-[var(--ink)]" style={{ fontWeight: 500 }}>Onboarding complete</span>
+                        <button type="button" onClick={() => updateBizField('onboarding_complete', !bizForm.onboarding_complete)} className={`relative w-11 h-6 rounded-full transition-colors ${bizForm.onboarding_complete ? 'bg-[var(--terra)]' : 'bg-[var(--ink-15)]'}`}>
+                          <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform shadow-sm ${bizForm.onboarding_complete ? 'translate-x-5' : ''}`} />
+                        </button>
+                      </label>
+                    </div>
+
+                    <div className="flex gap-3 pt-3">
+                      <button type="button" onClick={() => setShowCreateBusiness(false)} className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] hover:bg-[var(--ink-08)] transition-colors" style={{ fontWeight: 600 }}>Cancel</button>
+                      <button type="submit" disabled={bizSubmitting} className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50" style={{ fontWeight: 700 }}>
+                        {bizSubmitting ? 'Creating...' : 'Create business'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            )}
+            </>
           )}
 
           {/* OFFERS */}

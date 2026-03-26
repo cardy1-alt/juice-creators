@@ -13,7 +13,10 @@ export type Database = {
           address: string | null;
           bio: string | null;
           approved: boolean;
+          is_live: boolean;
+          region: string;
           logo_url: string | null;
+          instagram_handle: string | null;
           onboarding_complete: boolean;
           onboarding_step: number;
           created_at: string;
@@ -29,7 +32,10 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          is_live?: boolean;
+          region?: string;
           logo_url?: string | null;
+          instagram_handle?: string | null;
           onboarding_complete?: boolean;
           onboarding_step?: number;
           created_at?: string;
@@ -45,7 +51,10 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          is_live?: boolean;
+          region?: string;
           logo_url?: string | null;
+          instagram_handle?: string | null;
           onboarding_complete?: boolean;
           onboarding_step?: number;
           created_at?: string;
@@ -58,6 +67,13 @@ export type Database = {
           description: string;
           monthly_cap: number | null;
           is_live: boolean;
+          offer_type: string | null;
+          offer_item: string | null;
+          content_type: string;
+          specific_ask: string | null;
+          generated_title: string | null;
+          offer_photo_url: string | null;
+          min_level: number;
           created_at: string;
         };
         Insert: {
@@ -66,6 +82,13 @@ export type Database = {
           description: string;
           monthly_cap?: number | null;
           is_live?: boolean;
+          offer_type?: string | null;
+          offer_item?: string | null;
+          content_type?: string;
+          specific_ask?: string | null;
+          generated_title?: string | null;
+          offer_photo_url?: string | null;
+          min_level?: number;
           created_at?: string;
         };
         Update: {
@@ -74,6 +97,13 @@ export type Database = {
           description?: string;
           monthly_cap?: number | null;
           is_live?: boolean;
+          offer_type?: string | null;
+          offer_item?: string | null;
+          content_type?: string;
+          specific_ask?: string | null;
+          generated_title?: string | null;
+          offer_photo_url?: string | null;
+          min_level?: number;
           created_at?: string;
         };
       };
