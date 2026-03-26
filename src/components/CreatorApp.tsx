@@ -1145,20 +1145,7 @@ export default function CreatorApp() {
                 <Heart size={18} strokeWidth={1.5} color={savedOffers.has(offer.id) ? 'var(--terra)' : 'var(--ink)'} fill={savedOffers.has(offer.id) ? 'var(--terra)' : 'none'} />
               </button>
               {/* Text at bottom of image */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px' }}>
-                {/* Metadata row — overlaid inside hero */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <Users size={14} strokeWidth={1.5} color="rgba(255,255,255,0.72)" />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>
-                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
-                    </span>
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                    <Clock size={14} strokeWidth={1.5} color="rgba(255,255,255,0.72)" />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>48hrs to post</span>
-                  </div>
-                </div>
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px 24px' }}>
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
@@ -1168,6 +1155,19 @@ export default function CreatorApp() {
 
             {/* Body */}
             <div className="bg-[var(--shell)]" style={{ paddingBottom: 120 }}>
+              {/* Metadata row — below hero */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Users size={14} strokeWidth={1.5} color="var(--ink-60)" />
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
+                    {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
+                  </span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                  <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
+                </div>
+              </div>
               {/* Divider */}
               <div style={{ height: 1, background: 'var(--ink-08)', margin: '0 20px' }} />
 
