@@ -2033,29 +2033,27 @@ export default function CreatorApp() {
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: 'calc(100vh - 340px)' }}>
-                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)', margin: '0 0 8px', letterSpacing: '-0.03em' }}>Ready to visit?</p>
-                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 32px', maxWidth: 260, lineHeight: 1.65 }}>
-                                      Show this screen to a member of staff and ask them to tap the button below
-                                    </p>
-                                    <button
-                                      onClick={() => setConfirmVisitClaimId(claim.id)}
-                                      disabled={loading}
-                                      style={{
-                                        width: 200, height: 200, borderRadius: '50%', background: 'var(--terra)', border: 'none',
-                                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'white',
-                                        cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                        boxShadow: '0 8px 32px rgba(196,103,74,0.35)',
-                                        letterSpacing: '-0.02em',
-                                      }}
-                                    >
-                                      {loading ? 'Confirming…' : <><span>Confirm</span><br /><span>visit</span></>}
-                                    </button>
-                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)', margin: '20px 0 0', textAlign: 'center' }}>
-                                      This button is for staff to tap in your presence
-                                    </p>
-                                  </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 16 }}>
+                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Ready to visit?</p>
+                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 auto 24px', maxWidth: 240, lineHeight: 1.55 }}>
+                                    Show this screen to staff and ask them to tap the button below
+                                  </p>
+                                  <button
+                                    onClick={() => setConfirmVisitClaimId(claim.id)}
+                                    disabled={loading}
+                                    style={{
+                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--terra)', border: 'none',
+                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: 'white',
+                                      cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                      boxShadow: '0 8px 32px rgba(196,103,74,0.35)',
+                                      letterSpacing: '-0.02em', lineHeight: 1.3,
+                                    }}
+                                  >
+                                    {loading ? 'Confirming…' : <><span>Confirm</span><br /><span>visit</span></>}
+                                  </button>
+                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)', margin: '16px 0 0', textAlign: 'center' }}>
+                                    This button is for staff to tap in your presence
+                                  </p>
                                 </div>
                               )}
 
