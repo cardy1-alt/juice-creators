@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { Check, AlertTriangle, X } from 'lucide-react';
 
 interface DisputeModalProps {
   claimId: string;
@@ -49,7 +49,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
         {submitted ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--card)' }}>
-              <DoodleIcon name="check" size={32} className="text-[var(--terra)]" />
+              <Check size={32} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
             <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
             <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)' }}>
@@ -61,12 +61,12 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
-                  <DoodleIcon name="alert-triangle" size={20} className="text-[var(--terra)]" />
+                  <AlertTriangle size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
                 <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
               </div>
               <button onClick={onClose} className="p-2 rounded-[12px] transition-colors" style={{ background: 'var(--card)' }}>
-                <DoodleIcon name="x" size={20} className="text-[var(--ink-35)]" />
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 

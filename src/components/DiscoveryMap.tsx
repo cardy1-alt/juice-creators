@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { Navigation, Search, MapPin, X } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -177,7 +177,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--card)] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors disabled:opacity-50 min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
-          <DoodleIcon name="navigation" size={16} />
+          <Navigation size={16} strokeWidth={1.5} />
           {isLocating ? 'Finding...' : 'My Location'}
         </button>
         <button
@@ -185,7 +185,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--card)] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
-          <DoodleIcon name="search" size={16} />
+          <Search size={16} strokeWidth={1.5} />
           Enter Location
         </button>
       </div>
@@ -227,7 +227,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
             <div className="text-center bg-[var(--card)]/95 backdrop-blur-sm p-6 rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
-              <DoodleIcon name="map-pin" size={48} className="text-[var(--soft)] mx-auto mb-2" />
+              <MapPin size={48} strokeWidth={1.5} className="text-[var(--soft)] mx-auto mb-2" />
               <p className="text-[var(--mid)] text-[17px] font-semibold">No businesses near you yet</p>
               <p className="text-[var(--soft)] text-[15px] mt-1">Check back soon!</p>
             </div>
@@ -345,7 +345,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                   onClick={() => setSelectedBusiness(null)}
                   className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors"
                 >
-                  <DoodleIcon name="x" size={20} />
+                  <X size={20} strokeWidth={1.5} />
                 </button>
               </div>
 

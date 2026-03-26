@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ComponentType } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { Check, Clock, ChevronLeft, Heart, Lock, Users, MapPin, Zap, Camera, BadgeCheck, Copy, Instagram, Plus, User, ChevronRight, Bell, LogOut, Flag, X, ExternalLink, Home, Sparkles, LayoutGrid, Coffee } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -706,6 +706,13 @@ export default function CreatorApp() {
     { key: 'more', label: 'More', icon: 'grid' as const },
   ];
 
+  const categoryTabIconMap: Record<string, ComponentType<{ size?: number; strokeWidth?: number; color?: string; className?: string }>> = {
+    home: Home,
+    coffee: Coffee,
+    sparkles: Sparkles,
+    grid: LayoutGrid,
+  };
+
   const tabs = [
     { key: 'offers' as const, label: 'Explore', icon: 'explore' as const },
     { key: 'saved' as const, label: 'Saved', icon: 'saved' as const },
@@ -769,7 +776,7 @@ export default function CreatorApp() {
 
       {redeemToast && (
         <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--ink)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
-          <DoodleIcon name="check" size={16} />
+          <Check size={16} strokeWidth={1.5} />
           {redeemToast}
         </div>
       )}
@@ -902,7 +909,7 @@ export default function CreatorApp() {
                   {/* Timer block */}
                   <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
                     <div className="flex items-center gap-[8px]">
-                      <DoodleIcon name="clock" size={16} className="text-[var(--ink-60)]" />
+                      <Clock size={16} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                       <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
                         {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
                       </span>
@@ -1092,7 +1099,7 @@ export default function CreatorApp() {
                 onClick={() => setExpandedOffer(null)}
                 className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="chevron-left" size={18} style={{ color: 'rgba(34,34,34,0.4)' }} />
+                <ChevronLeft size={18} strokeWidth={1.5} color="rgba(34,34,34,0.4)" />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
@@ -1103,15 +1110,15 @@ export default function CreatorApp() {
                 onClick={() => toggleSaved(offer.id)}
                 className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="heart" size={16} style={{ color: 'rgba(34,34,34,0.4)' }} />
+                <Heart size={16} strokeWidth={1.5} color="rgba(34,34,34,0.4)" />
               </button>
               {/* Text overlay */}
-              <div className="relative px-[20px] pb-[20px] pt-[56px]">
-                <CategoryIcon category={offer.businesses.category} className="w-[44px] h-[44px] mb-[10px]" style={{ color: 'rgba(34,34,34,0.4)' }} />
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 28, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.15, margin: 0 }}>
+              <div className="relative px-[20px] pb-[20px] pt-[32px]">
+                <CategoryIcon category={offer.businesses.category} className="w-[36px] h-[36px] mb-[8px]" style={{ color: 'rgba(34,34,34,0.4)' }} />
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.15, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
               </div>
             </div>
 
@@ -1121,7 +1128,7 @@ export default function CreatorApp() {
                 {/* Level requirement banner */}
                 {detailIsLocked && (
                   <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(34,34,34,0.04)' }}>
-                    <DoodleIcon name="lock" size={14} className="text-[var(--ink-60)] mt-0.5 flex-shrink-0" />
+                    <Lock size={14} strokeWidth={1.5} className="text-[var(--ink-60)] mt-0.5 flex-shrink-0" />
                     <div>
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{detailLockedName} creators only</p>
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
@@ -1130,24 +1137,24 @@ export default function CreatorApp() {
                 )}
 
                 {/* A) Scarcity / urgency row */}
-                <div className="flex items-center gap-[20px] mb-[20px]">
+                <div className="flex items-center gap-[20px] mb-[24px]">
                   <div className="flex items-center gap-1.5">
-                    <DoodleIcon name="users" size={14} style={{ color: 'rgba(34,34,34,0.5)' }} />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)' }}>
+                    <Users size={14} strokeWidth={1.5} color="var(--ink-60)" />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
                       {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <DoodleIcon name="clock" size={14} style={{ color: 'rgba(34,34,34,0.5)' }} />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)' }}>48hrs to post</span>
+                    <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
                   </div>
                 </div>
 
                 {/* B) WHAT TO POST label */}
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 10, margin: '0 0 10px' }}>WHAT TO POST</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
 
                 {/* C) Primary post requirement */}
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
 
                 {/* D) Checklist items — no duplicates */}
                 <div className="flex flex-col gap-[10px] mb-[24px]">
@@ -1157,33 +1164,33 @@ export default function CreatorApp() {
                     'Submit your reel link in the app',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
-                      <DoodleIcon name="check" size={13} style={{ color: 'rgba(34,34,34,0.5)', marginTop: 3, flexShrink: 0 }} />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.7)' }}>{item}</span>
+                      <Check size={14} strokeWidth={1.5} color="var(--terra)" style={{ marginTop: 3, flexShrink: 0 }} />
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65 }}>{item}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* E) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
-                  <div className="mb-[24px]">
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>THEY'D LOVE IF YOU…</p>
-                    <div className="rounded-[12px] p-[14px]" style={{ background: 'var(--card)' }}>
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.7)', lineHeight: 1.55, margin: 0 }}>{offer.specific_ask}</p>
+                  <div style={{ marginBottom: 24 }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
+                    <div style={{ borderRadius: 12, padding: '14px 16px', background: 'var(--card)' }}>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink)', lineHeight: 1.65, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
                   </div>
                 )}
 
                 {/* F) About business */}
                 {(offer.businesses.bio || offer.businesses.address) && (
-                  <div className="mb-[24px]">
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>ABOUT</p>
+                  <div style={{ marginBottom: 24 }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
                     {offer.businesses.bio && (
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.8)', lineHeight: 1.55, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
                     )}
                     {offer.businesses.address && (
                       <div className="flex items-center gap-2">
-                        <DoodleIcon name="location-pin" size={15} style={{ color: 'rgba(34,34,34,0.6)', flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.6)' }}>{offer.businesses.address}</span>
+                        <MapPin size={14} strokeWidth={1.5} color="var(--ink-60)" style={{ flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)' }}>{offer.businesses.address}</span>
                       </div>
                     )}
                   </div>
@@ -1192,7 +1199,7 @@ export default function CreatorApp() {
             </div>
 
             {/* Sticky bottom bar */}
-            <div className="px-[20px] py-[14px] bg-[var(--shell)]" style={{ boxShadow: '0 -1px 0 rgba(34,34,34,0.06)' }}>
+            <div style={{ padding: '14px 16px 32px', background: 'var(--shell)', boxShadow: '0 -1px 0 rgba(34,34,34,0.06)' }}>
               {detailIsLocked ? (
                 <div
                   className="w-full py-[14px] rounded-[999px] text-center"
@@ -1229,7 +1236,7 @@ export default function CreatorApp() {
                       className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1"
                       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid var(--ink)', color: 'var(--ink)', background: 'transparent' }}
                     >
-                      On waitlist <DoodleIcon name="check" size={16} />
+                      On waitlist <Check size={16} strokeWidth={1.5} />
                     </button>
                   )}
                 </div>
@@ -1255,22 +1262,21 @@ export default function CreatorApp() {
                       className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
                       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
                     >
-                      <DoodleIcon name="check" size={16} className="text-white" /> Claimed
+                      <Check size={16} strokeWidth={1.5} className="text-white" /> Claimed
                     </button>
                   ) : hasActiveBusiness ? (
                     <button
-                      disabled
-                      className="w-full py-[14px] rounded-[999px] text-center cursor-not-allowed"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', opacity: 0.5 }}
+                      className="w-full py-[14px] rounded-[999px] text-center"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', borderRadius: 999 }}
                     >
-                      Active
+                      Active visit
                     </button>
                   ) : (
                     <button
                       onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
                       disabled={loading}
                       className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
                     >
                       Claim
                     </button>
@@ -1325,7 +1331,7 @@ export default function CreatorApp() {
                 {/* ── Header: logo + user info ── */}
                 <div style={{ padding: '16px 20px 0' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                    <Logo variant="icon-word" size={40} />
+                    <Logo variant="wordmark" size={22} />
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.2 }}>
                         {userProfile?.display_name || userProfile?.name || ''}
@@ -1378,7 +1384,7 @@ export default function CreatorApp() {
                           marginBottom: -1, transition: 'all 0.15s ease',
                         }}
                       >
-                        <DoodleIcon name={cat.icon} size={22} style={{ color: isActive ? 'var(--terra)' : 'var(--ink-35)' }} />
+                        {(() => { const TabIcon = categoryTabIconMap[cat.icon]; return TabIcon ? <TabIcon size={22} strokeWidth={1.5} color={isActive ? 'var(--terra)' : 'var(--ink-35)'} /> : null; })()}
                         <span style={{
                           fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isActive ? 600 : 400, fontSize: 12,
                           color: isActive ? 'var(--terra)' : 'var(--ink-35)',
@@ -1396,7 +1402,7 @@ export default function CreatorApp() {
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Your passes</span>
                         <button onClick={() => setView('active')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
-                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x mandatory' }}>
+                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 24px 4px', scrollbarWidth: 'none', scrollSnapType: 'x mandatory' }}>
                         {activeClaims.filter(c => c.businesses && c.offers).map((claim) => {
                           const claimTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                           const claimBiz = claim.businesses?.name || '';
@@ -1406,9 +1412,9 @@ export default function CreatorApp() {
                               key={claim.id}
                               onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); setQrOpenSource('home'); }}
                               style={{
-                                width: 'calc(100vw - 56px)', maxWidth: 360, flexShrink: 0, height: 260, borderRadius: 16,
+                                width: 'calc(100vw - 48px)', flexShrink: 0, height: 260, borderRadius: 16,
                                 border: 'none', cursor: 'pointer', textAlign: 'left', position: 'relative', overflow: 'hidden',
-                                scrollSnapAlign: 'start', background: 'var(--ink)',
+                                scrollSnapAlign: 'center', background: 'var(--ink)',
                               }}
                             >
                               {/* Background image */}
@@ -1714,7 +1720,7 @@ export default function CreatorApp() {
                           onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
                           className="flex-shrink-0 p-2"
                         >
-                          <DoodleIcon name="heart" size={20} className="text-[var(--terra)] fill-[var(--terra)]" />
+                          <Heart size={20} strokeWidth={1.5} className="text-[var(--terra)] fill-[var(--terra)]" />
                         </button>
                       </button>
                     );
@@ -1730,7 +1736,7 @@ export default function CreatorApp() {
             <>
               {activeClaims.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-6">
-                  <DoodleIcon name="zap" size={48} className="text-[var(--ink-35)] mb-4" />
+                  <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mb-4" />
                   <p className="text-[20px] font-bold text-[var(--ink)] mb-1">No active claims</p>
                   <p className="text-[18px] text-[var(--ink-60)] mb-5">Claim an offer to get started</p>
                   <button
@@ -1887,7 +1893,7 @@ export default function CreatorApp() {
                                   background: isOverdue ? 'var(--terra-10)' : 'rgba(245,196,160,0.12)',
                                 }}>
                                   <div className="flex items-center gap-2 mb-2">
-                                    <DoodleIcon name="clock" size={16} className="text-[var(--ink-60)]" />
+                                    <Clock size={16} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                                     <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : 'var(--ink)', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
@@ -1937,7 +1943,7 @@ export default function CreatorApp() {
 
                               {claim.reel_url && (
                                 <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[var(--card)]">
-                                  <DoodleIcon name="check" size={16} className="text-[var(--terra)] flex-shrink-0" />
+                                  <Check size={16} strokeWidth={1.5} className="text-[var(--terra)] flex-shrink-0" />
                                   <span className="text-[18px] text-[var(--ink)] font-medium">Reel submitted!</span>
                                 </div>
                               )}
@@ -1969,7 +1975,7 @@ export default function CreatorApp() {
                                       className="flex items-center gap-1 font-medium transition-colors"
                                       style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
                                     >
-                                      <DoodleIcon name="flag" size={11} /> Report an issue
+                                      <Flag size={11} strokeWidth={1.5} /> Report an issue
                                     </button>
                                     {(() => {
                                       const releaseStatus = canReleaseOffer(claim);
@@ -1982,7 +1988,7 @@ export default function CreatorApp() {
                                               className="flex items-center gap-1 font-medium transition-colors"
                                               style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
                                             >
-                                              <DoodleIcon name="x" size={11} /> Release offer
+                                              <X size={11} strokeWidth={1.5} /> Release offer
                                             </button>
                                           </>
                                         );
@@ -2012,7 +2018,7 @@ export default function CreatorApp() {
               <h1 className="text-[28px] text-[var(--ink)] mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
-                  <DoodleIcon name="zap" size={48} className="text-[var(--ink-35)] mx-auto mb-4" />
+                  <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mx-auto mb-4" />
                   <p className="text-[18px] font-semibold text-[var(--ink)]">No claims yet</p>
                   <p className="text-[18px] text-[var(--ink-60)] mt-1">Claim an offer to get started</p>
                 </div>
@@ -2052,7 +2058,7 @@ export default function CreatorApp() {
                                 onClick={(e) => e.stopPropagation()}
                                 className="flex items-center gap-1 text-[15px] font-semibold text-[var(--ink-60)] hover:underline"
                               >
-                                View Reel <DoodleIcon name="external-link" size={12} />
+                                View Reel <ExternalLink size={12} strokeWidth={1.5} />
                               </a>
                             )}
                           </div>
@@ -2085,7 +2091,7 @@ export default function CreatorApp() {
             <div className="px-[20px] pt-8">
               {isPendingApproval && (
                 <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(34,34,34,0.04)' }}>
-                  <DoodleIcon name="clock" size={28} className="text-[var(--ink-60)] mx-auto mb-2.5" />
+                  <Clock size={28} strokeWidth={1.5} className="text-[var(--ink-60)] mx-auto mb-2.5" />
                   <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">Account Under Review</h3>
                   <p className="text-[15px] text-[var(--ink-60)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
                 </div>
@@ -2125,7 +2131,7 @@ export default function CreatorApp() {
                           onClick={() => avatarInputRef.current?.click()}
                           className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
                         >
-                          <DoodleIcon name="camera" size={11} className="text-white" />
+                          <Camera size={11} strokeWidth={1.5} className="text-white" />
                         </button>
                       </div>
 
@@ -2136,7 +2142,7 @@ export default function CreatorApp() {
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
                             <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--terra)]">
-                              <DoodleIcon name="badge-check" size={13} /> Verified
+                              <BadgeCheck size={13} strokeWidth={1.5} /> Verified
                             </span>
                           )}
                         </div>
@@ -2146,12 +2152,12 @@ export default function CreatorApp() {
                             {copiedCode ? (
                               <span className="text-[var(--ink)] text-[13px]">Copied!</span>
                             ) : (
-                              <DoodleIcon name="copy" size={12} />
+                              <Copy size={12} strokeWidth={1.5} />
                             )}
                           </button>
                           {userProfile.instagram_handle && (
                             <span className="flex items-center gap-1 text-[14px] text-[var(--ink-35)]">
-                              <DoodleIcon name="instagram" size={12} /> {userProfile.instagram_handle}
+                              <Instagram size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
                             </span>
                           )}
                         </div>
@@ -2183,7 +2189,7 @@ export default function CreatorApp() {
                       return (
                         <div className="flex items-center gap-[10px] rounded-[18px] p-[14px_16px] mb-[16px]" style={{ background: 'var(--card)' }}>
                           <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
-                            <DoodleIcon name="badge-check" size={18} className="text-[var(--terra)]" />
+                            <BadgeCheck size={18} strokeWidth={1.5} className="text-[var(--terra)]" />
                           </div>
                           <div>
                             <p className="text-[18px] font-bold text-[var(--ink)]">Profile complete</p>
@@ -2204,7 +2210,7 @@ export default function CreatorApp() {
                         <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
                             <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[999px] text-[14px] font-semibold text-[var(--ink-60)] bg-[var(--shell)]">
-                              <DoodleIcon name="plus" size={16} className="w-[10px] h-[10px]" /> {field.label}
+                              <Plus size={16} strokeWidth={1.5} className="w-[10px] h-[10px]" /> {field.label}
                             </span>
                           ))}
                         </div>
@@ -2400,17 +2406,17 @@ export default function CreatorApp() {
                       className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <DoodleIcon name="user" size={20} className="text-[var(--ink-60)]" />
+                        <User size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                         <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Edit profile</span>
                       </div>
-                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--ink-35)]" />
+                      <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
                     </button>
                     <button
                       onClick={() => setProfileSubView('alerts')}
                       className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <DoodleIcon name="bell" size={20} className="text-[var(--ink-60)]" />
+                        <Bell size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                         <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Notifications</span>
                         {unreadCount > 0 && (
                           <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-bold flex items-center justify-center">
@@ -2418,13 +2424,13 @@ export default function CreatorApp() {
                           </span>
                         )}
                       </div>
-                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--ink-35)]" />
+                      <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
                     </button>
                     <button
                       onClick={signOut}
                       className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
-                      <DoodleIcon name="logout" size={20} className="text-[var(--terra)]" />
+                      <LogOut size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
                       <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
                     </button>
                   </div>
@@ -2434,7 +2440,7 @@ export default function CreatorApp() {
                 <>
                   <div className="flex items-center gap-3 mb-5">
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
-                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink)]" />
+                      <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
                     <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Notifications</h1>
                   </div>
@@ -2490,7 +2496,7 @@ export default function CreatorApp() {
                 <>
                   <div className="flex items-center gap-3 mb-5">
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
-                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink)]" />
+                      <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
                     <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Edit profile</h1>
                   </div>
@@ -2526,7 +2532,7 @@ export default function CreatorApp() {
                         <div
                           className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
                         >
-                          <DoodleIcon name="camera" size={13} className="text-white" />
+                          <Camera size={13} strokeWidth={1.5} className="text-white" />
                         </div>
                       </button>
                       <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Tap to change photo</p>

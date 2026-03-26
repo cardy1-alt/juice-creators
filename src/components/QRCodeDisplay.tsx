@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { supabase } from '../lib/supabase';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { RefreshCw } from 'lucide-react';
 
 interface QRCodeDisplayProps {
   token: string;
@@ -351,7 +351,7 @@ export default function QRCodeDisplay({ token, claimId, creatorCode, size: displ
 
           {/* Refresh timer */}
           <div className="flex items-center gap-1.5" style={{ marginTop: 12 }}>
-            <DoodleIcon name="sync" size={12} className={isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'} />
+            <RefreshCw size={12} strokeWidth={1.5} className={isRefreshing ? 'animate-spin text-[var(--terra)]' : 'text-[var(--soft)]'} />
             <span className={`text-[14px] font-medium ${isUrgent ? 'text-[var(--terra)]' : 'text-[var(--soft)]'}`}>
               Refreshes in {timeLeft}s
             </span>
