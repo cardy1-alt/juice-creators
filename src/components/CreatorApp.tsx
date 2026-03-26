@@ -1130,6 +1130,19 @@ export default function CreatorApp() {
               </button>
               {/* Text at bottom of image */}
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px' }}>
+                {/* Metadata row — overlaid inside hero */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Users size={14} strokeWidth={1.5} color="rgba(255,255,255,0.72)" />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>
+                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
+                    </span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                    <Clock size={14} strokeWidth={1.5} color="rgba(255,255,255,0.72)" />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.72)' }}>48hrs to post</span>
+                  </div>
+                </div>
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
@@ -1139,19 +1152,6 @@ export default function CreatorApp() {
 
             {/* Body */}
             <div className="bg-[var(--shell)]" style={{ paddingBottom: 120 }}>
-              {/* Availability row */}
-              <div style={{ padding: '16px 20px', display: 'flex', gap: 16 }}>
-                <div className="flex items-center gap-1.5">
-                  <Users size={15} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
-                    {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
-                  </span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Clock size={15} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
-                </div>
-              </div>
               {/* Divider */}
               <div style={{ height: 1, background: 'var(--ink-08)', margin: '0 20px' }} />
 
@@ -1518,12 +1518,11 @@ export default function CreatorApp() {
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
                               width: 'calc(50vw - 24px)', flexShrink: 0,
-                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              background: 'var(--card)',
+                              cursor: 'pointer', position: 'relative',
                             }}
                           >
                             {/* Image area */}
-                            <div style={{ position: 'relative', height: 140 }}>
+                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1555,11 +1554,9 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            {/* Text below image */}
-                            <div style={{ padding: '8px 10px 10px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                            </div>
+                            {/* Text below image — no container */}
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1590,12 +1587,10 @@ export default function CreatorApp() {
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
                               width: 'calc(50vw - 24px)', flexShrink: 0,
-                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              background: 'var(--card)',
+                              cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            {/* Image area */}
-                            <div style={{ position: 'relative', height: 140 }}>
+                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1625,11 +1620,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            {/* Text below image */}
-                            <div style={{ padding: '8px 10px 10px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                            </div>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1657,12 +1649,10 @@ export default function CreatorApp() {
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
                               width: 'calc(50vw - 24px)', flexShrink: 0,
-                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              background: 'var(--card)',
+                              cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            {/* Image area */}
-                            <div style={{ position: 'relative', height: 140 }}>
+                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1692,11 +1682,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            {/* Text below image */}
-                            <div style={{ padding: '8px 10px 10px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                            </div>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1729,12 +1716,10 @@ export default function CreatorApp() {
                               onClick={() => setExpandedOffer(offer.id)}
                               style={{
                                 width: 'calc(50vw - 24px)', flexShrink: 0,
-                                borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                                background: 'var(--card)',
+                                cursor: 'pointer', position: 'relative',
                               }}
                             >
-                              {/* Image area */}
-                              <div style={{ position: 'relative', height: 140 }}>
+                              <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
                                 {offer.offer_photo_url ? (
                                   <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                 ) : (
@@ -1774,11 +1759,8 @@ export default function CreatorApp() {
                                   {slotsUsed} claimed
                                 </span>
                               </div>
-                              {/* Text below image */}
-                              <div style={{ padding: '8px 10px 10px' }}>
-                                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                              </div>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                             </div>
                           );
                         })}
