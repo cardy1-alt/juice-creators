@@ -1142,13 +1142,13 @@ export default function CreatorApp() {
               {/* Availability row */}
               <div style={{ padding: '16px 20px', display: 'flex', gap: 16 }}>
                 <div className="flex items-center gap-1.5">
-                  <Users size={15} strokeWidth={1.5} color="var(--ink-35)" />
+                  <Users size={15} strokeWidth={1.5} color="var(--ink-60)" />
                   <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
                     {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
                   </span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <Clock size={15} strokeWidth={1.5} color="var(--ink-35)" />
+                  <Clock size={15} strokeWidth={1.5} color="var(--ink-60)" />
                   <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
                 </div>
               </div>
@@ -1168,7 +1168,7 @@ export default function CreatorApp() {
                 )}
 
                 {/* WHAT TO POST label */}
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
 
                 {/* C) Primary post requirement */}
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
@@ -1190,7 +1190,7 @@ export default function CreatorApp() {
                 {/* E) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
                   <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
                     <div style={{ borderRadius: 12, padding: '14px 16px', background: 'var(--card)' }}>
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink)', lineHeight: 1.65, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
@@ -1200,7 +1200,7 @@ export default function CreatorApp() {
                 {/* F) About business */}
                 {(offer.businesses.bio || offer.businesses.address) && (
                   <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
                     {offer.businesses.bio && (
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
                     )}
@@ -1429,17 +1429,17 @@ export default function CreatorApp() {
                               key={claim.id}
                               onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); setQrOpenSource('home'); }}
                               style={{
-                                width: 'calc(100vw - 48px)', flexShrink: 0, height: 200, borderRadius: 16,
+                                width: 'calc(100vw - 48px)', flexShrink: 0, height: 180, borderRadius: 16,
                                 border: 'none', cursor: 'pointer', textAlign: 'left', position: 'relative', overflow: 'hidden',
                                 scrollSnapAlign: 'center', background: 'var(--ink)',
                               }}
                             >
                               {/* Background image */}
                               {claimPhoto && <img src={claimPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.72) 0%, rgba(34,34,34,0) 55%)', pointerEvents: 'none' }} />
-                              {/* QR icon — top right */}
+                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 50%)', pointerEvents: 'none' }} />
+                              {/* QR icon — bottom right */}
                               <span style={{
-                                position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
+                                position: 'absolute', bottom: 12, right: 12, width: 32, height: 32, borderRadius: '50%',
                                 background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center',
                               }}>
@@ -1448,12 +1448,12 @@ export default function CreatorApp() {
                                 </svg>
                               </span>
                               {/* Content */}
-                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px 16px' }}>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>{claimBiz}</span>
-                                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'white', letterSpacing: '-0.02em', margin: '3px 0 6px', lineHeight: 1.15 }}>{claimTitle}</h3>
+                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 14px' }}>
+                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.72)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'block' }}>{claimBiz}</span>
+                                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: 'white', letterSpacing: '-0.02em', margin: '2px 0 5px', lineHeight: 1.15, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</h3>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--peach)' }} />
-                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>Show at the door</span>
+                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--peach)', flexShrink: 0 }} />
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 11, color: 'rgba(255,255,255,0.85)' }}>Show at the door</span>
                                 </div>
                               </div>
                             </button>
@@ -1642,7 +1642,7 @@ export default function CreatorApp() {
                   <div style={{ marginTop: 24, padding: '0 20px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
                       <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>All offers</span>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>{filteredOffers.length} available</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>{filteredOffers.length} available</span>
                     </div>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
                       {filteredOffers.map((offer) => {
@@ -1801,7 +1801,7 @@ export default function CreatorApp() {
                   {/* Header bar: "Active passes" + "X / Y" counter */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
                     <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Active passes</span>
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-60)' }}>
                       {(() => {
                         const filtered = activeClaims.filter(c => c.businesses && c.offers);
                         const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
@@ -2107,7 +2107,7 @@ export default function CreatorApp() {
                             <StatusPill status={claim.status} />
                           </div>
                           <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[var(--ink-08)]">
-                            <span className="text-[12px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+                            <span className="text-[13px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
                               {formatDate(claim.claimed_at)}
                             </span>
                             {claim.reel_url && (
@@ -2135,7 +2135,7 @@ export default function CreatorApp() {
           {view === 'all_offers' && (
             <div className="px-[20px] pt-5">
               <h1 className="text-[26px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>All offers</h1>
-              <p className="text-[12px] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-35)' }}>
+              <p className="text-[13px] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
                 {offers.length} live this week
               </p>
               <div className="text-center py-20">
@@ -2229,15 +2229,15 @@ export default function CreatorApp() {
                     <div className="flex items-center gap-[8px] mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
                         <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{claims.length}</p>
-                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
                         <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{collabsCompleted}</p>
-                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Posted</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Posted</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
                         <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
-                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Rating</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Rating</p>
                       </div>
                     </div>
                   </div>
@@ -2541,7 +2541,7 @@ export default function CreatorApp() {
                             <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'}`} />
                             <div className="flex-1 min-w-0">
                               <p className="text-[17px] text-[var(--ink)]">{notif.message}</p>
-                              <p className="text-[15px] text-[var(--ink-35)] mt-1">
+                              <p className="text-[13px] text-[var(--ink-60)] mt-1">
                                 {formatDate(notif.created_at)}
                               </p>
                             </div>
