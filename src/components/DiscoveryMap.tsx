@@ -44,8 +44,8 @@ function createMarkerIcon(name: string) {
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 2px 8px rgba(44,36,32,0.2);
-      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 2px 8px rgba(34,34,34,0.2);
+      font-family: 'Plus Jakarta Sans', sans-serif;
     ">${initials}</div>`,
     className: 'marker-icon',
     iconSize: [40, 40],
@@ -174,7 +174,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         <button
           onClick={requestLocation}
           disabled={isLocating}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EDE8DC] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors disabled:opacity-50 min-h-[44px]"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--card)] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors disabled:opacity-50 min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
           <DoodleIcon name="navigation" size={16} />
@@ -182,7 +182,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
         </button>
         <button
           onClick={() => setShowLocationInput(!showLocationInput)}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[#EDE8DC] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors min-h-[44px]"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--card)] text-[var(--near-black)] rounded-full text-[15px] font-semibold hover:bg-[var(--bg)] transition-colors min-h-[44px]"
           style={{ border: '1px solid var(--faint)' }}
         >
           <DoodleIcon name="search" size={16} />
@@ -195,7 +195,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       )}
 
       {showLocationInput && (
-        <div className="mb-3 bg-[#EDE8DC] rounded-[18px] p-4 shadow-[0_2px_12px_rgba(44,36,32,0.08)] relative">
+        <div className="mb-3 bg-[var(--card)] rounded-[18px] p-4 shadow-[0_2px_12px_rgba(34,34,34,0.08)] relative">
           <label className="block text-[15px] font-semibold text-[var(--near-black)] mb-2">
             Enter address or postcode
           </label>
@@ -208,7 +208,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
           />
           {/* Autocomplete dropdown */}
           {searchResults.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-[#EDE8DC] rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] z-20 overflow-hidden">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-[var(--card)] rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] z-20 overflow-hidden">
               {searchResults.map((result, idx) => (
                 <button
                   key={idx}
@@ -226,7 +226,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
       <div className="relative bg-[var(--bg)] rounded-[18px] overflow-hidden" style={{ height: '400px' }}>
         {businessesWithCoords.length === 0 && (
           <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-            <div className="text-center bg-[#EDE8DC]/95 backdrop-blur-sm p-6 rounded-[18px] shadow-[0_2px_12px_rgba(44,36,32,0.08)]">
+            <div className="text-center bg-[var(--card)]/95 backdrop-blur-sm p-6 rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
               <DoodleIcon name="map-pin" size={48} className="text-[var(--soft)] mx-auto mb-2" />
               <p className="text-[var(--mid)] text-[17px] font-semibold">No businesses near you yet</p>
               <p className="text-[var(--soft)] text-[15px] mt-1">Check back soon!</p>
@@ -279,14 +279,14 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       <div className="mt-4 space-y-[14px] overflow-y-auto" style={{ maxHeight: 'calc(100vh - 550px)' }}>
         <div className="flex items-center justify-between mb-2">
-          <h3 className="font-display font-normal text-[17px] text-[var(--near-black)]">Nearby Businesses</h3>
+          <h3 className="font-sans font-bold text-[17px] text-[var(--near-black)]">Nearby Businesses</h3>
           <span className="text-[15px] text-[var(--soft)]">{businessesWithDistance.length} found</span>
         </div>
 
         {businessesWithDistance.map((business) => (
           <div
             key={business.id}
-            className="bg-[#EDE8DC] rounded-[18px] p-[16px] shadow-[0_2px_12px_rgba(44,36,32,0.08)] cursor-pointer hover:shadow-[0_4px_20px_rgba(44,36,32,0.12)] transition-all"
+            className="bg-[var(--card)] rounded-[18px] p-[16px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] cursor-pointer hover:shadow-[0_4px_20px_rgba(34,34,34,0.12)] transition-all"
             onClick={() => setSelectedBusiness(business)}
           >
             <div className="flex items-start gap-3">
@@ -317,11 +317,11 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
 
       {selectedBusiness && (
         <div
-          className="fixed inset-0 bg-[#2C2420]/40 flex items-end justify-center z-50 p-4"
+          className="fixed inset-0 bg-[var(--ink)]/40 flex items-end justify-center z-50 p-4"
           onClick={() => setSelectedBusiness(null)}
         >
           <div
-            className="bg-[#EDE8DC] rounded-[18px] w-full max-w-md shadow-[0_4px_24px_rgba(44,36,32,0.12)] overflow-hidden animate-slide-up"
+            className="bg-[var(--card)] rounded-[18px] w-full max-w-md shadow-[0_4px_24px_rgba(34,34,34,0.12)] overflow-hidden animate-slide-up"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-5">
@@ -362,7 +362,7 @@ export default function DiscoveryMap({ businesses, onClaimOffer, userLocation }:
                     <div key={offer.id} className="bg-[var(--bg)] rounded-[12px] p-3">
                       <p className="text-[18px] text-[var(--mid)] mb-2">{offer.description}</p>
                       <div className="flex items-center justify-between">
-                        <span className="text-[15px] font-bold text-[var(--forest)]">{offer.reward_value}</span>
+                        <span className="text-[15px] font-bold text-[var(--terra)]">{offer.reward_value}</span>
                         <button
                           onClick={() => {
                             onClaimOffer(offer.id);

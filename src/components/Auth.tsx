@@ -139,13 +139,12 @@ function AddressAutocomplete({ value, onChange }: {
   return (
     <div ref={wrapperRef} className="relative">
       <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Address</label>
-      <div className={`relative rounded-[12px] border transition-all duration-200 ${
-        focused
-          ? 'border-[var(--ink)] bg-[var(--card)]'
-          : mapsError
-          ? 'border-[var(--terra)] bg-[var(--card)]'
-          : 'border-[var(--border)] bg-[var(--card)]'
-      }`}>
+      <div className="relative transition-all duration-200" style={{
+        borderRadius: '14px',
+        border: focused ? '1.5px solid var(--terra)' : mapsError ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
+        background: 'var(--card)',
+        boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
+      }}>
         <DoodleIcon name="map-pin" size={16} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'
         }`} />
@@ -164,14 +163,14 @@ function AddressAutocomplete({ value, onChange }: {
         <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
       )}
       {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] bg-[var(--card)] rounded-[12px] shadow-[0_4px_16px_rgba(40,32,26,0.10)] overflow-hidden border border-[var(--border)]">
+        <div className="absolute z-50 left-0 right-0 mt-[4px] overflow-hidden" style={{ background: 'var(--card)', borderRadius: '14px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--ink-08)' }}>
           {suggestions.map((s) => (
             <button
               key={s.place_id}
               type="button"
               onMouseDown={(e) => e.preventDefault()}
               onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[15px] text-[var(--ink)] hover:bg-[var(--shell)] transition-colors flex items-center gap-[10px] border-b border-[var(--border)] last:border-b-0"
+              className="w-full text-left px-[14px] py-[12px] text-[15px] text-[var(--ink)] hover:bg-[var(--shell)] transition-colors flex items-center gap-[10px]" style={{ borderBottom: '1px solid var(--ink-08)' }}
             >
               <DoodleIcon name="map-pin" size={14} className="text-[var(--ink-35)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
@@ -199,11 +198,12 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative rounded-[12px] border transition-all duration-200 ${
-      focused
-        ? 'border-[var(--ink)] bg-[var(--card)]'
-        : 'border-[var(--border)] bg-[var(--card)]'
-    }`}>
+    <div className="relative transition-all duration-200" style={{
+      borderRadius: '14px',
+      border: focused ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
+      background: 'var(--card)',
+      boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
+    }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -219,7 +219,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
         className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
-        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
+        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
         required={required}
         minLength={minLength}
       />
@@ -334,18 +334,17 @@ export default function Auth() {
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
           {/* Brand section */}
           <div className="flex flex-col items-center mb-[32px]">
-            <span style={{ fontFamily: "'Corben', serif", fontSize: 38, fontWeight: 400, color: 'var(--ink)', letterSpacing: '-1px', lineHeight: 1.1 }}>
+            <span style={{ fontFamily: "'Corben', serif", fontSize: 24, fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
               nayba
             </span>
-            <div style={{ width: 32, height: 2, background: 'var(--terra)', borderRadius: 2, marginTop: 10 }} />
           </div>
 
           {/* Hero copy */}
           <div className="text-center mb-[32px]">
-            <h1 style={{ fontFamily: "'Corben', serif", fontSize: 28, fontWeight: 400, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-0.6px', margin: 0 }}>
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 26, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-0.03em', margin: 0 }}>
               Local offers.<br />Yours to claim.
             </h1>
-            <p style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 14, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.7, marginTop: 12 }}>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 12 }}>
               Vetted creators only. Claim offers from local businesses, visit in person, post your Reel.
             </p>
           </div>
@@ -386,12 +385,12 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
-              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, marginTop: 2 }}
+              className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px', marginTop: 2 }}
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-[var(--shell)]/30 border-t-[var(--shell)] rounded-full animate-spin" />
+                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                 </span>
               ) : 'Sign In'}
             </button>
@@ -399,19 +398,19 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[13px] text-[var(--ink-35)] text-center mt-[8px] hover:text-[var(--ink-60)] transition-colors mx-auto"
-              style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400 }}
+              className="block text-[13px] text-center mt-[8px] transition-colors mx-auto"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: 'var(--terra)' }}
             >
               Forgot password?
             </button>
 
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)' }}>
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)' }}>
               Not a member?{' '}
               <button
                 type="button"
                 onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-                className="underline hover:text-[var(--ink)] transition-colors"
-                style={{ color: 'var(--ink-60)', textUnderlineOffset: 3, fontWeight: 400, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+                className="hover:text-[var(--ink)] transition-colors"
+                style={{ color: 'var(--terra)', fontWeight: 500, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
               >
                 Apply for access
               </button>
@@ -435,13 +434,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
                 </div>
-                <p className="font-display text-[19px] text-[var(--ink)] mb-[6px]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>Check your email</p>
+                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="font-display text-[19px] text-[var(--ink)] mb-[4px]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>Reset password</p>
+                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Reset password</p>
                   <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -461,8 +460,8 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={resetLoading}
-                  className="w-full py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
-                  style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
+                  className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -476,10 +475,9 @@ export default function Auth() {
         <div className="flex-1 flex flex-col">
           {/* Signup header */}
           <div className="flex flex-col items-center pt-[44px] pb-[24px] px-6">
-            <span style={{ fontFamily: "'Corben', serif", fontSize: 28, fontWeight: 400, color: 'var(--ink)', letterSpacing: '-0.6px', lineHeight: 1.1 }}>
+            <span style={{ fontFamily: "'Corben', serif", fontSize: 24, fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
               nayba
             </span>
-            <div style={{ width: 24, height: 2, background: 'var(--terra)', borderRadius: 2, marginTop: 8 }} />
           </div>
 
           <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
@@ -489,36 +487,36 @@ export default function Auth() {
               <button
                 type="button"
                 onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border transition-all duration-200 ${
-                  role === 'creator'
-                    ? 'border-[var(--ink)] bg-[var(--card)]'
-                    : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--ink-35)]'
-                }`}
+                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
+                style={{
+                  borderRadius: '16px',
+                  border: role === 'creator' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
+                  background: role === 'creator' ? 'var(--terra-5)' : 'var(--card)',
+                  padding: '24px',
+                }}
               >
-                <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'creator' ? 'bg-[var(--ink-08)]' : 'bg-[var(--shell)]'
-                }`}>
-                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
+                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'creator' ? 'var(--terra-10)' : 'var(--card)' }}>
+                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
-                <span className={`text-[15px] font-bold ${role === 'creator' ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'creator' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Creator
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
-                className={`flex-1 flex flex-col items-center gap-[8px] py-[18px] rounded-[18px] border transition-all duration-200 ${
-                  role === 'business'
-                    ? 'border-[var(--ink)] bg-[var(--card)]'
-                    : 'border-[var(--border)] bg-[var(--card)] hover:border-[var(--ink-35)]'
-                }`}
+                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
+                style={{
+                  borderRadius: '16px',
+                  border: role === 'business' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
+                  background: role === 'business' ? 'var(--terra-5)' : 'var(--card)',
+                  padding: '24px',
+                }}
               >
-                <div className={`w-[40px] h-[40px] rounded-[12px] flex items-center justify-center transition-colors ${
-                  role === 'business' ? 'bg-[var(--ink-08)]' : 'bg-[var(--shell)]'
-                }`}>
-                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
+                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'business' ? 'var(--terra-10)' : 'var(--card)' }}>
+                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
-                <span className={`text-[15px] font-bold ${role === 'business' ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'business' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Business
                 </span>
               </button>
@@ -528,23 +526,20 @@ export default function Auth() {
             <div className="flex items-center gap-[6px] mb-[20px]">
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center gap-[6px]">
-                  <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300 ${
-                    signupStep > step
-                      ? 'bg-[var(--ink)] text-[var(--shell)]'
-                      : signupStep === step
-                        ? 'bg-[var(--ink)] text-[var(--shell)]'
-                        : 'bg-[var(--card)] text-[var(--ink-35)]'
-                  }`}>
+                  <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300" style={{
+                    background: signupStep >= step ? 'var(--terra)' : 'var(--ink-08)',
+                    color: signupStep >= step ? 'white' : 'var(--ink-35)',
+                  }}>
                     {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
                   </div>
-                  {step < 3 && <div className={`w-[24px] h-[2px] rounded-full transition-colors duration-300 ${signupStep > step ? 'bg-[var(--ink)]' : 'bg-[var(--card)]'}`} />}
+                  {step < 3 && <div className="w-[24px] h-[2px] rounded-full transition-colors duration-300" style={{ background: signupStep > step ? 'var(--terra)' : 'var(--ink-08)' }} />}
                 </div>
               ))}
             </div>
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 className="font-display text-[21px] text-[var(--ink)]" style={{ letterSpacing: '-0.025em', fontWeight: 400 }}>
+              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p className="text-[14px] text-[var(--ink-60)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
@@ -567,11 +562,14 @@ export default function Auth() {
                             key={opt}
                             type="button"
                             onClick={() => setFollowerCount(opt)}
-                            className="flex-1 py-[10px] rounded-[10px] text-[14px] font-semibold transition-all"
+                            className="flex-1 py-[10px] text-[14px] transition-all"
                             style={{
-                              background: followerCount === opt ? 'var(--ink)' : 'var(--card)',
-                              color: followerCount === opt ? 'var(--shell)' : 'var(--ink)',
-                              border: followerCount === opt ? '1px solid var(--ink)' : '1px solid var(--border)',
+                              fontFamily: "'Plus Jakarta Sans', sans-serif",
+                              fontWeight: followerCount === opt ? 700 : 600,
+                              borderRadius: '999px',
+                              background: followerCount === opt ? 'var(--terra)' : 'var(--card)',
+                              color: followerCount === opt ? 'white' : 'var(--ink-35)',
+                              border: followerCount === opt ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
                             }}
                           >
                             {opt}
@@ -592,7 +590,7 @@ export default function Auth() {
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -604,7 +602,7 @@ export default function Auth() {
                         <select
                           value={dobMonth}
                           onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -616,7 +614,7 @@ export default function Auth() {
                         <select
                           value={dobYear}
                           onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border border-[var(--border)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--ink)] transition-all appearance-none"
+                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
                           style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
                           required
                         >
@@ -676,14 +674,15 @@ export default function Auth() {
                             key={cat}
                             type="button"
                             onClick={() => setCategory(cat)}
-                            className="flex items-center gap-[8px] px-[12px] py-[12px] rounded-[14px] text-left transition-all duration-200"
+                            className="flex items-center gap-[8px] px-[12px] py-[12px] text-left transition-all duration-200"
                             style={{
-                              border: category === cat ? '1px solid var(--ink)' : '1px solid var(--border)',
-                              background: category === cat ? 'var(--ink-08)' : 'var(--card)',
+                              borderRadius: '14px',
+                              border: category === cat ? '2px solid var(--terra)' : '1.5px solid var(--ink-08)',
+                              background: category === cat ? 'var(--terra-5)' : 'var(--card)',
                             }}
                           >
-                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--ink)]' : 'text-[var(--ink-35)]'}`} />
-                            <span className={`text-[15px] font-semibold truncate ${category === cat ? 'text-[var(--ink)]' : 'text-[var(--ink-60)]'}`}>{cat}</span>
+                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
+                            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '15px', color: category === cat ? 'var(--ink)' : 'var(--ink-60)' }} className="truncate">{cat}</span>
                           </button>
                         ))}
                       </div>
@@ -707,7 +706,10 @@ export default function Auth() {
                           placeholder="Tell creators a bit about your business..."
                           maxLength={150}
                           rows={3}
-                          className="w-full px-[16px] py-[14px] rounded-[12px] bg-[var(--card)] border border-[var(--border)] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--ink)] transition-all resize-none"
+                          className="w-full px-[16px] py-[14px] bg-[var(--card)] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none transition-all resize-none"
+                          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, border: '1.5px solid var(--ink-08)', borderRadius: '14px' }}
+                          onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                          onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                           required
                         />
                         <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/150</span>
@@ -755,7 +757,7 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                      className="w-[52px] h-[52px] rounded-[12px] flex items-center justify-center bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--border)] transition-all active:scale-[0.96]"
+                      className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
                     >
                       <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
                     </button>
@@ -782,8 +784,8 @@ export default function Auth() {
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
-                    className="flex-1 py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all inline-flex items-center justify-center gap-[6px]"
-                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
+                    className="flex-1 min-h-[52px] text-white transition-all active:scale-[0.98] inline-flex items-center justify-center gap-[6px]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                   >
                     Continue <DoodleIcon name="arrow-right" size={16} className="" />
                   </button>
@@ -793,19 +795,19 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                    className="w-[52px] h-[52px] rounded-[12px] flex items-center justify-center bg-[var(--card)] border border-[var(--border)] hover:bg-[var(--border)] transition-all active:scale-[0.96]"
+                    className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
                   >
                     <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
                   </button>
                   <button
                     type="submit"
                     disabled={loading}
-                    className="flex-1 py-[15px] rounded-pill text-[var(--shell)] text-[15px] font-semibold bg-[var(--ink)] hover:opacity-90 active:scale-[0.98] min-h-[52px] transition-all disabled:opacity-50"
-                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600 }}
+                    className="flex-1 min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
-                        <span className="w-[18px] h-[18px] border-2 border-[var(--shell)]/30 border-t-[var(--shell)] rounded-full animate-spin" />
+                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       </span>
                     ) : 'Create Account'}
                   </button>
@@ -813,13 +815,13 @@ export default function Auth() {
               )}
             </div>
 
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
               Already have an account?{' '}
               <button
                 type="button"
                 onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-                className="underline hover:text-[var(--ink)] transition-colors"
-                style={{ color: 'var(--ink-60)', textUnderlineOffset: 3, fontWeight: 400, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+                className="hover:text-[var(--ink)] transition-colors"
+                style={{ color: 'var(--terra)', fontWeight: 500, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
               >
                 Sign in
               </button>

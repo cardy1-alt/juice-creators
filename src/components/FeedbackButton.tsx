@@ -45,38 +45,39 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
       {!open && (
         <button
           onClick={() => setOpen(true)}
-          className="fixed bottom-[90px] right-[16px] z-[100] w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all active:scale-95"
-          style={{ background: 'var(--forest)', boxShadow: '0 2px 12px rgba(26,74,46,0.25)' }}
+          className="fixed bottom-[90px] right-[16px] z-[100] w-[52px] h-[52px] rounded-full flex items-center justify-center transition-all active:scale-95"
+          style={{ background: 'var(--terra)', boxShadow: 'var(--shadow-lg)' }}
           aria-label="Send feedback"
         >
-          <DoodleIcon name="message" size={18} className="text-[#F7F6F3]" />
+          <DoodleIcon name="message" size={18} className="text-white" />
         </button>
       )}
 
-      {/* Feedback modal */}
+      {/* Feedback bottom sheet */}
       {open && (
         <div className="fixed inset-0 z-[200] flex items-end justify-center" onClick={() => { setOpen(false); setSent(false); }}>
-          <div className="absolute inset-0 bg-[#2C2420]/30" />
+          <div className="absolute inset-0" style={{ background: 'rgba(34,34,34,0.5)' }} />
           <div
-            className="relative w-full max-w-md mx-4 mb-4 bg-[#EDE8DC] rounded-[20px] overflow-hidden"
-            style={{ boxShadow: '0 4px 24px rgba(26,26,26,0.15)' }}
+            className="relative w-full max-w-md mx-4 mb-4 overflow-hidden"
+            style={{ background: 'var(--shell)', borderRadius: '24px 24px 0 0', boxShadow: 'var(--shadow-lg)' }}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
             <div className="flex items-center justify-between px-[20px] pt-[18px] pb-[10px]">
-              <h3 className="text-[18px] font-bold text-[var(--near-black)]">Send feedback</h3>
+              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '18px', color: 'var(--ink)' }}>Send feedback</h3>
               <button
                 onClick={() => { setOpen(false); setSent(false); }}
-                className="w-[32px] h-[32px] flex items-center justify-center rounded-full hover:bg-[var(--bg)] transition-colors"
+                className="w-[32px] h-[32px] flex items-center justify-center rounded-full transition-colors"
+                style={{ background: 'var(--card)' }}
               >
-                <DoodleIcon name="x" size={16} className="text-[var(--soft)]" />
+                <DoodleIcon name="x" size={16} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
             {sent ? (
               <div className="px-[20px] pb-[20px] text-center py-[24px]">
-                <p className="text-[17px] font-semibold text-[var(--forest)]">Thanks for your feedback!</p>
-                <p className="text-[15px] text-[var(--mid)] mt-[4px]">We'll take a look.</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--terra)' }}>Thanks for your feedback!</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '4px' }}>We'll take a look.</p>
               </div>
             ) : (
               <div className="px-[20px] pb-[20px]">
@@ -87,15 +88,35 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                   rows={4}
                   maxLength={500}
                   autoFocus
-                  className="w-full px-[14px] py-[12px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] resize-none"
+                  className="w-full resize-none focus:outline-none"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 400,
+                    fontSize: '15px',
+                    color: 'var(--ink)',
+                    background: 'var(--card)',
+                    border: '1.5px solid var(--ink-08)',
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
                 <div className="flex items-center justify-between mt-[12px]">
-                  <span className="text-[13px] text-[var(--soft)]">{text.length}/500</span>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)' }}>{text.length}/500</span>
                   <button
                     onClick={handleSubmit}
                     disabled={!text.trim() || sending}
-                    className="px-[20px] py-[10px] rounded-[50px] text-[15px] font-bold text-white transition-all disabled:opacity-40"
-                    style={{ background: 'var(--terra)' }}
+                    className="transition-all disabled:opacity-40"
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 700,
+                      fontSize: '15px',
+                      color: 'white',
+                      background: 'var(--terra)',
+                      borderRadius: '999px',
+                      padding: '13px 24px',
+                    }}
                   >
                     {sending ? 'Sending...' : 'Send'}
                   </button>

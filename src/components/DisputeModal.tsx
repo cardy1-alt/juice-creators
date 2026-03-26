@@ -40,15 +40,19 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
   };
 
   return (
-    <div className="fixed inset-0 bg-[#2C2420]/50 flex items-center justify-center p-4 z-50" onClick={onClose}>
-      <div className="bg-[#EDE8DC] rounded-[18px] max-w-md w-full p-6 shadow-[0_2px_12px_rgba(44,36,32,0.08)]" onClick={(e) => e.stopPropagation()}>
+    <div className="fixed inset-0 flex items-center justify-center p-4 z-50" style={{ background: 'rgba(34,34,34,0.5)' }} onClick={onClose}>
+      <div
+        className="max-w-md w-full"
+        style={{ background: 'var(--shell)', borderRadius: '24px', padding: '28px', boxShadow: 'var(--shadow-lg)' }}
+        onClick={(e) => e.stopPropagation()}
+      >
         {submitted ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 rounded-full bg-[var(--bg)] flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--card)' }}>
               <DoodleIcon name="check" size={32} className="text-[var(--terra)]" />
             </div>
-            <h3 className="text-xl font-display font-normal text-[var(--near-black)] mb-2">Report Submitted</h3>
-            <p className="text-[var(--mid)] text-base">
+            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)' }}>
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
           </div>
@@ -59,20 +63,20 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
                   <DoodleIcon name="alert-triangle" size={20} className="text-[var(--terra)]" />
                 </div>
-                <h3 className="text-lg font-bold text-[var(--near-black)]">Report an Issue</h3>
+                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
               </div>
-              <button onClick={onClose} className="p-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                <DoodleIcon name="x" size={20} className="text-[var(--soft)]" />
+              <button onClick={onClose} className="p-2 rounded-[12px] transition-colors" style={{ background: 'var(--card)' }}>
+                <DoodleIcon name="x" size={20} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
-            <p className="text-base text-[var(--mid)] mb-4">
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginBottom: '16px' }}>
               Let us know if something went wrong with this collaboration. We'll review and take appropriate action.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label className="block text-base font-semibold text-[var(--near-black)] mb-2">
+                <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '15px', color: 'var(--ink-60)', display: 'block', marginBottom: '8px' }}>
                   What happened?
                 </label>
                 <textarea
@@ -80,14 +84,26 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Please describe the issue..."
                   rows={4}
-                  className="w-full px-[16px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] transition-all resize-none"
+                  className="w-full resize-none focus:outline-none transition-all"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 400,
+                    fontSize: '15px',
+                    color: 'var(--ink)',
+                    background: 'var(--card)',
+                    border: '1.5px solid var(--ink-08)',
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                   required
                 />
               </div>
 
               {disputeError && (
                 <div className="p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)]">
-                  <p className="text-[15px] font-medium text-[var(--terra)]">{disputeError}</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)' }}>{disputeError}</p>
                 </div>
               )}
 
@@ -95,14 +111,32 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <button
                   type="button"
                   onClick={onClose}
-                  className="flex-1 py-3 rounded-full min-h-[48px] text-[var(--near-black)] font-semibold bg-[var(--bg)] hover:bg-[var(--pressed)] transition-all text-base"
+                  className="flex-1 min-h-[48px] transition-all"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 600,
+                    fontSize: '14px',
+                    color: 'var(--ink)',
+                    background: 'transparent',
+                    border: '1.5px solid var(--ink-15)',
+                    borderRadius: '999px',
+                    padding: '13px 24px',
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || !message.trim()}
-                  className="flex-1 py-3 rounded-full min-h-[48px] text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] disabled:opacity-50 transition-all text-base"
+                  className="flex-1 min-h-[48px] text-white transition-all disabled:opacity-50"
+                  style={{
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 700,
+                    fontSize: '15px',
+                    background: 'var(--terra)',
+                    borderRadius: '999px',
+                    padding: '13px 24px',
+                  }}
                 >
                   {loading ? 'Submitting...' : 'Submit Report'}
                 </button>

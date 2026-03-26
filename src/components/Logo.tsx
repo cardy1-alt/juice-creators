@@ -26,7 +26,7 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
         fontWeight: 400,
         color,
         lineHeight: 1.1,
-        letterSpacing: '-0.02em',
+        letterSpacing: '-0.5px',
       }}
     >
       nayba
@@ -34,7 +34,7 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   );
 }
 
-export function Logo({ size = 40, color = "#D4470C", variant = 'icon-word' }: LogoProps) {
+export function Logo({ size = 40, color = "#1A3C34", variant = 'icon-word' }: LogoProps) {
   if (variant === 'icon') {
     return <LogoIcon size={size} />;
   }
@@ -43,7 +43,7 @@ export function Logo({ size = 40, color = "#D4470C", variant = 'icon-word' }: Lo
     return <LogoWordmark size={size} color={color} />;
   }
 
-  // icon-word: icon + wordmark side by side
+  // icon-word: icon + wordmark side by side, vertically centred
   return (
     <span style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.15 }}>
       <LogoIcon size={size} />
