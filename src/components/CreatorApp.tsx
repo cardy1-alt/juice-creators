@@ -199,6 +199,7 @@ export default function CreatorApp() {
   const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
   const [releaseConfirmId, setReleaseConfirmId] = useState<string | null>(null);
   const [confirmVisitClaimId, setConfirmVisitClaimId] = useState<string | null>(null);
+  const [confirmVisitError, setConfirmVisitError] = useState<string | null>(null);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [releasingClaim, setReleasingClaim] = useState(false);
   const [reelError, setReelError] = useState<string | null>(null);
@@ -1997,7 +1998,7 @@ export default function CreatorApp() {
                           className="flex-shrink-0"
                           style={{ scrollSnapAlign: 'center', width: 'calc(100vw - 40px)', marginLeft: claimIdx === 0 ? 20 : 6, marginRight: claimIdx === activeClaims.filter(c => c.businesses && c.offers).length - 1 ? 20 : 6 }}
                         >
-                          <div>
+                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 200px)' }}>
                             {/* Pass info card */}
                             <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '20px 20px' }}>
                               <p className="!text-[18px] !font-bold !text-[var(--ink)] m-0 truncate !leading-tight">{offerTitle}</p>
@@ -2021,50 +2022,60 @@ export default function CreatorApp() {
                               </div>
                             </div>
 
-                            {/* Content below terra card */}
-                            <div style={{ padding: '24px 4px 20px' }}>
+                            {/* Content below pass card */}
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '0 4px' }}>
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div className="flex flex-col items-center text-center pt-5">
-                                  <p className="!text-[24px] !font-extrabold !tracking-tight !text-[var(--ink)] !mb-2 !leading-tight">Ready to visit?</p>
-                                  <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !mb-6 max-w-[260px] !leading-snug">
-                                    Show this screen to staff and ask them to tap the button below
+                                <div className="flex flex-col items-center text-center" style={{ paddingTop: 24 }}>
+                                  <p className="!text-[24px] !font-extrabold !tracking-tight !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 6px' }}>Show this to staff</p>
+                                  <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
+                                    Ask them to tap the button to confirm your visit
                                   </p>
                                   <button
-                                    onClick={() => setConfirmVisitClaimId(claim.id)}
+                                    onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
                                     disabled={loading}
                                     className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[20px] !font-extrabold !text-white !tracking-tight !leading-none"
-                                    style={{ opacity: loading ? 0.6 : 1 }}
+                                    style={{
+                                      opacity: loading ? 0.6 : 1,
+                                      animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
+                                      transform: loading ? 'scale(0.95)' : 'scale(1)',
+                                      transition: 'transform 0.1s ease',
+                                    }}
                                   >
-                                    {loading ? 'Confirming…' : <>Confirm<br />visit</>}
+                                    {loading ? (
+                                      <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
+                                        <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                                        <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                                      </svg>
+                                    ) : <>Confirm<br />visit</>}
                                   </button>
-                                  <p className="!text-[12px] !font-medium !text-[var(--ink-35)] !mt-3 text-center">
-                                    This button is for staff to tap in your presence
-                                  </p>
+                                  {confirmVisitError && (
+                                    <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'var(--ochre)' }}>{confirmVisitError}</p>
+                                  )}
                                 </div>
                               )}
 
                               {/* Confirm visit dialog */}
                               {confirmVisitClaimId === claim.id && (
                                 <div
-                                  style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.5)' }}
+                                  style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.45)' }}
                                   onClick={() => setConfirmVisitClaimId(null)}
                                 >
                                   <div
                                     onClick={(e) => e.stopPropagation()}
-                                    style={{ background: 'var(--shell)', borderRadius: 20, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 40px rgba(34,34,34,0.18)' }}
+                                    style={{ background: 'var(--shell)', borderRadius: 24, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 32px rgba(34,34,34,0.14)' }}
                                   >
-                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: 'var(--ink)', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
-                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 24px', lineHeight: 1.5 }}>
+                                    <p className="!text-[18px] !font-extrabold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
+                                    <p className="!text-[15px] !font-normal !text-[var(--ink-60)]" style={{ margin: '0 0 24px', lineHeight: 1.65 }}>
                                       Only confirm if you are at {claim.businesses.name} and a staff member is present.
                                     </p>
-                                    <div style={{ display: 'flex', gap: 10 }}>
+                                    <div style={{ display: 'flex', gap: 12 }}>
                                       <button
                                         onClick={() => setConfirmVisitClaimId(null)}
+                                        className="!text-[15px] !font-semibold !text-[var(--ink)]"
                                         style={{
-                                          flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--ink-08)', background: 'transparent',
-                                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)',
+                                          flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--border)', background: 'transparent',
                                           cursor: 'pointer',
                                         }}
                                       >
@@ -2075,6 +2086,7 @@ export default function CreatorApp() {
                                           try {
                                             setLoading(true);
                                             setConfirmVisitClaimId(null);
+                                            setConfirmVisitError(null);
                                             const { error } = await supabase
                                               .from('claims')
                                               .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
@@ -2084,15 +2096,15 @@ export default function CreatorApp() {
                                             setClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
                                             if (selectedClaim?.id === claim.id) setSelectedClaim({ ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any);
                                           } catch (err: any) {
-                                            setClaimError('Something went wrong — please try again');
+                                            setConfirmVisitError('Something went wrong — please try again');
                                           } finally {
                                             setLoading(false);
                                           }
                                         }}
                                         disabled={loading}
+                                        className="!text-[15px] !font-bold !text-white"
                                         style={{
                                           flex: 1, height: 48, borderRadius: 999, border: 'none', background: 'var(--terra)',
-                                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'white',
                                           cursor: 'pointer', opacity: loading ? 0.6 : 1,
                                         }}
                                       >
@@ -2157,7 +2169,10 @@ export default function CreatorApp() {
                               )}
 
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center !text-[11px] mt-2 pb-1 [&_button]:!text-[11px] [&_span]:!text-[11px]">
+                              <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
+                                <div style={{ width: 48, height: 1, background: 'var(--ink-08)', marginBottom: 16 }} />
+                              </div>
+                              <div className="flex items-center justify-center !text-[13px] pb-1 [&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]">
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
