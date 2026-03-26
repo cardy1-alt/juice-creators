@@ -1500,67 +1500,50 @@ export default function CreatorApp() {
                             key={offer.id}
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0, background: 'var(--card)', border: '1px solid var(--ink-08)',
+                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                              position: 'relative', height: 220,
                             }}
                           >
-                            {/* Image zone */}
-                            <div style={{ width: '100%', height: 160, position: 'relative', overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              ) : (
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                </div>
-                              )}
-                              {/* Slot badge — shown at all slot counts */}
-                              {!isUnlimited && slotsLeft !== null && (
-                                <span style={{
-                                  position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
-                                  background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)',
-                                  color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
-                                }}>
-                                  {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                </span>
-                              )}
-                              {/* Heart button */}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                style={{
-                                  position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
-                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                }}
-                              >
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                              </button>
-                              {/* Reel badge */}
-                              {offer.content_type && (
-                                <span style={{
-                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '2px 8px',
-                                  background: 'rgba(34,34,34,0.65)', backdropFilter: 'blur(4px)',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 10, color: 'white',
-                                  display: 'inline-flex', alignItems: 'center', gap: 3,
-                                }}>
-                                  ♻ {offer.content_type}
-                                </span>
-                              )}
-                            </div>
-                            {/* Info */}
-                            <div style={{ padding: '10px 12px 12px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--ink)', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
-                              {offer.content_type && (
-                                <span style={{
-                                  display: 'inline-block', marginTop: 6, padding: '2px 8px', borderRadius: 999,
-                                  background: 'var(--terra-10)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 10, color: 'var(--terra)',
-                                }}>
-                                  ♻ Reel
-                                </span>
-                              )}
+                            {/* Full-bleed image */}
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              </div>
+                            )}
+                            {/* Slot badge */}
+                            {!isUnlimited && slotsLeft !== null && (
+                              <span style={{
+                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
+                                background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)',
+                                color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
+                              }}>
+                                {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
+                              </span>
+                            )}
+                            {/* Heart button */}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                              style={{
+                                position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                              }}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                              </svg>
+                            </button>
+                            {/* Bottom gradient overlay with text */}
+                            <div style={{
+                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 10px 10px',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0.35) 60%, transparent 100%)',
+                            }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.8)', margin: '2px 0 0', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
                             </div>
                           </div>
                         );
@@ -1591,60 +1574,49 @@ export default function CreatorApp() {
                             key={offer.id}
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0, background: 'var(--card)', border: '1px solid var(--ink-08)',
+                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                              position: 'relative', height: 220,
                             }}
                           >
-                            <div style={{ width: '100%', height: 160, position: 'relative', overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                              ) : (
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                </div>
-                              )}
-                              {!isUnlimited && slotsLeft !== null && (
-                                <span style={{
-                                  position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
-                                  background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)', color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
-                                }}>
-                                  {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                </span>
-                              )}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                style={{
-                                  position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
-                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                }}
-                              >
-                                <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                              </button>
-                              {offer.content_type && (
-                                <span style={{
-                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '2px 8px',
-                                  background: 'rgba(34,34,34,0.65)', backdropFilter: 'blur(4px)',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 10, color: 'white',
-                                }}>
-                                  ♻ {offer.content_type}
-                                </span>
-                              )}
-                            </div>
-                            <div style={{ padding: '10px 12px 12px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--ink)', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
-                              {offer.content_type && (
-                                <span style={{
-                                  display: 'inline-block', marginTop: 6, padding: '2px 8px', borderRadius: 999,
-                                  background: 'var(--terra-10)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 10, color: 'var(--terra)',
-                                }}>
-                                  ♻ Reel
-                                </span>
-                              )}
+                            {/* Full-bleed image */}
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              </div>
+                            )}
+                            {/* Slot badge */}
+                            {!isUnlimited && slotsLeft !== null && (
+                              <span style={{
+                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
+                                background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)', color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
+                              }}>
+                                {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
+                              </span>
+                            )}
+                            {/* Heart button */}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                              style={{
+                                position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                              }}
+                            >
+                              <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                              </svg>
+                            </button>
+                            {/* Bottom gradient overlay with text */}
+                            <div style={{
+                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 10px 10px',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0.35) 60%, transparent 100%)',
+                            }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.8)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
                             </div>
                           </div>
                         );
