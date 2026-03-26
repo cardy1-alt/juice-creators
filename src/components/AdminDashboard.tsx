@@ -70,6 +70,7 @@ export default function AdminDashboard() {
   const [bizOnboardingComplete, setBizOnboardingComplete] = useState(true);
   const [bizSubmitting, setBizSubmitting] = useState(false);
   const [bizErrors, setBizErrors] = useState<Record<string, string>>({});
+  const [inlineUpdating, setInlineUpdating] = useState<string | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -200,6 +201,17 @@ export default function AdminDashboard() {
       setCurrentPassword('');
       setNewPassword('');
       setConfirmPassword('');
+    }
+  };
+
+  const handleInlineBusinessUpdate = async (id: string, field: string, value: any) => {
+    setInlineUpdating(`${id}-${field}`);
+    const { error } = await supabase.from('businesses').update({ [field]: value }).eq('id', id);
+    setInlineUpdating(null);
+    if (error) {
+      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+    } else {
+      setBusinesses(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
     }
   };
 
@@ -487,6 +499,9 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Slug</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Category</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Region</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
                       </tr>
@@ -504,6 +519,45 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <button
+                              onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
+                              disabled={inlineUpdating === `${business.id}-is_live`}
+                              className="relative"
+                            >
+                              {inlineUpdating === `${business.id}-is_live` ? (
+                                <div className="w-[44px] h-[26px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
+                                  <div className="w-4 h-4 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
+                                </div>
+                              ) : (
+                                <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${business.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                                  <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                                </div>
+                              )}
+                            </button>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <select
+                              value={business.category}
+                              onChange={e => handleInlineBusinessUpdate(business.id, 'category', e.target.value)}
+                              disabled={inlineUpdating === `${business.id}-category`}
+                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            >
+                              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <select
+                              value={business.region || 'bury-st-edmunds'}
+                              onChange={e => handleInlineBusinessUpdate(business.id, 'region', e.target.value)}
+                              disabled={inlineUpdating === `${business.id}-region`}
+                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            >
+                              {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                          </td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
