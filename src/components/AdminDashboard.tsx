@@ -1268,7 +1268,7 @@ export default function AdminDashboard() {
                   rows={2}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
-                  placeholder='e.g. "they'd love if you showed the latte art"'
+                  placeholder={"e.g. \"they'd love if you showed the latte art\""}
                 />
                 <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offerSpecificAsk.length}/100</p>
               </div>
