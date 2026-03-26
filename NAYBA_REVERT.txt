@@ -1,0 +1,433 @@
+Work through this systematically, one file at a time. Start with src/styles/theme.css, confirm changes made, then move to the next file.
+# NAYBA — FULL APP VISUAL REVERT
+You are doing a complete visual overhaul of the Nayba app. The design has drifted through too many iterations. This prompt defines the new ground truth for every screen and every component. Do not preserve current styling decisions where they conflict with this spec. Work systematically through every file.
+---
+## STEP 1 — TYPOGRAPHY
+### Remove DM Sans entirely. Replace with Plus Jakarta Sans.
+In index.html, replace the DM Sans Google Fonts import with:
+https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap
+Keep the existing Corben import — it stays, but is used ONLY for the wordmark.
+### Update tailwind.config.js:
+fontFamily: {
+  display: ['Corben', 'serif'],
+  sans: ['Plus Jakarta Sans', 'sans-serif'],
+}
+### Update src/styles/theme.css base styles:
+- body, p, span, button, input, label: Plus Jakarta Sans
+- h1, h2, h3, h4, h5: Plus Jakarta Sans 800, letter-spacing -0.03em
+- Remove any Corben references from h1-h5 or body elements
+### Wordmark rule — enforced in Logo.tsx only:
+- "nayba" wordmark: Corben 400, letter-spacing -0.5px, color #1A3C34
+- This is the ONLY place Corben appears in the entire app
+- No other component, heading, label, or UI element uses Corben
+### Type scale — apply consistently across every component:
+Role                          | Font | Weight | Notes
+Page titles / greetings       | PJS  | 800    | letter-spacing -0.03em
+Hero card headlines           | PJS  | 800    | letter-spacing -0.02em
+Section headers               | PJS  | 700    |
+Button labels                 | PJS  | 700    |
+Active nav labels             | PJS  | 700    |
+Sub-headers / field labels    | PJS  | 600    |
+Badge text / filter chips     | PJS  | 600    | letter-spacing 0.1px
+Secondary labels / metadata   | PJS  | 500    |
+Distances / timestamps        | PJS  | 500    |
+Body copy / descriptions      | PJS  | 400    | line-height 1.65
+Placeholders                  | PJS  | 400    | color var(--ink-35)
+Minimum font size anywhere in the app: 10px. Minimum body text: 15px.
+---
+## STEP 2 — COLOUR TOKENS
+Replace ALL values in src/styles/theme.css :root block with the following. Keep existing variable names where they match — this ensures legacy references throughout the codebase continue to resolve correctly.
+:root {
+  /* Backgrounds */
+  --shell:   #F6F3EE;
+  --card:    #EDE8DF;
+  --border:  #E5DFD4;
+  /* Brand */
+  --terra:        #C4674A;
+  --terra-hover:  #A8573E;
+  --terra-5:      rgba(196,103,74,0.05);
+  --terra-10:     rgba(196,103,74,0.10);
+  --terra-15:     rgba(196,103,74,0.15);
+  --terra-20:     rgba(196,103,74,0.20);
+  --terra-40:     rgba(196,103,74,0.40);
+  --terra-ring:   rgba(196,103,74,0.30);
+  --forest:       #1A3C34;
+  --peach:        #F5C4A0;
+  --ochre:        #E8A020;
+  /* Ink scale */
+  --ink:     #222222;
+  --ink-60:  rgba(34,34,34,0.62);
+  --ink-35:  rgba(34,34,34,0.40);
+  --ink-15:  rgba(34,34,34,0.15);
+  --ink-08:  rgba(34,34,34,0.09);
+  /* Shadows — NEVER rgba(0,0,0,...) */
+  --shadow-sm: 0 1px 3px rgba(34,34,34,0.05);
+  --shadow-md: 0 2px 12px rgba(34,34,34,0.07);
+  --shadow-lg: 0 4px 20px rgba(34,34,34,0.11);
+  /* Radii */
+  --r-card: 16px;
+  --r-pill: 999px;
+  /* Legacy aliases — keep these, update their targets */
+  --white:         var(--shell);
+  --bg:            var(--shell);
+  --elevated:      var(--card);
+  --pressed:       var(--border);
+  --near-black:    var(--ink);
+  --mid:           var(--ink-60);
+  --soft:          var(--ink-35);
+  --faint:         var(--ink-08);
+  --warm-mid-grey: var(--ink-35);
+  --card-bg:       var(--card);
+  --card-border:   var(--ink-08);
+}
+### Colour rules — audit every component and enforce:
+1. --forest (#1A3C34) appears ONLY in Logo.tsx. Search the entire codebase for forest and remove every usage that is not the Logo component wordmark.
+2. Every box-shadow must use rgba(34,34,34,...). Search for rgba(0,0,0, and replace all instances.
+3. --terra is the single accent colour. Every primary CTA, active nav indicator, active state, progress bar, and active chip uses terra. No other colour plays this role.
+4. --peach is used only for: active pass timer pill, slot countdown at 3 or fewer remaining, active claim time indicators.
+5. Page and card backgrounds use --shell and --card respectively. No pure white (#ffffff or white) backgrounds on screens or cards — replace with --shell or --card.
+---
+## STEP 3 — GLOBAL COMPONENT PATTERNS
+Apply these patterns to every matching component across CreatorApp.tsx, BusinessPortal.tsx, Auth.tsx, AdminDashboard.tsx, and all sub-components.
+### Cards
+background:    var(--card);
+border:        1px solid var(--ink-08);
+border-radius: var(--r-card);  /* 16px */
+box-shadow:    var(--shadow-md);
+Small cards / inner tiles: border-radius 12px.
+### Primary buttons
+background:    var(--terra);
+color:         white;
+border-radius: var(--r-pill);
+font-family:   'Plus Jakarta Sans', sans-serif;
+font-weight:   700;
+font-size:     15px;
+padding:       13px 24px;
+transition:    background 0.15s ease;
+Hover: var(--terra-hover). Focus ring: 0 0 0 3px var(--terra-ring).
+### Secondary / ghost buttons
+background:    transparent;
+border:        1.5px solid var(--ink-15);
+color:         var(--ink);
+border-radius: var(--r-pill);
+font-weight:   600;
+font-size:     14px;
+Hover: background var(--card).
+### Input fields
+background:    var(--card);
+border:        1.5px solid var(--ink-08);
+border-radius: 14px;
+font-family:   'Plus Jakarta Sans', sans-serif;
+font-weight:   400;
+font-size:     15px;
+color:         var(--ink);
+padding:       14px 16px;
+Focus: border-color var(--terra), box-shadow 0 0 0 3px var(--terra-ring).
+Label: PJS 600, var(--ink-60).
+Placeholder: PJS 400, var(--ink-35).
+### Pill chips / filter tabs
+Inactive: background var(--card), border 1.5px solid var(--ink-08), color var(--ink-35), font-weight 600, border-radius var(--r-pill)
+Active: background var(--terra), border-color var(--terra), color white, font-weight 700
+### Status badges
+border-radius: var(--r-pill);
+font-weight:   700;
+font-size:     11px;
+padding:       3px 10px;
+### Slot / scarcity badge — creator cards
+- Only shown when slotsLeft <= 3
+- 1 slot: background var(--terra), color white, prepend white dot, label "Last slot"
+- 2-3 slots: background var(--terra-10), color var(--terra), label "X left"
+- Font: PJS 700, 11px, border-radius 999px
+### Section headers
+font-family:  'Plus Jakarta Sans', sans-serif;
+font-weight:  700;
+font-size:    18px;
+color:        var(--ink);
+Paired with "See all" / "View all" link: PJS 600, 13px, var(--terra).
+### Bottom navigation (CreatorApp)
+position:         fixed;
+bottom:           0;
+width:            100%;
+max-width:        430px;
+background:       rgba(246,243,238,0.96);
+backdrop-filter:  blur(20px);
+border-top:       1px solid var(--ink-08);
+padding:          10px 0 28px;
+Active tab: icon + label in var(--terra), PJS 700.
+Inactive tab: icon + label in var(--ink-35), PJS 500.
+Active badge: 15x15px circle, var(--terra) background, white PJS 800 text.
+---
+## STEP 4 — SCREEN-BY-SCREEN RULES
+### Auth.tsx
+Backgrounds: All screens use --shell (#F6F3EE). No white backgrounds.
+Onboarding screens:
+- Screen 1 background: #C8B8F0 (lavender — this one exception is intentional, keep it)
+- Screen 2 background: var(--peach) (#F5C4A0)
+- All other screens: var(--shell)
+Logo on auth screens: Corben 400 wordmark "nayba" in --forest, centred, 22px.
+Headings: PJS 800, var(--ink).
+Step indicators: Terra filled circles for completed/active steps. var(--ink-08) for future steps.
+FloatingInput: Follow input field pattern above.
+CTA buttons: Full-width, primary button pattern, border-radius 999px.
+Role selection cards: Card pattern, border 2px. Selected state: border var(--terra), background var(--terra-5).
+---
+### CreatorApp.tsx — Explore / Discovery feed
+Header:
+- "nayba" wordmark: Corben 400, --forest, 15px, letter-spacing -0.5px
+- Greeting: PJS 800, 26px, --ink, letter-spacing -0.03em, time-aware ("Good morning/afternoon/evening, [name]")
+- Location + offer count: [City] in --terra PJS 600 + " · X offers today" in --ink-60 PJS 400
+- Search button: 42x42px, border-radius 13px, background --card, border 1.5px solid var(--ink-08)
+Category icon row:
+- Horizontal scroll, no visible scrollbar
+- Each item: icon tile 48x48px, border-radius 14px, background --card, border 1.5px solid var(--ink-08)
+- Label below: PJS 600, 11px
+- Active: tile background --terra, border --terra, icon white, label --terra
+- Inactive: label --ink-35
+Active pass card:
+- Background: --terra
+- Border-radius: 20px
+- Padding: 20px
+- Business name: PJS 600, rgba(255,255,255,0.78), 13px
+- Timer pill: peach dot + "Xh left" PJS 700 white, background rgba(245,196,160,0.22), border rgba(245,196,160,0.35), border-radius 999px
+- Offer headline: PJS 800, 22px, white, letter-spacing -0.04em
+- "Show at the door" pill: rgba(255,255,255,0.16) bg, rgba(255,255,255,0.25) border, PJS 700 white, border-radius 999px
+- QR button: 38x38px circle, same frosted style
+- Decorative wave SVG at bottom of card: opacity 0.11, fill white, pointer-events none
+- Pagination dots: 3 dots, active white, inactive rgba(255,255,255,0.30)
+Offer cards (horizontal near-you row):
+- Width: ~170px, flex-shrink 0
+- Card: background --card, border 1px solid var(--ink-08), border-radius 16px
+- Image: full width, 140px height, object-fit cover
+- Subtle image gradient: transparent to rgba(34,34,34,0.18) bottom 30%
+- Heart button: absolute top-right of image, 30x30px circle, rgba(246,243,238,0.88), backdrop-blur 6px. Saved state: filled terra.
+- NEW badge: absolute bottom-left of image, --ink bg, white PJS 800, 9px, letter-spacing 0.8px, border-radius 999px
+- Offer name: PJS 700, 13px, --ink — ALWAYS leads, before business name
+- Business name: PJS 500, 12px, --ink-60
+- Slot badge: only at 3 or fewer slots, follow slot badge pattern above
+- Distance: PJS 500, 10px, --ink-35, right-aligned
+New this week (vertical list cards):
+- Full width, flex row, border-radius 16px, background --card, border 1px solid var(--ink-08)
+- Image: 100x100px, object-fit cover, left side
+- Offer name: PJS 700, 14px, --ink
+- Business name: PJS 500, 13px, --ink-60
+- Slot badge + heart button in bottom row
+- Heart button: 32x32px circle, background var(--ink-08)
+---
+### CreatorApp.tsx — Active Claims
+Pass slides:
+- Swipeable horizontal scroll snap
+- Each pass: background --card, border-radius 20px, padding 24px
+- QR code: 220x220px, centred, on warm #F5F3F0 inner card, border-radius 16px
+- Ref code pill: --ink background, white PJS 800, letter-spacing 1.5px
+- Business name: PJS 800, 20px, --ink
+- Offer name: PJS 500, 15px, --ink-60
+- Breadcrumb stepper: Claimed > Visited > Reel Due > Done. Active step: --terra filled dot. Completed: --terra with check. Future: --ink-08.
+- Timer pill: peach background, --ink PJS 700, border-radius 999px
+- "Report" / "Release" links: PJS 500, 13px, --ink-35, underline on hover
+---
+### CreatorApp.tsx — Saved
+- Same card pattern as explore cards but in vertical list format
+- Empty state: centred illustration + PJS 600 heading + PJS 400 body + terra CTA button
+- Business name leads on saved cards (unlike discovery where offer leads)
+---
+### CreatorApp.tsx — Claims History
+- Card list, full width
+- Status badges:
+  - Completed: background var(--terra-10), color --terra
+  - Reel Due: background rgba(232,160,32,0.12), color --ochre
+  - Visited: background rgba(34,34,34,0.06), color --ink-60
+  - Claimed: background rgba(34,34,34,0.06), color --ink-60
+- Date: PJS 500, 12px, --ink-35, format "14 Mar 2026"
+- Offer name: PJS 700, 14px, --ink
+- Business name: PJS 500, 13px, --ink-60
+- Empty state: same pattern as Saved
+---
+### CreatorApp.tsx — Profile
+- Avatar: 80x80px circle, border 3px solid --card, shadow --shadow-md
+- Display name: PJS 800, 22px, --ink
+- Instagram handle: PJS 500, 14px, --ink-60
+- Stats row (claimed / posted / rating): 3 equal tiles, background --card, border-radius 14px, border 1px solid var(--ink-08). Number: PJS 800, 20px, --terra. Label: PJS 500, 11px, --ink-35.
+- Level badge: use LevelBadge component as-is, size lg
+- Streak row: flame SVG. Active: --terra. Zero: --ink-35. Label PJS 600, count PJS 800.
+- Progress bar to next level: background --ink-08, fill --terra, border-radius 999px, height 6px
+- Profile completeness bar: same pattern
+- Ref code: --card background, PJS 800 code text, copy icon button, border-radius 12px
+- Settings list items: PJS 500, 15px, --ink, border-bottom 1px solid var(--ink-08), chevron right in --ink-35
+- Sign out: PJS 600, 15px, --terra, bottom of screen, no border
+---
+### BusinessPortal.tsx — Home Dashboard
+- Time-aware greeting: PJS 800, 24px, --ink
+- Business name subline: PJS 500, 14px, --ink-60
+- Stats row: 3 tiles — Active offers / Reels this week / Slots left. Tile pattern same as creator but number in --ink not terra.
+- Live offers list (max 3): card pattern, thumbnail left 72x72px object-fit cover border-radius 12px, offer title PJS 700, live badge (pulsing terra dot + "Live" PJS 600 --terra), claimed progress + slots right
+- Creator activity feed: avatar 36x36px circle, creator name PJS 600 --ink, action PJS 400 --ink-60, time PJS 400 12px --ink-35, "View reel" link terra PJS 600
+- Floating scan FAB: 56x56px circle, --terra background, white QR icon, shadow --shadow-lg, fixed bottom-right above nav
+---
+### BusinessPortal.tsx — Offers
+- Offer cards: card pattern, full width
+- Thumbnail: 72x72px, border-radius 12px, object-fit cover, left side
+- Live badge: pulsing dot (animate-pulse) in --terra + "Live" PJS 600 --terra
+- Claimed progress: PJS 500, 12px, --ink-60. Progress bar: --terra fill.
+- Slots remaining: PJS 700, 13px, --terra when 3 or fewer, --ink-60 otherwise
+- "+ New offer" button: full-width, primary button pattern, top of list
+---
+### BusinessPortal.tsx — Offer Builder (5-screen flow)
+Screen 1 — Offer type:
+- 4 tiles in 2x2 grid: Free Product / Free Service / Discount / Experience
+- Tile: background --card, border 2px solid var(--ink-08), border-radius 16px, padding 20px
+- Selected: border var(--terra), background var(--terra-5)
+- Icon: 40x40px, category gradient background, border-radius 12px
+- Label: PJS 700, 16px, --ink
+- Auto-advance on tap
+Screen 2 — Fill in blank:
+- Large input: "Free ____" fill-in. Font PJS 800, 24px, --ink
+- Placeholder text: category-aware, PJS 400, --ink-35
+- Live preview card below: mini card showing how it will look
+- Educational tip after 2s: PJS 400, 13px, --ink-60, background --card, border-radius 12px
+Screen 3 — Slots:
+- Stepper: minus / count / plus. Count: PJS 800, 28px. Buttons: 44x44px circles, --card bg.
+- Default 4, range 1-20
+- "Who can claim?" level chips below: pill pattern
+Screen 4 — Photo:
+- Upload zone: dashed border var(--ink-15), border-radius 16px, background --card
+- Category gradient placeholder when no photo
+- Skip button: ghost button pattern, bottom
+Screen 5 — Specific ask:
+- Textarea: input field pattern, min-height 100px
+- Character count: PJS 400, 12px, --ink-35, right-aligned
+- Example chips: pill chip pattern
+- Skip button: ghost button pattern
+Screen 6 — Preview:
+- Full preview card: card pattern
+- Offer quality indicator: "Good" / "Great" / "Excellent" pill badge
+  - Good: --ink-08 bg, --ink-60 text
+  - Great: rgba(232,160,32,0.12) bg, --ochre text
+  - Excellent: var(--terra-10) bg, --terra text
+- "Go live" button: primary button pattern, full width
+---
+### BusinessPortal.tsx — Scan
+- Camera viewfinder: full-screen background --ink, terra corner bracket SVGs (4 corner L-shapes only, not a full border)
+- Instruction text: PJS 600, 15px, white, centred below viewfinder
+- Manual ref code input: input field pattern, centred, max-width 280px
+- Success state: CheckCircle icon --terra, creator name PJS 800, "Visit confirmed" PJS 500 --ink-60
+- Fail state: X icon --ochre, error message PJS 500, retry button ghost pattern
+---
+### BusinessPortal.tsx — Claims / Content
+Pill toggle: Claims | Content — pill chip pattern, full width split
+Claims view:
+- Filter row: All / Active / Visited / Reel Due / Completed — horizontal scroll chips
+- Each claim: card pattern, creator avatar 40x40px circle, creator name PJS 700, offer PJS 500, status badge, timestamp PJS 400 --ink-35
+Content view:
+- Reel cards: card pattern, gradient strip at bottom of thumbnail
+- Instagram link: PJS 600, --terra
+- Review status badge: follow status badge pattern
+---
+### BusinessPortal.tsx — Profile
+- Business logo: 80x80px rounded square (border-radius 16px), border 2px solid var(--ink-08)
+- Business name: PJS 800, 22px, --ink
+- Edit fields: input field pattern throughout
+- Account section: settings list item pattern
+- Sign out: PJS 600, --terra, with confirmation bottom sheet. Bottom sheet: background --shell, border-radius 24px 24px 0 0, handle bar --ink-15.
+---
+### Auth.tsx — Full auth flow
+Sign in / sign up screens:
+- Full page background: --shell
+- "nayba" wordmark: Corben 400, --forest, 24px, centred
+- Heading: PJS 800, 26px, --ink
+- Subheading: PJS 400, 15px, --ink-60
+- All inputs: follow input field pattern
+- Primary CTA: primary button pattern, full width
+- Links ("Already have an account?"): PJS 500, --terra
+3-step creator onboarding:
+- Step indicators: 3 dots, active --terra, completed --terra with check, future --ink-08
+- Screen backgrounds:
+  - Step 1: #C8B8F0 (lavender — intentional, keep it)
+  - Step 2: var(--peach) (#F5C4A0)
+  - Step 3: var(--shell)
+- Step titles: PJS 800, 26px, --ink
+- Step body: PJS 400, 15px, --ink-60, line-height 1.65
+- Input fields: follow input pattern
+- Next / Back buttons: primary and ghost patterns respectively
+3-step business onboarding: Same pattern, all screens use --shell.
+Role selection:
+- Two cards side by side or stacked
+- Card: card pattern, padding 24px, centred content
+- Role icon: 48x48px, border-radius 14px, background --card
+- Role name: PJS 700, 17px, --ink
+- Description: PJS 400, 13px, --ink-60
+- Selected: border 2px solid var(--terra), background var(--terra-5)
+---
+### CreatorOnboarding.tsx and BusinessOnboarding.tsx
+Apply the same step and screen patterns as Auth onboarding above. Full-screen modal overlays with slide animations. Background --shell unless overridden by step-specific colour above.
+---
+### AdminDashboard.tsx
+- Background: --shell
+- Top tab navigation: pill chip pattern, horizontal scroll
+- Stat cards: card pattern, number PJS 800 24px --terra, label PJS 500 12px --ink-60
+- Tables: background --card, border 1px solid var(--ink-08), border-radius 16px. Header row: PJS 600, 12px, --ink-35, uppercase, letter-spacing 0.5px. Body rows: PJS 400, 14px, --ink. Row dividers: 1px solid var(--ink-08).
+- Status badges: follow status badge pattern
+- Action buttons: follow primary and ghost patterns
+---
+## STEP 5 — SPECIFIC COMPONENT FILES
+### Logo.tsx
+- Wordmark "nayba": Corben 400, letter-spacing -0.5px, color --forest (#1A3C34)
+- Icon variant: SVG mark only, terra or forest depending on context
+- Wordmark variant: text only
+- Icon-word variant: mark + wordmark side by side, vertically centred
+- Remove any non-Corben font usage from this file
+### LevelBadge.tsx
+Keep level colour progression as-is but ensure text uses PJS 700:
+- Level 1 Newcomer: --ink-35 background
+- Level 2 Explorer: muted sage
+- Level 3 Regular: medium green
+- Level 4 Local: --forest
+- Level 5 Trusted: --terra
+- Level 6 Nayba (prefix with star symbol): --ink
+### FeedbackButton.tsx
+- FAB: 52x52px circle, --terra background, white icon, shadow --shadow-lg
+- Bottom sheet: background --shell, border-radius 24px 24px 0 0
+- Title: PJS 700, 18px, --ink
+- Body: PJS 400, 15px, --ink-60
+### DisputeModal.tsx
+- Full-screen overlay: background rgba(34,34,34,0.5)
+- Modal card: background --shell, border-radius 24px, padding 28px
+- Title: PJS 800, 20px, --ink
+- Textarea: input field pattern
+- Submit button: primary button pattern
+- Cancel: ghost button pattern
+---
+## STEP 6 — GLOBAL SEARCH AND FIX
+Run these searches across the entire codebase and fix every instance:
+1. rgba(0,0,0, — replace all shadow/overlay uses with rgba(34,34,34, equivalents
+2. font-family.*Corben outside of Logo.tsx — remove, replace with PJS
+3. font-family.*DM Sans — remove everywhere, already replaced by PJS via Tailwind
+4. #ffffff or bg-white as a page or card background — replace with var(--shell) or var(--card)
+5. --forest colour usage outside Logo.tsx — remove
+6. font-display Tailwind class (Corben) outside Logo.tsx — replace with font-sans
+7. Any hardcoded hex colours matching old tokens (#F8F6F1, #F0ECE4, #28201A) — replace with new CSS variable equivalents
+---
+## STEP 7 — LEAVE THESE ALONE
+Do not change any of the following:
+- All Supabase logic, auth flows, data fetching
+- QRCodeDisplay.tsx internal logic
+- DiscoveryMap.tsx Leaflet implementation
+- Edge functions
+- Category colour system in src/lib/categories.tsx — pastel background colours used for offer card placeholders when no photo exists. Keep them.
+- Level progression logic in src/lib/levels.ts
+- Any animation/transition timing values unless they are 0 (add 0.15s-0.2s ease transitions to interactive elements that currently have none)
+- Supabase schema or queries
+---
+## STEP 8 — FINAL CHECKS
+Before marking this complete, verify every item:
+- No DM Sans references anywhere in the codebase
+- No Corben outside Logo.tsx
+- No rgba(0,0,0,...) shadows
+- No #ffffff or bg-white page or card backgrounds
+- No --forest colour outside Logo.tsx
+- Every CTA button is full pill (border-radius 999px)
+- Every card uses --card background and var(--ink-08) border
+- Bottom nav has correct frosted glass treatment
+- Active states across all interactive elements use --terra
+- Slot/scarcity badge only fires at 3 or fewer slots remaining
+- Offer name leads before business name on all discovery cards
+- Peach used only for timer/urgency moments, not decoratively
