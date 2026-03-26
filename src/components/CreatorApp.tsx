@@ -1998,10 +1998,10 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'center', width: 'calc(100vw - 40px)', marginLeft: claimIdx === 0 ? 20 : 6, marginRight: claimIdx === activeClaims.filter(c => c.businesses && c.offers).length - 1 ? 20 : 6 }}
                         >
                           <div>
-                            {/* Pass info card — terra header */}
-                            <div className="rounded-[20px]" style={{ background: 'var(--terra)', padding: '24px 24px 20px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'white', margin: 0, letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '4px 0 14px' }}>{claim.businesses.name}</p>
+                            {/* Pass info card */}
+                            <div className="rounded-[20px]" style={{ background: 'var(--card)', padding: '24px 24px 20px' }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)', margin: '4px 0 14px' }}>{claim.businesses.name}</p>
 
                               {/* Breadcrumb stepper */}
                               <div className="flex items-center flex-nowrap">
@@ -2015,12 +2015,12 @@ export default function CreatorApp() {
                                         fontFamily: "'Plus Jakarta Sans', sans-serif",
                                         fontSize: 13,
                                         fontWeight: isCurrent ? 700 : isDone ? 500 : 400,
-                                        color: isCurrent ? '#FFFFFF' : isDone ? 'rgba(255,255,255,0.6)' : 'rgba(255,255,255,0.4)',
+                                        color: isCurrent ? 'var(--ink)' : 'var(--ink-60)',
                                       }}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span style={{ fontSize: 11, margin: '0 6px', color: 'rgba(255,255,255,0.25)' }}>›</span>
+                                        <span style={{ fontSize: 11, margin: '0 6px', color: 'var(--ink-35)' }}>›</span>
                                       )}
                                     </span>
                                   );
@@ -2042,7 +2042,7 @@ export default function CreatorApp() {
                                     onClick={() => setConfirmVisitClaimId(claim.id)}
                                     disabled={loading}
                                     style={{
-                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--ink)', border: 'none',
+                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--terra)', border: 'none',
                                       fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'white',
                                       cursor: 'pointer', opacity: loading ? 0.6 : 1,
                                       letterSpacing: '-0.02em', lineHeight: 1.3,
