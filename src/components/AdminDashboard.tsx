@@ -319,6 +319,17 @@ export default function AdminDashboard() {
     fetchAll();
   };
 
+  const handleInlineOfferUpdate = async (id: string, field: string, value: any) => {
+    setInlineUpdating(`offer-${id}-${field}`);
+    const { error } = await supabase.from('offers').update({ [field]: value }).eq('id', id);
+    setInlineUpdating(null);
+    if (error) {
+      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+    } else {
+      setOffers(prev => prev.map(o => o.id === id ? { ...o, [field]: value } : o));
+    }
+  };
+
   const OFFER_TYPES = ['Free Product', 'Free Service', 'Discount', 'Experience'];
   const LEVEL_OPTIONS = [
     { value: '1', label: '1 Newcomer' }, { value: '2', label: '2 Explorer' }, { value: '3', label: '3 Regular' },
@@ -688,17 +699,68 @@ export default function AdminDashboard() {
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
                     <div key={offer.id} className="bg-[var(--card)] rounded-[18px] p-5 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
-                      <div className="flex items-start gap-3 mb-2">
+                      <div className="flex items-start gap-3 mb-3">
                         <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
                           <CategoryIcon category={offer.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
-                            <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
-                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offer.description}</p>
-                          <p className="text-sm text-[var(--soft)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
+                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* is_live toggle */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</span>
+                          <button
+                            onClick={() => handleInlineOfferUpdate(offer.id, 'is_live', !offer.is_live)}
+                            disabled={inlineUpdating === `offer-${offer.id}-is_live`}
+                          >
+                            {inlineUpdating === `offer-${offer.id}-is_live` ? (
+                              <div className="w-[40px] h-[24px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
+                                <div className="w-3.5 h-3.5 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
+                              </div>
+                            ) : (
+                              <div className={`w-[40px] h-[24px] rounded-full transition-all flex items-center ${offer.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                                <div className="w-[20px] h-[20px] rounded-full bg-white mx-[2px] shadow-sm" />
+                              </div>
+                            )}
+                          </button>
+                        </div>
+                        {/* monthly_cap inline edit */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Cap</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={offer.monthly_cap ?? ''}
+                            onChange={e => {
+                              const val = e.target.value === '' ? null : parseInt(e.target.value);
+                              setOffers(prev => prev.map(o => o.id === offer.id ? { ...o, monthly_cap: val } : o));
+                            }}
+                            onBlur={e => {
+                              const val = e.target.value === '' ? null : parseInt(e.target.value);
+                              handleInlineOfferUpdate(offer.id, 'monthly_cap', val);
+                            }}
+                            className="w-[70px] px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] text-center focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            placeholder="∞"
+                          />
+                        </div>
+                        {/* min_level dropdown */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Level</span>
+                          <select
+                            value={offer.min_level}
+                            onChange={e => handleInlineOfferUpdate(offer.id, 'min_level', parseInt(e.target.value))}
+                            disabled={inlineUpdating === `offer-${offer.id}-min_level`}
+                            className="px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          >
+                            {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                          </select>
                         </div>
                       </div>
                     </div>
