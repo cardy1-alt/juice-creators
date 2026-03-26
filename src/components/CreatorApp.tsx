@@ -2027,7 +2027,7 @@ export default function CreatorApp() {
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div className="flex flex-col items-center text-center" style={{ paddingTop: 24 }}>
+                                <div className="flex flex-col items-center text-center" style={{ paddingTop: 12 }}>
                                   <p className="!text-[24px] !font-extrabold !tracking-tight !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 6px' }}>Show this to staff</p>
                                   <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
                                     Ask them to tap the button to confirm your visit
@@ -2035,7 +2035,7 @@ export default function CreatorApp() {
                                   <button
                                     onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
                                     disabled={loading}
-                                    className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[20px] !font-extrabold !text-white !tracking-tight !leading-none"
+                                    className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[24px] !font-extrabold !text-white !tracking-tight !leading-none"
                                     style={{
                                       opacity: loading ? 0.6 : 1,
                                       animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
@@ -2048,7 +2048,7 @@ export default function CreatorApp() {
                                         <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
                                         <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
                                       </svg>
-                                    ) : <>Confirm<br />visit</>}
+                                    ) : <>Confirm</>}
                                   </button>
                                   {confirmVisitError && (
                                     <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'var(--ochre)' }}>{confirmVisitError}</p>
