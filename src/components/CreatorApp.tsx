@@ -2043,16 +2043,13 @@ export default function CreatorApp() {
                                     disabled={loading}
                                     style={{
                                       width: 160, height: 160, borderRadius: '50%', background: 'var(--terra)', border: 'none',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'white',
+                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 24, color: 'white',
                                       cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                      letterSpacing: '-0.02em', lineHeight: 1.3,
+                                      letterSpacing: '-0.03em', lineHeight: 1.15,
                                     }}
                                   >
-                                    {loading ? 'Confirming…' : <><span style={{ color: 'white', fontWeight: 700 }}>Confirm</span><br /><span style={{ color: 'white', fontWeight: 700 }}>visit</span></>}
+                                    {loading ? 'Confirming…' : <><span style={{ color: 'white', fontWeight: 800 }}>Confirm</span><br /><span style={{ color: 'white', fontWeight: 800 }}>visit</span></>}
                                   </button>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)', margin: '16px 0 0', textAlign: 'center' }}>
-                                    This button is for staff to tap in your presence
-                                  </p>
                                 </div>
                               )}
 
