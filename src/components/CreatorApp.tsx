@@ -1519,7 +1519,7 @@ export default function CreatorApp() {
                             style={{
                               width: 'calc(50vw - 24px)', flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              position: 'relative', height: 200,
+                              position: 'relative', height: 160,
                             }}
                           >
                             {/* Full-bleed image */}
@@ -1556,7 +1556,7 @@ export default function CreatorApp() {
                             {/* Bottom gradient overlay with text */}
                             <div style={{
                               position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
-                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 50%)',
                             }}>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
@@ -1592,7 +1592,7 @@ export default function CreatorApp() {
                             style={{
                               width: 'calc(50vw - 24px)', flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              position: 'relative', height: 200,
+                              position: 'relative', height: 160,
                             }}
                           >
                             {offer.offer_photo_url ? (
@@ -1625,7 +1625,7 @@ export default function CreatorApp() {
                             </button>
                             <div style={{
                               position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
-                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 50%)',
                             }}>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
@@ -1656,8 +1656,8 @@ export default function CreatorApp() {
                             key={offer.id}
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
-                              position: 'relative', height: 180,
+                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
+                              position: 'relative', height: 160,
                             }}
                           >
                             {offer.offer_photo_url ? (
@@ -1690,7 +1690,7 @@ export default function CreatorApp() {
                             </button>
                             <div style={{
                               position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
-                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0) 50%)',
                             }}>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
