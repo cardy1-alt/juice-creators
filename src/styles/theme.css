@@ -69,9 +69,10 @@
   }
   body, p, span, button, input, label, select, textarea, a {
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 400;
     color: var(--ink);
+    line-height: 1.65;
   }
 }
 
