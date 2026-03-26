@@ -113,8 +113,15 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
   const totalScreens = 3; // progress dots for screens 1-3 (screen 4 is success)
   const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
 
+  // Step-specific background colours
+  const getScreenBg = (s: number) => {
+    if (s === 1) return '#C8B8F0';
+    if (s === 2) return 'var(--peach)';
+    return 'var(--shell)';
+  };
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: getScreenBg(screen) }}>
       <style>{onboardingStyles}</style>
 
       {/* ─── Top bar ─── */}
@@ -122,14 +129,14 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
           {screen > 1 ? (
             <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
-              <DoodleIcon name="chevron-left" size={20} className="text-[var(--soft)]" />
+              <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink-35)]" />
             </button>
           ) : (
             <div className="w-[40px]" />
           )}
-          <span className="text-[20px] font-display font-normal text-[var(--forest)]" style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif" }}>nayba</span>
+          <span style={{ fontFamily: "'Corben', serif", fontSize: '22px', fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px' }}>nayba</span>
           {screen === 3 ? (
-            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="text-[15px] text-[var(--soft)] font-medium w-[40px] text-right" style={{ fontFamily: "'DM Sans', sans-serif" }}>Skip</button>
+            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="w-[40px] text-right" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 500, color: 'var(--ink-35)' }}>Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}
@@ -146,7 +153,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               style={{
                 width: dot === screen ? 8 : 6,
                 height: dot === screen ? 8 : 6,
-                background: dot === screen ? 'var(--terra)' : dot < screen ? 'var(--terra)' : 'var(--faint)',
+                background: dot <= screen ? 'var(--terra)' : 'var(--ink-08)',
               }}
             />
           ))}
@@ -164,19 +171,13 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[60px] flex flex-col items-center">
               <div className="h-[200px] flex items-center justify-center">
-                <Logo variant="icon" size={120} color="var(--forest)" />
+                <Logo variant="icon" size={120} />
               </div>
 
-              <h1
-                className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
-              >
+              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center' }}>
                 Welcome to nayba
               </h1>
-              <p
-                className="text-[18px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
-                style={{ fontWeight: 400, lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}
-              >
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
                 Discover local businesses, claim&nbsp;offers, and create authentic&nbsp;content.
               </p>
             </div>
@@ -185,12 +186,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)', fontFamily: "'DM Sans', sans-serif" }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Let's get started →
             </button>
-            <p className="text-[14px] text-[var(--soft)] text-center mt-[10px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Takes about 1 minute</p>
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '14px', color: 'var(--ink-35)', textAlign: 'center', marginTop: '10px' }}>Takes about 1 minute</p>
           </div>
         )}
 
@@ -198,30 +199,27 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1
-                className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
-              >
+              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Here's how it works
               </h1>
-              <p className="text-[17px] text-[var(--mid)] mt-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Claim. Visit. Post. Get rewarded.</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px' }}>Claim. Visit. Post. Get rewarded.</p>
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
                   { num: 1, bg: 'var(--terra)', title: 'Browse & claim an offer', desc: 'Find local businesses offering free products, services, or discounts in exchange for a reel.' },
-                  { num: 2, bg: 'var(--forest)', title: 'Visit the business', desc: 'Show your QR pass at the door, enjoy the experience, and soak in the vibes.' },
-                  { num: 3, bg: 'var(--near-black)', title: 'Post your reel', desc: 'You have 48 hours to post an authentic Instagram reel featuring the business. That\'s it!' },
+                  { num: 2, bg: 'var(--ink)', title: 'Visit the business', desc: 'Show your QR pass at the door, enjoy the experience, and soak in the vibes.' },
+                  { num: 3, bg: 'var(--ink)', title: 'Post your reel', desc: 'You have 48 hours to post an authentic Instagram reel featuring the business. That\'s it!' },
                 ].map(step => (
                   <div key={step.num} className="flex items-start gap-[16px]">
                     <div
                       className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: step.bg }}
                     >
-                      <span className="text-[17px] font-bold text-white" style={{ fontFamily: "'DM Sans', sans-serif" }}>{step.num}</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'white' }}>{step.num}</span>
                     </div>
                     <div className="flex-1 pt-[2px]">
-                      <p className="text-[17px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3, fontFamily: "'DM Sans', sans-serif" }}>{step.title}</p>
-                      <p className="text-[15px] text-[var(--mid)]" style={{ lineHeight: 1.6, fontFamily: "'DM Sans', sans-serif" }}>{step.desc}</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--ink)', marginBottom: '3px' }}>{step.title}</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65 }}>{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -232,8 +230,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)', fontFamily: "'DM Sans', sans-serif" }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Got it →
             </button>
@@ -244,13 +242,10 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 3 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1
-                className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
-              >
+              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Complete your profile
               </h1>
-              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[28px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Businesses will see this when you claim their offers</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their offers</p>
 
               {/* Avatar upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -261,12 +256,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 >
                   <div
                     className="w-[80px] h-[80px] rounded-full flex items-center justify-center overflow-hidden"
-                    style={{ background: avatarUrl ? undefined : 'linear-gradient(135deg, #D4470C 0%, #E07A4A 100%)' }}
+                    style={{ background: avatarUrl ? undefined : 'var(--terra)' }}
                   >
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-[32px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)', fontFamily: "'DM Sans', sans-serif" }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(displayName || profile.name || 'C')}
                       </span>
                     )}
@@ -285,7 +280,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                   className="hidden"
                   onChange={handleAvatarUpload}
                 />
-                <p className="text-[14px] text-[var(--soft)] mt-[10px] text-center" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '14px', color: 'var(--ink-35)', marginTop: '10px', textAlign: 'center' }}>
                   {avatarUploading ? 'Uploading...' : 'Add a profile photo'}
                 </p>
               </div>
@@ -294,36 +289,58 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               <div className="flex flex-col gap-[14px]">
                 {/* Display name */}
                 <div>
-                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Display name</label>
+                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Display name</label>
                   <input
                     type="text"
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
                     placeholder="How you want to be known"
-                    className="w-full px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    className="w-full focus:outline-none"
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 400,
+                      fontSize: '15px',
+                      color: 'var(--ink)',
+                      background: 'var(--card)',
+                      border: '1.5px solid var(--ink-08)',
+                      borderRadius: '14px',
+                      padding: '14px 16px',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                   />
                 </div>
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Bio</label>
+                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Bio</label>
                   <textarea
                     value={bio}
                     onChange={e => setBio(e.target.value.slice(0, 150))}
                     placeholder="Tell businesses a little about yourself..."
                     rows={3}
-                    className="w-full px-[16px] py-[14px] rounded-[18px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)] resize-none"
-                    style={{ fontFamily: "'DM Sans', sans-serif" }}
+                    className="w-full resize-none focus:outline-none"
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 400,
+                      fontSize: '15px',
+                      color: 'var(--ink)',
+                      background: 'var(--card)',
+                      border: '1.5px solid var(--ink-08)',
+                      borderRadius: '14px',
+                      padding: '14px 16px',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                   />
-                  <p className="text-[13px] text-[var(--soft)] text-right mt-[2px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{bio.length}/150</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)', textAlign: 'right', marginTop: '2px' }}>{bio.length}/150</p>
                 </div>
 
                 {/* Instagram (read-only, already collected at signup) */}
                 {profile.instagram_handle && (
                   <div>
-                    <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Instagram</label>
-                    <div className="px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] text-[16px] text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
+                    <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Instagram</label>
+                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', background: 'var(--card)', border: '1.5px solid var(--ink-08)', borderRadius: '14px', padding: '14px 16px' }}>
                       {profile.instagram_handle}
                     </div>
                   </div>
@@ -334,14 +351,14 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-1 min-h-[24px]" />
 
             {error && (
-              <p className="text-[15px] text-[var(--terra)] text-center mb-[12px]" style={{ fontFamily: "'DM Sans', sans-serif" }}>{error}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)', textAlign: 'center', marginBottom: '12px' }}>{error}</p>
             )}
 
             <button
               onClick={handleSaveProfile}
               disabled={saving}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)', fontFamily: "'DM Sans', sans-serif" }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               {saving ? (
                 <span className="inline-flex items-center gap-2">
@@ -367,36 +384,30 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               />
               <div
                 className="absolute inset-0 rounded-full"
-                style={{ background: 'var(--lavender)', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
+                style={{ background: '#C8B8F0', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
               />
               <div className="absolute inset-0 flex items-center justify-center z-10">
                 <DoodleIcon name="check" size={48} className="text-[var(--terra)]" />
               </div>
             </div>
 
-            <h1
-              className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.025em', fontFamily: "'Corben', serif", fontWeight: 400 }}
-            >
+            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '36px', color: 'var(--ink)', textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' }}>
               You're in.
             </h1>
 
-            <p
-              className="text-[17px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
-              style={{ fontWeight: 400, lineHeight: 1.7, fontFamily: "'DM Sans', sans-serif" }}
-            >
+            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
               {businessCount} local businesses with {offerCount} live offers are waiting for you to explore.
             </p>
 
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
-              <div className="rounded-[18px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[32px] font-display font-normal text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{businessCount}</p>
-                <p className="text-[12px] font-medium text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Businesses</p>
+              <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{businessCount}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Businesses</p>
               </div>
-              <div className="rounded-[18px] p-[16px_20px] text-center min-w-[100px]" style={{ background: 'var(--bg)' }}>
-                <p className="text-[32px] font-display font-normal text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400 }}>{offerCount}</p>
-                <p className="text-[12px] font-medium text-[var(--mid)]" style={{ fontFamily: "'DM Sans', sans-serif" }}>Live Offers</p>
+              <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Offers</p>
               </div>
             </div>
 
@@ -404,8 +415,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
             <button
               onClick={onComplete}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)', fontFamily: "'DM Sans', sans-serif" }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Start exploring →
             </button>

@@ -166,7 +166,6 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
   const town = (() => {
     if (!profile.address) return 'your area';
     const parts = profile.address.split(',').map((s: string) => s.trim());
-    // Try to get the town/city — usually 2nd or 3rd part
     if (parts.length >= 3) return parts[parts.length - 2];
     if (parts.length >= 2) return parts[1];
     return parts[0];
@@ -182,8 +181,17 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
     { key: 'experience', label: 'Experience', icon: 'star', sub: 'Tasting, tour, event' },
   ];
 
+  // PJS helper for inline styles
+  const pjs = (weight: number, size: string, color: string, extra?: Record<string, string>) => ({
+    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontWeight: weight,
+    fontSize: size,
+    color,
+    ...extra,
+  });
+
   return (
-    <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
+    <div className="fixed inset-0 z-50 flex flex-col" style={{ background: 'var(--shell)' }}>
       <style>{onboardingStyles}</style>
 
       {/* ─── Top bar ─── */}
@@ -191,14 +199,14 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
         <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
           {screen > 1 ? (
             <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
-              <DoodleIcon name="chevron-left" size={20} className="text-[var(--soft)]" />
+              <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink-35)]" />
             </button>
           ) : (
             <div className="w-[40px]" />
           )}
-          <Logo variant="icon" size={32} color="var(--forest)" />
+          <Logo variant="icon" size={32} />
           {screen === 3 ? (
-            <button onClick={goForward} className="text-[15px] text-[var(--soft)] font-medium w-[40px] text-right">Skip</button>
+            <button onClick={goForward} className="w-[40px] text-right" style={pjs(500, '15px', 'var(--ink-35)')}>Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}
@@ -215,7 +223,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               style={{
                 width: dot === screen ? 8 : 6,
                 height: dot === screen ? 8 : 6,
-                background: dot === screen ? 'var(--terra)' : dot < screen ? 'var(--terra)' : 'var(--faint)',
+                background: dot <= screen ? 'var(--terra)' : 'var(--ink-08)',
               }}
             />
           ))}
@@ -233,19 +241,13 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[60px] flex flex-col items-center">
               <div className="h-[200px] flex items-center justify-center">
-                <Logo variant="icon" size={120} color="var(--forest)" />
+                <Logo variant="icon" size={120} />
               </div>
 
-              <h1
-                className="text-[32px] font-display font-normal text-[var(--near-black)] text-center"
-                style={{ letterSpacing: '-0.025em' }}
-              >
+              <h1 style={pjs(800, '26px', 'var(--ink)', { letterSpacing: '-0.03em', textAlign: 'center' })}>
                 Welcome to nayba
               </h1>
-              <p
-                className="text-[18px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
-                style={{ fontWeight: 400, lineHeight: 1.6 }}
-              >
+              <p style={pjs(400, '15px', 'var(--ink-60)', { textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: '1.65' })}>
                 Turn local creators into your marketing&nbsp;team — no&nbsp;budget&nbsp;required.
               </p>
             </div>
@@ -254,16 +256,16 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ ...pjs(700, '15px', 'white'), background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Let's get started →
             </button>
-            <p className="text-[14px] text-[var(--soft)] text-center mt-[10px]">Takes about 3 minutes</p>
+            <p style={pjs(400, '14px', 'var(--ink-35)', { textAlign: 'center', marginTop: '10px' })}>Takes about 3 minutes</p>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
-              style={{ fontWeight: 400 }}
+              className="w-full text-center mt-[8px] py-[8px]"
+              style={pjs(500, '15px', 'var(--terra)')}
             >
               Finish later
             </button>
@@ -274,30 +276,27 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
         {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1
-                className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.025em' }}
-              >
+              <h1 style={pjs(800, '26px', 'var(--ink)', { letterSpacing: '-0.03em' })}>
                 Here's how it works
               </h1>
-              <p className="text-[17px] text-[var(--mid)] mt-[6px]">Creators visit. They post. You grow.</p>
+              <p style={pjs(400, '15px', 'var(--ink-60)', { marginTop: '6px' })}>Creators visit. They post. You grow.</p>
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
-                  { num: 1, bg: 'var(--terra)', title: 'You create an offer', desc: 'Choose what you\'ll give away \u2014 a free coffee, a haircut, whatever feels right.' },
-                  { num: 2, bg: 'var(--forest)', title: 'Creators visit your business', desc: 'Local creators claim your offer, visit in person, and experience what you do.' },
-                  { num: 3, bg: 'var(--near-black)', title: 'They post a reel about you', desc: 'Within 48 hours they post an Instagram reel. Real content. Real people. Real reach.' },
+                  { num: 1, bg: 'var(--terra)', title: 'You create an offer', desc: 'Choose what you\'ll give away — a free coffee, a haircut, whatever feels right.' },
+                  { num: 2, bg: 'var(--ink)', title: 'Creators visit your business', desc: 'Local creators claim your offer, visit in person, and experience what you do.' },
+                  { num: 3, bg: 'var(--ink)', title: 'They post a reel about you', desc: 'Within 48 hours they post an Instagram reel. Real content. Real people. Real reach.' },
                 ].map(step => (
                   <div key={step.num} className="flex items-start gap-[16px]">
                     <div
                       className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: step.bg }}
                     >
-                      <span className="text-[17px] font-bold text-white">{step.num}</span>
+                      <span style={pjs(700, '17px', 'white')}>{step.num}</span>
                     </div>
                     <div className="flex-1 pt-[2px]">
-                      <p className="text-[17px] font-bold text-[var(--near-black)]" style={{ marginBottom: 3 }}>{step.title}</p>
-                      <p className="text-[15px] text-[var(--mid)]" style={{ lineHeight: 1.6 }}>{step.desc}</p>
+                      <p style={pjs(700, '17px', 'var(--ink)', { marginBottom: '3px' })}>{step.title}</p>
+                      <p style={pjs(400, '15px', 'var(--ink-60)', { lineHeight: '1.65' })}>{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -308,32 +307,29 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ ...pjs(700, '15px', 'white'), background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Sounds good →
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
-              style={{ fontWeight: 400 }}
+              className="w-full text-center mt-[8px] py-[8px]"
+              style={pjs(500, '15px', 'var(--terra)')}
             >
               Finish later
             </button>
           </div>
         )}
 
-        {/* ═══ SCREEN 3 — BUSINESS PROFILE (logo + Instagram only; name & category already collected at signup) ═══ */}
+        {/* ═══ SCREEN 3 — BUSINESS PROFILE (logo + Instagram only) ═══ */}
         {screen === 3 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1
-                className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.025em' }}
-              >
+              <h1 style={pjs(800, '26px', 'var(--ink)', { letterSpacing: '-0.03em' })}>
                 Polish your profile
               </h1>
-              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[28px]">Add a logo and Instagram so creators can find you</p>
+              <p style={pjs(400, '15px', 'var(--ink-60)', { marginTop: '6px', marginBottom: '28px' })}>Add a logo and Instagram so creators can find you</p>
 
               {/* Logo upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -349,7 +345,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     {logoUrl ? (
                       <img src={logoUrl} alt="" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                     ) : (
-                      <span className="text-[32px] font-extrabold" style={{ color: 'rgba(255,255,255,0.8)' }}>
+                      <span style={pjs(800, '32px', 'rgba(255,255,255,0.8)')}>
                         {getInitials(profile.name || 'B')}
                       </span>
                     )}
@@ -368,22 +364,31 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                   className="hidden"
                   onChange={handleLogoUpload}
                 />
-                <p className="text-[14px] text-[var(--soft)] mt-[10px] text-center">
+                <p style={pjs(400, '14px', 'var(--ink-35)', { marginTop: '10px', textAlign: 'center' })}>
                   {logoUploading ? 'Uploading...' : 'Add your logo or a photo of your business'}
                 </p>
               </div>
 
               {/* Instagram */}
               <div>
-                <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[6px]">Instagram handle</label>
+                <label style={pjs(600, '13px', 'var(--ink-60)', { display: 'block', marginBottom: '6px' })}>Instagram handle</label>
                 <input
                   type="text"
                   value={instagram}
                   onChange={e => setInstagram(e.target.value)}
                   placeholder="@yourbusiness"
-                  className="w-full px-[16px] py-[14px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
+                  className="w-full focus:outline-none"
+                  style={{
+                    ...pjs(400, '15px', 'var(--ink)'),
+                    background: 'var(--card)',
+                    border: '1.5px solid var(--ink-08)',
+                    borderRadius: '14px',
+                    padding: '14px 16px',
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
-                <p className="text-[14px] text-[var(--soft)] mt-[4px]">Optional — add later if you prefer</p>
+                <p style={pjs(400, '14px', 'var(--ink-35)', { marginTop: '4px' })}>Optional — add later if you prefer</p>
               </div>
             </div>
 
@@ -391,19 +396,15 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={goForward}
-              className="w-full py-[16px] rounded-[50px] text-[17px] font-bold min-h-[52px] transition-all"
-              style={{
-                background: 'var(--terra)',
-                color: 'white',
-                boxShadow: '0 4px 16px rgba(212,71,12,0.25)',
-              }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ ...pjs(700, '15px', 'white'), background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Looking good →
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
-              style={{ fontWeight: 400 }}
+              className="w-full text-center mt-[8px] py-[8px]"
+              style={pjs(500, '15px', 'var(--terra)')}
             >
               Finish later
             </button>
@@ -414,13 +415,10 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
         {screen === 4 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1
-                className="text-[26px] font-display font-normal text-[var(--near-black)]"
-                style={{ letterSpacing: '-0.025em' }}
-              >
+              <h1 style={pjs(800, '26px', 'var(--ink)', { letterSpacing: '-0.03em' })}>
                 Create your offer
               </h1>
-              <p className="text-[18px] text-[var(--mid)] mt-[6px] mb-[24px]">This is what you'll give creators in exchange for a reel</p>
+              <p style={pjs(400, '15px', 'var(--ink-60)', { marginTop: '6px', marginBottom: '24px' })}>This is what you'll give creators in exchange for a reel</p>
 
               {/* DECISION 1 — Offer type tiles */}
               <div className="grid grid-cols-2 gap-[10px]">
@@ -433,17 +431,18 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       setDiscountAmount('20');
                       setDiscountUnit('%');
                     }}
-                    className="flex flex-col items-center justify-center gap-[8px] rounded-[18px] min-h-[100px] transition-all"
+                    className="flex flex-col items-center justify-center gap-[8px] min-h-[100px] transition-all"
                     style={{
                       padding: '20px 16px',
-                      border: offerType === t.key ? '1.5px solid #D4470C' : '1.5px solid var(--faint)',
-                      background: offerType === t.key ? 'rgba(212,71,12,0.08)' : '#EDE8DC',
+                      borderRadius: '16px',
+                      border: offerType === t.key ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
+                      background: offerType === t.key ? 'var(--terra-5)' : 'var(--card)',
                     }}
                   >
-                    <DoodleIcon name={t.icon} size={24} className="text-[#2C2420]" />
+                    <DoodleIcon name={t.icon} size={24} className="text-[var(--ink)]" />
                     <div className="text-center">
-                      <p className="text-[15px] font-bold text-[var(--near-black)]">{t.label}</p>
-                      <p className="text-[13px] text-[var(--mid)] mt-[2px]">{t.sub}</p>
+                      <p style={pjs(700, '16px', 'var(--ink)')}>{t.label}</p>
+                      <p style={pjs(400, '13px', 'var(--ink-60)', { marginTop: '2px' })}>{t.sub}</p>
                     </div>
                   </button>
                 ))}
@@ -453,19 +452,20 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               {offerType && offerType !== 'discount' && (
                 <div className="mt-[20px]">
                   <div className="flex items-baseline gap-[8px] mb-[4px]">
-                    <span className="text-[22px] font-display font-normal text-[var(--near-black)]">Free</span>
+                    <span style={pjs(800, '24px', 'var(--ink)')}>Free</span>
                     <input
                       type="text"
                       value={offerItem}
                       onChange={e => setOfferItem(e.target.value.slice(0, 60))}
                       placeholder={getCategoryPlaceholder(profile.category, offerType)}
-                      className="flex-1 text-[22px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--soft)] placeholder:font-normal"
+                      className="flex-1 bg-transparent outline-none"
+                      style={{ ...pjs(800, '24px', 'var(--ink)'), borderBottom: '2px solid var(--terra)' }}
                       autoFocus
                     />
                   </div>
-                  <p className="text-[13px] text-[var(--soft)] text-right">{offerItem.length}/60</p>
-                  <p className="text-[15px] text-[var(--mid)] mt-[4px]">
-                    Creators will see: <span className="font-semibold">Free {offerItem || getCategoryPlaceholder(profile.category, offerType)}</span>
+                  <p style={pjs(400, '13px', 'var(--ink-35)', { textAlign: 'right' })}>{offerItem.length}/60</p>
+                  <p style={pjs(400, '15px', 'var(--ink-60)', { marginTop: '4px' })}>
+                    Creators will see: <span style={{ fontWeight: 600 }}>Free {offerItem || getCategoryPlaceholder(profile.category, offerType)}</span>
                   </p>
                 </div>
               )}
@@ -484,25 +484,25 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           setDiscountAmount(val);
                         }
                       }}
-                      className="text-[44px] font-display font-normal text-[var(--near-black)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
-                      style={{ width: '100px' }}
+                      className="bg-transparent outline-none text-center"
+                      style={{ ...pjs(800, '44px', 'var(--ink)'), width: '100px', borderBottom: '2px solid var(--terra)' }}
                       autoFocus
                     />
                   </div>
                   <div className="flex justify-center gap-[8px] mb-[8px]">
                     <button
                       onClick={() => { setDiscountUnit('%'); if (parseInt(discountAmount) > 100) setDiscountAmount('100'); }}
-                      className="px-[20px] py-[8px] rounded-[50px] text-[18px] font-bold transition-all"
-                      style={{ background: discountUnit === '%' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '%' ? 'white' : 'var(--mid)' }}
+                      className="px-[20px] py-[8px] transition-all"
+                      style={{ ...pjs(700, '18px', discountUnit === '%' ? 'white' : 'var(--ink-60)'), background: discountUnit === '%' ? 'var(--ink)' : 'var(--card)', borderRadius: '999px' }}
                     >%</button>
                     <button
                       onClick={() => setDiscountUnit('£')}
-                      className="px-[20px] py-[8px] rounded-[50px] text-[18px] font-bold transition-all"
-                      style={{ background: discountUnit === '£' ? 'var(--near-black)' : 'var(--bg)', color: discountUnit === '£' ? 'white' : 'var(--mid)' }}
+                      className="px-[20px] py-[8px] transition-all"
+                      style={{ ...pjs(700, '18px', discountUnit === '£' ? 'white' : 'var(--ink-60)'), background: discountUnit === '£' ? 'var(--ink)' : 'var(--card)', borderRadius: '999px' }}
                     >£</button>
                   </div>
-                  <p className="text-[15px] text-[var(--mid)] text-center">
-                    Creators will see: <span className="font-semibold">{discountAmount}{discountUnit} off</span>
+                  <p style={pjs(400, '15px', 'var(--ink-60)', { textAlign: 'center' })}>
+                    Creators will see: <span style={{ fontWeight: 600 }}>{discountAmount}{discountUnit} off</span>
                   </p>
                 </div>
               )}
@@ -510,15 +510,16 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               {/* DECISION 2 — Monthly creators */}
               {offerType && (
                 <div className="mt-[24px]">
-                  <label className="block text-[13px] font-semibold text-[var(--near-black)] mb-[12px]">Monthly creators</label>
+                  <label style={pjs(600, '13px', 'var(--ink-60)', { display: 'block', marginBottom: '12px' })}>Monthly creators</label>
 
                   {!hasCap ? (
                     <div className="text-center">
-                      <p className="text-[17px] font-bold text-[var(--near-black)]">Unlimited</p>
-                      <p className="text-[14px] text-[var(--soft)] mt-[4px]">Accept as many creators as you like each month</p>
+                      <p style={pjs(700, '17px', 'var(--ink)')}>Unlimited</p>
+                      <p style={pjs(400, '14px', 'var(--ink-35)', { marginTop: '4px' })}>Accept as many creators as you like each month</p>
                       <button
                         onClick={() => setHasCap(true)}
-                        className="mt-[12px] text-[15px] font-semibold text-[var(--terra)]"
+                        className="mt-[12px]"
+                        style={pjs(600, '15px', 'var(--terra)')}
                       >
                         Set a monthly cap instead
                       </button>
@@ -528,28 +529,29 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       <div className="flex items-center justify-center gap-[24px]">
                         <button
                           onClick={() => setMonthlySlots(Math.max(1, monthlySlots - 1))}
-                          className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
-                          style={{ border: '1.5px solid var(--faint)' }}
+                          className="w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all"
+                          style={{ background: 'var(--card)', border: '1.5px solid var(--ink-08)' }}
                         >
-                          <DoodleIcon name="minus" size={18} className="text-[var(--mid)]" />
+                          <DoodleIcon name="minus" size={18} className="text-[var(--ink-60)]" />
                         </button>
-                        <span className="text-[52px] font-display font-normal text-[var(--near-black)]" style={{ minWidth: 48, textAlign: 'center' }}>
+                        <span style={pjs(800, '28px', 'var(--ink)', { minWidth: '48px', textAlign: 'center', display: 'inline-block' })}>
                           {monthlySlots}
                         </span>
                         <button
                           onClick={() => setMonthlySlots(Math.min(20, monthlySlots + 1))}
-                          className="w-[48px] h-[48px] rounded-full flex items-center justify-center transition-all"
+                          className="w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all"
                           style={{ background: 'var(--terra)' }}
                         >
                           <DoodleIcon name="plus" size={18} className="text-white" />
                         </button>
                       </div>
-                      <p className="text-[14px] text-[var(--soft)] text-center mt-[8px]">
+                      <p style={pjs(400, '14px', 'var(--ink-35)', { textAlign: 'center', marginTop: '8px' })}>
                         {monthlySlots} creator{monthlySlots === 1 ? '' : 's'} per month
                       </p>
                       <button
                         onClick={() => setHasCap(false)}
-                        className="block mx-auto mt-[8px] text-[15px] font-semibold text-[var(--terra)]"
+                        className="block mx-auto mt-[8px]"
+                        style={pjs(600, '15px', 'var(--terra)')}
                       >
                         Remove cap
                       </button>
@@ -562,20 +564,19 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             <div className="flex-1 min-h-[24px]" />
 
             {error && (
-              <p className="text-[15px] text-[var(--terra)] text-center mb-[12px]">{error}</p>
+              <p style={pjs(500, '15px', 'var(--terra)', { textAlign: 'center', marginBottom: '12px' })}>{error}</p>
             )}
 
             <button
               onClick={handleLaunch}
               disabled={saving || !offerType || (offerType !== 'discount' && offerItem.trim().length < 3) || (offerType === 'discount' && !discountAmount)}
-              className="w-full py-[16px] rounded-[50px] text-[17px] font-bold min-h-[52px] transition-all"
+              className="w-full min-h-[52px] transition-all"
               style={{
+                ...pjs(700, '15px', (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3)) ? 'white' : 'var(--ink-35)'),
                 background: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
-                  ? 'var(--terra)' : 'var(--bg)',
-                color: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
-                  ? 'white' : 'var(--soft)',
-                boxShadow: (!saving && offerType && (offerType === 'discount' ? discountAmount : offerItem.trim().length >= 3))
-                  ? '0 4px 16px rgba(212,71,12,0.25)' : 'none',
+                  ? 'var(--terra)' : 'var(--card)',
+                borderRadius: '999px',
+                padding: '13px 24px',
               }}
             >
               {saving ? (
@@ -586,8 +587,8 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
             </button>
             <button
               onClick={handleFinishLater}
-              className="w-full text-center mt-[8px] py-[8px] text-[18px] text-[var(--soft)]"
-              style={{ fontWeight: 400 }}
+              className="w-full text-center mt-[8px] py-[8px]"
+              style={pjs(500, '15px', 'var(--terra)')}
             >
               Finish later
             </button>
@@ -609,32 +610,26 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
               />
               <div
                 className="absolute inset-0 rounded-full"
-                style={{ background: 'var(--lavender)', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
+                style={{ background: '#C8B8F0', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
               />
               <div className="absolute inset-0 flex items-center justify-center z-10">
                 <DoodleIcon name="check" size={48} className="text-[var(--terra)]" />
               </div>
             </div>
 
-            <h1
-              className="text-[36px] font-display font-normal text-[var(--near-black)] text-center mt-[28px]"
-              style={{ letterSpacing: '-0.025em' }}
-            >
+            <h1 style={pjs(800, '36px', 'var(--ink)', { textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' })}>
               You're live.
             </h1>
 
-            <p
-              className="text-[17px] text-[var(--mid)] text-center mt-[12px] max-w-[280px] mx-auto"
-              style={{ fontWeight: 400, lineHeight: 1.7 }}
-            >
+            <p style={pjs(400, '15px', 'var(--ink-60)', { textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: '1.65' })}>
               Your offer for {generatedTitle} is now live on nayba.
               {' '}Creators in {town} can discover and claim it right now.
             </p>
 
             {/* Offer summary card */}
             <div
-              className="mt-[24px] w-full max-w-[260px] rounded-[20px] p-[16px] flex items-center gap-[12px]"
-              style={{ background: '#EDE8DC', border: '1px solid var(--faint)' }}
+              className="mt-[24px] w-full max-w-[260px] flex items-center gap-[12px]"
+              style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '16px', padding: '16px' }}
             >
               <div
                 className="w-[40px] h-[40px] rounded-[8px] flex items-center justify-center flex-shrink-0"
@@ -643,14 +638,14 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 <CategoryIcon category={profile.category} className="w-[18px] h-[18px] text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[18px] font-bold text-[var(--near-black)] truncate">{generatedTitle}</p>
-                <p className="text-[14px] text-[var(--mid)]">{hasCap ? `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month` : 'Unlimited creators'}</p>
+                <p className="truncate" style={pjs(700, '18px', 'var(--ink)')}>{generatedTitle}</p>
+                <p style={pjs(500, '14px', 'var(--ink-60)')}>{hasCap ? `${monthlySlots} creator${monthlySlots === 1 ? '' : 's'} per month` : 'Unlimited creators'}</p>
               </div>
               <span
-                className="inline-flex items-center gap-[4px] px-[8px] py-[3px] rounded-[50px] text-[12px] font-bold flex-shrink-0"
-                style={{ background: 'rgba(26,74,46,0.08)', color: 'var(--forest)' }}
+                className="inline-flex items-center gap-[4px] flex-shrink-0"
+                style={{ ...pjs(700, '12px', 'var(--terra)'), background: 'var(--terra-10)', borderRadius: '999px', padding: '3px 8px' }}
               >
-                <span className="w-[5px] h-[5px] rounded-full bg-[var(--forest)]" style={{ animation: 'livePulse 2s infinite' }} />
+                <span className="w-[5px] h-[5px] rounded-full animate-pulse" style={{ background: 'var(--terra)' }} />
                 Live
               </span>
             </div>
@@ -659,8 +654,8 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
             <button
               onClick={onComplete}
-              className="w-full py-[16px] rounded-[50px] text-white text-[17px] font-bold min-h-[52px] transition-all"
-              style={{ background: 'var(--terra)', boxShadow: '0 4px 16px rgba(212,71,12,0.25)' }}
+              className="w-full min-h-[52px] text-white transition-all"
+              style={{ ...pjs(700, '15px', 'white'), background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Go to my dashboard →
             </button>
@@ -671,16 +666,13 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 setLinkCopied(true);
                 setTimeout(() => setLinkCopied(false), 2000);
               }}
-              className="text-[14px] text-[var(--soft)] text-center mt-[10px] py-[8px]"
+              style={pjs(500, '14px', 'var(--ink-35)', { textAlign: 'center', marginTop: '10px', padding: '8px' })}
             >
-              {linkCopied ? 'Link copied \u2713' : 'Share nayba with another local business'}
+              {linkCopied ? 'Link copied ✓' : 'Share nayba with another local business'}
             </button>
           </div>
         )}
       </div>
-
-      {/* livePulse for the success card badge */}
-      <style>{`@keyframes livePulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.75); } }`}</style>
     </div>
   );
 }

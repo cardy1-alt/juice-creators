@@ -109,19 +109,19 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[#D4470C] text-white',
-    claimed: 'bg-[#D4470C] text-white',
-    redeemed: 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]',
-    visited: 'bg-[var(--bg)] text-[var(--near-black)]',
-    reel_due: 'bg-[#D4470C] text-white',
-    submitted: 'bg-[var(--forest)] text-white',
-    expired: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
-    overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[rgba(212,71,12,0.15)]',
-    completed: 'bg-[#EDE8DC] text-[rgba(44,36,32,0.55)]',
-    disputed: 'bg-[rgba(44,36,32,0.06)] text-[var(--soft)]',
+    active: 'bg-[var(--terra)] text-white',
+    claimed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
+    redeemed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
+    visited: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
+    reel_due: 'bg-[rgba(232,160,32,0.12)] text-[var(--ochre)]',
+    submitted: 'bg-[var(--terra)] text-white',
+    expired: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
+    overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[var(--terra-15)]',
+    completed: 'bg-[var(--terra-10)] text-[var(--terra)]',
+    disputed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
   };
   return (
-    <span className={`text-[13px] px-2.5 py-1 rounded-[50px] font-semibold ${styles[status] || 'bg-[var(--bg)] text-[var(--near-black)]'}`}>
+    <span className={`text-[13px] px-2.5 py-1 rounded-[999px] font-semibold ${styles[status] || 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]'}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
       {status}
     </span>
   );
@@ -136,18 +136,18 @@ function formatDate(dateStr: string): string {
 // ─── Scarcity colour shift helper ─────────────────────────────────────────
 function getSlotsBadgeStyle(slotsLeft: number, _totalSlots: number) {
   if (slotsLeft === 0) {
-    return { background: 'rgba(44,36,32,0.06)', color: 'rgba(44,36,32,0.4)', text: 'Full' };
+    return { background: 'rgba(34,34,34,0.06)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
   }
   if (slotsLeft === 1) {
-    return { background: 'rgba(44,36,32,0.08)', color: 'var(--near-black)', text: 'Last slot' };
+    return { background: 'var(--terra)', color: 'white', text: 'Last slot' };
   }
-  if (slotsLeft <= 2) {
-    return { background: 'rgba(44,36,32,0.08)', color: 'var(--near-black)', text: `${slotsLeft} left` };
+  if (slotsLeft <= 3) {
+    return { background: 'var(--terra-10)', color: 'var(--terra)', text: `${slotsLeft} left` };
   }
-  return { background: 'rgba(44,36,32,0.06)', color: 'var(--mid)', text: `${slotsLeft} left` };
+  return { background: 'rgba(34,34,34,0.06)', color: 'var(--ink-35)', text: `${slotsLeft} left` };
 }
 
-const cardPalette = ['#EDE8DC', '#E8EEE7', '#E4EAED', '#F2E8E0', '#EDE8D0'];
+const cardPalette = ['var(--card)', '#E8EEE7', '#E4EAED', '#F5C4A0', '#EDE8D0'];
 const getCardColor = (index: number) => cardPalette[index % cardPalette.length];
 
 export default function CreatorApp() {
@@ -693,7 +693,7 @@ export default function CreatorApp() {
   };
 
   const activeUrgency = getActiveUrgency();
-  const activeBadgeColor = 'bg-[#D4470C]';
+  const activeBadgeColor = 'bg-[var(--terra)]';
 
   const foodCategories = ['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'];
   const beautyCategories = ['salon', 'spa', 'beauty', 'nails', 'hair', 'skincare', 'barbershop', 'wellness'];
@@ -827,15 +827,15 @@ export default function CreatorApp() {
     return (
       <div
         className="rounded-[12px] flex items-center justify-center"
-        style={{ width: size, height: size, background: '#EDE8DC' }}
+        style={{ width: size, height: size, background: 'var(--card)' }}
       >
-        <CategoryIcon category={category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
+        <CategoryIcon category={category} className="w-[20px] h-[20px]" style={{ color: 'rgba(34,34,34,0.5)' }} />
       </div>
     );
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[#F7F6F3]">
+    <div className="h-[100dvh] flex flex-col bg-[var(--shell)]">
       {showOnboarding && (
         <CreatorOnboarding
           profile={userProfile}
@@ -852,13 +852,13 @@ export default function CreatorApp() {
 
       {/* Undo toast */}
       {undoToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--near-black)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--ink)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
           {undoToast}
         </div>
       )}
 
       {redeemToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--near-black)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--ink)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
           <DoodleIcon name="check" size={16} />
           {redeemToast}
         </div>
@@ -866,15 +866,15 @@ export default function CreatorApp() {
 
       {/* Level Up Overlay */}
       {showLevelUpOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(44,36,32,0.85)' }}>
-          <div className="bg-[#EDE8DC] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
+          <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
             <div className="flex justify-center mb-5">
               <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
             </div>
-            <h2 className="text-[26px] font-display text-[var(--near-black)] mb-2" style={{ letterSpacing: '-0.025em' }}>
+            <h2 className="text-[26px] text-[var(--ink)] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
               You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
             </h2>
-            <p className="text-[18px] text-[var(--mid)] mb-6 leading-[1.5]">
+            <p className="text-[18px] text-[var(--ink-60)] mb-6 leading-[1.5]">
               {showLevelUpOverlay.level === 2 && 'You posted your first reel. You can now access more offers.'}
               {showLevelUpOverlay.level === 3 && 'Businesses are starting to notice you. Keep it up.'}
               {showLevelUpOverlay.level === 4 && "You're a local favourite. Premium offers are unlocking."}
@@ -883,7 +883,8 @@ export default function CreatorApp() {
             </p>
             <button
               onClick={() => setShowLevelUpOverlay(null)}
-              className="w-full py-[14px] rounded-[50px] font-bold text-[18px] bg-[#D4470C] text-white hover:bg-[#B93D0A] transition-all min-h-[48px]"
+              className="w-full py-[13px] rounded-[999px] text-[15px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
             >
               Keep going →
             </button>
@@ -895,12 +896,12 @@ export default function CreatorApp() {
       {showClaimSuccess && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center"
-          style={{ background: 'rgba(40,32,26,0.48)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
+          style={{ background: 'rgba(34,34,34,0.48)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
           onClick={() => setShowClaimSuccess(null)}
         >
           <div
             style={{
-              background: '#FFFFFF',
+              background: 'var(--shell)',
               borderRadius: 22,
               padding: '28px 24px',
               maxWidth: 320,
@@ -926,16 +927,16 @@ export default function CreatorApp() {
             </div>
 
             <h3 style={{
-              fontFamily: "'Corben', serif",
-              fontWeight: 400,
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              fontWeight: 800,
               fontSize: 21,
               color: 'var(--ink)',
               margin: '0 0 8px',
-              letterSpacing: '-0.3px',
+              letterSpacing: '-0.03em',
             }}>{showClaimSuccess.offerTitle}</h3>
 
             <p style={{
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
               fontWeight: 400,
               fontSize: 13,
               color: 'var(--ink-60)',
@@ -954,9 +955,9 @@ export default function CreatorApp() {
                 borderRadius: 999,
                 border: 'none',
                 background: 'var(--terra)',
-                color: 'var(--shell)',
-                fontFamily: "'DM Sans', sans-serif",
-                fontWeight: 600,
+                color: 'white',
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                fontWeight: 700,
                 fontSize: 15,
                 cursor: 'pointer',
               }}
@@ -983,26 +984,26 @@ export default function CreatorApp() {
         return (
           <div
             className="fixed top-0 left-0 right-0 bottom-0"
-            style={{ zIndex: 9999, overflowY: 'auto', background: activeTab === 'pass' ? '#D4470C' : '#F7F6F3' }}
+            style={{ zIndex: 9999, overflowY: 'auto', background: activeTab === 'pass' ? 'var(--terra)' : 'var(--shell)' }}
           >
             {/* Back button — fixed so it stays visible when scrolling */}
             <button
               onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
               className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px]"
-              style={{ zIndex: 10000, borderRadius: 8, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--near-black)' }}
+              style={{ zIndex: 10000, borderRadius: 8, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)' }}
             >
               ← Back
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
               {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : '#2C2420', letterSpacing: '-0.025em', textAlign: 'center', margin: 0, lineHeight: 1.15 }}>{qrOfferTitle}</p>
-              <p className="text-[16px] text-center mt-[2px]" style={{ color: activeTab === 'pass' ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{qrClaim.businesses.name}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: 0, lineHeight: 1.15 }}>{qrOfferTitle}</p>
+              <p className="text-[16px] text-center mt-[2px]" style={{ color: activeTab === 'pass' ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
               {isReelDue && (
                 <div
                   className="relative flex items-center mt-[20px]"
-                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : '#EDE8DC', borderRadius: 50, padding: 3 }}
+                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : 'var(--card)', borderRadius: 999, padding: 3 }}
                 >
                   {/* Sliding active indicator */}
                   <div
@@ -1010,8 +1011,8 @@ export default function CreatorApp() {
                     style={{
                       width: 'calc(50% - 3px)',
                       height: 36,
-                      borderRadius: 50,
-                      background: activeTab === 'pass' ? '#FFFFFF' : '#2C2420',
+                      borderRadius: 999,
+                      background: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)',
                       left: activeTab === 'pass' ? 3 : 'calc(50%)',
                       transition: 'all 0.2s ease',
                     }}
@@ -1019,14 +1020,14 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setQrScreenTab('pass')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? '#D4470C' : 'rgba(44,36,32,0.88)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? 'var(--terra)' : 'rgba(34,34,34,0.88)', borderRadius: 999 }}
                   >
                     Show pass
                   </button>
                   <button
                     onClick={() => setQrScreenTab('reel')}
                     className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(255,255,255,0.7)', borderRadius: 50 }}
+                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(255,255,255,0.7)', borderRadius: 999 }}
                   >
                     Submit reel
                   </button>
@@ -1040,13 +1041,13 @@ export default function CreatorApp() {
                     token={qrClaim.qr_token}
                     claimId={qrClaim.id}
                     creatorCode={userProfile.code}
-                    size={240}
+                    size={220}
                     hideExtras
                   />
-                  {/* Ref code pill — white with low opacity background */}
+                  {/* Ref code pill */}
                   <span
-                    className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full mt-[20px]"
-                    style={{ background: 'rgba(255,255,255,0.2)', padding: '10px 20px' }}
+                    className="text-[17px] text-white inline-block rounded-full mt-[20px]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
                   >
                     {userProfile.code}
                   </span>
@@ -1065,19 +1066,19 @@ export default function CreatorApp() {
                   {/* Timer block */}
                   <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
                     <div className="flex items-center gap-[8px]">
-                      <DoodleIcon name="clock" size={16} className="text-[var(--mid)]" />
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: '#2C2420' }}>
+                      <DoodleIcon name="clock" size={16} className="text-[var(--ink-60)]" />
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
                         {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
                       </span>
                     </div>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', marginTop: 8, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
                       Post your reel within this window — it must clearly feature the business.
                     </p>
                   </div>
 
                   {/* Reel URL input */}
                   <div style={{ marginTop: 20 }}>
-                    <label className="text-[15px] font-semibold text-[var(--near-black)]" style={{ marginBottom: 8, display: 'block' }}>
+                    <label className="text-[15px] font-semibold text-[var(--ink)]" style={{ marginBottom: 8, display: 'block' }}>
                       Reel URL
                     </label>
                     <input
@@ -1085,15 +1086,15 @@ export default function CreatorApp() {
                       value={reelUrl}
                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                       placeholder="https://instagram.com/reel/"
-                      className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
-                      style={{ background: '#EDE8DC', border: '1.5px solid rgba(44,36,32,0.08)', borderRadius: 50, padding: '14px 16px', fontSize: '16px' }}
-                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--near-black)'; }}
-                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(44,36,32,0.15)'; }}
+                      className="w-full text-[17px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none"
+                      style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: '16px' }}
+                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
+                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.15)'; }}
                     />
                     {reelError ? (
-                      <p className="text-[15px] text-[var(--mid)] mt-[8px]">Please check the URL and try again.</p>
+                      <p className="text-[15px] text-[var(--ink-60)] mt-[8px]">Please check the URL and try again.</p>
                     ) : (
-                      <p className="text-[14px] text-[var(--soft)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
+                      <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
                     )}
                   </div>
 
@@ -1108,9 +1109,9 @@ export default function CreatorApp() {
                     disabled={loading || !isSubmitEnabled}
                     className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all"
                     style={{
-                      background: isSubmitEnabled ? '#D4470C' : 'rgba(212,71,12,0.3)',
+                      background: isSubmitEnabled ? 'var(--terra)' : 'var(--terra-40)',
                       height: 52,
-                      borderRadius: 50,
+                      borderRadius: 999,
                       marginTop: 16,
                       cursor: isSubmitEnabled && !loading ? 'pointer' : 'not-allowed',
                     }}
@@ -1127,7 +1128,7 @@ export default function CreatorApp() {
                   <div style={{ flexGrow: 1 }} />
                   <button
                     onClick={() => setDisputeClaimId(qrClaim.id)}
-                    className="w-full text-center text-[14px] text-[var(--soft)] min-h-[44px]"
+                    className="w-full text-center text-[14px] text-[var(--ink-35)] min-h-[44px]"
                     style={{ marginTop: 24 }}
                   >
                     Report an issue
@@ -1165,7 +1166,7 @@ export default function CreatorApp() {
           drift: -20 + Math.random() * 40,
         }));
         return (
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center" style={{ zIndex: 9999, background: 'var(--forest)' }}>
+          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center" style={{ zIndex: 9999, background: 'var(--terra)' }}>
             <style>{celebrationStyles}</style>
             {/* Confetti */}
             {confettiPieces.map(p => (
@@ -1203,7 +1204,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[36px] font-display font-extrabold text-white text-center mt-[24px]" style={{ letterSpacing: '-0.025em' }}>
+            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
               Reel submitted!
             </h2>
             <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1217,8 +1218,8 @@ export default function CreatorApp() {
             </div>
             <button
               onClick={() => { setShowReelCelebration(null); setView('offers'); }}
-              className="mt-[32px] px-[32px] py-[14px] rounded-full text-white text-[17px] font-bold min-h-[48px]"
-              style={{ background: '#D4470C' }}
+              className="mt-[32px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[48px]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
             >
               Back to explore
             </button>
@@ -1247,7 +1248,7 @@ export default function CreatorApp() {
         })();
 
         return (
-          <div className="fixed inset-0 z-50 bg-[#F7F6F3] flex flex-col">
+          <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col">
             {/* Hero — category colour */}
             <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryPastelBg(offer.businesses.category) }}>
               {/* Back button — 40% opacity */}
@@ -1255,39 +1256,39 @@ export default function CreatorApp() {
                 onClick={() => setExpandedOffer(null)}
                 className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="chevron-left" size={18} style={{ color: 'rgba(44,36,32,0.4)' }} />
+                <DoodleIcon name="chevron-left" size={18} style={{ color: 'rgba(34,34,34,0.4)' }} />
               </button>
               {/* Locked overlay on hero */}
               {detailIsLocked && (
-                <div className="absolute inset-0" style={{ background: 'rgba(44,36,32,0.25)' }} />
+                <div className="absolute inset-0" style={{ background: 'rgba(34,34,34,0.25)' }} />
               )}
               {/* Save button — 40% opacity */}
               <button
                 onClick={() => toggleSaved(offer.id)}
                 className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
               >
-                <DoodleIcon name="heart" size={16} style={{ color: 'rgba(44,36,32,0.4)' }} />
+                <DoodleIcon name="heart" size={16} style={{ color: 'rgba(34,34,34,0.4)' }} />
               </button>
               {/* Text overlay */}
               <div className="relative px-[20px] pb-[20px] pt-[56px]">
-                <CategoryIcon category={offer.businesses.category} className="w-[44px] h-[44px] mb-[10px]" style={{ color: 'rgba(44,36,32,0.4)' }} />
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: '#2C2420', letterSpacing: '-0.025em', lineHeight: 1.15, margin: 0 }}>
+                <CategoryIcon category={offer.businesses.category} className="w-[44px] h-[44px] mb-[10px]" style={{ color: 'rgba(34,34,34,0.4)' }} />
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 28, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.15, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
               </div>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto bg-[#F7F6F3]">
+            <div className="flex-1 overflow-y-auto bg-[var(--shell)]">
               <div className="p-[20px]">
                 {/* Level requirement banner */}
                 {detailIsLocked && (
-                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(44,36,32,0.04)' }}>
-                    <DoodleIcon name="lock" size={14} className="text-[var(--mid)] mt-0.5 flex-shrink-0" />
+                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(34,34,34,0.04)' }}>
+                    <DoodleIcon name="lock" size={14} className="text-[var(--ink-60)] mt-0.5 flex-shrink-0" />
                     <div>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 15, color: '#2C2420', margin: 0 }}>{detailLockedName} creators only</p>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{detailLockedName} creators only</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
                     </div>
                   </div>
                 )}
@@ -1295,22 +1296,22 @@ export default function CreatorApp() {
                 {/* A) Scarcity / urgency row */}
                 <div className="flex items-center gap-[20px] mb-[20px]">
                   <div className="flex items-center gap-1.5">
-                    <DoodleIcon name="users" size={14} style={{ color: 'rgba(44,36,32,0.5)' }} />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)' }}>
+                    <DoodleIcon name="users" size={14} style={{ color: 'rgba(34,34,34,0.5)' }} />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)' }}>
                       {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
                     </span>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <DoodleIcon name="clock" size={14} style={{ color: 'rgba(44,36,32,0.5)' }} />
-                    <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.5)' }}>48hrs to post</span>
+                    <DoodleIcon name="clock" size={14} style={{ color: 'rgba(34,34,34,0.5)' }} />
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.5)' }}>48hrs to post</span>
                   </div>
                 </div>
 
                 {/* B) WHAT TO POST label */}
-                <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 10, margin: '0 0 10px' }}>WHAT TO POST</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', marginBottom: 10, margin: '0 0 10px' }}>WHAT TO POST</p>
 
-                {/* C) Primary post requirement — Corben */}
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: '#2C2420', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
+                {/* C) Primary post requirement */}
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
 
                 {/* D) Checklist items — no duplicates */}
                 <div className="flex flex-col gap-[10px] mb-[24px]">
@@ -1320,8 +1321,8 @@ export default function CreatorApp() {
                     'Submit your reel link in the app',
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
-                      <DoodleIcon name="check" size={13} style={{ color: 'rgba(44,36,32,0.5)', marginTop: 3, flexShrink: 0 }} />
-                      <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.7)' }}>{item}</span>
+                      <DoodleIcon name="check" size={13} style={{ color: 'rgba(34,34,34,0.5)', marginTop: 3, flexShrink: 0 }} />
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.7)' }}>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -1329,9 +1330,9 @@ export default function CreatorApp() {
                 {/* E) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
                   <div className="mb-[24px]">
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>THEY'D LOVE IF YOU…</p>
-                    <div className="rounded-[12px] p-[14px]" style={{ background: '#EDE8DC' }}>
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.7)', lineHeight: 1.55, margin: 0 }}>{offer.specific_ask}</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>THEY'D LOVE IF YOU…</p>
+                    <div className="rounded-[12px] p-[14px]" style={{ background: 'var(--card)' }}>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.7)', lineHeight: 1.55, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
                   </div>
                 )}
@@ -1339,14 +1340,14 @@ export default function CreatorApp() {
                 {/* F) About business */}
                 {(offer.businesses.bio || offer.businesses.address) && (
                   <div className="mb-[24px]">
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>ABOUT</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.45)', textTransform: 'uppercase' as const, letterSpacing: '0.08em', margin: '0 0 10px' }}>ABOUT</p>
                     {offer.businesses.bio && (
-                      <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(44,36,32,0.8)', lineHeight: 1.55, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'rgba(34,34,34,0.8)', lineHeight: 1.55, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
                     )}
                     {offer.businesses.address && (
                       <div className="flex items-center gap-2">
-                        <DoodleIcon name="location-pin" size={15} style={{ color: 'rgba(44,36,32,0.6)', flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.6)' }}>{offer.businesses.address}</span>
+                        <DoodleIcon name="location-pin" size={15} style={{ color: 'rgba(34,34,34,0.6)', flexShrink: 0 }} />
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.6)' }}>{offer.businesses.address}</span>
                       </div>
                     )}
                   </div>
@@ -1355,17 +1356,17 @@ export default function CreatorApp() {
             </div>
 
             {/* Sticky bottom bar */}
-            <div className="px-[20px] py-[14px] bg-[#F7F6F3]" style={{ boxShadow: '0 -1px 0 rgba(44,36,32,0.06)' }}>
+            <div className="px-[20px] py-[14px] bg-[var(--shell)]" style={{ boxShadow: '0 -1px 0 rgba(34,34,34,0.06)' }}>
               {detailIsLocked ? (
                 <div
-                  className="w-full py-[14px] rounded-[50px] text-center"
-                  style={{ background: 'rgba(44,36,32,0.04)', fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(44,36,32,0.5)' }}
+                  className="w-full py-[14px] rounded-[999px] text-center"
+                  style={{ background: 'rgba(34,34,34,0.04)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)' }}
                 >
                   Unlocks at {detailLockedName}
                 </div>
               ) : full && waitlistedOffers[offer.id] ? (
                 <div>
-                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
                     You're #{waitlistedOffers[offer.id].position || '—'} on the waitlist
                   </p>
                   {waitlistConfirmLeave === offer.id ? (
@@ -1373,15 +1374,15 @@ export default function CreatorApp() {
                       <button
                         onClick={() => leaveWaitlist(offer.id)}
                         disabled={waitlistLoading === offer.id}
-                        className="flex-1 py-[14px] rounded-[50px] text-center"
-                        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, color: '#2C2420', border: '1.5px solid rgba(44,36,32,0.15)', background: 'transparent' }}
+                        className="flex-1 py-[14px] rounded-[999px] text-center"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
                       >
                         {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                       </button>
                       <button
                         onClick={() => setWaitlistConfirmLeave(null)}
-                        className="flex-1 py-[14px] rounded-[50px] text-center"
-                        style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(44,36,32,0.5)', background: 'transparent' }}
+                        className="flex-1 py-[14px] rounded-[999px] text-center"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(34,34,34,0.5)', background: 'transparent' }}
                       >
                         Cancel
                       </button>
@@ -1389,8 +1390,8 @@ export default function CreatorApp() {
                   ) : (
                     <button
                       onClick={() => setWaitlistConfirmLeave(offer.id)}
-                      className="w-full py-[14px] rounded-[50px] text-center flex items-center justify-center gap-1"
-                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid #2C2420', color: '#2C2420', background: 'transparent' }}
+                      className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid var(--ink)', color: 'var(--ink)', background: 'transparent' }}
                     >
                       On waitlist <DoodleIcon name="check" size={16} />
                     </button>
@@ -1398,33 +1399,33 @@ export default function CreatorApp() {
                 </div>
               ) : full ? (
                 <div>
-                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>All slots taken this month</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>All slots taken this month</p>
                   <button
                     onClick={() => joinWaitlist(offer.id)}
                     disabled={waitlistLoading === offer.id}
-                    className="w-full py-[14px] rounded-[50px] text-center disabled:opacity-40"
-                    style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid rgba(44,36,32,0.15)', color: '#2C2420', background: 'transparent' }}
+                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, border: '1.5px solid rgba(34,34,34,0.15)', color: 'var(--ink)', background: 'transparent' }}
                   >
                     {waitlistLoading === offer.id ? 'Joining...' : 'Join waitlist'}
                   </button>
                 </div>
               ) : (
                 <div>
-                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(44,36,32,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>
                     {alreadyClaimed ? 'You claimed this offer' : hasActiveBusiness ? 'You have an active visit here' : 'Post a reel within 48hrs'}
                   </p>
                   {alreadyClaimed ? (
                     <button
-                      className="w-full py-[14px] rounded-[50px] text-center flex items-center justify-center gap-1.5"
-                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF' }}
+                      className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
                     >
                       <DoodleIcon name="check" size={16} className="text-white" /> Claimed
                     </button>
                   ) : hasActiveBusiness ? (
                     <button
                       disabled
-                      className="w-full py-[14px] rounded-[50px] text-center cursor-not-allowed"
-                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF', opacity: 0.5 }}
+                      className="w-full py-[14px] rounded-[999px] text-center cursor-not-allowed"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', opacity: 0.5 }}
                     >
                       Active
                     </button>
@@ -1432,8 +1433,8 @@ export default function CreatorApp() {
                     <button
                       onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
                       disabled={loading}
-                      className="w-full py-[14px] rounded-[50px] text-center disabled:opacity-40 transition-all"
-                      style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#D4470C', color: '#FFFFFF' }}
+                      className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
                     >
                       Claim
                     </button>
@@ -1479,7 +1480,7 @@ export default function CreatorApp() {
                 {/* 1. Fixed header */}
                 <div style={{
                   background: 'var(--shell)',
-                  borderBottom: '1px solid var(--border)',
+                  borderBottom: '1px solid var(--ink-08)',
                   padding: '12px 16px',
                   display: 'flex',
                   alignItems: 'center',
@@ -1487,33 +1488,30 @@ export default function CreatorApp() {
                   flexShrink: 0,
                 }}>
                   <span style={{
-                    fontFamily: "'Corben', serif",
-                    fontWeight: 400,
-                    fontSize: 24,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 800,
+                    fontSize: 26,
                     color: 'var(--ink)',
-                    letterSpacing: '-0.4px',
+                    letterSpacing: '-0.03em',
                   }}>nayba</span>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {/* Location pill */}
+                    {/* Search button */}
                     <div style={{
+                      width: 42,
+                      height: 42,
                       background: 'var(--card)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 999,
-                      padding: '5px 10px',
+                      border: '1.5px solid var(--ink-08)',
+                      borderRadius: 13,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: 4,
-                      fontFamily: "'DM Sans', sans-serif",
-                      fontWeight: 500,
-                      fontSize: 12,
-                      color: 'var(--ink-60)',
+                      justifyContent: 'center',
+                      cursor: 'pointer',
                     }}>
-                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
-                        <circle cx="12" cy="10" r="3"/>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
                       </svg>
-                      Your area
                     </div>
 
                     {/* Avatar initials */}
@@ -1522,11 +1520,11 @@ export default function CreatorApp() {
                       height: 30,
                       borderRadius: '50%',
                       background: 'var(--card)',
-                      border: '1px solid var(--border)',
+                      border: '1.5px solid var(--ink-08)',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                       fontWeight: 600,
                       fontSize: 10,
                       color: 'var(--ink-60)',
@@ -1577,7 +1575,7 @@ export default function CreatorApp() {
                     >
                       <div>
                         <div style={{
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
                           fontWeight: 600,
                           fontSize: 9,
                           textTransform: 'uppercase' as const,
@@ -1586,7 +1584,7 @@ export default function CreatorApp() {
                           marginBottom: 2,
                         }}>ACTIVE CLAIM</div>
                         <div style={{
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
                           fontWeight: 500,
                           fontSize: 13,
                           color: 'rgba(248,246,241,0.92)',
@@ -1599,7 +1597,7 @@ export default function CreatorApp() {
                           background: 'var(--terra)',
                           borderRadius: 999,
                           padding: '3px 8px',
-                          fontFamily: "'DM Sans', sans-serif",
+                          fontFamily: "'Plus Jakarta Sans', sans-serif",
                           fontWeight: 600,
                           fontSize: 10,
                           color: 'var(--shell)',
@@ -1618,7 +1616,7 @@ export default function CreatorApp() {
                     margin: '8px 14px 0',
                     padding: '10px 14px',
                     borderRadius: 12,
-                    background: 'rgba(40,32,26,0.05)',
+                    background: 'rgba(34,34,34,0.05)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'space-between',
@@ -1632,7 +1630,7 @@ export default function CreatorApp() {
                 {/* 3. Card stack OR loading OR empty state */}
                 {offersLoading ? (
                   <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <p style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
                   </div>
                 ) : isEmpty ? (
                   /* Empty state */
@@ -1647,14 +1645,15 @@ export default function CreatorApp() {
                     gap: 8,
                   }}>
                     <h2 style={{
-                      fontFamily: "'Corben', serif",
-                      fontWeight: 400,
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 600,
                       fontSize: 24,
                       color: 'var(--ink)',
                       margin: 0,
+                      letterSpacing: '-0.03em',
                     }}>All caught up</h2>
                     <p style={{
-                      fontFamily: "'DM Sans', sans-serif",
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                       fontWeight: 400,
                       fontSize: 14,
                       color: 'var(--ink-60)',
@@ -1665,14 +1664,14 @@ export default function CreatorApp() {
                     <button
                       onClick={() => setView('all_offers')}
                       style={{
-                        fontFamily: "'DM Sans', sans-serif",
-                        fontWeight: 600,
-                        fontSize: 14,
-                        color: 'var(--shell)',
-                        background: 'var(--ink)',
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontWeight: 700,
+                        fontSize: 15,
+                        color: 'white',
+                        background: 'var(--terra)',
                         border: 'none',
                         borderRadius: 999,
-                        padding: '12px 24px',
+                        padding: '13px 24px',
                         cursor: 'pointer',
                       }}
                     >Browse all offers</button>
@@ -1736,8 +1735,8 @@ export default function CreatorApp() {
                               transform: transform || defaultTransform,
                               transition,
                               borderRadius: 18,
-                              border: '1px solid var(--border)',
-                              boxShadow: '0 2px 16px rgba(40,32,26,0.07)',
+                              border: '1px solid var(--ink-08)',
+                              boxShadow: '0 2px 16px rgba(34,34,34,0.07)',
                               background: 'var(--shell)',
                               display: 'flex',
                               flexDirection: 'column' as const,
@@ -1767,7 +1766,7 @@ export default function CreatorApp() {
                                   background: '#4E9468',
                                   borderRadius: 999,
                                   padding: '6px 16px',
-                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                                   fontWeight: 700,
                                   fontSize: 14,
                                   textTransform: 'uppercase' as const,
@@ -1786,7 +1785,7 @@ export default function CreatorApp() {
                                   background: 'var(--terra)',
                                   borderRadius: 999,
                                   padding: '6px 16px',
-                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                                   fontWeight: 700,
                                   fontSize: 14,
                                   textTransform: 'uppercase' as const,
@@ -1808,31 +1807,31 @@ export default function CreatorApp() {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                               }}>
-                                <span style={{ fontSize: 64, filter: 'drop-shadow(0 2px 6px rgba(0,0,0,0.10))', lineHeight: 1 }}>
+                                <span style={{ fontSize: 64, filter: 'drop-shadow(0 2px 6px rgba(34,34,34,0.10))', lineHeight: 1 }}>
                                   {categoryEmoji}
                                 </span>
                               </div>
 
                               {/* Slot badge */}
-                              {!isUnlimited && slotsLeft !== null && (
+                              {!isUnlimited && slotsLeft !== null && slotsLeft <= 3 && (
                                 <span style={{
                                   position: 'absolute' as const,
                                   top: 12,
                                   right: 12,
                                   borderRadius: 999,
                                   padding: '4px 10px',
-                                  fontFamily: "'DM Sans', sans-serif",
-                                  fontWeight: 600,
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                  fontWeight: 700,
                                   fontSize: 11,
-                                  ...(slotsLeft <= 2 ? {
+                                  ...(slotsLeft === 1 ? {
                                     background: 'var(--terra)',
-                                    color: 'var(--shell)',
+                                    color: 'white',
                                   } : {
-                                    background: 'rgba(248,246,241,0.55)',
-                                    color: 'rgba(40,32,26,0.75)',
+                                    background: 'var(--terra-10)',
+                                    color: 'var(--terra)',
                                   }),
                                 }}>
-                                  {slotsLeft <= 2 ? `🔥 ${slotsLeft} left` : `${slotsLeft} left`}
+                                  {slotsLeft === 1 ? 'Last slot' : `${slotsLeft} left`}
                                 </span>
                               )}
                             </div>
@@ -1841,7 +1840,7 @@ export default function CreatorApp() {
                             <div style={{
                               flex: '3 0 0',
                               background: 'var(--shell)',
-                              borderTop: '1px solid var(--border)',
+                              borderTop: '1px solid var(--ink-08)',
                               padding: '20px 20px 16px',
                               display: 'flex',
                               flexDirection: 'column' as const,
@@ -1850,7 +1849,7 @@ export default function CreatorApp() {
                             }}>
                               {/* Category label */}
                               <span style={{
-                                fontFamily: "'DM Sans', sans-serif",
+                                fontFamily: "'Plus Jakarta Sans', sans-serif",
                                 fontWeight: 600,
                                 fontSize: 11,
                                 textTransform: 'uppercase' as const,
@@ -1861,10 +1860,10 @@ export default function CreatorApp() {
 
                               {/* Offer title */}
                               <span style={{
-                                fontFamily: "'Corben', serif",
+                                fontFamily: "'Plus Jakarta Sans', sans-serif",
                                 fontWeight: 400,
                                 fontSize: 26,
-                                letterSpacing: '-0.4px',
+                                letterSpacing: '-0.03em',
                                 color: 'var(--ink)',
                                 lineHeight: 1.12,
                                 marginBottom: 14,
@@ -1874,7 +1873,7 @@ export default function CreatorApp() {
                               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: offer.specific_ask ? 12 : 0 }}>
                                 <div style={{ minWidth: 0, flex: 1 }}>
                                   <span style={{
-                                    fontFamily: "'DM Sans', sans-serif",
+                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                                     fontWeight: 500,
                                     fontSize: 14,
                                     color: 'var(--ink-60)',
@@ -1883,7 +1882,7 @@ export default function CreatorApp() {
                                   }}>{offer.businesses.name}</span>
                                   {streetName && (
                                     <span style={{
-                                      fontFamily: "'DM Sans', sans-serif",
+                                      fontFamily: "'Plus Jakarta Sans', sans-serif",
                                       fontWeight: 400,
                                       fontSize: 13,
                                       color: 'var(--ink-35)',
@@ -1892,10 +1891,10 @@ export default function CreatorApp() {
                                 </div>
                                 <div style={{
                                   background: 'var(--card)',
-                                  border: '1px solid var(--border)',
+                                  border: '1px solid var(--ink-08)',
                                   borderRadius: 999,
                                   padding: '4px 10px',
-                                  fontFamily: "'DM Sans', sans-serif",
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
                                   fontWeight: 500,
                                   fontSize: 11,
                                   color: 'var(--ink-35)',
@@ -1912,7 +1911,7 @@ export default function CreatorApp() {
                                   padding: '10px 12px',
                                 }}>
                                   <span style={{
-                                    fontFamily: "'DM Sans', sans-serif",
+                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
                                     fontWeight: 400,
                                     fontSize: 13,
                                     color: 'var(--ink-60)',
@@ -1947,14 +1946,14 @@ export default function CreatorApp() {
                               width: 6,
                               height: 6,
                               borderRadius: '50%',
-                              background: i === viewedCount ? 'var(--ink-60)' : 'var(--border)',
+                              background: i === viewedCount ? 'var(--ink-60)' : 'var(--ink-08)',
                               transform: i === viewedCount ? 'scale(1.2)' : 'none',
                               transition: 'background 0.2s, transform 0.2s',
                             }}
                           />
                         )) : (
                           /* Too many dots — show count instead */
-                          <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 11, color: 'var(--ink-35)' }}>
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 11, color: 'var(--ink-35)' }}>
                             {viewedCount + 1} / {totalCardCount}
                           </span>
                         )}
@@ -1967,7 +1966,7 @@ export default function CreatorApp() {
                 {!isEmpty && !offersLoading && (
                   <div style={{
                     background: 'var(--shell)',
-                    borderTop: '1px solid var(--border)',
+                    borderTop: '1px solid var(--ink-08)',
                     padding: '8px 0 24px',
                     display: 'flex',
                     alignItems: 'center',
@@ -1992,7 +1991,7 @@ export default function CreatorApp() {
                         height: 48,
                         borderRadius: '50%',
                         background: 'var(--card)',
-                        border: '1px solid var(--border)',
+                        border: '1px solid var(--ink-08)',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
@@ -2056,8 +2055,8 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Saved</h1>
-                <span className="text-[15px] text-[var(--mid)]">{matchedSaved.length} saved</span>
+                <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Saved</h1>
+                <span className="text-[15px] text-[var(--ink-60)]">{matchedSaved.length} saved</span>
               </div>
 
               {matchedSaved.length === 0 ? (
@@ -2068,14 +2067,14 @@ export default function CreatorApp() {
                     <circle cx="40" cy="36" r="6" stroke="var(--peach)" strokeWidth="2" fill="none" />
                     <circle cx="40" cy="36" r="2" fill="var(--peach)" />
                   </svg>
-                  <p className="text-[20px] font-display text-[var(--near-black)] mt-[16px]" style={{ letterSpacing: '-0.025em' }}>Nothing saved yet</p>
-                  <p className="text-[17px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
+                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
+                  <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
                   <button
                     onClick={() => setView('offers')}
-                    className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                    style={{ background: '#D4470C' }}
+                    className="mt-[20px] px-[24px] py-[13px] rounded-full text-white text-[15px] min-h-[44px]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)', borderRadius: 999 }}
                   >
                     Find offers
                   </button>
@@ -2090,19 +2089,20 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(offer.id)}
-                        className="w-full bg-[#EDE8DC] rounded-[18px] p-[16px] flex items-center gap-4 text-left"
+                        className="w-full rounded-[16px] p-[16px] flex items-center gap-4 text-left"
+                        style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', boxShadow: 'var(--shadow-md)' }}
                       >
                         {/* Category icon square */}
                         <div
                           className="rounded-[12px] flex-shrink-0 flex items-center justify-center"
-                          style={{ width: 46, height: 46, background: '#EDE8DC' }}
+                          style={{ width: 46, height: 46, background: 'var(--card)' }}
                         >
-                          <CategoryIcon category={offer.businesses.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(44,36,32,0.5)' }} />
+                          <CategoryIcon category={offer.businesses.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(34,34,34,0.5)' }} />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <p className="text-[17px] font-bold text-[var(--near-black)] truncate" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.025em' }}>{offer.businesses.name}</p>
-                          <p className="text-[15px] text-[var(--mid)] truncate">{offer.businesses.category}</p>
-                          <p className="text-[15px] font-semibold" style={{ color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--mid)' }}>
+                          <p className="text-[13px] text-[var(--ink)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>{offer.generated_title || offer.description}</p>
+                          <p className="text-[12px] text-[var(--ink-60)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{offer.businesses.name}</p>
+                          <p className="text-[11px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--ink-60)' }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                           </p>
                         </div>
@@ -2126,12 +2126,13 @@ export default function CreatorApp() {
             <>
               {activeClaims.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-6">
-                  <DoodleIcon name="zap" size={48} className="text-[var(--soft)] mb-4" />
-                  <p className="text-[20px] font-bold text-[var(--near-black)] mb-1">No active claims</p>
-                  <p className="text-[18px] text-[var(--mid)] mb-5">Claim an offer to get started</p>
+                  <DoodleIcon name="zap" size={48} className="text-[var(--ink-35)] mb-4" />
+                  <p className="text-[20px] font-bold text-[var(--ink)] mb-1">No active claims</p>
+                  <p className="text-[18px] text-[var(--ink-60)] mb-5">Claim an offer to get started</p>
                   <button
                     onClick={() => setView('offers')}
-                    className="bg-[#D4470C] text-white text-[18px] font-semibold rounded-[50px] px-[28px] py-[12px] hover:opacity-90 transition-all"
+                    className="bg-[var(--terra)] text-white text-[15px] rounded-[999px] px-[24px] py-[13px] hover:bg-[var(--terra-hover)] transition-all"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
                   >
                     Browse offers
                   </button>
@@ -2153,10 +2154,10 @@ export default function CreatorApp() {
                           }}
                           className={`whitespace-nowrap text-[14px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
                             isSelected
-                              ? 'bg-[#2C2420] text-[#FFFFFF]'
-                              : 'text-[rgba(44,36,32,0.68)]'
+                              ? 'bg-[var(--ink)] text-[#FFFFFF]'
+                              : 'text-[rgba(34,34,34,0.68)]'
                           }`}
-                          style={!isSelected ? { background: '#EDE8DC', height: '32px' } : { height: '32px' }}
+                          style={!isSelected ? { background: 'var(--card)', height: '32px' } : { height: '32px' }}
                         >
                           {claim.businesses.name}
                         </button>
@@ -2202,7 +2203,7 @@ export default function CreatorApp() {
                       if (!foundBreak && desc.length > 40) offerTitle = desc.slice(0, 40).trimEnd() + '…';
 
                       const isPassCard = currentStage === 'claimed';
-                      const cardBg = isPassCard ? '#D4470C' : '#F7F6F3';
+                      const cardBg = isPassCard ? 'var(--terra)' : 'var(--shell)';
 
                       return (
                         <div
@@ -2211,10 +2212,10 @@ export default function CreatorApp() {
                           style={{ scrollSnapAlign: 'start' }}
                         >
                           <div className="px-4 pt-3">
-                            <div className="rounded-[18px] px-5 pt-4 pb-2" style={{ minHeight: '75vh', background: cardBg }}>
+                            <div className="rounded-[20px] px-6 pt-6 pb-2" style={{ minHeight: '75vh', background: isPassCard ? 'var(--terra)' : 'var(--card)', padding: 24 }}>
 
                               {/* Offer title — one line */}
-                              <p className="truncate mb-[10px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: isPassCard ? '#FFFFFF' : '#2C2420', letterSpacing: '-0.025em' }}>{offerTitle}</p>
+                              <p className="truncate mb-[10px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: isPassCard ? '#FFFFFF' : 'var(--ink)', letterSpacing: '-0.03em' }}>{offerTitle}</p>
 
                               {/* Breadcrumb stepper — one line */}
                               <div className="flex items-center flex-nowrap mb-4">
@@ -2225,7 +2226,7 @@ export default function CreatorApp() {
                                   return (
                                     <span key={label} className="flex items-center">
                                       {idx === 0 && (
-                                        <span className={`inline-block w-[7px] h-[7px] rounded-full mr-1.5 ${isPassCard ? 'bg-white' : 'bg-[#D4470C]'}`} />
+                                        <span className={`inline-block w-[7px] h-[7px] rounded-full mr-1.5 ${isPassCard ? 'bg-white' : 'bg-[var(--terra)]'}`} />
                                       )}
                                       <span className={`text-[15px] ${
                                         isCurrent ? 'font-bold'
@@ -2233,12 +2234,12 @@ export default function CreatorApp() {
                                         : 'font-medium'
                                       }`} style={{ color: isPassCard
                                         ? (isFuture ? 'rgba(255,255,255,0.4)' : '#FFFFFF')
-                                        : (isFuture ? 'rgba(44,36,32,0.3)' : '#2C2420')
+                                        : (isFuture ? 'rgba(34,34,34,0.3)' : 'var(--ink)')
                                       }}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span className="text-[15px] mx-1" style={{ color: isPassCard ? 'rgba(255,255,255,0.35)' : 'rgba(44,36,32,0.25)' }}>→</span>
+                                        <span className="text-[15px] mx-1" style={{ color: isPassCard ? 'rgba(255,255,255,0.35)' : 'rgba(34,34,34,0.25)' }}>→</span>
                                       )}
                                     </span>
                                   );
@@ -2251,7 +2252,7 @@ export default function CreatorApp() {
                                   onClick={() => { setQrOpenSource('active'); setQrScreenTab('pass'); setShowQrFullscreen(true); }}
                                   className="w-full text-left"
                                 >
-                                  <p className="text-[15px] font-semibold text-center mb-[10px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'rgba(255,255,255,0.5)' }}>Tap to show pass</p>
+                                  <p className="text-[15px] font-semibold text-center mb-[10px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'rgba(255,255,255,0.5)' }}>Tap to show pass</p>
                                   <QRCodeDisplay
                                     token={claim.qr_token}
                                     claimId={claim.id}
@@ -2260,8 +2261,8 @@ export default function CreatorApp() {
                                   />
                                   <div className="flex items-center justify-center gap-2 mt-[16px]">
                                     <span
-                                      className="font-mono text-[17px] font-extrabold tracking-[1.5px] text-white inline-block rounded-full"
-                                      style={{ background: 'rgba(255,255,255,0.2)', padding: '10px 20px' }}
+                                      className="text-[17px] text-white inline-block rounded-full"
+                                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
                                     >
                                       {userProfile.code}
                                     </span>
@@ -2282,12 +2283,12 @@ export default function CreatorApp() {
                                   background: isOverdue ? 'var(--terra-10)' : 'rgba(245,196,160,0.12)',
                                 }}>
                                   <div className="flex items-center gap-2 mb-2">
-                                    <DoodleIcon name="clock" size={16} className="text-[var(--mid)]" />
-                                    <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : '#2C2420', margin: 0 }}>
+                                    <DoodleIcon name="clock" size={16} className="text-[var(--ink-60)]" />
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? '#D97706' : 'var(--ink)', margin: 0 }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </p>
                                   </div>
-                                  <p style={{ fontFamily: "'DM Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(44,36,32,0.68)', margin: 0 }}>
+                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.68)', margin: 0 }}>
                                     You have 48 hours to post your reel — it must clearly feature the business.
                                   </p>
                                 </div>
@@ -2296,7 +2297,7 @@ export default function CreatorApp() {
                               {/* Submit reel */}
                               {claim.status === 'redeemed' && !claim.reel_url && (
                                 <div style={{ marginTop: 20 }}>
-                                  <label className="text-[15px] font-semibold text-[var(--near-black)]" style={{ marginBottom: 8, display: 'block' }}>
+                                  <label className="text-[15px] font-semibold text-[var(--ink)]" style={{ marginBottom: 8, display: 'block' }}>
                                     Reel URL
                                   </label>
                                   <input
@@ -2304,24 +2305,24 @@ export default function CreatorApp() {
                                     value={reelUrl}
                                     onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                     placeholder="https://instagram.com/reel/"
-                                    className="w-full text-[17px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none"
-                                    style={{ background: '#EDE8DC', border: '1.5px solid rgba(44,36,32,0.08)', borderRadius: 50, padding: '14px 16px', fontSize: '16px' }}
-                                    onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--near-black)'; }}
-                                    onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(44,36,32,0.08)'; }}
+                                    className="w-full text-[17px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none"
+                                    style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: '16px' }}
+                                    onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
+                                    onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.08)'; }}
                                   />
                                   {reelError ? (
-                                    <p className="text-[15px] text-[var(--mid)] mt-[8px]">Please check the URL and try again.</p>
+                                    <p className="text-[15px] text-[var(--ink-60)] mt-[8px]">Please check the URL and try again.</p>
                                   ) : (
-                                    <p className="text-[14px] text-[var(--soft)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
+                                    <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
                                   )}
                                   <button
                                     onClick={handleSubmitReel}
                                     disabled={loading || !reelUrl}
                                     className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-40"
                                     style={{
-                                      background: (reelUrl && reelUrl.startsWith('http') && reelUrl.length > 4) ? '#D4470C' : 'rgba(212,71,12,0.3)',
+                                      background: (reelUrl && reelUrl.startsWith('http') && reelUrl.length > 4) ? 'var(--terra)' : 'var(--terra-40)',
                                       height: 52,
-                                      borderRadius: 50,
+                                      borderRadius: 999,
                                       marginTop: 16,
                                     }}
                                   >
@@ -2331,9 +2332,9 @@ export default function CreatorApp() {
                               )}
 
                               {claim.reel_url && (
-                                <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[#EDE8DC]">
-                                  <DoodleIcon name="check" size={16} className="text-[var(--forest)] flex-shrink-0" />
-                                  <span className="text-[18px] text-[var(--near-black)] font-medium">Reel submitted!</span>
+                                <div className="flex items-center gap-2 p-3 rounded-[12px] bg-[var(--card)]">
+                                  <DoodleIcon name="check" size={16} className="text-[var(--terra)] flex-shrink-0" />
+                                  <span className="text-[18px] text-[var(--ink)] font-medium">Reel submitted!</span>
                                 </div>
                               )}
 
@@ -2341,18 +2342,18 @@ export default function CreatorApp() {
                               <div className="flex items-center justify-center text-[14px]" style={{ marginTop: 16, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
-                                    <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--mid)' }}>Release this slot?</span>
+                                    <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
                                     <button
                                       onClick={() => handleReleaseOffer(claim.id)}
                                       disabled={releasingClaim}
-                                      className={`font-bold ${isPassCard ? 'text-white' : 'text-[var(--near-black)]'}`}
+                                      className={`font-bold ${isPassCard ? 'text-white' : 'text-[var(--ink)]'}`}
                                     >
                                       {releasingClaim ? '...' : 'Confirm'}
                                     </button>
                                     <button
                                       onClick={() => setReleaseConfirmId(null)}
                                       className="font-semibold"
-                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'var(--soft)' }}
+                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}
                                     >
                                       Cancel
                                     </button>
@@ -2362,7 +2363,7 @@ export default function CreatorApp() {
                                     <button
                                       onClick={() => setDisputeClaimId(claim.id)}
                                       className="flex items-center gap-1 font-medium transition-colors"
-                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(44,36,32,0.35)' }}
+                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
                                     >
                                       <DoodleIcon name="flag" size={11} /> Report an issue
                                     </button>
@@ -2371,11 +2372,11 @@ export default function CreatorApp() {
                                       if (releaseStatus.allowed) {
                                         return (
                                           <>
-                                            <span className="mx-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(44,36,32,0.2)' }}>·</span>
+                                            <span className="mx-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
                                             <button
                                               onClick={() => setReleaseConfirmId(claim.id)}
                                               className="flex items-center gap-1 font-medium transition-colors"
-                                              style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(44,36,32,0.45)' }}
+                                              style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
                                             >
                                               <DoodleIcon name="x" size={11} /> Release offer
                                             </button>
@@ -2388,7 +2389,7 @@ export default function CreatorApp() {
                                 )}
                               </div>
                               {releaseError && (
-                                <p className="text-[15px] text-center pb-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.7)' : 'var(--mid)' }}>{releaseError}</p>
+                                <p className="text-[15px] text-center pb-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
                               )}
                             </div>
                           </div>
@@ -2404,12 +2405,12 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[28px] font-display text-[var(--near-black)] mb-5" style={{ letterSpacing: '-0.025em' }}>Claims</h1>
+              <h1 className="text-[28px] text-[var(--ink)] mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
-                  <DoodleIcon name="zap" size={48} className="text-[var(--soft)] mx-auto mb-4" />
-                  <p className="text-[18px] font-semibold text-[var(--near-black)]">No claims yet</p>
-                  <p className="text-[18px] text-[var(--mid)] mt-1">Claim an offer to get started</p>
+                  <DoodleIcon name="zap" size={48} className="text-[var(--ink-35)] mx-auto mb-4" />
+                  <p className="text-[18px] font-semibold text-[var(--ink)]">No claims yet</p>
+                  <p className="text-[18px] text-[var(--ink-60)] mt-1">Claim an offer to get started</p>
                 </div>
               ) : (
                 <div className="space-y-[14px]">
@@ -2422,28 +2423,21 @@ export default function CreatorApp() {
                           setView('active');
                         }
                       }}
-                      className="w-full rounded-[18px] p-[16px] text-left"
-                      style={{ background: getCardColor(claimCardIdx) }}
+                      className="w-full rounded-[16px] p-[16px] text-left"
+                      style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', boxShadow: 'var(--shadow-md)' }}
                     >
                       <div className="flex items-start gap-3">
                         {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 36)}
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <div className="min-w-0 flex-1">
-                              <h3 className="font-semibold text-[17px] text-[var(--near-black)]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.025em' }}>{claim.businesses.name}</h3>
-                              <p className="text-[15px] text-[var(--mid)] mt-0.5">{claim.businesses.category}</p>
-                              <p className="text-[15px] text-[var(--mid)] mt-0.5 leading-[1.4]" style={{
-                                display: '-webkit-box',
-                                WebkitLineClamp: 2,
-                                WebkitBoxOrient: 'vertical',
-                                overflow: 'hidden',
-                                wordBreak: 'break-word'
-                              }}>{claim.offers.description}</p>
+                              <p className="text-[14px] text-[var(--ink)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>{claim.offers.generated_title || claim.offers.description}</p>
+                              <p className="text-[13px] text-[var(--ink-60)] mt-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{claim.businesses.name}</p>
                             </div>
                             <StatusPill status={claim.status} />
                           </div>
-                          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[var(--faint)]">
-                            <span className="text-[15px] text-[var(--soft)]">
+                          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[var(--ink-08)]">
+                            <span className="text-[12px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
                               {formatDate(claim.claimed_at)}
                             </span>
                             {claim.reel_url && (
@@ -2452,7 +2446,7 @@ export default function CreatorApp() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-1 text-[15px] font-semibold text-[var(--mid)] hover:underline"
+                                className="flex items-center gap-1 text-[15px] font-semibold text-[var(--ink-60)] hover:underline"
                               >
                                 View Reel <DoodleIcon name="external-link" size={12} />
                               </a>
@@ -2470,12 +2464,12 @@ export default function CreatorApp() {
           {/* -- ALL OFFERS (placeholder — Chunk 6 builds full screen) -- */}
           {view === 'all_offers' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[26px] font-display text-[var(--ink)]" style={{ letterSpacing: '-0.5px' }}>All offers</h1>
-              <p className="text-[12px] mt-1" style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-35)' }}>
+              <h1 className="text-[26px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>All offers</h1>
+              <p className="text-[12px] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-35)' }}>
                 {offers.length} live this week
               </p>
               <div className="text-center py-20">
-                <p className="text-[14px]" style={{ fontFamily: "'DM Sans', sans-serif", color: 'var(--ink-60)' }}>
+                <p className="text-[14px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
                   Full list coming in Chunk 6.
                 </p>
               </div>
@@ -2486,16 +2480,16 @@ export default function CreatorApp() {
           {view === 'profile' && (
             <div className="px-[20px] pt-8">
               {isPendingApproval && (
-                <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(44,36,32,0.04)' }}>
-                  <DoodleIcon name="clock" size={28} className="text-[var(--mid)] mx-auto mb-2.5" />
-                  <h3 className="text-[19px] font-bold text-[var(--near-black)] mb-1">Account Under Review</h3>
-                  <p className="text-[15px] text-[var(--mid)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
+                <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(34,34,34,0.04)' }}>
+                  <DoodleIcon name="clock" size={28} className="text-[var(--ink-60)] mx-auto mb-2.5" />
+                  <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">Account Under Review</h3>
+                  <p className="text-[15px] text-[var(--ink-60)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
                 </div>
               )}
               {profileSubView === 'main' ? (
                 <>
                   {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] p-[24px] mb-[24px]" style={{ background: '#EDE8DC' }}>
+                  <div className="rounded-[18px] p-[24px] mb-[24px]" style={{ background: 'var(--card)' }}>
                     <div className="flex items-start gap-[16px]">
                       {/* Avatar */}
                       <div className="relative flex-shrink-0">
@@ -2507,25 +2501,25 @@ export default function CreatorApp() {
                           onChange={handleAvatarUpload}
                         />
                         {uploadingAvatar ? (
-                          <div className="w-[72px] h-[72px] rounded-full bg-[var(--bg)] flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-[var(--near-black)] border-t-transparent rounded-full animate-spin" />
+                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--shell)] flex items-center justify-center" style={{ border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }}>
+                            <div className="w-6 h-6 border-2 border-[var(--ink)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : avatarUrl ? (
                           <button onClick={() => avatarInputRef.current?.click()}>
-                            <img src={avatarUrl} alt="Avatar" className="w-[72px] h-[72px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                            <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" style={{ border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                           </button>
                         ) : (
                           <button
                             onClick={() => avatarInputRef.current?.click()}
-                            className="w-[72px] h-[72px] rounded-full flex items-center justify-center"
-                            style={{ background: getCategorySolidColor(null) }}
+                            className="w-[80px] h-[80px] rounded-full flex items-center justify-center"
+                            style={{ background: getCategorySolidColor(null), border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }}
                           >
                             <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
                           </button>
                         )}
                         <button
                           onClick={() => avatarInputRef.current?.click()}
-                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[#D4470C] flex items-center justify-center border-2 border-[#F7F6F3]"
+                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
                         >
                           <DoodleIcon name="camera" size={11} className="text-white" />
                         </button>
@@ -2533,49 +2527,47 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[24px] font-display font-extrabold text-[var(--near-black)] leading-tight" style={{ letterSpacing: '-0.025em' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] text-[var(--ink)] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
-                            <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--forest)]">
+                            <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--terra)]">
                               <DoodleIcon name="badge-check" size={13} /> Verified
                             </span>
                           )}
                         </div>
                         <div className="flex items-center gap-[10px] mt-[6px]">
-                          <button onClick={copyCode} className="flex items-center gap-1 text-[14px] font-semibold text-[var(--soft)]">
+                          <button onClick={copyCode} className="flex items-center gap-1 text-[14px] font-semibold text-[var(--ink-35)]">
                             {userProfile.code}
                             {copiedCode ? (
-                              <span className="text-[var(--near-black)] text-[13px]">Copied!</span>
+                              <span className="text-[var(--ink)] text-[13px]">Copied!</span>
                             ) : (
                               <DoodleIcon name="copy" size={12} />
                             )}
                           </button>
                           {userProfile.instagram_handle && (
-                            <span className="flex items-center gap-1 text-[14px] text-[var(--soft)]">
+                            <span className="flex items-center gap-1 text-[14px] text-[var(--ink-35)]">
                               <DoodleIcon name="instagram" size={12} /> {userProfile.instagram_handle}
                             </span>
                           )}
                         </div>
                       </div>
                     </div>
-                    {uploadError && <p className="text-[15px] text-[var(--mid)] mt-2">{uploadError}</p>}
+                    {uploadError && <p className="text-[15px] text-[var(--ink-60)] mt-2">{uploadError}</p>}
 
                     {/* Stats row inside card */}
-                    <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--faint)]">
-                      <div className="flex-1 text-center">
-                        <p className="text-[24px] font-display font-extrabold text-[var(--near-black)]">{claims.length}</p>
-                        <p className="text-[13px] text-[var(--soft)] font-semibold">Claimed</p>
+                    <div className="flex items-center gap-[8px] mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
+                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{claims.length}</p>
+                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
                       </div>
-                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
-                      <div className="flex-1 text-center">
-                        <p className="text-[24px] font-display font-extrabold text-[var(--near-black)]">{collabsCompleted}</p>
-                        <p className="text-[13px] text-[var(--soft)] font-semibold">Posted</p>
+                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{collabsCompleted}</p>
+                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Posted</p>
                       </div>
-                      <div className="w-[1px] h-[32px] bg-[var(--faint)]" />
-                      <div className="flex-1 text-center">
-                        <p className="text-[24px] font-display font-extrabold text-[var(--near-black)]">{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
-                        <p className="text-[13px] text-[var(--soft)] font-semibold">Rating</p>
+                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[11px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Rating</p>
                       </div>
                     </div>
                   </div>
@@ -2585,29 +2577,29 @@ export default function CreatorApp() {
                     const completeness = getProfileCompleteness(userProfile);
                     if (completeness.score === 100) {
                       return (
-                        <div className="flex items-center gap-[10px] rounded-[18px] p-[14px_16px] mb-[16px]" style={{ background: '#EDE8DC' }}>
+                        <div className="flex items-center gap-[10px] rounded-[18px] p-[14px_16px] mb-[16px]" style={{ background: 'var(--card)' }}>
                           <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
-                            <DoodleIcon name="badge-check" size={18} className="text-[var(--forest)]" />
+                            <DoodleIcon name="badge-check" size={18} className="text-[var(--terra)]" />
                           </div>
                           <div>
-                            <p className="text-[18px] font-bold text-[var(--near-black)]">Profile complete</p>
-                            <p className="text-[14px] text-[var(--mid)]">Your profile is ready for businesses</p>
+                            <p className="text-[18px] font-bold text-[var(--ink)]">Profile complete</p>
+                            <p className="text-[14px] text-[var(--ink-60)]">Your profile is ready for businesses</p>
                           </div>
                         </div>
                       );
                     }
                     return (
-                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ background: '#EDE8DC' }}>
+                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ background: 'var(--card)' }}>
                         <div className="flex items-center justify-between mb-[10px]">
-                          <span className="text-[18px] font-bold text-[var(--near-black)]">Complete your profile</span>
-                          <span className="text-[14px] font-semibold text-[var(--near-black)]">{completeness.score}%</span>
+                          <span className="text-[18px] font-bold text-[var(--ink)]">Complete your profile</span>
+                          <span className="text-[14px] font-semibold text-[var(--ink)]">{completeness.score}%</span>
                         </div>
-                        <div className="h-[4px] rounded-[4px] mb-[12px]" style={{ background: '#EDE8DC' }}>
-                          <div className="h-full rounded-[4px] transition-all" style={{ width: `${completeness.score}%`, background: '#D4470C' }} />
+                        <div className="h-[6px] rounded-[999px] mb-[12px]" style={{ background: 'var(--ink-08)' }}>
+                          <div className="h-full rounded-[999px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
                         </div>
                         <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
-                            <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[50px] text-[14px] font-semibold text-[var(--mid)] bg-[var(--bg)]">
+                            <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[999px] text-[14px] font-semibold text-[var(--ink-60)] bg-[var(--shell)]">
                               <DoodleIcon name="plus" size={16} className="w-[10px] h-[10px]" /> {field.label}
                             </span>
                           ))}
@@ -2617,7 +2609,7 @@ export default function CreatorApp() {
                   })()}
 
                   {/* ═══ Level + streak section (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] bg-[var(--dusty-blue)] p-[20px] mb-[16px]">
+                  <div className="rounded-[18px] bg-[var(--card)] p-[20px] mb-[16px]">
                     {(() => {
                       const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
                       const levelColours: Record<number, string> = {
@@ -2625,8 +2617,8 @@ export default function CreatorApp() {
                         2: '#8FAF8F',
                         3: '#4CAF7D',
                         4: '#1A4A2E',
-                        5: '#D4470C',
-                        6: '#2C2420',
+                        5: 'var(--terra)',
+                        6: 'var(--ink)',
                       };
                       const levels = [1, 2, 3, 4, 5, 6];
                       const levelNames = ['Newcomer', 'Explorer', 'Regular', 'Local', 'Trusted', 'Nayba'];
@@ -2653,7 +2645,7 @@ export default function CreatorApp() {
                                         style={{
                                           width: 48,
                                           height: 48,
-                                          border: '3px solid #D4470C',
+                                          border: '3px solid var(--terra)',
                                         }}
                                       />
                                     )}
@@ -2662,12 +2654,12 @@ export default function CreatorApp() {
                                       style={{
                                         width: 40,
                                         height: 40,
-                                        background: isCompleted ? 'var(--forest)' : isCurrent ? 'rgba(212,71,12,0.1)' : '#EDE8DC',
-                                        border: isLocked ? '1.5px solid var(--faint)' : 'none',
+                                        background: isCompleted ? 'var(--terra)' : isCurrent ? 'var(--terra-10)' : 'var(--card)',
+                                        border: isLocked ? '1.5px solid var(--ink-08)' : 'none',
                                       }}
                                     >
                                       {isCompleted ? (
-                                        /* Checkmark for completed levels — white tick on --forest */
+                                        /* Checkmark for completed levels — white tick */
                                         <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                                           <path d="M4.5 9L7.5 12L13.5 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
                                         </svg>
@@ -2677,7 +2669,7 @@ export default function CreatorApp() {
                                           style={{
                                             fontWeight: isCurrent ? 700 : 500,
                                             fontSize: 18,
-                                            color: isLocked ? 'var(--soft)' : isCurrent ? '#D4470C' : 'white',
+                                            color: isLocked ? 'var(--ink-35)' : isCurrent ? 'var(--terra)' : 'white',
                                           }}
                                         >
                                           {lvl === 6 ? '✦' : lvl}
@@ -2693,8 +2685,8 @@ export default function CreatorApp() {
                                         height: 3,
                                         borderRadius: 3,
                                         background: isCompleted
-                                          ? 'var(--forest)'
-                                          : 'var(--faint)',
+                                          ? 'var(--terra)'
+                                          : 'var(--ink-08)',
                                       }}
                                     />
                                   )}
@@ -2707,7 +2699,7 @@ export default function CreatorApp() {
                             <span
                               className="inline-block rounded-full px-[12px] py-[3px]"
                               style={{
-                                background: currentLvl === 6 ? '#2C2420' : '#D4470C',
+                                background: currentLvl === 6 ? 'var(--ink)' : 'var(--terra)',
                                 color: 'white',
                                 fontWeight: 600,
                                 fontSize: 15,
@@ -2718,7 +2710,7 @@ export default function CreatorApp() {
                             {!progress.isMaxLevel && (
                               <span
                                 style={{
-                                  color: 'var(--mid)',
+                                  color: 'var(--ink-60)',
                                   fontWeight: 400,
                                   fontSize: 16,
                                 }}
@@ -2732,14 +2724,14 @@ export default function CreatorApp() {
                     })()}
 
                     {/* Streak row */}
-                    <div className="mt-[20px] pt-[20px] border-t border-[var(--faint)]">
+                    <div className="mt-[20px] pt-[20px] border-t border-[var(--ink-08)]">
                       <div className="flex items-center">
                         <div className="flex items-center gap-[8px]">
                           <span
                             style={{
                               fontWeight: 800,
                               fontSize: 32,
-                              color: 'var(--near-black)',
+                              color: 'var(--ink)',
                               lineHeight: 1,
                             }}
                           >
@@ -2756,14 +2748,14 @@ export default function CreatorApp() {
                                 flames.push(
                                   <FlameIcon
                                     key={i}
-                                    color={isCurrentMonthPending ? '#F5C4A0' : '#D4470C'}
+                                    color={isCurrentMonthPending ? '#F5C4A0' : 'var(--terra)'}
                                     size={18}
                                   />
                                 );
                               }
                               if (streak > 6) {
                                 flames.push(
-                                  <span key="more" className="text-[13px] font-semibold ml-[2px]" style={{ color: 'var(--soft)' }}>+{streak - 6}</span>
+                                  <span key="more" className="text-[13px] font-semibold ml-[2px]" style={{ color: 'var(--ink-35)' }}>+{streak - 6}</span>
                                 );
                               }
                               return flames;
@@ -2775,7 +2767,7 @@ export default function CreatorApp() {
                           style={{
                             fontWeight: 400,
                             fontSize: 16,
-                            color: 'var(--soft)',
+                            color: 'var(--ink-35)',
                           }}
                         >
                           {(userProfile.current_streak || 0) > 0 ? 'month streak' : 'No streak yet'}
@@ -2787,7 +2779,7 @@ export default function CreatorApp() {
                         style={{
                           fontWeight: 400,
                           fontSize: 15,
-                          color: 'var(--soft)',
+                          color: 'var(--ink-35)',
                         }}
                       >
                         {(userProfile.current_streak || 0) > 0
@@ -2801,35 +2793,35 @@ export default function CreatorApp() {
                   <div className="mt-[8px]">
                     <button
                       onClick={() => { setEditName(userProfile.name || ''); setEditHandle(userProfile.instagram_handle || ''); setProfileSubView('edit'); }}
-                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <DoodleIcon name="user" size={20} className="text-[var(--mid)]" />
-                        <span className="text-[17px] font-semibold text-[var(--near-black)]">Edit profile</span>
+                        <DoodleIcon name="user" size={20} className="text-[var(--ink-60)]" />
+                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Edit profile</span>
                       </div>
-                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--soft)]" />
+                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--ink-35)]" />
                     </button>
                     <button
                       onClick={() => setProfileSubView('alerts')}
-                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--faint)] text-left"
+                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
-                        <DoodleIcon name="bell" size={20} className="text-[var(--mid)]" />
-                        <span className="text-[17px] font-semibold text-[var(--near-black)]">Notifications</span>
+                        <DoodleIcon name="bell" size={20} className="text-[var(--ink-60)]" />
+                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Notifications</span>
                         {unreadCount > 0 && (
-                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[#D4470C] text-white text-[13px] font-bold flex items-center justify-center">
+                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-bold flex items-center justify-center">
                             {unreadCount}
                           </span>
                         )}
                       </div>
-                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--soft)]" />
+                      <DoodleIcon name="chevron-right" size={18} className="text-[var(--ink-35)]" />
                     </button>
                     <button
                       onClick={signOut}
                       className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
-                      <DoodleIcon name="logout" size={20} className="text-[var(--soft)]" />
-                      <span className="text-[17px] font-semibold text-[var(--soft)]">Sign out</span>
+                      <DoodleIcon name="logout" size={20} className="text-[var(--terra)]" />
+                      <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
                     </button>
                   </div>
                 </>
@@ -2837,10 +2829,10 @@ export default function CreatorApp() {
                 /* Alerts/Notifications sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
+                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Notifications</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2852,14 +2844,14 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[20px] font-display text-[var(--near-black)] mt-[16px]" style={{ letterSpacing: '-0.025em' }}>Nothing yet</p>
-                      <p className="text-[17px] text-[var(--mid)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
+                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Nothing yet</p>
+                      <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>
                       <button
                         onClick={() => setView('offers')}
-                        className="mt-[20px] px-[28px] py-[12px] rounded-full text-white text-[18px] font-semibold min-h-[44px]"
-                        style={{ background: '#D4470C' }}
+                        className="mt-[20px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[44px]"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
                       >
                         Browse offers
                       </button>
@@ -2876,10 +2868,10 @@ export default function CreatorApp() {
                           style={{ background: getCardColor(notifIdx) }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(44,36,32,0.1)]' : 'bg-[#D4470C]'}`} />
+                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'}`} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-[17px] text-[var(--near-black)]">{notif.message}</p>
-                              <p className="text-[15px] text-[var(--soft)] mt-1">
+                              <p className="text-[17px] text-[var(--ink)]">{notif.message}</p>
+                              <p className="text-[15px] text-[var(--ink-35)] mt-1">
                                 {formatDate(notif.created_at)}
                               </p>
                             </div>
@@ -2893,10 +2885,10 @@ export default function CreatorApp() {
                 /* Edit Profile sub-view */
                 <>
                   <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--bg)] rounded-[12px] transition-colors">
-                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--near-black)]" />
+                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
+                      <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] font-display text-[var(--near-black)]" style={{ letterSpacing: '-0.025em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
@@ -2914,8 +2906,8 @@ export default function CreatorApp() {
                         disabled={uploadingAvatar}
                       >
                         {uploadingAvatar ? (
-                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--bg)] flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-[var(--near-black)] border-t-transparent rounded-full animate-spin" />
+                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--shell)] flex items-center justify-center">
+                            <div className="w-6 h-6 border-2 border-[var(--ink)] border-t-transparent rounded-full animate-spin" />
                           </div>
                         ) : avatarUrl ? (
                           <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
@@ -2928,31 +2920,31 @@ export default function CreatorApp() {
                           </div>
                         )}
                         <div
-                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[#D4470C] flex items-center justify-center border-2 border-[#F7F6F3]"
+                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
                         >
                           <DoodleIcon name="camera" size={13} className="text-white" />
                         </div>
                       </button>
-                      <p className="text-[14px] text-[var(--soft)] mt-[8px]">Tap to change photo</p>
-                      {uploadError && <p className="text-[14px] text-[var(--mid)] mt-[4px]">{uploadError}</p>}
+                      <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Tap to change photo</p>
+                      {uploadError && <p className="text-[14px] text-[var(--ink-60)] mt-[4px]">{uploadError}</p>}
                     </div>
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--mid)] mb-[6px]">Name</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink-60)] mb-[6px]">Name</label>
                       <input
                         type="text"
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
-                        className="w-full px-[16px] py-[12px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
+                        className="w-full px-[16px] py-[12px] rounded-[999px] bg-[var(--card)] border-[1.5px] border-[rgba(34,34,34,0.08)] text-[16px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none focus:border-[var(--ink)]"
                       />
                     </div>
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--mid)] mb-[6px]">Instagram handle</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink-60)] mb-[6px]">Instagram handle</label>
                       <input
                         type="text"
                         value={editHandle}
                         onChange={(e) => setEditHandle(e.target.value)}
                         placeholder="@yourhandle"
-                        className="w-full px-[16px] py-[12px] rounded-[50px] bg-[#EDE8DC] border-[1.5px] border-[rgba(44,36,32,0.08)] text-[16px] text-[var(--near-black)] placeholder:text-[#2C2420]/40 focus:outline-none focus:border-[var(--near-black)]"
+                        className="w-full px-[16px] py-[12px] rounded-[999px] bg-[var(--card)] border-[1.5px] border-[rgba(34,34,34,0.08)] text-[16px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none focus:border-[var(--ink)]"
                       />
                     </div>
                     <button
@@ -2967,7 +2959,8 @@ export default function CreatorApp() {
                         setProfileSubView('main');
                         window.location.reload();
                       }}
-                      className="w-full py-[14px] rounded-[50px] bg-[#D4470C] text-white text-[17px] font-semibold disabled:opacity-50"
+                      className="w-full py-[13px] rounded-[999px] bg-[var(--terra)] text-white text-[15px] disabled:opacity-50 hover:bg-[var(--terra-hover)] transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
                     >
                       {editSaving ? 'Saving...' : 'Save changes'}
                     </button>
@@ -2985,14 +2978,15 @@ export default function CreatorApp() {
       <div
         className="flex-shrink-0"
         style={{
-          background: 'rgba(248,246,241,0.95)',
+          background: 'rgba(246,243,238,0.96)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid var(--border)',
+          borderTop: '1px solid var(--ink-08)',
+          padding: '10px 0 28px',
           paddingBottom: 'env(safe-area-inset-bottom, 28px)',
         }}
       >
-        <div className="max-w-md mx-auto flex pt-[10px] pb-[6px]">
+        <div className="max-w-md mx-auto flex">
           {tabs.map(tab => {
             const isActive = view === tab.key;
             const iconColor = isActive ? 'var(--terra)' : 'var(--ink-35)';
@@ -3002,8 +2996,8 @@ export default function CreatorApp() {
                 onClick={() => setView(tab.key)}
                 className="flex-1 flex flex-col items-center gap-[3px] min-h-[44px]"
                 style={{
-                  fontFamily: "'DM Sans', sans-serif",
-                  fontWeight: 500,
+                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontWeight: isActive ? 700 : 500,
                   fontSize: 10,
                   color: isActive ? 'var(--terra)' : 'var(--ink-35)',
                 }}
@@ -3036,15 +3030,24 @@ export default function CreatorApp() {
                     <span
                       style={{
                         position: 'absolute',
-                        top: 0,
-                        right: -1,
-                        width: 6,
-                        height: 6,
+                        top: -2,
+                        right: -4,
+                        width: 15,
+                        height: 15,
                         borderRadius: '50%',
                         background: 'var(--terra)',
                         border: '1.5px solid var(--shell)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontWeight: 800,
+                        fontSize: 8,
+                        color: 'white',
                       }}
-                    />
+                    >
+                      {activeClaims.length}
+                    </span>
                   )}
                 </div>
                 {tab.label}
