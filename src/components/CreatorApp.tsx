@@ -1096,40 +1096,66 @@ export default function CreatorApp() {
         })();
 
         return (
-          <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col">
-            {/* Hero — category colour */}
-            <div className="relative overflow-hidden flex flex-col justify-end" style={{ minHeight: 220, background: getCategoryPastelBg(offer.businesses.category) }}>
-              {/* Back button — 40% opacity */}
-              <button
-                onClick={() => setExpandedOffer(null)}
-                className="absolute top-[16px] left-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
-              >
-                <ChevronLeft size={18} strokeWidth={1.5} color="rgba(34,34,34,0.4)" />
-              </button>
-              {/* Locked overlay on hero */}
+          <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col overflow-y-auto">
+            {/* Hero — full-bleed image */}
+            <div className="relative" style={{ minHeight: 280, flexShrink: 0 }}>
+              {offer.offer_photo_url ? (
+                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
+              ) : (
+                <div style={{ width: '100%', height: 280, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                </div>
+              )}
+              {/* Gradient overlay */}
+              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.80) 0%, rgba(34,34,34,0) 55%)', pointerEvents: 'none' }} />
+              {/* Locked overlay */}
               {detailIsLocked && (
                 <div className="absolute inset-0" style={{ background: 'rgba(34,34,34,0.25)' }} />
               )}
-              {/* Save button — 40% opacity */}
+              {/* Back button — frosted glass */}
+              <button
+                onClick={() => setExpandedOffer(null)}
+                className="absolute flex items-center justify-center"
+                style={{ top: 52, left: 16, width: 36, height: 36, borderRadius: '50%', background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}
+              >
+                <ChevronLeft size={18} strokeWidth={1.5} color="var(--ink)" />
+              </button>
+              {/* Heart button — frosted glass */}
               <button
                 onClick={() => toggleSaved(offer.id)}
-                className="absolute top-[16px] right-[16px] w-[36px] h-[36px] rounded-full flex items-center justify-center"
+                className="absolute flex items-center justify-center"
+                style={{ top: 52, right: 16, width: 36, height: 36, borderRadius: '50%', background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}
               >
-                <Heart size={16} strokeWidth={1.5} color="rgba(34,34,34,0.4)" />
+                <Heart size={18} strokeWidth={1.5} color={savedOffers.has(offer.id) ? 'var(--terra)' : 'var(--ink)'} fill={savedOffers.has(offer.id) ? 'var(--terra)' : 'none'} />
               </button>
-              {/* Text overlay */}
-              <div className="relative px-[20px] pb-[20px] pt-[32px]">
-                <CategoryIcon category={offer.businesses.category} className="w-[36px] h-[36px] mb-[8px]" style={{ color: 'rgba(34,34,34,0.4)' }} />
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.15, margin: 0 }}>
+              {/* Text at bottom of image */}
+              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px' }}>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', margin: '6px 0 0' }}>{offer.businesses.name}</p>
               </div>
             </div>
 
             {/* Body */}
-            <div className="flex-1 overflow-y-auto bg-[var(--shell)]">
-              <div className="p-[20px]">
+            <div className="bg-[var(--shell)]" style={{ paddingBottom: 120 }}>
+              {/* Availability row */}
+              <div style={{ padding: '16px 20px', display: 'flex', gap: 16 }}>
+                <div className="flex items-center gap-1.5">
+                  <Users size={15} strokeWidth={1.5} color="var(--ink-35)" />
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
+                    {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <Clock size={15} strokeWidth={1.5} color="var(--ink-35)" />
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
+                </div>
+              </div>
+              {/* Divider */}
+              <div style={{ height: 1, background: 'var(--ink-08)', margin: '0 20px' }} />
+
+              <div style={{ padding: '20px 20px 0' }}>
                 {/* Level requirement banner */}
                 {detailIsLocked && (
                   <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(34,34,34,0.04)' }}>
@@ -1141,21 +1167,7 @@ export default function CreatorApp() {
                   </div>
                 )}
 
-                {/* A) Scarcity / urgency row */}
-                <div className="flex items-center gap-[20px] mb-[24px]">
-                  <div className="flex items-center gap-1.5">
-                    <Users size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
-                      {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
-                  </div>
-                </div>
-
-                {/* B) WHAT TO POST label */}
+                {/* WHAT TO POST label */}
                 <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-35)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
 
                 {/* C) Primary post requirement */}
@@ -1204,7 +1216,7 @@ export default function CreatorApp() {
             </div>
 
             {/* Sticky bottom bar */}
-            <div style={{ padding: '14px 16px 32px', background: 'var(--shell)', boxShadow: '0 -1px 0 rgba(34,34,34,0.06)' }}>
+            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px', paddingBottom: 32, background: 'rgba(246,243,238,0.96)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--ink-08)', zIndex: 10 }}>
               {detailIsLocked ? (
                 <div
                   className="w-full py-[14px] rounded-[999px] text-center"
@@ -1283,7 +1295,7 @@ export default function CreatorApp() {
                       className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
                       style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF' }}
                     >
-                      Claim
+                      Claim offer
                     </button>
                   )}
                 </div>
@@ -1336,7 +1348,7 @@ export default function CreatorApp() {
                 {/* ── Header: logo + user info ── */}
                 <div style={{ padding: '16px 20px 0' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
-                    <Logo variant="wordmark" size={22} />
+                    <Logo variant="wordmark" size={28} />
                     <div style={{ textAlign: 'right' }}>
                       <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.2 }}>
                         {userProfile?.display_name || userProfile?.name || ''}
@@ -1407,7 +1419,7 @@ export default function CreatorApp() {
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Your passes</span>
                         <button onClick={() => setView('active')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
-                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 24px 4px', scrollbarWidth: 'none', scrollSnapType: 'x mandatory' }}>
+                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 24px 4px', scrollbarWidth: 'none', scrollSnapType: 'x mandatory', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
                         {activeClaims.filter(c => c.businesses && c.offers).map((claim) => {
                           const claimTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                           const claimBiz = claim.businesses?.name || '';
@@ -1417,31 +1429,31 @@ export default function CreatorApp() {
                               key={claim.id}
                               onClick={() => { setSelectedClaim(claim); setShowQrFullscreen(true); setQrOpenSource('home'); }}
                               style={{
-                                width: 'calc(100vw - 48px)', flexShrink: 0, height: 260, borderRadius: 16,
+                                width: 'calc(100vw - 48px)', flexShrink: 0, height: 200, borderRadius: 16,
                                 border: 'none', cursor: 'pointer', textAlign: 'left', position: 'relative', overflow: 'hidden',
                                 scrollSnapAlign: 'center', background: 'var(--ink)',
                               }}
                             >
                               {/* Background image */}
                               {claimPhoto && <img src={claimPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 50%, rgba(34,34,34,0.65))', pointerEvents: 'none' }} />
+                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.72) 0%, rgba(34,34,34,0) 55%)', pointerEvents: 'none' }} />
+                              {/* QR icon — top right */}
+                              <span style={{
+                                position: 'absolute', top: 10, right: 10, width: 34, height: 34, borderRadius: '50%',
+                                background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              }}>
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7z"/>
+                                </svg>
+                              </span>
                               {/* Content */}
-                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 }}>
-                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.78)' }}>{claimBiz}</span>
-                                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'white', letterSpacing: '-0.04em', margin: '4px 0 12px', lineHeight: 1.15 }}>{claimTitle}</h3>
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--peach)' }} />
-                                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.85)' }}>Show at the door</span>
-                                  </div>
-                                  <span style={{
-                                    width: 36, height: 36, borderRadius: 10, background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                  }}>
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                      <rect x="3" y="3" width="18" height="18" rx="2"/><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7z"/>
-                                    </svg>
-                                  </span>
+                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '12px 16px' }}>
+                                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.75)' }}>{claimBiz}</span>
+                                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'white', letterSpacing: '-0.02em', margin: '3px 0 6px', lineHeight: 1.15 }}>{claimTitle}</h3>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                                  <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--peach)' }} />
+                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'rgba(255,255,255,0.85)' }}>Show at the door</span>
                                 </div>
                               </div>
                             </button>
@@ -1492,7 +1504,7 @@ export default function CreatorApp() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none' }}>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
                       {nearYouOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
@@ -1505,9 +1517,9 @@ export default function CreatorApp() {
                             key={offer.id}
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0,
+                              width: 'calc(50vw - 24px)', flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              position: 'relative', height: 220,
+                              position: 'relative', height: 200,
                             }}
                           >
                             {/* Full-bleed image */}
@@ -1521,10 +1533,9 @@ export default function CreatorApp() {
                             {/* Slot badge */}
                             {!isUnlimited && slotsLeft !== null && (
                               <span style={{
-                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
-                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
-                                background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)',
-                                color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
+                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                background: '#F5C4A0', color: 'var(--ink)',
                               }}>
                                 {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
                               </span>
@@ -1533,22 +1544,22 @@ export default function CreatorApp() {
                             <button
                               onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
                               style={{
-                                position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
-                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
+                                position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                               }}
                             >
-                              <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                               </svg>
                             </button>
                             {/* Bottom gradient overlay with text */}
                             <div style={{
-                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 10px 10px',
-                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0.35) 60%, transparent 100%)',
+                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
                             }}>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.8)', margin: '2px 0 0', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
                             </div>
                           </div>
                         );
@@ -1566,7 +1577,7 @@ export default function CreatorApp() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none' }}>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
                       {newThisWeekOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
@@ -1579,12 +1590,11 @@ export default function CreatorApp() {
                             key={offer.id}
                             onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              width: 'calc(50vw - 28px)', maxWidth: 200, flexShrink: 0,
+                              width: 'calc(50vw - 24px)', flexShrink: 0,
                               borderRadius: 16, overflow: 'hidden', cursor: 'pointer',
-                              position: 'relative', height: 220,
+                              position: 'relative', height: 200,
                             }}
                           >
-                            {/* Full-bleed image */}
                             {offer.offer_photo_url ? (
                               <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                             ) : (
@@ -1592,36 +1602,98 @@ export default function CreatorApp() {
                                 <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
                               </div>
                             )}
-                            {/* Slot badge */}
                             {!isUnlimited && slotsLeft !== null && (
                               <span style={{
-                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 10px',
-                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
-                                background: slotsLeft <= 1 ? 'var(--terra)' : 'var(--peach)', color: slotsLeft <= 1 ? 'white' : 'var(--ink)',
+                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                background: '#F5C4A0', color: 'var(--ink)',
                               }}>
                                 {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
                               </span>
                             )}
-                            {/* Heart button */}
                             <button
                               onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
                               style={{
-                                position: 'absolute', top: 8, right: 8, width: 32, height: 32, borderRadius: '50%',
-                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
+                                position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
                               }}
                             >
-                              <svg width="15" height="15" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                                 <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                               </svg>
                             </button>
-                            {/* Bottom gradient overlay with text */}
                             <div style={{
-                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '32px 10px 10px',
-                              background: 'linear-gradient(to top, rgba(34,34,34,0.75) 0%, rgba(34,34,34,0.35) 60%, transparent 100%)',
+                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
                             }}>
                               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.8)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* ── All offers — 2-column vertical grid ── */}
+                {!offersLoading && filteredOffers.length > 0 && (
+                  <div style={{ marginTop: 24, padding: '0 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>All offers</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>{filteredOffers.length} available</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      {filteredOffers.map((offer) => {
+                        const offerTitle = offer.generated_title || offer.description;
+                        const isUnlimited = offer.monthly_cap === null;
+                        const slotsUsed = offer.slotsUsed || 0;
+                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                        const isSaved = savedOffers.has(offer.id);
+                        return (
+                          <div
+                            key={offer.id}
+                            onClick={() => setExpandedOffer(offer.id)}
+                            style={{
+                              borderRadius: 14, overflow: 'hidden', cursor: 'pointer',
+                              position: 'relative', height: 180,
+                            }}
+                          >
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              </div>
+                            )}
+                            {!isUnlimited && slotsLeft !== null && (
+                              <span style={{
+                                position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
+                                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                background: '#F5C4A0', color: 'var(--ink)',
+                              }}>
+                                {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
+                              </span>
+                            )}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                              style={{
+                                position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                              </svg>
+                            </button>
+                            <div style={{
+                              position: 'absolute', bottom: 0, left: 0, right: 0, padding: '10px 12px',
+                              background: 'linear-gradient(to top, rgba(34,34,34,0.78) 0%, rgba(34,34,34,0) 50%)',
+                            }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white', margin: 0, lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'rgba(255,255,255,0.78)', margin: '2px 0 0', lineHeight: 1.3 }}>{offerTitle}</p>
                             </div>
                           </div>
                         );
@@ -1726,34 +1798,16 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div>
-                  {/* Pill tab strip with fade-right mask */}
-                  <div style={{ position: 'relative', paddingTop: 14 }}>
-                    <div className="hide-scrollbar flex gap-2 overflow-x-auto px-[20px] pb-0" style={{ scrollbarWidth: 'none', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
-                      {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
-                        const isSelected = selectedClaim?.id === claim.id;
-                        return (
-                          <button
-                            key={claim.id}
-                            onClick={() => {
-                              setSelectedClaim(claim);
-                              const idx = activeClaims.findIndex(c => c.id === claim.id);
-                              const slider = document.getElementById('claims-slider');
-                              if (slider) slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
-                            }}
-                            className={`whitespace-nowrap text-[14px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
-                              isSelected
-                                ? 'bg-[var(--ink)] text-[#FFFFFF]'
-                                : 'text-[rgba(34,34,34,0.68)]'
-                            }`}
-                            style={!isSelected ? { background: 'var(--card)', height: '32px' } : { height: '32px' }}
-                          >
-                            {claim.businesses.name}
-                          </button>
-                        );
-                      })}
-                      {/* Spacer for fade */}
-                      <div style={{ minWidth: 20, flexShrink: 0 }} />
-                    </div>
+                  {/* Header bar: "Active passes" + "X / Y" counter */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Active passes</span>
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>
+                      {(() => {
+                        const filtered = activeClaims.filter(c => c.businesses && c.offers);
+                        const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
+                        return `${(currentIdx >= 0 ? currentIdx : 0) + 1} / ${filtered.length}`;
+                      })()}
+                    </span>
                   </div>
 
                   {/* Swipeable slider */}
@@ -1763,12 +1817,15 @@ export default function CreatorApp() {
                     style={{
                       scrollSnapType: 'x mandatory',
                       scrollbarWidth: 'none',
+                      padding: '12px 0',
                     }}
                     onScroll={(e) => {
                       const el = e.currentTarget;
-                      const idx = Math.round(el.scrollLeft / el.clientWidth);
-                      if (activeClaims[idx] && selectedClaim?.id !== activeClaims[idx].id) {
-                        setSelectedClaim(activeClaims[idx]);
+                      const cardWidth = el.clientWidth;
+                      const idx = Math.round(el.scrollLeft / cardWidth);
+                      const filtered = activeClaims.filter(c => c.businesses && c.offers);
+                      if (filtered[idx] && selectedClaim?.id !== filtered[idx].id) {
+                        setSelectedClaim(filtered[idx]);
                       }
                     }}
                   >
@@ -1799,10 +1856,10 @@ export default function CreatorApp() {
                       return (
                         <div
                           key={claim.id}
-                          className="flex-shrink-0 w-full"
-                          style={{ scrollSnapAlign: 'start' }}
+                          className="flex-shrink-0"
+                          style={{ scrollSnapAlign: 'center', width: 'calc(100vw - 40px)', marginLeft: claimIdx === 0 ? 20 : 6, marginRight: claimIdx === activeClaims.filter(c => c.businesses && c.offers).length - 1 ? 20 : 6 }}
                         >
-                          <div className="px-4 pt-3">
+                          <div>
                             <div className="rounded-[20px] px-6 pt-6 pb-2" style={{ minHeight: '75vh', background: isPassCard ? 'var(--terra)' : 'var(--card)', padding: 24 }}>
 
                               {/* Offer title — one line */}
@@ -1986,6 +2043,30 @@ export default function CreatorApp() {
                       );
                     })}
                   </div>
+
+                  {/* Pagination dots — hidden if more than 7 passes */}
+                  {(() => {
+                    const filtered = activeClaims.filter(c => c.businesses && c.offers);
+                    if (filtered.length <= 1 || filtered.length > 7) return null;
+                    const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
+                    const activeIdx = currentIdx >= 0 ? currentIdx : 0;
+                    return (
+                      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingBottom: 8 }}>
+                        {filtered.map((_, i) => (
+                          <div
+                            key={i}
+                            style={{
+                              width: i === activeIdx ? 8 : 6,
+                              height: i === activeIdx ? 8 : 6,
+                              borderRadius: '50%',
+                              background: i === activeIdx ? 'var(--terra)' : 'rgba(34,34,34,0.18)',
+                              transition: 'all 0.2s ease',
+                            }}
+                          />
+                        ))}
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </>
