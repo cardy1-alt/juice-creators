@@ -838,15 +838,12 @@ export default function CreatorApp() {
               ← Back
             </button>
             <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
-              {/* Offer name + business name */}
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 24, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: 0, lineHeight: 1.15 }}>{qrOfferTitle}</p>
-              <p className="text-[16px] text-center mt-[2px]" style={{ color: activeTab === 'pass' ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{qrClaim.businesses.name}</p>
 
               {/* Segmented toggle — only for reel_due */}
               {isReelDue && (
                 <div
-                  className="relative flex items-center mt-[20px]"
-                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : 'var(--card)', borderRadius: 999, padding: 3 }}
+                  className="relative flex items-center"
+                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : 'var(--card)', borderRadius: 999, padding: 3, marginBottom: 20 }}
                 >
                   {/* Sliding active indicator */}
                   <div
@@ -879,14 +876,19 @@ export default function CreatorApp() {
 
               {/* === SHOW PASS STATE === */}
               {activeTab === 'pass' && (
-                <div className="flex flex-col items-center w-full" style={{ marginTop: 16, minHeight: isReelDue ? undefined : 'calc(100vh - 240px)', justifyContent: isReelDue ? undefined : 'center' }}>
-                  <QRCodeDisplay
-                    token={qrClaim.qr_token}
-                    claimId={qrClaim.id}
-                    creatorCode={userProfile.code}
-                    size={220}
-                    hideExtras
-                  />
+                <div className="flex flex-col items-center w-full" style={{ marginTop: isReelDue ? 0 : 0, minHeight: isReelDue ? undefined : 'calc(100vh - 200px)', justifyContent: isReelDue ? undefined : 'center' }}>
+                  {/* QR card with offer title inside */}
+                  <div style={{ background: 'white', borderRadius: 24, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 16px' }}>{qrClaim.businesses.name}</p>
+                    <QRCodeDisplay
+                      token={qrClaim.qr_token}
+                      claimId={qrClaim.id}
+                      creatorCode={userProfile.code}
+                      size={220}
+                      hideExtras
+                    />
+                  </div>
                   {/* Ref code pill */}
                   <span
                     className="text-[17px] text-white inline-block rounded-full mt-[20px]"
@@ -896,9 +898,12 @@ export default function CreatorApp() {
                   </span>
                   {/* Refresh countdown */}
                   <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
-                  {/* Level badge — white with low opacity background */}
-                  <div className="mt-[20px] rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                    <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
+                  {/* Level badge */}
+                  <div className="mt-[20px] flex flex-col items-center gap-[4px]">
+                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 11, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your level</span>
+                    <div className="rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
+                      <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -1419,7 +1424,7 @@ export default function CreatorApp() {
                             >
                               {/* Background image */}
                               {claimPhoto && <img src={claimPhoto} alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />}
-                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 20%, rgba(34,34,34,0.7))', pointerEvents: 'none' }} />
+                              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 50%, rgba(34,34,34,0.65))', pointerEvents: 'none' }} />
                               {/* Content */}
                               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20 }}>
                                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.78)' }}>{claimBiz}</span>
@@ -1721,30 +1726,34 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div>
-                  {/* Pill tab strip */}
-                  <div className="flex gap-2 overflow-x-auto px-[20px] pt-[14px] pb-0" style={{ scrollbarWidth: 'none' }}>
-                    {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
-                      const isSelected = selectedClaim?.id === claim.id;
-                      return (
-                        <button
-                          key={claim.id}
-                          onClick={() => {
-                            setSelectedClaim(claim);
-                            const idx = activeClaims.findIndex(c => c.id === claim.id);
-                            const slider = document.getElementById('claims-slider');
-                            if (slider) slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
-                          }}
-                          className={`whitespace-nowrap text-[14px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
-                            isSelected
-                              ? 'bg-[var(--ink)] text-[#FFFFFF]'
-                              : 'text-[rgba(34,34,34,0.68)]'
-                          }`}
-                          style={!isSelected ? { background: 'var(--card)', height: '32px' } : { height: '32px' }}
-                        >
-                          {claim.businesses.name}
-                        </button>
-                      );
-                    })}
+                  {/* Pill tab strip with fade-right mask */}
+                  <div style={{ position: 'relative', paddingTop: 14 }}>
+                    <div className="hide-scrollbar flex gap-2 overflow-x-auto px-[20px] pb-0" style={{ scrollbarWidth: 'none', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
+                      {activeClaims.filter(c => c.businesses && c.offers).map(claim => {
+                        const isSelected = selectedClaim?.id === claim.id;
+                        return (
+                          <button
+                            key={claim.id}
+                            onClick={() => {
+                              setSelectedClaim(claim);
+                              const idx = activeClaims.findIndex(c => c.id === claim.id);
+                              const slider = document.getElementById('claims-slider');
+                              if (slider) slider.scrollTo({ left: idx * slider.clientWidth, behavior: 'smooth' });
+                            }}
+                            className={`whitespace-nowrap text-[14px] font-semibold rounded-[20px] px-[14px] flex-shrink-0 transition-all ${
+                              isSelected
+                                ? 'bg-[var(--ink)] text-[#FFFFFF]'
+                                : 'text-[rgba(34,34,34,0.68)]'
+                            }`}
+                            style={!isSelected ? { background: 'var(--card)', height: '32px' } : { height: '32px' }}
+                          >
+                            {claim.businesses.name}
+                          </button>
+                        );
+                      })}
+                      {/* Spacer for fade */}
+                      <div style={{ minWidth: 20, flexShrink: 0 }} />
+                    </div>
                   </div>
 
                   {/* Swipeable slider */}
@@ -1807,21 +1816,18 @@ export default function CreatorApp() {
                                   const isFuture = idx > stageIndex;
                                   return (
                                     <span key={label} className="flex items-center">
-                                      {idx === 0 && (
-                                        <span className={`inline-block w-[7px] h-[7px] rounded-full mr-1.5 ${isPassCard ? 'bg-[var(--shell)]' : 'bg-[var(--terra)]'}`} />
-                                      )}
-                                      <span className={`text-[15px] ${
-                                        isCurrent ? 'font-bold'
-                                        : isDone ? 'font-bold'
-                                        : 'font-medium'
-                                      }`} style={{ color: isPassCard
-                                        ? (isFuture ? 'rgba(255,255,255,0.4)' : '#FFFFFF')
-                                        : (isFuture ? 'rgba(34,34,34,0.3)' : 'var(--ink)')
+                                      <span style={{
+                                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                                        fontSize: 13,
+                                        fontWeight: isCurrent ? 700 : isDone ? 600 : 500,
+                                        color: isPassCard
+                                          ? (isCurrent ? '#FFFFFF' : isFuture ? 'rgba(255,255,255,0.35)' : 'rgba(255,255,255,0.7)')
+                                          : (isCurrent ? 'var(--terra)' : isFuture ? 'rgba(34,34,34,0.3)' : 'var(--ink-60)'),
                                       }}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span className="text-[15px] mx-1" style={{ color: isPassCard ? 'rgba(255,255,255,0.35)' : 'rgba(34,34,34,0.25)' }}>→</span>
+                                        <span style={{ fontSize: 11, margin: '0 6px', color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>›</span>
                                       )}
                                     </span>
                                   );
@@ -1850,7 +1856,8 @@ export default function CreatorApp() {
                                     </span>
                                   </div>
                                   <p className="text-[15px] mt-[12px] text-center" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
-                                  <div className="flex items-center justify-center gap-2 mt-[16px]">
+                                  <div className="flex flex-col items-center gap-[4px] mt-[16px]">
+                                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 11, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your level</span>
                                     <div className="rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
                                       <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
                                     </div>
