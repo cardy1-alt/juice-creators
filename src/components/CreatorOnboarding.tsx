@@ -134,7 +134,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           ) : (
             <div className="w-[40px]" />
           )}
-          <span style={{ fontFamily: "'Corben', serif", fontSize: '22px', fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px' }}>nayba</span>
+          <Logo variant="wordmark" size={22} />
           {screen === 3 ? (
             <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="w-[40px] text-right" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 500, color: 'var(--ink-35)' }}>Skip</button>
           ) : (

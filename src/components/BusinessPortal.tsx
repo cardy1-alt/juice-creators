@@ -1553,12 +1553,16 @@ export default function BusinessPortal() {
       <div className="flex-1 overflow-y-auto">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="bg-[var(--card)] border-b border-[var(--ink-08)]" style={{ padding: '20px 20px 14px' }}>
+        <div style={{ padding: '20px 20px 14px', borderBottom: '1px solid var(--ink-08)' }}>
           <div className="flex items-center justify-between">
-            <Logo />
+            <Logo variant="icon-word" size={40} />
             <div className="text-right">
-              <p className="text-[15px] font-semibold text-[var(--ink)]">{userProfile.name}</p>
-              <span className="inline-block bg-[var(--card)] text-[var(--ink-60)] text-[13px] font-bold rounded-[20px] px-[10px] py-[3px] mt-0.5">
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{userProfile.name}</p>
+              <span style={{
+                display: 'inline-block', marginTop: 3, padding: '2px 10px', borderRadius: 999,
+                background: 'var(--card)', border: '1px solid var(--ink-08)',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)',
+              }}>
                 Business
               </span>
             </div>
@@ -1600,17 +1604,17 @@ export default function BusinessPortal() {
 
               {/* Compact inline stats */}
               <div className="flex items-center gap-[6px] mb-7 flex-wrap">
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[var(--ink-08)]">
-                  <span className="text-[15px] font-extrabold text-[var(--ink)]">{activeClaimsCount}</span>
-                  <span className="text-[12px] font-medium text-[var(--ink-60)]">active</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--terra)' }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'white' }}>{activeClaimsCount}</span>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>active</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[var(--ink-08)]">
-                  <span className="text-[15px] font-extrabold text-[var(--ink)]">{reelsThisMonth}</span>
-                  <span className="text-[12px] font-medium text-[var(--ink-60)]">reels</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{reelsThisMonth}</span>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>reels</span>
                 </span>
-                <span className="inline-flex items-center gap-[5px] px-[10px] py-[5px] rounded-full bg-[var(--ink-08)]">
-                  <span className="text-[15px] font-extrabold text-[var(--ink)]">{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
-                  <span className="text-[12px] font-medium text-[var(--ink-60)]">slots left</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>slots left</span>
                 </span>
               </div>
 
@@ -1727,12 +1731,15 @@ export default function BusinessPortal() {
                           className="w-full flex items-center gap-[12px] py-[10px] px-[2px] text-left"
                           onClick={() => { setCreatorFilter(claim.creator_id); setClaimsFilter('all'); setView('claims'); }}
                         >
-                          <div
-                            className="w-[36px] h-[36px] rounded-[12px] flex items-center justify-center flex-shrink-0"
-                            style={{ background: 'var(--card)' }}
-                          >
-                            <CategoryIcon category={userProfile.category} className="w-[20px] h-[20px]" style={{ color: 'var(--ink-60)' }} />
-                          </div>
+                          {claim.creators.avatar_url ? (
+                            <img src={claim.creators.avatar_url} alt="" className="flex-shrink-0" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
+                          ) : (
+                            <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--card)' }}>
+                              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink-60)' }}>
+                                {claim.creators.name?.charAt(0) || '?'}
+                              </span>
+                            </div>
+                          )}
                           <div className="flex-1 min-w-0">
                             <p className="text-[16px] font-semibold text-[var(--ink)] truncate">
                               {claim.creators.name}
@@ -2582,38 +2589,49 @@ export default function BusinessPortal() {
 
       {/* ═══ Bottom Nav ═══ */}
       <nav
-        className="bg-[var(--shell)] flex items-end justify-around flex-shrink-0"
-        style={{ borderTop: '1px solid var(--ink-08)', padding: '8px 0 max(10px, env(safe-area-inset-bottom))' }}
+        style={{
+          background: 'rgba(246,243,238,0.96)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)',
+          borderTop: '1px solid var(--ink-08)', padding: '8px 0', paddingBottom: 'env(safe-area-inset-bottom, 24px)',
+          display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', flexShrink: 0,
+        }}
       >
         {bottomTabs.map((tab) => {
           const isActive = view === tab.key;
           if (tab.key === 'scan') {
             return (
-              <div key={tab.key} className="flex-1 flex items-center justify-center">
+              <div key={tab.key} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <button
                   onClick={() => { if (isPendingApproval) return; setView('scan'); setScanResult(null); }}
-                  className={`w-[56px] h-[56px] rounded-full flex items-center justify-center ${isPendingApproval ? 'bg-[var(--ink-15)]' : 'bg-[var(--terra)]'} text-white`}
-                  style={{ marginTop: '-8px', boxShadow: isPendingApproval ? 'none' : 'var(--shadow-lg)' }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 6, padding: '10px 20px', borderRadius: 999,
+                    background: isPendingApproval ? 'var(--ink-15)' : 'var(--terra)', border: 'none', cursor: 'pointer',
+                    boxShadow: isPendingApproval ? 'none' : 'var(--shadow-md)',
+                  }}
                 >
-                  <DoodleIcon name="qr-code" size={22} className="text-white" />
+                  <DoodleIcon name="qr-code" size={18} style={{ color: 'white' }} />
+                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white' }}>Scan</span>
                 </button>
               </div>
             );
           }
 
           const isDisabled = isPendingApproval && tab.key !== 'profile';
+          const iconColor = isDisabled ? 'var(--ink-15)' : isActive ? 'var(--terra)' : 'var(--ink-35)';
           return (
             <button
               key={tab.key}
               onClick={() => { if (isDisabled) return; setView(tab.key); if (tab.key === 'claims') setCreatorFilter(null); if (tab.key !== 'offers') setSelectedOffer(null); }}
-              className={`flex-1 flex flex-col items-center gap-[2px] transition-all ${isDisabled ? 'text-[var(--ink-15)]' : isActive ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}
+              style={{
+                flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
+                background: 'none', border: 'none', cursor: isDisabled ? 'default' : 'pointer',
+                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 10,
+                color: iconColor,
+              }}
             >
-              <div className={`flex items-center justify-center rounded-full transition-all ${isActive ? 'bg-[var(--peach)]' : ''}`} style={{ width: 36, height: 28 }}>
-                <DoodleIcon name={tab.icon} size={20} />
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 24, height: 24 }}>
+                <DoodleIcon name={tab.icon} size={20} style={{ color: iconColor }} />
               </div>
-              <span className="text-[12px] font-semibold">
-                {tab.label}
-              </span>
+              <span>{tab.label}</span>
             </button>
           );
         })}

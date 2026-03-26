@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
 import { DoodleIcon } from '../lib/doodle-icons';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
+import { Logo } from './Logo';
 
 declare global {
   interface Window {
@@ -334,9 +335,7 @@ export default function Auth() {
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
           {/* Brand section */}
           <div className="flex flex-col items-center mb-[32px]">
-            <span style={{ fontFamily: "'Corben', serif", fontSize: 24, fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
-              nayba
-            </span>
+            <Logo variant="wordmark" size={24} />
           </div>
 
           {/* Hero copy */}
@@ -475,9 +474,7 @@ export default function Auth() {
         <div className="flex-1 flex flex-col">
           {/* Signup header */}
           <div className="flex flex-col items-center pt-[44px] pb-[24px] px-6">
-            <span style={{ fontFamily: "'Corben', serif", fontSize: 24, fontWeight: 400, color: 'var(--forest)', letterSpacing: '-0.5px', lineHeight: 1.1 }}>
-              nayba
-            </span>
+            <Logo variant="wordmark" size={24} />
           </div>
 
           <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
