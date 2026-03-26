@@ -2048,7 +2048,7 @@ export default function CreatorApp() {
                                       letterSpacing: '-0.02em', lineHeight: 1.3,
                                     }}
                                   >
-                                    {loading ? 'Confirming…' : <><span style={{ color: 'inherit' }}>Confirm</span><br /><span style={{ color: 'inherit' }}>visit</span></>}
+                                    {loading ? 'Confirming…' : <><span style={{ color: 'white', fontWeight: 700 }}>Confirm</span><br /><span style={{ color: 'white', fontWeight: 700 }}>visit</span></>}
                                   </button>
                                   <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)', margin: '16px 0 0', textAlign: 'center' }}>
                                     This button is for staff to tap in your presence
@@ -2168,7 +2168,7 @@ export default function CreatorApp() {
                               )}
 
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center text-[14px]" style={{ marginTop: 20, paddingBottom: 10 }}>
+                              <div className="flex items-center justify-center text-[11px]" style={{ marginTop: 20, paddingBottom: 10 }}>
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
