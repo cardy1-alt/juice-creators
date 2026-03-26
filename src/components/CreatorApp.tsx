@@ -198,6 +198,7 @@ export default function CreatorApp() {
   const [showSearchBar, setShowSearchBar] = useState(false);
   const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
   const [releaseConfirmId, setReleaseConfirmId] = useState<string | null>(null);
+  const [confirmVisitClaimId, setConfirmVisitClaimId] = useState<string | null>(null);
   const [releaseError, setReleaseError] = useState<string | null>(null);
   const [releasingClaim, setReleasingClaim] = useState(false);
   const [reelError, setReelError] = useState<string | null>(null);
@@ -2032,42 +2033,87 @@ export default function CreatorApp() {
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div style={{ textAlign: 'center' }}>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', margin: '0 0 8px' }}>Ready to visit?</p>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 20px', maxWidth: 280, lineHeight: 1.65 }}>
-                                    Show this screen to a member of staff and ask them to tap the button below
-                                  </p>
-                                  <button
-                                    onClick={async () => {
-                                      try {
-                                        setLoading(true);
-                                        const { error } = await supabase
-                                          .from('claims')
-                                          .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
-                                          .eq('id', claim.id);
-                                        if (error) throw error;
-                                        // Update local state
-                                        setActiveClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
-                                        setClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
-                                        if (selectedClaim?.id === claim.id) setSelectedClaim({ ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any);
-                                      } catch (err: any) {
-                                        setClaimError('Something went wrong — please try again');
-                                      } finally {
-                                        setLoading(false);
-                                      }
-                                    }}
-                                    disabled={loading}
-                                    style={{
-                                      width: '100%', height: 56, background: 'var(--terra)', borderRadius: 999, border: 'none',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white',
-                                      cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                    }}
+                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center', minHeight: 'calc(100vh - 340px)' }}>
+                                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)', margin: '0 0 8px', letterSpacing: '-0.03em' }}>Ready to visit?</p>
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 32px', maxWidth: 260, lineHeight: 1.65 }}>
+                                      Show this screen to a member of staff and ask them to tap the button below
+                                    </p>
+                                    <button
+                                      onClick={() => setConfirmVisitClaimId(claim.id)}
+                                      disabled={loading}
+                                      style={{
+                                        width: 200, height: 200, borderRadius: '50%', background: 'var(--terra)', border: 'none',
+                                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'white',
+                                        cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                        boxShadow: '0 8px 32px rgba(196,103,74,0.35)',
+                                        letterSpacing: '-0.02em',
+                                      }}
+                                    >
+                                      {loading ? 'Confirming…' : <><span>Confirm</span><br /><span>visit</span></>}
+                                    </button>
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)', margin: '20px 0 0', textAlign: 'center' }}>
+                                      This button is for staff to tap in your presence
+                                    </p>
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* Confirm visit dialog */}
+                              {confirmVisitClaimId === claim.id && (
+                                <div
+                                  style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.5)' }}
+                                  onClick={() => setConfirmVisitClaimId(null)}
+                                >
+                                  <div
+                                    onClick={(e) => e.stopPropagation()}
+                                    style={{ background: 'var(--shell)', borderRadius: 20, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 40px rgba(34,34,34,0.18)' }}
                                   >
-                                    {loading ? 'Confirming…' : 'Confirm my visit'}
-                                  </button>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-35)', margin: '12px 0 0', textAlign: 'center' }}>
-                                    This button is for staff to tap in your presence
-                                  </p>
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: 'var(--ink)', margin: '0 0 8px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
+                                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 24px', lineHeight: 1.5 }}>
+                                      Only confirm if you are at {claim.businesses.name} and a staff member is present.
+                                    </p>
+                                    <div style={{ display: 'flex', gap: 10 }}>
+                                      <button
+                                        onClick={() => setConfirmVisitClaimId(null)}
+                                        style={{
+                                          flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--ink-08)', background: 'transparent',
+                                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)',
+                                          cursor: 'pointer',
+                                        }}
+                                      >
+                                        Cancel
+                                      </button>
+                                      <button
+                                        onClick={async () => {
+                                          try {
+                                            setLoading(true);
+                                            setConfirmVisitClaimId(null);
+                                            const { error } = await supabase
+                                              .from('claims')
+                                              .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
+                                              .eq('id', claim.id);
+                                            if (error) throw error;
+                                            setActiveClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
+                                            setClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
+                                            if (selectedClaim?.id === claim.id) setSelectedClaim({ ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any);
+                                          } catch (err: any) {
+                                            setClaimError('Something went wrong — please try again');
+                                          } finally {
+                                            setLoading(false);
+                                          }
+                                        }}
+                                        disabled={loading}
+                                        style={{
+                                          flex: 1, height: 48, borderRadius: 999, border: 'none', background: 'var(--terra)',
+                                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'white',
+                                          cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                        }}
+                                      >
+                                        Yes, confirm
+                                      </button>
+                                    </div>
+                                  </div>
                                 </div>
                               )}
 
