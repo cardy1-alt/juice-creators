@@ -632,7 +632,7 @@ export default function AdminDashboard() {
                                 </div>
                               ) : (
                                 <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${business.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
-                                  <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                                  <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                                 </div>
                               )}
                             </button>
@@ -724,7 +724,7 @@ export default function AdminDashboard() {
                               </div>
                             ) : (
                               <div className={`w-[40px] h-[24px] rounded-full transition-all flex items-center ${offer.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
-                                <div className="w-[20px] h-[20px] rounded-full bg-white mx-[2px] shadow-sm" />
+                                <div className="w-[20px] h-[20px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                               </div>
                             )}
                           </button>
@@ -1101,7 +1101,7 @@ export default function AdminDashboard() {
                   >
                     <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{toggle.label}</span>
                     <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${toggle.value ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
-                      <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                      <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                     </div>
                   </button>
                 ))}
@@ -1109,22 +1109,22 @@ export default function AdminDashboard() {
 
               {bizErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.submit}</p>}
 
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddBusiness(false)}
-                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
-                >
-                  Cancel
-                </button>
+              <div className="space-y-3 pt-2">
                 <button
                   type="submit"
                   disabled={bizSubmitting}
-                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
                 >
                   {bizSubmitting ? 'Creating…' : 'Create business'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddBusiness(false)}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  Cancel
                 </button>
               </div>
             </form>
@@ -1318,28 +1318,28 @@ export default function AdminDashboard() {
               >
                 <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Is live</span>
                 <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${offerIsLive ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
-                  <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                  <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                 </div>
               </button>
 
               {offerErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.submit}</p>}
 
-              <div className="flex gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setShowAddOffer(false)}
-                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
-                >
-                  Cancel
-                </button>
+              <div className="space-y-3 pt-2">
                 <button
                   type="submit"
                   disabled={offerSubmitting}
-                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
                 >
                   {offerSubmitting ? 'Creating…' : 'Create offer'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddOffer(false)}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  Cancel
                 </button>
               </div>
             </form>
