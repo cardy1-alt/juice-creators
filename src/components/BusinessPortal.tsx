@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Clapperboard, Camera, Check, ChevronLeft, Lightbulb, X, Infinity, Minus, Plus, Info, QrCode, MapPin, Clock, BadgeCheck, ChevronRight, PauseCircle, RefreshCw, Sparkles, CheckCircle, ScanLine, ExternalLink, Copy, Instagram, User, Bell, LogOut, Gift, Tag, Star, Megaphone, FileText, Home, LayoutGrid, ClipboardList } from 'lucide-react';
+import { Clapperboard, Camera, Check, ChevronLeft, Lightbulb, X, Infinity, Minus, Plus, Info, QrCode, MapPin, Clock, BadgeCheck, ChevronRight, PauseCircle, RefreshCw, Sparkles, CheckCircle, ScanLine, ExternalLink, Copy, AtSign, User, Bell, LogOut, Gift, Tag, Star, Megaphone, FileText, Home, LayoutGrid, ClipboardList } from 'lucide-react';
 import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 import { getCategorySolidColor, CategoryIcon } from '../lib/categories';
@@ -2437,7 +2437,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-[10px] mt-[4px]">
                           {userProfile.instagram_handle && (
                             <span className="flex items-center gap-1 text-[14px] text-[var(--ink-60)]">
-                              <Instagram size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
+                              <AtSign size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
                             </span>
                           )}
                         </div>

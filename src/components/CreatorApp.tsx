@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, ComponentType } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { Check, Clock, ChevronLeft, Heart, Lock, Users, MapPin, Zap, Camera, BadgeCheck, Copy, Instagram, Plus, User, ChevronRight, Bell, LogOut, Flag, X, ExternalLink, Home, Sparkles, LayoutGrid, Coffee } from 'lucide-react';
+import { Check, Clock, ChevronLeft, Heart, Lock, Users, MapPin, Zap, Camera, BadgeCheck, Copy, AtSign, Plus, User, ChevronRight, Bell, LogOut, Flag, X, ExternalLink, Home, Sparkles, LayoutGrid, Coffee } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
@@ -2136,7 +2136,7 @@ export default function CreatorApp() {
                           </button>
                           {userProfile.instagram_handle && (
                             <span className="flex items-center gap-1 text-[14px] text-[var(--ink-35)]">
-                              <Instagram size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
+                              <AtSign size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
                             </span>
                           )}
                         </div>
