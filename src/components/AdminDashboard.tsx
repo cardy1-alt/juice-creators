@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Settings, Store, Tag, Users, X } from 'lucide-react';
+import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
@@ -29,8 +29,8 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
-interface Business { id: string; name: string; slug: string; owner_email: string; category: string; approved: boolean; created_at: string; }
-interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; }
+interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; min_level: number; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
 export default function AdminDashboard() {
@@ -48,6 +48,48 @@ export default function AdminDashboard() {
 
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+
+  // Add Business modal state
+  const [showAddBusiness, setShowAddBusiness] = useState(false);
+  const [bizName, setBizName] = useState('');
+  const [bizSlug, setBizSlug] = useState('');
+  const [bizSlugManual, setBizSlugManual] = useState(false);
+  const [bizEmail, setBizEmail] = useState('');
+  const [bizCategory, setBizCategory] = useState('');
+  const [bizRegion, setBizRegion] = useState('bury-st-edmunds');
+  const [bizAddress, setBizAddress] = useState('');
+  const [bizLat, setBizLat] = useState('');
+  const [bizLng, setBizLng] = useState('');
+  const [bizInstagram, setBizInstagram] = useState('');
+  const [bizBio, setBizBio] = useState('');
+  const [bizLogoFile, setBizLogoFile] = useState<File | null>(null);
+  const [bizLogoPreview, setBizLogoPreview] = useState<string | null>(null);
+  const [bizApproved, setBizApproved] = useState(true);
+  const [bizIsLive, setBizIsLive] = useState(false);
+  const [bizOnboardingComplete, setBizOnboardingComplete] = useState(true);
+  const [bizSubmitting, setBizSubmitting] = useState(false);
+  const [bizErrors, setBizErrors] = useState<Record<string, string>>({});
+  const [inlineUpdating, setInlineUpdating] = useState<string | null>(null);
+
+  // Add Offer modal state
+  const [showAddOffer, setShowAddOffer] = useState(false);
+  const [offerBusinessId, setOfferBusinessId] = useState('');
+  const [offerType, setOfferType] = useState('');
+  const [offerItem, setOfferItem] = useState('');
+  const [offerTitle, setOfferTitle] = useState('');
+  const [offerTitleManual, setOfferTitleManual] = useState(false);
+  const [offerDesc, setOfferDesc] = useState('');
+  const [offerMonthlyCap, setOfferMonthlyCap] = useState('');
+  const [offerSlots, setOfferSlots] = useState('4');
+  const [offerSpecificAsk, setOfferSpecificAsk] = useState('');
+  const [offerPhotoFile, setOfferPhotoFile] = useState<File | null>(null);
+  const [offerPhotoPreview, setOfferPhotoPreview] = useState<string | null>(null);
+  const [offerMinLevel, setOfferMinLevel] = useState('1');
+  const [offerContentType, setOfferContentType] = useState('reel');
+  const [offerIsLive, setOfferIsLive] = useState(false);
+  const [offerSubmitting, setOfferSubmitting] = useState(false);
+  const [offerErrors, setOfferErrors] = useState<Record<string, string>>({});
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -179,6 +221,184 @@ export default function AdminDashboard() {
       setNewPassword('');
       setConfirmPassword('');
     }
+  };
+
+  const handleInlineBusinessUpdate = async (id: string, field: string, value: any) => {
+    setInlineUpdating(`${id}-${field}`);
+    const { error } = await supabase.from('businesses').update({ [field]: value }).eq('id', id);
+    setInlineUpdating(null);
+    if (error) {
+      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+    } else {
+      setBusinesses(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
+    }
+  };
+
+  const CATEGORIES = ['Food & Drink', 'Hair & Beauty', 'Health & Fitness', 'Retail', 'Cafe & Coffee', 'Arts & Entertainment', 'Wellness & Spa', 'Pets', 'Education', 'Services'];
+  const REGIONS = ['bury-st-edmunds', 'ipswich', 'norwich', 'cambridge'];
+
+  const slugify = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const resetBizForm = () => {
+    setBizName(''); setBizSlug(''); setBizSlugManual(false); setBizEmail('');
+    setBizCategory(''); setBizRegion('bury-st-edmunds'); setBizAddress('');
+    setBizLat(''); setBizLng(''); setBizInstagram(''); setBizBio('');
+    setBizLogoFile(null); setBizLogoPreview(null); setBizApproved(true);
+    setBizIsLive(false); setBizOnboardingComplete(true); setBizErrors({});
+  };
+
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
+  const handleCreateBusiness = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!bizName.trim()) errors.name = 'Business name is required';
+    if (!bizSlug.trim()) errors.slug = 'Slug is required';
+    if (!bizEmail.trim()) errors.email = 'Owner email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bizEmail)) errors.email = 'Invalid email format';
+    if (!bizCategory) errors.category = 'Category is required';
+
+    if (Object.keys(errors).length > 0) { setBizErrors(errors); return; }
+
+    setBizSubmitting(true);
+    setBizErrors({});
+
+    // Check slug uniqueness
+    const { data: existingSlug } = await supabase.from('businesses').select('id').eq('slug', bizSlug.trim()).limit(1);
+    if (existingSlug && existingSlug.length > 0) {
+      setBizErrors({ slug: 'This slug is already taken' });
+      setBizSubmitting(false);
+      return;
+    }
+
+    // Upload logo if provided
+    let logoUrl: string | null = null;
+    if (bizLogoFile) {
+      const ext = bizLogoFile.name.split('.').pop();
+      const path = `business-logos/${Date.now()}-${bizSlug}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, bizLogoFile);
+      if (uploadError) {
+        setBizErrors({ logo: 'Failed to upload logo: ' + uploadError.message });
+        setBizSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
+      logoUrl = urlData.publicUrl;
+    }
+
+    const { error } = await supabase.from('businesses').insert({
+      name: bizName.trim(),
+      slug: bizSlug.trim(),
+      owner_email: bizEmail.trim(),
+      category: bizCategory,
+      region: bizRegion,
+      address: bizAddress.trim() || null,
+      latitude: bizLat ? parseFloat(bizLat) : null,
+      longitude: bizLng ? parseFloat(bizLng) : null,
+      instagram_handle: bizInstagram.trim().replace(/^@/, '') || null,
+      bio: bizBio.trim() || null,
+      logo_url: logoUrl,
+      approved: bizApproved,
+      is_live: bizIsLive,
+      onboarding_complete: bizOnboardingComplete,
+      onboarding_step: bizOnboardingComplete ? 4 : 0,
+    });
+
+    setBizSubmitting(false);
+    if (error) {
+      setBizErrors({ submit: error.message });
+      return;
+    }
+
+    showToast('Business created');
+    setShowAddBusiness(false);
+    resetBizForm();
+    fetchAll();
+  };
+
+  const handleInlineOfferUpdate = async (id: string, field: string, value: any) => {
+    setInlineUpdating(`offer-${id}-${field}`);
+    const { error } = await supabase.from('offers').update({ [field]: value }).eq('id', id);
+    setInlineUpdating(null);
+    if (error) {
+      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+    } else {
+      setOffers(prev => prev.map(o => o.id === id ? { ...o, [field]: value } : o));
+    }
+  };
+
+  const OFFER_TYPES = ['Free Product', 'Free Service', 'Discount', 'Experience'];
+  const LEVEL_OPTIONS = [
+    { value: '1', label: '1 Newcomer' }, { value: '2', label: '2 Explorer' }, { value: '3', label: '3 Regular' },
+    { value: '4', label: '4 Local' }, { value: '5', label: '5 Trusted' }, { value: '6', label: '6 Nayba' },
+  ];
+
+  const resetOfferForm = () => {
+    setOfferBusinessId(''); setOfferType(''); setOfferItem(''); setOfferTitle('');
+    setOfferTitleManual(false); setOfferDesc(''); setOfferMonthlyCap(''); setOfferSlots('4');
+    setOfferSpecificAsk(''); setOfferPhotoFile(null); setOfferPhotoPreview(null);
+    setOfferMinLevel('1'); setOfferContentType('reel'); setOfferIsLive(false); setOfferErrors({});
+  };
+
+  const handleCreateOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!offerBusinessId) errors.business = 'Business is required';
+    if (!offerType) errors.offer_type = 'Offer type is required';
+    if (!offerItem.trim()) errors.offer_item = 'Offer item is required';
+    const slotsNum = parseInt(offerSlots);
+    if (!offerSlots || isNaN(slotsNum) || slotsNum < 1 || slotsNum > 20) errors.slots = 'Total slots required (1–20)';
+    if (offerMonthlyCap && (isNaN(parseInt(offerMonthlyCap)) || parseInt(offerMonthlyCap) < 1)) errors.monthly_cap = 'Must be a positive integer';
+
+    if (Object.keys(errors).length > 0) { setOfferErrors(errors); return; }
+
+    setOfferSubmitting(true);
+    setOfferErrors({});
+
+    // Upload photo if provided
+    let photoUrl: string | null = null;
+    if (offerPhotoFile) {
+      const ext = offerPhotoFile.name.split('.').pop();
+      const path = `offer-photos/${Date.now()}-${offerBusinessId}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, offerPhotoFile);
+      if (uploadError) {
+        setOfferErrors({ photo: 'Failed to upload photo: ' + uploadError.message });
+        setOfferSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
+      photoUrl = urlData.publicUrl;
+    }
+
+    const generatedTitle = offerTitleManual && offerTitle.trim() ? offerTitle.trim() : `Free ${offerItem.trim()}`;
+
+    const { error } = await supabase.from('offers').insert({
+      business_id: offerBusinessId,
+      offer_type: offerType,
+      offer_item: offerItem.trim(),
+      generated_title: generatedTitle,
+      description: offerDesc.trim() || generatedTitle,
+      monthly_cap: offerMonthlyCap ? parseInt(offerMonthlyCap) : null,
+      specific_ask: offerSpecificAsk.trim() || null,
+      offer_photo_url: photoUrl,
+      min_level: parseInt(offerMinLevel),
+      content_type: offerContentType,
+      is_live: offerIsLive,
+    });
+
+    setOfferSubmitting(false);
+    if (error) {
+      setOfferErrors({ submit: error.message });
+      return;
+    }
+
+    showToast('Offer created');
+    setShowAddOffer(false);
+    resetOfferForm();
+    fetchAll();
   };
 
   const statCardData = [
@@ -359,6 +579,16 @@ export default function AdminDashboard() {
 
           {/* BUSINESSES */}
           {view === 'businesses' && (
+            <>
+            <div className="flex justify-end mb-4">
+              <button
+                onClick={() => { resetBizForm(); setShowAddBusiness(true); }}
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+              >
+                <Plus size={16} strokeWidth={2} /> Add business
+              </button>
+            </div>
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No businesses yet.</p></div>
@@ -370,6 +600,9 @@ export default function AdminDashboard() {
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Slug</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Category</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Region</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
                         <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
                       </tr>
@@ -387,6 +620,45 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <button
+                              onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
+                              disabled={inlineUpdating === `${business.id}-is_live`}
+                              className="relative"
+                            >
+                              {inlineUpdating === `${business.id}-is_live` ? (
+                                <div className="w-[44px] h-[26px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
+                                  <div className="w-4 h-4 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
+                                </div>
+                              ) : (
+                                <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${business.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                                  <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
+                                </div>
+                              )}
+                            </button>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <select
+                              value={business.category}
+                              onChange={e => handleInlineBusinessUpdate(business.id, 'category', e.target.value)}
+                              disabled={inlineUpdating === `${business.id}-category`}
+                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            >
+                              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                            </select>
+                          </td>
+                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <select
+                              value={business.region || 'bury-st-edmunds'}
+                              onChange={e => handleInlineBusinessUpdate(business.id, 'region', e.target.value)}
+                              disabled={inlineUpdating === `${business.id}-region`}
+                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            >
+                              {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                            </select>
+                          </td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
@@ -406,28 +678,89 @@ export default function AdminDashboard() {
                 </div>
               )}
             </div>
+            </>
           )}
 
           {/* OFFERS */}
           {view === 'offers' && (
             <>
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => { resetOfferForm(); setShowAddOffer(true); }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  <Plus size={16} strokeWidth={2} /> New offer
+                </button>
+              </div>
               {offers.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
                     <div key={offer.id} className="bg-[var(--card)] rounded-[18px] p-5 shadow-[0_2px_12px_rgba(34,34,34,0.08)]">
-                      <div className="flex items-start gap-3 mb-2">
+                      <div className="flex items-start gap-3 mb-3">
                         <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
                           <CategoryIcon category={offer.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
-                            <StatusPill status={offer.is_live ? 'live' : 'paused'} type="offer" />
                           </div>
-                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offer.description}</p>
-                          <p className="text-sm text-[var(--soft)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Cap: {offer.monthly_cap ? `${offer.monthly_cap}/month` : 'Unlimited'}</p>
+                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 flex-wrap">
+                        {/* is_live toggle */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</span>
+                          <button
+                            onClick={() => handleInlineOfferUpdate(offer.id, 'is_live', !offer.is_live)}
+                            disabled={inlineUpdating === `offer-${offer.id}-is_live`}
+                          >
+                            {inlineUpdating === `offer-${offer.id}-is_live` ? (
+                              <div className="w-[40px] h-[24px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
+                                <div className="w-3.5 h-3.5 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
+                              </div>
+                            ) : (
+                              <div className={`w-[40px] h-[24px] rounded-full transition-all flex items-center ${offer.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                                <div className="w-[20px] h-[20px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
+                              </div>
+                            )}
+                          </button>
+                        </div>
+                        {/* monthly_cap inline edit */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Cap</span>
+                          <input
+                            type="number"
+                            min="0"
+                            value={offer.monthly_cap ?? ''}
+                            onChange={e => {
+                              const val = e.target.value === '' ? null : parseInt(e.target.value);
+                              setOffers(prev => prev.map(o => o.id === offer.id ? { ...o, monthly_cap: val } : o));
+                            }}
+                            onBlur={e => {
+                              const val = e.target.value === '' ? null : parseInt(e.target.value);
+                              handleInlineOfferUpdate(offer.id, 'monthly_cap', val);
+                            }}
+                            className="w-[70px] px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] text-center focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            placeholder="∞"
+                          />
+                        </div>
+                        {/* min_level dropdown */}
+                        <div className="flex items-center gap-2">
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Level</span>
+                          <select
+                            value={offer.min_level}
+                            onChange={e => handleInlineOfferUpdate(offer.id, 'min_level', parseInt(e.target.value))}
+                            disabled={inlineUpdating === `offer-${offer.id}-min_level`}
+                            className="px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                          >
+                            {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                          </select>
                         </div>
                       </div>
                     </div>
@@ -573,6 +906,446 @@ export default function AdminDashboard() {
           )}
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[var(--ink)] text-white text-[15px] font-semibold shadow-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+          {toast}
+        </div>
+      )}
+
+      {/* Add Business Modal */}
+      {showAddBusiness && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
+          <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Add business</h2>
+              <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateBusiness} className="space-y-5">
+              {/* BASIC INFO */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Basic info</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Business name <span className="text-[var(--terra)]">*</span></label>
+                <input
+                  value={bizName}
+                  onChange={e => { setBizName(e.target.value); if (!bizSlugManual) setBizSlug(slugify(e.target.value)); }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="e.g. Wildcraft Coffee"
+                />
+                {bizErrors.name && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.name}</p>}
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Slug <span className="text-[var(--terra)]">*</span></label>
+                <input
+                  value={bizSlug}
+                  onChange={e => { setBizSlug(e.target.value); setBizSlugManual(true); }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] font-mono focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="wildcraft-coffee"
+                />
+                {bizErrors.slug && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.slug}</p>}
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Owner email <span className="text-[var(--terra)]">*</span></label>
+                <input
+                  type="email"
+                  value={bizEmail}
+                  onChange={e => setBizEmail(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="hello@business.com"
+                />
+                {bizErrors.email && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.email}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Category <span className="text-[var(--terra)]">*</span></label>
+                  <select
+                    value={bizCategory}
+                    onChange={e => setBizCategory(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    <option value="">Select…</option>
+                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  {bizErrors.category && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.category}</p>}
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Region</label>
+                  <select
+                    value={bizRegion}
+                    onChange={e => setBizRegion(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              {/* LOCATION */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Location</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Address</label>
+                <input
+                  value={bizAddress}
+                  onChange={e => setBizAddress(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="123 High Street, Bury St Edmunds"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Latitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={bizLat}
+                    onChange={e => setBizLat(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    placeholder="52.2434"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Longitude</label>
+                  <input
+                    type="number"
+                    step="any"
+                    value={bizLng}
+                    onChange={e => setBizLng(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    placeholder="0.7137"
+                  />
+                </div>
+              </div>
+
+              {/* PROFILE */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Profile</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Instagram handle</label>
+                <input
+                  value={bizInstagram}
+                  onChange={e => setBizInstagram(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="@wildcraftcoffee"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Bio <span className="text-[var(--ink-35)]">(max 200 chars)</span></label>
+                <textarea
+                  value={bizBio}
+                  onChange={e => { if (e.target.value.length <= 200) setBizBio(e.target.value); }}
+                  rows={3}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="A short description of the business…"
+                />
+                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{bizBio.length}/200</p>
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Logo</label>
+                {bizLogoPreview ? (
+                  <div className="flex items-center gap-3">
+                    <img src={bizLogoPreview} alt="Logo preview" className="w-14 h-14 rounded-[12px] object-cover" />
+                    <button type="button" onClick={() => { setBizLogoFile(null); setBizLogoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Remove</button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center gap-2 py-8 rounded-[12px] border-[1.5px] border-dashed border-[var(--ink-15)] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
+                    <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setBizLogoFile(file);
+                        setBizLogoPreview(URL.createObjectURL(file));
+                      }
+                    }} />
+                  </label>
+                )}
+                {bizErrors.logo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.logo}</p>}
+              </div>
+
+              {/* STATUS */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Status</p>
+
+              <div className="space-y-3">
+                {[
+                  { label: 'Approved', value: bizApproved, set: setBizApproved },
+                  { label: 'Is live', value: bizIsLive, set: setBizIsLive },
+                  { label: 'Onboarding complete', value: bizOnboardingComplete, set: setBizOnboardingComplete },
+                ].map(toggle => (
+                  <button
+                    key={toggle.label}
+                    type="button"
+                    onClick={() => toggle.set(!toggle.value)}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[var(--card)] border border-[var(--ink-08)]"
+                  >
+                    <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{toggle.label}</span>
+                    <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${toggle.value ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                      <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {bizErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.submit}</p>}
+
+              <div className="space-y-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={bizSubmitting}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  {bizSubmitting ? 'Creating…' : 'Create business'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddBusiness(false)}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Offer Modal */}
+      {showAddOffer && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
+          <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>New offer</h2>
+              <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateOffer} className="space-y-5">
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Offer details</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Business <span className="text-[var(--terra)]">*</span></label>
+                <select
+                  value={offerBusinessId}
+                  onChange={e => setOfferBusinessId(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                >
+                  <option value="">Select business…</option>
+                  {businesses.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+                {offerErrors.business && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.business}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer type <span className="text-[var(--terra)]">*</span></label>
+                  <select
+                    value={offerType}
+                    onChange={e => setOfferType(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    <option value="">Select…</option>
+                    {OFFER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  {offerErrors.offer_type && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_type}</p>}
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Content type</label>
+                  <select
+                    value={offerContentType}
+                    onChange={e => setOfferContentType(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    <option value="reel">Reel</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer item <span className="text-[var(--terra)]">*</span></label>
+                <input
+                  value={offerItem}
+                  onChange={e => {
+                    setOfferItem(e.target.value);
+                    if (!offerTitleManual) setOfferTitle(`Free ${e.target.value}`);
+                  }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder='e.g. "oat flat white", "gel manicure"'
+                />
+                {offerErrors.offer_item && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_item}</p>}
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Generated title</label>
+                <input
+                  value={offerTitle}
+                  onChange={e => { setOfferTitle(e.target.value); setOfferTitleManual(true); }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="Auto-generated from offer item"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Description</label>
+                <textarea
+                  value={offerDesc}
+                  onChange={e => setOfferDesc(e.target.value)}
+                  rows={2}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="Optional description"
+                />
+              </div>
+
+              {/* CAPACITY */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Capacity</p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Monthly slot cap <span className="text-[var(--ink-35)]">(blank = unlimited)</span></label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={offerMonthlyCap}
+                    onChange={e => setOfferMonthlyCap(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    placeholder="Unlimited"
+                  />
+                  {offerErrors.monthly_cap && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.monthly_cap}</p>}
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Total slots <span className="text-[var(--terra)]">*</span></label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={offerSlots}
+                    onChange={e => setOfferSlots(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  />
+                  {offerErrors.slots && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.slots}</p>}
+                </div>
+              </div>
+
+              {/* BRIEF */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Brief</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Specific ask <span className="text-[var(--ink-35)]">(max 100 chars)</span></label>
+                <textarea
+                  value={offerSpecificAsk}
+                  onChange={e => { if (e.target.value.length <= 100) setOfferSpecificAsk(e.target.value); }}
+                  rows={2}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder='e.g. "they'd love if you showed the latte art"'
+                />
+                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offerSpecificAsk.length}/100</p>
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer photo</label>
+                {offerPhotoPreview ? (
+                  <div className="flex items-center gap-3">
+                    <img src={offerPhotoPreview} alt="Offer preview" className="w-14 h-14 rounded-[12px] object-cover" />
+                    <button type="button" onClick={() => { setOfferPhotoFile(null); setOfferPhotoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Remove</button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center gap-2 py-8 rounded-[12px] border-[1.5px] border-dashed border-[var(--ink-15)] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
+                    <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setOfferPhotoFile(file);
+                        setOfferPhotoPreview(URL.createObjectURL(file));
+                      }
+                    }} />
+                  </label>
+                )}
+                {offerErrors.photo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.photo}</p>}
+              </div>
+
+              {/* ACCESS */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Access & status</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Min level</label>
+                <select
+                  value={offerMinLevel}
+                  onChange={e => setOfferMinLevel(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                >
+                  {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setOfferIsLive(!offerIsLive)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[var(--card)] border border-[var(--ink-08)]"
+              >
+                <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Is live</span>
+                <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${offerIsLive ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                  <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
+                </div>
+              </button>
+
+              {offerErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.submit}</p>}
+
+              <div className="space-y-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={offerSubmitting}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  {offerSubmitting ? 'Creating…' : 'Create offer'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowAddOffer(false)}
+                  className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
