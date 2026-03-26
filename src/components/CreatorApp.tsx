@@ -1376,9 +1376,19 @@ export default function CreatorApp() {
               ? feedOffers
               : feedOffers.filter(o => getCategoryGroup(o.businesses.category) === selectedCategory);
 
+            // Apply search filter
+            const searchTerm = searchQuery.trim().toLowerCase();
+            const searchedOffers = searchTerm
+              ? filteredOffers.filter(o => {
+                  const title = (o.generated_title || o.description || '').toLowerCase();
+                  const biz = (o.businesses.name || '').toLowerCase();
+                  return title.includes(searchTerm) || biz.includes(searchTerm);
+                })
+              : filteredOffers;
+
             // Split into near-you (horizontal row) and new-this-week (vertical list)
-            const nearYouOffers = filteredOffers.slice(0, 8);
-            const newThisWeekOffers = filteredOffers.slice(8);
+            const nearYouOffers = searchedOffers.slice(0, 8);
+            const newThisWeekOffers = searchedOffers.slice(8);
 
             // Extract city from first offer's address
             const cityName = (() => {
@@ -1396,18 +1406,32 @@ export default function CreatorApp() {
                 <div style={{ padding: '16px 20px 0' }}>
                   {/* Full-width pill search bar */}
                   <div
-                    onClick={() => setShowSearchBar(!showSearchBar)}
                     style={{
-                      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                      display: 'flex', alignItems: 'center',
                       padding: '0 16px', height: 52, marginBottom: 12,
-                      background: 'white', border: '1.5px solid var(--border)', borderRadius: 999, cursor: 'pointer',
+                      background: 'var(--shell)', border: '1.5px solid var(--border)', borderRadius: 999,
                     }}
                   >
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                      <Search size={18} strokeWidth={1.5} color="var(--ink-35)" />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'var(--ink-35)' }}>Find local offers…</span>
-                    </div>
-                    <SlidersHorizontal size={18} strokeWidth={1.5} color="var(--ink-35)" />
+                    <Search size={18} strokeWidth={1.5} color="var(--ink-35)" style={{ flexShrink: 0 }} />
+                    <input
+                      type="text"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Find local offers…"
+                      style={{
+                        flex: 1, border: 'none', background: 'transparent', outline: 'none',
+                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16,
+                        color: 'var(--ink)', marginLeft: 10,
+                      }}
+                    />
+                    {searchQuery && (
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
+                      >
+                        <X size={16} strokeWidth={1.5} color="var(--ink-35)" />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -1436,8 +1460,8 @@ export default function CreatorApp() {
                   })}
                 </div>
 
-                {/* ── Your passes — compact banner ── */}
-                {activeClaims.length > 0 && (() => {
+                {/* ── Your passes — compact banner (hidden during search) ── */}
+                {!searchTerm && activeClaims.length > 0 && (() => {
                   const filtered = activeClaims.filter(c => c.businesses && c.offers);
                   if (filtered.length === 0) return null;
                   const firstClaim = filtered[0];
@@ -1446,8 +1470,8 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 16, padding: '0 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Your passes</span>
-                        <button onClick={() => setView('active')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Your passes</span>
+                        <button onClick={() => setView('active')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
                       <button
                         onClick={() => { setSelectedClaim(firstClaim); setView('active'); }}
@@ -1494,19 +1518,66 @@ export default function CreatorApp() {
                 )}
 
                 {/* ── Empty state ── */}
-                {!offersLoading && filteredOffers.length === 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 32px', gap: 8 }}>
-                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>New offers drop every Tuesday.</p>
+                {!offersLoading && searchedOffers.length === 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: 8 }}>
+                    {searchTerm ? (
+                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No offers found for '{searchQuery.trim()}'</p>
+                    ) : (
+                      <>
+                        <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>New offers drop every Tuesday.</p>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* ── Search results — flat grid when searching ── */}
+                {!offersLoading && searchTerm && searchedOffers.length > 0 && (
+                  <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                    {searchedOffers.map((offer) => {
+                      const offerTitle = offer.generated_title || offer.description;
+                      const isSaved = savedOffers.has(offer.id);
+                      return (
+                        <div
+                          key={offer.id}
+                          onClick={() => setExpandedOffer(offer.id)}
+                          style={{ cursor: 'pointer', position: 'relative' }}
+                        >
+                          <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                            {offer.offer_photo_url ? (
+                              <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                            ) : (
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              </div>
+                            )}
+                            <button
+                              onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                              style={{
+                                position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
+                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                              }}
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                              </svg>
+                            </button>
+                          </div>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
 
                 {/* ── Near you — horizontal card row ── */}
-                {!offersLoading && nearYouOffers.length > 0 && (
+                {!offersLoading && !searchTerm && nearYouOffers.length > 0 && (
                   <div style={{ marginTop: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Near you</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Near you</span>
+                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
@@ -1589,11 +1660,11 @@ export default function CreatorApp() {
                 )}
 
                 {/* ── New this week — horizontal scroll cards ── */}
-                {!offersLoading && newThisWeekOffers.length > 0 && (
+                {!offersLoading && !searchTerm && newThisWeekOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>New this week</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>New this week</span>
+                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
@@ -1672,14 +1743,14 @@ export default function CreatorApp() {
                 )}
 
                 {/* ── All offers — horizontal scroll row ── */}
-                {!offersLoading && filteredOffers.length > 0 && (
+                {!offersLoading && !searchTerm && searchedOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>All offers</span>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink-35)' }}>{filteredOffers.length} available</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>All offers</span>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>{searchedOffers.length} available</span>
                     </div>
                     <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
-                      {filteredOffers.map((offer) => {
+                      {searchedOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
                         const slotsUsed = offer.slotsUsed || 0;
@@ -1752,8 +1823,8 @@ export default function CreatorApp() {
                 )}
 
                 {/* ── Trending — horizontal scroll row sorted by claims ── */}
-                {!offersLoading && (() => {
-                  const trendingOffers = [...filteredOffers]
+                {!offersLoading && !searchTerm && (() => {
+                  const trendingOffers = [...searchedOffers]
                     .filter(o => (o.slotsUsed || 0) > 0)
                     .sort((a, b) => (b.slotsUsed || 0) - (a.slotsUsed || 0))
                     .slice(0, 10);
@@ -1761,7 +1832,7 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 24 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Trending</span>
+                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Trending</span>
                       </div>
                       <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                         {trendingOffers.map((offer) => {
