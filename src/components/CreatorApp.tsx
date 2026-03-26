@@ -1508,7 +1508,7 @@ export default function CreatorApp() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                       {nearYouOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
@@ -1526,7 +1526,7 @@ export default function CreatorApp() {
                             }}
                           >
                             {/* Image area */}
-                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1577,8 +1577,8 @@ export default function CreatorApp() {
                               </button>
                             </div>
                             {/* Text below image — no container */}
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1595,7 +1595,7 @@ export default function CreatorApp() {
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                       {newThisWeekOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
@@ -1612,7 +1612,7 @@ export default function CreatorApp() {
                               cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1660,8 +1660,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1676,7 +1676,7 @@ export default function CreatorApp() {
                       <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>All offers</span>
                       <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink-35)' }}>{filteredOffers.length} available</span>
                     </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                       {filteredOffers.map((offer) => {
                         const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
@@ -1692,7 +1692,7 @@ export default function CreatorApp() {
                               cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
                               {offer.offer_photo_url ? (
                                 <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                               ) : (
@@ -1740,8 +1740,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1761,7 +1761,7 @@ export default function CreatorApp() {
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
                         <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'var(--ink)' }}>Trending</span>
                       </div>
-                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity', maskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)', WebkitMaskImage: 'linear-gradient(to right, black calc(100% - 40px), transparent 100%)' }}>
+                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                         {trendingOffers.map((offer) => {
                           const offerTitle = offer.generated_title || offer.description;
                           const isUnlimited = offer.monthly_cap === null;
@@ -1777,7 +1777,7 @@ export default function CreatorApp() {
                                 cursor: 'pointer', position: 'relative',
                               }}
                             >
-                              <div style={{ position: 'relative', height: 140, borderRadius: 12, overflow: 'hidden' }}>
+                              <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
                                 {offer.offer_photo_url ? (
                                   <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                 ) : (
@@ -1835,8 +1835,8 @@ export default function CreatorApp() {
                                   {slotsUsed} claimed
                                 </span>
                               </div>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                             </div>
                           );
                         })}
