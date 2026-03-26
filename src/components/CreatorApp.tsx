@@ -7,6 +7,7 @@ import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import LevelBadge from './LevelBadge';
 import { getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
+import { Logo } from './Logo';
 import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
 import { uploadAvatar } from '../lib/upload';
@@ -202,14 +203,7 @@ export default function CreatorApp() {
   const prevClaimStatusesRef = useRef<Record<string, string>>({});
   const passTouchRef = useRef<{ startX: number; startY: number } | null>(null);
 
-  // ─── Chunk 4: Swipe stack state ─────────────────────────────────────────
-  const [dismissedOfferIds, setDismissedOfferIds] = useState<Set<string>>(new Set());
-  const [showClaimSuccess, setShowClaimSuccess] = useState<{ offerTitle: string; businessName: string } | null>(null);
-  const [cardDragX, setCardDragX] = useState(0);
-  const [cardDragY, setCardDragY] = useState(0);
-  const [isDraggingCard, setIsDraggingCard] = useState(false);
-  const [swipeExiting, setSwipeExiting] = useState<'left' | 'right' | null>(null);
-  const cardDragStartRef = useRef<{ x: number; y: number } | null>(null);
+  // ─── Discovery feed state ─────────────────────────────────────────
 
   const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
 
@@ -718,108 +712,22 @@ export default function CreatorApp() {
     { key: 'all_offers' as const, label: 'All offers', icon: 'all_offers' as const },
   ];
 
-  // ─── Chunk 4: Swipe stack helpers ────────────────────────────────────────
+  // ─── Discovery feed helpers ────────────────────────────────────────
 
-  const getCategoryColour = (category: string): string => {
-    const lower = (category || '').toLowerCase();
-    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('bar') || lower.includes('pizza') || lower.includes('brunch') || lower.includes('dessert') || lower.includes('juice')) return 'var(--cat-food)';
-    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails') || lower.includes('barbershop') || lower.includes('skincare')) return 'var(--cat-beauty)';
-    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return 'var(--cat-cafe)';
-    if (lower.includes('wellness') || lower.includes('spa')) return 'var(--cat-wellness)';
-    if (lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return 'var(--cat-fitness)';
-    return 'var(--cat-fitness)';
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+    if (hour < 12) return 'Good morning';
+    if (hour < 18) return 'Good afternoon';
+    return 'Good evening';
   };
 
-  const getCategoryEmoji = (category: string): string => {
-    const lower = (category || '').toLowerCase();
-    if (lower.includes('food') || lower.includes('restaurant') || lower.includes('pizza') || lower.includes('brunch')) return '🍽️';
-    if (lower.includes('cafe') || lower.includes('coffee') || lower.includes('bakery')) return '☕';
-    if (lower.includes('beauty') || lower.includes('hair') || lower.includes('salon') || lower.includes('nails')) return '✂️';
-    if (lower.includes('wellness') || lower.includes('spa')) return '🧖';
-    if (lower.includes('fitness') || lower.includes('health') || lower.includes('gym')) return '💪';
-    if (lower.includes('retail') || lower.includes('shop')) return '🛍️';
-    if (lower.includes('art') || lower.includes('entertainment')) return '🎨';
-    if (lower.includes('education')) return '📚';
-    if (lower.includes('pet')) return '🐾';
-    return '✨';
-  };
-
-  const handleSwipeClaim = async (offer: Offer) => {
-    const offerTitle = offer.generated_title || offer.description;
-    const businessName = offer.businesses?.name || '';
-    const success = await handleClaim(offer);
-    if (success) {
-      // Override handleClaim's navigation to 'active' — stay on discover, show overlay
-      setView('offers');
-      setShowClaimSuccess({ offerTitle, businessName });
-    }
-  };
-
-  const startCardDrag = (startX: number, startY: number, offer: Offer, isTouch: boolean) => {
-    if (swipeExiting) return;
-    let dx = 0;
-    let dy = 0;
-    setIsDraggingCard(true);
-    setCardDragX(0);
-    setCardDragY(0);
-
-    const handleMove = (clientX: number, clientY: number) => {
-      dx = clientX - startX;
-      dy = clientY - startY;
-      setCardDragX(dx);
-      setCardDragY(dy);
-    };
-
-    const handleEnd = () => {
-      cleanup();
-      setIsDraggingCard(false);
-
-      if (dx > 85) {
-        setSwipeExiting('right');
-        setTimeout(() => {
-          setDismissedOfferIds(prev => new Set([...prev, offer.id]));
-          setSwipeExiting(null);
-          setCardDragX(0);
-          setCardDragY(0);
-          handleSwipeClaim(offer);
-        }, 280);
-      } else if (dx < -85) {
-        setSwipeExiting('left');
-        setTimeout(() => {
-          setDismissedOfferIds(prev => new Set([...prev, offer.id]));
-          setSwipeExiting(null);
-          setCardDragX(0);
-          setCardDragY(0);
-        }, 280);
-      } else {
-        setCardDragX(0);
-        setCardDragY(0);
-      }
-    };
-
-    const onMouseMove = (e: MouseEvent) => handleMove(e.clientX, e.clientY);
-    const onMouseUp = () => handleEnd();
-    const onTouchMove = (e: TouchEvent) => {
-      if (e.touches.length > 0) handleMove(e.touches[0].clientX, e.touches[0].clientY);
-    };
-    const onTouchEnd = () => handleEnd();
-
-    const cleanup = () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('mouseup', onMouseUp);
-      window.removeEventListener('touchmove', onTouchMove);
-      window.removeEventListener('touchend', onTouchEnd);
-      window.removeEventListener('touchcancel', onTouchEnd);
-    };
-
-    if (isTouch) {
-      window.addEventListener('touchmove', onTouchMove, { passive: true });
-      window.addEventListener('touchend', onTouchEnd);
-      window.addEventListener('touchcancel', onTouchEnd);
-    } else {
-      window.addEventListener('mousemove', onMouseMove);
-      window.addEventListener('mouseup', onMouseUp);
-    }
+  const toggleSave = (offerId: string) => {
+    setSavedOffers(prev => {
+      const next = new Set(prev);
+      if (next.has(offerId)) next.delete(offerId); else next.add(offerId);
+      localStorage.setItem('nayba_saved_offers', JSON.stringify([...next]));
+      return next;
+    });
   };
 
   // Helper to render business avatar
@@ -888,80 +796,6 @@ export default function CreatorApp() {
             >
               Keep going →
             </button>
-          </div>
-        </div>
-      )}
-
-      {/* Claim Success Overlay (Chunk 4 — swipe stack) */}
-      {showClaimSuccess && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center"
-          style={{ background: 'rgba(34,34,34,0.48)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}
-          onClick={() => setShowClaimSuccess(null)}
-        >
-          <div
-            style={{
-              background: 'var(--shell)',
-              borderRadius: 22,
-              padding: '28px 24px',
-              maxWidth: 320,
-              width: 'calc(100% - 48px)',
-              textAlign: 'center' as const,
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Checkmark circle */}
-            <div style={{
-              width: 46,
-              height: 46,
-              borderRadius: '50%',
-              background: 'var(--ink)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              margin: '0 auto 16px',
-            }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="20 6 9 17 4 12"/>
-              </svg>
-            </div>
-
-            <h3 style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontWeight: 800,
-              fontSize: 21,
-              color: 'var(--ink)',
-              margin: '0 0 8px',
-              letterSpacing: '-0.03em',
-            }}>{showClaimSuccess.offerTitle}</h3>
-
-            <p style={{
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              fontWeight: 400,
-              fontSize: 13,
-              color: 'var(--ink-60)',
-              margin: '0 0 20px',
-              lineHeight: 1.5,
-            }}>Show your QR code at the door. Post your reel within 48 hours of visiting.</p>
-
-            <button
-              onClick={() => {
-                setShowClaimSuccess(null);
-                setView('claims');
-              }}
-              style={{
-                width: '100%',
-                padding: '13px 0',
-                borderRadius: 999,
-                border: 'none',
-                background: 'var(--terra)',
-                color: 'white',
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                fontWeight: 700,
-                fontSize: 15,
-                cursor: 'pointer',
-              }}
-            >View my claims →</button>
           </div>
         </div>
       )}
@@ -1446,17 +1280,16 @@ export default function CreatorApp() {
         );
       })()}
 
-      <div className={`flex-1 ${view === 'offers' ? 'overflow-hidden' : 'overflow-y-auto'}`}>
-      <div className={`max-w-md mx-auto ${view === 'offers' ? 'h-full' : ''}`}>
+      <div className="flex-1 overflow-y-auto">
+      <div className="max-w-md mx-auto">
 
         {/* Content */}
-        <div className={view === 'offers' ? 'h-full' : 'pb-6'}>
+        <div className="pb-6">
 
-          {/* -- DISCOVER SWIPE STACK (Chunk 4) -- */}
+          {/* -- DISCOVER — VERTICAL SCROLL FEED -- */}
           {view === 'offers' && (() => {
-            // Filter stack: exclude dismissed, already claimed, and full offers
-            const stackOffers = offers.filter(o => {
-              if (dismissedOfferIds.has(o.id)) return false;
+            // Filter available offers: exclude already claimed and full offers
+            const feedOffers = offers.filter(o => {
               if (claims.some(c => c.offer_id === o.id && c.status !== 'expired')) return false;
               const isUnlimited = o.monthly_cap === null;
               if (!isUnlimited) {
@@ -1466,75 +1299,85 @@ export default function CreatorApp() {
               return true;
             });
 
-            const isEmpty = stackOffers.length === 0;
-            const totalCardCount = offers.filter(o => {
-              if (claims.some(c => c.offer_id === o.id && c.status !== 'expired')) return false;
-              const isUnlimited = o.monthly_cap === null;
-              if (!isUnlimited && Math.max(0, (o.monthly_cap as number) - (o.slotsUsed || 0)) === 0) return false;
-              return true;
-            }).length;
-            const viewedCount = totalCardCount - stackOffers.length;
+            // Apply category filter
+            const filteredOffers = selectedCategory === 'all'
+              ? feedOffers
+              : feedOffers.filter(o => getCategoryGroup(o.businesses.category) === selectedCategory);
+
+            // Split into near-you (horizontal row) and new-this-week (vertical list)
+            const nearYouOffers = filteredOffers.slice(0, 8);
+            const newThisWeekOffers = filteredOffers.slice(8);
+
+            // Extract city from first offer's address
+            const cityName = (() => {
+              const addr = offers[0]?.businesses?.address;
+              if (!addr) return '';
+              const parts = addr.split(',').map((s: string) => s.trim());
+              if (parts.length >= 3) return parts[parts.length - 2];
+              if (parts.length >= 2) return parts[1];
+              return parts[0];
+            })();
 
             return (
-              <div className="flex flex-col h-full" style={{ background: 'var(--shell)' }}>
-                {/* 1. Fixed header */}
-                <div style={{
-                  background: 'var(--shell)',
-                  borderBottom: '1px solid var(--ink-08)',
-                  padding: '12px 16px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'space-between',
-                  flexShrink: 0,
-                }}>
-                  <span style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    fontWeight: 800,
-                    fontSize: 26,
-                    color: 'var(--ink)',
-                    letterSpacing: '-0.03em',
-                  }}>nayba</span>
-
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    {/* Search button */}
-                    <div style={{
-                      width: 42,
-                      height: 42,
-                      background: 'var(--card)',
-                      border: '1.5px solid var(--ink-08)',
-                      borderRadius: 13,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      cursor: 'pointer',
-                    }}>
+              <div style={{ background: 'var(--shell)' }}>
+                {/* ── Header ── */}
+                <div style={{ padding: '16px 20px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                    <Logo variant="wordmark" size={15} color="var(--forest)" />
+                    <button
+                      onClick={() => setShowSearchBar(!showSearchBar)}
+                      style={{
+                        width: 42, height: 42, background: 'var(--card)', border: '1.5px solid var(--ink-08)',
+                        borderRadius: 13, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                      }}
+                    >
                       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                       </svg>
-                    </div>
-
-                    {/* Avatar initials */}
-                    <div style={{
-                      width: 30,
-                      height: 30,
-                      borderRadius: '50%',
-                      background: 'var(--card)',
-                      border: '1.5px solid var(--ink-08)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 600,
-                      fontSize: 10,
-                      color: 'var(--ink-60)',
-                    }}>
-                      {getInitials(userProfile?.display_name || userProfile?.name || '')}
-                    </div>
+                    </button>
                   </div>
+
+                  {/* Greeting */}
+                  <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'var(--ink)', letterSpacing: '-0.03em', margin: 0 }}>
+                    {getGreeting()}, {userProfile?.display_name?.split(' ')[0] || userProfile?.name?.split(' ')[0] || 'there'}
+                  </h1>
+
+                  {/* Location + offer count */}
+                  <p style={{ margin: '4px 0 0', fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {cityName && <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--terra)' }}>{cityName}</span>}
+                    {cityName && <span style={{ fontWeight: 400, fontSize: 15, color: 'var(--ink-60)' }}> · </span>}
+                    <span style={{ fontWeight: 400, fontSize: 15, color: 'var(--ink-60)' }}>{feedOffers.length} offer{feedOffers.length !== 1 ? 's' : ''} today</span>
+                  </p>
                 </div>
 
-                {/* 2. Active claim bar (conditional) */}
+                {/* ── Category icon row ── */}
+                <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '16px 20px 4px', scrollbarWidth: 'none' }}>
+                  {categoryTabs.map(cat => {
+                    const isActive = selectedCategory === cat.key;
+                    return (
+                      <button
+                        key={cat.key}
+                        onClick={() => setSelectedCategory(cat.key)}
+                        style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                      >
+                        <div style={{
+                          width: 48, height: 48, borderRadius: 14, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                          background: isActive ? 'var(--terra)' : 'var(--card)',
+                          border: isActive ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
+                          transition: 'all 0.15s ease',
+                        }}>
+                          <DoodleIcon name={cat.icon} size={20} style={{ color: isActive ? 'white' : 'var(--ink-35)' }} />
+                        </div>
+                        <span style={{
+                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11,
+                          color: isActive ? 'var(--terra)' : 'var(--ink-35)',
+                        }}>{cat.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* ── Active pass card (if any) ── */}
                 {activeClaims.length > 0 && activeClaims[0]?.businesses && activeClaims[0]?.offers && (() => {
                   const topClaim = activeClaims[0];
                   const claimTitle = topClaim.snapshot_generated_title || topClaim.offers.generated_title || topClaim.offers.description || '';
@@ -1544,507 +1387,225 @@ export default function CreatorApp() {
                       const diff = new Date(topClaim.reel_due_at).getTime() - Date.now();
                       if (diff <= 0) return 'Overdue';
                       const h = Math.floor(diff / (1000 * 60 * 60));
-                      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                      return `${h}h ${m}m`;
+                      return `${h}h left`;
                     }
                     if (topClaim.qr_expires_at) {
                       const diff = new Date(topClaim.qr_expires_at).getTime() - Date.now();
                       if (diff <= 0) return 'Expired';
                       const h = Math.floor(diff / (1000 * 60 * 60));
-                      const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                      return `${h}h ${m}m`;
+                      return `${h}h left`;
                     }
                     return 'Active';
                   })();
 
                   return (
                     <button
-                      onClick={() => setView('claims')}
+                      onClick={() => { setSelectedClaim(topClaim); setShowQrFullscreen(true); setQrOpenSource('home'); }}
                       style={{
-                        width: '100%',
-                        background: 'var(--ink)',
-                        padding: '10px 16px',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        flexShrink: 0,
-                        border: 'none',
-                        cursor: 'pointer',
-                        textAlign: 'left' as const,
+                        width: 'calc(100% - 40px)', margin: '16px 20px 0', background: 'var(--terra)', borderRadius: 20,
+                        padding: 20, border: 'none', cursor: 'pointer', textAlign: 'left', position: 'relative', overflow: 'hidden',
                       }}
                     >
-                      <div>
-                        <div style={{
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          fontWeight: 600,
-                          fontSize: 9,
-                          textTransform: 'uppercase' as const,
-                          letterSpacing: '1px',
-                          color: 'rgba(248,246,241,0.4)',
-                          marginBottom: 2,
-                        }}>ACTIVE CLAIM</div>
-                        <div style={{
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          fontWeight: 500,
-                          fontSize: 13,
-                          color: 'rgba(248,246,241,0.92)',
-                        }}>
-                          {claimTitle} · {claimBiz}
-                        </div>
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+                      {/* Decorative wave SVG */}
+                      <svg viewBox="0 0 400 60" style={{ position: 'absolute', bottom: 0, left: 0, width: '100%', height: 60, opacity: 0.11, fill: 'white', pointerEvents: 'none' }}>
+                        <path d="M0 30 Q100 0 200 30 T400 30 L400 60 L0 60 Z" />
+                      </svg>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(255,255,255,0.78)' }}>{claimBiz}</span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
                         <span style={{
-                          background: 'var(--terra)',
-                          borderRadius: 999,
-                          padding: '3px 8px',
-                          fontFamily: "'Plus Jakarta Sans', sans-serif",
-                          fontWeight: 600,
-                          fontSize: 10,
-                          color: 'var(--shell)',
-                        }}>{claimTimer}</span>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(248,246,241,0.4)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <path d="M9 18l6-6-6-6"/>
-                        </svg>
+                          background: 'rgba(245,196,160,0.22)', border: '1px solid rgba(245,196,160,0.35)', borderRadius: 999,
+                          padding: '3px 10px', display: 'inline-flex', alignItems: 'center', gap: 5,
+                        }}>
+                          <span style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--peach)' }} />
+                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 12, color: 'white' }}>{claimTimer}</span>
+                        </span>
+                      </div>
+                      <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 22, color: 'white', letterSpacing: '-0.04em', margin: '10px 0 12px' }}>{claimTitle}</h2>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <span style={{
+                          background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.25)', borderRadius: 999,
+                          padding: '6px 14px', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white',
+                        }}>Show at the door</span>
+                        <span style={{
+                          width: 38, height: 38, borderRadius: '50%', background: 'rgba(255,255,255,0.16)', border: '1px solid rgba(255,255,255,0.25)',
+                          display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        }}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" /><path d="M7 7h3v3H7zM14 7h3v3h-3zM7 14h3v3H7z" />
+                          </svg>
+                        </span>
                       </div>
                     </button>
                   );
                 })()}
 
-                {/* Claim error toast */}
+                {/* ── Claim error toast ── */}
                 {claimError && (
-                  <div style={{
-                    margin: '8px 14px 0',
-                    padding: '10px 14px',
-                    borderRadius: 12,
-                    background: 'rgba(34,34,34,0.05)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    flexShrink: 0,
-                  }}>
-                    <p style={{ fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
-                    <button onClick={() => setClaimError(null)} style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
+                  <div style={{ margin: '8px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(34,34,34,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
+                    <button onClick={() => setClaimError(null)} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
                   </div>
                 )}
 
-                {/* 3. Card stack OR loading OR empty state */}
-                {offersLoading ? (
-                  <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                {/* ── Loading state ── */}
+                {offersLoading && (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
                     <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
                   </div>
-                ) : isEmpty ? (
-                  /* Empty state */
-                  <div style={{
-                    flex: 1,
-                    display: 'flex',
-                    flexDirection: 'column' as const,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    background: 'var(--shell)',
-                    padding: '0 32px',
-                    gap: 8,
-                  }}>
-                    <h2 style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 600,
-                      fontSize: 24,
-                      color: 'var(--ink)',
-                      margin: 0,
-                      letterSpacing: '-0.03em',
-                    }}>All caught up</h2>
-                    <p style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                      fontWeight: 400,
-                      fontSize: 14,
-                      color: 'var(--ink-60)',
-                      textAlign: 'center' as const,
-                      lineHeight: 1.5,
-                      margin: '0 0 16px',
-                    }}>New offers drop every Tuesday. Browse everything live below.</p>
-                    <button
-                      onClick={() => setView('all_offers')}
-                      style={{
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                        fontWeight: 700,
-                        fontSize: 15,
-                        color: 'white',
-                        background: 'var(--terra)',
-                        border: 'none',
-                        borderRadius: 999,
-                        padding: '13px 24px',
-                        cursor: 'pointer',
-                      }}
-                    >Browse all offers</button>
-                  </div>
-                ) : (
-                  <>
-                    {/* Card stack area */}
-                    <div style={{ flex: 1, position: 'relative' as const, overflow: 'hidden' }}>
-                      {stackOffers.slice(0, 3).map((offer, idx) => {
-                        const isTop = idx === 0;
+                )}
 
+                {/* ── Empty state ── */}
+                {!offersLoading && filteredOffers.length === 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '60px 32px', gap: 8 }}>
+                    <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
+                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>New offers drop every Tuesday.</p>
+                  </div>
+                )}
+
+                {/* ── Near you — horizontal card row ── */}
+                {!offersLoading && nearYouOffers.length > 0 && (
+                  <div style={{ marginTop: 20 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Near you</span>
+                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>See all</button>
+                    </div>
+                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none' }}>
+                      {nearYouOffers.map((offer) => {
+                        const offerTitle = offer.generated_title || offer.description;
                         const isUnlimited = offer.monthly_cap === null;
                         const slotsUsed = offer.slotsUsed || 0;
                         const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-
-                        let transform = '';
-                        let transition = 'transform 0.28s ease';
-                        const zIndex = idx === 0 ? 10 : idx === 1 ? 1 : 0;
-
-                        if (isTop) {
-                          if (swipeExiting === 'right') {
-                            transform = `translateX(${window.innerWidth}px) rotate(20deg)`;
-                          } else if (swipeExiting === 'left') {
-                            transform = `translateX(-${window.innerWidth}px) rotate(-20deg)`;
-                          } else if (isDraggingCard) {
-                            transform = `translateX(${cardDragX}px) translateY(${cardDragY * 0.12}px) rotate(${cardDragX * 0.04}deg)`;
-                            transition = 'none';
-                          }
-                        } else if (idx === 1) {
-                          const progress = isDraggingCard ? Math.min(Math.abs(cardDragX) / 85, 1) : 0;
-                          const scale = 0.96 + (0.04 * progress);
-                          const ty = 10 - (10 * progress);
-                          transform = `scale(${scale}) translateY(${ty}px)`;
-                          if (isDraggingCard) transition = 'none';
-                        } else if (idx === 2) {
-                          const progress = isDraggingCard ? Math.min(Math.abs(cardDragX) / 85, 1) : 0;
-                          const scale = 0.92 + (0.04 * progress);
-                          const ty = 20 - (10 * progress);
-                          transform = `scale(${scale}) translateY(${ty}px)`;
-                          if (isDraggingCard) transition = 'none';
-                        }
-
-                        const defaultTransform = idx === 1 ? 'scale(0.96) translateY(10px)' : idx === 2 ? 'scale(0.92) translateY(20px)' : 'none';
-                        const categoryColour = getCategoryColour(offer.businesses.category);
-                        const categoryEmoji = getCategoryEmoji(offer.businesses.category);
-                        const offerTitle = offer.generated_title || offer.description;
-                        const bizAddress = offer.businesses.address || '';
-                        const streetName = bizAddress.split(',')[0] || '';
-                        const hintOpacity = isTop && isDraggingCard ? Math.min(Math.abs(cardDragX) / 60, 1) : 0;
+                        const isSaved = savedOffers.has(offer.id);
 
                         return (
                           <div
                             key={offer.id}
+                            onClick={() => setExpandedOffer(offer.id)}
                             style={{
-                              position: 'absolute' as const,
-                              top: 8,
-                              left: 12,
-                              right: 12,
-                              bottom: 4,
-                              zIndex,
-                              transform: transform || defaultTransform,
-                              transition,
-                              borderRadius: 18,
-                              border: '1px solid var(--ink-08)',
-                              boxShadow: '0 2px 16px rgba(34,34,34,0.07)',
-                              background: 'var(--shell)',
-                              display: 'flex',
-                              flexDirection: 'column' as const,
-                              overflow: 'hidden',
-                              touchAction: isTop ? 'none' as const : 'auto' as const,
-                              userSelect: 'none' as const,
-                              WebkitUserSelect: 'none' as const,
+                              width: 170, flexShrink: 0, background: 'var(--card)', border: '1px solid var(--ink-08)',
+                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer', boxShadow: 'var(--shadow-md)',
                             }}
-                            onMouseDown={isTop ? (e: React.MouseEvent) => {
-                              e.preventDefault();
-                              startCardDrag(e.clientX, e.clientY, offer, false);
-                            } : undefined}
-                            onTouchStart={isTop ? (e: React.TouchEvent) => {
-                              startCardDrag(e.touches[0].clientX, e.touches[0].clientY, offer, true);
-                            } : undefined}
                           >
-                            {/* Swipe hint labels */}
-                            {isTop && (
-                              <>
-                                <div style={{
-                                  position: 'absolute' as const,
-                                  left: 16,
-                                  top: 16,
-                                  zIndex: 20,
-                                  transform: 'rotate(-8deg)',
-                                  opacity: cardDragX > 0 ? hintOpacity : 0,
-                                  background: '#4E9468',
-                                  borderRadius: 999,
-                                  padding: '6px 16px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                  fontWeight: 700,
-                                  fontSize: 14,
-                                  textTransform: 'uppercase' as const,
-                                  letterSpacing: '1.2px',
-                                  color: '#fff',
-                                  pointerEvents: 'none' as const,
-                                  boxShadow: '0 2px 8px rgba(78,148,104,0.35)',
-                                }}>CLAIM</div>
-                                <div style={{
-                                  position: 'absolute' as const,
-                                  right: 16,
-                                  top: 16,
-                                  zIndex: 20,
-                                  transform: 'rotate(8deg)',
-                                  opacity: cardDragX < 0 ? hintOpacity : 0,
-                                  background: 'var(--terra)',
-                                  borderRadius: 999,
-                                  padding: '6px 16px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                  fontWeight: 700,
-                                  fontSize: 14,
-                                  textTransform: 'uppercase' as const,
-                                  letterSpacing: '1.2px',
-                                  color: '#fff',
-                                  pointerEvents: 'none' as const,
-                                  boxShadow: '0 2px 8px rgba(196,103,74,0.35)',
-                                }}>PASS</div>
-                              </>
-                            )}
-
-                            {/* Emoji zone — proportional, flat category colour */}
-                            <div style={{ flex: '2 0 0', position: 'relative' as const, overflow: 'hidden', minHeight: 120 }}>
-                              <div style={{
-                                width: '100%',
-                                height: '100%',
-                                background: categoryColour,
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                              }}>
-                                <span style={{ fontSize: 64, filter: 'drop-shadow(0 2px 6px rgba(34,34,34,0.10))', lineHeight: 1 }}>
-                                  {categoryEmoji}
-                                </span>
-                              </div>
-
+                            {/* Image zone */}
+                            <div style={{ width: '100%', height: 140, position: 'relative', overflow: 'hidden' }}>
+                              {offer.offer_photo_url ? (
+                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                </div>
+                              )}
+                              {/* Gradient overlay */}
+                              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '30%', background: 'linear-gradient(transparent, rgba(34,34,34,0.18))', pointerEvents: 'none' }} />
+                              {/* Heart button */}
+                              <button
+                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                                style={{
+                                  position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
+                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none',
+                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
+                                }}
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                </svg>
+                              </button>
                               {/* Slot badge */}
                               {!isUnlimited && slotsLeft !== null && slotsLeft <= 3 && (
                                 <span style={{
-                                  position: 'absolute' as const,
-                                  top: 12,
-                                  right: 12,
-                                  borderRadius: 999,
-                                  padding: '4px 10px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                  fontWeight: 700,
-                                  fontSize: 11,
-                                  ...(slotsLeft === 1 ? {
-                                    background: 'var(--terra)',
-                                    color: 'white',
-                                  } : {
-                                    background: 'var(--terra-10)',
-                                    color: 'var(--terra)',
-                                  }),
+                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '3px 10px',
+                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
+                                  ...(slotsLeft === 1
+                                    ? { background: 'var(--terra)', color: 'white' }
+                                    : { background: 'var(--terra-10)', color: 'var(--terra)' }),
                                 }}>
-                                  {slotsLeft === 1 ? 'Last slot' : `${slotsLeft} left`}
+                                  {slotsLeft === 1 ? '● Last slot' : `${slotsLeft} left`}
                                 </span>
                               )}
                             </div>
-
-                            {/* Info panel */}
-                            <div style={{
-                              flex: '3 0 0',
-                              background: 'var(--shell)',
-                              borderTop: '1px solid var(--ink-08)',
-                              padding: '20px 20px 16px',
-                              display: 'flex',
-                              flexDirection: 'column' as const,
-                              justifyContent: 'center',
-                              overflow: 'hidden',
-                            }}>
-                              {/* Category label */}
-                              <span style={{
-                                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                fontWeight: 600,
-                                fontSize: 11,
-                                textTransform: 'uppercase' as const,
-                                letterSpacing: '1.2px',
-                                color: 'var(--ink-35)',
-                                marginBottom: 6,
-                              }}>{offer.businesses.category}</span>
-
-                              {/* Offer title */}
-                              <span style={{
-                                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                fontWeight: 400,
-                                fontSize: 26,
-                                letterSpacing: '-0.03em',
-                                color: 'var(--ink)',
-                                lineHeight: 1.12,
-                                marginBottom: 14,
-                              }}>{offerTitle}</span>
-
-                              {/* Business row */}
-                              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: offer.specific_ask ? 12 : 0 }}>
-                                <div style={{ minWidth: 0, flex: 1 }}>
-                                  <span style={{
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                    fontWeight: 500,
-                                    fontSize: 14,
-                                    color: 'var(--ink-60)',
-                                    display: 'block',
-                                    marginBottom: 2,
-                                  }}>{offer.businesses.name}</span>
-                                  {streetName && (
-                                    <span style={{
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                      fontWeight: 400,
-                                      fontSize: 13,
-                                      color: 'var(--ink-35)',
-                                    }}>{streetName}</span>
-                                  )}
-                                </div>
-                                <div style={{
-                                  background: 'var(--card)',
-                                  border: '1px solid var(--ink-08)',
-                                  borderRadius: 999,
-                                  padding: '4px 10px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                  fontWeight: 500,
-                                  fontSize: 11,
-                                  color: 'var(--ink-35)',
-                                  flexShrink: 0,
-                                  marginLeft: 8,
-                                }}>Nearby</div>
-                              </div>
-
-                              {/* Brief / specific ask */}
-                              {offer.specific_ask && (
-                                <div style={{
-                                  background: 'var(--card)',
-                                  borderRadius: 10,
-                                  padding: '10px 12px',
-                                }}>
-                                  <span style={{
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                    fontWeight: 400,
-                                    fontSize: 13,
-                                    color: 'var(--ink-60)',
-                                    lineHeight: 1.5,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 2,
-                                    WebkitBoxOrient: 'vertical' as const,
-                                    overflow: 'hidden',
-                                  }}><span style={{ fontWeight: 600, fontSize: 11, letterSpacing: '0.3px', color: 'var(--ink-35)' }}>Brief:</span> {offer.specific_ask}</span>
-                                </div>
-                              )}
+                            {/* Info */}
+                            <div style={{ padding: '10px 12px 12px' }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'var(--ink)', margin: 0, lineHeight: 1.3, display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)', margin: '4px 0 0' }}>{offer.businesses.name}</p>
                             </div>
                           </div>
                         );
                       })}
                     </div>
-
-                    {/* 4. Progress dots */}
-                    {totalCardCount > 0 && (
-                      <div style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        gap: 5,
-                        padding: '6px 0',
-                        flexShrink: 0,
-                      }}>
-                        {totalCardCount <= 20 ? Array.from({ length: totalCardCount }, (_, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              width: 6,
-                              height: 6,
-                              borderRadius: '50%',
-                              background: i === viewedCount ? 'var(--ink-60)' : 'var(--ink-08)',
-                              transform: i === viewedCount ? 'scale(1.2)' : 'none',
-                              transition: 'background 0.2s, transform 0.2s',
-                            }}
-                          />
-                        )) : (
-                          /* Too many dots — show count instead */
-                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 11, color: 'var(--ink-35)' }}>
-                            {viewedCount + 1} / {totalCardCount}
-                          </span>
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {/* 5. Action buttons — only when cards exist */}
-                {!isEmpty && !offersLoading && (
-                  <div style={{
-                    background: 'var(--shell)',
-                    borderTop: '1px solid var(--ink-08)',
-                    padding: '8px 0 24px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: 20,
-                    flexShrink: 0,
-                  }}>
-                    {/* Pass button */}
-                    <button
-                      onClick={() => {
-                        if (stackOffers.length === 0 || swipeExiting) return;
-                        setSwipeExiting('left');
-                        setTimeout(() => {
-                          setDismissedOfferIds(prev => new Set([...prev, stackOffers[0].id]));
-                          setSwipeExiting(null);
-                          setCardDragX(0);
-                          setCardDragY(0);
-                        }, 280);
-                      }}
-                      style={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: '50%',
-                        background: 'var(--card)',
-                        border: '1px solid var(--ink-08)',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        transition: 'transform 0.12s',
-                      }}
-                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
-                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--ink-60)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <line x1="18" y1="6" x2="6" y2="18"/>
-                        <line x1="6" y1="6" x2="18" y2="18"/>
-                      </svg>
-                    </button>
-
-                    {/* Claim button */}
-                    <button
-                      onClick={() => {
-                        if (stackOffers.length === 0 || swipeExiting) return;
-                        const topOffer = stackOffers[0];
-                        setSwipeExiting('right');
-                        setTimeout(() => {
-                          setDismissedOfferIds(prev => new Set([...prev, topOffer.id]));
-                          setSwipeExiting(null);
-                          setCardDragX(0);
-                          setCardDragY(0);
-                          handleSwipeClaim(topOffer);
-                        }, 280);
-                      }}
-                      style={{
-                        width: 56,
-                        height: 56,
-                        borderRadius: '50%',
-                        background: 'var(--terra)',
-                        border: 'none',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        cursor: 'pointer',
-                        boxShadow: '0 4px 14px rgba(196,103,74,0.25)',
-                        transition: 'transform 0.12s',
-                      }}
-                      onMouseDown={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(0.9)'; }}
-                      onMouseUp={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.transform = 'scale(1)'; }}
-                    >
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
-                    </button>
                   </div>
                 )}
+
+                {/* ── New this week — vertical list cards ── */}
+                {!offersLoading && newThisWeekOffers.length > 0 && (
+                  <div style={{ marginTop: 24, padding: '0 20px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
+                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>New this week</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+                      {newThisWeekOffers.map((offer) => {
+                        const offerTitle = offer.generated_title || offer.description;
+                        const isUnlimited = offer.monthly_cap === null;
+                        const slotsUsed = offer.slotsUsed || 0;
+                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
+                        const isSaved = savedOffers.has(offer.id);
+
+                        return (
+                          <div
+                            key={offer.id}
+                            onClick={() => setExpandedOffer(offer.id)}
+                            style={{
+                              display: 'flex', flexDirection: 'row', background: 'var(--card)', border: '1px solid var(--ink-08)',
+                              borderRadius: 16, overflow: 'hidden', cursor: 'pointer', boxShadow: 'var(--shadow-md)',
+                            }}
+                          >
+                            {/* Image */}
+                            <div style={{ width: 100, height: 100, flexShrink: 0, overflow: 'hidden' }}>
+                              {offer.offer_photo_url ? (
+                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                              ) : (
+                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                </div>
+                              )}
+                            </div>
+                            {/* Info */}
+                            <div style={{ flex: 1, padding: '10px 12px', display: 'flex', flexDirection: 'column', justifyContent: 'center', minWidth: 0 }}>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: 0, lineHeight: 1.3 }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)', margin: '3px 0 0' }}>{offer.businesses.name}</p>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
+                                {!isUnlimited && slotsLeft !== null && slotsLeft <= 3 && (
+                                  <span style={{
+                                    borderRadius: 999, padding: '3px 10px', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11,
+                                    ...(slotsLeft === 1
+                                      ? { background: 'var(--terra)', color: 'white' }
+                                      : { background: 'var(--terra-10)', color: 'var(--terra)' }),
+                                  }}>
+                                    {slotsLeft === 1 ? '● Last slot' : `${slotsLeft} left`}
+                                  </span>
+                                )}
+                                <div style={{ flex: 1 }} />
+                                <button
+                                  onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
+                                  style={{
+                                    width: 32, height: 32, borderRadius: '50%', background: 'var(--ink-08)', border: 'none',
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', flexShrink: 0,
+                                  }}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom spacer for nav clearance */}
+                <div style={{ height: 24 }} />
               </div>
             );
           })()}
