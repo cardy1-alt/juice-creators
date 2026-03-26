@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { MessageCircle, X } from 'lucide-react';
 import { sendFeedbackEmail } from '../lib/notifications';
 
 interface FeedbackButtonProps {
@@ -49,7 +49,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
           style={{ background: 'var(--terra)', boxShadow: 'var(--shadow-lg)' }}
           aria-label="Send feedback"
         >
-          <DoodleIcon name="message" size={18} className="text-white" />
+          <MessageCircle size={18} strokeWidth={1.5} className="text-white" />
         </button>
       )}
 
@@ -70,7 +70,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                 className="w-[32px] h-[32px] flex items-center justify-center rounded-full transition-colors"
                 style={{ background: 'var(--card)' }}
               >
-                <DoodleIcon name="x" size={16} className="text-[var(--ink-35)]" />
+                <X size={16} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 

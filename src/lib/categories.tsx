@@ -1,9 +1,9 @@
 import React from 'react';
 import {
-  DoodleCutlery, DoodleScissors, DoodleDumbbell, DoodleBag,
-  DoodleCoffee, DoodlePaintBrush, DoodleFlower, DoodlePawPrint,
-  DoodleGradCap, DoodleWrench, DoodleShop,
-} from './doodle-icons';
+  UtensilsCrossed, Scissors, Dumbbell, ShoppingBag,
+  Coffee, Paintbrush, Flower2, PawPrint,
+  GraduationCap, Wrench, Store,
+} from 'lucide-react';
 
 export const CATEGORY_ICONS: Record<string, string> = {
   'Food & Drink': 'Cutlery',
@@ -74,23 +74,23 @@ export function getCategoryBorderColor(category: string | undefined | null): str
 }
 
 const ICON_COMPONENTS: Record<string, React.FC<any>> = {
-  Cutlery: DoodleCutlery,
-  Scissors: DoodleScissors,
-  Dumbbell: DoodleDumbbell,
-  Bag: DoodleBag,
-  Coffee: DoodleCoffee,
-  PaintBrush: DoodlePaintBrush,
-  Flower: DoodleFlower,
-  PawPrint: DoodlePawPrint,
-  GradCap: DoodleGradCap,
-  Wrench: DoodleWrench,
-  Shop: DoodleShop,
+  Cutlery: UtensilsCrossed,
+  Scissors: Scissors,
+  Dumbbell: Dumbbell,
+  Bag: ShoppingBag,
+  Coffee: Coffee,
+  PaintBrush: Paintbrush,
+  Flower: Flower2,
+  PawPrint: PawPrint,
+  GradCap: GraduationCap,
+  Wrench: Wrench,
+  Shop: Store,
 };
 
 export function CategoryIcon({ category, className = "w-4 h-4", style }: { category: string | undefined | null; className?: string; style?: React.CSSProperties }) {
   const iconName = getCategoryIconName(category);
-  const IconComponent = ICON_COMPONENTS[iconName] || DoodleShop;
-  return <IconComponent className={className} style={style} />;
+  const IconComponent = ICON_COMPONENTS[iconName] || Store;
+  return <IconComponent className={className} style={style} strokeWidth={1.5} />;
 }
 
 const CATEGORY_SOLID_COLORS: Record<string, string> = {

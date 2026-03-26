@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { MapPin, Eye, EyeOff, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, Instagram, Lock } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -146,7 +146,7 @@ function AddressAutocomplete({ value, onChange }: {
         background: 'var(--card)',
         boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
       }}>
-        <DoodleIcon name="map-pin" size={16} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
+        <MapPin size={16} strokeWidth={1.5} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'
         }`} />
         <input
@@ -173,7 +173,7 @@ function AddressAutocomplete({ value, onChange }: {
               onClick={() => handleSelect(s)}
               className="w-full text-left px-[14px] py-[12px] text-[15px] text-[var(--ink)] hover:bg-[var(--shell)] transition-colors flex items-center gap-[10px]" style={{ borderBottom: '1px solid var(--ink-08)' }}
             >
-              <DoodleIcon name="map-pin" size={14} className="text-[var(--ink-35)] flex-shrink-0" />
+              <MapPin size={14} strokeWidth={1.5} className="text-[var(--ink-35)] flex-shrink-0" />
               <span className="truncate">{s.description}</span>
             </button>
           ))}
@@ -209,7 +209,11 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
         }`}>
-          <DoodleIcon name={iconName} size={16} />
+          {iconName === 'user' && <User size={16} strokeWidth={1.5} />}
+          {iconName === 'instagram' && <Instagram size={16} strokeWidth={1.5} />}
+          {iconName === 'mail' && <Mail size={16} strokeWidth={1.5} />}
+          {iconName === 'lock' && <Lock size={16} strokeWidth={1.5} />}
+          {iconName === 'shop' && <Store size={16} strokeWidth={1.5} />}
         </span>
       )}
       <input
@@ -369,7 +373,7 @@ export default function Auth() {
               minLength={8}
               rightElement={
                 <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                  {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
+                  {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                 </button>
               }
             />
@@ -425,13 +429,13 @@ export default function Auth() {
               onClick={() => setForgotPassword(false)}
               className="flex items-center gap-[6px] text-[13px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
             >
-              <DoodleIcon name="arrow-left" size={14} className="" /> Back to sign in
+              <ChevronLeft size={14} strokeWidth={1.5} /> Back to sign in
             </button>
 
             {resetSent ? (
               <div className="text-center py-[32px]">
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
-                  <DoodleIcon name="mail" size={24} className="text-[var(--terra)]" />
+                  <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
                 <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
@@ -493,7 +497,7 @@ export default function Auth() {
                 }}
               >
                 <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'creator' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <DoodleIcon name="sparkles" size={18} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
+                  <Sparkles size={18} strokeWidth={1.5} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'creator' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Creator
@@ -514,7 +518,7 @@ export default function Auth() {
                 }}
               >
                 <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'business' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <DoodleIcon name="shop" size={18} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
+                  <Store size={18} strokeWidth={1.5} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
                 </div>
                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'business' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Business
@@ -533,7 +537,7 @@ export default function Auth() {
                     background: signupStep >= step ? 'var(--terra)' : 'var(--ink-08)',
                     color: signupStep >= step ? 'white' : 'var(--ink-35)',
                   }}>
-                    {signupStep > step ? <DoodleIcon name="check" size={13} className="" /> : step}
+                    {signupStep > step ? <Check size={13} strokeWidth={1.5} /> : step}
                   </div>
                   {step < 3 && <div className="w-[24px] h-[2px] rounded-full transition-colors duration-300" style={{ background: signupStep > step ? 'var(--terra)' : 'var(--ink-08)' }} />}
                 </div>
@@ -589,7 +593,7 @@ export default function Auth() {
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Date of Birth</label>
                       <div className="flex items-center gap-[8px]">
-                        <DoodleIcon name="cake" size={16} className="text-[var(--ink-35)] flex-shrink-0" />
+                        <Cake size={16} strokeWidth={1.5} className="text-[var(--ink-35)] flex-shrink-0" />
                         <select
                           value={dobDay}
                           onChange={(e) => setDobDay(e.target.value)}
@@ -652,7 +656,7 @@ export default function Auth() {
                       minLength={8}
                       rightElement={
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                          {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
+                          {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                         </button>
                       }
                     />
@@ -736,7 +740,7 @@ export default function Auth() {
                       minLength={8}
                       rightElement={
                         <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                          {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
+                          {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                         </button>
                       }
                     />
@@ -762,7 +766,7 @@ export default function Auth() {
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                       className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
                     >
-                      <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
+                      <ChevronLeft size={18} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
                   )}
                   <button
@@ -790,7 +794,7 @@ export default function Auth() {
                     className="flex-1 min-h-[52px] text-white transition-all active:scale-[0.98] inline-flex items-center justify-center gap-[6px]"
                     style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                   >
-                    Continue <DoodleIcon name="arrow-right" size={16} className="" />
+                    Continue <ChevronRight size={16} strokeWidth={1.5} />
                   </button>
                 </div>
               ) : (
@@ -800,7 +804,7 @@ export default function Auth() {
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
                     className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
                   >
-                    <DoodleIcon name="arrow-left" size={18} className="text-[var(--ink)]" />
+                    <ChevronLeft size={18} strokeWidth={1.5} className="text-[var(--ink)]" />
                   </button>
                   <button
                     type="submit"

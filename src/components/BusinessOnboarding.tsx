@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { ChevronLeft, Camera, Minus, Plus, Check, Gift, Sparkles, Tag, Star, type LucideIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
 import { CategoryIcon, getCategorySolidColor } from '../lib/categories';
@@ -174,6 +174,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
   const totalScreens = 4; // progress dots for screens 1-4 (screen 5 is success, no dots)
   const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
 
+  const iconMap: Record<string, LucideIcon> = { gift: Gift, sparkles: Sparkles, tag: Tag, star: Star };
   const offerTiles = [
     { key: 'product', label: 'Free Product', icon: 'gift', sub: 'Coffee, meal, item' },
     { key: 'service', label: 'Free Service', icon: 'sparkles', sub: 'Haircut, facial, class' },
@@ -199,7 +200,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
         <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
           {screen > 1 ? (
             <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
-              <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink-35)]" />
+              <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
             </button>
           ) : (
             <div className="w-[40px]" />
@@ -354,7 +355,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                     className="absolute -bottom-[4px] -right-[4px] w-[24px] h-[24px] rounded-full flex items-center justify-center"
                     style={{ background: 'var(--terra)' }}
                   >
-                    <DoodleIcon name="camera" size={12} className="text-white" />
+                    <Camera size={12} strokeWidth={1.5} className="text-white" />
                   </div>
                 </button>
                 <input
@@ -439,7 +440,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                       background: offerType === t.key ? 'var(--terra-5)' : 'var(--card)',
                     }}
                   >
-                    <DoodleIcon name={t.icon} size={24} className="text-[var(--ink)]" />
+                    {(() => { const Icon = iconMap[t.icon]; return Icon ? <Icon size={24} strokeWidth={1.5} className="text-[var(--ink)]" /> : null; })()}
                     <div className="text-center">
                       <p style={pjs(700, '16px', 'var(--ink)')}>{t.label}</p>
                       <p style={pjs(400, '13px', 'var(--ink-60)', { marginTop: '2px' })}>{t.sub}</p>
@@ -532,7 +533,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           className="w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all"
                           style={{ background: 'var(--card)', border: '1.5px solid var(--ink-08)' }}
                         >
-                          <DoodleIcon name="minus" size={18} className="text-[var(--ink-60)]" />
+                          <Minus size={18} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                         </button>
                         <span style={pjs(800, '28px', 'var(--ink)', { minWidth: '48px', textAlign: 'center', display: 'inline-block' })}>
                           {monthlySlots}
@@ -542,7 +543,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                           className="w-[44px] h-[44px] rounded-full flex items-center justify-center transition-all"
                           style={{ background: 'var(--terra)' }}
                         >
-                          <DoodleIcon name="plus" size={18} className="text-white" />
+                          <Plus size={18} strokeWidth={1.5} className="text-white" />
                         </button>
                       </div>
                       <p style={pjs(400, '14px', 'var(--ink-35)', { textAlign: 'center', marginTop: '8px' })}>
@@ -613,7 +614,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
                 style={{ background: '#C8B8F0', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
               />
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <DoodleIcon name="check" size={48} className="text-[var(--terra)]" />
+                <Check size={48} strokeWidth={1.5} className="text-[var(--terra)]" />
               </div>
             </div>
 

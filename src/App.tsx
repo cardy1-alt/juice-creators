@@ -4,7 +4,7 @@ import Auth from './components/Auth';
 import CreatorApp from './components/CreatorApp';
 import BusinessPortal from './components/BusinessPortal';
 import AdminDashboard from './components/AdminDashboard';
-import { DoodleIcon } from './lib/doodle-icons';
+import { AlertCircle, RefreshCw, QrCode, LogOut } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMessage: string }> {
@@ -30,7 +30,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
         <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
           <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
-              <DoodleIcon name="alert-circle" size={28} className="text-[var(--terra)]" />
+              <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
             <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">Something went wrong</h2>
             <p className="text-[var(--mid)] text-base mb-4">An unexpected error occurred. Please refresh the page.</p>
@@ -41,7 +41,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
               onClick={() => window.location.reload()}
               className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
             >
-              <DoodleIcon name="refresh-cw" size={16} />
+              <RefreshCw size={16} strokeWidth={1.5} />
               Refresh
             </button>
           </div>
@@ -92,7 +92,7 @@ function RedeemLanding() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
       <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
-          <DoodleIcon name="qr-code" size={28} className="text-[var(--terra)]" />
+          <QrCode size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
         </div>
         <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">
           Creator Pass
@@ -153,7 +153,7 @@ function App() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
       <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-md text-center">
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
-          <DoodleIcon name="alert-circle" size={28} className="text-[var(--terra)]" />
+          <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
         </div>
         <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">
           Account Not Found
@@ -165,7 +165,7 @@ function App() {
           onClick={signOut}
           className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
         >
-          <DoodleIcon name="logout" size={16} />
+          <LogOut size={16} strokeWidth={1.5} />
           Sign Out
         </button>
       </div>

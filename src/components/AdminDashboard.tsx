@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Settings, Store, Tag, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
@@ -12,12 +12,12 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   const badgeStyle: React.CSSProperties = { fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, padding: '3px 10px' };
   if (type === 'approval') {
     return status === 'approved'
-      ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><DoodleIcon name="check" size={12} /> Approved</span>
+      ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><Check size={12} strokeWidth={1.5} /> Approved</span>
       : <span className={`${badgeBase} bg-[var(--terra)] text-white`} style={badgeStyle}>Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
-      ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><DoodleIcon name="check" size={12} /> Live</span>
+      ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><Check size={12} strokeWidth={1.5} /> Live</span>
       : <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink-35)]`} style={badgeStyle}>Paused</span>;
   }
   const styles: Record<string, string> = {
@@ -182,19 +182,19 @@ export default function AdminDashboard() {
   };
 
   const statCardData = [
-    { iconName: 'users' as const, value: stats.totalCreators, label: 'Total Creators' },
-    { iconName: 'store' as const, value: stats.totalBusinesses, label: 'Total Businesses' },
-    { iconName: 'clipboard-list' as const, value: stats.totalClaims, label: 'Claims This Month' },
-    { iconName: 'film' as const, value: stats.totalReels, label: 'Reels Posted' },
+    { Icon: Users, value: stats.totalCreators, label: 'Total Creators' },
+    { Icon: Store, value: stats.totalBusinesses, label: 'Total Businesses' },
+    { Icon: ClipboardList, value: stats.totalClaims, label: 'Claims This Month' },
+    { Icon: Clapperboard, value: stats.totalReels, label: 'Reels Posted' },
   ];
 
   const tabData = [
-    { key: 'stats' as const, label: 'Overview', iconName: 'bar-chart' as const },
-    { key: 'creators' as const, label: 'Creators', iconName: 'users' as const, badge: stats.pendingCreators },
-    { key: 'businesses' as const, label: 'Businesses', iconName: 'store' as const, badge: stats.pendingBusinesses },
-    { key: 'offers' as const, label: 'Offers', iconName: 'bag' as const },
-    { key: 'claims' as const, label: 'Claims', iconName: 'clipboard-list' as const },
-    { key: 'settings' as const, label: 'Settings', iconName: 'settings' as const },
+    { key: 'stats' as const, label: 'Overview', Icon: BarChart },
+    { key: 'creators' as const, label: 'Creators', Icon: Users, badge: stats.pendingCreators },
+    { key: 'businesses' as const, label: 'Businesses', Icon: Store, badge: stats.pendingBusinesses },
+    { key: 'offers' as const, label: 'Offers', Icon: Tag },
+    { key: 'claims' as const, label: 'Claims', Icon: ClipboardList },
+    { key: 'settings' as const, label: 'Settings', Icon: Settings },
   ];
 
   return (
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
               </div>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
-              <DoodleIcon name="logout" size={18} className="text-[var(--soft)]" />
+              <LogOut size={18} strokeWidth={1.5} className="text-[var(--soft)]" />
             </button>
           </div>
         </div>
@@ -231,7 +231,7 @@ export default function AdminDashboard() {
               style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: view === tab.key ? 700 : 600, fontSize: '14px' }}
             >
               <div className="relative">
-                <DoodleIcon name={tab.iconName} size={16} />
+                <tab.Icon size={16} strokeWidth={1.5} />
                 {tab.badge ? (
                   <span className="absolute -top-1.5 -right-1.5 w-3.5 h-3.5 rounded-full bg-[var(--terra)] text-white text-[10px] font-bold flex items-center justify-center">
                     {tab.badge}
@@ -259,14 +259,14 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}><DoodleIcon name="alert-triangle" size={16} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
                         onClick={() => setView('creators')}
                         className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[var(--card)] transition-all"
                       >
-                        <DoodleIcon name="users" size={24} />
+                        <Users size={24} strokeWidth={1.5} />
                         <div className="text-left">
                           <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingCreators}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
@@ -278,7 +278,7 @@ export default function AdminDashboard() {
                         onClick={() => setView('businesses')}
                         className="flex items-center gap-2 px-4 py-2 rounded-[12px] bg-[var(--card)] transition-all"
                       >
-                        <DoodleIcon name="store" size={24} />
+                        <Store size={24} strokeWidth={1.5} />
                         <div className="text-left">
                           <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingBusinesses}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 {statCardData.map((stat, i) => (
                   <div key={i} className="bg-[var(--card)] rounded-[16px] p-6 border border-[var(--ink-08)]" style={{ boxShadow: 'var(--shadow-md)' }}>
-                    <div className="mb-3"><DoodleIcon name={stat.iconName} size={24} className="text-[var(--ink-60)]" /></div>
+                    <div className="mb-3"><stat.Icon size={24} strokeWidth={1.5} className="text-[var(--ink-60)]" /></div>
                     <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stat.value}</p>
                     <p className="text-[12px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
                   </div>
@@ -304,7 +304,7 @@ export default function AdminDashboard() {
           {view === 'creators' && (
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {creators.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="users" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No creators yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -340,11 +340,11 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
                               <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
-                                <DoodleIcon name="check" size={12} /> Approve
+                                <Check size={12} strokeWidth={1.5} /> Approve
                               </button>
                             ) : (
                               <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
-                                <DoodleIcon name="x" size={12} /> Revoke
+                                <X size={12} strokeWidth={1.5} /> Revoke
                               </button>
                             )}
                           </td>
@@ -361,7 +361,7 @@ export default function AdminDashboard() {
           {view === 'businesses' && (
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {businesses.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="store" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No businesses yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -391,11 +391,11 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
                               <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
-                                <DoodleIcon name="check" size={12} /> Approve
+                                <Check size={12} strokeWidth={1.5} /> Approve
                               </button>
                             ) : (
                               <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
-                                <DoodleIcon name="x" size={12} /> Revoke
+                                <X size={12} strokeWidth={1.5} /> Revoke
                               </button>
                             )}
                           </td>
@@ -412,7 +412,7 @@ export default function AdminDashboard() {
           {view === 'offers' && (
             <>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="bag" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
@@ -441,7 +441,7 @@ export default function AdminDashboard() {
           {view === 'claims' && (
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {claims.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><DoodleIcon name="clipboard-list" size={32} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No claims yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
@@ -482,7 +482,7 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {claim.status === 'active' && (
                               <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
-                                <DoodleIcon name="x" size={12} /> Expire
+                                <X size={12} strokeWidth={1.5} /> Expire
                               </button>
                             )}
                           </td>

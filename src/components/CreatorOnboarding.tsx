@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { DoodleIcon } from '../lib/doodle-icons';
+import { ChevronLeft, Camera, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
 import { getInitials } from '../lib/avatar';
@@ -129,7 +129,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         <div className="flex items-center justify-between px-[20px] pt-[16px] pb-[8px] flex-shrink-0">
           {screen > 1 ? (
             <button onClick={goBack} className="w-[40px] h-[40px] flex items-center justify-center -ml-[8px]">
-              <DoodleIcon name="chevron-left" size={20} className="text-[var(--ink-35)]" />
+              <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
             </button>
           ) : (
             <div className="w-[40px]" />
@@ -270,7 +270,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     className="absolute -bottom-[4px] -right-[4px] w-[24px] h-[24px] rounded-full flex items-center justify-center"
                     style={{ background: 'var(--terra)' }}
                   >
-                    <DoodleIcon name="camera" size={12} className="text-white" />
+                    <Camera size={12} strokeWidth={1.5} className="text-white" />
                   </div>
                 </button>
                 <input
@@ -387,7 +387,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 style={{ background: '#C8B8F0', animation: 'ringExpand3 1.2s ease-out 0.6s forwards', opacity: 0 }}
               />
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <DoodleIcon name="check" size={48} className="text-[var(--terra)]" />
+                <Check size={48} strokeWidth={1.5} className="text-[var(--terra)]" />
               </div>
             </div>
 
