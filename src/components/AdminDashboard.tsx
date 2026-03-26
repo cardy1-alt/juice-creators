@@ -30,7 +30,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
 interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; }
-interface OfferWithBusiness { id: string; description: string; monthly_cap: number; is_live: boolean; businesses: { name: string; category: string }; }
+interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; min_level: number; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
 export default function AdminDashboard() {
@@ -71,6 +71,25 @@ export default function AdminDashboard() {
   const [bizSubmitting, setBizSubmitting] = useState(false);
   const [bizErrors, setBizErrors] = useState<Record<string, string>>({});
   const [inlineUpdating, setInlineUpdating] = useState<string | null>(null);
+
+  // Add Offer modal state
+  const [showAddOffer, setShowAddOffer] = useState(false);
+  const [offerBusinessId, setOfferBusinessId] = useState('');
+  const [offerType, setOfferType] = useState('');
+  const [offerItem, setOfferItem] = useState('');
+  const [offerTitle, setOfferTitle] = useState('');
+  const [offerTitleManual, setOfferTitleManual] = useState(false);
+  const [offerDesc, setOfferDesc] = useState('');
+  const [offerMonthlyCap, setOfferMonthlyCap] = useState('');
+  const [offerSlots, setOfferSlots] = useState('4');
+  const [offerSpecificAsk, setOfferSpecificAsk] = useState('');
+  const [offerPhotoFile, setOfferPhotoFile] = useState<File | null>(null);
+  const [offerPhotoPreview, setOfferPhotoPreview] = useState<string | null>(null);
+  const [offerMinLevel, setOfferMinLevel] = useState('1');
+  const [offerContentType, setOfferContentType] = useState('reel');
+  const [offerIsLive, setOfferIsLive] = useState(false);
+  const [offerSubmitting, setOfferSubmitting] = useState(false);
+  const [offerErrors, setOfferErrors] = useState<Record<string, string>>({});
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -297,6 +316,77 @@ export default function AdminDashboard() {
     showToast('Business created');
     setShowAddBusiness(false);
     resetBizForm();
+    fetchAll();
+  };
+
+  const OFFER_TYPES = ['Free Product', 'Free Service', 'Discount', 'Experience'];
+  const LEVEL_OPTIONS = [
+    { value: '1', label: '1 Newcomer' }, { value: '2', label: '2 Explorer' }, { value: '3', label: '3 Regular' },
+    { value: '4', label: '4 Local' }, { value: '5', label: '5 Trusted' }, { value: '6', label: '6 Nayba' },
+  ];
+
+  const resetOfferForm = () => {
+    setOfferBusinessId(''); setOfferType(''); setOfferItem(''); setOfferTitle('');
+    setOfferTitleManual(false); setOfferDesc(''); setOfferMonthlyCap(''); setOfferSlots('4');
+    setOfferSpecificAsk(''); setOfferPhotoFile(null); setOfferPhotoPreview(null);
+    setOfferMinLevel('1'); setOfferContentType('reel'); setOfferIsLive(false); setOfferErrors({});
+  };
+
+  const handleCreateOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const errors: Record<string, string> = {};
+    if (!offerBusinessId) errors.business = 'Business is required';
+    if (!offerType) errors.offer_type = 'Offer type is required';
+    if (!offerItem.trim()) errors.offer_item = 'Offer item is required';
+    const slotsNum = parseInt(offerSlots);
+    if (!offerSlots || isNaN(slotsNum) || slotsNum < 1 || slotsNum > 20) errors.slots = 'Total slots required (1–20)';
+    if (offerMonthlyCap && (isNaN(parseInt(offerMonthlyCap)) || parseInt(offerMonthlyCap) < 1)) errors.monthly_cap = 'Must be a positive integer';
+
+    if (Object.keys(errors).length > 0) { setOfferErrors(errors); return; }
+
+    setOfferSubmitting(true);
+    setOfferErrors({});
+
+    // Upload photo if provided
+    let photoUrl: string | null = null;
+    if (offerPhotoFile) {
+      const ext = offerPhotoFile.name.split('.').pop();
+      const path = `offer-photos/${Date.now()}-${offerBusinessId}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, offerPhotoFile);
+      if (uploadError) {
+        setOfferErrors({ photo: 'Failed to upload photo: ' + uploadError.message });
+        setOfferSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
+      photoUrl = urlData.publicUrl;
+    }
+
+    const generatedTitle = offerTitleManual && offerTitle.trim() ? offerTitle.trim() : `Free ${offerItem.trim()}`;
+
+    const { error } = await supabase.from('offers').insert({
+      business_id: offerBusinessId,
+      offer_type: offerType,
+      offer_item: offerItem.trim(),
+      generated_title: generatedTitle,
+      description: offerDesc.trim() || generatedTitle,
+      monthly_cap: offerMonthlyCap ? parseInt(offerMonthlyCap) : null,
+      specific_ask: offerSpecificAsk.trim() || null,
+      offer_photo_url: photoUrl,
+      min_level: parseInt(offerMinLevel),
+      content_type: offerContentType,
+      is_live: offerIsLive,
+    });
+
+    setOfferSubmitting(false);
+    if (error) {
+      setOfferErrors({ submit: error.message });
+      return;
+    }
+
+    showToast('Offer created');
+    setShowAddOffer(false);
+    resetOfferForm();
     fetchAll();
   };
 
@@ -583,6 +673,15 @@ export default function AdminDashboard() {
           {/* OFFERS */}
           {view === 'offers' && (
             <>
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => { resetOfferForm(); setShowAddOffer(true); }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  <Plus size={16} strokeWidth={2} /> New offer
+                </button>
+              </div>
               {offers.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No offers yet.</p></div>
               ) : (
@@ -964,6 +1063,221 @@ export default function AdminDashboard() {
                   style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
                 >
                   {bizSubmitting ? 'Creating…' : 'Create business'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Offer Modal */}
+      {showAddOffer && (
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
+          <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>New offer</h2>
+              <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateOffer} className="space-y-5">
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Offer details</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Business <span className="text-[var(--terra)]">*</span></label>
+                <select
+                  value={offerBusinessId}
+                  onChange={e => setOfferBusinessId(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                >
+                  <option value="">Select business…</option>
+                  {businesses.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
+                </select>
+                {offerErrors.business && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.business}</p>}
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer type <span className="text-[var(--terra)]">*</span></label>
+                  <select
+                    value={offerType}
+                    onChange={e => setOfferType(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    <option value="">Select…</option>
+                    {OFFER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  {offerErrors.offer_type && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_type}</p>}
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Content type</label>
+                  <select
+                    value={offerContentType}
+                    onChange={e => setOfferContentType(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  >
+                    <option value="reel">Reel</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer item <span className="text-[var(--terra)]">*</span></label>
+                <input
+                  value={offerItem}
+                  onChange={e => {
+                    setOfferItem(e.target.value);
+                    if (!offerTitleManual) setOfferTitle(`Free ${e.target.value}`);
+                  }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder='e.g. "oat flat white", "gel manicure"'
+                />
+                {offerErrors.offer_item && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_item}</p>}
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Generated title</label>
+                <input
+                  value={offerTitle}
+                  onChange={e => { setOfferTitle(e.target.value); setOfferTitleManual(true); }}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="Auto-generated from offer item"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Description</label>
+                <textarea
+                  value={offerDesc}
+                  onChange={e => setOfferDesc(e.target.value)}
+                  rows={2}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder="Optional description"
+                />
+              </div>
+
+              {/* CAPACITY */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Capacity</p>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Monthly slot cap <span className="text-[var(--ink-35)]">(blank = unlimited)</span></label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={offerMonthlyCap}
+                    onChange={e => setOfferMonthlyCap(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    placeholder="Unlimited"
+                  />
+                  {offerErrors.monthly_cap && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.monthly_cap}</p>}
+                </div>
+                <div>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Total slots <span className="text-[var(--terra)]">*</span></label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="20"
+                    value={offerSlots}
+                    onChange={e => setOfferSlots(e.target.value)}
+                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  />
+                  {offerErrors.slots && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.slots}</p>}
+                </div>
+              </div>
+
+              {/* BRIEF */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Brief</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Specific ask <span className="text-[var(--ink-35)]">(max 100 chars)</span></label>
+                <textarea
+                  value={offerSpecificAsk}
+                  onChange={e => { if (e.target.value.length <= 100) setOfferSpecificAsk(e.target.value); }}
+                  rows={2}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  placeholder='e.g. "they'd love if you showed the latte art"'
+                />
+                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offerSpecificAsk.length}/100</p>
+              </div>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer photo</label>
+                {offerPhotoPreview ? (
+                  <div className="flex items-center gap-3">
+                    <img src={offerPhotoPreview} alt="Offer preview" className="w-14 h-14 rounded-[12px] object-cover" />
+                    <button type="button" onClick={() => { setOfferPhotoFile(null); setOfferPhotoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Remove</button>
+                  </div>
+                ) : (
+                  <label className="flex flex-col items-center justify-center gap-2 py-8 rounded-[12px] border-[1.5px] border-dashed border-[var(--ink-15)] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
+                    <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={e => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        setOfferPhotoFile(file);
+                        setOfferPhotoPreview(URL.createObjectURL(file));
+                      }
+                    }} />
+                  </label>
+                )}
+                {offerErrors.photo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.photo}</p>}
+              </div>
+
+              {/* ACCESS */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Access & status</p>
+
+              <div>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Min level</label>
+                <select
+                  value={offerMinLevel}
+                  onChange={e => setOfferMinLevel(e.target.value)}
+                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                >
+                  {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
+                </select>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setOfferIsLive(!offerIsLive)}
+                className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[var(--card)] border border-[var(--ink-08)]"
+              >
+                <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Is live</span>
+                <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${offerIsLive ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                  <div className="w-[22px] h-[22px] rounded-full bg-white mx-[2px] shadow-sm" />
+                </div>
+              </button>
+
+              {offerErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.submit}</p>}
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddOffer(false)}
+                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={offerSubmitting}
+                  className="flex-1 px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
+                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                >
+                  {offerSubmitting ? 'Creating…' : 'Create offer'}
                 </button>
               </div>
             </form>
