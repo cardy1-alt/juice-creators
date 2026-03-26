@@ -2042,10 +2042,9 @@ export default function CreatorApp() {
                                     onClick={() => setConfirmVisitClaimId(claim.id)}
                                     disabled={loading}
                                     style={{
-                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--terra)', border: 'none',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 18, color: 'white',
+                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--ink)', border: 'none',
+                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'white',
                                       cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                      boxShadow: '0 8px 32px rgba(196,103,74,0.35)',
                                       letterSpacing: '-0.02em', lineHeight: 1.3,
                                     }}
                                   >
