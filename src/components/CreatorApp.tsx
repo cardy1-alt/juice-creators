@@ -1999,28 +1999,21 @@ export default function CreatorApp() {
                         >
                           <div>
                             {/* Pass info card */}
-                            <div className="rounded-[20px]" style={{ background: 'var(--card)', padding: '24px 24px 20px' }}>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)', margin: '4px 0 14px' }}>{claim.businesses.name}</p>
+                            <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '16px 20px 14px' }}>
+                              <p className="!text-[14px] !font-semibold !text-[var(--ink)] m-0 truncate">{offerTitle}</p>
+                              <p className="!text-[12px] !font-medium !text-[var(--ink-60)] mt-1 mb-2">{claim.businesses.name}</p>
 
                               {/* Breadcrumb stepper */}
                               <div className="flex items-center flex-nowrap">
                                 {stageLabels.map((label, idx) => {
-                                  const isDone = idx < stageIndex;
                                   const isCurrent = idx === stageIndex;
-                                  const isFuture = idx > stageIndex;
                                   return (
                                     <span key={label} className="flex items-center">
-                                      <span style={{
-                                        fontFamily: "'Plus Jakarta Sans', sans-serif",
-                                        fontSize: 13,
-                                        fontWeight: isCurrent ? 700 : isDone ? 500 : 400,
-                                        color: isCurrent ? 'var(--ink)' : 'var(--ink-60)',
-                                      }}>
+                                      <span className={`!text-[11px] ${isCurrent ? '!font-bold !text-[var(--ink)]' : '!font-normal !text-[var(--ink-35)]'}`}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
-                                        <span style={{ fontSize: 11, margin: '0 6px', color: 'var(--ink-35)' }}>›</span>
+                                        <span className="!text-[10px] mx-1.5 !text-[var(--ink-35)]">›</span>
                                       )}
                                     </span>
                                   );
