@@ -501,6 +501,9 @@ export default function Auth() {
                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'creator' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Creator
                 </span>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
+                  Claim local offers
+                </span>
               </button>
               <button
                 type="button"
@@ -518,6 +521,9 @@ export default function Auth() {
                 </div>
                 <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'business' ? 'var(--ink)' : 'var(--ink-60)' }}>
                   Business
+                </span>
+                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
+                  Reach local creators
                 </span>
               </button>
             </div>
@@ -542,7 +548,7 @@ export default function Auth() {
               <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
-              <p className="text-[14px] text-[var(--ink-60)] mt-[2px]">{stepTitles[signupStep - 1].subtitle}</p>
+              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
             </div>
 
             {/* ── Creator signup (multi-step) ── */}
@@ -648,7 +654,7 @@ export default function Auth() {
                       required
                       minLength={8}
                       rightElement={
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
                           {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
                         </button>
                       }
@@ -732,7 +738,7 @@ export default function Auth() {
                       required
                       minLength={8}
                       rightElement={
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--soft)] hover:text-[var(--mid)] transition-colors p-1">
+                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
                           {showPassword ? <DoodleIcon name="eye-off" size={16} className="" /> : <DoodleIcon name="eye" size={16} className="" />}
                         </button>
                       }
