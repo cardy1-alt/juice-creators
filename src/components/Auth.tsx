@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { MapPin, Eye, EyeOff, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, Instagram, Lock } from 'lucide-react';
+import { MapPin, Eye, EyeOff, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -210,7 +210,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
         }`}>
           {iconName === 'user' && <User size={16} strokeWidth={1.5} />}
-          {iconName === 'instagram' && <Instagram size={16} strokeWidth={1.5} />}
+          {iconName === 'instagram' && <AtSign size={16} strokeWidth={1.5} />}
           {iconName === 'mail' && <Mail size={16} strokeWidth={1.5} />}
           {iconName === 'lock' && <Lock size={16} strokeWidth={1.5} />}
           {iconName === 'shop' && <Store size={16} strokeWidth={1.5} />}
