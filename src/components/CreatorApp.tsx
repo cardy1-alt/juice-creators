@@ -1098,11 +1098,11 @@ export default function CreatorApp() {
         return (
           <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col overflow-y-auto">
             {/* Hero — full-bleed image */}
-            <div className="relative" style={{ minHeight: 280, flexShrink: 0 }}>
+            <div className="relative" style={{ minHeight: 300, flexShrink: 0 }}>
               {offer.offer_photo_url ? (
-                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: 280, objectFit: 'cover', display: 'block' }} />
+                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: 300, objectFit: 'cover', display: 'block' }} />
               ) : (
-                <div style={{ width: '100%', height: 280, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <div style={{ width: '100%', height: 300, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
                 </div>
               )}
@@ -1739,7 +1739,7 @@ export default function CreatorApp() {
                   </button>
                 </div>
               ) : (
-                <div className="space-y-[14px]">
+                <div className="space-y-[12px]">
                   {matchedSaved.map(offer => {
                     const isUnlimited = offer.monthly_cap === null;
                     const slotsUsed = offer.slotsUsed || 0;
@@ -1748,26 +1748,20 @@ export default function CreatorApp() {
                       <button
                         key={offer.id}
                         onClick={() => setExpandedOffer(offer.id)}
-                        className="w-full rounded-[16px] p-[16px] flex items-center gap-4 text-left"
-                        style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', boxShadow: 'var(--shadow-md)' }}
+                        className="w-full text-left"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
                       >
-                        {/* Category icon square */}
-                        <div
-                          className="rounded-[12px] flex-shrink-0 flex items-center justify-center"
-                          style={{ width: 46, height: 46, background: 'var(--card)' }}
-                        >
-                          <CategoryIcon category={offer.businesses.category} className="w-[20px] h-[20px]" style={{ color: 'rgba(34,34,34,0.5)' }} />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-[13px] text-[var(--ink)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>{offer.generated_title || offer.description}</p>
-                          <p className="text-[12px] text-[var(--ink-60)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{offer.businesses.name}</p>
-                          <p className="text-[11px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, color: !isUnlimited && slotsLeft !== null ? getSlotsBadgeStyle(slotsLeft, offer.monthly_cap as number).color : 'var(--ink-60)' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.businesses.name}</p>
+                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                           </p>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                          className="flex-shrink-0 p-2"
+                          className="flex-shrink-0"
+                          style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer' }}
                         >
                           <Heart size={20} strokeWidth={1.5} className="text-[var(--terra)] fill-[var(--terra)]" />
                         </button>
@@ -2083,8 +2077,8 @@ export default function CreatorApp() {
                   <p className="text-[18px] text-[var(--ink-60)] mt-1">Claim an offer to get started</p>
                 </div>
               ) : (
-                <div className="space-y-[14px]">
-                  {claims.filter(c => c.businesses && c.offers).map((claim, claimCardIdx) => (
+                <div className="space-y-[12px]">
+                  {claims.filter(c => c.businesses && c.offers).map((claim) => (
                     <button
                       key={claim.id}
                       onClick={() => {
@@ -2093,36 +2087,16 @@ export default function CreatorApp() {
                           setView('active');
                         }
                       }}
-                      className="w-full rounded-[16px] p-[16px] text-left"
-                      style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', boxShadow: 'var(--shadow-md)' }}
+                      className="w-full text-left"
+                      style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
                     >
-                      <div className="flex items-start gap-3">
-                        {renderBusinessAvatar(claim.businesses.name, claim.businesses.category, claim.businesses.logo_url, 36)}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-2">
-                            <div className="min-w-0 flex-1">
-                              <p className="text-[14px] text-[var(--ink)] truncate" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>{claim.offers.generated_title || claim.offers.description}</p>
-                              <p className="text-[13px] text-[var(--ink-60)] mt-0.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{claim.businesses.name}</p>
-                            </div>
-                            <StatusPill status={claim.status} />
-                          </div>
-                          <div className="flex items-center justify-between mt-2.5 pt-2.5 border-t border-[var(--ink-08)]">
-                            <span className="text-[13px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
-                              {formatDate(claim.claimed_at)}
-                            </span>
-                            {claim.reel_url && (
-                              <a
-                                href={claim.reel_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={(e) => e.stopPropagation()}
-                                className="flex items-center gap-1 text-[15px] font-semibold text-[var(--ink-60)] hover:underline"
-                              >
-                                View Reel <ExternalLink size={12} strokeWidth={1.5} />
-                              </a>
-                            )}
-                          </div>
-                        </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0 }}>{claim.businesses.name}</p>
+                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
+                      </div>
+                      <div style={{ flexShrink: 0, marginLeft: 12 }}>
+                        <StatusPill status={claim.status} />
                       </div>
                     </button>
                   ))}
@@ -2528,22 +2502,18 @@ export default function CreatorApp() {
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      {notifications.map((notif, notifIdx) => (
+                      {notifications.map((notif) => (
                         <button
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className={`w-full text-left rounded-[18px] p-4 transition-all ${
-                            notif.read ? 'opacity-50' : ''
-                          }`}
-                          style={{ background: getCardColor(notifIdx) }}
+                          className="w-full text-left transition-all"
+                          style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
                         >
                           <div className="flex items-start gap-3">
-                            <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${notif.read ? 'bg-[rgba(34,34,34,0.1)]' : 'bg-[var(--terra)]'}`} />
+                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'var(--ink-08)' : 'var(--terra)', flexShrink: 0, marginTop: 4 }} />
                             <div className="flex-1 min-w-0">
-                              <p className="text-[17px] text-[var(--ink)]">{notif.message}</p>
-                              <p className="text-[13px] text-[var(--ink-60)] mt-1">
-                                {formatDate(notif.created_at)}
-                              </p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message}</p>
+                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', marginTop: 4, margin: '4px 0 0' }}>{formatDate(notif.created_at)}</p>
                             </div>
                           </div>
                         </button>
@@ -2652,7 +2622,7 @@ export default function CreatorApp() {
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           borderTop: '1px solid var(--ink-08)',
-          padding: '10px 0 28px',
+          padding: '14px 0 28px',
           paddingBottom: 'env(safe-area-inset-bottom, 28px)',
         }}
       >
@@ -2668,7 +2638,7 @@ export default function CreatorApp() {
                 style={{
                   fontFamily: "'Plus Jakarta Sans', sans-serif",
                   fontWeight: isActive ? 600 : 500,
-                  fontSize: 10,
+                  fontSize: 12,
                   color: isActive ? 'var(--terra)' : 'var(--ink-35)',
                   background: 'none', border: 'none', cursor: 'pointer',
                 }}
@@ -2676,25 +2646,25 @@ export default function CreatorApp() {
                 <div className="relative flex items-center justify-center" style={{ width: 24, height: 24 }}>
                   {/* Explore — magnifying glass */}
                   {tab.icon === 'explore' && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
                     </svg>
                   )}
                   {/* Saved — heart */}
                   {tab.icon === 'saved' && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
                     </svg>
                   )}
                   {/* Active — lightning bolt */}
                   {tab.icon === 'active' && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
                     </svg>
                   )}
                   {/* Claims — document */}
                   {tab.icon === 'claims' && (
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
                     </svg>
                   )}
@@ -2703,7 +2673,7 @@ export default function CreatorApp() {
                     avatarUrl ? (
                       <img src={avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: isActive ? '2px solid var(--terra)' : '2px solid transparent' }} />
                     ) : (
-                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
                       </svg>
                     )
@@ -2715,7 +2685,7 @@ export default function CreatorApp() {
                       minWidth: 16, height: 16, borderRadius: '50%',
                       background: 'var(--terra)', border: '2px solid var(--shell)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 9, color: 'white',
+                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 10, color: 'white',
                     }}>
                       {(tab as any).badge}
                     </span>
