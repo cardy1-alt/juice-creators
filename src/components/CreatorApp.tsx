@@ -1999,9 +1999,9 @@ export default function CreatorApp() {
                         >
                           <div>
                             {/* Pass info card */}
-                            <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '16px 20px 14px' }}>
-                              <p className="!text-[14px] !font-semibold !text-[var(--ink)] m-0 truncate">{offerTitle}</p>
-                              <p className="!text-[12px] !font-medium !text-[var(--ink-60)] mt-1 mb-2">{claim.businesses.name}</p>
+                            <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '20px 20px' }}>
+                              <p className="!text-[18px] !font-bold !text-[var(--ink)] m-0 truncate !leading-tight">{offerTitle}</p>
+                              <p className="!text-[15px] !font-medium !text-[var(--ink-60)] !mt-1 !mb-3">{claim.businesses.name}</p>
 
                               {/* Breadcrumb stepper */}
                               <div className="flex items-center flex-nowrap">
@@ -2009,7 +2009,7 @@ export default function CreatorApp() {
                                   const isCurrent = idx === stageIndex;
                                   return (
                                     <span key={label} className="flex items-center">
-                                      <span className={`!text-[11px] ${isCurrent ? '!font-bold !text-[var(--ink)]' : '!font-normal !text-[var(--ink-35)]'}`}>
+                                      <span className={`!text-[12px] ${isCurrent ? '!font-bold !text-[var(--ink)]' : '!font-normal !text-[var(--ink-35)]'}`}>
                                         {label}
                                       </span>
                                       {idx < stageLabels.length - 1 && (
@@ -2026,19 +2026,22 @@ export default function CreatorApp() {
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div className="flex flex-col items-center text-center pt-4">
-                                  <p className="text-[18px] font-extrabold tracking-tight text-[var(--ink)] mb-1">Ready to visit?</p>
-                                  <p className="text-[13px] font-normal text-[var(--ink-60)] mb-6 max-w-[220px] leading-snug">
+                                <div className="flex flex-col items-center text-center pt-5">
+                                  <p className="!text-[24px] !font-extrabold !tracking-tight !text-[var(--ink)] !mb-2 !leading-tight">Ready to visit?</p>
+                                  <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !mb-6 max-w-[260px] !leading-snug">
                                     Show this screen to staff and ask them to tap the button below
                                   </p>
                                   <button
                                     onClick={() => setConfirmVisitClaimId(claim.id)}
                                     disabled={loading}
-                                    className="w-[180px] h-[180px] rounded-full bg-[var(--terra)] border-none cursor-pointer text-[28px] font-extrabold text-white tracking-tight leading-none"
+                                    className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[20px] !font-extrabold !text-white !tracking-tight !leading-none"
                                     style={{ opacity: loading ? 0.6 : 1 }}
                                   >
                                     {loading ? 'Confirming…' : <>Confirm<br />visit</>}
                                   </button>
+                                  <p className="!text-[12px] !font-medium !text-[var(--ink-35)] !mt-3 text-center">
+                                    This button is for staff to tap in your presence
+                                  </p>
                                 </div>
                               )}
 
@@ -2154,7 +2157,7 @@ export default function CreatorApp() {
                               )}
 
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center !text-[11px] mt-5 pb-2.5 [&_button]:!text-[11px] [&_span]:!text-[11px]">
+                              <div className="flex items-center justify-center !text-[11px] mt-2 pb-1 [&_button]:!text-[11px] [&_span]:!text-[11px]">
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
@@ -2213,29 +2216,6 @@ export default function CreatorApp() {
                     })}
                   </div>
 
-                  {/* Pagination dots — hidden if more than 7 passes */}
-                  {(() => {
-                    const filtered = activeClaims.filter(c => c.businesses && c.offers);
-                    if (filtered.length <= 1 || filtered.length > 7) return null;
-                    const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
-                    const activeIdx = currentIdx >= 0 ? currentIdx : 0;
-                    return (
-                      <div style={{ display: 'flex', justifyContent: 'center', gap: 6, paddingBottom: 8 }}>
-                        {filtered.map((_, i) => (
-                          <div
-                            key={i}
-                            style={{
-                              width: i === activeIdx ? 8 : 6,
-                              height: i === activeIdx ? 8 : 6,
-                              borderRadius: '50%',
-                              background: i === activeIdx ? 'var(--terra)' : 'rgba(34,34,34,0.18)',
-                              transition: 'all 0.2s ease',
-                            }}
-                          />
-                        ))}
-                      </div>
-                    );
-                  })()}
                 </div>
               )}
             </>
