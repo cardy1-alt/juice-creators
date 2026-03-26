@@ -2033,22 +2033,18 @@ export default function CreatorApp() {
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
-                                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: 16 }}>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', margin: '0 0 6px', letterSpacing: '-0.03em' }}>Ready to visit?</p>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 auto 24px', maxWidth: 240, lineHeight: 1.55 }}>
+                                <div className="flex flex-col items-center text-center pt-4">
+                                  <p className="text-[18px] font-extrabold tracking-tight text-[var(--ink)] mb-1">Ready to visit?</p>
+                                  <p className="text-[13px] font-normal text-[var(--ink-60)] mb-6 max-w-[220px] leading-snug">
                                     Show this screen to staff and ask them to tap the button below
                                   </p>
                                   <button
                                     onClick={() => setConfirmVisitClaimId(claim.id)}
                                     disabled={loading}
-                                    style={{
-                                      width: 160, height: 160, borderRadius: '50%', background: 'var(--terra)', border: 'none',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 24, color: 'white',
-                                      cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                      letterSpacing: '-0.03em', lineHeight: 1.15,
-                                    }}
+                                    className="w-[180px] h-[180px] rounded-full bg-[var(--terra)] border-none cursor-pointer text-[28px] font-extrabold text-white tracking-tight leading-none"
+                                    style={{ opacity: loading ? 0.6 : 1 }}
                                   >
-                                    {loading ? 'Confirming…' : <><span style={{ color: 'white', fontWeight: 800 }}>Confirm</span><br /><span style={{ color: 'white', fontWeight: 800 }}>visit</span></>}
+                                    {loading ? 'Confirming…' : <>Confirm<br />visit</>}
                                   </button>
                                 </div>
                               )}
@@ -2165,7 +2161,7 @@ export default function CreatorApp() {
                               )}
 
                               {/* Report / Release links */}
-                              <div className="flex items-center justify-center text-[11px]" style={{ marginTop: 20, paddingBottom: 10 }}>
+                              <div className="flex items-center justify-center !text-[11px] mt-5 pb-2.5 [&_button]:!text-[11px] [&_span]:!text-[11px]">
                                 {releaseConfirmId === claim.id ? (
                                   <div className="flex items-center gap-3">
                                     <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
