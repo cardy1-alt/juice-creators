@@ -97,12 +97,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchUserProfile = async (authUser: User) => {
     const email = authUser.email;
     if (!email) {
-      console.warn('[AuthContext] No email on auth user');
       return;
     }
 
     if (email.toLowerCase() === ADMIN_EMAIL) {
-      console.log('[AuthContext] Admin detected');
       setUserRole('admin');
       setUserProfile({ email, name: 'Admin' });
       return;
@@ -116,11 +114,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (creatorError) {
-      console.error('[AuthContext] Error fetching creator profile:', creatorError.code, creatorError.message);
+      // TODO: add error tracking
     }
 
     if (creator) {
-      console.log('[AuthContext] Creator profile found:', creator.id);
       setUserRole('creator');
       setUserProfile(creator);
       return;
@@ -134,18 +131,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (businessError) {
-      console.error('[AuthContext] Error fetching business profile:', businessError.code, businessError.message);
+      // TODO: add error tracking
     }
 
     if (business) {
-      console.log('[AuthContext] Business profile found:', business.id);
       setUserRole('business');
       setUserProfile(business);
       return;
     }
 
     // No profile found — clear role so fallback screen shows
-    console.warn('[AuthContext] No profile found for user:', authUser.id);
     setUserRole(null);
     setUserProfile(null);
   };
@@ -223,8 +218,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     signingUpRef.current = true;
 
     try {
-      console.log('[AuthContext] Starting signup as', role);
-
       const { data, error } = await supabase.auth.signUp({
         email: normEmail,
         password,
@@ -235,24 +228,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (error) throw error;
       if (!data.user) throw new Error('Sign up failed — no user returned');
 
-      console.log('[AuthContext] Auth user created:', data.user.id, 'session:', !!data.session);
-
       // Check if we have a session — if email confirmation is required, session is null
       // and the INSERT will fail because RLS requires an authenticated session.
       if (!data.session) {
-        console.log('[AuthContext] No session — attempting sign in to establish session');
         const { error: signInError } = await supabase.auth.signInWithPassword({ email: normEmail, password });
         if (signInError) {
           throw new Error(
             'Account created. Please check your email to confirm, then sign in.'
           );
         }
-        console.log('[AuthContext] Session established via sign in');
       }
 
       // Now we have an authenticated session — INSERT the profile row
       if (role === 'creator') {
-        console.log('[AuthContext] Inserting creator profile for:', data.user.id);
         const insertPayload: Record<string, any> = {
           email: normEmail,
           name: additionalData.name,
@@ -267,12 +255,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           insertPayload.latitude = additionalData.latitude;
           insertPayload.longitude = additionalData.longitude;
         }
-        console.log('[AuthContext] Creator INSERT payload:', JSON.stringify(insertPayload));
-
         const { error: insertError } = await supabase.from('creators').insert(insertPayload);
 
         if (insertError) {
-          console.error('[AuthContext] Creator INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          // TODO: add error tracking
           // Try to recover — the profile may already exist from a previous
           // attempt (23505) or the INSERT may have been blocked by RLS (42501).
           // Either way, check if a profile row exists for this email.
@@ -282,7 +268,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .eq('email', normEmail)
             .maybeSingle();
           if (existing) {
-            console.log('[AuthContext] Recovered existing creator profile:', existing.id);
             setUser(data.user);
             setUserRole('creator');
             setUserProfile(existing);
@@ -294,8 +279,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Creator profile inserted successfully');
-
         // Best-effort fetch to get the generated id — if RLS blocks the
         // read (e.g. email case mismatch with JWT), fall back gracefully
         let creatorId: string | undefined;
@@ -329,7 +312,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           sendAdminApprovalRequest({ userType: 'creator', userId: creatorId, displayName: additionalData.name, email: normEmail }).catch(() => {});
         }
       } else if (role === 'business') {
-        console.log('[AuthContext] Inserting business profile for:', data.user.id);
         const insertPayload = {
           owner_email: normEmail,
           name: additionalData.name,
@@ -341,12 +323,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           bio: additionalData.bio,
           approved: false
         };
-        console.log('[AuthContext] Business INSERT payload:', JSON.stringify(insertPayload));
-
         const { error: insertError } = await supabase.from('businesses').insert(insertPayload);
 
         if (insertError) {
-          console.error('[AuthContext] Business INSERT failed:', insertError.code, insertError.message, insertError.details, insertError.hint);
+          // TODO: add error tracking
           // Try to recover — the profile may already exist from a previous
           // attempt (23505) or the INSERT may have been blocked by RLS (42501).
           // Either way, check if a profile row exists for this email.
@@ -356,7 +336,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             .eq('owner_email', normEmail)
             .maybeSingle();
           if (existing) {
-            console.log('[AuthContext] Recovered existing business profile:', existing.id);
             setUser(data.user);
             setUserRole('business');
             setUserProfile(existing);
@@ -368,8 +347,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create business profile: ${insertError.message}`);
         }
-        console.log('[AuthContext] Business profile inserted successfully');
-
         // Best-effort fetch to get the generated id
         let businessId: string | undefined;
         try {

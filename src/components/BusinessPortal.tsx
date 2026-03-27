@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { friendlyError } from '../lib/errors';
 import { Clapperboard, Camera, Check, ChevronLeft, Lightbulb, X, Infinity, Minus, Plus, Info, QrCode, MapPin, Clock, BadgeCheck, ChevronRight, PauseCircle, RefreshCw, Sparkles, CheckCircle, ScanLine, ExternalLink, Copy, AtSign, User, Bell, LogOut, Gift, Tag, Star, Megaphone, FileText, Home, LayoutGrid, ClipboardList } from 'lucide-react';
 import BusinessOnboarding from './BusinessOnboarding';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
@@ -1271,7 +1272,7 @@ export default function BusinessPortal() {
 
       if (error) throw error;
       if (!data || data?.error) {
-        setScanResult({ type: 'error', message: data?.error || 'No response from server.' });
+        setScanResult({ type: 'error', message: friendlyError(data?.error) });
         setScanCode('');
         return;
       }
@@ -1301,7 +1302,7 @@ export default function BusinessPortal() {
       setScanCode('');
       fetchClaims();
     } catch (error: any) {
-      setScanResult({ type: 'error', message: error.message });
+      setScanResult({ type: 'error', message: friendlyError(error.message) });
     } finally {
       setLoading(false);
     }

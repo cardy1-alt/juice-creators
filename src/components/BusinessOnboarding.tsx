@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Camera, Minus, Plus, Check, Gift, Sparkles, Tag, Star, type LucideIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
+import { friendlyError } from '../lib/errors';
 import { CategoryIcon, getCategorySolidColor } from '../lib/categories';
 import { getInitials } from '../lib/avatar';
 import { Logo } from './Logo';
@@ -152,7 +153,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
       goForward(); // go to screen 5 (success)
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      setError(friendlyError(err.message));
     } finally {
       setSaving(false);
     }

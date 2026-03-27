@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, Camera, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { uploadAvatar } from '../lib/upload';
+import { friendlyError } from '../lib/errors';
 import { getInitials } from '../lib/avatar';
 import { Logo } from './Logo';
 
@@ -106,7 +107,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
       goForward(); // go to screen 3 (success)
     } catch (err: any) {
-      setError(err.message || 'Something went wrong');
+      setError(friendlyError(err.message));
     } finally {
       setSaving(false);
     }
