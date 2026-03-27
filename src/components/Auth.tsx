@@ -328,7 +328,7 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F3EE] overscroll-none">
+    <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
         /* ─── SIGN IN: vertically centred brand + hero + form ─── */
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
@@ -404,7 +404,7 @@ export default function Auth() {
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
             <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
-              Local offers.<br /><span className="text-[#C4674A] italic">Yours</span> to claim.
+              Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
             </h1>
           </div>
 
