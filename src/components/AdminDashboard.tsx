@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { friendlyError } from '../lib/errors';
 import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
@@ -213,7 +214,7 @@ export default function AdminDashboard() {
       if (error.message.includes('same')) {
         setPasswordMessage({ type: 'error', text: 'New password must be different from current password' });
       } else {
-        setPasswordMessage({ type: 'error', text: error.message || 'Failed to update password' });
+        setPasswordMessage({ type: 'error', text: friendlyError(error.message) });
       }
     } else {
       setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
@@ -228,7 +229,7 @@ export default function AdminDashboard() {
     const { error } = await supabase.from('businesses').update({ [field]: value }).eq('id', id);
     setInlineUpdating(null);
     if (error) {
-      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+      setActionFeedback({ type: 'error', text: friendlyError(error.message) });
     } else {
       setBusinesses(prev => prev.map(b => b.id === id ? { ...b, [field]: value } : b));
     }
@@ -281,7 +282,7 @@ export default function AdminDashboard() {
       const path = `business-logos/${Date.now()}-${bizSlug}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('logos').upload(path, bizLogoFile);
       if (uploadError) {
-        setBizErrors({ logo: 'Failed to upload logo: ' + uploadError.message });
+        setBizErrors({ logo: friendlyError(uploadError.message) });
         setBizSubmitting(false);
         return;
       }
@@ -309,7 +310,7 @@ export default function AdminDashboard() {
 
     setBizSubmitting(false);
     if (error) {
-      setBizErrors({ submit: error.message });
+      setBizErrors({ submit: friendlyError(error.message) });
       return;
     }
 
@@ -324,7 +325,7 @@ export default function AdminDashboard() {
     const { error } = await supabase.from('offers').update({ [field]: value }).eq('id', id);
     setInlineUpdating(null);
     if (error) {
-      setActionFeedback({ type: 'error', text: `Failed to update ${field}: ${error.message}` });
+      setActionFeedback({ type: 'error', text: friendlyError(error.message) });
     } else {
       setOffers(prev => prev.map(o => o.id === id ? { ...o, [field]: value } : o));
     }
@@ -365,7 +366,7 @@ export default function AdminDashboard() {
       const path = `offer-photos/${Date.now()}-${offerBusinessId}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('logos').upload(path, offerPhotoFile);
       if (uploadError) {
-        setOfferErrors({ photo: 'Failed to upload photo: ' + uploadError.message });
+        setOfferErrors({ photo: friendlyError(uploadError.message) });
         setOfferSubmitting(false);
         return;
       }
@@ -391,7 +392,7 @@ export default function AdminDashboard() {
 
     setOfferSubmitting(false);
     if (error) {
-      setOfferErrors({ submit: error.message });
+      setOfferErrors({ submit: friendlyError(error.message) });
       return;
     }
 

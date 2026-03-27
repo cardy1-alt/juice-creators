@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
+import { friendlyError } from '../lib/errors';
 import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
@@ -105,7 +106,7 @@ export default function Auth() {
       if (error) throw error;
       setResetSent(true);
     } catch (err: any) {
-      setResetError(err.message || 'Failed to send reset email');
+      setResetError(friendlyError(err.message));
     } finally {
       setResetLoading(false);
     }
@@ -124,7 +125,7 @@ export default function Auth() {
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
-      setError(err.message || 'An error occurred');
+      setError(friendlyError(err.message));
     } finally {
       setLoading(false);
     }

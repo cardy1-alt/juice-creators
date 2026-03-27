@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, ComponentType } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { friendlyError } from '../lib/errors';
 import { Check, Clock, ChevronLeft, Heart, Lock, Users, MapPin, Zap, Camera, BadgeCheck, Copy, AtSign, Plus, User, ChevronRight, Bell, LogOut, Flag, X, ExternalLink, Home, Sparkles, LayoutGrid, Coffee, Clapperboard, Search, SlidersHorizontal } from 'lucide-react';
 import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
@@ -533,7 +534,7 @@ export default function CreatorApp() {
           'not_approved': 'Your account needs to be approved before claiming offers.',
           'offer_not_live': 'This offer is no longer available.',
         };
-        setClaimError(errorMessages[data.error] || data.error);
+        setClaimError(errorMessages[data.error] || friendlyError(data.error));
         return false;
       }
 
@@ -548,7 +549,7 @@ export default function CreatorApp() {
       sendNewClaimBusinessEmail(offer.business_id, userProfile.display_name || userProfile.name, offerTitle).catch(() => {});
       return true;
     } catch (error: any) {
-      setClaimError(error.message || 'Failed to claim offer');
+      setClaimError(friendlyError(error.message));
       return false;
     } finally {
       setLoading(false);
@@ -614,7 +615,7 @@ export default function CreatorApp() {
       setShowReelCelebration({ offerName: celebOfferName, businessName: celebBizName });
       return true;
     } catch (error: any) {
-      setReelError(error.message || 'Failed to submit reel');
+      setReelError(friendlyError(error.message));
       return false;
     } finally {
       setLoading(false);
@@ -632,7 +633,7 @@ export default function CreatorApp() {
 
       if (error) throw error;
       if (data?.error) {
-        setReleaseError(data.error);
+        setReleaseError(friendlyError(data.error));
         return;
       }
 
@@ -640,7 +641,7 @@ export default function CreatorApp() {
       fetchOffers();
       fetchClaims();
     } catch (error: any) {
-      setReleaseError(error.message || 'Failed to release offer');
+      setReleaseError(friendlyError(error.message));
     } finally {
       setReleasingClaim(false);
     }
