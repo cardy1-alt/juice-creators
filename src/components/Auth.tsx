@@ -529,53 +529,7 @@ export default function Auth() {
 
           <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
           <form onSubmit={handleSubmit}>
-            {/* Role selector cards */}
-            <div className="flex gap-[10px] mb-[24px]">
-              <button
-                type="button"
-                onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
-                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
-                style={{
-                  borderRadius: '16px',
-                  border: role === 'creator' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
-                  background: role === 'creator' ? 'var(--terra-5)' : 'var(--card)',
-                  padding: '24px',
-                }}
-              >
-                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'creator' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <Sparkles size={18} strokeWidth={1.5} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
-                </div>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'creator' ? 'var(--ink)' : 'var(--ink-60)' }}>
-                  Creator
-                </span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
-                  Claim local offers
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
-                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
-                style={{
-                  borderRadius: '16px',
-                  border: role === 'business' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
-                  background: role === 'business' ? 'var(--terra-5)' : 'var(--card)',
-                  padding: '24px',
-                }}
-              >
-                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'business' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <Store size={18} strokeWidth={1.5} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
-                </div>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'business' ? 'var(--ink)' : 'var(--ink-60)' }}>
-                  Business
-                </span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
-                  Reach local creators
-                </span>
-              </button>
-            </div>
-
-            {/* Step indicator (both Creator & Business) */}
+            {/* Step indicator */}
             <div className="flex items-center gap-[6px] mb-[20px]">
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center gap-[6px]">
