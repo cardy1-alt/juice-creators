@@ -1204,7 +1204,7 @@ export default function CreatorApp() {
                 <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
 
                 {/* C) Primary post requirement */}
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
 
                 {/* D) Checklist items — no duplicates */}
                 <div className="flex flex-col gap-[10px] mb-[24px]">
