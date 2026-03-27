@@ -17,7 +17,7 @@ export default function LevelBadge({ level, levelName, size = 'sm' }: LevelBadge
     <span
       className="inline-block rounded-full whitespace-nowrap"
       style={{
-        fontFamily: "'Plus Jakarta Sans', sans-serif",
+        fontFamily: "'Instrument Sans', sans-serif",
         fontWeight: 700,
         background: level === 1 ? 'var(--ink-35)' : getLevelColour(level),
         color: level === 1 ? 'var(--ink)' : 'var(--shell)',

@@ -51,8 +51,8 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--card)' }}>
               <Check size={32} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
-            <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)' }}>
+            <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)' }}>
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
           </div>
@@ -63,20 +63,20 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
                   <AlertTriangle size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
+                <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
               </div>
               <button onClick={onClose} className="p-2 rounded-[12px] transition-colors" style={{ background: 'var(--card)' }}>
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginBottom: '16px' }}>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginBottom: '16px' }}>
               Let us know if something went wrong with this collaboration. We'll review and take appropriate action.
             </p>
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '15px', color: 'var(--ink-60)', display: 'block', marginBottom: '8px' }}>
+                <label style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '15px', color: 'var(--ink-60)', display: 'block', marginBottom: '8px' }}>
                   What happened?
                 </label>
                 <textarea
@@ -86,7 +86,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   rows={4}
                   className="w-full resize-none focus:outline-none transition-all"
                   style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Instrument Sans', sans-serif",
                     fontWeight: 400,
                     fontSize: '15px',
                     color: 'var(--ink)',
@@ -103,7 +103,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
 
               {disputeError && (
                 <div className="p-3 rounded-[12px] bg-[var(--terra-10)] border border-[var(--terra-20)]">
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)' }}>{disputeError}</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)' }}>{disputeError}</p>
                 </div>
               )}
 
@@ -113,7 +113,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   onClick={onClose}
                   className="flex-1 min-h-[48px] transition-all"
                   style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Instrument Sans', sans-serif",
                     fontWeight: 600,
                     fontSize: '14px',
                     color: 'var(--ink)',
@@ -130,7 +130,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                   disabled={loading || !message.trim()}
                   className="flex-1 min-h-[48px] text-white transition-all disabled:opacity-50"
                   style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Instrument Sans', sans-serif",
                     fontWeight: 700,
                     fontSize: '15px',
                     background: 'var(--terra)',

@@ -868,7 +868,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               </div>
               {/* Body */}
               <div className="p-4">
-                <p className="text-[17px] font-extrabold text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Your business</p>
+                <p className="text-[17px] font-extrabold text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Your business</p>
                 <p className="text-[18px] font-sans font-extrabold text-[var(--ink)] mt-0.5" style={{ letterSpacing: '-0.03em' }}>{generatedTitle}</p>
                 <div className="flex items-center gap-1 mt-1.5">
                   <Clapperboard size={13} strokeWidth={1.5} className="text-[var(--terra)]" />
@@ -1561,11 +1561,11 @@ export default function BusinessPortal() {
           <div className="flex items-center justify-between">
             <Logo variant="wordmark" size={22} />
             <div className="text-right">
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{userProfile.name}</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{userProfile.name}</p>
               <span style={{
                 display: 'inline-block', marginTop: 3, padding: '2px 10px', borderRadius: 999,
                 background: 'var(--card)', border: '1px solid var(--ink-08)',
-                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)',
+                fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)',
               }}>
                 Business
               </span>
@@ -1597,10 +1597,10 @@ export default function BusinessPortal() {
               {/* Greeting + compact stats banner */}
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 24, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
+                  <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 24, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                     {getGreeting()}, {userProfile.name}
                   </h2>
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
                     {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
                   </p>
                 </div>
@@ -1609,16 +1609,16 @@ export default function BusinessPortal() {
               {/* Compact inline stats */}
               <div className="flex items-center gap-[6px] mb-7 flex-wrap">
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--terra)' }}>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'white' }}>{activeClaimsCount}</span>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>active</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'white' }}>{activeClaimsCount}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>active</span>
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{reelsThisMonth}</span>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>reels</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{reelsThisMonth}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>reels</span>
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>slots left</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>slots left</span>
                 </span>
               </div>
 
@@ -1739,7 +1739,7 @@ export default function BusinessPortal() {
                             <img src={claim.creators.avatar_url} alt="" className="flex-shrink-0" style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover' }} />
                           ) : (
                             <div className="flex-shrink-0 flex items-center justify-center" style={{ width: 40, height: 40, borderRadius: '50%', background: 'var(--card)' }}>
-                              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink-60)' }}>
+                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink-60)' }}>
                                 {claim.creators.name?.charAt(0) || '?'}
                               </span>
                             </div>
@@ -2613,7 +2613,7 @@ export default function BusinessPortal() {
                   }}
                 >
                   <QrCode size={18} strokeWidth={1.5} color="white" />
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white' }}>Scan</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 13, color: 'white' }}>Scan</span>
                 </button>
               </div>
             );
@@ -2628,7 +2628,7 @@ export default function BusinessPortal() {
               style={{
                 flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
                 background: 'none', border: 'none', cursor: isDisabled ? 'default' : 'pointer',
-                fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 10,
+                fontFamily: "'Instrument Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 10,
                 color: iconColor,
               }}
             >

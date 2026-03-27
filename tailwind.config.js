@@ -5,7 +5,7 @@ export default {
     extend: {
       fontFamily: {
         display: ['Corben', 'serif'],
-        sans: ['Plus Jakarta Sans', 'sans-serif'],
+        sans: ['Instrument Sans', 'sans-serif'],
       },
       colors: {
         nayba: {

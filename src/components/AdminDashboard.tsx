@@ -10,7 +10,7 @@ import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedE
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
   const badgeBase = "inline-flex items-center gap-1 text-[11px] rounded-[999px]" as const;
-  const badgeStyle: React.CSSProperties = { fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, padding: '3px 10px' };
+  const badgeStyle: React.CSSProperties = { fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, padding: '3px 10px' };
   if (type === 'approval') {
     return status === 'approved'
       ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><Check size={12} strokeWidth={1.5} /> Approved</span>
@@ -435,7 +435,7 @@ export default function AdminDashboard() {
                 <Logo size={24} />
               </div>
               <div>
-                <p className="text-sm text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Admin Dashboard</p>
+                <p className="text-sm text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Admin Dashboard</p>
               </div>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
@@ -455,7 +455,7 @@ export default function AdminDashboard() {
                   ? 'bg-[var(--terra)] text-white border-[1.5px] border-[var(--terra)]'
                   : 'bg-[var(--card)] text-[var(--ink-35)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)]'
               }`}
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: view === tab.key ? 700 : 600, fontSize: '14px' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: view === tab.key ? 700 : 600, fontSize: '14px' }}
             >
               <div className="relative">
                 <tab.Icon size={16} strokeWidth={1.5} />
@@ -472,12 +472,12 @@ export default function AdminDashboard() {
 
         <div className="p-6">
           {fetchError && (
-            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] text-[15px] text-[var(--terra)] font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className="mb-4 p-3 rounded-[12px] bg-[var(--terra-10)] text-[15px] text-[var(--terra)] font-medium" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
               {fetchError}
             </div>
           )}
           {actionFeedback && (
-            <div className={`mb-4 p-3 rounded-[12px] text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] text-[var(--terra)]' : 'bg-[rgba(34,34,34,0.06)] text-[var(--ink)]'}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <div className={`mb-4 p-3 rounded-[12px] text-[15px] font-medium ${actionFeedback.type === 'error' ? 'bg-[var(--terra-10)] text-[var(--terra)]' : 'bg-[rgba(34,34,34,0.06)] text-[var(--ink)]'}`} style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
               {actionFeedback.text}
             </div>
           )}
@@ -486,7 +486,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -495,8 +495,8 @@ export default function AdminDashboard() {
                       >
                         <Users size={24} strokeWidth={1.5} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingCreators}</p>
-                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingCreators}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
                         </div>
                       </button>
                     )}
@@ -507,8 +507,8 @@ export default function AdminDashboard() {
                       >
                         <Store size={24} strokeWidth={1.5} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingBusinesses}</p>
-                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingBusinesses}</p>
+                          <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
                         </div>
                       </button>
                     )}
@@ -519,8 +519,8 @@ export default function AdminDashboard() {
                 {statCardData.map((stat, i) => (
                   <div key={i} className="bg-[var(--card)] rounded-[16px] p-6 border border-[var(--ink-08)]" style={{ boxShadow: 'var(--shadow-md)' }}>
                     <div className="mb-3"><stat.Icon size={24} strokeWidth={1.5} className="text-[var(--ink-60)]" /></div>
-                    <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stat.value}</p>
-                    <p className="text-[12px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
+                    <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stat.value}</p>
+                    <p className="text-[12px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -531,46 +531,46 @@ export default function AdminDashboard() {
           {view === 'creators' && (
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {creators.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No creators yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Users size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Name</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Handle</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Followers</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Code</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Name</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Handle</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Followers</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Code</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--ink-08)]">
                       {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(creatorsPage * PAGE_SIZE, (creatorsPage + 1) * PAGE_SIZE).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>
                             <span className="mr-2">{creator.name}</span>
                             {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{creator.instagram_handle}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{creator.instagram_handle}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {creator.follower_count ? (
-                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{creator.follower_count}</span>
+                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{creator.follower_count}</span>
                             ) : (
                               <span className="text-sm text-[var(--soft)]">—</span>
                             )}
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-sm font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[var(--card)]">{creator.code}</span></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{creator.email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{creator.email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
+                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                                 <Check size={12} strokeWidth={1.5} /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
+                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                                 <X size={12} strokeWidth={1.5} /> Revoke
                               </button>
                             )}
@@ -583,7 +583,7 @@ export default function AdminDashboard() {
               )}
               {creators.length > PAGE_SIZE && (
                 <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
-                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     {creatorsPage * PAGE_SIZE + 1}–{Math.min((creatorsPage + 1) * PAGE_SIZE, creators.length)} of {creators.length}
                   </span>
                   <div className="flex gap-2">
@@ -591,7 +591,7 @@ export default function AdminDashboard() {
                       onClick={() => setCreatorsPage(p => p - 1)}
                       disabled={creatorsPage === 0}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       <ChevronLeft size={14} strokeWidth={2} /> Previous
                     </button>
@@ -599,7 +599,7 @@ export default function AdminDashboard() {
                       onClick={() => setCreatorsPage(p => p + 1)}
                       disabled={(creatorsPage + 1) * PAGE_SIZE >= creators.length}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       Next <ChevronRight size={14} strokeWidth={2} />
                     </button>
@@ -616,27 +616,27 @@ export default function AdminDashboard() {
               <button
                 onClick={() => { resetBizForm(); setShowAddBusiness(true); }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
               >
                 <Plus size={16} strokeWidth={2} /> Add business
               </button>
             </div>
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {businesses.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No businesses yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Slug</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Category</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Region</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Slug</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Category</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Region</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--ink-08)]">
@@ -647,11 +647,11 @@ export default function AdminDashboard() {
                               <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
                                 <CategoryIcon category={business.category} className="w-5 h-5 text-[var(--mid)]" />
                               </div>
-                              <span className="text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{business.name}</span>
+                              <span className="text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{business.name}</span>
                             </div>
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{business.owner_email}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{business.owner_email}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <button
                               onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
@@ -675,7 +675,7 @@ export default function AdminDashboard() {
                               onChange={e => handleInlineBusinessUpdate(business.id, 'category', e.target.value)}
                               disabled={inlineUpdating === `${business.id}-category`}
                               className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                             >
                               {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                             </select>
@@ -686,7 +686,7 @@ export default function AdminDashboard() {
                               onChange={e => handleInlineBusinessUpdate(business.id, 'region', e.target.value)}
                               disabled={inlineUpdating === `${business.id}-region`}
                               className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                             >
                               {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                             </select>
@@ -694,11 +694,11 @@ export default function AdminDashboard() {
                           <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
+                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                                 <Check size={12} strokeWidth={1.5} /> Approve
                               </button>
                             ) : (
-                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
+                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                                 <X size={12} strokeWidth={1.5} /> Revoke
                               </button>
                             )}
@@ -711,7 +711,7 @@ export default function AdminDashboard() {
               )}
               {businesses.length > PAGE_SIZE && (
                 <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
-                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     {businessesPage * PAGE_SIZE + 1}–{Math.min((businessesPage + 1) * PAGE_SIZE, businesses.length)} of {businesses.length}
                   </span>
                   <div className="flex gap-2">
@@ -719,7 +719,7 @@ export default function AdminDashboard() {
                       onClick={() => setBusinessesPage(p => p - 1)}
                       disabled={businessesPage === 0}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       <ChevronLeft size={14} strokeWidth={2} /> Previous
                     </button>
@@ -727,7 +727,7 @@ export default function AdminDashboard() {
                       onClick={() => setBusinessesPage(p => p + 1)}
                       disabled={(businessesPage + 1) * PAGE_SIZE >= businesses.length}
                       className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       Next <ChevronRight size={14} strokeWidth={2} />
                     </button>
@@ -745,13 +745,13 @@ export default function AdminDashboard() {
                 <button
                   onClick={() => { resetOfferForm(); setShowAddOffer(true); }}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
                   <Plus size={16} strokeWidth={2} /> New offer
                 </button>
               </div>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No offers yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
@@ -762,15 +762,15 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
+                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
                           </div>
-                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
+                          <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-3 flex-wrap">
                         {/* is_live toggle */}
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</span>
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</span>
                           <button
                             onClick={() => handleInlineOfferUpdate(offer.id, 'is_live', !offer.is_live)}
                             disabled={inlineUpdating === `offer-${offer.id}-is_live`}
@@ -788,7 +788,7 @@ export default function AdminDashboard() {
                         </div>
                         {/* monthly_cap inline edit */}
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Cap</span>
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Cap</span>
                           <input
                             type="number"
                             min="0"
@@ -802,19 +802,19 @@ export default function AdminDashboard() {
                               handleInlineOfferUpdate(offer.id, 'monthly_cap', val);
                             }}
                             className="w-[70px] px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] text-center focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                             placeholder="∞"
                           />
                         </div>
                         {/* min_level dropdown */}
                         <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Level</span>
+                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Level</span>
                           <select
                             value={offer.min_level}
                             onChange={e => handleInlineOfferUpdate(offer.id, 'min_level', parseInt(e.target.value))}
                             disabled={inlineUpdating === `offer-${offer.id}-min_level`}
                             className="px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                            style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                            style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                           >
                             {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                           </select>
@@ -831,38 +831,38 @@ export default function AdminDashboard() {
           {view === 'claims' && (
             <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
               {claims.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No claims yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead>
                       <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Creator</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Claimed</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Creator</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Claimed</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
+                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--ink-08)]">
                       {claims.map((claim) => (
                         <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{claim.creators.name}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{claim.creators.name}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2">
                               <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
                                 <CategoryIcon category={claim.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
                               </div>
-                              <span className="text-base text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{claim.businesses.name}</span>
+                              <span className="text-base text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{claim.businesses.name}</span>
                             </div>
                           </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{new Date(claim.claimed_at).toLocaleDateString()}</td>
+                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{new Date(claim.claimed_at).toLocaleDateString()}</td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
                               className="px-2.5 py-1 rounded-[12px] text-sm font-semibold border border-[var(--faint)] text-[var(--near-black)] bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
@@ -871,7 +871,7 @@ export default function AdminDashboard() {
                           </td>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             {claim.status === 'active' && (
-                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>
+                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                                 <X size={12} strokeWidth={1.5} /> Expire
                               </button>
                             )}
@@ -889,10 +889,10 @@ export default function AdminDashboard() {
           {view === 'settings' && (
             <div className="max-w-2xl">
               <div className="bg-[var(--card)] rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
-                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Change Password</h2>
+                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
-                    <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                       Current Password
                     </label>
                     <input
@@ -903,11 +903,11 @@ export default function AdminDashboard() {
                       required
                       className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(34,34,34,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[var(--card)] text-[var(--near-black)] placeholder:text-[var(--ink)]/40"
                       placeholder="Enter current password"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="newPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <label htmlFor="newPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                       New Password
                     </label>
                     <input
@@ -919,11 +919,11 @@ export default function AdminDashboard() {
                       minLength={8}
                       className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(34,34,34,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[var(--card)] text-[var(--near-black)] placeholder:text-[var(--ink)]/40"
                       placeholder="Enter new password (min 8 characters)"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     />
                   </div>
                   <div>
-                    <label htmlFor="confirmPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    <label htmlFor="confirmPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                       Confirm New Password
                     </label>
                     <input
@@ -935,7 +935,7 @@ export default function AdminDashboard() {
                       minLength={8}
                       className="w-full px-4 py-2.5 rounded-[50px] border-[1.5px] border-[rgba(34,34,34,0.08)] focus:outline-none focus:border-[var(--near-black)] text-[16px] bg-[var(--card)] text-[var(--near-black)] placeholder:text-[var(--ink)]/40"
                       placeholder="Confirm new password"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     />
                   </div>
                   {passwordMessage && (
@@ -945,7 +945,7 @@ export default function AdminDashboard() {
                           ? 'bg-[rgba(34,34,34,0.06)] text-[var(--ink)]'
                           : 'bg-[var(--terra-10)] text-[var(--terra)]'
                       }`}
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       {passwordMessage.text}
                     </div>
@@ -953,7 +953,7 @@ export default function AdminDashboard() {
                   <button
                     type="submit"
                     className="w-full px-4 py-2.5 bg-[var(--terra)] text-white rounded-[999px] font-bold text-[15px] hover:bg-[var(--terra-hover)] transition-colors"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                   >
                     Update Password
                   </button>
@@ -966,7 +966,7 @@ export default function AdminDashboard() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[var(--ink)] text-white text-[15px] font-semibold shadow-lg" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[var(--ink)] text-white text-[15px] font-semibold shadow-lg" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
           {toast}
         </div>
       )}
@@ -976,7 +976,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Add business</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Add business</h2>
               <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
@@ -984,66 +984,66 @@ export default function AdminDashboard() {
 
             <form onSubmit={handleCreateBusiness} className="space-y-5">
               {/* BASIC INFO */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Basic info</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Basic info</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Business name <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Business name <span className="text-[var(--terra)]">*</span></label>
                 <input
                   value={bizName}
                   onChange={e => { setBizName(e.target.value); if (!bizSlugManual) setBizSlug(slugify(e.target.value)); }}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="e.g. Wildcraft Coffee"
                 />
-                {bizErrors.name && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.name}</p>}
+                {bizErrors.name && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.name}</p>}
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Slug <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Slug <span className="text-[var(--terra)]">*</span></label>
                 <input
                   value={bizSlug}
                   onChange={e => { setBizSlug(e.target.value); setBizSlugManual(true); }}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] font-mono focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="wildcraft-coffee"
                 />
-                {bizErrors.slug && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.slug}</p>}
+                {bizErrors.slug && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.slug}</p>}
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Owner email <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Owner email <span className="text-[var(--terra)]">*</span></label>
                 <input
                   type="email"
                   value={bizEmail}
                   onChange={e => setBizEmail(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="hello@business.com"
                 />
-                {bizErrors.email && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.email}</p>}
+                {bizErrors.email && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.email}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Category <span className="text-[var(--terra)]">*</span></label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Category <span className="text-[var(--terra)]">*</span></label>
                   <select
                     value={bizCategory}
                     onChange={e => setBizCategory(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   >
                     <option value="">Select…</option>
                     {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
-                  {bizErrors.category && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.category}</p>}
+                  {bizErrors.category && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.category}</p>}
                 </div>
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Region</label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Region</label>
                   <select
                     value={bizRegion}
                     onChange={e => setBizRegion(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   >
                     {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                   </select>
@@ -1051,84 +1051,84 @@ export default function AdminDashboard() {
               </div>
 
               {/* LOCATION */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Location</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Location</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Address</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Address</label>
                 <input
                   value={bizAddress}
                   onChange={e => setBizAddress(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="123 High Street, Bury St Edmunds"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Latitude</label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Latitude</label>
                   <input
                     type="number"
                     step="any"
                     value={bizLat}
                     onChange={e => setBizLat(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                     placeholder="52.2434"
                   />
                 </div>
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Longitude</label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Longitude</label>
                   <input
                     type="number"
                     step="any"
                     value={bizLng}
                     onChange={e => setBizLng(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                     placeholder="0.7137"
                   />
                 </div>
               </div>
 
               {/* PROFILE */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Profile</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Profile</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Instagram handle</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Instagram handle</label>
                 <input
                   value={bizInstagram}
                   onChange={e => setBizInstagram(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="@wildcraftcoffee"
                 />
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Bio <span className="text-[var(--ink-35)]">(max 200 chars)</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Bio <span className="text-[var(--ink-35)]">(max 200 chars)</span></label>
                 <textarea
                   value={bizBio}
                   onChange={e => { if (e.target.value.length <= 200) setBizBio(e.target.value); }}
                   rows={3}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="A short description of the business…"
                 />
-                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{bizBio.length}/200</p>
+                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{bizBio.length}/200</p>
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Logo</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Logo</label>
                 {bizLogoPreview ? (
                   <div className="flex items-center gap-3">
                     <img src={bizLogoPreview} alt="Logo preview" className="w-14 h-14 rounded-[12px] object-cover" />
-                    <button type="button" onClick={() => { setBizLogoFile(null); setBizLogoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Remove</button>
+                    <button type="button" onClick={() => { setBizLogoFile(null); setBizLogoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Remove</button>
                   </div>
                 ) : (
                   <label className="flex flex-col items-center justify-center gap-2 py-8 rounded-[12px] border-[1.5px] border-dashed border-[var(--ink-15)] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
                     <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
-                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
+                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
                     <input type="file" accept="image/*" className="hidden" onChange={e => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -1138,11 +1138,11 @@ export default function AdminDashboard() {
                     }} />
                   </label>
                 )}
-                {bizErrors.logo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.logo}</p>}
+                {bizErrors.logo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.logo}</p>}
               </div>
 
               {/* STATUS */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Status</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Status</p>
 
               <div className="space-y-3">
                 {[
@@ -1156,7 +1156,7 @@ export default function AdminDashboard() {
                     onClick={() => toggle.set(!toggle.value)}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[var(--card)] border border-[var(--ink-08)]"
                   >
-                    <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>{toggle.label}</span>
+                    <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{toggle.label}</span>
                     <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${toggle.value ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
                       <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                     </div>
@@ -1164,14 +1164,14 @@ export default function AdminDashboard() {
                 ))}
               </div>
 
-              {bizErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{bizErrors.submit}</p>}
+              {bizErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.submit}</p>}
 
               <div className="space-y-3 pt-2">
                 <button
                   type="submit"
                   disabled={bizSubmitting}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
                   {bizSubmitting ? 'Creating…' : 'Create business'}
                 </button>
@@ -1179,7 +1179,7 @@ export default function AdminDashboard() {
                   type="button"
                   onClick={() => setShowAddBusiness(false)}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
                   Cancel
                 </button>
@@ -1194,50 +1194,50 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>New offer</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>New offer</h2>
               <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
             <form onSubmit={handleCreateOffer} className="space-y-5">
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Offer details</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Offer details</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Business <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Business <span className="text-[var(--terra)]">*</span></label>
                 <select
                   value={offerBusinessId}
                   onChange={e => setOfferBusinessId(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                 >
                   <option value="">Select business…</option>
                   {businesses.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
-                {offerErrors.business && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.business}</p>}
+                {offerErrors.business && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.business}</p>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer type <span className="text-[var(--terra)]">*</span></label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer type <span className="text-[var(--terra)]">*</span></label>
                   <select
                     value={offerType}
                     onChange={e => setOfferType(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   >
                     <option value="">Select…</option>
                     {OFFER_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
-                  {offerErrors.offer_type && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_type}</p>}
+                  {offerErrors.offer_type && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_type}</p>}
                 </div>
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Content type</label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Content type</label>
                   <select
                     value={offerContentType}
                     onChange={e => setOfferContentType(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   >
                     <option value="reel">Reel</option>
                   </select>
@@ -1245,7 +1245,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer item <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer item <span className="text-[var(--terra)]">*</span></label>
                 <input
                   value={offerItem}
                   onChange={e => {
@@ -1253,54 +1253,54 @@ export default function AdminDashboard() {
                     if (!offerTitleManual) setOfferTitle(`Free ${e.target.value}`);
                   }}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder='e.g. "oat flat white", "gel manicure"'
                 />
-                {offerErrors.offer_item && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_item}</p>}
+                {offerErrors.offer_item && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.offer_item}</p>}
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Generated title</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Generated title</label>
                 <input
                   value={offerTitle}
                   onChange={e => { setOfferTitle(e.target.value); setOfferTitleManual(true); }}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="Auto-generated from offer item"
                 />
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Description</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Description</label>
                 <textarea
                   value={offerDesc}
                   onChange={e => setOfferDesc(e.target.value)}
                   rows={2}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="Optional description"
                 />
               </div>
 
               {/* CAPACITY */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Capacity</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Capacity</p>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Monthly slot cap <span className="text-[var(--ink-35)]">(blank = unlimited)</span></label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Monthly slot cap <span className="text-[var(--ink-35)]">(blank = unlimited)</span></label>
                   <input
                     type="number"
                     min="1"
                     value={offerMonthlyCap}
                     onChange={e => setOfferMonthlyCap(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                     placeholder="Unlimited"
                   />
-                  {offerErrors.monthly_cap && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.monthly_cap}</p>}
+                  {offerErrors.monthly_cap && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.monthly_cap}</p>}
                 </div>
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Total slots <span className="text-[var(--terra)]">*</span></label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Total slots <span className="text-[var(--terra)]">*</span></label>
                   <input
                     type="number"
                     min="1"
@@ -1308,39 +1308,39 @@ export default function AdminDashboard() {
                     value={offerSlots}
                     onChange={e => setOfferSlots(e.target.value)}
                     className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   />
-                  {offerErrors.slots && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.slots}</p>}
+                  {offerErrors.slots && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.slots}</p>}
                 </div>
               </div>
 
               {/* BRIEF */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Brief</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Brief</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Specific ask <span className="text-[var(--ink-35)]">(max 100 chars)</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Specific ask <span className="text-[var(--ink-35)]">(max 100 chars)</span></label>
                 <textarea
                   value={offerSpecificAsk}
                   onChange={e => { if (e.target.value.length <= 100) setOfferSpecificAsk(e.target.value); }}
                   rows={2}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder={"e.g. \"they'd love if you showed the latte art\""}
                 />
-                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{offerSpecificAsk.length}/100</p>
+                <p className="text-right text-[12px] text-[var(--ink-35)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{offerSpecificAsk.length}/100</p>
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Offer photo</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer photo</label>
                 {offerPhotoPreview ? (
                   <div className="flex items-center gap-3">
                     <img src={offerPhotoPreview} alt="Offer preview" className="w-14 h-14 rounded-[12px] object-cover" />
-                    <button type="button" onClick={() => { setOfferPhotoFile(null); setOfferPhotoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Remove</button>
+                    <button type="button" onClick={() => { setOfferPhotoFile(null); setOfferPhotoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Remove</button>
                   </div>
                 ) : (
                   <label className="flex flex-col items-center justify-center gap-2 py-8 rounded-[12px] border-[1.5px] border-dashed border-[var(--ink-15)] bg-[var(--card)] cursor-pointer hover:border-[var(--ink-35)] transition-colors">
                     <Upload size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
-                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
+                    <span className="text-[14px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Upload photo</span>
                     <input type="file" accept="image/*" className="hidden" onChange={e => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -1350,19 +1350,19 @@ export default function AdminDashboard() {
                     }} />
                   </label>
                 )}
-                {offerErrors.photo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.photo}</p>}
+                {offerErrors.photo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.photo}</p>}
               </div>
 
               {/* ACCESS */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}>Access & status</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Access & status</p>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Min level</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Min level</label>
                 <select
                   value={offerMinLevel}
                   onChange={e => setOfferMinLevel(e.target.value)}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                 >
                   {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
                 </select>
@@ -1373,20 +1373,20 @@ export default function AdminDashboard() {
                 onClick={() => setOfferIsLive(!offerIsLive)}
                 className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[var(--card)] border border-[var(--ink-08)]"
               >
-                <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Is live</span>
+                <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Is live</span>
                 <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${offerIsLive ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
                   <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
                 </div>
               </button>
 
-              {offerErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>{offerErrors.submit}</p>}
+              {offerErrors.submit && <p className="text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.submit}</p>}
 
               <div className="space-y-3 pt-2">
                 <button
                   type="submit"
                   disabled={offerSubmitting}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
                   {offerSubmitting ? 'Creating…' : 'Create offer'}
                 </button>
@@ -1394,7 +1394,7 @@ export default function AdminDashboard() {
                   type="button"
                   onClick={() => setShowAddOffer(false)}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
                   Cancel
                 </button>

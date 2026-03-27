@@ -43,7 +43,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
         className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
-        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}
+        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
         required={required}
         minLength={minLength}
       />
@@ -162,13 +162,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Check your email</p>
+                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Reset password</p>
+                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Reset password</p>
                   <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -189,7 +189,7 @@ export default function Auth() {
                   type="submit"
                   disabled={resetLoading}
                   className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                 >
                   {resetLoading ? 'Sending...' : 'Send Reset Link'}
                 </button>
@@ -210,19 +210,19 @@ export default function Auth() {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--terra)' }} />
                 <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
               </span>
-              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
+              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
             </div>
           </div>
 
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
-            <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
+            <h1 className="text-[40px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
               Local offers.<br /><span style={{ color: '#C4674A', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}>Yours</span> to claim.
             </h1>
           </div>
 
           {/* 4. Subtext */}
-          <p className="text-center mb-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, margin: 0 }}>
+          <p className="text-center mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, margin: 0 }}>
             Claim offers from businesses near you. Visit in person, post your Reel, get rewarded.
           </p>
 
@@ -236,7 +236,7 @@ export default function Auth() {
                   style={{
                     background: ['var(--terra)', 'var(--peach)', 'var(--card)', 'var(--ink-15)'][i],
                     zIndex: 4 - i,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Instrument Sans', sans-serif",
                     fontWeight: 700,
                     fontSize: 12,
                     color: i === 0 ? 'white' : 'var(--ink-60)',
@@ -246,7 +246,7 @@ export default function Auth() {
                 </div>
               ))}
             </div>
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
+            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
               48 local businesses · vetted creators only
             </span>
           </div>
@@ -254,7 +254,7 @@ export default function Auth() {
           {/* 6. Divider with "Sign in" label */}
           <div className="flex items-center gap-[12px] mb-[20px]">
             <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
-            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-35)' }}>Sign in</span>
+            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-35)' }}>Sign in</span>
             <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
           </div>
 
@@ -297,7 +297,7 @@ export default function Auth() {
               type="submit"
               disabled={loading}
               className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -307,7 +307,7 @@ export default function Auth() {
             </button>
 
             {/* 10. Apply for access */}
-            <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
+            <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
               Not a member?{' '}
               <button
                 type="button"
@@ -324,7 +324,7 @@ export default function Auth() {
               type="button"
               onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
               className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
             >
               Forgot password?
             </button>
@@ -359,10 +359,10 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
             </div>
 
             {/* ── Creator signup (multi-step) ── */}
@@ -384,7 +384,7 @@ export default function Auth() {
                             onClick={() => setFollowerCount(opt)}
                             className="flex-1 py-[10px] text-[14px] transition-all"
                             style={{
-                              fontFamily: "'Plus Jakarta Sans', sans-serif",
+                              fontFamily: "'Instrument Sans', sans-serif",
                               fontWeight: followerCount === opt ? 700 : 600,
                               borderRadius: '999px',
                               background: followerCount === opt ? 'var(--terra)' : 'var(--card)',
@@ -396,7 +396,7 @@ export default function Auth() {
                           </button>
                         ))}
                       </div>
-                      <p className="text-[13px] text-[var(--ink-60)] mt-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Don't worry — we welcome all sizes</p>
+                      <p className="text-[13px] text-[var(--ink-60)] mt-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Don't worry — we welcome all sizes</p>
                     </div>
                   </div>
                 )}
@@ -454,7 +454,7 @@ export default function Auth() {
                         value={address}
                         onChange={(e) => setAddress(e.target.value)}
                         className="w-full px-[14px] py-[15px] rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
                         required
                       >
                         <option value="" disabled>Select your town</option>
@@ -497,7 +497,7 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Store size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[15px] text-[var(--ink-60)] leading-[1.65]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <p className="text-[15px] text-[var(--ink-60)] leading-[1.65]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                   Want to list your business on nayba? Get in touch at{' '}
                   <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a>
                 </p>
@@ -539,7 +539,7 @@ export default function Auth() {
                       setSignupStep(signupStep + 1);
                     }}
                     className="flex-1 min-h-[52px] text-white transition-all active:scale-[0.98] inline-flex items-center justify-center gap-[6px]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                   >
                     Continue <ChevronRight size={16} strokeWidth={1.5} />
                   </button>
@@ -547,9 +547,9 @@ export default function Auth() {
               ) : (
                 <>
                 <div className="text-center mb-[14px]">
-                  <p className="text-[15px] font-bold text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Application received</p>
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.5 }}>We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
-                  <p className="text-[12px] text-[var(--ink-35)] mt-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
+                  <p className="text-[15px] font-bold text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Application received</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.5 }}>We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
+                  <p className="text-[12px] text-[var(--ink-35)] mt-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
                 </div>
                 <div className="flex gap-[10px]">
                   <button
@@ -563,7 +563,7 @@ export default function Auth() {
                     type="submit"
                     disabled={loading}
                     className="flex-1 min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
                   >
                     {loading ? (
                       <span className="inline-flex items-center gap-2">
@@ -576,7 +576,7 @@ export default function Auth() {
               )}
             </div>
 
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
               Already have an account?{' '}
               <button
                 type="button"

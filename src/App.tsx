@@ -382,7 +382,7 @@ function CookieConsent() {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.08)' }}>
-      <div className="bg-white px-[16px] py-[16px] flex items-center justify-between gap-[16px] max-w-[600px] mx-auto" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+      <div className="bg-white px-[16px] py-[16px] flex items-center justify-between gap-[16px] max-w-[600px] mx-auto" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
         <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] m-0" style={{ fontWeight: 400 }}>
           We use cookies to keep you signed in and improve your experience.
         </p>
@@ -392,7 +392,7 @@ function CookieConsent() {
             setVisible(false);
           }}
           className="flex-shrink-0 px-[20px] py-[8px] text-[13px] text-white rounded-[999px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
-          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+          style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
         >
           Got it
         </button>

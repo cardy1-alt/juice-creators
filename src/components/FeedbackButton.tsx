@@ -64,7 +64,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
           >
             {/* Header */}
             <div className="flex items-center justify-between px-[20px] pt-[18px] pb-[10px]">
-              <h3 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '18px', color: 'var(--ink)' }}>Send feedback</h3>
+              <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '18px', color: 'var(--ink)' }}>Send feedback</h3>
               <button
                 onClick={() => { setOpen(false); setSent(false); }}
                 className="w-[32px] h-[32px] flex items-center justify-center rounded-full transition-colors"
@@ -76,8 +76,8 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
 
             {sent ? (
               <div className="px-[20px] pb-[20px] text-center py-[24px]">
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--terra)' }}>Thanks for your feedback!</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '4px' }}>We'll take a look.</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--terra)' }}>Thanks for your feedback!</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '4px' }}>We'll take a look.</p>
               </div>
             ) : (
               <div className="px-[20px] pb-[20px]">
@@ -90,7 +90,7 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                   autoFocus
                   className="w-full resize-none focus:outline-none"
                   style={{
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Instrument Sans', sans-serif",
                     fontWeight: 400,
                     fontSize: '15px',
                     color: 'var(--ink)',
@@ -103,13 +103,13 @@ export default function FeedbackButton({ userId, userType, displayName, currentP
                   onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                 />
                 <div className="flex items-center justify-between mt-[12px]">
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)' }}>{text.length}/500</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)' }}>{text.length}/500</span>
                   <button
                     onClick={handleSubmit}
                     disabled={!text.trim() || sending}
                     className="transition-all disabled:opacity-40"
                     style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontFamily: "'Instrument Sans', sans-serif",
                       fontWeight: 700,
                       fontSize: '15px',
                       color: 'white',
