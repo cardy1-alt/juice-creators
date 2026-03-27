@@ -2103,8 +2103,13 @@ export default function CreatorApp() {
                               </div>
                             </div>
 
+                            {/* Swipe hint */}
+                            {activeClaims.filter(c => c.businesses && c.offers).length > 1 && (
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, color: 'rgba(34,34,34,0.35)', textAlign: 'center', margin: '8px 0 0' }}>‹ › swipe to switch pass</p>
+                            )}
+
                             {/* Content below pass card */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', flex: 1, padding: '0 4px' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 4px 0' }}>
 
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
@@ -2200,30 +2205,11 @@ export default function CreatorApp() {
                               {claim.redeemed_at && !claim.reel_url && (
                                 <div style={{ textAlign: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
-                                    <Check size={28} strokeWidth={1.5} color="var(--terra)" />
-                                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Visit confirmed!</span>
+                                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Visit confirmed!</span>
                                   </div>
                                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
                                     Now post your Reel within 48 hours and submit the link below
                                   </p>
-                                  {/* Reel deadline */}
-                                  {(() => {
-                                    const due = claim.reel_due_at ? new Date(claim.reel_due_at).getTime() : 0;
-                                    const now = Date.now();
-                                    const diff = due - now;
-                                    const claimOverdue = due > 0 && diff < 0;
-                                    const hrs = Math.floor(diff / (1000 * 60 * 60));
-                                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                                    const claimTimeLeft = due > 0 && diff > 0 ? `${hrs}h ${mins}m` : '';
-                                    return (
-                                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(34,34,34,0.08)', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
-                                        <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>
-                                          {claimOverdue ? 'Overdue!' : claimTimeLeft ? `${claimTimeLeft} remaining` : 'Post your reel now'}
-                                        </span>
-                                      </div>
-                                    );
-                                  })()}
                                   {/* Reel URL input */}
                                   <div style={{ textAlign: 'left' }}>
                                     <input
@@ -2242,7 +2228,7 @@ export default function CreatorApp() {
                                       disabled={loading || !reelUrl}
                                       style={{
                                         width: '100%', height: 52, borderRadius: 999, border: 'none', marginTop: 14,
-                                        background: (reelUrl && reelUrl.startsWith('http') && reelUrl.length > 4) ? 'var(--terra)' : 'var(--terra-40)',
+                                        background: 'var(--terra)',
                                         fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
                                       }}
                                     >
