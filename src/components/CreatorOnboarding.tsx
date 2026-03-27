@@ -179,7 +179,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
-                  { num: 1, bg: 'var(--terra)', title: 'Browse & claim an offer', desc: 'Find local businesses offering free products, services, or discounts in exchange for a reel.' },
+                  { num: 1, bg: 'var(--terra)', title: 'Browse & claim a collab', desc: 'Find local businesses offering free products, services, or discounts in exchange for a reel.' },
                   { num: 2, bg: 'var(--ink)', title: 'Visit the business', desc: 'Show your QR pass at the door, enjoy the experience, and soak in the vibes.' },
                   { num: 3, bg: 'var(--ink)', title: 'Post your reel', desc: 'You have 48 hours to post an authentic Instagram reel featuring the business. That\'s it!' },
                 ].map(step => (
@@ -218,7 +218,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Complete your profile
               </h1>
-              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their offers</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their collabs</p>
 
               {/* Avatar upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -397,7 +397,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             </h1>
 
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
-              {businessCount} local businesses with {offerCount} live offers are waiting for you to explore.
+              {businessCount} local businesses with {offerCount} live collabs are waiting for you to explore.
             </p>
 
             {/* Stats cards */}
@@ -408,7 +408,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               </div>
               <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
                 <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Offers</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Collabs</p>
               </div>
             </div>
 
