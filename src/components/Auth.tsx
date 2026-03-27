@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -83,6 +83,8 @@ export default function Auth() {
   const [resetSent, setResetSent] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState('');
+  const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const { signIn, signUp } = useAuth();
 
@@ -685,9 +687,168 @@ export default function Auth() {
               </button>
             </p>
             <p className="text-[13px] text-[var(--ink-35)] text-center mt-[8px] leading-[1.5]">
-              By signing up you agree to our terms. Your account will be reviewed by our team.
+              By signing up you agree to{' '}
+              <button
+                type="button"
+                onClick={() => setShowTerms(true)}
+                className="underline text-[var(--terra)] hover:text-[var(--terra-hover)] transition-colors"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
+              >
+                our terms
+              </button>
+              {' '}and{' '}
+              <button
+                type="button"
+                onClick={() => setShowPrivacy(true)}
+                className="underline text-[var(--terra)] hover:text-[var(--terra-hover)] transition-colors"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
+              >
+                privacy policy
+              </button>
+              . Your account will be reviewed by our team.
             </p>
           </form>
+          </div>
+        </div>
+      )}
+
+      {/* Terms of Service Modal */}
+      {showTerms && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowTerms(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-sans font-extrabold text-[var(--near-black)]">Terms of Service</h2>
+              <button
+                onClick={() => setShowTerms(false)}
+                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
+              >
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-[14px] leading-[1.6] text-[var(--ink-60)]">
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">What is Nayba?</h3>
+                <p>
+                  Nayba is a platform that connects local creators with independent businesses. Creators discover participating businesses, visit in person, and create short-form content (Reels) in exchange for complimentary products or services.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Content Standards</h3>
+                <p>
+                  All content created through Nayba must be honest, genuine, and based on a real visit to the business. Misleading, fabricated, or AI-generated content that misrepresents the experience is not permitted. You retain ownership of your content.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Account &amp; Conduct</h3>
+                <p>
+                  Nayba reserves the right to suspend or remove accounts that violate these terms, engage in fraudulent activity, abuse the platform, or behave in a way that harms the community, businesses, or other creators.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Pilot / Beta</h3>
+                <p>
+                  Nayba is currently in pilot. Features may change, and the service is provided as-is without guarantees of uptime or availability. By participating you acknowledge the platform is under active development.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Contact</h3>
+                <p>
+                  If you have questions about these terms or need support, please email{' '}
+                  <a href="mailto:hello@nayba.app" className="text-[var(--terra)] underline">hello@nayba.app</a>.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowTerms(false)}
+              className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Policy Modal */}
+      {showPrivacy && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowPrivacy(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-sans font-extrabold text-[var(--near-black)]">Privacy Policy</h2>
+              <button
+                onClick={() => setShowPrivacy(false)}
+                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
+              >
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-[14px] leading-[1.6] text-[var(--ink-60)]">
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">What We Collect</h3>
+                <p>When you create an account, we collect the following personal information:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                  <li>Name</li>
+                  <li>Email address</li>
+                  <li>Date of birth</li>
+                  <li>Town / location</li>
+                  <li>Instagram handle</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Why We Collect It</h3>
+                <p>Your data is used to:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                  <li>Create and manage your Nayba account</li>
+                  <li>Verify you meet the minimum age requirement</li>
+                  <li>Match you with relevant local offers based on your location</li>
+                  <li>Enable businesses to verify creator visits</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Third Parties</h3>
+                <p>
+                  We do not sell your personal data to third parties. Your information is only shared with businesses you choose to interact with through the platform.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Data Storage</h3>
+                <p>
+                  Your data is stored securely using Supabase, a cloud-hosted database platform with encryption at rest and in transit.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Your Rights</h3>
+                <p>
+                  You have the right to request deletion of your account and all associated data at any time. To make a request, email{' '}
+                  <a href="mailto:hello@nayba.app" className="text-[var(--terra)] underline">hello@nayba.app</a>.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPrivacy(false)}
+              className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+            >
+              Close
+            </button>
           </div>
         </div>
       )}
