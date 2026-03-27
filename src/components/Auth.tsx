@@ -70,11 +70,9 @@ export default function Auth() {
   const dateOfBirth = dobDay && dobMonth && dobYear
     ? `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`
     : '';
-  const [category, setCategory] = useState(CATEGORY_LIST[0]);
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
-  const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -94,9 +92,6 @@ export default function Auth() {
     return (base || 'CREATOR') + suffix;
   };
 
-  const generateSlug = (name: string) => {
-    return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -125,10 +120,8 @@ export default function Auth() {
       if (mode === 'signin') {
         await signIn(email, password);
       } else {
-        const additionalData = role === 'creator'
-          ? { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude }
-          : { name, slug: generateSlug(name), category, address: address || null, latitude, longitude, bio: bio || null };
-        await signUp(email, password, role, additionalData);
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude };
+        await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred');
@@ -144,13 +137,7 @@ export default function Auth() {
     { title: 'Almost there', subtitle: 'Set up your login' },
   ];
 
-  const businessStepTitles = [
-    { title: 'About your business', subtitle: 'Help creators find you' },
-    { title: 'Location & vibe', subtitle: 'Where can creators visit?' },
-    { title: 'Almost there', subtitle: 'Set up your login' },
-  ];
-
-  const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
+  const stepTitles = creatorStepTitles;
 
   return (
     <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
@@ -503,100 +490,17 @@ export default function Auth() {
               </>
             )}
 
-            {/* ── Business signup (multi-step) ── */}
+            {/* ── Business signup disabled for pilot ── */}
             {role === 'business' && (
-              <>
-                {/* Step 1: Name & Category */}
-                {signupStep === 1 && (
-                  <div className="space-y-[16px]">
-                    <FloatingInput label="Business Name" icon="shop" value={name} onChange={setName} placeholder="Juice Bar Co" required />
-
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[10px]">Category</label>
-                      <div className="grid grid-cols-2 gap-[8px]">
-                        {CATEGORY_LIST.map((cat) => (
-                          <button
-                            key={cat}
-                            type="button"
-                            onClick={() => setCategory(cat)}
-                            className="flex items-center gap-[8px] px-[12px] py-[12px] text-left transition-all duration-200"
-                            style={{
-                              borderRadius: '14px',
-                              border: category === cat ? '2px solid var(--terra)' : '1.5px solid var(--ink-08)',
-                              background: category === cat ? 'var(--terra-5)' : 'var(--card)',
-                            }}
-                          >
-                            <CategoryIcon category={cat} className={`w-[16px] h-[16px] flex-shrink-0 ${category === cat ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
-                            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '15px', color: category === cat ? 'var(--ink)' : 'var(--ink-60)' }} className="truncate">{cat}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 2: Address & Bio */}
-                {signupStep === 2 && (
-                  <div className="space-y-[14px]">
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Your town</label>
-                      <select
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="w-full px-[14px] py-[15px] rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
-                        required
-                      >
-                        <option value="" disabled>Select your town</option>
-                        <option value="Bury St Edmunds">Bury St Edmunds</option>
-                        <option value="Ipswich" disabled style={{ color: 'var(--ink-35)' }}>Ipswich — coming soon</option>
-                        <option value="Norwich" disabled style={{ color: 'var(--ink-35)' }}>Norwich — coming soon</option>
-                        <option value="Cambridge" disabled style={{ color: 'var(--ink-35)' }}>Cambridge — coming soon</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Bio</label>
-                      <div className="relative">
-                        <textarea
-                          value={bio}
-                          onChange={(e) => setBio(e.target.value.slice(0, 150))}
-                          placeholder="Tell creators a bit about your business..."
-                          maxLength={150}
-                          rows={3}
-                          className="w-full px-[16px] py-[14px] bg-[var(--card)] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none transition-all resize-none"
-                          style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, border: '1.5px solid var(--ink-08)', borderRadius: '14px' }}
-                          onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
-                          onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
-                          required
-                        />
-                        <span className={`absolute bottom-[10px] right-[12px] text-[13px] font-medium ${bio.length > 130 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/150</span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Email & Password */}
-                {signupStep === 3 && (
-                  <div className="space-y-[12px]">
-                    <FloatingInput label="Email" icon="mail" type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
-                    <FloatingInput
-                      label="Password"
-                      icon="lock"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={setPassword}
-                      placeholder="Min 8 characters"
-                      required
-                      minLength={8}
-                      rightElement={
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                          {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-                        </button>
-                      }
-                    />
-                  </div>
-                )}
-              </>
+              <div className="text-center py-[32px]">
+                <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
+                  <Store size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
+                </div>
+                <p className="text-[15px] text-[var(--ink-60)] leading-[1.65]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  Want to list your business on nayba? Get in touch at{' '}
+                  <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a>
+                </p>
+              </div>
             )}
 
             {error && (
@@ -630,14 +534,6 @@ export default function Auth() {
                         setError('Please enter your date of birth');
                         return;
                       }
-                      if (role === 'business' && signupStep === 1 && !name) {
-                        setError('Please enter your business name');
-                        return;
-                      }
-                      if (role === 'business' && signupStep === 2 && (!address || !bio)) {
-                        setError('Please enter your business address and bio');
-                        return;
-                      }
                       setError('');
                       setSignupStep(signupStep + 1);
                     }}
@@ -649,7 +545,11 @@ export default function Auth() {
                 </div>
               ) : (
                 <>
-                <p className="text-center mb-[12px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)' }}>We review every application manually. You'll hear back within 24 hours.</p>
+                <div className="text-center mb-[14px]">
+                  <p className="text-[15px] font-bold text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Application received</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.5 }}>We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
+                  <p className="text-[12px] text-[var(--ink-35)] mt-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
+                </div>
                 <div className="flex gap-[10px]">
                   <button
                     type="button"
