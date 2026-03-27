@@ -404,7 +404,7 @@ export default function Auth() {
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
             <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
-              Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
+              Local offers.<br /><span style={{ color: '#C4674A', fontSize: 'inherit', fontWeight: 'inherit', lineHeight: 'inherit' }}>Yours</span> to claim.
             </h1>
           </div>
 
@@ -414,7 +414,7 @@ export default function Auth() {
           </p>
 
           {/* 5. Stacked avatars + social proof */}
-          <div className="flex items-center justify-center gap-[10px] mb-[28px]">
+          <div className="flex items-center justify-center gap-[10px] mt-4 mb-[28px]">
             <div className="flex -space-x-[10px]">
               {['S', 'M', 'J', 'R'].map((initial, i) => (
                 <div
