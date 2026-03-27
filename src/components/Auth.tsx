@@ -404,7 +404,7 @@ export default function Auth() {
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
             <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
-              Local offers.<br /><span className="text-[#C4674A] italic">Yours</span> to claim.
+              Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
             </h1>
           </div>
 
