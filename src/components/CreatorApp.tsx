@@ -1541,7 +1541,7 @@ export default function CreatorApp() {
                       <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No offers found for '{searchQuery.trim()}'</p>
                     ) : (
                       <>
-                        <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
+                        <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>No offers available right now — check back soon.</p>
                       </>
                     )}
@@ -1954,7 +1954,7 @@ export default function CreatorApp() {
               {matchedSaved.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-[40px]">
                   <Heart size={48} strokeWidth={1.5} color="#C4674A" fill="none" />
-                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
+                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
                   <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
@@ -2203,7 +2203,7 @@ export default function CreatorApp() {
                                 <div style={{ textAlign: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
                                     <Check size={28} strokeWidth={1.5} color="var(--terra)" />
-                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Visit confirmed!</span>
+                                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Visit confirmed!</span>
                                   </div>
                                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
                                     Now post your Reel within 48 hours and submit the link below
@@ -2337,7 +2337,7 @@ export default function CreatorApp() {
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mx-auto mb-4" />
-                  <p className="text-[18px] font-semibold text-[var(--ink)]">No claims yet</p>
+                  <p className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>No claims yet</p>
                   <p className="text-[18px] text-[var(--ink-60)] mt-1">Claim an offer to get started</p>
                 </div>
               ) : (
@@ -2596,7 +2596,7 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing yet</p>
+                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing yet</p>
                       <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>
