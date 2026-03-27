@@ -608,7 +608,7 @@ export default function Auth() {
                     <FloatingInput label="Instagram Handle" icon="instagram" value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
 
                     <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Follower Count</label>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Instagram following</label>
                       <div className="flex gap-[8px]">
                         {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
                           <button
@@ -629,6 +629,7 @@ export default function Auth() {
                           </button>
                         ))}
                       </div>
+                      <p className="text-[13px] text-[var(--ink-60)] mt-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Don't worry — we welcome all sizes</p>
                     </div>
                   </div>
                 )}
@@ -677,7 +678,7 @@ export default function Auth() {
                           ))}
                         </select>
                       </div>
-                      <p className="text-[13px] text-[var(--ink-35)] mt-[6px]">You must be at least 13 years old</p>
+                      <p className="text-[13px] text-[var(--ink-35)] mt-[6px]">We use this to verify your age. You must be 13 or over.</p>
                     </div>
 
                     <AddressAutocomplete
