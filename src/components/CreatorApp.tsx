@@ -2068,17 +2068,22 @@ export default function CreatorApp() {
                     const isClaimed = claim.status === 'active' && !claim.redeemed_at;
 
                     return (
-                      <div style={{ padding: '12px 20px 0' }}>
+                      <div
+                        style={{ padding: '12px 20px 0', touchAction: 'pan-y' }}
+                        onTouchStart={(e) => { passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY }; }}
+                        onTouchEnd={(e) => {
+                          if (!passTouchRef.current) return;
+                          const dx = e.changedTouches[0].clientX - passTouchRef.current.startX;
+                          const dy = e.changedTouches[0].clientY - passTouchRef.current.startY;
+                          passTouchRef.current = null;
+                          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
+                            if (dx < 0 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
+                            if (dx > 0 && idx > 0) setSelectedClaim(filtered[idx - 1]);
+                          }
+                        }}
+                      >
                         {/* Compact pass navigator */}
                         <div
-                          onTouchStart={(e) => { passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY }; }}
-                          onTouchEnd={(e) => {
-                            if (!passTouchRef.current) return;
-                            const dx = e.changedTouches[0].clientX - passTouchRef.current.startX;
-                            passTouchRef.current = null;
-                            if (dx < -40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
-                            if (dx > 40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
-                          }}
                           style={{ display: 'flex', alignItems: 'center', gap: 10, background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px' }}
                         >
                           <button
@@ -2087,8 +2092,8 @@ export default function CreatorApp() {
                             style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(34,34,34,0.08)', color: isClaimed ? 'white' : 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                           >‹</button>
                           <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 11, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
                           </div>
                           <button
                             onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
