@@ -2367,8 +2367,9 @@ export default function CreatorApp() {
               {isPendingApproval && (
                 <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(34,34,34,0.04)' }}>
                   <Clock size={28} strokeWidth={1.5} className="text-[var(--ink-60)] mx-auto mb-2.5" />
-                  <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">Account Under Review</h3>
-                  <p className="text-[15px] text-[var(--ink-60)] leading-[1.5]">We're reviewing your profile — you'll get an email once approved. In the meantime, make sure your profile is looking great!</p>
+                  <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">Application received</h3>
+                  <p className="text-[15px] text-[var(--ink-60)] leading-[1.5]">We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
+                  <p className="text-[13px] text-[var(--ink-35)] mt-[8px]">Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
                 </div>
               )}
               {profileSubView === 'main' ? (
