@@ -172,7 +172,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 1 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Here's how it works
               </h1>
               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px' }}>Claim. Visit. Post. Get rewarded.</p>
@@ -215,7 +215,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Complete your profile
               </h1>
               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their offers</p>
@@ -234,7 +234,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'rgba(255,255,255,0.8)' }}>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '32px', color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(displayName || profile.name || 'C')}
                       </span>
                     )}
@@ -392,7 +392,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               </div>
             </div>
 
-            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '36px', color: 'var(--ink)', textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' }}>
+            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '36px', color: 'var(--ink)', textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' }}>
               You're in.
             </h1>
 
@@ -403,11 +403,11 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
               <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{businessCount}</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '32px', color: 'var(--ink)' }}>{businessCount}</p>
                 <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Businesses</p>
               </div>
               <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
                 <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Offers</p>
               </div>
             </div>

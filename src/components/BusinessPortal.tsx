@@ -420,7 +420,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
     return (
       <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col items-center justify-center px-6">
         <Check size={56} strokeWidth={1.5} className="text-[var(--terra)] mb-4" />
-        <p className="text-[24px] font-sans font-extrabold text-[var(--ink)] text-center" style={{ letterSpacing: '-0.03em' }}>Your offer is live!</p>
+        <p className="text-[24px] font-sans font-semibold text-[var(--ink)] text-center" style={{ letterSpacing: '-0.03em' }}>Your offer is live!</p>
         <p className="text-[18px] text-[var(--ink-60)] text-center mt-2">Creators can now discover and claim it</p>
         <button
           onClick={onCancel}
@@ -469,7 +469,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 1: What are you offering? ── */}
         {screen === 1 && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What are you offering?</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What are you offering?</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-6" style={{ lineHeight: '1.6' }}>Choose the type of experience</p>
             <div className="grid grid-cols-2 gap-3">
               {tiles.map(t => (
@@ -511,11 +511,11 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2: Fill in the blank ── */}
         {screen === 2 && offerType !== 'discount' && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What exactly will you give?</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What exactly will you give?</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-8" style={{ lineHeight: '1.6' }}>We'll use this to create your offer card</p>
 
             <div className="flex items-baseline gap-2 mb-2">
-              <span className="text-[24px] font-sans font-extrabold text-[var(--ink)]">Free</span>
+              <span className="text-[24px] font-sans font-semibold text-[var(--ink)]">Free</span>
               <input
                 type="text"
                 value={offerItem}
@@ -527,7 +527,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                   }
                 }}
                 placeholder={getCategoryPlaceholder(category, offerType)}
-                className="flex-1 text-[24px] font-sans font-extrabold text-[var(--ink)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--ink-60)] placeholder:font-normal"
+                className="flex-1 text-[24px] font-sans font-semibold text-[var(--ink)] border-b-2 border-[var(--terra)] bg-transparent outline-none placeholder:text-[var(--ink-60)] placeholder:font-normal"
                 autoFocus
               />
             </div>
@@ -582,7 +582,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 2 (Discount): Amount + unit toggle ── */}
         {screen === 2 && offerType === 'discount' && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What's the discount?</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>What's the discount?</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-8" style={{ lineHeight: '1.6' }}>Set the amount creators will receive</p>
 
             <div className="flex justify-center mb-4">
@@ -598,7 +598,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 }}
                 min={1}
                 max={discountUnit === '%' ? 100 : 999}
-                className="text-[52px] font-sans font-extrabold text-[var(--ink)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
+                className="text-[52px] font-sans font-semibold text-[var(--ink)] border-b-2 border-[var(--terra)] bg-transparent outline-none text-center"
                 style={{ width: '120px' }}
                 autoFocus
               />
@@ -651,7 +651,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 3: How many slots? ── */}
         {screen === 3 && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>How many creators?</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>How many creators?</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-10" style={{ lineHeight: '1.6' }}>Each slot is one creator visit</p>
 
             {monthlyCap === null ? (
@@ -659,7 +659,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 <div className="w-20 h-20 rounded-full bg-[var(--terra-10)] flex items-center justify-center mb-3">
                   <Infinity size={40} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <span className="text-[32px] font-sans font-extrabold text-[var(--ink)]">Unlimited</span>
+                <span className="text-[32px] font-sans font-semibold text-[var(--ink)]">Unlimited</span>
               </div>
             ) : (
               <div className="flex items-center justify-center gap-6 mb-4">
@@ -669,7 +669,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 >
                   <Minus size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                 </button>
-                <span className="text-[28px] font-sans font-extrabold text-[var(--ink)] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
+                <span className="text-[28px] font-sans font-semibold text-[var(--ink)] min-w-[80px] text-center" style={{ lineHeight: 1 }}>
                   {monthlyCap}
                 </span>
                 <button
@@ -717,7 +717,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 4: Add a photo (optional) ── */}
         {screen === 4 && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Add a photo</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Add a photo</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-8" style={{ lineHeight: '1.6' }}>Optional — helps your offer stand out</p>
 
             <div className="flex flex-col items-center mb-6">
@@ -750,7 +750,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                     ) : (
                       <>
-                        <span className="text-[26px] font-extrabold text-[rgba(255,255,255,0.8)]">{getInitials('Offer')}</span>
+                        <span className="text-[26px] font-semibold text-[rgba(255,255,255,0.8)]">{getInitials('Offer')}</span>
                         <Camera size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
                         <span className="text-[14px] text-[var(--ink-60)]">Tap to add photo</span>
                       </>
@@ -811,7 +811,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 5: Any specific ask? ── */}
         {screen === 5 && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Anything specific?</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Anything specific?</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-6" style={{ lineHeight: '1.6' }}>Optional — most businesses skip this</p>
 
             <textarea
@@ -847,7 +847,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
         {/* ── Screen 6: Preview ── */}
         {screen === 6 && (
           <div>
-            <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Your offer</h2>
+            <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mt-4 mb-1" style={{ letterSpacing: '-0.03em' }}>Your offer</h2>
             <p className="text-[18px] text-[var(--ink-60)] mb-6" style={{ lineHeight: '1.6' }}>This is exactly what creators will see</p>
 
             {/* Offer card preview */}
@@ -860,7 +860,7 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
                 {offerPhotoUrl ? (
                   <img src={offerPhotoUrl} alt="Offer" className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 ) : (
-                  <span className="text-[32px] font-extrabold text-white/80">{getInitials('Offer')}</span>
+                  <span className="text-[32px] font-semibold text-white/80">{getInitials('Offer')}</span>
                 )}
                 <span className="absolute top-3 right-3 inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[13px] font-bold text-[var(--ink)]" style={{ background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(4px)' }}>
                   <Clapperboard size={10} strokeWidth={1.5} className="" /> Reel
@@ -868,8 +868,8 @@ function OfferBuilder({ category, instagramHandle, onComplete, onCancel }: Offer
               </div>
               {/* Body */}
               <div className="p-4">
-                <p className="text-[17px] font-extrabold text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Your business</p>
-                <p className="text-[18px] font-sans font-extrabold text-[var(--ink)] mt-0.5" style={{ letterSpacing: '-0.03em' }}>{generatedTitle}</p>
+                <p className="text-[17px] font-semibold text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Your business</p>
+                <p className="text-[18px] font-sans font-semibold text-[var(--ink)] mt-0.5" style={{ letterSpacing: '-0.03em' }}>{generatedTitle}</p>
                 <div className="flex items-center gap-1 mt-1.5">
                   <Clapperboard size={13} strokeWidth={1.5} className="text-[var(--terra)]" />
                   <span className="text-[15px] text-[var(--ink-60)]">Instagram Reel</span>
@@ -1464,7 +1464,7 @@ export default function BusinessPortal() {
                   </div>
                   {/* Name + meta */}
                   <div className="flex-1 min-w-0 pt-[2px]">
-                    <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{biz.name}</h2>
+                    <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{biz.name}</h2>
                     <p className="text-[18px] text-[var(--ink-60)] mt-[2px]">{biz.category}</p>
                     {biz.address && (
                       <p className="text-[14px] text-[var(--ink-60)] mt-[4px] flex items-center gap-[4px]">
@@ -1477,17 +1477,17 @@ export default function BusinessPortal() {
                 {/* Stats row inside card */}
                 <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
                   <div className="flex-1 text-center">
-                    <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{biz.claim_count}</p>
+                    <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{biz.claim_count}</p>
                     <p className="text-[13px] text-[var(--ink-60)] font-semibold">Collabs</p>
                   </div>
                   <div className="w-[1px] h-[32px] bg-[var(--ink-08)]" />
                   <div className="flex-1 text-center">
-                    <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{biz.creator_count}</p>
+                    <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{biz.creator_count}</p>
                     <p className="text-[13px] text-[var(--ink-60)] font-semibold">Creators</p>
                   </div>
                   <div className="w-[1px] h-[32px] bg-[var(--ink-08)]" />
                   <div className="flex-1 text-center">
-                    <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{biz.offer_count}</p>
+                    <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{biz.offer_count}</p>
                     <p className="text-[13px] text-[var(--ink-60)] font-semibold">Live offers</p>
                   </div>
                 </div>
@@ -1496,7 +1496,7 @@ export default function BusinessPortal() {
               {/* ═══ About card ═══ */}
               {biz.bio && (
                 <div className="rounded-[18px] p-[16px] mb-[16px]">
-                  <h3 className="text-[18px] font-sans font-extrabold text-[var(--ink)] mb-[8px]" style={{ letterSpacing: '-0.03em' }}>About</h3>
+                  <h3 className="text-[18px] font-sans font-semibold text-[var(--ink)] mb-[8px]" style={{ letterSpacing: '-0.03em' }}>About</h3>
                   <p className="text-[18px] text-[var(--ink-60)] leading-[1.5]">{biz.bio}</p>
                 </div>
               )}
@@ -1597,7 +1597,7 @@ export default function BusinessPortal() {
               {/* Greeting + compact stats banner */}
               <div className="flex items-start justify-between mb-2">
                 <div>
-                  <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 24, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
+                  <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                     {getGreeting()}, {userProfile.name}
                   </h2>
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
@@ -1609,22 +1609,22 @@ export default function BusinessPortal() {
               {/* Compact inline stats */}
               <div className="flex items-center gap-[6px] mb-7 flex-wrap">
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--terra)' }}>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'white' }}>{activeClaimsCount}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'white' }}>{activeClaimsCount}</span>
                   <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'rgba(255,255,255,0.8)' }}>active</span>
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{reelsThisMonth}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{reelsThisMonth}</span>
                   <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>reels</span>
                 </span>
                 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 5, padding: '4px 10px', borderRadius: 999, background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 14, color: 'var(--ink)' }}>{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)' }}>{totalSlotsLeft > 98 ? '∞' : totalSlotsLeft}</span>
                   <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>slots left</span>
                 </span>
               </div>
 
               {/* Your campaign — single active offer card */}
               <div className="mb-7">
-                <h3 className="text-[20px] font-sans font-extrabold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Your campaign</h3>
+                <h3 className="text-[20px] font-sans font-semibold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Your campaign</h3>
 
                 {activeOffer ? (() => {
                   const slotsUsed = activeOffer.slotsUsed || 0;
@@ -1674,7 +1674,7 @@ export default function BusinessPortal() {
                       </div>
                       {/* Card body with title + stats */}
                       <div className="px-[16px] py-[12px] bg-[var(--card)]">
-                        <p className="text-[20px] font-sans font-extrabold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{activeOffer.generated_title || activeOffer.description}</p>
+                        <p className="text-[20px] font-sans font-semibold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{activeOffer.generated_title || activeOffer.description}</p>
                         <p className="text-[15px] text-[var(--ink-60)] mt-[3px]">{isUnlimited ? 'Unlimited creators' : `${slotCap} creator${slotCap === 1 ? '' : 's'} per month`} · {slotsUsed} claimed</p>
                       </div>
                       {/* Footer actions */}
@@ -1711,7 +1711,7 @@ export default function BusinessPortal() {
               {/* Recent creator activity — vertical list */}
               <div className="mb-6">
                 <div className="flex items-center justify-between mb-[14px]">
-                  <h3 className="text-[20px] font-sans font-extrabold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Creator activity</h3>
+                  <h3 className="text-[20px] font-sans font-semibold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Creator activity</h3>
                   {recentActivity.length > 0 && (
                     <button onClick={() => setView('claims')} className="text-[15px] font-semibold text-[var(--terra)]">
                       View all
@@ -1762,7 +1762,7 @@ export default function BusinessPortal() {
               {/* ═══ Also on Nayba ═══ */}
               {nearbyBusinesses.length > 0 && (
                 <div className="mt-2">
-                  <h3 className="text-[20px] font-sans font-extrabold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Also on Nayba</h3>
+                  <h3 className="text-[20px] font-sans font-semibold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Also on Nayba</h3>
                   <div className="space-y-[8px]">
                     {nearbyBusinesses.map((biz) => (
                       <button
@@ -1807,7 +1807,7 @@ export default function BusinessPortal() {
                     <button onClick={() => setSelectedOffer(null)} className="p-2 -ml-2 hover:bg-[var(--card)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[24px] font-sans font-extrabold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Edit offer</h1>
+                    <h1 className="text-[24px] font-sans font-semibold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Edit offer</h1>
                   </div>
 
                   {/* Hero image with upload */}
@@ -1926,7 +1926,7 @@ export default function BusinessPortal() {
               ) : (
                 /* ── Campaign view with active offer + history ── */
                 <>
-                  <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mb-[20px]" style={{ letterSpacing: '-0.03em' }}>Your campaign</h2>
+                  <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mb-[20px]" style={{ letterSpacing: '-0.03em' }}>Your campaign</h2>
 
                   {/* Active offer section */}
                   {activeOffer ? (() => {
@@ -2005,7 +2005,7 @@ export default function BusinessPortal() {
                   )}
 
                   {/* Campaign history */}
-                  <h3 className="text-[20px] font-sans font-extrabold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Past campaigns</h3>
+                  <h3 className="text-[20px] font-sans font-semibold text-[var(--ink)] mb-[14px]" style={{ letterSpacing: '-0.03em' }}>Past campaigns</h3>
                   {offers.filter(o => !o.is_live && o !== activeOffer).length === 0 ? (
                     <p className="text-[18px] text-[var(--ink-60)] text-center py-[24px]">Your campaign history will appear here</p>
                   ) : (
@@ -2060,7 +2060,7 @@ export default function BusinessPortal() {
                     <>
                       <CheckCircle size={64} strokeWidth={1.5} className="text-[var(--terra)] mb-4" />
                       {scanResult.creatorName && (
-                        <p className="text-[22px] font-sans font-extrabold text-[var(--ink)] mb-1" style={{ letterSpacing: '-0.03em' }}>{scanResult.creatorName}</p>
+                        <p className="text-[22px] font-sans font-semibold text-[var(--ink)] mb-1" style={{ letterSpacing: '-0.03em' }}>{scanResult.creatorName}</p>
                       )}
                       <p className="text-[18px] font-medium text-[var(--ink-60)] mb-1">Visit confirmed</p>
                       <p className="text-[14px] text-[var(--ink-60)] mb-6">{new Date().toLocaleString()}</p>
@@ -2092,7 +2092,7 @@ export default function BusinessPortal() {
                     <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center mb-4" style={{ background: 'var(--card)' }}>
                       <QrCode size={32} strokeWidth={1.5} className="text-[var(--terra)]" />
                     </div>
-                    <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mb-1" style={{ letterSpacing: '-0.03em' }}>Scan creator pass</h2>
+                    <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mb-1" style={{ letterSpacing: '-0.03em' }}>Scan creator pass</h2>
                     <p className="text-[18px] text-[var(--ink-60)] text-center">Ask the creator to open their Active tab<br />and show their QR code</p>
                   </div>
 
@@ -2133,7 +2133,7 @@ export default function BusinessPortal() {
             <div>
               {/* Header row */}
               <div className="flex items-baseline justify-between mb-[16px]">
-                <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Claims</h2>
+                <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Claims</h2>
                 {creatorFilter ? (
                   <button
                     onClick={() => setCreatorFilter(null)}
@@ -2299,7 +2299,7 @@ export default function BusinessPortal() {
           {/* ═══ NOTIFICATIONS ═══ */}
           {view === 'notifications' && (
             <div className="max-w-lg mx-auto">
-              <h2 className="text-[24px] font-sans font-extrabold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.03em' }}>Alerts</h2>
+              <h2 className="text-[24px] font-sans font-semibold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.03em' }}>Alerts</h2>
 
               {notifications.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2309,7 +2309,7 @@ export default function BusinessPortal() {
                     <path d="M32 56C32 60.4 35.6 64 40 64C44.4 64 48 60.4 48 56" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" fill="none" />
                     <path d="M62 20L58 28H64L60 36" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none" />
                   </svg>
-                  <p className="text-[20px] font-sans font-extrabold text-[var(--ink)] mt-[16px]" style={{ letterSpacing: '-0.03em' }}>No alerts yet</p>
+                  <p className="text-[20px] font-sans font-semibold text-[var(--ink)] mt-[16px]" style={{ letterSpacing: '-0.03em' }}>No alerts yet</p>
                   <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                     When a creator claims your offer and visits, you'll see it here instantly.
                   </p>
@@ -2390,7 +2390,7 @@ export default function BusinessPortal() {
                             className="w-[80px] h-[80px] rounded-[16px] flex items-center justify-center"
                             style={{ background: getCategorySolidColor(userProfile.category) }}
                           >
-                            <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
+                            <span className="text-white text-[28px] font-semibold">{getInitials(userProfile.name)}</span>
                           </button>
                         )}
                         <button
@@ -2403,7 +2403,7 @@ export default function BusinessPortal() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] font-sans font-extrabold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] font-sans font-semibold text-[var(--ink)] leading-tight" style={{ letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
                           <span className="inline-block bg-[var(--card)] text-[var(--ink-60)] text-[13px] font-bold rounded-full px-[10px] py-[3px]">
                             {userProfile.category}
@@ -2449,17 +2449,17 @@ export default function BusinessPortal() {
                     {/* Stats row inside card */}
                     <div className="flex items-center mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
                       <div className="flex-1 text-center">
-                        <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{offers.filter(o => o.is_live).length}</p>
+                        <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{offers.filter(o => o.is_live).length}</p>
                         <p className="text-[13px] text-[var(--ink-60)] font-semibold">Live offers</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--ink-08)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{claims.length}</p>
+                        <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{claims.length}</p>
                         <p className="text-[13px] text-[var(--ink-60)] font-semibold">Claims</p>
                       </div>
                       <div className="w-[1px] h-[32px] bg-[var(--ink-08)]" />
                       <div className="flex-1 text-center">
-                        <p className="text-[24px] font-sans font-extrabold text-[var(--ink)]">{claims.filter(c => c.status === 'completed').length}</p>
+                        <p className="text-[24px] font-sans font-semibold text-[var(--ink)]">{claims.filter(c => c.status === 'completed').length}</p>
                         <p className="text-[13px] text-[var(--ink-60)] font-semibold">Collabs</p>
                       </div>
                     </div>
@@ -2468,7 +2468,7 @@ export default function BusinessPortal() {
                   {/* ═══ About card ═══ */}
                   {userProfile.bio && (
                     <div className="rounded-[18px] p-[16px] mb-[16px]">
-                      <h3 className="text-[18px] font-sans font-extrabold text-[var(--ink)] mb-[8px]" style={{ letterSpacing: '-0.03em' }}>About</h3>
+                      <h3 className="text-[18px] font-sans font-semibold text-[var(--ink)] mb-[8px]" style={{ letterSpacing: '-0.03em' }}>About</h3>
                       <p className="text-[18px] text-[var(--ink-60)] leading-[1.5]">{userProfile.bio}</p>
                     </div>
                   )}
@@ -2511,7 +2511,7 @@ export default function BusinessPortal() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--card)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] font-sans font-extrabold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] font-sans font-semibold text-[var(--ink)]" style={{ letterSpacing: '-0.03em' }}>Edit profile</h1>
                   </div>
 
                   {/* Edit fields */}

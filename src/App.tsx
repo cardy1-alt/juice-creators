@@ -34,7 +34,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
             <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
               <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
-            <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">Something went wrong</h2>
+            <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Something went wrong</h2>
             <p className="text-[var(--mid)] text-base mb-4">An unexpected error occurred. Please refresh the page.</p>
             {this.state.errorMessage && (
               <p className="text-[var(--soft)] text-sm mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
@@ -96,7 +96,7 @@ function RedeemLanding() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <QrCode size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">
+        <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">
           Creator Pass
         </h2>
         <p className="text-[var(--mid)] text-base mb-6">
@@ -193,7 +193,7 @@ function ResetPassword() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[rgba(76,175,80,0.1)] mb-4">
             <CheckCircle size={28} strokeWidth={1.5} className="text-[#4CAF50]" />
           </div>
-          <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">Password Updated</h2>
+          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Password Updated</h2>
           <p className="text-[var(--mid)] text-base">Redirecting you to sign in...</p>
         </div>
       </div>
@@ -207,7 +207,7 @@ function ResetPassword() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
             <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
           </div>
-          <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">Link Expired</h2>
+          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Link Expired</h2>
           <p className="text-[var(--mid)] text-base mb-6">This password reset link has expired or is invalid. Please request a new one.</p>
           <a
             href="/"
@@ -238,7 +238,7 @@ function ResetPassword() {
           <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
             <Lock size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
           </div>
-          <h2 className="text-xl font-sans font-extrabold mb-1 text-[var(--near-black)]">Reset Password</h2>
+          <h2 className="text-xl font-sans font-semibold mb-1 text-[var(--near-black)]">Reset Password</h2>
           <p className="text-[var(--mid)] text-sm">Enter your new password below</p>
         </div>
 
@@ -355,7 +355,7 @@ function App() {
         <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
           <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-sans font-extrabold mb-2 text-[var(--near-black)]">
+        <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">
           Account Not Found
         </h2>
         <p className="text-[var(--mid)] text-base mb-6">

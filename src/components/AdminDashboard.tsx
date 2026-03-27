@@ -486,7 +486,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
                       >
                         <Users size={24} strokeWidth={1.5} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingCreators}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{stats.pendingCreators}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Creator{stats.pendingCreators !== 1 ? 's' : ''}</p>
                         </div>
                       </button>
@@ -507,7 +507,7 @@ export default function AdminDashboard() {
                       >
                         <Store size={24} strokeWidth={1.5} />
                         <div className="text-left">
-                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stats.pendingBusinesses}</p>
+                          <p className="text-lg text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{stats.pendingBusinesses}</p>
                           <p className="text-[12px] text-[var(--mid)] font-medium" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Business{stats.pendingBusinesses !== 1 ? 'es' : ''}</p>
                         </div>
                       </button>
@@ -519,7 +519,7 @@ export default function AdminDashboard() {
                 {statCardData.map((stat, i) => (
                   <div key={i} className="bg-[var(--card)] rounded-[16px] p-6 border border-[var(--ink-08)]" style={{ boxShadow: 'var(--shadow-md)' }}>
                     <div className="mb-3"><stat.Icon size={24} strokeWidth={1.5} className="text-[var(--ink-60)]" /></div>
-                    <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stat.value}</p>
+                    <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{stat.value}</p>
                     <p className="text-[12px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
                   </div>
                 ))}
@@ -762,7 +762,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
-                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
+                            <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
                           </div>
                           <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
                         </div>
@@ -889,7 +889,7 @@ export default function AdminDashboard() {
           {view === 'settings' && (
             <div className="max-w-2xl">
               <div className="bg-[var(--card)] rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
-                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Change Password</h2>
+                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
@@ -976,7 +976,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Add business</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Add business</h2>
               <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
@@ -1194,7 +1194,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>New offer</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>New offer</h2>
               <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>

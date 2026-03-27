@@ -162,13 +162,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Check your email</p>
+                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 600 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 800 }}>Reset password</p>
+                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 600 }}>Reset password</p>
                   <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -359,7 +359,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
@@ -622,7 +622,7 @@ export default function Auth() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-sans font-extrabold text-[var(--near-black)]">Terms of Service</h2>
+              <h2 className="text-lg font-sans font-semibold text-[var(--near-black)]">Terms of Service</h2>
               <button
                 onClick={() => setShowTerms(false)}
                 className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
@@ -688,7 +688,7 @@ export default function Auth() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-sans font-extrabold text-[var(--near-black)]">Privacy Policy</h2>
+              <h2 className="text-lg font-sans font-semibold text-[var(--near-black)]">Privacy Policy</h2>
               <button
                 onClick={() => setShowPrivacy(false)}
                 className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
