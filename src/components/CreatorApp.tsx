@@ -216,6 +216,9 @@ export default function CreatorApp() {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<{ level: number; levelName: string } | null>(null);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [streakWarningDismissed, setStreakWarningDismissed] = useState(false);
   const [redeemToast, setRedeemToast] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -824,6 +827,54 @@ export default function CreatorApp() {
             >
               Keep going →
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteAccount && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
+          <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
+            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
+              Delete your account?
+            </h2>
+            <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] mb-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              This will permanently delete your account and all your data. This cannot be undone.
+            </p>
+            {deleteError && (
+              <p className="text-[13px] text-[var(--terra)] mb-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+                {deleteError}
+              </p>
+            )}
+            <div className="flex gap-[12px]">
+              <button
+                onClick={() => setShowDeleteAccount(false)}
+                disabled={deletingAccount}
+                className="flex-1 py-[13px] rounded-[999px] text-[15px] text-[var(--ink)] bg-[var(--shell)] hover:bg-[var(--ink-08)] transition-all min-h-[48px]"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={async () => {
+                  setDeletingAccount(true);
+                  setDeleteError(null);
+                  try {
+                    const { error } = await supabase.rpc('delete_user_account');
+                    if (error) throw error;
+                    await signOut();
+                  } catch {
+                    setDeleteError(friendlyError(null));
+                    setDeletingAccount(false);
+                  }
+                }}
+                disabled={deletingAccount}
+                className="flex-1 py-[13px] rounded-[999px] text-[15px] text-white transition-all min-h-[48px] disabled:opacity-50"
+                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
+              >
+                {deletingAccount ? 'Deleting...' : 'Delete account'}
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -2710,6 +2761,16 @@ export default function CreatorApp() {
                       <LogOut size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
                       <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
                     </button>
+
+                    <div className="border-t border-[var(--ink-08)] pt-[16px] mt-[8px]">
+                      <button
+                        onClick={() => { setDeleteError(null); setShowDeleteAccount(true); }}
+                        className="text-[13px] text-[var(--ink-35)] hover:text-[var(--terra)] transition-colors"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}
+                      >
+                        Delete my account
+                      </button>
+                    </div>
                   </div>
                 </>
               ) : profileSubView === 'alerts' ? (
