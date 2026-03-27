@@ -808,7 +808,7 @@ export default function CreatorApp() {
       {showDeleteAccount && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
           <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
-            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>
               Delete your account?
             </h2>
             <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
@@ -922,7 +922,7 @@ export default function CreatorApp() {
                 <div className="flex flex-col items-center w-full" style={{ marginTop: isReelDue ? 0 : 0, minHeight: isReelDue ? undefined : 'calc(100vh - 200px)', justifyContent: isReelDue ? undefined : 'center' }}>
                   {/* QR card with offer title inside */}
                   <div style={{ background: 'white', borderRadius: 24, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
                     <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 16px' }}>{qrClaim.businesses.name}</p>
                     <QRCodeDisplay
                       token={qrClaim.qr_token}
@@ -935,7 +935,7 @@ export default function CreatorApp() {
                   {/* Ref code pill */}
                   <span
                     className="text-[17px] text-white inline-block rounded-full mt-[20px]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
                   >
                     {userProfile.code}
                   </span>
@@ -1541,7 +1541,7 @@ export default function CreatorApp() {
                       <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No offers found for '{searchQuery.trim()}'</p>
                     ) : (
                       <>
-                        <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
+                        <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>No offers available right now — check back soon.</p>
                       </>
                     )}
@@ -1954,7 +1954,7 @@ export default function CreatorApp() {
               {matchedSaved.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-[40px]">
                   <Heart size={48} strokeWidth={1.5} color="#C4674A" fill="none" />
-                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
+                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
                   <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
@@ -2149,7 +2149,7 @@ export default function CreatorApp() {
                                     onClick={(e) => e.stopPropagation()}
                                     style={{ background: 'var(--shell)', borderRadius: 24, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 32px rgba(34,34,34,0.14)' }}
                                   >
-                                    <p className="!text-[18px] !font-extrabold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
+                                    <p className="!text-[18px] !font-semibold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
                                     <p className="!text-[15px] !font-normal !text-[var(--ink-60)]" style={{ margin: '0 0 24px', lineHeight: 1.65 }}>
                                       Only confirm if you are at {claim.businesses.name} and a staff member is present.
                                     </p>
@@ -2203,7 +2203,7 @@ export default function CreatorApp() {
                                 <div style={{ textAlign: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
                                     <Check size={28} strokeWidth={1.5} color="var(--terra)" />
-                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Visit confirmed!</span>
+                                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Visit confirmed!</span>
                                   </div>
                                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
                                     Now post your Reel within 48 hours and submit the link below
@@ -2337,7 +2337,7 @@ export default function CreatorApp() {
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mx-auto mb-4" />
-                  <p className="text-[18px] font-semibold text-[var(--ink)]">No claims yet</p>
+                  <p className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>No claims yet</p>
                   <p className="text-[18px] text-[var(--ink-60)] mt-1">Claim an offer to get started</p>
                 </div>
               ) : (
@@ -2469,15 +2469,15 @@ export default function CreatorApp() {
                     {/* Stats row inside card */}
                     <div className="flex items-center gap-[8px] mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{claims.length}</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{claims.length}</p>
                         <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{collabsCompleted}</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{collabsCompleted}</p>
                         <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Posted</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
                         <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Rating</p>
                       </div>
                     </div>
@@ -2596,7 +2596,7 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Nothing yet</p>
+                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing yet</p>
                       <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>

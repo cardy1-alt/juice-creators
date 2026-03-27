@@ -51,7 +51,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
             <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--card)' }}>
               <Check size={32} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
-            <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
+            <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '20px', color: 'var(--ink)', marginBottom: '8px' }}>Report Submitted</h3>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)' }}>
               Thanks for letting us know. We'll look into this and get back to you shortly.
             </p>
@@ -63,7 +63,7 @@ export default function DisputeModal({ claimId, reporterRole, onClose }: Dispute
                 <div className="w-10 h-10 rounded-[12px] bg-[var(--terra-10)] flex items-center justify-center">
                   <AlertTriangle size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
+                <h3 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '20px', color: 'var(--ink)' }}>Report an Issue</h3>
               </div>
               <button onClick={onClose} className="p-2 rounded-[12px] transition-colors" style={{ background: 'var(--card)' }}>
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
