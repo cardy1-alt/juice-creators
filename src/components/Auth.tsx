@@ -845,6 +845,8 @@ export default function Auth() {
                   </button>
                 </div>
               ) : (
+                <>
+                <p className="text-center mb-[12px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)' }}>We review every application manually. You'll hear back within 24 hours.</p>
                 <div className="flex gap-[10px]">
                   <button
                     type="button"
@@ -866,6 +868,7 @@ export default function Auth() {
                     ) : 'Create Account'}
                   </button>
                 </div>
+                </>
               )}
             </div>
 
