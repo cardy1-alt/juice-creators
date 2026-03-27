@@ -1139,13 +1139,12 @@ export default function CreatorApp() {
           <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col overflow-y-auto">
             {/* Hero — full-bleed image */}
             <div className="relative" style={{ minHeight: 300, flexShrink: 0 }}>
-              {offer.offer_photo_url ? (
-                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: 300, objectFit: 'cover', display: 'block' }} />
-              ) : (
-                <div style={{ width: '100%', height: 300, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                  <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                </div>
-              )}
+              <div style={{ width: '100%', height: 300, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                {offer.offer_photo_url && (
+                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                )}
+              </div>
               {/* Gradient overlay */}
               <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.80) 0%, rgba(34,34,34,0) 55%)', pointerEvents: 'none' }} />
               {/* Locked overlay */}
@@ -1574,13 +1573,12 @@ export default function CreatorApp() {
                           style={{ cursor: 'pointer', position: 'relative' }}
                         >
                           <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                            {offer.offer_photo_url ? (
-                              <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                            ) : (
-                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                              </div>
-                            )}
+                            <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                              <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              {offer.offer_photo_url && (
+                                <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                              )}
+                            </div>
                             <button
                               onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
                               style={{
@@ -1630,13 +1628,12 @@ export default function CreatorApp() {
                           >
                             {/* Image area */}
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                              ) : (
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                </div>
-                              )}
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                {offer.offer_photo_url && (
+                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
+                              </div>
                               {/* Slot badge */}
                               {!isUnlimited && (
                                 waitlistedOffers[offer.id] ? (
@@ -1716,13 +1713,12 @@ export default function CreatorApp() {
                             }}
                           >
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                              ) : (
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                </div>
-                              )}
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                {offer.offer_photo_url && (
+                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
+                              </div>
                               {!isUnlimited && (
                                 waitlistedOffers[offer.id] ? (
                                   <span style={{
@@ -1796,13 +1792,12 @@ export default function CreatorApp() {
                             }}
                           >
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              {offer.offer_photo_url ? (
-                                <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                              ) : (
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                </div>
-                              )}
+                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                {offer.offer_photo_url && (
+                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                )}
+                              </div>
                               {!isUnlimited && (
                                 waitlistedOffers[offer.id] ? (
                                   <span style={{
@@ -1881,13 +1876,12 @@ export default function CreatorApp() {
                               }}
                             >
                               <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                                {offer.offer_photo_url ? (
-                                  <img src={offer.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                ) : (
-                                  <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
-                                  </div>
-                                )}
+                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                  {offer.offer_photo_url && (
+                                    <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  )}
+                                </div>
                                 {/* Slot badge top-left */}
                                 {!isUnlimited && (
                                   waitlistedOffers[offer.id] ? (
@@ -2091,13 +2085,12 @@ export default function CreatorApp() {
                             <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden' }}>
                               {/* Photo or gradient fallback */}
                               <div style={{ height: 180, position: 'relative' }}>
-                                {claim.offers?.offer_photo_url ? (
-                                  <img src={claim.offers.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                                ) : (
-                                  <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(bizCategory), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                    <CategoryIcon category={bizCategory} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(bizCategory) }} />
-                                  </div>
-                                )}
+                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(bizCategory), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                  <CategoryIcon category={bizCategory} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(bizCategory) }} />
+                                  {claim.offers?.offer_photo_url && (
+                                    <img src={claim.offers.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+                                  )}
+                                </div>
                                 {/* Gradient overlay */}
                                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.6) 0%, rgba(34,34,34,0) 50%)', pointerEvents: 'none' }} />
                                 {/* Status pill bottom left */}
