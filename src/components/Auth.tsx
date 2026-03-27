@@ -592,7 +592,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
