@@ -84,6 +84,7 @@ export default function Auth() {
   const [resetLoading, setResetLoading] = useState(false);
   const [resetError, setResetError] = useState('');
   const [showTerms, setShowTerms] = useState(false);
+  const [showPrivacy, setShowPrivacy] = useState(false);
 
   const { signIn, signUp } = useAuth();
 
@@ -695,6 +696,15 @@ export default function Auth() {
               >
                 our terms
               </button>
+              {' '}and{' '}
+              <button
+                type="button"
+                onClick={() => setShowPrivacy(true)}
+                className="underline text-[var(--terra)] hover:text-[var(--terra-hover)] transition-colors"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
+              >
+                privacy policy
+              </button>
               . Your account will be reviewed by our team.
             </p>
           </form>
@@ -760,6 +770,81 @@ export default function Auth() {
 
             <button
               onClick={() => setShowTerms(false)}
+              className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Privacy Policy Modal */}
+      {showPrivacy && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowPrivacy(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="relative bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-sans font-extrabold text-[var(--near-black)]">Privacy Policy</h2>
+              <button
+                onClick={() => setShowPrivacy(false)}
+                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
+              >
+                <X size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
+              </button>
+            </div>
+
+            <div className="space-y-4 text-[14px] leading-[1.6] text-[var(--ink-60)]">
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">What We Collect</h3>
+                <p>When you create an account, we collect the following personal information:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                  <li>Name</li>
+                  <li>Email address</li>
+                  <li>Date of birth</li>
+                  <li>Town / location</li>
+                  <li>Instagram handle</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Why We Collect It</h3>
+                <p>Your data is used to:</p>
+                <ul className="list-disc pl-5 mt-1 space-y-0.5">
+                  <li>Create and manage your Nayba account</li>
+                  <li>Verify you meet the minimum age requirement</li>
+                  <li>Match you with relevant local offers based on your location</li>
+                  <li>Enable businesses to verify creator visits</li>
+                </ul>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Third Parties</h3>
+                <p>
+                  We do not sell your personal data to third parties. Your information is only shared with businesses you choose to interact with through the platform.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Data Storage</h3>
+                <p>
+                  Your data is stored securely using Supabase, a cloud-hosted database platform with encryption at rest and in transit.
+                </p>
+              </div>
+
+              <div>
+                <h3 className="font-semibold text-[var(--near-black)] mb-1">Your Rights</h3>
+                <p>
+                  You have the right to request deletion of your account and all associated data at any time. To make a request, email{' '}
+                  <a href="mailto:hello@nayba.app" className="text-[var(--terra)] underline">hello@nayba.app</a>.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => setShowPrivacy(false)}
               className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
             >
               Close
