@@ -2084,22 +2084,12 @@ export default function CreatorApp() {
                       >
                         {/* Compact pass navigator */}
                         <div
-                          style={{ display: 'flex', alignItems: 'center', gap: 10, background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px' }}
+                          style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px' }}
                         >
-                          <button
-                            onClick={() => { if (idx > 0) setSelectedClaim(filtered[idx - 1]); }}
-                            disabled={idx === 0}
-                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(34,34,34,0.08)', color: isClaimed ? 'white' : 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                          >‹</button>
                           <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
                             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
                             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
                           </div>
-                          <button
-                            onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
-                            disabled={idx === filtered.length - 1}
-                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(34,34,34,0.08)', color: isClaimed ? 'white' : 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
-                          >›</button>
                         </div>
 
                         {/* Stepper */}
@@ -2323,6 +2313,22 @@ export default function CreatorApp() {
                             <p className="text-[15px] text-center pb-2" style={{ color: isClaimed ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
                           )}
                         </div>
+
+                        {/* Floating navigation arrows */}
+                        {filtered.length > 1 && (
+                          <div style={{ position: 'fixed', bottom: 124, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 16, zIndex: 50, pointerEvents: 'none' }}>
+                            <button
+                              onClick={() => { if (idx > 0) setSelectedClaim(filtered[idx - 1]); }}
+                              disabled={idx === 0}
+                              style={{ width: 64, height: 64, borderRadius: '50%', border: 'none', background: 'white', color: '#C4674A', fontSize: 22, fontWeight: 700, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(34,34,34,0.1)', pointerEvents: 'auto' }}
+                            >‹</button>
+                            <button
+                              onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
+                              disabled={idx === filtered.length - 1}
+                              style={{ width: 64, height: 64, borderRadius: '50%', border: 'none', background: 'white', color: '#C4674A', fontSize: 22, fontWeight: 700, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(34,34,34,0.1)', pointerEvents: 'auto' }}
+                            >›</button>
+                          </div>
+                        )}
                       </div>
                     );
                   })()}
