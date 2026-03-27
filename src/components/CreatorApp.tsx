@@ -139,7 +139,7 @@ function StatusPill({ status }: { status: string }) {
     disputed: 'Disputed',
   };
   return (
-    <span className={`text-[13px] px-2.5 py-1 rounded-[999px] font-semibold ${styles[status] || 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]'}`} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+    <span className={`text-[13px] px-2.5 py-1 rounded-[999px] font-semibold ${styles[status] || 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]'}`} style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
       {labels[status] || status}
     </span>
   );
@@ -803,46 +803,19 @@ export default function CreatorApp() {
         </div>
       )}
 
-      {/* Level Up Overlay */}
-      {showLevelUpOverlay && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
-          <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
-            <div className="flex justify-center mb-5">
-              <LevelBadge level={showLevelUpOverlay.level} levelName={showLevelUpOverlay.levelName} size="lg" />
-            </div>
-            <h2 className="text-[26px] text-[var(--ink)] mb-2" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
-              You're now a {showLevelUpOverlay.levelName === 'Nayba' ? '✦ Nayba' : showLevelUpOverlay.levelName}
-            </h2>
-            <p className="text-[18px] text-[var(--ink-60)] mb-6 leading-[1.5]">
-              {showLevelUpOverlay.level === 2 && 'You posted your first reel. You can now access more offers.'}
-              {showLevelUpOverlay.level === 3 && 'Businesses are starting to notice you. Keep it up.'}
-              {showLevelUpOverlay.level === 4 && "You're a local favourite. Premium offers are unlocking."}
-              {showLevelUpOverlay.level === 5 && 'Trusted creator status. The best offers are now available to you.'}
-              {showLevelUpOverlay.level === 6 && 'The highest tier. You are a Nayba.'}
-            </p>
-            <button
-              onClick={() => setShowLevelUpOverlay(null)}
-              className="w-full py-[13px] rounded-[999px] text-[15px] bg-[var(--terra)] text-white hover:bg-[var(--terra-hover)] transition-all min-h-[48px]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
-            >
-              Keep going →
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Delete Account Confirmation Modal */}
       {showDeleteAccount && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
           <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
-            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
               Delete your account?
             </h2>
-            <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] mb-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
               This will permanently delete your account and all your data. This cannot be undone.
             </p>
             {deleteError && (
-              <p className="text-[13px] text-[var(--terra)] mb-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>
+              <p className="text-[13px] text-[var(--terra)] mb-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>
                 {deleteError}
               </p>
             )}
@@ -851,7 +824,7 @@ export default function CreatorApp() {
                 onClick={() => setShowDeleteAccount(false)}
                 disabled={deletingAccount}
                 className="flex-1 py-[13px] rounded-[999px] text-[15px] text-[var(--ink)] bg-[var(--shell)] hover:bg-[var(--ink-08)] transition-all min-h-[48px]"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}
+                style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}
               >
                 Cancel
               </button>
@@ -870,7 +843,7 @@ export default function CreatorApp() {
                 }}
                 disabled={deletingAccount}
                 className="flex-1 py-[13px] rounded-[999px] text-[15px] text-white transition-all min-h-[48px] disabled:opacity-50"
-                style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
+                style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
               >
                 {deletingAccount ? 'Deleting...' : 'Delete account'}
               </button>
@@ -949,8 +922,8 @@ export default function CreatorApp() {
                 <div className="flex flex-col items-center w-full" style={{ marginTop: isReelDue ? 0 : 0, minHeight: isReelDue ? undefined : 'calc(100vh - 200px)', justifyContent: isReelDue ? undefined : 'center' }}>
                   {/* QR card with offer title inside */}
                   <div style={{ background: 'white', borderRadius: 24, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 16px' }}>{qrClaim.businesses.name}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 16px' }}>{qrClaim.businesses.name}</p>
                     <QRCodeDisplay
                       token={qrClaim.qr_token}
                       claimId={qrClaim.id}
@@ -962,19 +935,12 @@ export default function CreatorApp() {
                   {/* Ref code pill */}
                   <span
                     className="text-[17px] text-white inline-block rounded-full mt-[20px]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
                   >
                     {userProfile.code}
                   </span>
                   {/* Refresh countdown */}
                   <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
-                  {/* Level badge */}
-                  <div className="mt-[20px] flex flex-col items-center gap-[4px]">
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 11, color: 'rgba(255,255,255,0.5)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Your level</span>
-                    <div className="rounded-full px-[14px] py-[6px]" style={{ background: 'rgba(255,255,255,0.2)' }}>
-                      <span className="text-[14px] font-semibold text-white">{userProfile.level_name || 'Newcomer'}</span>
-                    </div>
-                  </div>
                 </div>
               )}
 
@@ -985,11 +951,11 @@ export default function CreatorApp() {
                   <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
                     <div className="flex items-center gap-[8px]">
                       <Clock size={16} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
                         {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
                       </span>
                     </div>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
                       Post your reel within this window — it must clearly feature the business.
                     </p>
                   </div>
@@ -1122,7 +1088,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
               Reel submitted!
             </h2>
             <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1131,13 +1097,10 @@ export default function CreatorApp() {
             <p className="text-[18px] text-white text-center mt-[2px]" style={{ opacity: 0.6 }}>
               {showReelCelebration.businessName}
             </p>
-            <div className="mt-[16px]">
-              <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="lg" />
-            </div>
             <button
               onClick={() => { setShowReelCelebration(null); setView('offers'); }}
               className="mt-[32px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[48px]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
             >
               Back to explore
             </button>
@@ -1200,8 +1163,8 @@ export default function CreatorApp() {
               </button>
               {/* Text at bottom of image */}
               <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px 24px' }}>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
+                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
                   {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
                 </p>
               </div>
@@ -1213,13 +1176,13 @@ export default function CreatorApp() {
               <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px' }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Users size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
                     {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
                   </span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                   <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
                 </div>
               </div>
               {/* Divider */}
@@ -1231,17 +1194,17 @@ export default function CreatorApp() {
                   <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(34,34,34,0.04)' }}>
                     <Lock size={14} strokeWidth={1.5} className="text-[var(--ink-60)] mt-0.5 flex-shrink-0" />
                     <div>
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{detailLockedName} creators only</p>
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{detailLockedName} creators only</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
                     </div>
                   </div>
                 )}
 
                 {/* WHAT TO POST label */}
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
 
                 {/* C) Primary post requirement */}
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
 
                 {/* D) Checklist items — no duplicates */}
                 <div className="flex flex-col gap-[10px] mb-[24px]">
@@ -1252,7 +1215,7 @@ export default function CreatorApp() {
                   ].map((item) => (
                     <div key={item} className="flex items-start gap-2.5">
                       <Check size={14} strokeWidth={1.5} color="var(--terra)" style={{ marginTop: 3, flexShrink: 0 }} />
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65 }}>{item}</span>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65 }}>{item}</span>
                     </div>
                   ))}
                 </div>
@@ -1260,9 +1223,9 @@ export default function CreatorApp() {
                 {/* E) They'd love if you… (only if specific_ask exists) */}
                 {offer.specific_ask && (
                   <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
                     <div style={{ borderRadius: 12, padding: '14px 16px', background: 'var(--card)' }}>
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink)', lineHeight: 1.65, margin: 0 }}>{offer.specific_ask}</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink)', lineHeight: 1.65, margin: 0 }}>{offer.specific_ask}</p>
                     </div>
                   </div>
                 )}
@@ -1270,14 +1233,14 @@ export default function CreatorApp() {
                 {/* F) About business */}
                 {(offer.businesses.bio || offer.businesses.address) && (
                   <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
                     {offer.businesses.bio && (
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
                     )}
                     {offer.businesses.address && (
                       <div className="flex items-center gap-2">
                         <MapPin size={14} strokeWidth={1.5} color="var(--ink-60)" style={{ flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)' }}>{offer.businesses.address}</span>
+                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)' }}>{offer.businesses.address}</span>
                       </div>
                     )}
                   </div>
@@ -1285,7 +1248,7 @@ export default function CreatorApp() {
                 {/* How this works — capped offers only, not yet on list */}
                 {!isUnlimited && !alreadyClaimed && !waitlistedOffers[offer.id] && (
                   <div style={{ background: 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: '0 0 10px' }}>How this works</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: '0 0 10px' }}>How this works</p>
                     {[
                       { icon: Clapperboard, text: 'Join the list to reserve your spot' },
                       { icon: Bell, text: "We'll notify you when it's your turn" },
@@ -1294,7 +1257,7 @@ export default function CreatorApp() {
                     ].map((item, i) => (
                       <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: i < 3 ? 8 : 0 }}>
                         <item.icon size={14} strokeWidth={1.5} color="var(--terra)" style={{ flexShrink: 0, marginTop: 2 }} />
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', lineHeight: 1.4 }}>{item.text}</span>
+                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', lineHeight: 1.4 }}>{item.text}</span>
                       </div>
                     ))}
                   </div>
@@ -1303,11 +1266,11 @@ export default function CreatorApp() {
                 {/* On the list — capped offers, already queued */}
                 {!isUnlimited && waitlistedOffers[offer.id] && !alreadyClaimed && (
                   <div style={{ background: 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)', margin: '0 0 4px' }}>You're on the list</p>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 8px' }}>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)', margin: '0 0 4px' }}>You're on the list</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 8px' }}>
                       {(waitlistedOffers[offer.id].position || 0) <= 1 ? "You're next!" : `${waitlistedOffers[offer.id].position} people ahead of you`}
                     </p>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
                       We'll send you a notification when it's your turn. Keep an eye on your alerts.
                     </p>
                   </div>
@@ -1320,23 +1283,25 @@ export default function CreatorApp() {
               {detailIsLocked ? (
                 <div
                   className="w-full py-[14px] rounded-[999px] text-center"
-                  style={{ background: 'rgba(34,34,34,0.04)', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)' }}
+                  style={{ background: 'rgba(34,34,34,0.04)', fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)' }}
                 >
                   Unlocks at {detailLockedName}
                 </div>
               ) : alreadyClaimed ? (
                 <button
+                  onClick={() => { setExpandedOffer(null); setView('active'); }}
                   className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
                 >
-                  <Check size={16} strokeWidth={1.5} color="white" /> Active visit
+                  <Check size={16} strokeWidth={1.5} color="white" /> View active pass
                 </button>
               ) : hasActiveBusiness ? (
                 <button
+                  onClick={() => { setExpandedOffer(null); setView('active'); }}
                   className="w-full py-[14px] rounded-[999px] text-center"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none', borderRadius: 999 }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none', borderRadius: 999 }}
                 >
-                  Active visit
+                  View active pass
                 </button>
               ) : waitlistedOffers[offer.id] ? (
                 <div>
@@ -1346,14 +1311,14 @@ export default function CreatorApp() {
                         onClick={() => leaveWaitlist(offer.id)}
                         disabled={waitlistLoading === offer.id}
                         className="flex-1 py-[14px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
                       >
                         {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                       </button>
                       <button
                         onClick={() => setWaitlistConfirmLeave(null)}
                         className="flex-1 py-[14px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(34,34,34,0.5)', background: 'transparent', border: 'none' }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(34,34,34,0.5)', background: 'transparent', border: 'none' }}
                       >
                         Cancel
                       </button>
@@ -1362,7 +1327,7 @@ export default function CreatorApp() {
                     <button
                       onClick={() => setWaitlistConfirmLeave(offer.id)}
                       className="w-full py-[14px] rounded-[999px] text-center"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-35)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-35)', background: 'transparent', border: 'none', cursor: 'pointer' }}
                     >
                       Leave the list
                     </button>
@@ -1373,7 +1338,7 @@ export default function CreatorApp() {
                   onClick={() => joinWaitlist(offer.id)}
                   disabled={waitlistLoading === offer.id}
                   className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
                 >
                   {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
                 </button>
@@ -1382,18 +1347,18 @@ export default function CreatorApp() {
                   onClick={() => joinWaitlist(offer.id)}
                   disabled={waitlistLoading === offer.id}
                   className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
-                  style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
                 >
                   {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
                 </button>
               ) : (
                 <div>
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>Post a reel within 48hrs</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>Post a reel within 48hrs</p>
                   <button
                     onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
                     disabled={loading}
                     className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
                   >
                     Claim offer
                   </button>
@@ -1472,7 +1437,7 @@ export default function CreatorApp() {
                       placeholder="Find local offers…"
                       style={{
                         flex: 1, border: 'none', background: 'transparent', outline: 'none',
-                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 16,
+                        fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16,
                         color: 'var(--ink)', marginLeft: 10,
                       }}
                     />
@@ -1504,7 +1469,7 @@ export default function CreatorApp() {
                       >
                         {(() => { const TabIcon = categoryTabIconMap[cat.icon]; return TabIcon ? <TabIcon size={22} strokeWidth={1.5} color={isActive ? 'var(--terra)' : 'var(--ink-35)'} /> : null; })()}
                         <span style={{
-                          fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 13,
+                          fontFamily: "'Instrument Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 13,
                           color: isActive ? 'var(--terra)' : 'var(--ink-35)',
                         }}>{cat.label}</span>
                       </button>
@@ -1522,8 +1487,8 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 16, padding: '0 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Your passes</span>
-                        <button onClick={() => setView('active')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
+                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
+                        <button onClick={() => setView('active')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
                       <button
                         onClick={() => { setSelectedClaim(firstClaim); setView('active'); }}
@@ -1534,18 +1499,18 @@ export default function CreatorApp() {
                         }}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                          <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>48h left</span>
+                          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>48h left</span>
                           <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
                         </div>
                       </button>
                       {filtered.length > 1 && (
                         <button
                           onClick={() => setView('active')}
-                          style={{ display: 'block', margin: '8px auto 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)' }}
+                          style={{ display: 'block', margin: '8px auto 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)' }}
                         >
                           and {filtered.length - 1} more active pass{filtered.length - 1 > 1 ? 'es' : ''}
                         </button>
@@ -1557,15 +1522,15 @@ export default function CreatorApp() {
                 {/* ── Claim error toast ── */}
                 {claimError && (
                   <div style={{ margin: '8px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(34,34,34,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
-                    <button onClick={() => setClaimError(null)} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
+                    <button onClick={() => setClaimError(null)} style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
                   </div>
                 )}
 
                 {/* ── Loading state ── */}
                 {offersLoading && (
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
-                    <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading offers…</p>
                   </div>
                 )}
 
@@ -1573,11 +1538,11 @@ export default function CreatorApp() {
                 {!offersLoading && searchedOffers.length === 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: 8 }}>
                     {searchTerm ? (
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No offers found for '{searchQuery.trim()}'</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No offers found for '{searchQuery.trim()}'</p>
                     ) : (
                       <>
-                        <h2 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
-                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>No offers available right now — check back soon.</p>
+                        <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>No offers available right now — check back soon.</p>
                       </>
                     )}
                   </div>
@@ -1616,8 +1581,8 @@ export default function CreatorApp() {
                               </svg>
                             </button>
                           </div>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                         </div>
                       );
                     })}
@@ -1628,8 +1593,8 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && nearYouOffers.length > 0 && (
                   <div style={{ marginTop: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Near you</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Near you</span>
+                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
@@ -1664,7 +1629,7 @@ export default function CreatorApp() {
                                 waitlistedOffers[offer.id] ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: 'var(--terra)', color: 'white',
                                   }}>
                                     On the list ✓
@@ -1672,7 +1637,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft === 0 ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     Join the list
@@ -1680,7 +1645,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft !== null ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
@@ -1702,8 +1667,8 @@ export default function CreatorApp() {
                               </button>
                             </div>
                             {/* Text below image — no container */}
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1715,8 +1680,8 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && newThisWeekOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>New this week</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>New this week</span>
+                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
                     </div>
@@ -1749,7 +1714,7 @@ export default function CreatorApp() {
                                 waitlistedOffers[offer.id] ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: 'var(--terra)', color: 'white',
                                   }}>
                                     On the list ✓
@@ -1757,7 +1722,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft === 0 ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     Join the list
@@ -1765,7 +1730,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft !== null ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
@@ -1785,8 +1750,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1798,8 +1763,8 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && searchedOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>All offers</span>
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>{searchedOffers.length} available</span>
+                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>All offers</span>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>{searchedOffers.length} available</span>
                     </div>
                     <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                       {searchedOffers.map((offer) => {
@@ -1829,7 +1794,7 @@ export default function CreatorApp() {
                                 waitlistedOffers[offer.id] ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: 'var(--terra)', color: 'white',
                                   }}>
                                     On the list ✓
@@ -1837,7 +1802,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft === 0 ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     Join the list
@@ -1845,7 +1810,7 @@ export default function CreatorApp() {
                                 ) : slotsLeft !== null ? (
                                   <span style={{
                                     position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
@@ -1865,8 +1830,8 @@ export default function CreatorApp() {
                                 </svg>
                               </button>
                             </div>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                           </div>
                         );
                       })}
@@ -1884,7 +1849,7 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 24 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                        <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Trending</span>
+                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Trending</span>
                       </div>
                       <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                         {trendingOffers.map((offer) => {
@@ -1915,7 +1880,7 @@ export default function CreatorApp() {
                                   waitlistedOffers[offer.id] ? (
                                     <span style={{
                                       position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                       background: 'var(--terra)', color: 'white',
                                     }}>
                                       On the list ✓
@@ -1923,7 +1888,7 @@ export default function CreatorApp() {
                                   ) : slotsLeft === 0 ? (
                                     <span style={{
                                       position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                       background: '#F5C4A0', color: 'var(--ink)',
                                     }}>
                                       Join the list
@@ -1931,7 +1896,7 @@ export default function CreatorApp() {
                                   ) : slotsLeft !== null ? (
                                     <span style={{
                                       position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                       background: '#F5C4A0', color: 'var(--ink)',
                                     }}>
                                       {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
@@ -1954,14 +1919,14 @@ export default function CreatorApp() {
                                 {/* Claim count badge bottom-left */}
                                 <span style={{
                                   position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                  fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 11,
+                                  fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11,
                                   background: 'rgba(34,34,34,0.72)', color: 'white',
                                 }}>
                                   {slotsUsed} claimed
                                 </span>
                               </div>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
                             </div>
                           );
                         })}
@@ -1982,26 +1947,21 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Saved</h1>
+                <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Saved</h1>
                 <span className="text-[15px] text-[var(--ink-60)]">{matchedSaved.length} saved</span>
               </div>
 
               {matchedSaved.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 px-[40px]">
-                  {/* Heart with map pin SVG */}
-                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                    <path d="M40 68S14 48 14 32C14 22 22 14 32 14C36 14 39 16 40 18C41 16 44 14 48 14C58 14 66 22 66 32C66 48 40 68 40 68Z" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                    <circle cx="40" cy="36" r="6" stroke="var(--peach)" strokeWidth="2" fill="none" />
-                    <circle cx="40" cy="36" r="2" fill="var(--peach)" />
-                  </svg>
-                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
-                  <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
+                  <Heart size={48} strokeWidth={1.5} color="#C4674A" fill="none" />
+                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
+                  <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
                     Heart an offer on the explore feed to save it for later.
                   </p>
                   <button
                     onClick={() => setView('offers')}
                     className="mt-[20px] px-[24px] py-[13px] rounded-full text-white text-[15px] min-h-[44px]"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)', borderRadius: 999 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)', borderRadius: 999 }}
                   >
                     Find offers
                   </button>
@@ -2020,9 +1980,9 @@ export default function CreatorApp() {
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
                       >
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.businesses.name}</p>
-                          <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.businesses.name}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
                           </p>
                         </div>
@@ -2053,7 +2013,7 @@ export default function CreatorApp() {
                   <button
                     onClick={() => setView('offers')}
                     className="bg-[var(--terra)] text-white text-[15px] rounded-[999px] px-[24px] py-[13px] hover:bg-[var(--terra-hover)] transition-all"
-                    style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                   >
                     Browse offers
                   </button>
@@ -2062,8 +2022,8 @@ export default function CreatorApp() {
                 <div>
                   {/* Header bar: "Active passes" + "X / Y" counter */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Active passes</span>
-                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-60)' }}>
+                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Active passes</span>
+                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-60)' }}>
                       {(() => {
                         const filtered = activeClaims.filter(c => c.businesses && c.offers);
                         const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
@@ -2243,15 +2203,15 @@ export default function CreatorApp() {
                                 <div style={{ textAlign: 'center' }}>
                                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
                                     <Check size={28} strokeWidth={1.5} color="var(--terra)" />
-                                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Visit confirmed!</span>
+                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 18, color: 'var(--ink)' }}>Visit confirmed!</span>
                                   </div>
-                                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
+                                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
                                     Now post your Reel within 48 hours and submit the link below
                                   </p>
                                   {/* Reel deadline */}
                                   <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F5C4A0', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
                                     <Clock size={14} strokeWidth={1.5} color="var(--ink)" />
-                                    <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>
+                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>
                                       {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
                                     </span>
                                   </div>
@@ -2263,18 +2223,18 @@ export default function CreatorApp() {
                                       onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
                                       placeholder="Paste your Instagram Reel link here"
                                       className="w-full focus:outline-none"
-                                      style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: 16, fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)' }}
+                                      style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: 16, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)' }}
                                       onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
                                       onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.08)'; }}
                                     />
-                                    {reelError && <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', marginTop: 8 }}>Please check the URL and try again.</p>}
+                                    {reelError && <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', marginTop: 8 }}>Please check the URL and try again.</p>}
                                     <button
                                       onClick={handleSubmitReel}
                                       disabled={loading || !reelUrl}
                                       style={{
                                         width: '100%', height: 52, borderRadius: 999, border: 'none', marginTop: 14,
                                         background: (reelUrl && reelUrl.startsWith('http') && reelUrl.length > 4) ? 'var(--terra)' : 'var(--terra-40)',
-                                        fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
+                                        fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
                                       }}
                                     >
                                       Submit Reel
@@ -2287,7 +2247,7 @@ export default function CreatorApp() {
                               {claim.reel_url && (
                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 }}>
                                   <Check size={20} strokeWidth={1.5} color="var(--terra)" />
-                                  <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>Reel submitted!</span>
+                                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>Reel submitted!</span>
                                 </div>
                               )}
 
@@ -2362,7 +2322,7 @@ export default function CreatorApp() {
           {/* -- CLAIMS (formerly History/Messages) -- */}
           {view === 'claims' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[28px] text-[var(--ink)] mb-5" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Claims</h1>
+              <h1 className="text-[28px] text-[var(--ink)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Claims</h1>
               {claims.length === 0 ? (
                 <div className="text-center py-20">
                   <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mx-auto mb-4" />
@@ -2371,7 +2331,9 @@ export default function CreatorApp() {
                 </div>
               ) : (
                 <div className="space-y-[12px]">
-                  {claims.filter(c => c.businesses && c.offers).map((claim) => (
+                  {claims.filter(c => c.businesses && c.offers).map((claim) => {
+                    const leftBorderColor = claim.status === 'active' ? '#C4674A' : claim.status === 'visited' || claim.status === 'redeemed' ? '#8AAE92' : claim.status === 'reel_due' ? '#F5C4A0' : 'rgba(34,34,34,0.15)';
+                    return (
                     <button
                       key={claim.id}
                       onClick={() => {
@@ -2381,18 +2343,19 @@ export default function CreatorApp() {
                         }
                       }}
                       className="w-full text-left"
-                      style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
+                      style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px', borderLeft: `3px solid ${leftBorderColor}` }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
-                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0 }}>{claim.businesses.name}</p>
-                        <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0 }}>{claim.businesses.name}</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
                       </div>
                       <div style={{ flexShrink: 0, marginLeft: 12 }}>
                         <StatusPill status={claim.status} />
                       </div>
                     </button>
-                  ))}
+                  );
+                  })}
                 </div>
               )}
             </div>
@@ -2401,12 +2364,12 @@ export default function CreatorApp() {
           {/* -- ALL OFFERS (placeholder — Chunk 6 builds full screen) -- */}
           {view === 'all_offers' && (
             <div className="px-[20px] pt-5">
-              <h1 className="text-[26px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>All offers</h1>
-              <p className="text-[13px] mt-1" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
+              <h1 className="text-[26px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>All offers</h1>
+              <p className="text-[13px] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
                 {offers.length} live this week
               </p>
               <div className="text-center py-20">
-                <p className="text-[14px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
+                <p className="text-[14px]" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
                   Full list coming in Chunk 6.
                 </p>
               </div>
@@ -2465,9 +2428,8 @@ export default function CreatorApp() {
 
                       {/* Name + meta */}
                       <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] text-[var(--ink)] leading-tight" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
+                        <h2 className="text-[22px] text-[var(--ink)] leading-tight" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
                         <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
-                          <LevelBadge level={userProfile.level || 1} levelName={userProfile.level_name || 'Newcomer'} size="sm" />
                           {userProfile.profile_complete && (
                             <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--terra)]">
                               <BadgeCheck size={13} strokeWidth={1.5} /> Verified
@@ -2496,16 +2458,16 @@ export default function CreatorApp() {
                     {/* Stats row inside card */}
                     <div className="flex items-center gap-[8px] mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{claims.length}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{claims.length}</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{collabsCompleted}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Posted</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{collabsCompleted}</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Posted</p>
                       </div>
                       <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Rating</p>
+                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
+                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Rating</p>
                       </div>
                     </div>
                   </div>
@@ -2537,195 +2499,26 @@ export default function CreatorApp() {
                         </div>
                         <div className="flex flex-wrap gap-[6px]">
                           {completeness.missing.map(field => (
-                            <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[999px] text-[14px] font-semibold text-[var(--ink-60)] bg-[var(--shell)]">
-                              <Plus size={16} strokeWidth={1.5} className="w-[10px] h-[10px]" /> {field.label}
-                            </span>
+                            field.key === 'bio' ? (
+                              <button
+                                key={field.key}
+                                onClick={() => { setEditName(userProfile.name || ''); setEditHandle(userProfile.instagram_handle || ''); setProfileSubView('edit'); }}
+                                className="text-[14px] font-semibold text-[var(--terra)]"
+                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
+                              >
+                                Add a short bio →
+                              </button>
+                            ) : (
+                              <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[999px] text-[14px] font-semibold text-[var(--ink-60)] bg-[var(--shell)]">
+                                <Plus size={16} strokeWidth={1.5} className="w-[10px] h-[10px]" /> {field.label}
+                              </span>
+                            )
                           ))}
                         </div>
                       </div>
                     );
                   })()}
 
-                  {/* ═══ Level + streak section (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] bg-[var(--card)] p-[20px] mb-[16px]">
-                    {(() => {
-                      const progress = getLevelProgress(userProfile.total_reels || 0, userProfile.average_rating || 0, userProfile.level || 1);
-                      const levelColours: Record<number, string> = {
-                        1: '#9E9E9E',
-                        2: '#8FAF8F',
-                        3: '#4CAF7D',
-                        4: '#1A4A2E',
-                        5: 'var(--terra)',
-                        6: 'var(--ink)',
-                      };
-                      const levels = [1, 2, 3, 4, 5, 6];
-                      const levelNames = ['Newcomer', 'Explorer', 'Regular', 'Local', 'Trusted', 'Nayba'];
-                      const currentLvl = userProfile.level || 1;
-
-                      return (
-                        <>
-                          {/* Level journey row */}
-                          <div className="flex items-center mb-[16px]">
-                            {levels.map((lvl, idx) => {
-                              const isCompleted = lvl < currentLvl;
-                              const isCurrent = lvl === currentLvl;
-                              const isLocked = lvl > currentLvl;
-                              const colour = levelColours[lvl];
-
-                              return (
-                                <div key={lvl} className="flex items-center" style={{ flex: idx < levels.length - 1 ? 1 : 'none' }}>
-                                  {/* Circle */}
-                                  <div className="relative flex items-center justify-center" style={{ width: 40, height: 40 }}>
-                                    {/* Glow ring for current level */}
-                                    {isCurrent && (
-                                      <div
-                                        className="absolute rounded-full"
-                                        style={{
-                                          width: 48,
-                                          height: 48,
-                                          border: '3px solid var(--terra)',
-                                        }}
-                                      />
-                                    )}
-                                    <div
-                                      className="rounded-full flex items-center justify-center"
-                                      style={{
-                                        width: 40,
-                                        height: 40,
-                                        background: isCompleted ? 'var(--terra)' : isCurrent ? 'var(--terra-10)' : 'var(--card)',
-                                        border: isLocked ? '1.5px solid var(--ink-08)' : 'none',
-                                      }}
-                                    >
-                                      {isCompleted ? (
-                                        /* Checkmark for completed levels — white tick */
-                                        <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-                                          <path d="M4.5 9L7.5 12L13.5 6" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                                        </svg>
-                                      ) : (
-                                        /* Number for current + locked */
-                                        <span
-                                          style={{
-                                            fontWeight: isCurrent ? 700 : 500,
-                                            fontSize: 18,
-                                            color: isLocked ? 'var(--ink-35)' : isCurrent ? 'var(--terra)' : 'white',
-                                          }}
-                                        >
-                                          {lvl === 6 ? '✦' : lvl}
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                  {/* Connector line */}
-                                  {idx < levels.length - 1 && (
-                                    <div
-                                      className="flex-1 mx-[4px]"
-                                      style={{
-                                        height: 3,
-                                        borderRadius: 3,
-                                        background: isCompleted
-                                          ? 'var(--terra)'
-                                          : 'var(--ink-08)',
-                                      }}
-                                    />
-                                  )}
-                                </div>
-                              );
-                            })}
-                          </div>
-                          {/* Level name pill + progress text */}
-                          <div className="flex items-center gap-[8px]">
-                            <span
-                              className="inline-block rounded-full px-[12px] py-[3px]"
-                              style={{
-                                background: currentLvl === 6 ? 'var(--ink)' : 'var(--terra)',
-                                color: 'white',
-                                fontWeight: 600,
-                                fontSize: 15,
-                              }}
-                            >
-                              {currentLvl === 6 ? '✦ Nayba' : levelNames[currentLvl - 1]}
-                            </span>
-                            {!progress.isMaxLevel && (
-                              <span
-                                style={{
-                                  color: 'var(--ink-60)',
-                                  fontWeight: 400,
-                                  fontSize: 16,
-                                }}
-                              >
-                                · {progress.reelsToNext} reel{progress.reelsToNext !== 1 ? 's' : ''} to {progress.nextName}
-                              </span>
-                            )}
-                          </div>
-                        </>
-                      );
-                    })()}
-
-                    {/* Streak row */}
-                    <div className="mt-[20px] pt-[20px] border-t border-[var(--ink-08)]">
-                      <div className="flex items-center">
-                        <div className="flex items-center gap-[8px]">
-                          <span
-                            style={{
-                              fontWeight: 800,
-                              fontSize: 32,
-                              color: 'var(--ink)',
-                              lineHeight: 1,
-                            }}
-                          >
-                            {userProfile.current_streak || 0}
-                          </span>
-                          <div className="flex items-center gap-[3px]">
-                            {(() => {
-                              const streak = userProfile.current_streak || 0;
-                              const streakStatus = checkStreakStatus(userProfile.last_reel_month);
-                              const showMax = Math.min(streak > 0 ? streak : 1, 6);
-                              const flames = [];
-                              for (let i = 0; i < showMax; i++) {
-                                const isCurrentMonthPending = i === showMax - 1 && streakStatus === 'at_risk';
-                                flames.push(
-                                  <FlameIcon
-                                    key={i}
-                                    color={isCurrentMonthPending ? '#F5C4A0' : 'var(--terra)'}
-                                    size={18}
-                                  />
-                                );
-                              }
-                              if (streak > 6) {
-                                flames.push(
-                                  <span key="more" className="text-[13px] font-semibold ml-[2px]" style={{ color: 'var(--ink-35)' }}>+{streak - 6}</span>
-                                );
-                              }
-                              return flames;
-                            })()}
-                          </div>
-                        </div>
-                        <span
-                          className="ml-auto"
-                          style={{
-                            fontWeight: 400,
-                            fontSize: 16,
-                            color: 'var(--ink-35)',
-                          }}
-                        >
-                          {(userProfile.current_streak || 0) > 0 ? 'month streak' : 'No streak yet'}
-                        </span>
-                      </div>
-                      {/* Motivational subline */}
-                      <p
-                        className="mt-[6px]"
-                        style={{
-                          fontWeight: 400,
-                          fontSize: 15,
-                          color: 'var(--ink-35)',
-                        }}
-                      >
-                        {(userProfile.current_streak || 0) > 0
-                          ? 'Keep posting to protect your streak'
-                          : 'Post a reel this month to start your streak'}
-                      </p>
-                    </div>
-                  </div>
 
                   {/* ═══ Settings ═══ */}
                   <div className="mt-[8px]">
@@ -2735,7 +2528,7 @@ export default function CreatorApp() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <User size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Edit profile</span>
+                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Edit profile</span>
                       </div>
                       <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
                     </button>
@@ -2745,7 +2538,7 @@ export default function CreatorApp() {
                     >
                       <div className="flex items-center gap-[12px]">
                         <Bell size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}>Notifications</span>
+                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Notifications</span>
                         {unreadCount > 0 && (
                           <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-bold flex items-center justify-center">
                             {unreadCount}
@@ -2759,14 +2552,14 @@ export default function CreatorApp() {
                       className="w-full flex items-center gap-[12px] py-[16px] text-left"
                     >
                       <LogOut size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
-                      <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
+                      <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
                     </button>
 
                     <div className="border-t border-[var(--ink-08)] pt-[16px] mt-[8px]">
                       <button
                         onClick={() => { setDeleteError(null); setShowDeleteAccount(true); }}
                         className="text-[13px] text-[var(--ink-35)] hover:text-[var(--terra)] transition-colors"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500 }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}
                       >
                         Delete my account
                       </button>
@@ -2780,7 +2573,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Notifications</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2792,14 +2585,14 @@ export default function CreatorApp() {
                         <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
                         <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
                       </svg>
-                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Nothing yet</p>
+                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Nothing yet</p>
                       <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
                         You'll see a notification when a business confirms your visit or when a new offer drops nearby.
                       </p>
                       <button
                         onClick={() => setView('offers')}
                         className="mt-[20px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[44px]"
-                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
                       >
                         Browse offers
                       </button>
@@ -2816,8 +2609,8 @@ export default function CreatorApp() {
                           <div className="flex items-start gap-3">
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'var(--ink-08)' : 'var(--terra)', flexShrink: 0, marginTop: 4 }} />
                             <div className="flex-1 min-w-0">
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message}</p>
-                              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', marginTop: 4, margin: '4px 0 0' }}>{formatDate(notif.created_at)}</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message}</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', marginTop: 4, margin: '4px 0 0' }}>{formatDate(notif.created_at)}</p>
                             </div>
                           </div>
                         </button>
@@ -2832,7 +2625,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
@@ -2904,7 +2697,7 @@ export default function CreatorApp() {
                         window.location.reload();
                       }}
                       className="w-full py-[13px] rounded-[999px] bg-[var(--terra)] text-white text-[15px] disabled:opacity-50 hover:bg-[var(--terra-hover)] transition-all"
-                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700 }}
+                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                     >
                       {editSaving ? 'Saving...' : 'Save changes'}
                     </button>
@@ -2940,7 +2733,7 @@ export default function CreatorApp() {
                 onClick={() => setView(tab.key)}
                 className="flex-1 flex flex-col items-center gap-[3px] min-h-[44px]"
                 style={{
-                  fontFamily: "'Plus Jakarta Sans', sans-serif",
+                  fontFamily: "'Instrument Sans', sans-serif",
                   fontWeight: isActive ? 600 : 500,
                   fontSize: 12,
                   color: isActive ? 'var(--terra)' : 'var(--ink-35)',
@@ -2989,7 +2782,7 @@ export default function CreatorApp() {
                       minWidth: 16, height: 16, borderRadius: '50%',
                       background: 'var(--terra)', border: '2px solid var(--shell)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: 10, color: 'white',
+                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 10, color: 'white',
                     }}>
                       {(tab as any).badge}
                     </span>

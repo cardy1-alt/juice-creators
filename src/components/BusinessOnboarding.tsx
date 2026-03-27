@@ -185,7 +185,7 @@ export default function BusinessOnboarding({ profile, onComplete, onFinishLater 
 
   // PJS helper for inline styles
   const pjs = (weight: number, size: string, color: string, extra?: Record<string, string>) => ({
-    fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontFamily: "'Instrument Sans', sans-serif",
     fontWeight: weight,
     fontSize: size,
     color,

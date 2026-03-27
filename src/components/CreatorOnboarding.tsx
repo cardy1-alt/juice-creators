@@ -138,7 +138,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           )}
           <Logo variant="wordmark" size={22} />
           {screen === 2 ? (
-            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="w-[40px] text-right" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 500, color: 'var(--ink-35)' }}>Skip</button>
+            <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="w-[40px] text-right" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: '15px', fontWeight: 500, color: 'var(--ink-35)' }}>Skip</button>
           ) : (
             <div className="w-[40px]" />
           )}
@@ -172,10 +172,10 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 1 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Here's how it works
               </h1>
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px' }}>Claim. Visit. Post. Get rewarded.</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px' }}>Claim. Visit. Post. Get rewarded.</p>
 
               <div className="flex flex-col gap-[20px] mt-[28px]">
                 {[
@@ -188,11 +188,11 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                       className="w-[40px] h-[40px] rounded-full flex items-center justify-center flex-shrink-0"
                       style={{ background: step.bg }}
                     >
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'white' }}>{step.num}</span>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'white' }}>{step.num}</span>
                     </div>
                     <div className="flex-1 pt-[2px]">
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--ink)', marginBottom: '3px' }}>{step.title}</p>
-                      <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65 }}>{step.desc}</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: 'var(--ink)', marginBottom: '3px' }}>{step.title}</p>
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65 }}>{step.desc}</p>
                     </div>
                   </div>
                 ))}
@@ -204,7 +204,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <button
               onClick={goForward}
               className="w-full min-h-[52px] text-white transition-all"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Got it →
             </button>
@@ -215,10 +215,10 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
-              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
+              <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
                 Complete your profile
               </h1>
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their offers</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', marginTop: '6px', marginBottom: '28px' }}>Businesses will see this when you claim their offers</p>
 
               {/* Avatar upload */}
               <div className="flex flex-col items-center mb-[24px]">
@@ -234,7 +234,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     {avatarUrl ? (
                       <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
                     ) : (
-                      <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'rgba(255,255,255,0.8)' }}>
+                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'rgba(255,255,255,0.8)' }}>
                         {getInitials(displayName || profile.name || 'C')}
                       </span>
                     )}
@@ -253,7 +253,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                   className="hidden"
                   onChange={handleAvatarUpload}
                 />
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '14px', color: 'var(--ink-35)', marginTop: '10px', textAlign: 'center' }}>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '14px', color: 'var(--ink-35)', marginTop: '10px', textAlign: 'center' }}>
                   {avatarUploading ? 'Uploading...' : 'Add a profile photo'}
                 </p>
               </div>
@@ -262,7 +262,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               <div className="flex flex-col gap-[14px]">
                 {/* Display name */}
                 <div>
-                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Display name</label>
+                  <label style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Display name</label>
                   <input
                     type="text"
                     value={displayName}
@@ -270,7 +270,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     placeholder="How you want to be known"
                     className="w-full focus:outline-none"
                     style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontFamily: "'Instrument Sans', sans-serif",
                       fontWeight: 400,
                       fontSize: '15px',
                       color: 'var(--ink)',
@@ -286,7 +286,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
 
                 {/* Bio */}
                 <div>
-                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Bio</label>
+                  <label style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Bio</label>
                   <textarea
                     value={bio}
                     onChange={e => setBio(e.target.value.slice(0, 150))}
@@ -294,7 +294,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     rows={3}
                     className="w-full resize-none focus:outline-none"
                     style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontFamily: "'Instrument Sans', sans-serif",
                       fontWeight: 400,
                       fontSize: '15px',
                       color: 'var(--ink)',
@@ -306,18 +306,18 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
                     onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                   />
-                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)', textAlign: 'right', marginTop: '2px' }}>{bio.length}/150</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)', textAlign: 'right', marginTop: '2px' }}>{bio.length}/150</p>
                 </div>
 
                 {/* Your town */}
                 <div>
-                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Your town</label>
+                  <label style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Your town</label>
                   <select
                     value={town}
                     onChange={e => setTown(e.target.value)}
                     className="w-full focus:outline-none appearance-none"
                     style={{
-                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontFamily: "'Instrument Sans', sans-serif",
                       fontWeight: 400,
                       fontSize: '15px',
                       color: town ? 'var(--ink)' : 'var(--ink-35)',
@@ -340,8 +340,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                 {/* Instagram (read-only, already collected at signup) */}
                 {profile.instagram_handle && (
                   <div>
-                    <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Instagram</label>
-                    <div style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', background: 'var(--card)', border: '1.5px solid var(--ink-08)', borderRadius: '14px', padding: '14px 16px' }}>
+                    <label style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Instagram</label>
+                    <div style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', background: 'var(--card)', border: '1.5px solid var(--ink-08)', borderRadius: '14px', padding: '14px 16px' }}>
                       {profile.instagram_handle}
                     </div>
                   </div>
@@ -352,14 +352,14 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="flex-1 min-h-[24px]" />
 
             {error && (
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)', textAlign: 'center', marginBottom: '12px' }}>{error}</p>
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '15px', color: 'var(--terra)', textAlign: 'center', marginBottom: '12px' }}>{error}</p>
             )}
 
             <button
               onClick={handleSaveProfile}
               disabled={saving}
               className="w-full min-h-[52px] text-white transition-all"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               {saving ? (
                 <span className="inline-flex items-center gap-2">
@@ -392,23 +392,23 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
               </div>
             </div>
 
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '36px', color: 'var(--ink)', textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' }}>
+            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '36px', color: 'var(--ink)', textAlign: 'center', marginTop: '28px', letterSpacing: '-0.03em' }}>
               You're in.
             </h1>
 
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
               {businessCount} local businesses with {offerCount} live offers are waiting for you to explore.
             </p>
 
             {/* Stats cards */}
             <div className="flex gap-[12px] mt-[24px]">
               <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{businessCount}</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Businesses</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{businessCount}</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Businesses</p>
               </div>
               <div className="text-center min-w-[100px]" style={{ background: 'var(--card)', borderRadius: '16px', border: '1px solid var(--ink-08)', padding: '16px 20px' }}>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
-                <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Offers</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: '32px', color: 'var(--ink)' }}>{offerCount}</p>
+                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: '12px', color: 'var(--ink-60)' }}>Live Offers</p>
               </div>
             </div>
 
@@ -417,7 +417,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <button
               onClick={onComplete}
               className="w-full min-h-[52px] text-white transition-all"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
             >
               Start exploring →
             </button>

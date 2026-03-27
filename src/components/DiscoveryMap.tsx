@@ -45,7 +45,7 @@ function createMarkerIcon(name: string) {
       align-items: center;
       justify-content: center;
       box-shadow: 0 2px 8px rgba(34,34,34,0.2);
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Instrument Sans', sans-serif;
     ">${initials}</div>`,
     className: 'marker-icon',
     iconSize: [40, 40],
