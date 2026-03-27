@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { MapPin, Eye, EyeOff, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
+import { MapPin, Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -810,9 +810,9 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                      className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
+                      className="flex items-center gap-[4px] text-[13px] font-medium text-[var(--ink-60)] transition-colors hover:text-[var(--ink)]"
                     >
-                      <ChevronLeft size={18} strokeWidth={1.5} className="text-[var(--ink)]" />
+                      <ArrowLeft size={14} strokeWidth={1.5} /> Back
                     </button>
                   )}
                   <button
@@ -848,9 +848,9 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                    className="w-[52px] h-[52px] flex items-center justify-center transition-all active:scale-[0.96]" style={{ background: 'transparent', border: '1.5px solid var(--ink-15)', borderRadius: '999px' }}
+                    className="flex items-center gap-[4px] text-[13px] font-medium text-[var(--ink-60)] transition-colors hover:text-[var(--ink)]"
                   >
-                    <ChevronLeft size={18} strokeWidth={1.5} className="text-[var(--ink)]" />
+                    <ArrowLeft size={14} strokeWidth={1.5} /> Back
                   </button>
                   <button
                     type="submit"
