@@ -2017,18 +2017,27 @@ export default function CreatorApp() {
                   </button>
                 </div>
               ) : (
-                <div>
+                (() => {
+                  const _f = activeClaims.filter(c => c.businesses && c.offers);
+                  const _i = _f.findIndex(c => c.id === selectedClaim?.id);
+                  const _c = _f[_i >= 0 ? _i : 0];
+                  const _pageIsClaimed = _c && _c.status === 'active' && !_c.redeemed_at;
+                  return (
+                <div style={{ background: _pageIsClaimed ? '#C4674A' : undefined, minHeight: _pageIsClaimed ? 'calc(100vh - 80px)' : undefined, transition: 'background 0.3s ease' }}>
                   {/* Header bar: "Active passes" + "X / Y" counter */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
-                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Active passes</span>
-                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-60)' }}>
-                      {(() => {
-                        const filtered = activeClaims.filter(c => c.businesses && c.offers);
-                        const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
-                        return `${(currentIdx >= 0 ? currentIdx : 0) + 1} / ${filtered.length}`;
-                      })()}
-                    </span>
-                  </div>
+                  {(() => {
+                    const filteredForHeader = _f;
+                    const headerIdx = _i;
+                    const headerIsClaimed = _pageIsClaimed;
+                    return (
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
+                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: headerIsClaimed ? 'white' : 'var(--ink)', letterSpacing: '-0.03em' }}>Active passes</span>
+                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: headerIsClaimed ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>
+                          {`${(headerIdx >= 0 ? headerIdx : 0) + 1} / ${filteredForHeader.length}`}
+                        </span>
+                      </div>
+                    );
+                  })()}
 
                   {/* Compact pass navigator + content */}
                   {(() => {
@@ -2056,25 +2065,35 @@ export default function CreatorApp() {
                     }
                     if (!foundBreak && desc.length > 40) offerTitle = desc.slice(0, 40).trimEnd() + '…';
 
-                    const isPassCard = false;
+                    const isClaimed = claim.status === 'active' && !claim.redeemed_at;
+
+                    let touchStartX = 0;
 
                     return (
                       <div style={{ padding: '12px 20px 0' }}>
                         {/* Compact pass navigator */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--card)', borderRadius: 12, padding: '10px 14px' }}>
+                        <div
+                          onTouchStart={(e) => { touchStartX = e.touches[0].clientX; }}
+                          onTouchEnd={(e) => {
+                            const dx = e.changedTouches[0].clientX - touchStartX;
+                            if (dx < -40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
+                            if (dx > 40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
+                          }}
+                          style={{ display: 'flex', alignItems: 'center', gap: 10, background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px' }}
+                        >
                           <button
                             onClick={() => { if (idx > 0) setSelectedClaim(filtered[idx - 1]); }}
                             disabled={idx === 0}
-                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'rgba(34,34,34,0.08)', color: 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(34,34,34,0.08)', color: isClaimed ? 'white' : 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                           >‹</button>
                           <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 11, color: 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 11, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
                           </div>
                           <button
                             onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
                             disabled={idx === filtered.length - 1}
-                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'rgba(34,34,34,0.08)', color: 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: isClaimed ? 'rgba(255,255,255,0.2)' : 'rgba(34,34,34,0.08)', color: isClaimed ? 'white' : 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                           >›</button>
                         </div>
 
@@ -2082,9 +2101,9 @@ export default function CreatorApp() {
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginTop: 10 }}>
                           {stageLabels.map((label, sIdx) => (
                             <span key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, fontWeight: sIdx === stageIndex ? 700 : 400, color: sIdx === stageIndex ? '#C4674A' : 'rgba(34,34,34,0.35)' }}>{label}</span>
+                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, fontWeight: sIdx === stageIndex ? 700 : 400, color: isClaimed ? (sIdx === stageIndex ? 'white' : 'rgba(255,255,255,0.5)') : (sIdx === stageIndex ? '#C4674A' : 'rgba(34,34,34,0.35)') }}>{label}</span>
                               {sIdx < stageLabels.length - 1 && (
-                                <span style={{ fontSize: 10, margin: '0 6px', color: 'rgba(34,34,34,0.35)' }}>›</span>
+                                <span style={{ fontSize: 10, margin: '0 6px', color: isClaimed ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.35)' }}>›</span>
                               )}
                             </span>
                           ))}
@@ -2094,17 +2113,18 @@ export default function CreatorApp() {
                         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 4px' }}>
 
                           {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
-                          {claim.status === 'active' && !claim.redeemed_at && (
+                          {isClaimed && (
                             <div className="flex flex-col items-center text-center" style={{ paddingTop: 40 }}>
-                              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 6px', lineHeight: 1.1 }}>Show this to staff</p>
-                              <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
+                              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'white', letterSpacing: '-0.03em', margin: '0 0 6px', lineHeight: 1.1 }}>Show this to staff</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(255,255,255,0.7)', margin: '0 auto 28px', maxWidth: 260, lineHeight: 1.5 }}>
                                 Ask them to tap the button to confirm your visit
                               </p>
                               <button
                                 onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
                                 disabled={loading}
-                                className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[24px] !font-extrabold !text-white !tracking-tight !leading-none"
+                                className="!w-[200px] !h-[200px] rounded-full border-none cursor-pointer !text-[24px] !font-extrabold !tracking-tight !leading-none"
                                 style={{
+                                  background: 'white', color: '#C4674A',
                                   opacity: loading ? 0.6 : 1,
                                   animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
                                   transform: loading ? 'scale(0.95)' : 'scale(1)',
@@ -2113,13 +2133,13 @@ export default function CreatorApp() {
                               >
                                 {loading ? (
                                   <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
-                                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                                    <circle cx="12" cy="12" r="10" stroke="rgba(196,103,74,0.3)" strokeWidth="3" />
+                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="#C4674A" strokeWidth="3" strokeLinecap="round" />
                                   </svg>
                                 ) : <>Confirm</>}
                               </button>
                               {confirmVisitError && (
-                                <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'var(--ochre)' }}>{confirmVisitError}</p>
+                                <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'rgba(255,255,255,0.8)' }}>{confirmVisitError}</p>
                               )}
                             </div>
                           )}
@@ -2243,23 +2263,23 @@ export default function CreatorApp() {
 
                           {/* Report / Release links */}
                           <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
-                            <div style={{ width: 48, height: 1, background: 'var(--ink-08)', marginBottom: 16 }} />
+                            <div style={{ width: 48, height: 1, background: isClaimed ? 'rgba(255,255,255,0.2)' : 'var(--ink-08)', marginBottom: 16 }} />
                           </div>
                           <div className="flex items-center justify-center !text-[13px] pb-1 [&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]">
                             {releaseConfirmId === claim.id ? (
                               <div className="flex items-center gap-3">
-                                <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
+                                <span style={{ color: isClaimed ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
                                 <button
                                   onClick={() => handleReleaseOffer(claim.id)}
                                   disabled={releasingClaim}
-                                  className={`font-bold ${isPassCard ? 'text-white' : 'text-[var(--ink)]'}`}
+                                  className={`font-bold ${isClaimed ? 'text-white' : 'text-[var(--ink)]'}`}
                                 >
                                   {releasingClaim ? '...' : 'Confirm'}
                                 </button>
                                 <button
                                   onClick={() => setReleaseConfirmId(null)}
                                   className="font-semibold"
-                                  style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}
+                                  style={{ color: isClaimed ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}
                                 >
                                   Cancel
                                 </button>
@@ -2269,7 +2289,7 @@ export default function CreatorApp() {
                                 <button
                                   onClick={() => setDisputeClaimId(claim.id)}
                                   className="flex items-center gap-1 font-medium transition-colors"
-                                  style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
+                                  style={{ color: isClaimed ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
                                 >
                                   <Flag size={11} strokeWidth={1.5} /> Report an issue
                                 </button>
@@ -2278,11 +2298,11 @@ export default function CreatorApp() {
                                   if (releaseStatus.allowed) {
                                     return (
                                       <>
-                                        <span className="mx-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
+                                        <span className="mx-2" style={{ color: isClaimed ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
                                         <button
                                           onClick={() => setReleaseConfirmId(claim.id)}
                                           className="flex items-center gap-1 font-medium transition-colors"
-                                          style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
+                                          style={{ color: isClaimed ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
                                         >
                                           <X size={11} strokeWidth={1.5} /> Release offer
                                         </button>
@@ -2295,7 +2315,7 @@ export default function CreatorApp() {
                             )}
                           </div>
                           {releaseError && (
-                            <p className="text-[15px] text-center pb-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
+                            <p className="text-[15px] text-center pb-2" style={{ color: isClaimed ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
                           )}
                         </div>
                       </div>
@@ -2303,6 +2323,8 @@ export default function CreatorApp() {
                   })()}
 
                 </div>
+                  );
+                })()
               )}
             </>
           )}
