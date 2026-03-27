@@ -2067,15 +2067,15 @@ export default function CreatorApp() {
 
                     const isClaimed = claim.status === 'active' && !claim.redeemed_at;
 
-                    let touchStartX = 0;
-
                     return (
                       <div style={{ padding: '12px 20px 0' }}>
                         {/* Compact pass navigator */}
                         <div
-                          onTouchStart={(e) => { touchStartX = e.touches[0].clientX; }}
+                          onTouchStart={(e) => { passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY }; }}
                           onTouchEnd={(e) => {
-                            const dx = e.changedTouches[0].clientX - touchStartX;
+                            if (!passTouchRef.current) return;
+                            const dx = e.changedTouches[0].clientX - passTouchRef.current.startX;
+                            passTouchRef.current = null;
                             if (dx < -40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
                             if (dx > 40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
                           }}
@@ -2126,7 +2126,7 @@ export default function CreatorApp() {
                                 style={{
                                   background: 'white', color: '#C4674A',
                                   opacity: loading ? 0.6 : 1,
-                                  animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
+                                  animation: loading ? 'none' : 'pulse-ring-white 2s ease-in-out infinite',
                                   transform: loading ? 'scale(0.95)' : 'scale(1)',
                                   transition: 'transform 0.1s ease',
                                 }}
@@ -2265,7 +2265,7 @@ export default function CreatorApp() {
                           <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
                             <div style={{ width: 48, height: 1, background: isClaimed ? 'rgba(255,255,255,0.2)' : 'var(--ink-08)', marginBottom: 16 }} />
                           </div>
-                          <div className="flex items-center justify-center !text-[13px] pb-1 [&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]">
+                          <div className={`flex items-center justify-center !text-[13px] pb-1 ${isClaimed ? '' : '[&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]'}`}>
                             {releaseConfirmId === claim.id ? (
                               <div className="flex items-center gap-3">
                                 <span style={{ color: isClaimed ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
@@ -2289,7 +2289,7 @@ export default function CreatorApp() {
                                 <button
                                   onClick={() => setDisputeClaimId(claim.id)}
                                   className="flex items-center gap-1 font-medium transition-colors"
-                                  style={{ color: isClaimed ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
+                                  style={{ color: isClaimed ? 'rgba(255,255,255,0.4)' : 'rgba(34,34,34,0.35)' }}
                                 >
                                   <Flag size={11} strokeWidth={1.5} /> Report an issue
                                 </button>
