@@ -1088,7 +1088,7 @@ export default function CreatorApp() {
                 }}
               />
             </svg>
-            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>
+            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>
               Reel submitted!
             </h2>
             <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
@@ -1487,7 +1487,7 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 16, padding: '0 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
+                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
                         <button onClick={() => setView('active')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
                       <button
@@ -1593,7 +1593,7 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && nearYouOffers.length > 0 && (
                   <div style={{ marginTop: 20 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Near you</span>
+                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Near you</span>
                       <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
@@ -1680,7 +1680,7 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && newThisWeekOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>New this week</span>
+                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>New this week</span>
                       <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
                       </button>
@@ -1763,7 +1763,7 @@ export default function CreatorApp() {
                 {!offersLoading && !searchTerm && searchedOffers.length > 0 && (
                   <div style={{ marginTop: 24 }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 19, color: 'var(--ink)', letterSpacing: '-0.03em' }}>All offers</span>
+                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>All offers</span>
                       <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>{searchedOffers.length} available</span>
                     </div>
                     <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
@@ -1849,7 +1849,7 @@ export default function CreatorApp() {
                   return (
                     <div style={{ marginTop: 24 }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 19, color: 'var(--ink)' }}>Trending</span>
+                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Trending</span>
                       </div>
                       <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
                         {trendingOffers.map((offer) => {
@@ -2022,7 +2022,7 @@ export default function CreatorApp() {
                 <div>
                   {/* Header bar: "Active passes" + "X / Y" counter */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px 0 20px' }}>
-                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 18, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Active passes</span>
+                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Active passes</span>
                     <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-60)' }}>
                       {(() => {
                         const filtered = activeClaims.filter(c => c.businesses && c.offers);
@@ -2111,7 +2111,7 @@ export default function CreatorApp() {
                               {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
                               {claim.status === 'active' && !claim.redeemed_at && (
                                 <div className="flex flex-col items-center text-center" style={{ paddingTop: 12 }}>
-                                  <p className="!text-[24px] !font-extrabold !tracking-tight !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 6px' }}>Show this to staff</p>
+                                  <p className="!text-[28px] !text-[var(--ink)] !leading-tight" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', margin: '0 0 6px' }}>Show this to staff</p>
                                   <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
                                     Ask them to tap the button to confirm your visit
                                   </p>
@@ -2573,7 +2573,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Notifications</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Notifications</h1>
                   </div>
                   {notifications.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-16 px-[40px]">
@@ -2625,7 +2625,7 @@ export default function CreatorApp() {
                     <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
                       <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
                     </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>Edit profile</h1>
+                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Edit profile</h1>
                   </div>
                   <div className="space-y-[16px]">
                     {/* Avatar upload */}
