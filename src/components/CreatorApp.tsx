@@ -223,7 +223,7 @@ export default function CreatorApp() {
   const [redeemToast, setRedeemToast] = useState<string | null>(null);
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const prevClaimStatusesRef = useRef<Record<string, string>>({});
-  const passTouchRef = useRef<{ startX: number; startY: number } | null>(null);
+  const touchStartX = useRef(0);
 
   // ─── Discovery feed state ─────────────────────────────────────────
 
@@ -2068,23 +2068,16 @@ export default function CreatorApp() {
                     const isClaimed = claim.status === 'active' && !claim.redeemed_at;
 
                     return (
-                      <div
-                        style={{ padding: '12px 20px 0', touchAction: 'pan-y' }}
-                        onTouchStart={(e) => { passTouchRef.current = { startX: e.touches[0].clientX, startY: e.touches[0].clientY }; }}
-                        onTouchEnd={(e) => {
-                          if (!passTouchRef.current) return;
-                          const dx = e.changedTouches[0].clientX - passTouchRef.current.startX;
-                          const dy = e.changedTouches[0].clientY - passTouchRef.current.startY;
-                          passTouchRef.current = null;
-                          if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) {
-                            if (dx < 0 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
-                            if (dx > 0 && idx > 0) setSelectedClaim(filtered[idx - 1]);
-                          }
-                        }}
-                      >
+                      <div style={{ padding: '12px 20px 0' }}>
                         {/* Compact pass navigator */}
                         <div
-                          style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px' }}
+                          style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px', touchAction: 'pan-y' }}
+                          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
+                          onTouchEnd={(e) => {
+                            const delta = touchStartX.current - e.changedTouches[0].clientX;
+                            if (delta > 40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
+                            if (delta < -40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
+                          }}
                         >
                           <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
                             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
@@ -2314,21 +2307,7 @@ export default function CreatorApp() {
                           )}
                         </div>
 
-                        {/* Floating navigation arrows */}
-                        {filtered.length > 1 && (
-                          <div style={{ position: 'fixed', bottom: 124, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 16, zIndex: 50, pointerEvents: 'none' }}>
-                            <button
-                              onClick={() => { if (idx > 0) setSelectedClaim(filtered[idx - 1]); }}
-                              disabled={idx === 0}
-                              style={{ width: 64, height: 64, borderRadius: '50%', border: 'none', background: 'white', color: '#C4674A', fontSize: 22, fontWeight: 700, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(34,34,34,0.1)', pointerEvents: 'auto' }}
-                            >‹</button>
-                            <button
-                              onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
-                              disabled={idx === filtered.length - 1}
-                              style={{ width: 64, height: 64, borderRadius: '50%', border: 'none', background: 'white', color: '#C4674A', fontSize: 22, fontWeight: 700, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.35 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 2px 12px rgba(34,34,34,0.1)', pointerEvents: 'auto' }}
-                            >›</button>
-                          </div>
-                        )}
+
                       </div>
                     );
                   })()}
