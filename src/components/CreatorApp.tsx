@@ -2228,7 +2228,7 @@ export default function CreatorApp() {
                           disabled={loading}
                           className="!w-[200px] !h-[200px] rounded-full border-none cursor-pointer !text-[24px] !font-extrabold !tracking-tight !leading-none"
                           style={{
-                            background: 'white', color: '#C4674A',
+                            background: '#8B3D28', color: 'white',
                             opacity: loading ? 0.6 : 1,
                             animation: loading ? 'none' : 'pulse-ring-white 2s ease-in-out infinite',
                             transform: loading ? 'scale(0.95)' : 'scale(1)',
@@ -2237,8 +2237,8 @@ export default function CreatorApp() {
                         >
                           {loading ? (
                             <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
-                              <circle cx="12" cy="12" r="10" stroke="rgba(196,103,74,0.3)" strokeWidth="3" />
-                              <path d="M12 2a10 10 0 0 1 10 10" stroke="#C4674A" strokeWidth="3" strokeLinecap="round" />
+                              <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                              <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
                             </svg>
                           ) : <>Confirm</>}
                         </button>
