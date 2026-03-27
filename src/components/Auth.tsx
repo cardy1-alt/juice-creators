@@ -199,12 +199,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className="relative transition-all duration-200" style={{
-      borderRadius: '14px',
-      border: focused ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-      background: 'var(--shell)',
-      boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
-    }}>
+    <div className={`relative transition-all duration-200 bg-white rounded-2xl ${focused ? 'border border-[#C4674A] ring-2 ring-[rgba(196,103,74,0.12)]' : 'border border-[rgba(34,34,34,0.10)]'}`}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -333,7 +328,7 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--shell)] overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#F6F3EE] overscroll-none">
       {mode === 'signin' ? (
         /* ─── SIGN IN: vertically centred brand + hero + form ─── */
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
@@ -392,7 +387,7 @@ export default function Auth() {
           <>
           {/* 1. Wordmark */}
           <div className="flex flex-col items-center mb-[20px]">
-            <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--forest)', letterSpacing: '-0.5px' }}>nayba</span>
+            <span className="font-[Corben] text-[#1A3C34] text-[26px]" style={{ letterSpacing: '-0.5px' }}>nayba</span>
           </div>
 
           {/* 2. Live pill */}
@@ -408,8 +403,8 @@ export default function Auth() {
 
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 28, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-0.03em', margin: 0 }}>
-              Local offers.<br /><span style={{ color: 'var(--terra)', fontStyle: 'italic' }}>Yours</span> to claim.
+            <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
+              Local offers.<br /><span className="text-[#C4674A] italic">Yours</span> to claim.
             </h1>
           </div>
 
@@ -488,8 +483,8 @@ export default function Auth() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px', marginTop: 2 }}
+              className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               {loading ? (
                 <span className="inline-flex items-center gap-2">
@@ -499,13 +494,13 @@ export default function Auth() {
             </button>
 
             {/* 10. Apply for access */}
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 400, color: 'var(--ink-60)' }}>
+            <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
               Not a member?{' '}
               <button
                 type="button"
                 onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-                className="hover:underline transition-colors"
-                style={{ color: 'var(--terra)', fontWeight: 700, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 14 }}
+                className="text-[#C4674A] font-bold hover:underline transition-colors"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
               >
                 Apply for access
               </button>
@@ -515,8 +510,8 @@ export default function Auth() {
             <button
               type="button"
               onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[12px] text-center mt-[4px] transition-colors mx-auto"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, color: 'var(--ink-35)' }}
+              className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
             >
               Forgot password?
             </button>
