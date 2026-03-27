@@ -162,13 +162,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 600 }}>Check your email</p>
+                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.03em', fontWeight: 400 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", letterSpacing: '-0.03em', fontWeight: 600 }}>Reset password</p>
+                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.03em', fontWeight: 400 }}>Reset password</p>
                   <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -359,7 +359,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
