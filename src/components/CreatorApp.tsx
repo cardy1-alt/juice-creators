@@ -1980,7 +1980,7 @@ export default function CreatorApp() {
                         style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
                       >
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
                           <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.businesses.name}</p>
                           <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>
                             {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
@@ -2084,7 +2084,7 @@ export default function CreatorApp() {
                           <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 200px)' }}>
                             {/* Pass info card */}
                             <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '20px 20px' }}>
-                              <p className="!text-[18px] !font-bold !text-[var(--ink)] m-0 truncate !leading-tight">{offerTitle}</p>
+                              <p className="!text-[18px] !font-semibold !text-[var(--ink)] m-0 truncate !leading-tight">{offerTitle}</p>
                               <p className="!text-[15px] !font-medium !text-[var(--ink-60)] !mt-1 !mb-3">{claim.businesses.name}</p>
 
                               {/* Breadcrumb stepper */}
@@ -2357,7 +2357,7 @@ export default function CreatorApp() {
                       style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px', borderLeft: `3px solid ${leftBorderColor}` }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0 }}>{claim.businesses.name}</p>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
                       </div>
