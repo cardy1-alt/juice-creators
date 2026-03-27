@@ -328,7 +328,7 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F6F3EE] overscroll-none">
+    <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
         /* ─── SIGN IN: vertically centred brand + hero + form ─── */
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
