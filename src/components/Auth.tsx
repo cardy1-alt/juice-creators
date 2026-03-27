@@ -143,7 +143,7 @@ function AddressAutocomplete({ value, onChange }: {
       <div className="relative transition-all duration-200" style={{
         borderRadius: '14px',
         border: focused ? '1.5px solid var(--terra)' : mapsError ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-        background: 'var(--card)',
+        background: 'var(--shell)',
         boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
       }}>
         <MapPin size={16} strokeWidth={1.5} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
@@ -202,7 +202,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
     <div className="relative transition-all duration-200" style={{
       borderRadius: '14px',
       border: focused ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-      background: 'var(--card)',
+      background: 'var(--shell)',
       boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
     }}>
       {iconName && (
@@ -398,26 +398,26 @@ export default function Auth() {
               ) : 'Sign In'}
             </button>
 
-            <button
-              type="button"
-              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[13px] text-center mt-[8px] transition-colors mx-auto"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: 'var(--terra)' }}
-            >
-              Forgot password?
-            </button>
-
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)' }}>
+            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 400, color: 'var(--ink-35)' }}>
               Not a member?{' '}
               <button
                 type="button"
                 onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
                 className="hover:text-[var(--ink)] transition-colors"
-                style={{ color: 'var(--terra)', fontWeight: 500, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+                style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 14 }}
               >
                 Apply for access
               </button>
             </p>
+
+            <button
+              type="button"
+              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
+              className="block text-[13px] text-center mt-[8px] transition-colors mx-auto"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: 'var(--ink-35)' }}
+            >
+              Forgot password?
+            </button>
           </form>
         )}
 
