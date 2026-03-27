@@ -1,10 +1,11 @@
-import { Component, ReactNode, useState, useEffect } from 'react';
+import React, { Component, ReactNode, useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import Auth from './components/Auth';
-import CreatorApp from './components/CreatorApp';
-import BusinessPortal from './components/BusinessPortal';
-import AdminDashboard from './components/AdminDashboard';
+
+const CreatorApp = React.lazy(() => import('./components/CreatorApp'));
+const BusinessPortal = React.lazy(() => import('./components/BusinessPortal'));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 import { AlertCircle, RefreshCw, QrCode, LogOut, Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
@@ -329,16 +330,22 @@ function App() {
     return <Auth />;
   }
 
+  const suspenseFallback = (
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F6F3EE' }}>
+      <span style={{ fontFamily: "'Corben', cursive", color: '#1A3C34', fontSize: '2rem' }}>nayba</span>
+    </div>
+  );
+
   if (userRole === 'admin') {
-    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><AdminDashboard /></div></>;
+    return <React.Suspense fallback={suspenseFallback}>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><AdminDashboard /></div></React.Suspense>;
   }
 
   if (userRole === 'creator') {
-    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><CreatorApp /></div></>;
+    return <React.Suspense fallback={suspenseFallback}>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><CreatorApp /></div></React.Suspense>;
   }
 
   if (userRole === 'business') {
-    return <>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><BusinessPortal /></div></>;
+    return <React.Suspense fallback={suspenseFallback}>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><BusinessPortal /></div></React.Suspense>;
   }
 
   // Fallback — user authenticated but no profile found
