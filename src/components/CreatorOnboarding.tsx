@@ -39,9 +39,10 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
   const [animKey, setAnimKey] = useState(0);
 
-  // Screen 3 state
+  // Screen 2 state
   const [displayName, setDisplayName] = useState(profile.display_name || profile.name || '');
   const [bio, setBio] = useState(profile.bio || '');
+  const [town, setTown] = useState(profile.address || '');
   const [avatarUrl, setAvatarUrl] = useState<string | null>(profile.avatar_url || null);
   const [avatarUploading, setAvatarUploading] = useState(false);
   const avatarInputRef = useRef<HTMLInputElement>(null);
@@ -98,6 +99,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
       const { error: updateError } = await supabase.from('creators').update({
         display_name: displayName.trim() || null,
         bio: bio.trim() || null,
+        address: town || null,
         onboarding_complete: true,
       }).eq('id', profile.id);
       if (updateError) throw updateError;
@@ -304,6 +306,34 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
                     onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
                   />
                   <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-35)', textAlign: 'right', marginTop: '2px' }}>{bio.length}/150</p>
+                </div>
+
+                {/* Your town */}
+                <div>
+                  <label style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: '13px', color: 'var(--ink-60)', display: 'block', marginBottom: '6px' }}>Your town</label>
+                  <select
+                    value={town}
+                    onChange={e => setTown(e.target.value)}
+                    className="w-full focus:outline-none appearance-none"
+                    style={{
+                      fontFamily: "'Plus Jakarta Sans', sans-serif",
+                      fontWeight: 400,
+                      fontSize: '15px',
+                      color: town ? 'var(--ink)' : 'var(--ink-35)',
+                      background: 'var(--card)',
+                      border: '1.5px solid var(--ink-08)',
+                      borderRadius: '14px',
+                      padding: '14px 16px',
+                    }}
+                    onFocus={(e) => { e.currentTarget.style.borderColor = 'var(--terra)'; e.currentTarget.style.boxShadow = '0 0 0 3px var(--terra-ring)'; }}
+                    onBlur={(e) => { e.currentTarget.style.borderColor = 'var(--ink-08)'; e.currentTarget.style.boxShadow = 'none'; }}
+                  >
+                    <option value="" disabled>Select your town</option>
+                    <option value="Bury St Edmunds">Bury St Edmunds</option>
+                    <option value="Ipswich" disabled>Ipswich — coming soon</option>
+                    <option value="Norwich" disabled>Norwich — coming soon</option>
+                    <option value="Cambridge" disabled>Cambridge — coming soon</option>
+                  </select>
                 </div>
 
                 {/* Instagram (read-only, already collected at signup) */}
