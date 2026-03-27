@@ -2030,284 +2030,277 @@ export default function CreatorApp() {
                     </span>
                   </div>
 
-                  {/* Swipeable slider */}
-                  <div
-                    id="claims-slider"
-                    className="flex overflow-x-auto"
-                    style={{
-                      scrollSnapType: 'x mandatory',
-                      scrollbarWidth: 'none',
-                      padding: '12px 0',
-                    }}
-                    onScroll={(e) => {
-                      const el = e.currentTarget;
-                      const cardWidth = el.clientWidth;
-                      const idx = Math.round(el.scrollLeft / cardWidth);
-                      const filtered = activeClaims.filter(c => c.businesses && c.offers);
-                      if (filtered[idx] && selectedClaim?.id !== filtered[idx].id) {
-                        setSelectedClaim(filtered[idx]);
-                      }
-                    }}
-                  >
-                    {activeClaims.filter(c => c.businesses && c.offers).map((claim, claimIdx) => {
-                      const currentStage = claim.reel_url
-                        ? 'submitted'
-                        : claim.redeemed_at
-                        ? 'reel_due'
-                        : 'claimed';
+                  {/* Compact pass navigator + content */}
+                  {(() => {
+                    const filtered = activeClaims.filter(c => c.businesses && c.offers);
+                    const currentIdx = filtered.findIndex(c => c.id === selectedClaim?.id);
+                    const idx = currentIdx >= 0 ? currentIdx : 0;
+                    const claim = filtered[idx];
+                    if (!claim) return null;
 
-                      const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
-                      const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
+                    const currentStage = claim.reel_url
+                      ? 'submitted'
+                      : claim.redeemed_at
+                      ? 'reel_due'
+                      : 'claimed';
+                    const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
+                    const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
 
-                      // Use snapshot fields (frozen at claim time) if available, fall back to live offer data
-                      const desc = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
-                      const breakPoints = [' in exchange', ' for a', ' for an', ' when you', ' with your'];
-                      let offerTitle = desc;
-                      let foundBreak = false;
-                      for (const bp of breakPoints) {
-                        const bpIdx = desc.indexOf(bp);
-                        if (bpIdx > 0 && bpIdx <= 50) { offerTitle = desc.slice(0, bpIdx); foundBreak = true; break; }
-                      }
-                      if (!foundBreak && desc.length > 40) offerTitle = desc.slice(0, 40).trimEnd() + '…';
+                    const desc = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
+                    const breakPoints = [' in exchange', ' for a', ' for an', ' when you', ' with your'];
+                    let offerTitle = desc;
+                    let foundBreak = false;
+                    for (const bp of breakPoints) {
+                      const bpIdx = desc.indexOf(bp);
+                      if (bpIdx > 0 && bpIdx <= 50) { offerTitle = desc.slice(0, bpIdx); foundBreak = true; break; }
+                    }
+                    if (!foundBreak && desc.length > 40) offerTitle = desc.slice(0, 40).trimEnd() + '…';
 
-                      const isPassCard = false;
-                      const cardBg = 'var(--shell)';
+                    const isPassCard = false;
 
-                      return (
-                        <div
-                          key={claim.id}
-                          className="flex-shrink-0"
-                          style={{ scrollSnapAlign: 'center', width: 'calc(100vw - 40px)', marginLeft: claimIdx === 0 ? 20 : 6, marginRight: claimIdx === activeClaims.filter(c => c.businesses && c.offers).length - 1 ? 20 : 6 }}
-                        >
-                          <div style={{ display: 'flex', flexDirection: 'column', minHeight: 'calc(100vh - 200px)' }}>
-                            {/* Pass info card */}
-                            <div className="rounded-[16px]" style={{ background: 'var(--card)', padding: '20px 20px' }}>
-                              <p className="!text-[18px] !font-semibold !text-[var(--ink)] m-0 truncate !leading-tight">{offerTitle}</p>
-                              <p className="!text-[15px] !font-medium !text-[var(--ink-60)] !mt-1 !mb-3">{claim.businesses.name}</p>
+                    return (
+                      <div style={{ padding: '12px 20px 0' }}>
+                        {/* Compact pass navigator */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 10, background: 'var(--card)', borderRadius: 12, padding: '10px 14px' }}>
+                          <button
+                            onClick={() => { if (idx > 0) setSelectedClaim(filtered[idx - 1]); }}
+                            disabled={idx === 0}
+                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'rgba(34,34,34,0.08)', color: 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', opacity: idx === 0 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                          >‹</button>
+                          <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 11, color: 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
+                          </div>
+                          <button
+                            onClick={() => { if (idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]); }}
+                            disabled={idx === filtered.length - 1}
+                            style={{ width: 28, height: 28, borderRadius: 8, border: 'none', background: 'rgba(34,34,34,0.08)', color: 'rgba(34,34,34,0.4)', fontSize: 14, cursor: idx === filtered.length - 1 ? 'default' : 'pointer', opacity: idx === filtered.length - 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
+                          >›</button>
+                        </div>
 
-                              {/* Breadcrumb stepper */}
-                              <div className="flex items-center flex-nowrap">
-                                {stageLabels.map((label, idx) => {
-                                  const isCurrent = idx === stageIndex;
-                                  return (
-                                    <span key={label} className="flex items-center">
-                                      <span className={`!text-[12px] ${isCurrent ? '!font-bold !text-[var(--ink)]' : '!font-normal !text-[var(--ink-35)]'}`}>
-                                        {label}
-                                      </span>
-                                      {idx < stageLabels.length - 1 && (
-                                        <span className="!text-[10px] mx-1.5 !text-[var(--ink-35)]">›</span>
-                                      )}
-                                    </span>
-                                  );
-                                })}
-                              </div>
+                        {/* Stepper */}
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginTop: 10 }}>
+                          {stageLabels.map((label, sIdx) => (
+                            <span key={label} style={{ display: 'flex', alignItems: 'center' }}>
+                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, fontWeight: sIdx === stageIndex ? 700 : 400, color: sIdx === stageIndex ? '#C4674A' : 'rgba(34,34,34,0.35)' }}>{label}</span>
+                              {sIdx < stageLabels.length - 1 && (
+                                <span style={{ fontSize: 10, margin: '0 6px', color: 'rgba(34,34,34,0.35)' }}>›</span>
+                              )}
+                            </span>
+                          ))}
+                        </div>
+
+                        {/* Content */}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 4px' }}>
+
+                          {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
+                          {claim.status === 'active' && !claim.redeemed_at && (
+                            <div className="flex flex-col items-center text-center" style={{ paddingTop: 40 }}>
+                              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 6px', lineHeight: 1.1 }}>Show this to staff</p>
+                              <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
+                                Ask them to tap the button to confirm your visit
+                              </p>
+                              <button
+                                onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
+                                disabled={loading}
+                                className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[24px] !font-extrabold !text-white !tracking-tight !leading-none"
+                                style={{
+                                  opacity: loading ? 0.6 : 1,
+                                  animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
+                                  transform: loading ? 'scale(0.95)' : 'scale(1)',
+                                  transition: 'transform 0.1s ease',
+                                }}
+                              >
+                                {loading ? (
+                                  <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
+                                    <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
+                                    <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
+                                  </svg>
+                                ) : <>Confirm</>}
+                              </button>
+                              {confirmVisitError && (
+                                <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'var(--ochre)' }}>{confirmVisitError}</p>
+                              )}
                             </div>
+                          )}
 
-                            {/* Swipe hint */}
-                            {activeClaims.filter(c => c.businesses && c.offers).length > 1 && (
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, color: 'rgba(34,34,34,0.35)', textAlign: 'center', margin: '8px 0 0' }}>‹ › swipe to switch pass</p>
-                            )}
-
-                            {/* Content below pass card */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '20px 4px 0' }}>
-
-                              {/* CONFIRM VISIT — shown when status is "claimed" (active, not yet visited) */}
-                              {claim.status === 'active' && !claim.redeemed_at && (
-                                <div className="flex flex-col items-center text-center" style={{ paddingTop: 12 }}>
-                                  <p className="!text-[28px] !text-[var(--ink)] !leading-tight" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', margin: '0 0 6px' }}>Show this to staff</p>
-                                  <p className="!text-[16px] !font-medium !text-[var(--ink-60)] !leading-snug" style={{ margin: '0 auto 28px', maxWidth: 260 }}>
-                                    Ask them to tap the button to confirm your visit
-                                  </p>
+                          {/* Confirm visit dialog */}
+                          {confirmVisitClaimId === claim.id && (
+                            <div
+                              style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.45)' }}
+                              onClick={() => setConfirmVisitClaimId(null)}
+                            >
+                              <div
+                                onClick={(e) => e.stopPropagation()}
+                                style={{ background: 'var(--shell)', borderRadius: 24, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 32px rgba(34,34,34,0.14)' }}
+                              >
+                                <p className="!text-[18px] !font-semibold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
+                                <p className="!text-[15px] !font-normal !text-[var(--ink-60)]" style={{ margin: '0 0 24px', lineHeight: 1.65 }}>
+                                  Only confirm if you are at {claim.businesses.name} and a staff member is present.
+                                </p>
+                                <div style={{ display: 'flex', gap: 12 }}>
                                   <button
-                                    onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
-                                    disabled={loading}
-                                    className="!w-[200px] !h-[200px] rounded-full bg-[var(--terra)] border-none cursor-pointer !text-[24px] !font-extrabold !text-white !tracking-tight !leading-none"
+                                    onClick={() => setConfirmVisitClaimId(null)}
+                                    className="!text-[15px] !font-semibold !text-[var(--ink)]"
                                     style={{
-                                      opacity: loading ? 0.6 : 1,
-                                      animation: loading ? 'none' : 'pulse-ring 2.5s ease-out infinite',
-                                      transform: loading ? 'scale(0.95)' : 'scale(1)',
-                                      transition: 'transform 0.1s ease',
+                                      flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--border)', background: 'transparent',
+                                      cursor: 'pointer',
                                     }}
                                   >
-                                    {loading ? (
-                                      <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
-                                        <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                                        <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                                      </svg>
-                                    ) : <>Confirm</>}
+                                    Cancel
                                   </button>
-                                  {confirmVisitError && (
-                                    <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'var(--ochre)' }}>{confirmVisitError}</p>
-                                  )}
-                                </div>
-                              )}
-
-                              {/* Confirm visit dialog */}
-                              {confirmVisitClaimId === claim.id && (
-                                <div
-                                  style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.45)' }}
-                                  onClick={() => setConfirmVisitClaimId(null)}
-                                >
-                                  <div
-                                    onClick={(e) => e.stopPropagation()}
-                                    style={{ background: 'var(--shell)', borderRadius: 24, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 32px rgba(34,34,34,0.14)' }}
-                                  >
-                                    <p className="!text-[18px] !font-semibold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
-                                    <p className="!text-[15px] !font-normal !text-[var(--ink-60)]" style={{ margin: '0 0 24px', lineHeight: 1.65 }}>
-                                      Only confirm if you are at {claim.businesses.name} and a staff member is present.
-                                    </p>
-                                    <div style={{ display: 'flex', gap: 12 }}>
-                                      <button
-                                        onClick={() => setConfirmVisitClaimId(null)}
-                                        className="!text-[15px] !font-semibold !text-[var(--ink)]"
-                                        style={{
-                                          flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--border)', background: 'transparent',
-                                          cursor: 'pointer',
-                                        }}
-                                      >
-                                        Cancel
-                                      </button>
-                                      <button
-                                        onClick={async () => {
-                                          try {
-                                            setLoading(true);
-                                            setConfirmVisitClaimId(null);
-                                            setConfirmVisitError(null);
-                                            const { error } = await supabase
-                                              .from('claims')
-                                              .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
-                                              .eq('id', claim.id);
-                                            if (error) throw error;
-                                            setActiveClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
-                                            setClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
-                                            if (selectedClaim?.id === claim.id) setSelectedClaim({ ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any);
-                                          } catch (err: any) {
-                                            setConfirmVisitError('Something went wrong — please try again');
-                                          } finally {
-                                            setLoading(false);
-                                          }
-                                        }}
-                                        disabled={loading}
-                                        className="!text-[15px] !font-bold !text-white"
-                                        style={{
-                                          flex: 1, height: 48, borderRadius: 999, border: 'none', background: 'var(--terra)',
-                                          cursor: 'pointer', opacity: loading ? 0.6 : 1,
-                                        }}
-                                      >
-                                        Yes, confirm
-                                      </button>
-                                    </div>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* POST-VISIT — shown when visited (redeemed) but reel not yet submitted */}
-                              {claim.redeemed_at && !claim.reel_url && (
-                                <div style={{ textAlign: 'center' }}>
-                                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginBottom: 8 }}>
-                                    <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 32, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Visit confirmed!</span>
-                                  </div>
-                                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
-                                    Now post your Reel within 48 hours and submit the link below
-                                  </p>
-                                  {/* Reel URL input */}
-                                  <div style={{ textAlign: 'left' }}>
-                                    <input
-                                      type="url"
-                                      value={reelUrl}
-                                      onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
-                                      placeholder="Paste your Instagram Reel link here"
-                                      className="w-full focus:outline-none"
-                                      style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: 16, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)' }}
-                                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
-                                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.08)'; }}
-                                    />
-                                    {reelError && <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', marginTop: 8 }}>Please check the URL and try again.</p>}
-                                    <button
-                                      onClick={handleSubmitReel}
-                                      disabled={loading || !reelUrl}
-                                      style={{
-                                        width: '100%', height: 52, borderRadius: 999, border: 'none', marginTop: 14,
-                                        background: 'var(--terra)',
-                                        fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
-                                      }}
-                                    >
-                                      Submit Reel
-                                    </button>
-                                  </div>
-                                </div>
-                              )}
-
-                              {/* Reel already submitted */}
-                              {claim.reel_url && (
-                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: 16 }}>
-                                  <Check size={20} strokeWidth={1.5} color="var(--terra)" />
-                                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>Reel submitted!</span>
-                                </div>
-                              )}
-
-                              {/* Report / Release links */}
-                              <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
-                                <div style={{ width: 48, height: 1, background: 'var(--ink-08)', marginBottom: 16 }} />
-                              </div>
-                              <div className="flex items-center justify-center !text-[13px] pb-1 [&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]">
-                                {releaseConfirmId === claim.id ? (
-                                  <div className="flex items-center gap-3">
-                                    <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
-                                    <button
-                                      onClick={() => handleReleaseOffer(claim.id)}
-                                      disabled={releasingClaim}
-                                      className={`font-bold ${isPassCard ? 'text-white' : 'text-[var(--ink)]'}`}
-                                    >
-                                      {releasingClaim ? '...' : 'Confirm'}
-                                    </button>
-                                    <button
-                                      onClick={() => setReleaseConfirmId(null)}
-                                      className="font-semibold"
-                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}
-                                    >
-                                      Cancel
-                                    </button>
-                                  </div>
-                                ) : (
-                                  <>
-                                    <button
-                                      onClick={() => setDisputeClaimId(claim.id)}
-                                      className="flex items-center gap-1 font-medium transition-colors"
-                                      style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
-                                    >
-                                      <Flag size={11} strokeWidth={1.5} /> Report an issue
-                                    </button>
-                                    {(() => {
-                                      const releaseStatus = canReleaseOffer(claim);
-                                      if (releaseStatus.allowed) {
-                                        return (
-                                          <>
-                                            <span className="mx-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
-                                            <button
-                                              onClick={() => setReleaseConfirmId(claim.id)}
-                                              className="flex items-center gap-1 font-medium transition-colors"
-                                              style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
-                                            >
-                                              <X size={11} strokeWidth={1.5} /> Release offer
-                                            </button>
-                                          </>
-                                        );
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        setLoading(true);
+                                        setConfirmVisitClaimId(null);
+                                        setConfirmVisitError(null);
+                                        const { error } = await supabase
+                                          .from('claims')
+                                          .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
+                                          .eq('id', claim.id);
+                                        if (error) throw error;
+                                        setActiveClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
+                                        setClaims(prev => prev.map(c => c.id === claim.id ? { ...c, status: 'redeemed', redeemed_at: new Date().toISOString() } : c));
+                                        if (selectedClaim?.id === claim.id) setSelectedClaim({ ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any);
+                                      } catch (err: any) {
+                                        setConfirmVisitError('Something went wrong — please try again');
+                                      } finally {
+                                        setLoading(false);
                                       }
-                                      return null;
-                                    })()}
-                                  </>
-                                )}
+                                    }}
+                                    disabled={loading}
+                                    className="!text-[15px] !font-bold !text-white"
+                                    style={{
+                                      flex: 1, height: 48, borderRadius: 999, border: 'none', background: 'var(--terra)',
+                                      cursor: 'pointer', opacity: loading ? 0.6 : 1,
+                                    }}
+                                  >
+                                    Yes, confirm
+                                  </button>
+                                </div>
                               </div>
-                              {releaseError && (
-                                <p className="text-[15px] text-center pb-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
-                              )}
                             </div>
+                          )}
+
+                          {/* POST-VISIT — shown when visited (redeemed) but reel not yet submitted */}
+                          {claim.redeemed_at && !claim.reel_url && (
+                            <div style={{ textAlign: 'center', paddingTop: 40 }}>
+                              <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 10px', lineHeight: 1.1 }}>Visit confirmed!</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
+                                Post your Reel within 48 hours and submit the link below
+                              </p>
+                              {/* Timer pill */}
+                              {(() => {
+                                const due = claim.reel_due_at ? new Date(claim.reel_due_at).getTime() : 0;
+                                const now = Date.now();
+                                const diff = due - now;
+                                const hrs = Math.floor(diff / (1000 * 60 * 60));
+                                const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                const timeLeft = due > 0 && diff > 0 ? `${hrs}h ${mins}m remaining` : '';
+                                if (!timeLeft) return null;
+                                return (
+                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F5C4A0', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
+                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>{timeLeft}</span>
+                                  </div>
+                                );
+                              })()}
+                              {/* Reel URL input */}
+                              <div style={{ textAlign: 'left' }}>
+                                <input
+                                  type="url"
+                                  value={reelUrl}
+                                  onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
+                                  placeholder="Paste your Instagram Reel link here"
+                                  className="w-full focus:outline-none"
+                                  style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: 16, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)' }}
+                                  onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
+                                  onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.08)'; }}
+                                />
+                                {reelError && <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', marginTop: 8 }}>Please check the URL and try again.</p>}
+                                <button
+                                  onClick={handleSubmitReel}
+                                  disabled={loading || !reelUrl}
+                                  style={{
+                                    width: '100%', height: 56, borderRadius: 999, border: 'none', marginTop: 14,
+                                    background: 'var(--terra)',
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
+                                  }}
+                                >
+                                  Submit Reel
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Reel already submitted */}
+                          {claim.reel_url && (
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '40px 16px 16px' }}>
+                              <Check size={20} strokeWidth={1.5} color="var(--terra)" />
+                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>Reel submitted!</span>
+                            </div>
+                          )}
+
+                          {/* Report / Release links */}
+                          <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
+                            <div style={{ width: 48, height: 1, background: 'var(--ink-08)', marginBottom: 16 }} />
                           </div>
+                          <div className="flex items-center justify-center !text-[13px] pb-1 [&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]">
+                            {releaseConfirmId === claim.id ? (
+                              <div className="flex items-center gap-3">
+                                <span style={{ color: isPassCard ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)' }}>Release this slot?</span>
+                                <button
+                                  onClick={() => handleReleaseOffer(claim.id)}
+                                  disabled={releasingClaim}
+                                  className={`font-bold ${isPassCard ? 'text-white' : 'text-[var(--ink)]'}`}
+                                >
+                                  {releasingClaim ? '...' : 'Confirm'}
+                                </button>
+                                <button
+                                  onClick={() => setReleaseConfirmId(null)}
+                                  className="font-semibold"
+                                  style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}
+                                >
+                                  Cancel
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => setDisputeClaimId(claim.id)}
+                                  className="flex items-center gap-1 font-medium transition-colors"
+                                  style={{ color: isPassCard ? 'rgba(255,255,255,0.45)' : 'rgba(34,34,34,0.35)' }}
+                                >
+                                  <Flag size={11} strokeWidth={1.5} /> Report an issue
+                                </button>
+                                {(() => {
+                                  const releaseStatus = canReleaseOffer(claim);
+                                  if (releaseStatus.allowed) {
+                                    return (
+                                      <>
+                                        <span className="mx-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
+                                        <button
+                                          onClick={() => setReleaseConfirmId(claim.id)}
+                                          className="flex items-center gap-1 font-medium transition-colors"
+                                          style={{ color: isPassCard ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
+                                        >
+                                          <X size={11} strokeWidth={1.5} /> Release offer
+                                        </button>
+                                      </>
+                                    );
+                                  }
+                                  return null;
+                                })()}
+                              </>
+                            )}
+                          </div>
+                          {releaseError && (
+                            <p className="text-[15px] text-center pb-2" style={{ color: isPassCard ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
+                          )}
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })()}
 
                 </div>
               )}
