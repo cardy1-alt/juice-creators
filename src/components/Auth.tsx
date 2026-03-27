@@ -1,187 +1,10 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
-import { MapPin, Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Sparkles, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
-
-declare global {
-  interface Window {
-    google?: any;
-    _gmapsLoaded?: boolean;
-    _gmapsCallbacks?: (() => void)[];
-  }
-}
-
-function loadGoogleMaps(): Promise<void> {
-  if (window._gmapsLoaded && window.google?.maps?.places) return Promise.resolve();
-  return new Promise((resolve) => {
-    if (!window._gmapsCallbacks) {
-      window._gmapsCallbacks = [];
-      const apiKey = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-      if (!apiKey || !/^AIza[a-zA-Z0-9_-]{31,}$/.test(apiKey)) {
-        console.warn('[GoogleMaps] No valid API key found. Set VITE_GOOGLE_MAPS_API_KEY in your .env file.');
-        resolve();
-        return;
-      }
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async`;
-      script.async = true;
-      script.onload = () => {
-        window._gmapsLoaded = true;
-        window._gmapsCallbacks?.forEach(cb => cb());
-        window._gmapsCallbacks = [];
-      };
-      script.onerror = () => {
-        console.error('[GoogleMaps] Failed to load Google Maps script. Check your API key and allowed referrers.');
-        window._gmapsCallbacks?.forEach(cb => cb());
-        window._gmapsCallbacks = [];
-      };
-      document.head.appendChild(script);
-    }
-    window._gmapsCallbacks!.push(resolve);
-  });
-}
-
-function AddressAutocomplete({ value, onChange }: {
-  value: string;
-  onChange: (address: string, lat: number | null, lng: number | null) => void;
-}) {
-  const [query, setQuery] = useState(value);
-  const [suggestions, setSuggestions] = useState<any[]>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [mapsReady, setMapsReady] = useState(false);
-  const [mapsError, setMapsError] = useState(false);
-  const [focused, setFocused] = useState(false);
-  const serviceRef = useRef<any>(null);
-  const geocoderRef = useRef<any>(null);
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
-
-  useEffect(() => {
-    let mounted = true;
-    loadGoogleMaps().then(async () => {
-      if (!mounted) return;
-      if (window.google?.maps) {
-        try {
-          await window.google.maps.importLibrary('places');
-          serviceRef.current = new window.google.maps.places.AutocompleteService();
-          geocoderRef.current = new window.google.maps.Geocoder();
-          setMapsReady(true);
-        } catch (err) {
-          console.error('[AddressAutocomplete] Failed to initialize Places:', err);
-          setMapsError(true);
-        }
-      } else {
-        // Google Maps script didn't load — API key likely missing or invalid
-        setMapsError(true);
-      }
-    }).catch(() => {
-      if (mounted) setMapsError(true);
-    });
-    return () => { mounted = false; };
-  }, []);
-
-  useEffect(() => {
-    setQuery(value);
-  }, [value]);
-
-  // Close suggestions on outside click
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        setShowSuggestions(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClick);
-    return () => document.removeEventListener('mousedown', handleClick);
-  }, []);
-
-  const fetchSuggestions = (input: string) => {
-    if (!serviceRef.current || input.length < 2) {
-      setSuggestions([]);
-      return;
-    }
-    serviceRef.current.getPlacePredictions(
-      { input, componentRestrictions: { country: 'gb' }, types: ['geocode'] },
-      (predictions: any[] | null) => {
-        setSuggestions(predictions || []);
-        setShowSuggestions(true);
-      }
-    );
-  };
-
-  const handleInput = (val: string) => {
-    setQuery(val);
-    onChange(val, null, null);
-    clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(() => fetchSuggestions(val), 250);
-  };
-
-  const handleSelect = (suggestion: any) => {
-    const description = suggestion.description;
-    setQuery(description);
-    setShowSuggestions(false);
-    if (geocoderRef.current) {
-      geocoderRef.current.geocode({ placeId: suggestion.place_id }, (results: any[], status: string) => {
-        if (status === 'OK' && results[0]) {
-          const loc = results[0].geometry.location;
-          onChange(description, loc.lat(), loc.lng());
-        } else {
-          onChange(description, null, null);
-        }
-      });
-    } else {
-      onChange(description, null, null);
-    }
-  };
-
-  return (
-    <div ref={wrapperRef} className="relative">
-      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Address</label>
-      <div className="relative transition-all duration-200" style={{
-        borderRadius: '14px',
-        border: focused ? '1.5px solid var(--terra)' : mapsError ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-        background: 'var(--shell)',
-        boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
-      }}>
-        <MapPin size={16} strokeWidth={1.5} className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
-          focused ? 'text-[var(--ink-60)]' : mapsError ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'
-        }`} />
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => handleInput(e.target.value)}
-          onFocus={() => { setFocused(true); if (suggestions.length > 0) setShowSuggestions(true); }}
-          onBlur={() => setFocused(false)}
-          placeholder={mapsError ? 'Type your address manually' : 'Enter your address'}
-          className="w-full pl-[40px] pr-[16px] py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none"
-          autoComplete={mapsError ? 'street-address' : 'off'}
-        />
-      </div>
-      {mapsError && (
-        <p className="text-[13px] text-[var(--terra)] mt-[4px]">Address suggestions unavailable — type your address manually</p>
-      )}
-      {showSuggestions && suggestions.length > 0 && (
-        <div className="absolute z-50 left-0 right-0 mt-[4px] overflow-hidden" style={{ background: 'var(--card)', borderRadius: '14px', boxShadow: 'var(--shadow-lg)', border: '1px solid var(--ink-08)' }}>
-          {suggestions.map((s) => (
-            <button
-              key={s.place_id}
-              type="button"
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={() => handleSelect(s)}
-              className="w-full text-left px-[14px] py-[12px] text-[15px] text-[var(--ink)] hover:bg-[var(--shell)] transition-colors flex items-center gap-[10px]" style={{ borderBottom: '1px solid var(--ink-08)' }}
-            >
-              <MapPin size={14} strokeWidth={1.5} className="text-[var(--ink-35)] flex-shrink-0" />
-              <span className="truncate">{s.description}</span>
-            </button>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
 
 /* Floating label input component */
 function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, placeholder, required, minLength, rightElement }: {
@@ -529,53 +352,7 @@ export default function Auth() {
 
           <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
           <form onSubmit={handleSubmit}>
-            {/* Role selector cards */}
-            <div className="flex gap-[10px] mb-[24px]">
-              <button
-                type="button"
-                onClick={() => { setRole('creator'); setSignupStep(1); setError(''); }}
-                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
-                style={{
-                  borderRadius: '16px',
-                  border: role === 'creator' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
-                  background: role === 'creator' ? 'var(--terra-5)' : 'var(--card)',
-                  padding: '24px',
-                }}
-              >
-                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'creator' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <Sparkles size={18} strokeWidth={1.5} className={`${role === 'creator' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
-                </div>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'creator' ? 'var(--ink)' : 'var(--ink-60)' }}>
-                  Creator
-                </span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
-                  Claim local offers
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => { setRole('business'); setSignupStep(1); setError(''); }}
-                className="flex-1 flex flex-col items-center gap-[8px] py-[18px] transition-all duration-200"
-                style={{
-                  borderRadius: '16px',
-                  border: role === 'business' ? '2px solid var(--terra)' : '2px solid var(--ink-08)',
-                  background: role === 'business' ? 'var(--terra-5)' : 'var(--card)',
-                  padding: '24px',
-                }}
-              >
-                <div className="w-[48px] h-[48px] rounded-[14px] flex items-center justify-center" style={{ background: role === 'business' ? 'var(--terra-10)' : 'var(--card)' }}>
-                  <Store size={18} strokeWidth={1.5} className={`${role === 'business' ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`} />
-                </div>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '17px', color: role === 'business' ? 'var(--ink)' : 'var(--ink-60)' }}>
-                  Business
-                </span>
-                <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '13px', color: 'var(--ink-60)' }}>
-                  Reach local creators
-                </span>
-              </button>
-            </div>
-
-            {/* Step indicator (both Creator & Business) */}
+            {/* Step indicator */}
             <div className="flex items-center gap-[6px] mb-[20px]">
               {[1, 2, 3].map((step) => (
                 <div key={step} className="flex items-center gap-[6px]">
@@ -681,10 +458,22 @@ export default function Auth() {
                       <p className="text-[13px] text-[var(--ink-35)] mt-[6px]">We use this to verify your age. You must be 13 or over.</p>
                     </div>
 
-                    <AddressAutocomplete
-                      value={address}
-                      onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
-                    />
+                    <div>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Your town</label>
+                      <select
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full px-[14px] py-[15px] rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
+                        required
+                      >
+                        <option value="" disabled>Select your town</option>
+                        <option value="Bury St Edmunds">Bury St Edmunds</option>
+                        <option value="Ipswich" disabled style={{ color: 'var(--ink-35)' }}>Ipswich — coming soon</option>
+                        <option value="Norwich" disabled style={{ color: 'var(--ink-35)' }}>Norwich — coming soon</option>
+                        <option value="Cambridge" disabled style={{ color: 'var(--ink-35)' }}>Cambridge — coming soon</option>
+                      </select>
+                    </div>
                   </div>
                 )}
 
@@ -747,10 +536,22 @@ export default function Auth() {
                 {/* Step 2: Address & Bio */}
                 {signupStep === 2 && (
                   <div className="space-y-[14px]">
-                    <AddressAutocomplete
-                      value={address}
-                      onChange={(addr, lat, lng) => { setAddress(addr); setLatitude(lat); setLongitude(lng); }}
-                    />
+                    <div>
+                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Your town</label>
+                      <select
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        className="w-full px-[14px] py-[15px] rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
+                        style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
+                        required
+                      >
+                        <option value="" disabled>Select your town</option>
+                        <option value="Bury St Edmunds">Bury St Edmunds</option>
+                        <option value="Ipswich" disabled style={{ color: 'var(--ink-35)' }}>Ipswich — coming soon</option>
+                        <option value="Norwich" disabled style={{ color: 'var(--ink-35)' }}>Norwich — coming soon</option>
+                        <option value="Cambridge" disabled style={{ color: 'var(--ink-35)' }}>Cambridge — coming soon</option>
+                      </select>
+                    </div>
                     <div>
                       <label className="block text-[15px] font-semibold text-[var(--ink)] mb-2">Bio</label>
                       <div className="relative">
