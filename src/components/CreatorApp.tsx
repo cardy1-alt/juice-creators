@@ -1503,17 +1503,14 @@ export default function CreatorApp() {
                         }}
                       >
                         <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
                           <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0, marginLeft: 12 }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
+                          {hoursLeft > 0 && (
                             <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>{timerLabel}</span>
-                            <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
-                          </div>
-                          {filtered.length > 1 && (
-                            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>{filtered.length} active</span>
                           )}
+                          <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
                         </div>
                       </button>
                     </div>
