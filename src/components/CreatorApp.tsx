@@ -98,7 +98,7 @@ interface Claim {
   snapshot_offer_item?: string | null;
   snapshot_specific_ask?: string | null;
   snapshot_generated_title?: string | null;
-  offers: { description: string; generated_title?: string | null; offer_item?: string | null; specific_ask?: string | null; content_type?: string | null };
+  offers: { description: string; generated_title?: string | null; offer_item?: string | null; specific_ask?: string | null; content_type?: string | null; offer_photo_url?: string | null };
   businesses: { name: string; category: string; logo_url?: string | null };
 }
 
@@ -483,7 +483,7 @@ export default function CreatorApp() {
   const fetchClaims = async () => {
     const { data, error } = await supabase
       .from('claims')
-      .select('*, offers(description, generated_title, offer_item, specific_ask, content_type), businesses(name, category, logo_url)')
+      .select('*, offers(description, generated_title, offer_item, specific_ask, content_type, offer_photo_url), businesses(name, category, logo_url)')
       .eq('creator_id', userProfile.id)
       .not('status', 'in', '(expired)')
       .order('claimed_at', { ascending: false });
@@ -2091,8 +2091,8 @@ export default function CreatorApp() {
                             <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden' }}>
                               {/* Photo or gradient fallback */}
                               <div style={{ height: 180, position: 'relative' }}>
-                                {(claim as any).offers?.offer_photo_url ? (
-                                  <img src={(claim as any).offers.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                                {claim.offers?.offer_photo_url ? (
+                                  <img src={claim.offers.offer_photo_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                                 ) : (
                                   <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(bizCategory), display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                                     <CategoryIcon category={bizCategory} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(bizCategory) }} />
