@@ -216,7 +216,7 @@ export default function Auth() {
 
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
-            <h1 className="text-[50px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
+            <h1 className="text-[44px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
               Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
             </h1>
           </div>
