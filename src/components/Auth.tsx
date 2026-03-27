@@ -199,12 +199,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className="relative transition-all duration-200" style={{
-      borderRadius: '14px',
-      border: focused ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-      background: 'var(--shell)',
-      boxShadow: focused ? '0 0 0 3px var(--terra-ring)' : 'none',
-    }}>
+    <div className={`relative transition-all duration-200 bg-white rounded-2xl ${focused ? 'border border-[#C4674A] ring-2 ring-[rgba(196,103,74,0.12)]' : 'border border-[rgba(34,34,34,0.10)]'}`}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -333,96 +328,13 @@ export default function Auth() {
   const stepTitles = role === 'creator' ? creatorStepTitles : businessStepTitles;
 
   return (
-    <div className="min-h-screen flex flex-col bg-[var(--shell)] overscroll-none">
+    <div className="min-h-screen flex flex-col bg-[#F6F3EE] overscroll-none">
       {mode === 'signin' ? (
         /* ─── SIGN IN: vertically centred brand + hero + form ─── */
         <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
-          {/* Brand section */}
-          <div className="flex flex-col items-center mb-[32px]">
-            <Logo variant="wordmark" size={24} />
-          </div>
-
-          {/* Hero copy */}
-          <div className="text-center mb-[32px]">
-            <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 26, fontWeight: 800, color: 'var(--ink)', lineHeight: 1.15, letterSpacing: '-0.03em', margin: 0 }}>
-              Local offers.<br />Yours to claim.
-            </h1>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 12 }}>
-              Vetted creators only. Claim offers from local businesses, visit in person, post your Reel.
-            </p>
-          </div>
-
-        {/* ─── SIGN IN ─── */}
-        {!forgotPassword && (
-          <form onSubmit={handleSubmit} className="space-y-[12px]">
-            <FloatingInput
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@example.com"
-              required
-            />
-            <FloatingInput
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={setPassword}
-              placeholder="Enter your password"
-              required
-              minLength={8}
-              rightElement={
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                  {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-                </button>
-              }
-            />
-
-            {error && (
-              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
-                {error}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px', marginTop: 2 }}
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                </span>
-              ) : 'Sign In'}
-            </button>
-
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 14, fontWeight: 400, color: 'var(--ink-35)' }}>
-              Not a member?{' '}
-              <button
-                type="button"
-                onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-                className="hover:text-[var(--ink)] transition-colors"
-                style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 14 }}
-              >
-                Apply for access
-              </button>
-            </p>
-
-            <button
-              type="button"
-              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-[13px] text-center mt-[8px] transition-colors mx-auto"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, color: 'var(--ink-35)' }}
-            >
-              Forgot password?
-            </button>
-          </form>
-        )}
 
         {/* ─── FORGOT PASSWORD ─── */}
-        {forgotPassword && (
+        {forgotPassword ? (
           <div>
             <button
               type="button"
@@ -471,6 +383,140 @@ export default function Auth() {
               </form>
             )}
           </div>
+        ) : (
+          <>
+          {/* 1. Wordmark */}
+          <div className="flex flex-col items-center mb-[20px]">
+            <span className="font-[Corben] text-[#1A3C34] text-[26px]" style={{ letterSpacing: '-0.5px' }}>nayba</span>
+          </div>
+
+          {/* 2. Live pill */}
+          <div className="flex justify-center mb-[24px]">
+            <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
+              <span className="relative flex h-[8px] w-[8px]">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--terra)' }} />
+                <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
+              </span>
+              <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
+            </div>
+          </div>
+
+          {/* 3. Headline */}
+          <div className="text-center mb-[16px]">
+            <h1 className="text-[40px] font-extrabold tracking-[-1.4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
+              Local offers.<br /><span className="text-[#C4674A] italic">Yours</span> to claim.
+            </h1>
+          </div>
+
+          {/* 4. Subtext */}
+          <p className="text-center mb-[24px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, margin: 0 }}>
+            Claim offers from businesses near you. Visit in person, post your Reel, get rewarded.
+          </p>
+
+          {/* 5. Stacked avatars + social proof */}
+          <div className="flex items-center justify-center gap-[10px] mb-[28px]">
+            <div className="flex -space-x-[10px]">
+              {['S', 'M', 'J', 'R'].map((initial, i) => (
+                <div
+                  key={initial}
+                  className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[var(--shell)]"
+                  style={{
+                    background: ['var(--terra)', 'var(--peach)', 'var(--card)', 'var(--ink-15)'][i],
+                    zIndex: 4 - i,
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontWeight: 700,
+                    fontSize: 12,
+                    color: i === 0 ? 'white' : 'var(--ink-60)',
+                  }}
+                >
+                  {initial}
+                </div>
+              ))}
+            </div>
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
+              48 local businesses · vetted creators only
+            </span>
+          </div>
+
+          {/* 6. Divider with "Sign in" label */}
+          <div className="flex items-center gap-[12px] mb-[20px]">
+            <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
+            <span style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-35)' }}>Sign in</span>
+            <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
+          </div>
+
+          {/* 7–9. Sign in form */}
+          <form onSubmit={handleSubmit} className="space-y-[12px]">
+            {/* 7. Email input */}
+            <FloatingInput
+              label="Email"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              placeholder="you@example.com"
+              required
+            />
+            {/* 8. Password input with eye toggle */}
+            <FloatingInput
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={setPassword}
+              placeholder="Enter your password"
+              required
+              minLength={8}
+              rightElement={
+                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
+                  {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                </button>
+              }
+            />
+
+            {error && (
+              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
+                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                {error}
+              </div>
+            )}
+
+            {/* 9. Sign in button */}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
+              {loading ? (
+                <span className="inline-flex items-center gap-2">
+                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                </span>
+              ) : 'Sign In'}
+            </button>
+
+            {/* 10. Apply for access */}
+            <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", color: 'var(--ink-60)' }}>
+              Not a member?{' '}
+              <button
+                type="button"
+                onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+                className="text-[#C4674A] font-bold hover:underline transition-colors"
+                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
+              >
+                Apply for access
+              </button>
+            </p>
+
+            {/* 11. Forgot password — de-emphasised */}
+            <button
+              type="button"
+              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
+              className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
+              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+            >
+              Forgot password?
+            </button>
+          </form>
+          </>
         )}
         </div>
       ) : (
