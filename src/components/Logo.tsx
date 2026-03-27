@@ -6,28 +6,19 @@ interface LogoProps {
 
 function LogoIcon({ size }: { size: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 40 40"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
+    <span
+      style={{
+        fontFamily: "'Corben', serif",
+        fontSize: size,
+        fontWeight: 400,
+        color: '#1A3C34',
+        lineHeight: 1.1,
+        letterSpacing: '-0.5px',
+      }}
       aria-hidden="true"
     >
-      <rect width="40" height="40" rx="8" fill="#1A3C34" />
-      <text
-        x="50%"
-        y="54%"
-        dominantBaseline="middle"
-        textAnchor="middle"
-        fontFamily="'Plus Jakarta Sans', sans-serif"
-        fontWeight="700"
-        fontSize="22"
-        fill="#F6F3EE"
-      >
-        N
-      </text>
-    </svg>
+      nayba
+    </span>
   );
 }
 
