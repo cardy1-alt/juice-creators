@@ -102,7 +102,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
       }).eq('id', profile.id);
       if (updateError) throw updateError;
 
-      goForward(); // go to screen 4 (success)
+      goForward(); // go to screen 3 (success)
     } catch (err: any) {
       setError(err.message || 'Something went wrong');
     } finally {
@@ -110,13 +110,12 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
     }
   };
 
-  const totalScreens = 3; // progress dots for screens 1-3 (screen 4 is success)
+  const totalScreens = 2; // progress dots for screens 1-2 (screen 3 is success)
   const animClass = direction === 'forward' ? 'slideInRight' : 'slideInLeft';
 
   // Step-specific background colours
   const getScreenBg = (s: number) => {
-    if (s === 1) return '#C8B8F0';
-    if (s === 2) return 'var(--peach)';
+    if (s === 1) return 'var(--peach)';
     return 'var(--shell)';
   };
 
@@ -135,7 +134,7 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
             <div className="w-[40px]" />
           )}
           <Logo variant="wordmark" size={22} />
-          {screen === 3 ? (
+          {screen === 2 ? (
             <button onClick={() => { supabase.from('creators').update({ onboarding_complete: true }).eq('id', profile.id).then(() => onComplete()).catch((err: any) => console.error('[Onboarding] Skip failed:', err)); }} className="w-[40px] text-right" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '15px', fontWeight: 500, color: 'var(--ink-35)' }}>Skip</button>
           ) : (
             <div className="w-[40px]" />
@@ -166,37 +165,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
         className="flex-1 flex flex-col overflow-y-auto px-[20px] pb-[20px]"
         style={{ animation: `${animClass} 280ms ease` }}
       >
-        {/* ═══ SCREEN 1 — WELCOME ═══ */}
+        {/* ═══ SCREEN 1 — HOW IT WORKS ═══ */}
         {screen === 1 && (
-          <div className="flex-1 flex flex-col">
-            <div className="flex-shrink-0 pt-[60px] flex flex-col items-center">
-              <div className="h-[200px] flex items-center justify-center">
-                <Logo variant="icon" size={120} />
-              </div>
-
-              <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center' }}>
-                Welcome to nayba
-              </h1>
-              <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', textAlign: 'center', marginTop: '12px', maxWidth: '280px', lineHeight: 1.65 }}>
-                Discover local businesses, claim&nbsp;offers, and create authentic&nbsp;content.
-              </p>
-            </div>
-
-            <div className="flex-1" />
-
-            <button
-              onClick={goForward}
-              className="w-full min-h-[52px] text-white transition-all"
-              style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
-            >
-              Let's get started →
-            </button>
-            <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400, fontSize: '14px', color: 'var(--ink-35)', textAlign: 'center', marginTop: '10px' }}>Takes about 1 minute</p>
-          </div>
-        )}
-
-        {/* ═══ SCREEN 2 — HOW IT WORKS ═══ */}
-        {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
@@ -238,8 +208,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           </div>
         )}
 
-        {/* ═══ SCREEN 3 — COMPLETE YOUR PROFILE ═══ */}
-        {screen === 3 && (
+        {/* ═══ SCREEN 2 — COMPLETE YOUR PROFILE ═══ */}
+        {screen === 2 && (
           <div className="flex-1 flex flex-col">
             <div className="flex-shrink-0 pt-[24px]">
               <h1 style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 800, fontSize: '26px', color: 'var(--ink)', letterSpacing: '-0.03em' }}>
@@ -369,8 +339,8 @@ export default function CreatorOnboarding({ profile, onComplete }: CreatorOnboar
           </div>
         )}
 
-        {/* ═══ SCREEN 4 — SUCCESS ═══ */}
-        {screen === 4 && (
+        {/* ═══ SCREEN 3 — SUCCESS ═══ */}
+        {screen === 3 && (
           <div className="flex-1 flex flex-col items-center justify-center">
             {/* Expanding rings animation */}
             <div className="relative w-[60px] h-[60px] mb-[8px]">
