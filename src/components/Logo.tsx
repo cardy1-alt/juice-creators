@@ -6,14 +6,19 @@ interface LogoProps {
 
 function LogoIcon({ size }: { size: number }) {
   return (
-    <img
-      src="/nayba_logo.svg"
-      alt="nayba"
-      width={size}
-      height={size}
-      style={{ objectFit: 'contain' }}
+    <span
+      style={{
+        fontFamily: "'Corben', serif",
+        fontSize: size,
+        fontWeight: 400,
+        color: '#1A3C34',
+        lineHeight: 1.1,
+        letterSpacing: '-0.5px',
+      }}
       aria-hidden="true"
-    />
+    >
+      nayba
+    </span>
   );
 }
 

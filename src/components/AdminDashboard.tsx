@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { friendlyError } from '../lib/errors';
-import { AlertTriangle, BarChart, Check, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
+import { AlertTriangle, BarChart, Check, ChevronLeft, ChevronRight, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import LevelBadge from './LevelBadge';
@@ -46,6 +46,10 @@ export default function AdminDashboard() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordMessage, setPasswordMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const PAGE_SIZE = 20;
+  const [creatorsPage, setCreatorsPage] = useState(0);
+  const [businessesPage, setBusinessesPage] = useState(0);
 
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [actionFeedback, setActionFeedback] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -108,6 +112,8 @@ export default function AdminDashboard() {
 
   const fetchAll = async () => {
     setFetchError(null);
+    setCreatorsPage(0);
+    setBusinessesPage(0);
     const currentMonth = new Date().toISOString().slice(0, 7);
     const [creatorsData, businessesData, offersData, claimsData] = await Promise.all([
       supabase.from('creators').select('*').order('created_at', { ascending: false }).limit(500),
@@ -541,7 +547,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--ink-08)]">
-                      {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((creator) => (
+                      {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(creatorsPage * PAGE_SIZE, (creatorsPage + 1) * PAGE_SIZE).map((creator) => (
                         <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontWeight: 400 }}>
                             <span className="mr-2">{creator.name}</span>
@@ -573,6 +579,31 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+              {creators.length > PAGE_SIZE && (
+                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
+                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {creatorsPage * PAGE_SIZE + 1}–{Math.min((creatorsPage + 1) * PAGE_SIZE, creators.length)} of {creators.length}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setCreatorsPage(p => p - 1)}
+                      disabled={creatorsPage === 0}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    >
+                      <ChevronLeft size={14} strokeWidth={2} /> Previous
+                    </button>
+                    <button
+                      onClick={() => setCreatorsPage(p => p + 1)}
+                      disabled={(creatorsPage + 1) * PAGE_SIZE >= creators.length}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    >
+                      Next <ChevronRight size={14} strokeWidth={2} />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -609,7 +640,7 @@ export default function AdminDashboard() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-[var(--ink-08)]">
-                      {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).map((business) => (
+                      {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(businessesPage * PAGE_SIZE, (businessesPage + 1) * PAGE_SIZE).map((business) => (
                         <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
                           <td className="px-5 py-3.5 whitespace-nowrap">
                             <div className="flex items-center gap-2.5">
@@ -676,6 +707,31 @@ export default function AdminDashboard() {
                       ))}
                     </tbody>
                   </table>
+                </div>
+              )}
+              {businesses.length > PAGE_SIZE && (
+                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
+                  <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                    {businessesPage * PAGE_SIZE + 1}–{Math.min((businessesPage + 1) * PAGE_SIZE, businesses.length)} of {businesses.length}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setBusinessesPage(p => p - 1)}
+                      disabled={businessesPage === 0}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    >
+                      <ChevronLeft size={14} strokeWidth={2} /> Previous
+                    </button>
+                    <button
+                      onClick={() => setBusinessesPage(p => p + 1)}
+                      disabled={(businessesPage + 1) * PAGE_SIZE >= businesses.length}
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
+                    >
+                      Next <ChevronRight size={14} strokeWidth={2} />
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
