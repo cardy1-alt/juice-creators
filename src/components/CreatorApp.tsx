@@ -1477,91 +1477,45 @@ export default function CreatorApp() {
                   })}
                 </div>
 
-                {/* ── Your passes — carousel banner (hidden during search) ── */}
+                {/* ── Your passes — compact banner (hidden during search) ── */}
                 {!searchTerm && activeClaims.length > 0 && (() => {
                   const filtered = activeClaims.filter(c => c.businesses && c.offers);
                   if (filtered.length === 0) return null;
-                  const isCarousel = filtered.length > 1;
+                  const sorted = [...filtered].sort((a, b) => new Date(a.qr_expires_at).getTime() - new Date(b.qr_expires_at).getTime());
+                  const urgentClaim = sorted[0];
+                  const claimTitle = urgentClaim.snapshot_generated_title || urgentClaim.offers.generated_title || urgentClaim.offers.description || '';
+                  const claimBiz = urgentClaim.businesses?.name || '';
+                  const msLeft = new Date(urgentClaim.qr_expires_at).getTime() - Date.now();
+                  const hoursLeft = Math.max(0, Math.floor(msLeft / (1000 * 60 * 60)));
+                  const timerLabel = hoursLeft >= 24 ? `${Math.floor(hoursLeft / 24)}d left` : `${hoursLeft}h left`;
                   return (
                     <div style={{ marginTop: 16, padding: '0 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                         <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
                         <button onClick={() => setView('active')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
-                      <div
-                        className="hide-scrollbar"
-                        ref={(el) => {
-                          if (!el) return;
-                          if (!isCarousel) return;
-                          let ticking = false;
-                          const handler = () => {
-                            if (ticking) return;
-                            ticking = true;
-                            requestAnimationFrame(() => {
-                              const cardWidth = el.offsetWidth;
-                              const idx = Math.round(el.scrollLeft / cardWidth);
-                              const dots = el.parentElement?.querySelector('[data-pass-dots]');
-                              if (dots) {
-                                Array.from(dots.children).forEach((dot: any, i: number) => {
-                                  dot.style.background = i === idx ? '#C4674A' : 'rgba(34,34,34,0.15)';
-                                });
-                              }
-                              ticking = false;
-                            });
-                          };
-                          el.addEventListener('scroll', handler, { passive: true });
-                        }}
+                      <button
+                        onClick={() => { setSelectedClaim(urgentClaim); setView('active'); }}
                         style={{
-                          display: 'flex',
-                          overflowX: isCarousel ? 'auto' : 'hidden',
-                          scrollSnapType: isCarousel ? 'x mandatory' : undefined,
-                          WebkitOverflowScrolling: 'touch',
-                          scrollbarWidth: 'none',
-                          msOverflowStyle: 'none',
+                          width: '100%', background: 'var(--terra)', borderRadius: 14, padding: '12px 16px',
+                          border: 'none', cursor: 'pointer', textAlign: 'left',
+                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                         }}
                       >
-                        {filtered.map((claim, idx) => {
-                          const title = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
-                          const biz = claim.businesses?.name || '';
-                          return (
-                            <button
-                              key={idx}
-                              onClick={() => { setSelectedClaim(claim); setView('active'); }}
-                              style={{
-                                flex: '0 0 100%',
-                                width: '100%',
-                                background: 'var(--terra)',
-                                borderRadius: 14,
-                                padding: '12px 16px',
-                                border: 'none',
-                                cursor: 'pointer',
-                                textAlign: 'left',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'space-between',
-                                scrollSnapAlign: isCarousel ? 'start' : undefined,
-                                boxSizing: 'border-box',
-                              }}
-                            >
-                              <div style={{ flex: 1, minWidth: 0 }}>
-                                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
-                                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{biz}</p>
-                              </div>
-                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>48h left</span>
-                                <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
-                              </div>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {isCarousel && (
-                        <div data-pass-dots style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
-                          {filtered.map((_, i) => (
-                            <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: i === 0 ? '#C4674A' : 'rgba(34,34,34,0.15)', transition: 'background 0.2s' }} />
-                          ))}
+                        <div style={{ flex: 1, minWidth: 0 }}>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
+                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
                         </div>
-                      )}
+                        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0, marginLeft: 12 }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>{timerLabel}</span>
+                            <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
+                          </div>
+                          {filtered.length > 1 && (
+                            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>{filtered.length} active</span>
+                          )}
+                        </div>
+                      </button>
                     </div>
                   );
                 })()}
@@ -2024,7 +1978,7 @@ export default function CreatorApp() {
                         key={offer.id}
                         onClick={() => setExpandedOffer(offer.id)}
                         className="w-full text-left"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', borderRadius: 16, padding: '14px 16px' }}
                       >
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
                           <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
@@ -2401,7 +2355,7 @@ export default function CreatorApp() {
                         }
                       }}
                       className="w-full text-left"
-                      style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px', borderLeft: `3px solid ${leftBorderColor}` }}
+                      style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', borderRadius: 16, padding: '14px 16px', borderLeft: `3px solid ${leftBorderColor}` }}
                     >
                       <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
