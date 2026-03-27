@@ -545,7 +545,11 @@ export default function Auth() {
                 </div>
               ) : (
                 <>
-                <p className="text-center mb-[12px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)' }}>We review every application manually. You'll hear back within 24 hours.</p>
+                <div className="text-center mb-[14px]">
+                  <p className="text-[15px] font-bold text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Application received</p>
+                  <p style={{ fontFamily: "'Plus Jakarta Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.5 }}>We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
+                  <p className="text-[12px] text-[var(--ink-35)] mt-[6px]" style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
+                </div>
                 <div className="flex gap-[10px]">
                   <button
                     type="button"
