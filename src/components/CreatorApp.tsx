@@ -1477,43 +1477,90 @@ export default function CreatorApp() {
                   })}
                 </div>
 
-                {/* ── Your passes — compact banner (hidden during search) ── */}
+                {/* ── Your passes — carousel banner (hidden during search) ── */}
                 {!searchTerm && activeClaims.length > 0 && (() => {
                   const filtered = activeClaims.filter(c => c.businesses && c.offers);
                   if (filtered.length === 0) return null;
-                  const firstClaim = filtered[0];
-                  const claimTitle = firstClaim.snapshot_generated_title || firstClaim.offers.generated_title || firstClaim.offers.description || '';
-                  const claimBiz = firstClaim.businesses?.name || '';
+                  const isCarousel = filtered.length > 1;
                   return (
                     <div style={{ marginTop: 16, padding: '0 20px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
                         <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
                         <button onClick={() => setView('active')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
                       </div>
-                      <button
-                        onClick={() => { setSelectedClaim(firstClaim); setView('active'); }}
+                      <div
+                        className="hide-scrollbar"
+                        ref={(el) => {
+                          if (!el) return;
+                          if (!isCarousel) return;
+                          let ticking = false;
+                          const handler = () => {
+                            if (ticking) return;
+                            ticking = true;
+                            requestAnimationFrame(() => {
+                              const cardWidth = el.offsetWidth;
+                              const idx = Math.round(el.scrollLeft / cardWidth);
+                              const dots = el.parentElement?.querySelector('[data-pass-dots]');
+                              if (dots) {
+                                Array.from(dots.children).forEach((dot: any, i: number) => {
+                                  dot.style.background = i === idx ? '#C4674A' : 'rgba(34,34,34,0.15)';
+                                });
+                              }
+                              ticking = false;
+                            });
+                          };
+                          el.addEventListener('scroll', handler, { passive: true });
+                        }}
                         style={{
-                          width: '100%', background: 'var(--terra)', borderRadius: 14, padding: '12px 16px',
-                          border: 'none', cursor: 'pointer', textAlign: 'left',
-                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+                          display: 'flex',
+                          overflowX: isCarousel ? 'auto' : 'hidden',
+                          scrollSnapType: isCarousel ? 'x mandatory' : undefined,
+                          WebkitOverflowScrolling: 'touch',
+                          scrollbarWidth: 'none',
+                          msOverflowStyle: 'none',
                         }}
                       >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
+                        {filtered.map((claim, idx) => {
+                          const title = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
+                          const biz = claim.businesses?.name || '';
+                          return (
+                            <button
+                              key={idx}
+                              onClick={() => { setSelectedClaim(claim); setView('active'); }}
+                              style={{
+                                flex: '0 0 100%',
+                                width: '100%',
+                                background: 'var(--terra)',
+                                borderRadius: 14,
+                                padding: '12px 16px',
+                                border: 'none',
+                                cursor: 'pointer',
+                                textAlign: 'left',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'space-between',
+                                scrollSnapAlign: isCarousel ? 'start' : undefined,
+                                boxSizing: 'border-box',
+                              }}
+                            >
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{title}</p>
+                                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{biz}</p>
+                              </div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
+                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>48h left</span>
+                                <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      {isCarousel && (
+                        <div data-pass-dots style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+                          {filtered.map((_, i) => (
+                            <div key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: i === 0 ? '#C4674A' : 'rgba(34,34,34,0.15)', transition: 'background 0.2s' }} />
+                          ))}
                         </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>48h left</span>
-                          <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
-                        </div>
-                      </button>
-                      {filtered.length > 1 && (
-                        <button
-                          onClick={() => setView('active')}
-                          style={{ display: 'block', margin: '8px auto 0', background: 'none', border: 'none', cursor: 'pointer', fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-60)' }}
-                        >
-                          and {filtered.length - 1} more active pass{filtered.length - 1 > 1 ? 'es' : ''}
-                        </button>
                       )}
                     </div>
                   );
