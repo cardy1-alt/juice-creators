@@ -67,7 +67,7 @@
     font-weight: 800;
     letter-spacing: -0.03em;
   }
-  body, p, span, button, input, label, select, textarea, a {
+  body, p, button, input, label, select, textarea, a {
     font-family: 'Instrument Sans', sans-serif;
     font-size: 16px;
     font-weight: 400;

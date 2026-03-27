@@ -2209,12 +2209,23 @@ export default function CreatorApp() {
                                     Now post your Reel within 48 hours and submit the link below
                                   </p>
                                   {/* Reel deadline */}
-                                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F5C4A0', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
-                                    <Clock size={14} strokeWidth={1.5} color="var(--ink)" />
-                                    <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>
-                                      {isOverdue ? 'Overdue!' : `${timeLeft} remaining`}
-                                    </span>
-                                  </div>
+                                  {(() => {
+                                    const due = claim.reel_due_at ? new Date(claim.reel_due_at).getTime() : 0;
+                                    const now = Date.now();
+                                    const diff = due - now;
+                                    const claimOverdue = due > 0 && diff < 0;
+                                    const hrs = Math.floor(diff / (1000 * 60 * 60));
+                                    const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                                    const claimTimeLeft = due > 0 && diff > 0 ? `${hrs}h ${mins}m` : '';
+                                    return (
+                                      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(34,34,34,0.08)', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
+                                        <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
+                                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>
+                                          {claimOverdue ? 'Overdue!' : claimTimeLeft ? `${claimTimeLeft} remaining` : 'Post your reel now'}
+                                        </span>
+                                      </div>
+                                    );
+                                  })()}
                                   {/* Reel URL input */}
                                   <div style={{ textAlign: 'left' }}>
                                     <input
