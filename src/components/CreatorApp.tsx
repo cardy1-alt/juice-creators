@@ -224,6 +224,8 @@ export default function CreatorApp() {
   const avatarInputRef = useRef<HTMLInputElement>(null);
   const prevClaimStatusesRef = useRef<Record<string, string>>({});
   const touchStartX = useRef(0);
+  const swipeHandlerRef = useRef<((delta: number) => void) | null>(null);
+  const swipeCardRef = useRef<HTMLDivElement | null>(null);
 
   // ─── Discovery feed state ─────────────────────────────────────────
 
@@ -2067,26 +2069,65 @@ export default function CreatorApp() {
 
                     const isClaimed = claim.status === 'active' && !claim.redeemed_at;
 
+                    // Update the swipe handler ref so native listeners can call current state
+                    swipeHandlerRef.current = (delta: number) => {
+                      if (delta > 40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
+                      if (delta < -40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
+                    };
+
                     return (
                       <div style={{ padding: '12px 20px 0' }}>
                         {/* Compact pass navigator */}
                         <div
-                          style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '10px 14px', touchAction: 'pan-y' }}
-                          onTouchStart={(e) => { touchStartX.current = e.touches[0].clientX; }}
-                          onTouchEnd={(e) => {
-                            const delta = touchStartX.current - e.changedTouches[0].clientX;
-                            if (delta > 40 && idx < filtered.length - 1) setSelectedClaim(filtered[idx + 1]);
-                            if (delta < -40 && idx > 0) setSelectedClaim(filtered[idx - 1]);
+                          ref={(el) => {
+                            if (!el) return;
+                            swipeCardRef.current = el;
+                            if ((el as any).__swipeAttached) return;
+                            (el as any).__swipeAttached = true;
+                            let startX = 0;
+                            let startY = 0;
+                            let locked: 'none' | 'horizontal' | 'vertical' = 'none';
+                            el.addEventListener('touchstart', (e) => {
+                              startX = e.touches[0].clientX;
+                              startY = e.touches[0].clientY;
+                              locked = 'none';
+                            }, { passive: true });
+                            el.addEventListener('touchmove', (e) => {
+                              if (locked === 'vertical') return;
+                              const dx = Math.abs(e.touches[0].clientX - startX);
+                              const dy = Math.abs(e.touches[0].clientY - startY);
+                              if (locked === 'none' && (dx > 8 || dy > 8)) {
+                                locked = dx > dy ? 'horizontal' : 'vertical';
+                              }
+                              if (locked === 'horizontal') {
+                                e.preventDefault();
+                              }
+                            }, { passive: false });
+                            el.addEventListener('touchend', (e) => {
+                              if (locked !== 'horizontal') return;
+                              const delta = startX - e.changedTouches[0].clientX;
+                              if (swipeHandlerRef.current) swipeHandlerRef.current(delta);
+                            }, { passive: true });
                           }}
+                          style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '14px 16px', cursor: filtered.length > 1 ? 'grab' : 'default' }}
                         >
-                          <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
+                          <div style={{ flex: 1, minWidth: 0, textAlign: 'center', userSelect: 'none' }}>
                             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
                             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
                           </div>
                         </div>
 
+                        {/* Dot indicators */}
+                        {filtered.length > 1 && (
+                          <div style={{ display: 'flex', justifyContent: 'center', gap: 6, marginTop: 10 }}>
+                            {filtered.map((_, dotIdx) => (
+                              <div key={dotIdx} style={{ width: 7, height: 7, borderRadius: '50%', background: dotIdx === idx ? (isClaimed ? 'white' : '#C4674A') : (isClaimed ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.15)'), transition: 'background 0.2s' }} />
+                            ))}
+                          </div>
+                        )}
+
                         {/* Stepper */}
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginTop: 10 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginTop: filtered.length > 1 ? 8 : 10 }}>
                           {stageLabels.map((label, sIdx) => (
                             <span key={label} style={{ display: 'flex', alignItems: 'center' }}>
                               <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, fontWeight: sIdx === stageIndex ? 700 : 400, color: isClaimed ? (sIdx === stageIndex ? 'white' : 'rgba(255,255,255,0.5)') : (sIdx === stageIndex ? '#C4674A' : 'rgba(34,34,34,0.35)') }}>{label}</span>
