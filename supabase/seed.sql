@@ -306,7 +306,7 @@ VALUES
     8,
     true,
     'Free coffee + pastry',
-    'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800'
+    'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=600&fit=crop'
   ),
   (
     'c2222222-2222-2222-2222-222222222222',
@@ -315,7 +315,7 @@ VALUES
     4,
     true,
     'Brunch for two',
-    'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800'
+    'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&h=600&fit=crop'
   ),
   (
     'c3333333-3333-3333-3333-333333333333',
@@ -324,7 +324,7 @@ VALUES
     6,
     true,
     'Express facial',
-    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800'
+    'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&h=600&fit=crop'
   ),
   (
     'c4444444-4444-4444-4444-444444444444',
@@ -333,7 +333,7 @@ VALUES
     null,
     true,
     'Free gel manicure',
-    'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800'
+    'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=600&fit=crop'
   ),
   (
     'c5555555-5555-5555-5555-555555555555',
@@ -342,7 +342,7 @@ VALUES
     10,
     true,
     'Smoothie bowl + juice',
-    'https://images.unsplash.com/photo-1638176066666-ffb2f013c7dd?w=800'
+    'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&h=600&fit=crop'
   ),
   (
     'c6666666-6666-6666-6666-666666666666',
@@ -351,7 +351,7 @@ VALUES
     4,
     true,
     'Free day pass + PT session',
-    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800'
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop'
   ),
   (
     'c7777777-7777-7777-7777-777777777777',
@@ -360,7 +360,7 @@ VALUES
     6,
     true,
     'Outfit styling session',
-    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800'
+    'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop'
   ),
   (
     'c8888888-8888-8888-8888-888888888888',
@@ -369,7 +369,7 @@ VALUES
     null,
     true,
     'Free dog grooming',
-    'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?w=800'
+    'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop'
   ),
   (
     'c9999999-9999-9999-9999-999999999999',
@@ -378,7 +378,7 @@ VALUES
     5,
     true,
     'Paint & sip for two',
-    'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=800'
+    'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=600&fit=crop'
   )
 ON CONFLICT (id) DO UPDATE SET
   generated_title = EXCLUDED.generated_title,
