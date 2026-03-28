@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { friendlyError } from '../lib/errors';
-import { AlertTriangle, BarChart, Check, ChevronLeft, ChevronRight, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
+import { AlertTriangle, BarChart, Check, ChevronLeft, ChevronRight, ClipboardList, Clapperboard, LogOut, Pencil, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedEmail, sendBusinessDeniedEmail } from '../lib/notifications';
@@ -29,7 +29,7 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
 }
 
 interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
-interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; address?: string | null; bio?: string | null; logo_url?: string | null; onboarding_complete?: boolean; }
 interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
@@ -75,6 +75,7 @@ export default function AdminDashboard() {
   const [bizSubmitting, setBizSubmitting] = useState(false);
   const [bizErrors, setBizErrors] = useState<Record<string, string>>({});
   const [inlineUpdating, setInlineUpdating] = useState<string | null>(null);
+  const [editingBusinessId, setEditingBusinessId] = useState<string | null>(null);
 
   // Add Offer modal state
   const [showAddOffer, setShowAddOffer] = useState(false);
@@ -93,6 +94,7 @@ export default function AdminDashboard() {
   const [offerIsLive, setOfferIsLive] = useState(false);
   const [offerSubmitting, setOfferSubmitting] = useState(false);
   const [offerErrors, setOfferErrors] = useState<Record<string, string>>({});
+  const [editingOfferId, setEditingOfferId] = useState<string | null>(null);
 
   useEffect(() => { fetchAll(); }, []);
 
@@ -326,6 +328,81 @@ export default function AdminDashboard() {
     fetchAll();
   };
 
+  const openEditBusiness = (business: Business) => {
+    resetBizForm();
+    setEditingBusinessId(business.id);
+    setBizName(business.name);
+    setBizSlug(business.slug);
+    setBizEmail(business.owner_email);
+    setBizCategory(business.category);
+    setBizRegion(business.region || 'bury-st-edmunds');
+    setBizAddress((business as any).address || '');
+    setBizInstagram(business.instagram_handle || '');
+    setBizBio((business as any).bio || '');
+    setBizLogoPreview((business as any).logo_url || null);
+    setBizApproved(business.approved);
+    setBizIsLive(business.is_live);
+    setBizOnboardingComplete((business as any).onboarding_complete ?? true);
+    setShowAddBusiness(true);
+  };
+
+  const handleUpdateBusiness = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingBusinessId) return;
+    const errors: Record<string, string> = {};
+    if (!bizName.trim()) errors.name = 'Business name is required';
+    if (!bizEmail.trim()) errors.email = 'Owner email is required';
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bizEmail)) errors.email = 'Invalid email format';
+    if (!bizCategory) errors.category = 'Category is required';
+    if (Object.keys(errors).length > 0) { setBizErrors(errors); return; }
+
+    setBizSubmitting(true);
+    setBizErrors({});
+
+    let logoUrl: string | null | undefined = undefined;
+    if (bizLogoFile) {
+      const ext = bizLogoFile.name.split('.').pop();
+      const path = `business-logos/${Date.now()}-${editingBusinessId}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, bizLogoFile);
+      if (uploadError) {
+        setBizErrors({ logo: friendlyError(uploadError.message) });
+        setBizSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
+      logoUrl = urlData.publicUrl;
+    } else if (!bizLogoPreview) {
+      logoUrl = null;
+    }
+
+    const updateData: Record<string, any> = {
+      name: bizName.trim(),
+      owner_email: bizEmail.trim(),
+      category: bizCategory,
+      region: bizRegion,
+      address: bizAddress.trim() || null,
+      instagram_handle: bizInstagram.trim().replace(/^@/, '') || null,
+      bio: bizBio.trim() || null,
+      approved: bizApproved,
+      is_live: bizIsLive,
+      onboarding_complete: bizOnboardingComplete,
+    };
+    if (logoUrl !== undefined) updateData.logo_url = logoUrl;
+
+    const { error } = await supabase.from('businesses').update(updateData).eq('id', editingBusinessId);
+    setBizSubmitting(false);
+    if (error) {
+      setBizErrors({ submit: friendlyError(error.message) });
+      return;
+    }
+
+    showToast('Business updated');
+    setShowAddBusiness(false);
+    setEditingBusinessId(null);
+    resetBizForm();
+    fetchAll();
+  };
+
   const handleInlineOfferUpdate = async (id: string, field: string, value: any) => {
     setInlineUpdating(`offer-${id}-${field}`);
     const { error } = await supabase.from('offers').update({ [field]: value }).eq('id', id);
@@ -399,6 +476,80 @@ export default function AdminDashboard() {
 
     showToast('Collab created');
     setShowAddOffer(false);
+    resetOfferForm();
+    fetchAll();
+  };
+
+  const openEditOffer = (offer: OfferWithBusiness) => {
+    resetOfferForm();
+    setEditingOfferId(offer.id);
+    setOfferBusinessId(offer.business_id);
+    setOfferType(offer.offer_type || '');
+    setOfferItem(offer.offer_item || '');
+    setOfferTitle(offer.generated_title || '');
+    setOfferTitleManual(true);
+    setOfferDesc(offer.description || '');
+    setOfferMonthlyCap(offer.monthly_cap != null ? String(offer.monthly_cap) : '');
+    setOfferSpecificAsk(offer.specific_ask || '');
+    setOfferPhotoPreview(offer.offer_photo_url || null);
+    setOfferContentType(offer.content_type || 'reel');
+    setOfferIsLive(offer.is_live);
+    setShowAddOffer(true);
+  };
+
+  const handleUpdateOffer = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingOfferId) return;
+    const errors: Record<string, string> = {};
+    if (!offerBusinessId) errors.business = 'Business is required';
+    if (!offerType) errors.offer_type = 'Collab type is required';
+    if (!offerItem.trim()) errors.offer_item = 'This field is required';
+    if (offerMonthlyCap && (isNaN(parseInt(offerMonthlyCap)) || parseInt(offerMonthlyCap) < 1)) errors.monthly_cap = 'Must be a positive integer';
+    if (Object.keys(errors).length > 0) { setOfferErrors(errors); return; }
+
+    setOfferSubmitting(true);
+    setOfferErrors({});
+
+    let photoUrl: string | null | undefined = undefined;
+    if (offerPhotoFile) {
+      const ext = offerPhotoFile.name.split('.').pop();
+      const path = `offer-photos/${Date.now()}-${offerBusinessId}.${ext}`;
+      const { error: uploadError } = await supabase.storage.from('logos').upload(path, offerPhotoFile);
+      if (uploadError) {
+        setOfferErrors({ photo: friendlyError(uploadError.message) });
+        setOfferSubmitting(false);
+        return;
+      }
+      const { data: urlData } = supabase.storage.from('logos').getPublicUrl(path);
+      photoUrl = urlData.publicUrl;
+    } else if (!offerPhotoPreview) {
+      photoUrl = null;
+    }
+
+    const generatedTitle = offerTitle.trim() || `Free ${offerItem.trim()}`;
+    const updateData: Record<string, any> = {
+      business_id: offerBusinessId,
+      offer_type: offerType,
+      offer_item: offerItem.trim(),
+      generated_title: generatedTitle,
+      description: offerDesc.trim() || generatedTitle,
+      monthly_cap: offerMonthlyCap ? parseInt(offerMonthlyCap) : null,
+      specific_ask: offerSpecificAsk.trim() || null,
+      content_type: offerContentType,
+      is_live: offerIsLive,
+    };
+    if (photoUrl !== undefined) updateData.offer_photo_url = photoUrl;
+
+    const { error } = await supabase.from('offers').update(updateData).eq('id', editingOfferId);
+    setOfferSubmitting(false);
+    if (error) {
+      setOfferErrors({ submit: friendlyError(error.message) });
+      return;
+    }
+
+    showToast('Collab updated');
+    setShowAddOffer(false);
+    setEditingOfferId(null);
     resetOfferForm();
     fetchAll();
   };
@@ -592,7 +743,7 @@ export default function AdminDashboard() {
             <>
             <div className="flex justify-end mb-4">
               <button
-                onClick={() => { resetBizForm(); setShowAddBusiness(true); }}
+                onClick={() => { resetBizForm(); setEditingBusinessId(null); setShowAddBusiness(true); }}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
                 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
               >
@@ -620,6 +771,12 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => openEditBusiness(business)}
+                            className="p-1.5 rounded-[10px] hover:bg-[var(--shell)] transition-colors"
+                          >
+                            <Pencil size={14} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                          </button>
                           <button
                             onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
                             disabled={inlineUpdating === `${business.id}-is_live`}
@@ -703,7 +860,7 @@ export default function AdminDashboard() {
             <>
               <div className="flex justify-end mb-4">
                 <button
-                  onClick={() => { resetOfferForm(); setShowAddOffer(true); }}
+                  onClick={() => { resetOfferForm(); setEditingOfferId(null); setShowAddOffer(true); }}
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
@@ -723,6 +880,12 @@ export default function AdminDashboard() {
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between gap-2">
                             <h3 className="text-base text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{offer.businesses.name}</h3>
+                            <button
+                              onClick={() => openEditOffer(offer)}
+                              className="p-1.5 rounded-[10px] hover:bg-[var(--shell)] transition-colors flex-shrink-0"
+                            >
+                              <Pencil size={14} strokeWidth={1.5} className="text-[var(--ink-35)]" />
+                            </button>
                           </div>
                           <p className="text-[var(--mid)] text-base mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{offer.generated_title || offer.description}</p>
                         </div>
@@ -906,16 +1069,16 @@ export default function AdminDashboard() {
 
       {/* Add Business Modal */}
       {showAddBusiness && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => { setShowAddBusiness(false); setEditingBusinessId(null); }}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Add business</h2>
-              <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
+              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>{editingBusinessId ? 'Edit business' : 'Add business'}</h2>
+              <button onClick={() => { setShowAddBusiness(false); setEditingBusinessId(null); }} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateBusiness} className="space-y-5">
+            <form onSubmit={editingBusinessId ? handleUpdateBusiness : handleCreateBusiness} className="space-y-5">
               {/* BASIC INFO */}
               <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Basic info</p>
 
@@ -1068,11 +1231,11 @@ export default function AdminDashboard() {
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
-                  {bizSubmitting ? 'Creating…' : 'Create business'}
+                  {bizSubmitting ? (editingBusinessId ? 'Saving…' : 'Creating…') : (editingBusinessId ? 'Save changes' : 'Create business')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAddBusiness(false)}
+                  onClick={() => { setShowAddBusiness(false); setEditingBusinessId(null); }}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
@@ -1086,16 +1249,16 @@ export default function AdminDashboard() {
 
       {/* Add Offer Modal */}
       {showAddOffer && (
-        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => { setShowAddOffer(false); setEditingOfferId(null); }}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>New collab</h2>
-              <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
+              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>{editingOfferId ? 'Edit collab' : 'New collab'}</h2>
+              <button onClick={() => { setShowAddOffer(false); setEditingOfferId(null); }} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
-            <form onSubmit={handleCreateOffer} className="space-y-5">
+            <form onSubmit={editingOfferId ? handleUpdateOffer : handleCreateOffer} className="space-y-5">
               <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Collab details</p>
 
               <div>
@@ -1271,11 +1434,11 @@ export default function AdminDashboard() {
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
-                  {offerSubmitting ? 'Creating…' : 'Create collab'}
+                  {offerSubmitting ? (editingOfferId ? 'Saving…' : 'Creating…') : (editingOfferId ? 'Save changes' : 'Create collab')}
                 </button>
                 <button
                   type="button"
-                  onClick={() => setShowAddOffer(false)}
+                  onClick={() => { setShowAddOffer(false); setEditingOfferId(null); }}
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-[var(--ink-60)] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-colors"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
