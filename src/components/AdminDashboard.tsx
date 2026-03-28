@@ -119,7 +119,7 @@ export default function AdminDashboard() {
       supabase.from('creators').select('*').order('created_at', { ascending: false }).limit(500),
       supabase.from('businesses').select('*').order('created_at', { ascending: false }).limit(500),
       supabase.from('offers').select('*, businesses(name, category)').order('created_at', { ascending: false }).limit(500),
-      supabase.from('claims').select('*, creators(name), businesses(name, category)').order('claimed_at', { ascending: false }).limit(500)
+      supabase.from('claims').select('*, creators(name), businesses(name, category), offers(generated_title, description)').order('claimed_at', { ascending: false }).limit(500)
     ]);
     const errors = [creatorsData.error, businessesData.error, offersData.error, claimsData.error].filter(Boolean);
     if (errors.length > 0) {
@@ -263,7 +263,6 @@ export default function AdminDashboard() {
     e.preventDefault();
     const errors: Record<string, string> = {};
     if (!bizName.trim()) errors.name = 'Business name is required';
-    if (!bizSlug.trim()) errors.slug = 'Slug is required';
     if (!bizEmail.trim()) errors.email = 'Owner email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(bizEmail)) errors.email = 'Invalid email format';
     if (!bizCategory) errors.category = 'Category is required';
@@ -273,8 +272,11 @@ export default function AdminDashboard() {
     setBizSubmitting(true);
     setBizErrors({});
 
+    // Auto-generate slug from name
+    const generatedSlug = bizSlug.trim() || slugify(bizName.trim());
+
     // Check slug uniqueness
-    const { data: existingSlug } = await supabase.from('businesses').select('id').eq('slug', bizSlug.trim()).limit(1);
+    const { data: existingSlug } = await supabase.from('businesses').select('id').eq('slug', generatedSlug).limit(1);
     if (existingSlug && existingSlug.length > 0) {
       setBizErrors({ slug: 'This slug is already taken' });
       setBizSubmitting(false);
@@ -298,7 +300,7 @@ export default function AdminDashboard() {
 
     const { error } = await supabase.from('businesses').insert({
       name: bizName.trim(),
-      slug: bizSlug.trim(),
+      slug: generatedSlug,
       owner_email: bizEmail.trim(),
       category: bizCategory,
       region: bizRegion,
@@ -354,8 +356,8 @@ export default function AdminDashboard() {
     e.preventDefault();
     const errors: Record<string, string> = {};
     if (!offerBusinessId) errors.business = 'Business is required';
-    if (!offerType) errors.offer_type = 'Offer type is required';
-    if (!offerItem.trim()) errors.offer_item = 'Offer item is required';
+    if (!offerType) errors.offer_type = 'Collab type is required';
+    if (!offerItem.trim()) errors.offer_item = 'This field is required';
     const slotsNum = parseInt(offerSlots);
     if (!offerSlots || isNaN(slotsNum) || slotsNum < 1 || slotsNum > 20) errors.slots = 'Total slots required (1–20)';
     if (offerMonthlyCap && (isNaN(parseInt(offerMonthlyCap)) || parseInt(offerMonthlyCap) < 1)) errors.monthly_cap = 'Must be a positive integer';
@@ -402,7 +404,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    showToast('Offer created');
+    showToast('Collab created');
     setShowAddOffer(false);
     resetOfferForm();
     fetchAll();
@@ -419,7 +421,7 @@ export default function AdminDashboard() {
     { key: 'stats' as const, label: 'Overview', Icon: BarChart },
     { key: 'creators' as const, label: 'Creators', Icon: Users, badge: stats.pendingCreators },
     { key: 'businesses' as const, label: 'Businesses', Icon: Store, badge: stats.pendingBusinesses },
-    { key: 'offers' as const, label: 'Offers', Icon: Tag },
+    { key: 'offers' as const, label: 'Collabs', Icon: Tag },
     { key: 'claims' as const, label: 'Claims', Icon: ClipboardList },
     { key: 'settings' as const, label: 'Settings', Icon: Settings },
   ];
@@ -431,12 +433,8 @@ export default function AdminDashboard() {
         <div className="bg-[var(--shell)] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <Logo size={24} />
-              </div>
-              <div>
-                <p className="text-sm text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Admin Dashboard</p>
-              </div>
+              <Logo size={22} variant="wordmark" />
+              <span className="text-sm text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Admin Dashboard</span>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
               <LogOut size={18} strokeWidth={1.5} className="text-[var(--soft)]" />
@@ -486,7 +484,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -515,12 +513,14 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               )}
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-3">
                 {statCardData.map((stat, i) => (
-                  <div key={i} className="bg-[var(--card)] rounded-[16px] p-6 border border-[var(--ink-08)]" style={{ boxShadow: 'var(--shadow-md)' }}>
-                    <div className="mb-3"><stat.Icon size={24} strokeWidth={1.5} className="text-[var(--ink-60)]" /></div>
-                    <p className="text-[24px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>{stat.value}</p>
-                    <p className="text-[12px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
+                  <div key={i} className="bg-[var(--card)] rounded-[16px] p-4 border border-[var(--ink-08)]" style={{ boxShadow: 'var(--shadow-md)' }}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <stat.Icon size={18} strokeWidth={1.5} className="text-[var(--ink-60)]" />
+                      <p className="text-[22px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, letterSpacing: '-0.03em' }}>{stat.value}</p>
+                    </div>
+                    <p className="text-[12px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{stat.label}</p>
                   </div>
                 ))}
               </div>
@@ -529,60 +529,46 @@ export default function AdminDashboard() {
 
           {/* CREATORS */}
           {view === 'creators' && (
-            <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
+            <div>
               {creators.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Users size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No creators yet.</p></div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Name</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Handle</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Followers</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Code</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--ink-08)]">
-                      {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(creatorsPage * PAGE_SIZE, (creatorsPage + 1) * PAGE_SIZE).map((creator) => (
-                        <tr key={creator.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!creator.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>
-                            <span className="mr-2">{creator.name}</span>
+                <div className="space-y-3">
+                  {[...creators].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(creatorsPage * PAGE_SIZE, (creatorsPage + 1) * PAGE_SIZE).map((creator) => (
+                    <div key={creator.id} className={`bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] p-4 ${!creator.approved ? 'border-[var(--terra)]' : ''}`} style={{ boxShadow: 'var(--shadow-md)' }}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{creator.name}</span>
                             {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{creator.instagram_handle}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            {creator.follower_count ? (
-                              <span className="text-sm font-semibold px-2 py-0.5 rounded-full bg-[var(--bg)] text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{creator.follower_count}</span>
-                            ) : (
-                              <span className="text-sm text-[var(--soft)]">—</span>
+                            <StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" />
+                          </div>
+                          <p className="text-[13px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>@{creator.instagram_handle}</p>
+                          <div className="flex items-center gap-4 mt-2">
+                            {creator.follower_count && (
+                              <span className="text-[13px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>{creator.follower_count} followers</span>
                             )}
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><span className="text-sm font-mono font-bold px-2 py-0.5 rounded bg-[var(--near-black)] text-[var(--card)]">{creator.code}</span></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{creator.email}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" /></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            {!creator.approved ? (
-                              <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                                <Check size={12} strokeWidth={1.5} /> Approve
-                              </button>
-                            ) : (
-                              <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                                <X size={12} strokeWidth={1.5} /> Revoke
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                            <span className="text-[13px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{claims.filter(c => c.creators.name === creator.name && c.reel_url).length} reels</span>
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0">
+                          {!creator.approved ? (
+                            <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                              <Check size={12} strokeWidth={1.5} /> Approve
+                            </button>
+                          ) : (
+                            <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                              <X size={12} strokeWidth={1.5} /> Revoke
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
               {creators.length > PAGE_SIZE && (
-                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
+                <div className="flex items-center justify-between mt-4">
                   <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     {creatorsPage * PAGE_SIZE + 1}–{Math.min((creatorsPage + 1) * PAGE_SIZE, creators.length)} of {creators.length}
                   </span>
@@ -590,7 +576,7 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => setCreatorsPage(p => p - 1)}
                       disabled={creatorsPage === 0}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--card)] transition-all"
                       style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       <ChevronLeft size={14} strokeWidth={2} /> Previous
@@ -598,7 +584,7 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => setCreatorsPage(p => p + 1)}
                       disabled={(creatorsPage + 1) * PAGE_SIZE >= creators.length}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--card)] transition-all"
                       style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       Next <ChevronRight size={14} strokeWidth={2} />
@@ -621,96 +607,78 @@ export default function AdminDashboard() {
                 <Plus size={16} strokeWidth={2} /> Add business
               </button>
             </div>
-            <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
+            <div>
               {businesses.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><Store size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No businesses yet.</p></div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Slug</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Email</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Live</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Category</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Region</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--ink-08)]">
-                      {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(businessesPage * PAGE_SIZE, (businessesPage + 1) * PAGE_SIZE).map((business) => (
-                        <tr key={business.id} className={`hover:bg-[var(--bg)]/50 transition-colors ${!business.approved ? 'bg-[var(--terra-5)]' : ''}`}>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            <div className="flex items-center gap-2.5">
-                              <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
-                                <CategoryIcon category={business.category} className="w-5 h-5 text-[var(--mid)]" />
-                              </div>
-                              <span className="text-base font-medium text-[var(--near-black)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{business.name}</span>
+                <div className="space-y-3">
+                  {[...businesses].sort((a, b) => (a.approved === b.approved ? 0 : a.approved ? 1 : -1)).slice(businessesPage * PAGE_SIZE, (businessesPage + 1) * PAGE_SIZE).map((business) => (
+                    <div key={business.id} className={`bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] p-4 ${!business.approved ? 'border-[var(--terra)]' : ''}`} style={{ boxShadow: 'var(--shadow-md)' }}>
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-[42px] h-[42px] rounded-[12px] bg-[var(--shell)] flex items-center justify-center flex-shrink-0">
+                            <CategoryIcon category={business.category} className="w-5 h-5 text-[var(--mid)]" />
+                          </div>
+                          <div className="min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{business.name}</span>
+                              <StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" />
                             </div>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-base text-[var(--mid)] font-mono">{business.slug}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{business.owner_email}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            <button
-                              onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
-                              disabled={inlineUpdating === `${business.id}-is_live`}
-                              className="relative"
-                            >
-                              {inlineUpdating === `${business.id}-is_live` ? (
-                                <div className="w-[44px] h-[26px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
-                                  <div className="w-4 h-4 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
-                                </div>
-                              ) : (
-                                <div className={`w-[44px] h-[26px] rounded-full transition-all flex items-center ${business.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
-                                  <div className="w-[22px] h-[22px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
-                                </div>
-                              )}
-                            </button>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            <select
-                              value={business.category}
-                              onChange={e => handleInlineBusinessUpdate(business.id, 'category', e.target.value)}
-                              disabled={inlineUpdating === `${business.id}-category`}
-                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                            >
-                              {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                            </select>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            <select
-                              value={business.region || 'bury-st-edmunds'}
-                              onChange={e => handleInlineBusinessUpdate(business.id, 'region', e.target.value)}
-                              disabled={inlineUpdating === `${business.id}-region`}
-                              className="px-2.5 py-1.5 rounded-[12px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                            >
-                              {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
-                            </select>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap"><StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" /></td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            {!business.approved ? (
-                              <button onClick={() => handleApproveBusiness(business.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                                <Check size={12} strokeWidth={1.5} /> Approve
-                              </button>
+                            <p className="text-[13px] text-[var(--ink-60)] mt-0.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{business.region?.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 flex-shrink-0">
+                          <button
+                            onClick={() => handleInlineBusinessUpdate(business.id, 'is_live', !business.is_live)}
+                            disabled={inlineUpdating === `${business.id}-is_live`}
+                          >
+                            {inlineUpdating === `${business.id}-is_live` ? (
+                              <div className="w-[40px] h-[24px] rounded-full bg-[var(--ink-08)] flex items-center justify-center">
+                                <div className="w-3.5 h-3.5 border-2 border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" />
+                              </div>
                             ) : (
-                              <button onClick={() => handleApproveBusiness(business.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                                <X size={12} strokeWidth={1.5} /> Revoke
-                              </button>
+                              <div className={`w-[40px] h-[24px] rounded-full transition-all flex items-center ${business.is_live ? 'bg-[var(--terra)] justify-end' : 'bg-[var(--ink-08)] justify-start'}`}>
+                                <div className="w-[20px] h-[20px] rounded-full bg-[var(--card)] mx-[2px] shadow-sm" />
+                              </div>
                             )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 mt-3 flex-wrap">
+                        <select
+                          value={business.category}
+                          onChange={e => handleInlineBusinessUpdate(business.id, 'category', e.target.value)}
+                          disabled={inlineUpdating === `${business.id}-category`}
+                          className="px-2.5 py-1 rounded-[10px] text-[12px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                          style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                        >
+                          {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <select
+                          value={business.region || 'bury-st-edmunds'}
+                          onChange={e => handleInlineBusinessUpdate(business.id, 'region', e.target.value)}
+                          disabled={inlineUpdating === `${business.id}-region`}
+                          className="px-2.5 py-1 rounded-[10px] text-[12px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                          style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                        >
+                          {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
+                        </select>
+                        {!business.approved ? (
+                          <button onClick={() => handleApproveBusiness(business.id, true)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                            <Check size={12} strokeWidth={1.5} /> Approve
+                          </button>
+                        ) : (
+                          <button onClick={() => handleApproveBusiness(business.id, false)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                            <X size={12} strokeWidth={1.5} /> Revoke
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               )}
               {businesses.length > PAGE_SIZE && (
-                <div className="flex items-center justify-between px-5 py-3 border-t border-[var(--ink-08)]">
+                <div className="flex items-center justify-between mt-4">
                   <span className="text-[13px] text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     {businessesPage * PAGE_SIZE + 1}–{Math.min((businessesPage + 1) * PAGE_SIZE, businesses.length)} of {businesses.length}
                   </span>
@@ -718,7 +686,7 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => setBusinessesPage(p => p - 1)}
                       disabled={businessesPage === 0}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--card)] transition-all"
                       style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       <ChevronLeft size={14} strokeWidth={2} /> Previous
@@ -726,7 +694,7 @@ export default function AdminDashboard() {
                     <button
                       onClick={() => setBusinessesPage(p => p + 1)}
                       disabled={(businessesPage + 1) * PAGE_SIZE >= businesses.length}
-                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--bg)] transition-all"
+                      className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[13px] font-bold border border-[var(--ink-08)] text-[var(--ink)] disabled:opacity-30 hover:bg-[var(--card)] transition-all"
                       style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                     >
                       Next <ChevronRight size={14} strokeWidth={2} />
@@ -747,11 +715,11 @@ export default function AdminDashboard() {
                   className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
-                  <Plus size={16} strokeWidth={2} /> New offer
+                  <Plus size={16} strokeWidth={2} /> New collab
                 </button>
               </div>
               {offers.length === 0 ? (
-                <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No offers yet.</p></div>
+                <div className="text-center py-16"><div className="flex justify-center mb-3"><Tag size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No collabs yet.</p></div>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2">
                   {offers.map((offer) => (
@@ -829,57 +797,43 @@ export default function AdminDashboard() {
 
           {/* CLAIMS */}
           {view === 'claims' && (
-            <div className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] overflow-hidden">
+            <div>
               {claims.length === 0 ? (
                 <div className="text-center py-16"><div className="flex justify-center mb-3"><ClipboardList size={32} strokeWidth={1.5} className="text-[var(--soft)]" /></div><p className="text-[var(--mid)] text-base" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>No claims yet.</p></div>
               ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="bg-[var(--card)] border-b border-[var(--ink-08)]">
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Creator</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Business</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Claimed</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Status</th>
-                        <th className="px-5 py-3 text-left text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-[var(--ink-08)]">
-                      {claims.map((claim) => (
-                        <tr key={claim.id} className="hover:bg-[var(--bg)]/50 transition-colors">
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{claim.creators.name}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            <div className="flex items-center gap-2">
-                              <div className="w-[46px] h-[46px] rounded-[12px] bg-[var(--card)] flex items-center justify-center flex-shrink-0">
-                                <CategoryIcon category={claim.businesses.category} className="w-5 h-5 text-[var(--mid)]" />
-                              </div>
-                              <span className="text-base text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{claim.businesses.name}</span>
+                <div className="space-y-3">
+                  {claims.map((claim) => {
+                    const borderColor = claim.status === 'active' ? 'var(--terra)' : claim.status === 'redeemed' ? 'rgba(34,34,34,0.15)' : 'var(--terra-10)';
+                    return (
+                      <div key={claim.id} className="bg-[var(--card)] rounded-[16px] border border-[var(--ink-08)] p-4 overflow-hidden" style={{ boxShadow: 'var(--shadow-md)', borderLeft: `4px solid ${borderColor}` }}>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{claim.creators.name}</span>
+                              <StatusPill status={claim.status} type="claim" />
                             </div>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap text-[14px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{new Date(claim.claimed_at).toLocaleDateString()}</td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
+                            <p className="text-[13px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{claim.businesses.name}</p>
+                            {(claim as any).offers?.generated_title && (
+                              <p className="text-[13px] text-[var(--ink-35)] mt-0.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{(claim as any).offers.generated_title}</p>
+                            )}
+                            <p className="text-[12px] text-[var(--ink-35)] mt-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{new Date(claim.claimed_at).toLocaleDateString()}</p>
+                          </div>
+                          <div className="flex-shrink-0">
                             <select
                               value={claim.status}
                               onChange={(e) => handleUpdateClaimStatus(claim.id, e.target.value)}
-                              className="px-2.5 py-1 rounded-[12px] text-sm font-semibold border border-[var(--faint)] text-[var(--near-black)] bg-[var(--bg)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
+                              className="px-2.5 py-1 rounded-[10px] text-[12px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
                               style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                             >
                               <option value="active">Active</option>
                               <option value="redeemed">Redeemed</option>
                               <option value="expired">Expired</option>
                             </select>
-                          </td>
-                          <td className="px-5 py-3.5 whitespace-nowrap">
-                            {claim.status === 'active' && (
-                              <button onClick={() => handleUpdateClaimStatus(claim.id, 'expired')} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[15px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                                <X size={12} strokeWidth={1.5} /> Expire
-                              </button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
@@ -889,7 +843,7 @@ export default function AdminDashboard() {
           {view === 'settings' && (
             <div className="max-w-2xl">
               <div className="bg-[var(--card)] rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
-                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Change Password</h2>
+                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
@@ -976,7 +930,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Add business</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Add business</h2>
               <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
@@ -990,24 +944,12 @@ export default function AdminDashboard() {
                 <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Business name <span className="text-[var(--terra)]">*</span></label>
                 <input
                   value={bizName}
-                  onChange={e => { setBizName(e.target.value); if (!bizSlugManual) setBizSlug(slugify(e.target.value)); }}
+                  onChange={e => { setBizName(e.target.value); setBizSlug(slugify(e.target.value)); }}
                   className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="e.g. Wildcraft Coffee"
                 />
                 {bizErrors.name && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.name}</p>}
-              </div>
-
-              <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Slug <span className="text-[var(--terra)]">*</span></label>
-                <input
-                  value={bizSlug}
-                  onChange={e => { setBizSlug(e.target.value); setBizSlugManual(true); }}
-                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] font-mono focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
-                  placeholder="wildcraft-coffee"
-                />
-                {bizErrors.slug && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{bizErrors.slug}</p>}
               </div>
 
               <div>
@@ -1062,33 +1004,7 @@ export default function AdminDashboard() {
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
                   placeholder="123 High Street, Bury St Edmunds"
                 />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Latitude</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={bizLat}
-                    onChange={e => setBizLat(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
-                    placeholder="52.2434"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Longitude</label>
-                  <input
-                    type="number"
-                    step="any"
-                    value={bizLng}
-                    onChange={e => setBizLng(e.target.value)}
-                    className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
-                    placeholder="0.7137"
-                  />
-                </div>
+                <p className="mt-1.5 text-[12px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Coordinates can be added later if needed.</p>
               </div>
 
               {/* PROFILE */}
@@ -1194,14 +1110,14 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>New offer</h2>
+              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>New collab</h2>
               <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
             </div>
 
             <form onSubmit={handleCreateOffer} className="space-y-5">
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Offer details</p>
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Collab details</p>
 
               <div>
                 <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Business <span className="text-[var(--terra)]">*</span></label>
@@ -1219,7 +1135,7 @@ export default function AdminDashboard() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer type <span className="text-[var(--terra)]">*</span></label>
+                  <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Collab type <span className="text-[var(--terra)]">*</span></label>
                   <select
                     value={offerType}
                     onChange={e => setOfferType(e.target.value)}
@@ -1245,7 +1161,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer item <span className="text-[var(--terra)]">*</span></label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>What they get <span className="text-[var(--terra)]">*</span></label>
                 <input
                   value={offerItem}
                   onChange={e => {
@@ -1260,7 +1176,7 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Generated title</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Title</label>
                 <input
                   value={offerTitle}
                   onChange={e => { setOfferTitle(e.target.value); setOfferTitleManual(true); }}
@@ -1331,10 +1247,10 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Offer photo</label>
+                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Collab photo</label>
                 {offerPhotoPreview ? (
                   <div className="flex items-center gap-3">
-                    <img src={offerPhotoPreview} alt="Offer preview" className="w-14 h-14 rounded-[12px] object-cover" />
+                    <img src={offerPhotoPreview} alt="Collab preview" className="w-14 h-14 rounded-[12px] object-cover" />
                     <button type="button" onClick={() => { setOfferPhotoFile(null); setOfferPhotoPreview(null); }} className="text-[13px] text-[var(--terra)] font-semibold" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Remove</button>
                   </div>
                 ) : (
@@ -1388,7 +1304,7 @@ export default function AdminDashboard() {
                   className="w-full px-4 py-3 rounded-[999px] text-[15px] text-white bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
                 >
-                  {offerSubmitting ? 'Creating…' : 'Create offer'}
+                  {offerSubmitting ? 'Creating…' : 'Create collab'}
                 </button>
                 <button
                   type="button"

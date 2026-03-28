@@ -104,7 +104,7 @@
 | 8.3 | `public/nayba_logo.svg` | **126 KB** SVG logo — extremely oversized | Blocks first paint on slow connections | **HIGH** |
 | 8.4 | `src/components/CreatorApp.tsx:2394-2407, 1855-1860` + `BusinessPortal.tsx:1650` | All `<img>` tags missing `loading="lazy"` and `width`/`height` attributes | Layout shift (CLS) and unnecessary network requests for off-screen images | **MEDIUM** |
 | 8.5 | `vite.config.ts` | Only `react` + `react-dom` in `manualChunks` — `leaflet` (~200KB), `html5-qrcode` (~50KB) not split | Large libs bundled into main chunk even if user never opens map or QR scanner | **MEDIUM** |
-| 8.6 | `index.html:11` | 5 font weights of Plus Jakarta Sans + Corben loaded synchronously on every page | Render-blocking; Corben only used in one wordmark component | **MEDIUM** |
+| 8.6 | `index.html:11` | 5 font weights of Instrument Sans + Corben loaded synchronously on every page | Render-blocking; Corben only used in wordmark + section titles | **MEDIUM** |
 | 8.7 | `src/components/AdminDashboard.tsx:94` | `fetchAll()` on mount loads up to 500 each of creators, businesses, offers, claims with no pagination | Admin dashboard hangs with large datasets | **MEDIUM** |
 | 8.8 | `src/App.tsx:10-53` | Single `ErrorBoundary` at app root — crash in one tab takes down entire app | No graceful degradation per feature | **LOW** |
 | 8.9 | No `manifest.json` or service worker | No PWA support — no installability, no offline fallback | Not a blocker but missed mobile engagement opportunity | **LOW** |
