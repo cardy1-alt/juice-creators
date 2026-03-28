@@ -365,7 +365,8 @@ export default function AdminDashboard() {
       const path = `business-logos/${Date.now()}-${editingBusinessId}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('logos').upload(path, bizLogoFile);
       if (uploadError) {
-        setBizErrors({ logo: friendlyError(uploadError.message) });
+        console.error('[EditBusiness] Logo upload error:', uploadError);
+        setBizErrors({ logo: `Upload failed: ${uploadError.message}` });
         setBizSubmitting(false);
         return;
       }
@@ -392,7 +393,8 @@ export default function AdminDashboard() {
     const { error } = await supabase.from('businesses').update(updateData).eq('id', editingBusinessId);
     setBizSubmitting(false);
     if (error) {
-      setBizErrors({ submit: friendlyError(error.message) });
+      console.error('[EditBusiness] Update error:', error);
+      setBizErrors({ submit: `Save failed: ${error.message}` });
       return;
     }
 
@@ -516,7 +518,8 @@ export default function AdminDashboard() {
       const path = `offer-photos/${Date.now()}-${offerBusinessId}.${ext}`;
       const { error: uploadError } = await supabase.storage.from('logos').upload(path, offerPhotoFile);
       if (uploadError) {
-        setOfferErrors({ photo: friendlyError(uploadError.message) });
+        console.error('[EditOffer] Photo upload error:', uploadError);
+        setOfferErrors({ photo: `Upload failed: ${uploadError.message}` });
         setOfferSubmitting(false);
         return;
       }
@@ -543,7 +546,8 @@ export default function AdminDashboard() {
     const { error } = await supabase.from('offers').update(updateData).eq('id', editingOfferId);
     setOfferSubmitting(false);
     if (error) {
-      setOfferErrors({ submit: friendlyError(error.message) });
+      console.error('[EditOffer] Update error:', error);
+      setOfferErrors({ submit: `Save failed: ${error.message}` });
       return;
     }
 
