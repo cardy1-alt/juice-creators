@@ -5,7 +5,6 @@ import { friendlyError } from '../lib/errors';
 import { AlertTriangle, BarChart, Check, ChevronLeft, ChevronRight, ClipboardList, Clapperboard, LogOut, Plus, Settings, Store, Tag, Upload, Users, X } from 'lucide-react';
 import { CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
-import LevelBadge from './LevelBadge';
 import { sendCreatorApprovedEmail, sendBusinessApprovedEmail, sendCreatorDeniedEmail, sendBusinessDeniedEmail } from '../lib/notifications';
 
 function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim' | 'approval' | 'offer' }) {
@@ -29,9 +28,9 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   return <span className={`${badgeBase} ${styles[status] || 'bg-[var(--card)] text-[var(--ink-35)]'}`} style={badgeStyle}>{status}</span>;
 }
 
-interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; level?: number; level_name?: string; }
+interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
 interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; }
-interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; min_level: number; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
+interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
 export default function AdminDashboard() {
@@ -90,7 +89,6 @@ export default function AdminDashboard() {
   const [offerSpecificAsk, setOfferSpecificAsk] = useState('');
   const [offerPhotoFile, setOfferPhotoFile] = useState<File | null>(null);
   const [offerPhotoPreview, setOfferPhotoPreview] = useState<string | null>(null);
-  const [offerMinLevel, setOfferMinLevel] = useState('1');
   const [offerContentType, setOfferContentType] = useState('reel');
   const [offerIsLive, setOfferIsLive] = useState(false);
   const [offerSubmitting, setOfferSubmitting] = useState(false);
@@ -340,16 +338,12 @@ export default function AdminDashboard() {
   };
 
   const OFFER_TYPES = ['Free Product', 'Free Service', 'Discount', 'Experience'];
-  const LEVEL_OPTIONS = [
-    { value: '1', label: '1 Newcomer' }, { value: '2', label: '2 Explorer' }, { value: '3', label: '3 Regular' },
-    { value: '4', label: '4 Local' }, { value: '5', label: '5 Trusted' }, { value: '6', label: '6 Nayba' },
-  ];
 
   const resetOfferForm = () => {
     setOfferBusinessId(''); setOfferType(''); setOfferItem(''); setOfferTitle('');
     setOfferTitleManual(false); setOfferDesc(''); setOfferMonthlyCap(''); setOfferSlots('4');
     setOfferSpecificAsk(''); setOfferPhotoFile(null); setOfferPhotoPreview(null);
-    setOfferMinLevel('1'); setOfferContentType('reel'); setOfferIsLive(false); setOfferErrors({});
+    setOfferContentType('reel'); setOfferIsLive(false); setOfferErrors({});
   };
 
   const handleCreateOffer = async (e: React.FormEvent) => {
@@ -393,7 +387,6 @@ export default function AdminDashboard() {
       monthly_cap: offerMonthlyCap ? parseInt(offerMonthlyCap) : null,
       specific_ask: offerSpecificAsk.trim() || null,
       offer_photo_url: photoUrl,
-      min_level: parseInt(offerMinLevel),
       content_type: offerContentType,
       is_live: offerIsLive,
     });
@@ -433,8 +426,8 @@ export default function AdminDashboard() {
         <div className="bg-[var(--shell)] border-b border-[var(--faint)]" style={{ padding: '20px 20px 14px' }}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Logo size={22} variant="wordmark" />
-              <span className="text-sm text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Admin Dashboard</span>
+              <Logo size={24} variant="wordmark" />
+              <span className="text-[15px] text-[var(--mid)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Admin</span>
             </div>
             <button onClick={signOut} className="p-2 rounded-[12px] hover:bg-[var(--bg)] transition-colors">
               <LogOut size={18} strokeWidth={1.5} className="text-[var(--soft)]" />
@@ -484,7 +477,7 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               {(stats.pendingCreators > 0 || stats.pendingBusinesses > 0) && (
                 <div className="bg-[var(--terra-10)] rounded-[18px] p-5">
-                  <h3 className="text-base text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
+                  <h3 className="text-[18px] text-[var(--near-black)] mb-3 flex items-center gap-2" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}><AlertTriangle size={16} strokeWidth={1.5} className="text-[var(--terra)]" /> Pending Approvals</h3>
                   <div className="flex gap-4">
                     {stats.pendingCreators > 0 && (
                       <button
@@ -540,7 +533,6 @@ export default function AdminDashboard() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{creator.name}</span>
-                            {creator.level && <LevelBadge level={creator.level} levelName={creator.level_name || 'Newcomer'} size="sm" />}
                             <StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" />
                           </div>
                           <p className="text-[13px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>@{creator.instagram_handle}</p>
@@ -774,19 +766,6 @@ export default function AdminDashboard() {
                             placeholder="∞"
                           />
                         </div>
-                        {/* min_level dropdown */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-[12px] text-[var(--ink-35)] uppercase" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '0.5px' }}>Level</span>
-                          <select
-                            value={offer.min_level}
-                            onChange={e => handleInlineOfferUpdate(offer.id, 'min_level', parseInt(e.target.value))}
-                            disabled={inlineUpdating === `offer-${offer.id}-min_level`}
-                            className="px-2 py-1 rounded-[10px] text-[13px] font-semibold border border-[var(--ink-08)] text-[var(--ink)] bg-[var(--shell)] focus:outline-none focus:ring-2 focus:ring-[var(--terra-ring)] focus:border-[var(--terra)]"
-                            style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                          >
-                            {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
-                          </select>
-                        </div>
                       </div>
                     </div>
                   ))}
@@ -843,7 +822,7 @@ export default function AdminDashboard() {
           {view === 'settings' && (
             <div className="max-w-2xl">
               <div className="bg-[var(--card)] rounded-[18px] shadow-[0_2px_12px_rgba(34,34,34,0.08)] p-6">
-                <h2 className="text-lg text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Change Password</h2>
+                <h2 className="text-[22px] text-[var(--near-black)] mb-5" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Change Password</h2>
                 <form onSubmit={handleChangePassword} className="space-y-4">
                   <div>
                     <label htmlFor="currentPassword" className="block text-base font-semibold text-[var(--near-black)] mb-2" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
@@ -930,7 +909,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddBusiness(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Add business</h2>
+              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Add business</h2>
               <button onClick={() => setShowAddBusiness(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
@@ -1110,7 +1089,7 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto" style={{ background: 'rgba(34,34,34,0.45)' }} onClick={() => setShowAddOffer(false)}>
           <div className="w-full max-w-[560px] my-8 mx-4 rounded-[24px] p-7" style={{ background: 'var(--shell)', boxShadow: 'var(--shadow-lg)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-[20px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>New collab</h2>
+              <h2 className="text-[22px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>New collab</h2>
               <button onClick={() => setShowAddOffer(false)} className="p-2 rounded-[12px] hover:bg-[var(--card)] transition-colors">
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-35)]" />
               </button>
@@ -1269,20 +1248,8 @@ export default function AdminDashboard() {
                 {offerErrors.photo && <p className="mt-1 text-[13px] text-[var(--ochre)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}>{offerErrors.photo}</p>}
               </div>
 
-              {/* ACCESS */}
-              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Access & status</p>
-
-              <div>
-                <label className="block text-[13px] text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Min level</label>
-                <select
-                  value={offerMinLevel}
-                  onChange={e => setOfferMinLevel(e.target.value)}
-                  className="w-full px-4 py-3.5 rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[var(--terra-ring)]"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
-                >
-                  {LEVEL_OPTIONS.map(l => <option key={l.value} value={l.value}>{l.label}</option>)}
-                </select>
-              </div>
+              {/* STATUS */}
+              <p className="text-[13px] uppercase tracking-[1px] text-[var(--ink-35)] pt-2" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>Status</p>
 
               <button
                 type="button"
