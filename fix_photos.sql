@@ -1,0 +1,10 @@
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=800&h=600&fit=crop' WHERE id = 'c1111111-1111-1111-1111-111111111111';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=800&h=600&fit=crop' WHERE id = 'c2222222-2222-2222-2222-222222222222';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=800&h=600&fit=crop' WHERE id = 'c3333333-3333-3333-3333-333333333333';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1604654894610-df63bc536371?w=800&h=600&fit=crop' WHERE id = 'c4444444-4444-4444-4444-444444444444';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1590301157890-4810ed352733?w=800&h=600&fit=crop' WHERE id = 'c5555555-5555-5555-5555-555555555555';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&h=600&fit=crop' WHERE id = 'c6666666-6666-6666-6666-666666666666';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop' WHERE id = 'c7777777-7777-7777-7777-777777777777';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=800&h=600&fit=crop' WHERE id = 'c8888888-8888-8888-8888-888888888888';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=600&fit=crop' WHERE id = 'c9999999-9999-9999-9999-999999999999';
+UPDATE offers SET offer_photo_url = 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&h=600&fit=crop' WHERE offer_photo_url IS NULL;
