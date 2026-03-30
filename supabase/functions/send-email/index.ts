@@ -6,7 +6,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const FROM_EMAIL = 'Nayba <hello@nayba.app>';
 const ADMIN_EMAIL = 'hello@nayba.app';
-const APP_URL = Deno.env.get('APP_URL') || 'https://nayba.vercel.app';
+const APP_URL = Deno.env.get('APP_URL') || 'https://app.nayba.app';
 
 function escapeHtml(str: string): string {
   return str
@@ -406,6 +406,28 @@ function feedbackEmail(meta: Record<string, string>): { subject: string; html: s
   };
 }
 
+function reelSubmittedCreatorEmail(name: string, meta: Record<string, string>): { subject: string; html: string } {
+  const offerTitle = meta.offer_title || 'your collab';
+  const businessName = meta.business_name || 'a local business';
+  return {
+    subject: 'Your Nayba collab is complete \u{1F389}',
+    html: wrapEmail(`
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+      </div>
+      ${heading('Collab Complete!')}
+      ${subtext(`Amazing work, ${escapeHtml(name)}.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">with ${escapeHtml(businessName)}</p>
+      `)}
+      ${p("Your Reel has been submitted and the collab is now complete. Thanks for supporting a local business \u2014 that's what Nayba is all about.")}
+      ${p('Ready for your next one? There are more offers waiting for you.')}
+      ${btn('Explore More Offers', APP_URL)}
+    `),
+  };
+}
+
 function genericNotificationEmail(name: string, message: string): { subject: string; html: string } {
   return {
     subject: `Nayba — ${message.slice(0, 60)}`,
@@ -525,6 +547,9 @@ Deno.serve(async (req: Request) => {
         break;
       case 'feedback':
         email = feedbackEmail(meta);
+        break;
+      case 'reel_submitted_creator':
+        email = reelSubmittedCreatorEmail(recipientName, meta);
         break;
       default:
         email = genericNotificationEmail(recipientName, notification.message);
