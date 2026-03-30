@@ -580,9 +580,9 @@ export default function CreatorApp() {
       return false;
     }
 
-    const instagramReelPattern = /^https:\/\/(www\.)?instagram\.com\/reel\/[A-Za-z0-9_-]+\/?/i;
+    const instagramReelPattern = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?/i;
     if (!instagramReelPattern.test(reelUrl)) {
-      setReelError('Please enter a valid Instagram reel URL (https://instagram.com/reel/...)');
+      setReelError('Please enter a valid Instagram post URL (https://instagram.com/reel/... or /p/...)');
       return false;
     }
 
