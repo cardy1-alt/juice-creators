@@ -213,7 +213,7 @@ export default function CreatorApp() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [copiedCode, setCopiedCode] = useState(false);
   const [undoToast, setUndoToast] = useState<string | null>(null);
-  const [waitlistedOffers, setWaitlistedOffers] = useState<Record<string, { id: string; position: number }>>({});
+  const [waitlistedOffers, setWaitlistedOffers] = useState<Record<string, { id: string; position: number; promoted?: boolean }>>({});
   const [waitlistLoading, setWaitlistLoading] = useState<string | null>(null);
   const [waitlistConfirmLeave, setWaitlistConfirmLeave] = useState<string | null>(null);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -342,18 +342,19 @@ export default function CreatorApp() {
   const fetchWaitlist = async () => {
     const { data } = await supabase
       .from('waitlist')
-      .select('id, offer_id')
+      .select('id, offer_id, notified_at, promotion_expires_at')
       .eq('creator_id', userProfile.id);
     if (data) {
-      const map: Record<string, { id: string; position: number }> = {};
+      const map: Record<string, { id: string; position: number; promoted?: boolean }> = {};
       for (const entry of data) {
+        const isPromoted = !!(entry.notified_at && entry.promotion_expires_at && new Date(entry.promotion_expires_at) > new Date());
         // Get position for this entry
         const { count } = await supabase
           .from('waitlist')
           .select('*', { count: 'exact', head: true })
           .eq('offer_id', entry.offer_id)
           .lte('created_at', new Date().toISOString());
-        map[entry.offer_id] = { id: entry.id, position: count || 1 };
+        map[entry.offer_id] = { id: entry.id, position: count || 1, promoted: isPromoted };
       }
       setWaitlistedOffers(map);
     }
@@ -1306,14 +1307,25 @@ export default function CreatorApp() {
 
                 {/* On the list — capped offers, already queued */}
                 {!isUnlimited && waitlistedOffers[offer.id] && !alreadyClaimed && (
-                  <div style={{ background: 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)', margin: '0 0 4px' }}>You're on the list</p>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 8px' }}>
-                      {(waitlistedOffers[offer.id].position || 0) <= 1 ? "You're next!" : `${waitlistedOffers[offer.id].position} people ahead of you`}
-                    </p>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
-                      We'll send you a notification when it's your turn. Keep an eye on your alerts.
-                    </p>
+                  <div style={{ background: waitlistedOffers[offer.id].promoted ? 'rgba(196,103,74,0.06)' : 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24, border: waitlistedOffers[offer.id].promoted ? '1.5px solid rgba(196,103,74,0.2)' : 'none' }}>
+                    {waitlistedOffers[offer.id].promoted ? (
+                      <>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--terra)', margin: '0 0 4px' }}>A spot is ready for you!</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
+                          Claim this collab now — your spot is held for 24 hours before it moves to the next person.
+                        </p>
+                      </>
+                    ) : (
+                      <>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)', margin: '0 0 4px' }}>You're on the list</p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 8px' }}>
+                          {(waitlistedOffers[offer.id].position || 0) <= 1 ? "You're next!" : `${waitlistedOffers[offer.id].position} people ahead of you`}
+                        </p>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
+                          We'll send you a notification when it's your turn. Keep an eye on your alerts.
+                        </p>
+                      </>
+                    )}
                   </div>
                 )}
               </div>
@@ -1352,6 +1364,20 @@ export default function CreatorApp() {
                 >
                   View active pass
                 </button>
+              ) : waitlistedOffers[offer.id]?.promoted ? (
+                <div>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--terra)', textAlign: 'center', margin: '0 0 8px', lineHeight: 1.5 }}>
+                    A spot just opened — claim it before it goes to the next person!
+                  </p>
+                  <button
+                    onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
+                    disabled={loading}
+                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                  >
+                    {loading ? 'Claiming...' : 'Claim now'}
+                  </button>
+                </div>
               ) : waitlistedOffers[offer.id] ? (
                 <div>
                   <button
