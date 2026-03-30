@@ -30,7 +30,7 @@ export async function sendCreatorWelcomeEmail(creatorId: string): Promise<void> 
   await insertNotification({
     userId: creatorId,
     userType: 'creator',
-    message: 'Welcome to Nayba! Explore local offers and claim your first one.',
+    message: 'Welcome to Nayba! Explore local collabs and claim your first one.',
     emailType: 'creator_welcome',
   });
 }
@@ -39,7 +39,7 @@ export async function sendBusinessWelcomeEmail(businessId: string): Promise<void
   await insertNotification({
     userId: businessId,
     userType: 'business',
-    message: 'Welcome to Nayba! Create your first offer to start attracting creators.',
+    message: 'Welcome to Nayba! Create your first collab to start attracting creators.',
     emailType: 'business_welcome',
   });
 }
@@ -137,7 +137,7 @@ export async function sendCreatorApprovedEmail(creatorId: string): Promise<void>
   await insertNotification({
     userId: creatorId,
     userType: 'creator',
-    message: 'Your creator account has been approved! Start exploring offers.',
+    message: 'Your creator account has been approved! Start exploring collabs.',
     emailType: 'creator_approved',
   });
 }
@@ -146,7 +146,7 @@ export async function sendBusinessApprovedEmail(businessId: string): Promise<voi
   await insertNotification({
     userId: businessId,
     userType: 'business',
-    message: 'Your business account has been approved! Create your first offer.',
+    message: 'Your business account has been approved! Create your first collab.',
     emailType: 'business_approved',
   });
 }

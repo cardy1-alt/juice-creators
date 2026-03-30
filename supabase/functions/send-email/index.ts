@@ -123,10 +123,10 @@ function creatorWelcomeEmail(name: string): { subject: string; html: string } {
     html: wrapEmail(`
       ${heading(`Welcome, ${escapeHtml(name)}!`)}
       ${subtext("We're really glad you're here.")}
-      ${p('Nayba connects you with local businesses who want to work with creators like you. Browse offers from cafes, salons, gyms, and more in your area.')}
+      ${p('Nayba connects you with local businesses who want to work with creators like you. Browse collabs from cafes, salons, gyms, and more in your area.')}
       ${p("<strong>Here's how it works:</strong>")}
       ${stepList([
-        'Claim an offer from a local business',
+        'Claim a collab from a local business',
         'Visit in person and show your QR pass',
         'Post an Instagram Reel within 48 hours',
       ])}
@@ -150,10 +150,10 @@ function businessWelcomeEmail(name: string): { subject: string; html: string } {
     html: wrapEmail(`
       ${heading(`Welcome, ${escapeHtml(name)}!`)}
       ${subtext('Great to have you on board.')}
-      ${p("Nayba turns local creators into your marketing team — no budget required. Create an offer, local creators claim it, visit your business, and post an authentic Instagram Reel about the experience.")}
+      ${p("Nayba turns local creators into your marketing team — no budget required. Create a collab, local creators claim it, visit your business, and post an authentic Instagram Reel about the experience.")}
       ${p("<strong>Getting started is simple:</strong>")}
       ${stepList([
-        'Create your first offer (a free coffee, a discount — whatever feels right)',
+        'Create your first collab (a free coffee, a discount — whatever feels right)',
         'Creators discover and claim it',
         'They visit, you scan their QR code, and they post a Reel',
       ])}
@@ -177,7 +177,7 @@ function offerClaimedCreatorEmail(name: string, meta: Record<string, string>): {
   return {
     subject: `You claimed ${offerTitle} from ${businessName}`,
     html: wrapEmail(`
-      ${heading('Offer Claimed!')}
+      ${heading('Collab Claimed!')}
       ${subtext(`Nice one, ${escapeHtml(name)}.`)}
       ${infoBox(`
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
@@ -282,15 +282,15 @@ function creatorApprovedEmail(name: string): { subject: string; html: string } {
       </div>
       ${heading("You're Approved!")}
       ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're all set.`)}
-      ${p('You can now browse offers from local businesses in your area, claim the ones you like, and start creating.')}
+      ${p('You can now browse collabs from local businesses in your area, claim the ones you like, and start creating.')}
       ${p("<strong>Here's how it works:</strong>")}
       ${stepList([
-        'Browse and claim an offer',
+        'Browse and claim a collab',
         'Visit the business and show your QR pass',
         'Post an Instagram Reel within 48 hours',
       ])}
-      ${p('Jump in and claim your first offer — there are businesses waiting to work with you.')}
-      ${btn('Explore Offers', APP_URL)}
+      ${p('Jump in and claim your first collab — there are businesses waiting to work with you.')}
+      ${btn('Explore Collabs', APP_URL)}
     `),
   };
 }
@@ -304,9 +304,9 @@ function businessApprovedEmail(name: string): { subject: string; html: string } 
       </div>
       ${heading("You're Approved!")}
       ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're live on the platform.`)}
-      ${p('Create your first offer and local creators will be able to discover and claim it right away.')}
+      ${p('Create your first collab and local creators will be able to discover and claim it right away.')}
       ${p("If you need any help getting started, just reply to this email — we're here for you.")}
-      ${btn('Create Your First Offer', APP_URL)}
+      ${btn('Create Your First Collab', APP_URL)}
     `),
   };
 }
@@ -422,8 +422,8 @@ function reelSubmittedCreatorEmail(name: string, meta: Record<string, string>): 
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">with ${escapeHtml(businessName)}</p>
       `)}
       ${p("Your Reel has been submitted and the collab is now complete. Thanks for supporting a local business \u2014 that's what Nayba is all about.")}
-      ${p('Ready for your next one? There are more offers waiting for you.')}
-      ${btn('Explore More Offers', APP_URL)}
+      ${p('Ready for your next one? There are more collabs waiting for you.')}
+      ${btn('Explore More Collabs', APP_URL)}
     `),
   };
 }
