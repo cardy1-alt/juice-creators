@@ -10,7 +10,7 @@ import LevelBadge from './LevelBadge';
 import { getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import { getInitials } from '../lib/avatar';
-import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail } from '../lib/notifications';
+import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail, sendReelSubmittedCreatorEmail } from '../lib/notifications';
 import { uploadAvatar } from '../lib/upload';
 import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
 
@@ -580,8 +580,8 @@ export default function CreatorApp() {
       return false;
     }
 
-    const instagramPattern = /^https:\/\/(www\.)?instagram\.com\//i;
-    if (!instagramPattern.test(reelUrl)) {
+    const instagramReelPattern = /^https:\/\/(www\.)?instagram\.com\/reel\/[A-Za-z0-9_-]+\/?/i;
+    if (!instagramReelPattern.test(reelUrl)) {
       setReelError('Please enter a valid Instagram reel URL (https://instagram.com/reel/...)');
       return false;
     }
@@ -619,6 +619,9 @@ export default function CreatorApp() {
       setReelError(null);
       fetchClaims();
       fetchCollabsCompleted();
+
+      // Send collab-complete email to creator (non-blocking)
+      sendReelSubmittedCreatorEmail(userProfile.id, celebOfferName, celebBizName).catch(() => {});
 
       setShowReelCelebration({ offerName: celebOfferName, businessName: celebBizName });
       return true;
@@ -759,14 +762,8 @@ export default function CreatorApp() {
     return 'Good evening';
   };
 
-  const toggleSave = (offerId: string) => {
-    setSavedOffers(prev => {
-      const next = new Set(prev);
-      if (next.has(offerId)) next.delete(offerId); else next.add(offerId);
-      localStorage.setItem('nayba_saved_offers', JSON.stringify([...next]));
-      return next;
-    });
-  };
+  // toggleSave is an alias for toggleSaved — unified in pre-launch audit
+  const toggleSave = toggleSaved;
 
   // Helper to render business avatar
   const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 46) => {

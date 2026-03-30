@@ -86,6 +86,20 @@ export async function sendReelDueReminderEmail(
   });
 }
 
+export async function sendReelSubmittedCreatorEmail(
+  creatorId: string,
+  offerTitle: string,
+  businessName: string,
+): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `Your Nayba collab with ${businessName} is complete!`,
+    emailType: 'reel_submitted_creator',
+    emailMeta: { offer_title: offerTitle, business_name: businessName },
+  });
+}
+
 export async function sendNewClaimBusinessEmail(
   businessId: string,
   creatorName: string,
