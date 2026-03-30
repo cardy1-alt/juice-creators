@@ -952,19 +952,28 @@ export default function CreatorApp() {
               {activeTab === 'reel' && isReelDue && (
                 <div className="flex flex-col w-full" style={{ marginTop: 24, minHeight: '75vh' }}>
                   {/* Timer block */}
-                  <div style={{ background: 'rgba(245,196,160,0.12)', border: '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
-                    <div className="flex items-center gap-[8px]">
-                      <Clock size={16} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 18, color: 'var(--ink)' }}>
-                        {reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
-                      </span>
-                    </div>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16, color: 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
-                      Post your reel within this window — it must clearly feature the business.
-                    </p>
-                  </div>
+                  {(() => {
+                    const isOverdue = qrClaim.reel_due_at && new Date() > new Date(qrClaim.reel_due_at);
+                    return (
+                      <div style={{ background: isOverdue ? 'rgba(196,103,74,0.08)' : 'rgba(245,196,160,0.12)', border: isOverdue ? '1.5px solid var(--terra)' : '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
+                        <div className="flex items-center gap-[8px]">
+                          <Clock size={16} strokeWidth={1.5} className={isOverdue ? 'text-[var(--terra)]' : 'text-[var(--ink-60)]'} />
+                          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? 'var(--terra)' : 'var(--ink)' }}>
+                            {isOverdue ? 'Deadline passed' : reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
+                          </span>
+                        </div>
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16, color: isOverdue ? 'var(--terra)' : 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
+                          {isOverdue
+                            ? 'This reel was not submitted in time and counts as a strike. Contact support if you need help.'
+                            : 'Post your reel within this window — it must clearly feature the business.'}
+                        </p>
+                      </div>
+                    );
+                  })()}
 
-                  {/* Reel URL input */}
+                  {/* Reel URL input — hidden when overdue */}
+                  {!(qrClaim.reel_due_at && new Date() > new Date(qrClaim.reel_due_at)) && (
+                  <>
                   <div style={{ marginTop: 20 }}>
                     <label className="text-[15px] font-semibold text-[var(--ink)]" style={{ marginBottom: 8, display: 'block' }}>
                       Reel URL
@@ -1011,6 +1020,8 @@ export default function CreatorApp() {
                       </>
                     ) : 'Submit'}
                   </button>
+                  </>
+                  )}
 
                   {/* Spacer + report link */}
                   <div style={{ flexGrow: 1 }} />
@@ -2300,14 +2311,22 @@ export default function CreatorApp() {
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
                           Post your Reel within 48 hours and submit the link below
                         </p>
-                        {/* Timer pill */}
+                        {/* Timer pill or overdue warning */}
                         {(() => {
                           const due = claim.reel_due_at ? new Date(claim.reel_due_at).getTime() : 0;
                           const now = Date.now();
                           const diff = due - now;
+                          const isOverdue = due > 0 && diff <= 0;
                           const hrs = Math.floor(diff / (1000 * 60 * 60));
                           const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                           const tl = due > 0 && diff > 0 ? `${hrs}h ${mins}m remaining` : '';
+                          if (isOverdue) {
+                            return (
+                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(196,103,74,0.12)', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
+                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)' }}>Deadline passed — this counts as a strike</span>
+                              </div>
+                            );
+                          }
                           if (!tl) return null;
                           return (
                             <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F5C4A0', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
@@ -2315,7 +2334,8 @@ export default function CreatorApp() {
                             </div>
                           );
                         })()}
-                        {/* Reel URL input */}
+                        {/* Reel URL input — hidden when overdue */}
+                        {!(claim.reel_due_at && new Date() > new Date(claim.reel_due_at)) ? (
                         <div style={{ textAlign: 'left' }}>
                           <input
                             type="url"
@@ -2340,6 +2360,11 @@ export default function CreatorApp() {
                             Submit Reel
                           </button>
                         </div>
+                        ) : (
+                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--terra)', margin: '0 auto', maxWidth: 280, lineHeight: 1.65 }}>
+                          Contact support if you believe this is an error.
+                        </p>
+                        )}
                       </div>
                     )}
 
