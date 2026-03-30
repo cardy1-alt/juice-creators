@@ -112,11 +112,33 @@ Deno.serve(async (_req: Request) => {
     }
   }
 
+  // 4. Handle expired waitlist promotion windows
+  // When a promoted creator doesn't claim within their 24-hour window,
+  // clear their promotion and promote the next person in line.
+  let promotionsExpired = 0;
+  const { data: expiredPromotions } = await supabase
+    .from('waitlist')
+    .select('id, offer_id')
+    .not('notified_at', 'is', null)
+    .lte('promotion_expires_at', now.toISOString());
+
+  if (expiredPromotions && expiredPromotions.length > 0) {
+    for (const entry of expiredPromotions) {
+      // Remove the expired promotion entry (they missed their window)
+      await supabase.from('waitlist').delete().eq('id', entry.id);
+      // The DB trigger promote_next_waitlisted_creator won't fire from this
+      // delete since it's on claims, so call the RPC directly
+      await supabase.rpc('promote_next_waitlisted_creator', { p_offer_id: entry.offer_id });
+      promotionsExpired++;
+    }
+  }
+
   return new Response(
     JSON.stringify({
       reminders_sent_24h: remindersSent,
       warnings_sent_6h: warningsSent,
       marked_overdue: overdue?.length || 0,
+      promotions_expired: promotionsExpired,
     }),
     { status: 200 }
   );

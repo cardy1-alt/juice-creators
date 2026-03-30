@@ -428,6 +428,41 @@ function reelSubmittedCreatorEmail(name: string, meta: Record<string, string>): 
   };
 }
 
+function slotReadyEmail(name: string, meta: Record<string, string>): { subject: string; html: string } {
+  const offerTitle = meta.offer_title || 'a collab';
+  const businessName = meta.business_name || 'a local business';
+  const expiresAt = meta.expires_at || '';
+  let deadlineStr = '';
+  if (expiresAt) {
+    try {
+      const d = new Date(expiresAt);
+      deadlineStr = d.toLocaleString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Europe/London' });
+    } catch { deadlineStr = ''; }
+  }
+  return {
+    subject: `A spot just opened — ${offerTitle} at ${businessName}`,
+    html: wrapEmail(`
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#128276;</div>
+      </div>
+      ${heading('Your spot is ready!')}
+      ${subtext(`Great news, ${escapeHtml(name)} — a slot just opened up.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">at ${escapeHtml(businessName)}</p>
+      `)}
+      ${p('You were next on the waitlist and this spot is yours — but you need to claim it before it moves to the next person.')}
+      ${deadlineStr ? infoBox(`
+        <div style="text-align: center;">
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: ${TERRA}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">Claim by</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0;">${escapeHtml(deadlineStr)}</p>
+        </div>
+      `) : ''}
+      ${btn('Claim Now', APP_URL)}
+    `),
+  };
+}
+
 function genericNotificationEmail(name: string, message: string): { subject: string; html: string } {
   return {
     subject: `Nayba — ${message.slice(0, 60)}`,
@@ -550,6 +585,9 @@ Deno.serve(async (req: Request) => {
         break;
       case 'reel_submitted_creator':
         email = reelSubmittedCreatorEmail(recipientName, meta);
+        break;
+      case 'slot_ready':
+        email = slotReadyEmail(recipientName, meta);
         break;
       default:
         email = genericNotificationEmail(recipientName, notification.message);
