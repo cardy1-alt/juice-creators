@@ -2095,7 +2095,12 @@ export default function CreatorApp() {
             <div style={{ background: 'var(--shell)' }}>
               {/* Header */}
               <div style={{ padding: '14px 20px 0' }}>
-                <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 16px' }}>Passes</h1>
+                <div className="flex items-center gap-3 mb-4">
+                  <button onClick={() => setView('offers')} className="p-1 -ml-1">
+                    <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
+                  </button>
+                  <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: 'var(--ink)', letterSpacing: '-0.03em', margin: 0 }}>Passes</h1>
+                </div>
                 {/* Pill toggle */}
                 <div style={{ display: 'flex', background: 'var(--card)', borderRadius: 999, padding: 3, marginBottom: 16 }}>
                   {(['active', 'past'] as const).map(section => {
