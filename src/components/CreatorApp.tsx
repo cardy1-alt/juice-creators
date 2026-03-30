@@ -7,7 +7,7 @@ import QRCodeDisplay from './QRCodeDisplay';
 import CreatorOnboarding from './CreatorOnboarding';
 import DisputeModal from './DisputeModal';
 import LevelBadge from './LevelBadge';
-import { getCategorySolidColor, getCategoryPastelBg, getCategoryPastelIcon, CategoryIcon } from '../lib/categories';
+import { getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import { getInitials } from '../lib/avatar';
 import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail, sendReelSubmittedCreatorEmail } from '../lib/notifications';
@@ -111,17 +111,17 @@ interface Notification {
 
 function StatusPill({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    active: 'bg-[var(--terra)] text-white',
-    claimed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
+    active: 'bg-[#F5C4A0] text-[var(--ink)]',
+    claimed: 'bg-[#F5C4A0] text-[var(--ink)]',
     queued: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
     slot_ready: 'bg-[rgba(196,103,74,0.15)] text-[var(--terra)]',
-    redeemed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
-    visited: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
-    reel_due: 'bg-[rgba(232,160,32,0.12)] text-[var(--ochre)]',
-    submitted: 'bg-[var(--terra-10)] text-[var(--terra)]',
-    expired: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-35)]',
-    overdue: 'bg-[var(--peach)] text-[var(--terra)] border border-[var(--terra-15)]',
-    completed: 'bg-[var(--terra-10)] text-[var(--terra)]',
+    redeemed: 'bg-[rgba(138,174,146,0.2)] text-[#5A7A5E]',
+    visited: 'bg-[rgba(138,174,146,0.2)] text-[#5A7A5E]',
+    reel_due: 'bg-[var(--terra)] text-white',
+    submitted: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
+    expired: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
+    overdue: 'bg-[rgba(34,34,34,0.35)] text-white',
+    completed: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
     disputed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
   };
   const labels: Record<string, string> = {
@@ -183,6 +183,7 @@ export default function CreatorApp() {
   const [activePassIdx, setActivePassIdx] = useState(0);
   const [showReelCelebration, setShowReelCelebration] = useState<{ offerName: string; businessName: string } | null>(null);
   const [passesSection, setPassesSection] = useState<'active' | 'past'>('active');
+  const [passesSearch, setPassesSearch] = useState('');
   const [passDetailClaim, setPassDetailClaim] = useState<Claim | null>(null);
   const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
   const [editName, setEditName] = useState('');
@@ -361,11 +362,18 @@ export default function CreatorApp() {
   const joinWaitlist = async (offerId: string) => {
     setWaitlistLoading(offerId);
     try {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('waitlist')
-        .insert({ offer_id: offerId, creator_id: userProfile.id });
+        .insert({ offer_id: offerId, creator_id: userProfile.id })
+        .select('id')
+        .single();
       if (error) throw error;
-      await fetchWaitlist();
+      // Optimistically update UI immediately
+      if (data) {
+        setWaitlistedOffers(prev => ({ ...prev, [offerId]: { id: data.id, position: 1 } }));
+      }
+      // Then fetch accurate position in background
+      fetchWaitlist();
     } catch (err: any) {
       setClaimError(err?.code === '23505' ? 'You are already on this waitlist.' : 'Failed to join waitlist. Please try again.');
     } finally {
@@ -442,6 +450,17 @@ export default function CreatorApp() {
     }
   };
 
+  const markAllNotificationsRead = async () => {
+    const unread = notifications.filter(n => !n.read);
+    if (unread.length === 0) return;
+    try {
+      await supabase.from('notifications').update({ read: true }).eq('user_id', userProfile.id).eq('read', false);
+      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    } catch (err: any) {
+      console.error('Failed to mark all notifications read:', err.message);
+    }
+  };
+
   const fetchOffers = async () => {
     setOffersLoading(true);
     const { data, error } = await supabase
@@ -508,13 +527,15 @@ export default function CreatorApp() {
       prevClaimStatusesRef.current = Object.fromEntries(newClaims.map(c => [c.id, c.status]));
 
       setClaims(newClaims);
-      const active = newClaims.filter(c =>
-        c.status === 'active' ||
-        c.status === 'claimed' ||
-        c.status === 'visited' ||
-        c.status === 'reel_due' ||
-        (c.status === 'redeemed' && !c.reel_url)
-      );
+      const active = newClaims.filter(c => {
+        const isActive = c.status === 'active' || c.status === 'claimed' || c.status === 'visited' || c.status === 'reel_due' || (c.status === 'redeemed' && !c.reel_url);
+        if (!isActive) return false;
+        // Exclude overdue (reel deadline passed)
+        if (c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()) return false;
+        // Exclude expired
+        if (c.status === 'expired') return false;
+        return true;
+      });
       setActiveClaims(active);
       if (selectedClaim && !active.find(c => c.id === selectedClaim.id)) {
         setSelectedClaim(active[0] || null);
@@ -576,7 +597,7 @@ export default function CreatorApp() {
     setReelError(null);
 
     if (selectedClaim.reel_due_at && new Date() > new Date(selectedClaim.reel_due_at)) {
-      setReelError('The deadline for this reel has passed. Please contact support if you need an extension.');
+      setReelError('The posting deadline has passed. Contact us if you think this is an error.');
       return false;
     }
 
@@ -700,7 +721,13 @@ export default function CreatorApp() {
   }
 
   // Compute past claims for the Past section
-  const pastClaims = claims.filter(c => c.businesses && c.offers && (c.status === 'completed' || c.status === 'submitted' || c.status === 'expired' || c.status === 'disputed'));
+  const pastClaims = claims.filter(c => {
+    if (!c.businesses || !c.offers) return false;
+    if (c.status === 'completed' || c.status === 'submitted' || c.status === 'expired' || c.status === 'disputed') return true;
+    // Overdue: redeemed but reel deadline passed
+    if (c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()) return true;
+    return false;
+  });
 
   const getActiveUrgency = () => {
     if (activeClaims.length === 0) return 'none';
@@ -964,7 +991,7 @@ export default function CreatorApp() {
                         </div>
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16, color: isOverdue ? 'var(--terra)' : 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
                           {isOverdue
-                            ? 'This reel was not submitted in time and counts as a strike. Contact support if you need help.'
+                            ? 'The posting deadline has passed. Contact us if you think this is an error.'
                             : 'Post your reel within this window — it must clearly feature the business.'}
                         </p>
                       </div>
@@ -1147,8 +1174,8 @@ export default function CreatorApp() {
           <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col overflow-y-auto">
             {/* Hero — full-bleed image */}
             <div className="relative" style={{ minHeight: 300, flexShrink: 0 }}>
-              <div style={{ width: '100%', height: 300, background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+              <div style={{ width: '100%', height: 300, background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: '#C4674A' }} />
                 {offer.offer_photo_url && (
                   <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 )}
@@ -1327,20 +1354,30 @@ export default function CreatorApp() {
                 </button>
               ) : waitlistedOffers[offer.id] ? (
                 <div>
+                  <button
+                    className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#8AAE92', color: 'white', border: 'none', cursor: 'default' }}
+                    disabled
+                  >
+                    <Check size={16} strokeWidth={2} /> You're on the list
+                  </button>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.5 }}>
+                    We'll notify you when a spot opens at {offer.businesses.name}.
+                  </p>
                   {waitlistConfirmLeave === offer.id ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2" style={{ marginTop: 8 }}>
                       <button
                         onClick={() => leaveWaitlist(offer.id)}
                         disabled={waitlistLoading === offer.id}
-                        className="flex-1 py-[14px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
+                        className="flex-1 py-[10px] rounded-[999px] text-center"
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
                       >
                         {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
                       </button>
                       <button
                         onClick={() => setWaitlistConfirmLeave(null)}
-                        className="flex-1 py-[14px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'rgba(34,34,34,0.5)', background: 'transparent', border: 'none' }}
+                        className="flex-1 py-[10px] rounded-[999px] text-center"
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'rgba(34,34,34,0.5)', background: 'transparent', border: 'none' }}
                       >
                         Cancel
                       </button>
@@ -1348,22 +1385,27 @@ export default function CreatorApp() {
                   ) : (
                     <button
                       onClick={() => setWaitlistConfirmLeave(offer.id)}
-                      className="w-full py-[14px] rounded-[999px] text-center"
-                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-35)', background: 'transparent', border: 'none', cursor: 'pointer' }}
+                      className="w-full py-[10px] text-center"
+                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)', background: 'transparent', border: 'none', cursor: 'pointer', marginTop: 4 }}
                     >
                       Leave the list
                     </button>
                   )}
                 </div>
               ) : !isUnlimited && full ? (
-                <button
-                  onClick={() => joinWaitlist(offer.id)}
-                  disabled={waitlistLoading === offer.id}
-                  className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                >
-                  {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
-                </button>
+                <div>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 8px', lineHeight: 1.5 }}>
+                    This collab is full right now. Join the list and we'll notify you when a spot opens.
+                  </p>
+                  <button
+                    onClick={() => joinWaitlist(offer.id)}
+                    disabled={waitlistLoading === offer.id}
+                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
+                  >
+                    {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
+                  </button>
+                </div>
               ) : !isUnlimited ? (
                 <button
                   onClick={() => joinWaitlist(offer.id)}
@@ -1501,7 +1543,7 @@ export default function CreatorApp() {
 
                 {/* ── Your passes — compact banner (hidden during search) ── */}
                 {!searchTerm && activeClaims.length > 0 && (() => {
-                  const filtered = activeClaims.filter(c => c.businesses && c.offers);
+                  const filtered = activeClaims.filter(c => c.businesses && c.offers && !(c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()));
                   if (filtered.length === 0) return null;
                   const sorted = [...filtered].sort((a, b) => new Date(a.qr_expires_at).getTime() - new Date(b.qr_expires_at).getTime());
                   const urgentClaim = sorted[0];
@@ -1581,8 +1623,8 @@ export default function CreatorApp() {
                           style={{ cursor: 'pointer', position: 'relative' }}
                         >
                           <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                            <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                              <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                            <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                              <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                               {offer.offer_photo_url && (
                                 <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                               )}
@@ -1636,8 +1678,8 @@ export default function CreatorApp() {
                           >
                             {/* Image area */}
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
                                   <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                 )}
@@ -1721,8 +1763,8 @@ export default function CreatorApp() {
                             }}
                           >
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
                                   <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                 )}
@@ -1800,8 +1842,8 @@ export default function CreatorApp() {
                             }}
                           >
                             <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
                                   <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                 )}
@@ -1884,8 +1926,8 @@ export default function CreatorApp() {
                               }}
                             >
                               <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(offer.businesses.category), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: getCategoryPastelIcon(offer.businesses.category) }} />
+                                <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                                   {offer.offer_photo_url && (
                                     <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                   )}
@@ -1962,7 +2004,12 @@ export default function CreatorApp() {
             return (
             <div className="px-[20px] pt-5">
               <div className="flex items-center justify-between mb-5">
-                <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Saved</h1>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setView('offers')} className="p-1 -ml-1">
+                    <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
+                  </button>
+                  <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Saved</h1>
+                </div>
                 <span className="text-[15px] text-[var(--ink-60)]">{matchedSaved.length} saved</span>
               </div>
 
@@ -2046,7 +2093,7 @@ export default function CreatorApp() {
                 </div>
               </div>
 
-              {/* Active section — image card list */}
+              {/* Active section — 2 column grid with search */}
               {passesSection === 'active' && (
                 <div style={{ padding: '0 20px' }}>
                   {activeClaims.filter(c => c.businesses && c.offers).length === 0 ? (
@@ -2063,21 +2110,60 @@ export default function CreatorApp() {
                       </button>
                     </div>
                   ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                      {activeClaims.filter(c => c.businesses && c.offers).map((claim) => {
+                    <>
+                      {/* Search bar */}
+                      <div style={{ position: 'relative', marginBottom: 14 }}>
+                        <Search size={16} strokeWidth={1.5} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,34,34,0.35)' }} />
+                        <input
+                          value={passesSearch}
+                          onChange={(e) => setPassesSearch(e.target.value)}
+                          placeholder="Search passes..."
+                          className="w-full focus:outline-none"
+                          style={{ background: 'var(--card)', borderRadius: 999, padding: '11px 14px 11px 38px', fontSize: 15, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)', border: 'none' }}
+                        />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                      {(() => {
+                        const filtered = activeClaims
+                          .filter(c => c.businesses && c.offers)
+                          .filter(c => {
+                            if (!passesSearch.trim()) return true;
+                            const q = passesSearch.toLowerCase();
+                            const title = (c.snapshot_generated_title || c.offers.generated_title || c.offers.description || '').toLowerCase();
+                            const biz = (c.businesses?.name || '').toLowerCase();
+                            return title.includes(q) || biz.includes(q);
+                          })
+                          .sort((a, b) => {
+                            // Sort: reel_due first, then visited, then claimed
+                            const urgency = (c: typeof a) => {
+                              const isReelDue = !!(c.redeemed_at && !c.reel_url);
+                              const isVisited = c.status === 'redeemed' || c.status === 'visited';
+                              if (isReelDue) return 0;
+                              if (isVisited) return 1;
+                              return 2;
+                            };
+                            const diff = urgency(a) - urgency(b);
+                            if (diff !== 0) return diff;
+                            // Within group, sort by deadline ascending (most urgent first)
+                            const aTime = a.reel_due_at ? new Date(a.reel_due_at).getTime() : a.qr_expires_at ? new Date(a.qr_expires_at).getTime() : Infinity;
+                            const bTime = b.reel_due_at ? new Date(b.reel_due_at).getTime() : b.qr_expires_at ? new Date(b.qr_expires_at).getTime() : Infinity;
+                            return aTime - bTime;
+                          });
+                        return filtered.map((claim) => {
                         const claimTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
                         const bizName = claim.businesses?.name || '';
                         const bizCategory = claim.businesses?.category || '';
                         const isClaimed = claim.status === 'active' && !claim.redeemed_at;
                         const isReelDue = !!(claim.redeemed_at && !claim.reel_url);
                         const isVisited = claim.status === 'redeemed' || claim.status === 'visited';
-                        const statusColor = isClaimed ? 'var(--terra)' : isReelDue ? '#F5C4A0' : isVisited ? '#8AAE92' : 'var(--terra)';
-                        const statusLabel = isClaimed ? 'Active' : isReelDue ? 'Reel due' : isVisited ? 'Visited' : 'Active';
+                        const statusColor = isReelDue ? 'var(--terra)' : isVisited ? '#8AAE92' : isClaimed ? '#F5C4A0' : '#F5C4A0';
+                        const statusTextColor = isReelDue ? 'white' : 'var(--ink)';
+                        const statusLabel = isReelDue ? 'Reel due' : isVisited ? 'Visited' : 'Active';
                         // Timer for reel due
                         const timerLabel = (() => {
                           if (!isReelDue || !claim.reel_due_at) return '';
                           const diff = new Date(claim.reel_due_at).getTime() - Date.now();
-                          if (diff <= 0) return 'Overdue';
+                          if (diff <= 0) return '';
                           const hrs = Math.floor(diff / (1000 * 60 * 60));
                           const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                           return `${hrs}h ${mins}m`;
@@ -2091,10 +2177,9 @@ export default function CreatorApp() {
                           >
                             {/* Image card */}
                             <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden' }}>
-                              {/* Photo or gradient fallback */}
-                              <div style={{ height: 180, position: 'relative' }}>
-                                <div style={{ width: '100%', height: '100%', background: getCategoryPastelBg(bizCategory), display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                  <CategoryIcon category={bizCategory} className="w-[32px] h-[32px]" style={{ color: getCategoryPastelIcon(bizCategory) }} />
+                              <div style={{ height: 140, position: 'relative' }}>
+                                <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                                  <CategoryIcon category={bizCategory} className="w-[28px] h-[28px]" style={{ color: 'var(--terra)' }} />
                                   {claim.offers?.offer_photo_url && (
                                     <img src={claim.offers.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
                                   )}
@@ -2103,17 +2188,17 @@ export default function CreatorApp() {
                                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.6) 0%, rgba(34,34,34,0) 50%)', pointerEvents: 'none' }} />
                                 {/* Status pill bottom left */}
                                 <span style={{
-                                  position: 'absolute', bottom: 10, left: 10, borderRadius: 999, padding: '4px 10px',
-                                  fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11,
-                                  background: statusColor, color: isClaimed ? 'white' : 'var(--ink)',
+                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '3px 8px',
+                                  fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
+                                  background: statusColor, color: statusTextColor,
                                 }}>
                                   {statusLabel}
                                 </span>
                                 {/* Timer pill bottom right */}
                                 {isReelDue && timerLabel && (
                                   <span style={{
-                                    position: 'absolute', bottom: 10, right: 10, borderRadius: 999, padding: '4px 10px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11,
+                                    position: 'absolute', bottom: 8, right: 8, borderRadius: 999, padding: '3px 8px',
+                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
                                     background: '#F5C4A0', color: 'var(--ink)',
                                   }}>
                                     {timerLabel}
@@ -2122,12 +2207,14 @@ export default function CreatorApp() {
                               </div>
                             </div>
                             {/* Text below */}
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: '8px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{bizName}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
+                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{bizName}</p>
                           </button>
                         );
-                      })}
+                      });
+                      })()}
                     </div>
+                    </>
                   )}
                 </div>
               )}
@@ -2144,7 +2231,9 @@ export default function CreatorApp() {
                   ) : (
                     <div className="space-y-[12px]">
                       {pastClaims.map((claim) => {
-                        const leftBorderColor = claim.status === 'completed' || claim.status === 'submitted' ? '#8AAE92' : claim.status === 'expired' ? 'rgba(34,34,34,0.15)' : claim.status === 'disputed' ? '#F5C4A0' : 'rgba(34,34,34,0.15)';
+                        const isOverdue = !!(claim.redeemed_at && !claim.reel_url && claim.reel_due_at && new Date(claim.reel_due_at) < new Date());
+                        const displayStatus = isOverdue ? 'overdue' : claim.status;
+                        const leftBorderColor = displayStatus === 'completed' || displayStatus === 'submitted' ? '#8AAE92' : displayStatus === 'overdue' ? 'rgba(34,34,34,0.35)' : displayStatus === 'expired' ? 'rgba(34,34,34,0.15)' : displayStatus === 'disputed' ? '#F5C4A0' : 'rgba(34,34,34,0.15)';
                         return (
                           <div
                             key={claim.id}
@@ -2156,7 +2245,7 @@ export default function CreatorApp() {
                               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
                             </div>
                             <div style={{ flexShrink: 0, marginLeft: 12 }}>
-                              <StatusPill status={claim.status} />
+                              <StatusPill status={displayStatus} />
                             </div>
                           </div>
                         );
@@ -2323,7 +2412,7 @@ export default function CreatorApp() {
                           if (isOverdue) {
                             return (
                               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(196,103,74,0.12)', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
-                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)' }}>Deadline passed — this counts as a strike</span>
+                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)' }}>The posting deadline has passed</span>
                               </div>
                             );
                           }
@@ -2362,7 +2451,7 @@ export default function CreatorApp() {
                         </div>
                         ) : (
                         <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--terra)', margin: '0 auto', maxWidth: 280, lineHeight: 1.65 }}>
-                          Contact support if you believe this is an error.
+                          Contact us if you think this is an error.
                         </p>
                         )}
                       </div>
@@ -2442,7 +2531,12 @@ export default function CreatorApp() {
 
           {/* -- PROFILE -- */}
           {view === 'profile' && (
-            <div className="px-[20px] pt-8">
+            <div className="px-[20px] pt-5">
+              <div className="mb-3">
+                <button onClick={() => setView('offers')} className="p-1 -ml-1">
+                  <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
+                </button>
+              </div>
               {isPendingApproval && (
                 <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(34,34,34,0.04)' }}>
                   <Clock size={28} strokeWidth={1.5} className="text-[var(--ink-60)] mx-auto mb-2.5" />
@@ -2501,18 +2595,17 @@ export default function CreatorApp() {
                           )}
                         </div>
                         <div className="flex items-center gap-[10px] mt-[6px]">
-                          <button onClick={copyCode} className="flex items-center gap-1 text-[14px] font-semibold text-[var(--ink-35)]">
-                            {userProfile.code}
-                            {copiedCode ? (
-                              <span className="text-[var(--ink)] text-[13px]">Copied!</span>
-                            ) : (
-                              <Copy size={12} strokeWidth={1.5} />
-                            )}
-                          </button>
                           {userProfile.instagram_handle && (
-                            <span className="flex items-center gap-1 text-[14px] text-[var(--ink-35)]">
+                            <a
+                              href={`https://instagram.com/${userProfile.instagram_handle.replace(/^@/, '')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] transition-colors"
+                              style={{ textDecoration: 'none' }}
+                            >
                               <AtSign size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
-                            </span>
+                              <ExternalLink size={10} strokeWidth={1.5} />
+                            </a>
                           )}
                         </div>
                       </div>
@@ -2533,6 +2626,18 @@ export default function CreatorApp() {
                         <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
                         <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Rating</p>
                       </div>
+                    </div>
+
+                    {/* Ref code — small at bottom of card */}
+                    <div className="flex items-center justify-center gap-1 mt-[12px] pt-[12px] border-t border-[var(--ink-08)]">
+                      <button onClick={copyCode} className="flex items-center gap-1 text-[12px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>
+                        Ref: {userProfile.code}
+                        {copiedCode ? (
+                          <span className="text-[var(--terra)] text-[11px]">Copied!</span>
+                        ) : (
+                          <Copy size={10} strokeWidth={1.5} />
+                        )}
+                      </button>
                     </div>
                   </div>
 
@@ -2597,7 +2702,7 @@ export default function CreatorApp() {
                       <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
                     </button>
                     <button
-                      onClick={() => setProfileSubView('alerts')}
+                      onClick={() => { setProfileSubView('alerts'); markAllNotificationsRead(); }}
                       className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
                     >
                       <div className="flex items-center gap-[12px]">
@@ -2668,12 +2773,12 @@ export default function CreatorApp() {
                           key={notif.id}
                           onClick={() => !notif.read && markNotificationRead(notif.id)}
                           className="w-full text-left transition-all"
-                          style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: 16, padding: '14px 16px' }}
+                          style={{ background: 'var(--card)', borderRadius: 16, padding: '14px 16px' }}
                         >
                           <div className="flex items-start gap-3">
                             <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'var(--ink-08)' : 'var(--terra)', flexShrink: 0, marginTop: 4 }} />
                             <div className="flex-1 min-w-0">
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message}</p>
+                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message.replace(/\b[a-z]+-[a-z]+(-[a-z]+)*/g, (slug: string) => slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</p>
                               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', marginTop: 4, margin: '4px 0 0' }}>{formatDate(notif.created_at)}</p>
                             </div>
                           </div>
