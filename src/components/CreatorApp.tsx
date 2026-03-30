@@ -1648,7 +1648,7 @@ export default function CreatorApp() {
                           onClick={() => setExpandedOffer(offer.id)}
                           style={{ cursor: 'pointer', position: 'relative' }}
                         >
-                          <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                          <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
                             <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                               <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                               {offer.offer_photo_url && (
@@ -1703,7 +1703,7 @@ export default function CreatorApp() {
                             }}
                           >
                             {/* Image area */}
-                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
                               <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                                 <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
@@ -1788,7 +1788,7 @@ export default function CreatorApp() {
                               cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
                               <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                                 <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
@@ -1867,7 +1867,7 @@ export default function CreatorApp() {
                               cursor: 'pointer', position: 'relative',
                             }}
                           >
-                            <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
                               <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                                 <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                                 {offer.offer_photo_url && (
@@ -1951,7 +1951,7 @@ export default function CreatorApp() {
                                 cursor: 'pointer', position: 'relative',
                               }}
                             >
-                              <div style={{ position: 'relative', height: 180, borderRadius: 12, overflow: 'hidden' }}>
+                              <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
                                 <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
                                   <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
                                   {offer.offer_photo_url && (
