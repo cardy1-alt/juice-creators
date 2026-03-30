@@ -6,7 +6,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const FROM_EMAIL = 'Nayba <hello@nayba.app>';
 const ADMIN_EMAIL = 'hello@nayba.app';
-const APP_URL = Deno.env.get('APP_URL') || 'https://nayba.vercel.app';
+const APP_URL = Deno.env.get('APP_URL') || 'https://app.nayba.app';
 
 function escapeHtml(str: string): string {
   return str
