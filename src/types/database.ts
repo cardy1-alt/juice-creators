@@ -14,6 +14,7 @@ export type Database = {
           address: string | null;
           bio: string | null;
           approved: boolean;
+          disapproved: boolean;
           is_live: boolean;
           logo_url: string | null;
           instagram_handle: string | null;
@@ -33,6 +34,7 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          disapproved?: boolean;
           is_live?: boolean;
           logo_url?: string | null;
           instagram_handle?: string | null;
@@ -52,6 +54,7 @@ export type Database = {
           address?: string | null;
           bio?: string | null;
           approved?: boolean;
+          disapproved?: boolean;
           is_live?: boolean;
           logo_url?: string | null;
           instagram_handle?: string | null;
@@ -116,6 +119,7 @@ export type Database = {
           code: string;
           email: string;
           approved: boolean;
+          disapproved: boolean;
           onboarding_complete: boolean;
           avatar_url: string | null;
           address: string | null;
@@ -141,6 +145,7 @@ export type Database = {
           code: string;
           email: string;
           approved?: boolean;
+          disapproved?: boolean;
           onboarding_complete?: boolean;
           avatar_url?: string | null;
           address?: string | null;
@@ -166,6 +171,7 @@ export type Database = {
           code?: string;
           email?: string;
           approved?: boolean;
+          disapproved?: boolean;
           onboarding_complete?: boolean;
           avatar_url?: string | null;
           address?: string | null;

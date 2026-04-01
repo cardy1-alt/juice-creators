@@ -11,9 +11,9 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   const badgeBase = "inline-flex items-center gap-1 text-[11px] rounded-[999px]" as const;
   const badgeStyle: React.CSSProperties = { fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, padding: '3px 10px' };
   if (type === 'approval') {
-    return status === 'approved'
-      ? <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><Check size={12} strokeWidth={1.5} /> Approved</span>
-      : <span className={`${badgeBase} bg-[var(--terra)] text-white`} style={badgeStyle}>Pending</span>;
+    if (status === 'approved') return <span className={`${badgeBase} bg-[var(--card)] text-[var(--ink)]`} style={badgeStyle}><Check size={12} strokeWidth={1.5} /> Approved</span>;
+    if (status === 'disapproved') return <span className={`${badgeBase} bg-[var(--ink-08)] text-[var(--ink-60)]`} style={badgeStyle}><X size={12} strokeWidth={1.5} /> Disapproved</span>;
+    return <span className={`${badgeBase} bg-[var(--terra)] text-white`} style={badgeStyle}>Pending</span>;
   }
   if (type === 'offer') {
     return status === 'live'
@@ -28,8 +28,8 @@ function StatusPill({ status, type = 'claim' }: { status: string; type?: 'claim'
   return <span className={`${badgeBase} ${styles[status] || 'bg-[var(--card)] text-[var(--ink-35)]'}`} style={badgeStyle}>{status}</span>;
 }
 
-interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; created_at: string; }
-interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; address?: string | null; bio?: string | null; logo_url?: string | null; onboarding_complete?: boolean; }
+interface Creator { id: string; name: string; instagram_handle: string; follower_count: string | null; email: string; code: string; approved: boolean; disapproved: boolean; created_at: string; }
+interface Business { id: string; name: string; slug: string; owner_email: string; category: string; region: string; approved: boolean; disapproved: boolean; is_live: boolean; instagram_handle: string | null; created_at: string; address?: string | null; bio?: string | null; logo_url?: string | null; onboarding_complete?: boolean; }
 interface OfferWithBusiness { id: string; business_id: string; description: string; offer_type: string | null; offer_item: string | null; generated_title: string | null; content_type: string | null; specific_ask: string | null; offer_photo_url: string | null; monthly_cap: number | null; is_live: boolean; businesses: { name: string; category: string }; }
 interface ClaimWithDetails { id: string; status: string; claimed_at: string; reel_url: string | null; creators: { name: string }; businesses: { name: string; category: string }; }
 
@@ -141,35 +141,73 @@ export default function AdminDashboard() {
     });
   };
 
-  const handleApproveCreator = async (id: string, approved: boolean) => {
+  const handleApproveCreator = async (id: string) => {
     try {
       setActionFeedback(null);
-      const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
+      const { error } = await supabase.from('creators').update({ approved: true, disapproved: false }).eq('id', id);
       if (error) throw error;
-      setActionFeedback({ type: 'success', text: `Creator ${approved ? 'approved' : 'denied'} successfully.` });
-      // Send approval/denial email (non-blocking)
-      if (approved) {
-        sendCreatorApprovedEmail(id).catch(() => {});
-      } else {
-        sendCreatorDeniedEmail(id).catch(() => {});
-      }
+      setActionFeedback({ type: 'success', text: 'Creator approved successfully.' });
+      sendCreatorApprovedEmail(id).catch(() => {});
       fetchAll();
     } catch (err: any) {
       setActionFeedback({ type: 'error', text: err.message || 'Failed to update creator.' });
     }
   };
-  const handleApproveBusiness = async (id: string, approved: boolean) => {
+  const handleDisapproveCreator = async (id: string) => {
     try {
       setActionFeedback(null);
-      const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
+      const { error } = await supabase.from('creators').update({ approved: false, disapproved: true }).eq('id', id);
       if (error) throw error;
-      setActionFeedback({ type: 'success', text: `Business ${approved ? 'approved' : 'denied'} successfully.` });
-      // Send approval/denial email (non-blocking)
-      if (approved) {
-        sendBusinessApprovedEmail(id).catch(() => {});
-      } else {
-        sendBusinessDeniedEmail(id).catch(() => {});
-      }
+      setActionFeedback({ type: 'success', text: 'Creator disapproved successfully.' });
+      sendCreatorDeniedEmail(id).catch(() => {});
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update creator.' });
+    }
+  };
+  const handleRevokeCreator = async (id: string) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('creators').update({ approved: false, disapproved: false }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: 'Creator approval revoked successfully.' });
+      sendCreatorDeniedEmail(id).catch(() => {});
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update creator.' });
+    }
+  };
+  const handleApproveBusiness = async (id: string) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('businesses').update({ approved: true, disapproved: false }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: 'Business approved successfully.' });
+      sendBusinessApprovedEmail(id).catch(() => {});
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update business.' });
+    }
+  };
+  const handleDisapproveBusiness = async (id: string) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('businesses').update({ approved: false, disapproved: true }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: 'Business disapproved successfully.' });
+      sendBusinessDeniedEmail(id).catch(() => {});
+      fetchAll();
+    } catch (err: any) {
+      setActionFeedback({ type: 'error', text: err.message || 'Failed to update business.' });
+    }
+  };
+  const handleRevokeBusiness = async (id: string) => {
+    try {
+      setActionFeedback(null);
+      const { error } = await supabase.from('businesses').update({ approved: false, disapproved: false }).eq('id', id);
+      if (error) throw error;
+      setActionFeedback({ type: 'success', text: 'Business approval revoked successfully.' });
+      sendBusinessDeniedEmail(id).catch(() => {});
       fetchAll();
     } catch (err: any) {
       setActionFeedback({ type: 'error', text: err.message || 'Failed to update business.' });
@@ -688,7 +726,7 @@ export default function AdminDashboard() {
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{creator.name}</span>
-                            <StatusPill status={creator.approved ? 'approved' : 'pending'} type="approval" />
+                            <StatusPill status={creator.approved ? 'approved' : creator.disapproved ? 'disapproved' : 'pending'} type="approval" />
                           </div>
                           <p className="text-[13px] text-[var(--ink-60)] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>@{creator.instagram_handle}</p>
                           <div className="flex items-center gap-4 mt-2">
@@ -698,14 +736,25 @@ export default function AdminDashboard() {
                             <span className="text-[13px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{claims.filter(c => c.creators.name === creator.name && c.reel_url).length} reels</span>
                           </div>
                         </div>
-                        <div className="flex-shrink-0">
-                          {!creator.approved ? (
-                            <button onClick={() => handleApproveCreator(creator.id, true)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                              <Check size={12} strokeWidth={1.5} /> Approve
-                            </button>
-                          ) : (
-                            <button onClick={() => handleApproveCreator(creator.id, false)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                        <div className="flex-shrink-0 flex items-center gap-2">
+                          {!creator.approved && !creator.disapproved && (
+                            <>
+                              <button onClick={() => handleApproveCreator(creator.id)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                                <Check size={12} strokeWidth={1.5} /> Approve
+                              </button>
+                              <button onClick={() => handleDisapproveCreator(creator.id)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                                <X size={12} strokeWidth={1.5} /> Disapprove
+                              </button>
+                            </>
+                          )}
+                          {creator.approved && (
+                            <button onClick={() => handleRevokeCreator(creator.id)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                               <X size={12} strokeWidth={1.5} /> Revoke
+                            </button>
+                          )}
+                          {creator.disapproved && (
+                            <button onClick={() => handleApproveCreator(creator.id)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                              <Check size={12} strokeWidth={1.5} /> Approve
                             </button>
                           )}
                         </div>
@@ -769,7 +818,7 @@ export default function AdminDashboard() {
                           <div className="min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
                               <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{business.name}</span>
-                              <StatusPill status={business.approved ? 'approved' : 'pending'} type="approval" />
+                              <StatusPill status={business.approved ? 'approved' : business.disapproved ? 'disapproved' : 'pending'} type="approval" />
                             </div>
                             <p className="text-[13px] text-[var(--ink-60)] mt-0.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>{business.region?.replace(/-/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase())}</p>
                           </div>
@@ -816,13 +865,24 @@ export default function AdminDashboard() {
                         >
                           {REGIONS.map(r => <option key={r} value={r}>{r}</option>)}
                         </select>
-                        {!business.approved ? (
-                          <button onClick={() => handleApproveBusiness(business.id, true)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
-                            <Check size={12} strokeWidth={1.5} /> Approve
-                          </button>
-                        ) : (
-                          <button onClick={() => handleApproveBusiness(business.id, false)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                        {!business.approved && !business.disapproved && (
+                          <>
+                            <button onClick={() => handleApproveBusiness(business.id)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                              <Check size={12} strokeWidth={1.5} /> Approve
+                            </button>
+                            <button onClick={() => handleDisapproveBusiness(business.id)} className="inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                              <X size={12} strokeWidth={1.5} /> Disapprove
+                            </button>
+                          </>
+                        )}
+                        {business.approved && (
+                          <button onClick={() => handleRevokeBusiness(business.id)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-[var(--ink-60)] font-bold text-[13px] border-[1.5px] border-[var(--ink-08)] hover:border-[var(--ink-15)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
                             <X size={12} strokeWidth={1.5} /> Revoke
+                          </button>
+                        )}
+                        {business.disapproved && (
+                          <button onClick={() => handleApproveBusiness(business.id)} className="ml-auto inline-flex items-center gap-1 px-3 py-1.5 rounded-[999px] text-white font-bold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-all" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}>
+                            <Check size={12} strokeWidth={1.5} /> Approve
                           </button>
                         )}
                       </div>
