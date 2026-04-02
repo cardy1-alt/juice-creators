@@ -121,7 +121,7 @@ export default function AdminBrandsTab() {
             <h2 className="text-[18px] font-semibold text-[var(--ink)]">Create Brand</h2>
             <button onClick={() => setShowCreate(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
           </div>
-          <form onSubmit={handleCreate} className="grid grid-cols-2 gap-4">
+          <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className={labelCls}>Brand name *</label>
               <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className={inputCls} required />
@@ -168,8 +168,8 @@ export default function AdminBrandsTab() {
         </div>
       )}
 
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-        <table className="w-full">
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+        <table className="w-full min-w-[700px]">
           <thead><tr>
             <th className={thCls}>Name</th><th className={thCls}>Category</th><th className={thCls}>Region</th>
             <th className={thCls}>Email</th><th className={thCls}>Instagram</th><th className={thCls}>Campaigns</th>

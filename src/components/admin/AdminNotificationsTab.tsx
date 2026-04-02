@@ -107,7 +107,7 @@ export default function AdminNotificationsTab() {
       {/* Send campaign notification */}
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-6 mb-6">
         <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
-        <div className="grid grid-cols-2 gap-4 mb-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1.5">Select campaign</label>
             <select value={selectedCampaignId} onChange={e => { setSelectedCampaignId(e.target.value); setPreview(false); }} className={inputCls}>
@@ -159,11 +159,11 @@ export default function AdminNotificationsTab() {
       </div>
 
       {/* Notification log */}
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
         <div className="px-4 py-3 border-b border-[var(--ink-10)]">
           <h3 className="text-[14px] font-semibold text-[var(--ink)]">Sent Notifications</h3>
         </div>
-        <table className="w-full">
+        <table className="w-full min-w-[500px]">
           <thead><tr>
             <th className={thCls}>Sent</th><th className={thCls}>Type</th><th className={thCls}>Message</th>
           </tr></thead>

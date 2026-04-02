@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
   LayoutDashboard, Users, ClipboardList, Film, BarChart3,
-  LogOut, ExternalLink, Mail, Check, Clock, Eye
+  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X
 } from 'lucide-react';
 
 // ─── Types ───
@@ -77,6 +77,12 @@ export default function BusinessPortal() {
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [activeTab, setActiveTab] = useState<Tab>('summary');
   const [loading, setLoading] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  const handleTabClick = (tab: Tab) => {
+    setActiveTab(tab);
+    setSidebarOpen(false);
+  };
 
   useEffect(() => { if (user) fetchBrand(); }, [user]);
 
@@ -141,7 +147,7 @@ export default function BusinessPortal() {
   if (campaigns.length === 0) {
     return (
       <div className="flex min-h-screen bg-[var(--shell)]">
-        <aside className="w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex flex-col flex-shrink-0">
+        <aside className="hidden md:flex w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex-col flex-shrink-0">
           <div className="px-5 py-5 border-b border-[var(--border)]">
             <Logo size={28} variant="wordmark" />
             <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
@@ -153,7 +159,7 @@ export default function BusinessPortal() {
             </button>
           </div>
         </aside>
-        <main className="flex-1 flex items-center justify-center p-8">
+        <main className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div className="text-center max-w-md">
             <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">Your campaigns will appear here</p>
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Contact nayba to get started with your first campaign.</p>
@@ -168,11 +174,25 @@ export default function BusinessPortal() {
 
   return (
     <div className="flex min-h-screen bg-[var(--shell)]">
-      {/* Sidebar */}
-      <aside className="w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex flex-col flex-shrink-0">
-        <div className="px-5 py-5 border-b border-[var(--border)]">
-          <Logo size={28} variant="wordmark" />
-          <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar — hidden on mobile by default, overlay when open */}
+      <aside className={`
+        w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex flex-col flex-shrink-0
+        fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="px-5 py-5 border-b border-[var(--border)] flex items-center justify-between">
+          <div>
+            <Logo size={28} variant="wordmark" />
+            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+          </div>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--ink-35)] hover:text-[var(--ink)]">
+            <X size={20} />
+          </button>
         </div>
 
         {/* Campaign selector */}
@@ -189,7 +209,7 @@ export default function BusinessPortal() {
           {TABS.map(tab => {
             const active = activeTab === tab.key;
             return (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              <button key={tab.key} onClick={() => handleTabClick(tab.key)}
                 className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] font-medium mb-0.5 transition-colors ${active ? 'bg-[var(--terra-light)] text-[var(--terra)]' : 'text-[var(--ink-60)] hover:bg-[var(--shell)]'}`}>
                 <tab.icon size={18} strokeWidth={active ? 2 : 1.5} />
                 {tab.label}
@@ -206,7 +226,16 @@ export default function BusinessPortal() {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 p-8 overflow-auto">
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Mobile header */}
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-[var(--card)] border-b border-[var(--border)]">
+          <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
+            <Menu size={22} />
+          </button>
+          <Logo size={22} variant="wordmark" />
+        </div>
+
+        <main className="flex-1 p-4 md:p-8 overflow-auto">
         {/* Summary Tab */}
         {activeTab === 'summary' && campaign && (
           <div>
@@ -223,7 +252,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6">
               {[
                 { label: 'Applicants', value: applications.length },
                 { label: 'Selected', value: selectedCount },
@@ -277,8 +306,8 @@ export default function BusinessPortal() {
         {activeTab === 'selection' && (
           <div>
             <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Selection</h1>
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-              <table className="w-full">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+              <table className="w-full min-w-[700px]">
                 <thead><tr>
                   <th className={thCls}>Creator</th><th className={thCls}>Instagram</th>
                   <th className={thCls}>Completion</th><th className={thCls}>Level</th>
@@ -318,8 +347,8 @@ export default function BusinessPortal() {
             {applications.filter(a => a.status === 'selected' || a.status === 'confirmed').length > 0 && (
               <div className="mt-6">
                 <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-3">Confirmed Creators</h2>
-                <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-                  <table className="w-full">
+                <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+                  <table className="w-full min-w-[400px]">
                     <thead><tr>
                       <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>Status</th>
                     </tr></thead>
@@ -343,8 +372,8 @@ export default function BusinessPortal() {
         {activeTab === 'participation' && (
           <div>
             <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Participation</h1>
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-              <table className="w-full">
+            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+              <table className="w-full min-w-[700px]">
                 <thead><tr>
                   <th className={thCls}>Creator</th><th className={thCls}>Status</th>
                   <th className={thCls}>Perk Sent</th><th className={thCls}>Content Deadline</th>
@@ -390,7 +419,7 @@ export default function BusinessPortal() {
         {activeTab === 'content' && (
           <div>
             <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Content</h1>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
                 <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
@@ -418,7 +447,7 @@ export default function BusinessPortal() {
             <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Analytics</h1>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
                 <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Total Reach</p>
                 <p className="text-[28px] font-bold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
@@ -467,6 +496,7 @@ export default function BusinessPortal() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }

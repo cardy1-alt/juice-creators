@@ -156,7 +156,7 @@ export default function AdminCreatorsTab() {
               </div>
             </div>
           ) : (
-            <form onSubmit={handleCreateCreator} className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleCreateCreator} className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className={labelCls}>Display name *</label>
                 <input value={form.displayName} onChange={e => setForm(p => ({ ...p, displayName: e.target.value }))} className={inputCls} required />
@@ -196,11 +196,11 @@ export default function AdminCreatorsTab() {
 
       {/* Pending Approvals */}
       {pendingCreators.length > 0 && (
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden mb-6">
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto mb-6">
           <div className="px-4 py-3 border-b border-[var(--ink-10)]">
             <h3 className="text-[14px] font-semibold text-[var(--terra)]">Pending Approvals ({pendingCreators.length})</h3>
           </div>
-          <table className="w-full">
+          <table className="w-full min-w-[600px]">
             <thead><tr>
               <th className={thCls}>Name</th><th className={thCls}>Email</th><th className={thCls}>Instagram</th>
               <th className={thCls}>Joined</th><th className={thCls}>Actions</th>
@@ -226,8 +226,8 @@ export default function AdminCreatorsTab() {
       )}
 
       {/* All Creators */}
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-        <table className="w-full">
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+        <table className="w-full min-w-[800px]">
           <thead><tr>
             <th className={thCls}>Name</th><th className={thCls}>Instagram</th><th className={thCls}>City</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
