@@ -129,7 +129,7 @@ function CampaignForm({ brands, campaign, onSave, onCancel }: {
         <h2 className="text-[18px] font-semibold text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
         <button onClick={onCancel} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
       </div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Brand */}
         <div>
           <label className={labelCls}>Brand *</label>
@@ -391,7 +391,7 @@ function CampaignDetailPanel({ campaign, onClose, onRefresh }: {
               </div>
             </div>
           )}
-          <table className="w-full">
+          <div className="overflow-x-auto"><table className="w-full min-w-[800px]">
             <thead><tr>
               <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>Level</th>
               <th className={thCls}>Completion</th><th className={thCls}>Pitch</th><th className={thCls}>Applied</th>
@@ -426,13 +426,13 @@ function CampaignDetailPanel({ campaign, onClose, onRefresh }: {
                 <tr><td colSpan={8} className="py-8 text-center text-[14px] text-[var(--ink-35)]">No applicants yet</td></tr>
               )}
             </tbody>
-          </table>
+          </table></div>
         </div>
       )}
 
       {/* Participations */}
       {subTab === 'participations' && (
-        <table className="w-full">
+        <div className="overflow-x-auto"><table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Status</th><th className={thCls}>Perk Sent</th>
             <th className={thCls}>Reel URL</th><th className={thCls}>Reach</th><th className={thCls}>Likes</th>
@@ -475,12 +475,12 @@ function CampaignDetailPanel({ campaign, onClose, onRefresh }: {
               <tr><td colSpan={9} className="py-8 text-center text-[14px] text-[var(--ink-35)]">No participations yet</td></tr>
             )}
           </tbody>
-        </table>
+        </table></div>
       )}
 
       {/* Content */}
       {subTab === 'content' && (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {participations.filter(p => p.reel_url).map(p => (
             <div key={p.id} className="border border-[var(--border)] rounded-[var(--r-card)] p-4 bg-white">
               <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
@@ -560,8 +560,8 @@ export default function AdminCampaignsTab() {
           <Plus size={16} /> New Campaign
         </button>
       </div>
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
-        <table className="w-full">
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+        <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Brand</th><th className={thCls}>Title</th><th className={thCls}>Status</th>
             <th className={thCls}>City</th><th className={thCls}>Target</th><th className={thCls}>Applicants</th>

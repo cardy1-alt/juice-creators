@@ -82,7 +82,7 @@ export default function AdminAnalyticsTab() {
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Analytics</h1>
 
       {/* Stat cards */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
           <div key={s.label} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
             <div className="flex items-center gap-3 mb-2">
@@ -107,7 +107,7 @@ export default function AdminAnalyticsTab() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Creators by city */}
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
           <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-4">Creators by City</p>
