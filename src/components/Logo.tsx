@@ -8,10 +8,10 @@ function LogoIcon({ size }: { size: number }) {
   return (
     <span
       style={{
-        fontFamily: "'Corben', serif",
+        fontFamily: "'Instrument Sans', sans-serif",
         fontSize: size,
-        fontWeight: 400,
-        color: '#1A3C34',
+        fontWeight: 700,
+        color: 'var(--terra)',
         lineHeight: 1.1,
         letterSpacing: '-0.5px',
       }}
@@ -26,9 +26,9 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   return (
     <span
       style={{
-        fontFamily: "'Corben', serif",
+        fontFamily: "'Instrument Sans', sans-serif",
         fontSize: size,
-        fontWeight: 400,
+        fontWeight: 700,
         color,
         lineHeight: 1.1,
         letterSpacing: '-0.5px',
@@ -39,7 +39,7 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   );
 }
 
-export function Logo({ size = 40, color = "#1A3C34", variant = 'icon-word' }: LogoProps) {
+export function Logo({ size = 40, color = "var(--terra)", variant = 'icon-word' }: LogoProps) {
   if (variant === 'icon') {
     return <LogoIcon size={size} />;
   }

@@ -331,8 +331,8 @@ function App() {
   }
 
   const suspenseFallback = (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F6F3EE' }}>
-      <span style={{ fontFamily: "'Corben', cursive", color: '#1A3C34', fontSize: '2rem' }}>nayba</span>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--shell)' }}>
+      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, color: 'var(--terra)', fontSize: '2rem' }}>nayba</span>
     </div>
   );
 
