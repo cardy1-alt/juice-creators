@@ -7,7 +7,7 @@ import {
   Compass, Megaphone, Users, User, MoreHorizontal,
   Search, Clock, Gift, Film, Check, Lock, LogOut,
   ChevronRight, Settings, History, Link2, HelpCircle,
-  Instagram, ExternalLink, X, Image
+  AtSign, ExternalLink, X, Image
 } from 'lucide-react';
 
 // ─── Types ───
@@ -446,7 +446,7 @@ function ProfileTab({ profile }: { profile: CreatorProfile }) {
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <Instagram size={20} className="text-[var(--ink-60)]" />
+            <AtSign size={20} className="text-[var(--ink-60)]" />
             <div>
               <p className="text-[15px] font-medium text-[var(--ink)]">Instagram</p>
               <p className="text-[13px] text-[var(--ink-35)]">{profile.instagram_connected ? 'Connected' : 'Not connected'}</p>
