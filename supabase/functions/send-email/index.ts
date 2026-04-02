@@ -123,12 +123,12 @@ function creatorWelcomeEmail(name: string): { subject: string; html: string } {
     html: wrapEmail(`
       ${heading(`Welcome, ${escapeHtml(name)}!`)}
       ${subtext("We're really glad you're here.")}
-      ${p('Nayba connects you with local businesses who want to work with creators like you. Browse collabs from cafes, salons, gyms, and more in your area.')}
+      ${p('Nayba connects you with local brands who want to work with creators like you. Browse campaigns from cafes, wellness studios, food brands, and more in your area.')}
       ${p("<strong>Here's how it works:</strong>")}
       ${stepList([
-        'Claim a collab from a local business',
-        'Visit in person and show your QR pass',
-        'Post an Instagram Reel within 48 hours',
+        'Browse campaigns and express interest',
+        'Get selected and receive your perk',
+        'Post an Instagram Reel about your experience',
       ])}
       ${divider()}
       ${infoBox(`
@@ -140,6 +140,76 @@ function creatorWelcomeEmail(name: string): { subject: string; html: string } {
         </p>
       `)}
       ${btn('Complete Your Profile', APP_URL)}
+    `),
+  };
+}
+
+function campaignNotificationEmail(name: string, meta: Record<string, string>): { subject: string; html: string } {
+  const brandName = meta.brand_name || 'a local brand';
+  const campaignTitle = meta.campaign_title || 'a new campaign';
+  const campaignId = meta.campaign_id || '';
+  return {
+    subject: `New campaign just dropped — ${brandName}`,
+    html: wrapEmail(`
+      ${heading('New Campaign!')}
+      ${subtext(`Hey ${escapeHtml(name)}, there's a new opportunity for you.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 6px;">${escapeHtml(brandName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; color: ${MID}; margin: 0;">${escapeHtml(campaignTitle)}</p>
+      `)}
+      ${p("A brand in your area is looking for local creators. Check out the campaign, see what's on offer, and let them know you're interested.")}
+      ${p("Spots are limited — express your interest early.")}
+      ${btn('View Campaign', `${APP_URL}?campaign=${campaignId}`)}
+    `),
+  };
+}
+
+function creatorSelectedEmail(name: string, meta: Record<string, string>): { subject: string; html: string } {
+  const brandName = meta.brand_name || 'a local brand';
+  const campaignTitle = meta.campaign_title || 'a campaign';
+  const campaignId = meta.campaign_id || '';
+  const perkDescription = meta.perk_description || '';
+  return {
+    subject: `${brandName} wants you — you've been selected`,
+    html: wrapEmail(`
+      <div style="text-align: center; margin-bottom: 24px;">
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+      </div>
+      ${heading("You've been selected!")}
+      ${subtext(`Great news, ${escapeHtml(name)} — ${escapeHtml(brandName)} wants to work with you.`)}
+      ${infoBox(`
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(campaignTitle)}</p>
+        ${perkDescription ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">${escapeHtml(perkDescription)}</p>` : ''}
+      `)}
+      ${p("<strong>What happens next:</strong>")}
+      ${stepList([
+        'Confirm your spot in the app',
+        "You'll receive your perk from the brand",
+        'Post an Instagram Reel about your experience',
+      ])}
+      ${p("Don't keep them waiting — confirm now!")}
+      ${btn('Confirm Your Spot', `${APP_URL}?campaign=${campaignId}`)}
+    `),
+  };
+}
+
+function contentDeadlineReminderEmail(name: string, meta: Record<string, string>): { subject: string; html: string } {
+  const brandName = meta.brand_name || 'a local brand';
+  const campaignId = meta.campaign_id || '';
+  return {
+    subject: `Your Reel is due in 48 hours — ${brandName}`,
+    html: wrapEmail(`
+      ${heading('Your Reel is due soon')}
+      ${subtext(`Hey ${escapeHtml(name)}, just a friendly reminder.`)}
+      ${infoBox(`
+        <div style="text-align: center;">
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(brandName)}</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 600; color: ${TERRA}; margin: 0;">Due in 48 hours</p>
+        </div>
+      `)}
+      ${p("Post your Instagram Reel and submit the link in the nayba app. It doesn't need to be perfect — just authentic.")}
+      ${p("Missing the deadline affects your completion rate, which brands can see when choosing creators for future campaigns.")}
+      ${btn('Submit Your Reel', `${APP_URL}?campaign=${campaignId}`)}
     `),
   };
 }
@@ -588,6 +658,15 @@ Deno.serve(async (req: Request) => {
         break;
       case 'slot_ready':
         email = slotReadyEmail(recipientName, meta);
+        break;
+      case 'campaign_notification':
+        email = campaignNotificationEmail(recipientName, meta);
+        break;
+      case 'creator_selected':
+        email = creatorSelectedEmail(recipientName, meta);
+        break;
+      case 'content_deadline_reminder':
+        email = contentDeadlineReminderEmail(recipientName, meta);
         break;
       default:
         email = genericNotificationEmail(recipientName, notification.message);

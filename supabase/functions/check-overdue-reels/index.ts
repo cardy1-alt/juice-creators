@@ -1,8 +1,7 @@
 // Supabase Edge Function: check-overdue-reels
-// Run periodically via Supabase cron (pg_cron) or external scheduler.
-// 1. Sends a 24-hour reminder notification for reels due soon
-// 2. Sends a 6-hour warning notification for reels due very soon
-// 3. Marks claims as 'overdue' when reel_due_at has passed with no reel submitted
+// Run periodically via cron. Checks participations table for:
+// 1. Content deadline approaching (48 hours) — sends reminder
+// 2. Content deadline passed — marks participation as overdue
 //
 // Required env vars (auto-set by Supabase):
 //   SUPABASE_URL
@@ -17,128 +16,91 @@ Deno.serve(async (_req: Request) => {
   );
 
   const now = new Date();
-  const twentyFourHoursFromNow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-  const sixHoursFromNow = new Date(now.getTime() + 6 * 60 * 60 * 1000);
+  const fortyEightHoursFromNow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
 
   let remindersSent = 0;
+  let markedOverdue = 0;
 
-  // 1. Send 24-hour reel due reminder (uses the reel_due_reminder email template)
-  const { data: dueSoon24 } = await supabase
-    .from('claims')
-    .select('id, creator_id, business_id, reel_due_at, businesses(name)')
-    .eq('status', 'redeemed')
-    .is('reel_url', null)
-    .gt('reel_due_at', sixHoursFromNow.toISOString())
-    .lte('reel_due_at', twentyFourHoursFromNow.toISOString());
+  // 1. Send 48-hour content deadline reminder
+  // Find participations where content_deadline is within 48 hours and reel not submitted
+  const { data: dueSoon } = await supabase
+    .from('participations')
+    .select('id, creator_id, campaign_id, campaigns(title, content_deadline, businesses(name))')
+    .in('status', ['confirmed', 'visited'])
+    .is('reel_url', null);
 
-  if (dueSoon24 && dueSoon24.length > 0) {
-    for (const claim of dueSoon24) {
-      // Check if 24hr reminder already sent
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', claim.creator_id)
-        .eq('email_type', 'reel_due_reminder');
+  if (dueSoon && dueSoon.length > 0) {
+    for (const part of dueSoon) {
+      const campaign = (part as any).campaigns;
+      const contentDeadline = campaign?.content_deadline;
+      if (!contentDeadline) continue;
 
-      if (!count || count === 0) {
-        const businessName = (claim as any).businesses?.name || 'the business';
-        await supabase.from('notifications').insert({
-          user_id: claim.creator_id,
-          user_type: 'creator',
-          message: `Reminder: Your Reel for ${businessName} is due in less than 24 hours.`,
-          email_type: 'reel_due_reminder',
-          email_meta: {
-            business_name: businessName,
-            reel_due_at: claim.reel_due_at || '',
-          },
-        });
-        remindersSent++;
+      const deadline = new Date(contentDeadline);
+      // Only send reminder if deadline is within 48 hours and hasn't passed yet
+      if (deadline > now && deadline <= fortyEightHoursFromNow) {
+        // Check if reminder already sent for this participation
+        const { count } = await supabase
+          .from('notifications')
+          .select('*', { count: 'exact', head: true })
+          .eq('user_id', part.creator_id)
+          .eq('campaign_id', part.campaign_id)
+          .eq('email_type', 'content_deadline_reminder');
+
+        if (!count || count === 0) {
+          const brandName = campaign?.businesses?.name || 'the brand';
+          await supabase.from('notifications').insert({
+            user_id: part.creator_id,
+            user_type: 'creator',
+            message: `Your Reel for ${brandName} is due in less than 48 hours.`,
+            email_type: 'content_deadline_reminder',
+            campaign_id: part.campaign_id,
+            email_meta: {
+              brand_name: brandName,
+              campaign_id: part.campaign_id,
+              campaign_title: campaign?.title || '',
+            },
+          });
+          remindersSent++;
+        }
       }
     }
   }
 
-  // 2. Send 6-hour warning for reels due very soon
-  const { data: dueSoon6 } = await supabase
-    .from('claims')
-    .select('id, creator_id, business_id, reel_due_at, businesses(name)')
-    .eq('status', 'redeemed')
-    .is('reel_url', null)
-    .gt('reel_due_at', now.toISOString())
-    .lte('reel_due_at', sixHoursFromNow.toISOString());
+  // 2. Mark overdue participations
+  // Find participations where content_deadline has passed, reel not submitted, not already overdue/completed
+  const { data: allActive } = await supabase
+    .from('participations')
+    .select('id, creator_id, campaign_id, campaigns(content_deadline, businesses(name))')
+    .in('status', ['confirmed', 'visited'])
+    .is('reel_url', null);
 
-  let warningsSent = 0;
-  if (dueSoon6 && dueSoon6.length > 0) {
-    for (const claim of dueSoon6) {
-      const { count } = await supabase
-        .from('notifications')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', claim.creator_id)
-        .like('message', `%reel for ${(claim as any).businesses?.name}%due soon%`);
+  if (allActive && allActive.length > 0) {
+    for (const part of allActive) {
+      const contentDeadline = (part as any).campaigns?.content_deadline;
+      if (!contentDeadline) continue;
 
-      if (!count || count === 0) {
-        const businessName = (claim as any).businesses?.name || 'the business';
+      if (new Date(contentDeadline) <= now) {
+        await supabase
+          .from('participations')
+          .update({ status: 'overdue' })
+          .eq('id', part.id);
+
+        const brandName = (part as any).campaigns?.businesses?.name || 'the brand';
         await supabase.from('notifications').insert({
-          user_id: claim.creator_id,
+          user_id: part.creator_id,
           user_type: 'creator',
-          message: `Your reel for ${businessName} is due soon! Less than 6 hours remaining.`,
+          message: `Your Reel for ${brandName} is overdue. The content deadline has passed.`,
+          campaign_id: part.campaign_id,
         });
-        warningsSent++;
+        markedOverdue++;
       }
-    }
-  }
-
-  // 3. Mark overdue claims
-  const { data: overdue } = await supabase
-    .from('claims')
-    .select('id, creator_id, business_id, businesses(name)')
-    .eq('status', 'redeemed')
-    .is('reel_url', null)
-    .lte('reel_due_at', now.toISOString());
-
-  if (overdue && overdue.length > 0) {
-    const overdueIds = overdue.map(c => c.id);
-    await supabase
-      .from('claims')
-      .update({ status: 'overdue' })
-      .in('id', overdueIds);
-
-    for (const claim of overdue) {
-      const businessName = (claim as any).businesses?.name || 'the business';
-      await supabase.from('notifications').insert({
-        user_id: claim.creator_id,
-        user_type: 'creator',
-        message: `Your reel for ${businessName} is overdue. The 48-hour deadline has passed.`,
-      });
-    }
-  }
-
-  // 4. Handle expired waitlist promotion windows
-  // When a promoted creator doesn't claim within their 24-hour window,
-  // clear their promotion and promote the next person in line.
-  let promotionsExpired = 0;
-  const { data: expiredPromotions } = await supabase
-    .from('waitlist')
-    .select('id, offer_id')
-    .not('notified_at', 'is', null)
-    .lte('promotion_expires_at', now.toISOString());
-
-  if (expiredPromotions && expiredPromotions.length > 0) {
-    for (const entry of expiredPromotions) {
-      // Remove the expired promotion entry (they missed their window)
-      await supabase.from('waitlist').delete().eq('id', entry.id);
-      // The DB trigger promote_next_waitlisted_creator won't fire from this
-      // delete since it's on claims, so call the RPC directly
-      await supabase.rpc('promote_next_waitlisted_creator', { p_offer_id: entry.offer_id });
-      promotionsExpired++;
     }
   }
 
   return new Response(
     JSON.stringify({
-      reminders_sent_24h: remindersSent,
-      warnings_sent_6h: warningsSent,
-      marked_overdue: overdue?.length || 0,
-      promotions_expired: promotionsExpired,
+      reminders_sent: remindersSent,
+      marked_overdue: markedOverdue,
     }),
     { status: 200 }
   );
