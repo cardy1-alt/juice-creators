@@ -36,6 +36,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
   const { user } = useAuth();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
+  const [creatorId, setCreatorId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [showPitchModal, setShowPitchModal] = useState(false);
   const [pitch, setPitch] = useState('');
@@ -54,25 +55,34 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       .single();
     if (campData) setCampaign(campData as Campaign);
 
-    // Check if creator already applied
-    if (user) {
-      const { data: appData } = await supabase
-        .from('applications')
-        .select('id, status')
-        .eq('campaign_id', campaignId)
-        .eq('creator_id', user.id)
+    // Look up real creator ID by email (creators.id != auth.uid())
+    if (user?.email) {
+      const { data: creatorData } = await supabase
+        .from('creators')
+        .select('id')
+        .eq('email', user.email)
         .single();
-      if (appData) setApplication(appData as Application);
+      if (creatorData) {
+        setCreatorId(creatorData.id);
+        // Check if creator already applied
+        const { data: appData } = await supabase
+          .from('applications')
+          .select('id, status')
+          .eq('campaign_id', campaignId)
+          .eq('creator_id', creatorData.id)
+        .single();
+        if (appData) setApplication(appData as Application);
+      }
     }
     setLoading(false);
   };
 
   const handleApply = async (withPitch?: string) => {
-    if (!user || !campaign) return;
+    if (!creatorId || !campaign) return;
     setSubmitting(true);
     await supabase.from('applications').insert({
       campaign_id: campaign.id,
-      creator_id: user.id,
+      creator_id: creatorId,
       pitch: withPitch || null,
       status: 'interested',
     });
@@ -83,7 +93,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
   };
 
   const handleConfirm = async () => {
-    if (!application || !user || !campaign) return;
+    if (!application || !creatorId || !campaign) return;
     setSubmitting(true);
     await supabase.from('applications').update({
       status: 'confirmed',
@@ -93,7 +103,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     await supabase.from('participations').insert({
       application_id: application.id,
       campaign_id: campaign.id,
-      creator_id: user.id,
+      creator_id: creatorId,
     });
     setSubmitting(false);
     fetchCampaign();
