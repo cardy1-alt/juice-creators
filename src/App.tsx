@@ -6,7 +6,8 @@ import Auth from './components/Auth';
 const CreatorApp = React.lazy(() => import('./components/CreatorApp'));
 const BusinessPortal = React.lazy(() => import('./components/BusinessPortal'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
-import { AlertCircle, RefreshCw, QrCode, LogOut, Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
+const CampaignDetail = React.lazy(() => import('./components/CampaignDetail'));
+import { AlertCircle, RefreshCw, LogOut, Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMessage: string }> {
@@ -30,14 +31,14 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
     if (this.state.hasError) {
       return (
         <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-          <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+          <div className="bg-[var(--card)] rounded-[var(--r-card)] shadow-[var(--shadow-md)] border border-[var(--border)] p-8 max-w-sm text-center">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-light)] mb-4">
               <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
             </div>
-            <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Something went wrong</h2>
-            <p className="text-[var(--mid)] text-base mb-4">An unexpected error occurred. Please refresh the page.</p>
+            <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--ink)]">Something went wrong</h2>
+            <p className="text-[var(--ink-60)] text-base mb-4">An unexpected error occurred. Please refresh the page.</p>
             {this.state.errorMessage && (
-              <p className="text-[var(--soft)] text-sm mb-4 font-mono bg-[var(--bg)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
+              <p className="text-[var(--ink-35)] text-sm mb-4 font-mono bg-[var(--shell)] rounded-lg p-3 text-left break-all">{this.state.errorMessage}</p>
             )}
             <button
               onClick={() => window.location.reload()}
@@ -62,7 +63,7 @@ function DemoBanner() {
 
   const roles = ['creator', 'business', 'admin'] as const;
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--near-black)] text-white px-4 py-2 flex items-center justify-between text-sm">
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--ink)] text-white px-4 py-2 flex items-center justify-between text-sm">
       <span className="font-semibold">DEMO MODE</span>
       <div className="flex gap-2">
         {roles.map((r) => (
@@ -89,35 +90,16 @@ function DemoBanner() {
   );
 }
 
-function RedeemLanding() {
-  return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-      <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
-          <QrCode size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
-        </div>
-        <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">
-          Creator Pass
-        </h2>
-        <p className="text-[var(--mid)] text-base mb-6">
-          This QR code is for the business to scan. Ask the business to open their app and use the Scan tab to verify your visit.
-        </p>
-        <a
-          href="/"
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
-        >
-          Go to app
-        </a>
-      </div>
-    </div>
-  );
-}
-
 function isPasswordRecovery(): boolean {
   if (window.location.pathname === '/reset-password') return true;
   const hash = window.location.hash;
   if (hash.includes('type=recovery')) return true;
   return false;
+}
+
+function getCampaignIdFromUrl(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  return params.get('campaign');
 }
 
 function ResetPassword() {
@@ -131,20 +113,16 @@ function ResetPassword() {
   const [sessionError, setSessionError] = useState(false);
 
   useEffect(() => {
-    // Supabase auto-exchanges the hash tokens for a session via onAuthStateChange.
-    // Wait for a PASSWORD_RECOVERY or SIGNED_IN event before allowing submission.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' || event === 'SIGNED_IN') {
         setSessionReady(true);
       }
     });
 
-    // If the session is already established (e.g. page didn't just load), check now.
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) setSessionReady(true);
     });
 
-    // If no session after 5 seconds, the link is likely expired/invalid.
     const timeout = setTimeout(() => {
       setSessionError(true);
     }, 5000);
@@ -173,7 +151,6 @@ function ResetPassword() {
       const { error: updateError } = await supabase.auth.updateUser({ password });
       if (updateError) throw updateError;
       setSuccess(true);
-      // Redirect to login after a short delay
       setTimeout(() => {
         window.location.href = '/';
       }, 2000);
@@ -189,12 +166,12 @@ function ResetPassword() {
   if (success) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-        <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[rgba(76,175,80,0.1)] mb-4">
-            <CheckCircle size={28} strokeWidth={1.5} className="text-[#4CAF50]" />
+        <div className="bg-[var(--card)] rounded-[var(--r-card)] shadow-[var(--shadow-md)] border border-[var(--border)] p-8 max-w-sm text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[rgba(45,122,79,0.1)] mb-4">
+            <CheckCircle size={28} strokeWidth={1.5} className="text-[var(--success)]" />
           </div>
-          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Password Updated</h2>
-          <p className="text-[var(--mid)] text-base">Redirecting you to sign in...</p>
+          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--ink)]">Password Updated</h2>
+          <p className="text-[var(--ink-60)] text-base">Redirecting you to sign in...</p>
         </div>
       </div>
     );
@@ -203,12 +180,12 @@ function ResetPassword() {
   if (!sessionReady && sessionError) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-        <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm text-center">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+        <div className="bg-[var(--card)] rounded-[var(--r-card)] shadow-[var(--shadow-md)] border border-[var(--border)] p-8 max-w-sm text-center">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-light)] mb-4">
             <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
           </div>
-          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">Link Expired</h2>
-          <p className="text-[var(--mid)] text-base mb-6">This password reset link has expired or is invalid. Please request a new one.</p>
+          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--ink)]">Link Expired</h2>
+          <p className="text-[var(--ink-60)] text-base mb-6">This password reset link has expired or is invalid. Please request a new one.</p>
           <a
             href="/"
             className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
@@ -225,7 +202,7 @@ function ResetPassword() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
         <div className="text-center">
           <div className="w-12 h-12 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[var(--mid)] text-base font-medium">Verifying reset link...</p>
+          <p className="text-[var(--ink-60)] text-base font-medium">Verifying reset link...</p>
         </div>
       </div>
     );
@@ -233,13 +210,13 @@ function ResetPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-      <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-sm w-full">
+      <div className="bg-[var(--card)] rounded-[var(--r-card)] shadow-[var(--shadow-md)] border border-[var(--border)] p-8 max-w-sm w-full">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-light)] mb-4">
             <Lock size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
           </div>
-          <h2 className="text-xl font-sans font-semibold mb-1 text-[var(--near-black)]">Reset Password</h2>
-          <p className="text-[var(--mid)] text-sm">Enter your new password below</p>
+          <h2 className="text-xl font-sans font-semibold mb-1 text-[var(--ink)]">Reset Password</h2>
+          <p className="text-[var(--ink-60)] text-sm">Enter your new password below</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -253,7 +230,7 @@ function ResetPassword() {
                 placeholder="At least 8 characters"
                 required
                 minLength={8}
-                className="w-full px-4 py-3 pr-11 rounded-2xl border border-[rgba(34,34,34,0.10)] bg-white text-[var(--near-black)] text-base focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]"
+                className="w-full px-4 py-3 pr-11 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[var(--ink)] text-base focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]"
               />
               <button
                 type="button"
@@ -274,7 +251,7 @@ function ResetPassword() {
               placeholder="Re-enter your password"
               required
               minLength={8}
-              className="w-full px-4 py-3 rounded-2xl border border-[rgba(34,34,34,0.10)] bg-white text-[var(--near-black)] text-base focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]"
+              className="w-full px-4 py-3 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[var(--ink)] text-base focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]"
             />
           </div>
 
@@ -303,7 +280,7 @@ function ResetPassword() {
 function App() {
   const { user, userRole, loading, signOut } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
-  const hasRedeemParam = new URLSearchParams(window.location.search).has('redeem');
+  const campaignId = getCampaignIdFromUrl();
 
   // Password recovery route — must be checked before auth gate
   if (isPasswordRecovery()) {
@@ -315,24 +292,60 @@ function App() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
         <div className="text-center">
           <div className="w-12 h-12 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-[var(--mid)] text-base font-medium">Loading...</p>
+          <p className="text-[var(--ink-60)] text-base font-medium">Loading...</p>
         </div>
       </div>
     );
   }
 
-  // If ?redeem= is present and user is not a business, show helpful landing
-  if (hasRedeemParam && userRole !== 'business') {
-    return <RedeemLanding />;
+  // Campaign deep link — unauthenticated: store campaign ID and show auth
+  if (campaignId && !user) {
+    try {
+      sessionStorage.setItem('nayba_pending_campaign', campaignId);
+    } catch {}
+    return <Auth />;
   }
 
   if (!user) {
     return <Auth />;
   }
 
+  // Campaign deep link — authenticated creator: render campaign detail directly
+  if (campaignId && userRole === 'creator') {
+    return (
+      <React.Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
+          <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
+        {isDemo && <DemoBanner />}
+        <div className={isDemo ? 'pt-10' : ''}>
+          <CampaignDetail campaignId={campaignId} />
+        </div>
+      </React.Suspense>
+    );
+  }
+
+  // Check for stored campaign ID after login (redirect from deep link)
+  const pendingCampaign = (() => {
+    try {
+      return sessionStorage.getItem('nayba_pending_campaign');
+    } catch {
+      return null;
+    }
+  })();
+
+  if (pendingCampaign && userRole === 'creator') {
+    try {
+      sessionStorage.removeItem('nayba_pending_campaign');
+    } catch {}
+    window.location.search = `?campaign=${pendingCampaign}`;
+    return null;
+  }
+
   const suspenseFallback = (
-    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: '#F6F3EE' }}>
-      <span style={{ fontFamily: "'Corben', cursive", color: '#1A3C34', fontSize: '2rem' }}>nayba</span>
+    <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--shell)' }}>
+      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, color: 'var(--terra)', fontSize: '2rem' }}>nayba</span>
     </div>
   );
 
@@ -351,14 +364,14 @@ function App() {
   // Fallback — user authenticated but no profile found
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-[var(--shell)]">
-      <div className="bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-8 max-w-md text-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-10)] mb-4">
+      <div className="bg-[var(--card)] rounded-[var(--r-card)] shadow-[var(--shadow-md)] border border-[var(--border)] p-8 max-w-md text-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-light)] mb-4">
           <AlertCircle size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
         </div>
-        <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--near-black)]">
+        <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--ink)]">
           Account Not Found
         </h2>
-        <p className="text-[var(--mid)] text-base mb-6">
+        <p className="text-[var(--ink-60)] text-base mb-6">
           Your account profile could not be found. Please sign out and try again, or contact support.
         </p>
         <button
@@ -381,7 +394,7 @@ function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -4px 24px rgba(0,0,0,0.08)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -4px 24px rgba(34,34,34,0.08)' }}>
       <div className="bg-white px-[16px] py-[16px] flex items-center justify-between gap-[16px] max-w-[600px] mx-auto" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
         <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] m-0" style={{ fontWeight: 400 }}>
           We use cookies to keep you signed in and improve your experience.

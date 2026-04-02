@@ -1,2993 +1,557 @@
-import { useState, useEffect, useRef, ComponentType } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { friendlyError } from '../lib/errors';
-import { Check, Clock, ChevronLeft, Heart, Lock, Users, MapPin, Zap, Camera, BadgeCheck, Copy, AtSign, Plus, User, ChevronRight, Bell, LogOut, Flag, X, ExternalLink, Home, Sparkles, LayoutGrid, Coffee, Clapperboard, Search, SlidersHorizontal } from 'lucide-react';
-import QRCodeDisplay from './QRCodeDisplay';
-import CreatorOnboarding from './CreatorOnboarding';
-import DisputeModal from './DisputeModal';
-import LevelBadge from './LevelBadge';
-import { getCategorySolidColor, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
-import { getInitials } from '../lib/avatar';
-import { sendOfferClaimedCreatorEmail, sendNewClaimBusinessEmail, sendReelSubmittedCreatorEmail } from '../lib/notifications';
-import { uploadAvatar } from '../lib/upload';
-import { getLevelProgress, getProfileCompleteness, checkStreakStatus, isStreakWarningPeriod, getCurrentMonth, getLevelColour } from '../lib/levels';
+import CampaignDetail from './CampaignDetail';
+import {
+  Compass, Megaphone, Users, User, MoreHorizontal,
+  Search, Clock, Gift, Film, Check, Lock, LogOut,
+  ChevronRight, Settings, History, Link2, HelpCircle,
+  Instagram, ExternalLink, X, Image
+} from 'lucide-react';
 
-function useCountdown(targetDate: string | null) {
-  const [timeLeft, setTimeLeft] = useState('');
-  const [isOverdue, setIsOverdue] = useState(false);
-
-  useEffect(() => {
-    if (!targetDate) return;
-
-    const updateCountdown = () => {
-      const now = new Date().getTime();
-      const target = new Date(targetDate).getTime();
-      const diff = target - now;
-
-      if (diff < 0) {
-        setIsOverdue(true);
-        setTimeLeft('Overdue');
-        return;
-      }
-
-      const hours = Math.floor(diff / (1000 * 60 * 60));
-      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-      setTimeLeft(`${hours}h ${minutes}m`);
-      setIsOverdue(false);
-    };
-
-    updateCountdown();
-    const interval = setInterval(updateCountdown, 60000);
-    return () => clearInterval(interval);
-  }, [targetDate]);
-
-  return { timeLeft, isOverdue };
+// ─── Types ───
+interface CreatorProfile {
+  id: string; name: string; display_name: string | null; instagram_handle: string;
+  email: string; level: number; level_name: string; avatar_url: string | null;
+  address: string | null; completion_rate: number; total_campaigns: number;
+  completed_campaigns: number; instagram_connected: boolean; total_reels: number;
+  bio: string | null;
+}
+interface Campaign {
+  id: string; title: string; headline: string | null; perk_description: string | null;
+  perk_value: number | null; target_city: string | null; expression_deadline: string | null;
+  status: string; businesses?: { name: string };
+}
+interface Application {
+  id: string; campaign_id: string; status: string; applied_at: string;
+  campaigns?: Campaign & { businesses?: { name: string } };
+}
+interface Participation {
+  id: string; campaign_id: string; application_id: string; perk_sent: boolean;
+  reel_url: string | null; status: string; created_at: string;
+  campaigns?: { title: string; headline: string | null; content_deadline: string | null; businesses?: { name: string } };
 }
 
-interface Offer {
-  id: string;
-  business_id: string;
-  description: string;
-  monthly_cap: number | null;
-  min_level?: number;
-  slotsUsed?: number;
-  offer_type?: string | null;
-  offer_item?: string | null;
-  content_type?: string | null;
-  specific_ask?: string | null;
-  generated_title?: string | null;
-  offer_photo_url?: string | null;
-  businesses: { name: string; category: string; logo_url?: string | null; latitude?: number; longitude?: number; address?: string; bio?: string | null };
+type Tab = 'discover' | 'campaigns' | 'naybahood' | 'profile' | 'more';
+
+function fmtDate(d: string | null) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-// ─── Star SVG for streaks (solid fill) ───────────────────────────────────
-function FlameIcon({ color, size = 16 }: { color: string; size?: number }) {
+function daysUntil(d: string | null) {
+  if (!d) return null;
+  const diff = Math.ceil((new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  return diff;
+}
+
+// ─── Bottom Nav ───
+function BottomNav({ active, onNavigate }: { active: Tab; onNavigate: (t: Tab) => void }) {
+  const tabs: { key: Tab; label: string; icon: typeof Compass }[] = [
+    { key: 'discover', label: 'Discover', icon: Compass },
+    { key: 'campaigns', label: 'Campaigns', icon: Megaphone },
+    { key: 'naybahood', label: 'Naybahood', icon: Users },
+    { key: 'profile', label: 'Profile', icon: User },
+    { key: 'more', label: 'More', icon: MoreHorizontal },
+  ];
   return (
-    <svg width={size} height={size} viewBox="0 0 16 16" fill="none">
-      <path
-        d="M8 1L9.79 5.36L14.5 5.95L11.1 9.12L11.95 13.78L8 11.54L4.05 13.78L4.9 9.12L1.5 5.95L6.21 5.36L8 1Z"
-        fill={color}
-      />
-    </svg>
+    <nav className="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] z-40 px-2 pb-[env(safe-area-inset-bottom)]">
+      <div className="flex max-w-[600px] mx-auto">
+        {tabs.map(t => (
+          <button key={t.key} onClick={() => onNavigate(t.key)}
+            className={`flex-1 flex flex-col items-center py-2 pt-2.5 text-[11px] font-medium transition-colors ${active === t.key ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>
+            <t.icon size={20} strokeWidth={active === t.key ? 2 : 1.5} />
+            <span className="mt-0.5">{t.label}</span>
+          </button>
+        ))}
+      </div>
+    </nav>
   );
 }
 
-interface LeaderboardEntry {
-  id: string;
-  display_name: string | null;
-  name: string;
-  avatar_url: string | null;
-  level: number;
-  level_name: string;
-  reels_this_week: number;
-}
+// ─── Discover Tab ───
+function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
+  profile: CreatorProfile; onOpenCampaign: (id: string) => void; onGoToCampaigns: () => void;
+}) {
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [applications, setApplications] = useState<Record<string, string>>({});
+  const [activeParticipations, setActiveParticipations] = useState(0);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('All');
 
-interface Claim {
-  id: string;
-  status: string;
-  qr_token: string;
-  qr_expires_at: string;
-  claimed_at: string;
-  redeemed_at: string | null;
-  reel_url: string | null;
-  reel_due_at: string | null;
-  offer_id: string;
-  business_id: string;
-  snapshot_offer_item?: string | null;
-  snapshot_specific_ask?: string | null;
-  snapshot_generated_title?: string | null;
-  offers: { description: string; generated_title?: string | null; offer_item?: string | null; specific_ask?: string | null; content_type?: string | null; offer_photo_url?: string | null };
-  businesses: { name: string; category: string; logo_url?: string | null };
-}
+  useEffect(() => { fetchDiscover(); }, []);
 
-interface Notification {
-  id: string;
-  message: string;
-  read: boolean;
-  created_at: string;
-}
+  const fetchDiscover = async () => {
+    const { data: camps } = await supabase.from('campaigns').select('*, businesses(name)')
+      .in('status', ['active', 'live']).order('created_at', { ascending: false });
+    if (camps) setCampaigns(camps as Campaign[]);
 
-function StatusPill({ status }: { status: string }) {
-  const styles: Record<string, string> = {
-    active: 'bg-[#F5C4A0] text-[var(--ink)]',
-    claimed: 'bg-[#F5C4A0] text-[var(--ink)]',
-    queued: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
-    slot_ready: 'bg-[rgba(196,103,74,0.15)] text-[var(--terra)]',
-    redeemed: 'bg-[rgba(138,174,146,0.2)] text-[#5A7A5E]',
-    visited: 'bg-[rgba(138,174,146,0.2)] text-[#5A7A5E]',
-    reel_due: 'bg-[var(--terra)] text-white',
-    submitted: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
-    expired: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
-    overdue: 'bg-[rgba(34,34,34,0.35)] text-white',
-    completed: 'bg-[rgba(34,34,34,0.15)] text-[var(--ink-60)]',
-    disputed: 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]',
-  };
-  const labels: Record<string, string> = {
-    active: 'Active',
-    claimed: 'Claimed',
-    queued: 'On the list',
-    slot_ready: 'Slot ready',
-    redeemed: 'Visited',
-    visited: 'Visited',
-    reel_due: 'Reel Due',
-    submitted: 'Completed',
-    expired: 'Expired',
-    overdue: 'Overdue',
-    completed: 'Completed',
-    disputed: 'Disputed',
-  };
-  return (
-    <span className={`text-[13px] px-2.5 py-1 rounded-[999px] font-semibold ${styles[status] || 'bg-[rgba(34,34,34,0.06)] text-[var(--ink-60)]'}`} style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
-      {labels[status] || status}
-    </span>
-  );
-}
-
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr);
-  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-// ─── Scarcity colour shift helper ─────────────────────────────────────────
-function getSlotsBadgeStyle(slotsLeft: number, _totalSlots: number) {
-  if (slotsLeft === 0) {
-    return { background: 'rgba(34,34,34,0.06)', color: 'rgba(34,34,34,0.4)', text: 'Full' };
-  }
-  if (slotsLeft === 1) {
-    return { background: 'var(--terra)', color: 'white', text: 'Last slot' };
-  }
-  if (slotsLeft <= 3) {
-    return { background: 'var(--terra-10)', color: 'var(--terra)', text: `${slotsLeft} left` };
-  }
-  return { background: 'rgba(34,34,34,0.06)', color: 'var(--ink-35)', text: `${slotsLeft} left` };
-}
-
-const cardPalette = ['var(--card)', '#E8EEE7', '#E4EAED', '#F5C4A0', '#EDE8D0'];
-const getCardColor = (index: number) => cardPalette[index % cardPalette.length];
-
-export default function CreatorApp() {
-  const { userProfile, signOut } = useAuth();
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [claims, setClaims] = useState<Claim[]>([]);
-  const [activeClaims, setActiveClaims] = useState<Claim[]>([]);
-  const [selectedClaim, setSelectedClaim] = useState<Claim | null>(null);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [savedOffers, setSavedOffers] = useState<Set<string>>(new Set());
-  const [view, setView] = useState<'offers' | 'saved' | 'passes' | 'profile' | 'all_offers' | 'pass_detail'>('offers');
-  const [showQrFullscreen, setShowQrFullscreen] = useState(false);
-  const [qrScreenTab, setQrScreenTab] = useState<'pass' | 'reel'>('pass');
-  const [qrOpenSource, setQrOpenSource] = useState<'home' | 'active'>('home');
-  const [activePassIdx, setActivePassIdx] = useState(0);
-  const [showReelCelebration, setShowReelCelebration] = useState<{ offerName: string; businessName: string } | null>(null);
-  const [passesSection, setPassesSection] = useState<'active' | 'past'>('active');
-  const [passesSearch, setPassesSearch] = useState('');
-  const [passDetailClaim, setPassDetailClaim] = useState<Claim | null>(null);
-  const [profileSubView, setProfileSubView] = useState<'main' | 'alerts' | 'edit'>('main');
-  const [editName, setEditName] = useState('');
-  const [editHandle, setEditHandle] = useState('');
-  const [editSaving, setEditSaving] = useState(false);
-  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
-  const [reelUrl, setReelUrl] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [offersLoading, setOffersLoading] = useState(true);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const [collabsCompleted, setCollabsCompleted] = useState(0);
-  const [disputeClaimId, setDisputeClaimId] = useState<string | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [expandedOffer, setExpandedOffer] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showSearchBar, setShowSearchBar] = useState(false);
-  const [sortBy, setSortBy] = useState<'newest' | 'slots' | 'name'>('newest');
-  const [releaseConfirmId, setReleaseConfirmId] = useState<string | null>(null);
-  const [confirmVisitClaimId, setConfirmVisitClaimId] = useState<string | null>(null);
-  const [confirmVisitError, setConfirmVisitError] = useState<string | null>(null);
-  const [releaseError, setReleaseError] = useState<string | null>(null);
-  const [releasingClaim, setReleasingClaim] = useState(false);
-  const [reelError, setReelError] = useState<string | null>(null);
-  const [claimError, setClaimError] = useState<string | null>(null);
-  const [avatarUrl, setAvatarUrl] = useState<string | null>(userProfile?.avatar_url || null);
-  const [uploadingAvatar, setUploadingAvatar] = useState(false);
-  const [uploadError, setUploadError] = useState<string | null>(null);
-  const [copiedCode, setCopiedCode] = useState(false);
-  const [undoToast, setUndoToast] = useState<string | null>(null);
-  const [waitlistedOffers, setWaitlistedOffers] = useState<Record<string, { id: string; position: number; promoted?: boolean }>>({});
-  const [waitlistLoading, setWaitlistLoading] = useState<string | null>(null);
-  const [waitlistConfirmLeave, setWaitlistConfirmLeave] = useState<string | null>(null);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
-  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
-  const [showLevelUpOverlay, setShowLevelUpOverlay] = useState<{ level: number; levelName: string } | null>(null);
-  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
-  const [deletingAccount, setDeletingAccount] = useState(false);
-  const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [streakWarningDismissed, setStreakWarningDismissed] = useState(false);
-  const [redeemToast, setRedeemToast] = useState<string | null>(null);
-  const avatarInputRef = useRef<HTMLInputElement>(null);
-  const prevClaimStatusesRef = useRef<Record<string, string>>({});
-  const touchStartX = useRef(0);
-  const swipeHandlerRef = useRef<((delta: number) => void) | null>(null);
-  const swipeCardRef = useRef<HTMLDivElement | null>(null);
-
-  // ─── Discovery feed state ─────────────────────────────────────────
-
-  const { timeLeft, isOverdue } = useCountdown(selectedClaim?.reel_due_at || null);
-
-  // Load saved offers from localStorage
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('nayba_saved_offers');
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) setSavedOffers(new Set(parsed.filter((v): v is string => typeof v === 'string')));
-      }
-    } catch {}
-  }, []);
-
-  const toggleSaved = (offerId: string) => {
-    const offer = offers.find(o => o.id === offerId);
-    setSavedOffers(prev => {
-      const next = new Set(prev);
-      if (next.has(offerId)) {
-        next.delete(offerId);
-        setUndoToast('Removed from saved');
-        setTimeout(() => setUndoToast(null), 3000);
-        // Remove from saved_businesses table
-        if (offer) {
-          supabase.from('saved_businesses').delete()
-            .eq('creator_id', userProfile.id)
-            .eq('business_id', offer.business_id)
-            .then(() => {});
-        }
-      } else {
-        next.add(offerId);
-        // Save to saved_businesses table for notification triggers
-        if (offer) {
-          supabase.from('saved_businesses').upsert({
-            creator_id: userProfile.id,
-            business_id: offer.business_id,
-          }, { onConflict: 'creator_id,business_id' }).then(() => {});
-        }
-      }
-      localStorage.setItem('nayba_saved_offers', JSON.stringify([...next]));
-      return next;
-    });
-  };
-
-  useEffect(() => {
-    if (userProfile?.approved && !userProfile.onboarding_complete) {
-      setShowOnboarding(true);
-    }
-  }, [userProfile]);
-
-  useEffect(() => {
-    if (userProfile?.approved) {
-      fetchOffers();
-      fetchClaims();
-      fetchNotifications();
-      fetchCollabsCompleted();
-      fetchWaitlist();
-      fetchLeaderboard();
-      checkLevelUp();
-      checkAndResetStreak();
-    }
-  }, [userProfile]);
-
-  const fetchLeaderboard = async () => {
-    setLeaderboardLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('weekly_leaderboard')
-        .select('*')
-        .order('reels_this_week', { ascending: false })
-        .limit(10);
-      if (data && !error) setLeaderboard(data as LeaderboardEntry[]);
-    } catch {
-      // view may not exist yet
-    } finally {
-      setLeaderboardLoading(false);
-    }
-  };
-
-  const checkLevelUp = () => {
-    if (!userProfile?.level) return;
-    const storedLevel = localStorage.getItem(`nayba_level_${userProfile.id}`);
-    const currentLevel = userProfile.level || 1;
-    if (storedLevel && parseInt(storedLevel) < currentLevel) {
-      setShowLevelUpOverlay({ level: currentLevel, levelName: userProfile.level_name || 'Newcomer' });
-    }
-    localStorage.setItem(`nayba_level_${userProfile.id}`, String(currentLevel));
-  };
-
-  const checkAndResetStreak = async () => {
-    if (!userProfile?.last_reel_month) return;
-    const status = checkStreakStatus(userProfile.last_reel_month);
-    if (status === 'broken' && userProfile.current_streak > 0) {
-      await supabase
-        .from('creators')
-        .update({ current_streak: 0 })
-        .eq('id', userProfile.id);
-    }
-    // Dismiss streak warning if already posted this month
-    const dismissed = localStorage.getItem(`nayba_streak_dismiss_${getCurrentMonth()}`);
-    if (dismissed) setStreakWarningDismissed(true);
-  };
-
-  const dismissStreakWarning = () => {
-    setStreakWarningDismissed(true);
-    localStorage.setItem(`nayba_streak_dismiss_${getCurrentMonth()}`, 'true');
-  };
-
-  const fetchWaitlist = async () => {
-    const { data } = await supabase
-      .from('waitlist')
-      .select('id, offer_id, notified_at, promotion_expires_at')
-      .eq('creator_id', userProfile.id);
-    if (data) {
-      const map: Record<string, { id: string; position: number; promoted?: boolean }> = {};
-      for (const entry of data) {
-        const isPromoted = !!(entry.notified_at && entry.promotion_expires_at && new Date(entry.promotion_expires_at) > new Date());
-        // Get position for this entry
-        const { count } = await supabase
-          .from('waitlist')
-          .select('*', { count: 'exact', head: true })
-          .eq('offer_id', entry.offer_id)
-          .lte('created_at', new Date().toISOString());
-        map[entry.offer_id] = { id: entry.id, position: count || 1, promoted: isPromoted };
-      }
-      setWaitlistedOffers(map);
-    }
-  };
-
-  const joinWaitlist = async (offerId: string) => {
-    setWaitlistLoading(offerId);
-    try {
-      const { data, error } = await supabase
-        .from('waitlist')
-        .insert({ offer_id: offerId, creator_id: userProfile.id })
-        .select('id')
-        .single();
-      if (error) throw error;
-      // Optimistically update UI immediately
-      if (data) {
-        setWaitlistedOffers(prev => ({ ...prev, [offerId]: { id: data.id, position: 1 } }));
-      }
-      // Then fetch accurate position in background
-      fetchWaitlist();
-    } catch (err: any) {
-      setClaimError(err?.code === '23505' ? 'You are already on this waitlist.' : 'Failed to join waitlist. Please try again.');
-    } finally {
-      setWaitlistLoading(null);
-    }
-  };
-
-  const leaveWaitlist = async (offerId: string) => {
-    setWaitlistLoading(offerId);
-    try {
-      const entry = waitlistedOffers[offerId];
-      if (entry) {
-        await supabase.from('waitlist').delete().eq('id', entry.id);
-        setWaitlistedOffers(prev => {
-          const next = { ...prev };
-          delete next[offerId];
-          return next;
-        });
-      }
-    } catch {
-      setClaimError('Failed to leave waitlist. Please try again.');
-    } finally {
-      setWaitlistLoading(null);
-      setWaitlistConfirmLeave(null);
-    }
-  };
-
-  const fetchCollabsCompleted = async () => {
-    const { count } = await supabase
-      .from('claims')
-      .select('*', { count: 'exact', head: true })
-      .eq('creator_id', userProfile.id)
-      .not('reel_url', 'is', null);
-    setCollabsCompleted(count || 0);
-  };
-
-  useEffect(() => {
-    if (!userProfile?.approved) return;
-
-    const channel = supabase
-      .channel('creator-realtime')
-      .on(
-        'postgres_changes',
-        { event: '*', schema: 'public', table: 'claims', filter: `creator_id=eq.${userProfile.id}` },
-        () => { fetchClaims(); fetchOffers(); }
-      )
-      .on(
-        'postgres_changes',
-        { event: 'INSERT', schema: 'public', table: 'notifications', filter: `user_id=eq.${userProfile.id}` },
-        () => { fetchNotifications(); }
-      )
-      .subscribe();
-
-    return () => { supabase.removeChannel(channel); };
-  }, [userProfile]);
-
-  const fetchNotifications = async () => {
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', userProfile.id)
-      .order('created_at', { ascending: false })
-      .limit(20);
-    if (data) setNotifications(data);
-  };
-
-  const markNotificationRead = async (id: string) => {
-    try {
-      const { error } = await supabase.from('notifications').update({ read: true }).eq('id', id);
-      if (error) throw error;
-      fetchNotifications();
-    } catch (err: any) {
-      console.error('Failed to mark notification read:', err.message);
-    }
-  };
-
-  const markAllNotificationsRead = async () => {
-    const unread = notifications.filter(n => !n.read);
-    if (unread.length === 0) return;
-    try {
-      await supabase.from('notifications').update({ read: true }).eq('user_id', userProfile.id).eq('read', false);
-      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-    } catch (err: any) {
-      console.error('Failed to mark all notifications read:', err.message);
-    }
-  };
-
-  const fetchOffers = async () => {
-    setOffersLoading(true);
-    const { data, error } = await supabase
-      .from('offers')
-      .select('*, businesses(name, category, latitude, longitude, address, logo_url, bio)')
-      .eq('is_live', true);
-
-    if (error) {
-      console.error('Error fetching offers:', error);
-      setOffersLoading(false);
-      return;
+    const { data: apps } = await supabase.from('applications').select('campaign_id, status').eq('creator_id', profile.id);
+    if (apps) {
+      const map: Record<string, string> = {};
+      apps.forEach((a: any) => { map[a.campaign_id] = a.status; });
+      setApplications(map);
     }
 
-    if (data) {
-      const currentMonth = new Date().toISOString().slice(0, 7);
-      const offersWithSlots = await Promise.all(
-        data.map(async (offer) => {
-          const { count } = await supabase
-            .from('claims')
-            .select('*', { count: 'exact', head: true })
-            .eq('offer_id', offer.id)
-            .eq('month', currentMonth);
-          return { ...offer, slotsUsed: count || 0 };
-        })
-      );
-      // Deduplicate: if same business_id + same description, keep only one
-      const seen = new Set<string>();
-      const deduped = offersWithSlots.filter(o => {
-        const key = `${o.business_id}::${o.description}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
-      });
-      setOffers(deduped as Offer[]);
-    }
-    setOffersLoading(false);
+    const { count } = await supabase.from('participations').select('id', { count: 'exact', head: true })
+      .eq('creator_id', profile.id).in('status', ['confirmed', 'visited', 'content_submitted']);
+    setActiveParticipations(count || 0);
   };
 
-  const fetchClaims = async () => {
-    const { data, error } = await supabase
-      .from('claims')
-      .select('*, offers(description, generated_title, offer_item, specific_ask, content_type, offer_photo_url), businesses(name, category, logo_url)')
-      .eq('creator_id', userProfile.id)
-      .not('status', 'in', '(expired)')
-      .order('claimed_at', { ascending: false });
+  const categories = ['All', 'Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
 
-    if (error) {
-      console.error('Error fetching claims:', error);
-      return;
+  const filtered = campaigns.filter(c => {
+    if (search) {
+      const q = search.toLowerCase();
+      if (!c.title.toLowerCase().includes(q) && !c.businesses?.name?.toLowerCase().includes(q)) return false;
     }
-
-    if (data) {
-      // Filter out claims with missing join data to prevent render crashes
-      const newClaims = (data as Claim[]).filter(c => c.businesses && c.offers);
-      // Detect newly redeemed claims to show confirmation toast
-      for (const claim of newClaims) {
-        const prev = prevClaimStatusesRef.current[claim.id];
-        if (prev === 'active' && claim.status === 'redeemed') {
-          const bizName = (claim as any).businesses?.name;
-          setRedeemToast(bizName ? `Visit confirmed at ${bizName}!` : 'Visit confirmed! Time to post your reel.');
-          setTimeout(() => setRedeemToast(null), 5000);
-        }
-      }
-      prevClaimStatusesRef.current = Object.fromEntries(newClaims.map(c => [c.id, c.status]));
-
-      setClaims(newClaims);
-      const active = newClaims.filter(c => {
-        const isActive = c.status === 'active' || c.status === 'claimed' || c.status === 'visited' || c.status === 'reel_due' || (c.status === 'redeemed' && !c.reel_url);
-        if (!isActive) return false;
-        // Exclude overdue (reel deadline passed)
-        if (c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()) return false;
-        // Exclude expired
-        if (c.status === 'expired') return false;
-        return true;
-      });
-      setActiveClaims(active);
-      if (selectedClaim && !active.find(c => c.id === selectedClaim.id)) {
-        setSelectedClaim(active[0] || null);
-      } else if (!selectedClaim && active.length > 0) {
-        setSelectedClaim(active[0]);
-      }
-    }
-  };
-
-  const handleClaim = async (offer: Offer): Promise<boolean> => {
-    setLoading(true);
-    setClaimError(null);
-    try {
-      const { data, error } = await supabase.rpc('claim_offer', {
-        p_offer_id: offer.id,
-        p_creator_id: userProfile.id,
-      });
-
-      if (error) throw error;
-      if (data?.error) {
-        const errorMessages: Record<string, string> = {
-          'monthly_cap_reached': 'This collab has reached its monthly limit. Try again next month or join the waitlist.',
-          'already_claimed': 'You already have an active claim for this collab.',
-          'not_approved': 'Your account needs to be approved before claiming collabs.',
-          'offer_not_live': 'This collab is no longer available.',
-        };
-        setClaimError(errorMessages[data.error] || friendlyError(data.error));
-        return false;
-      }
-
-      setView('passes');
-      setPassesSection('active');
-      fetchOffers();
-      fetchClaims();
-
-      // Send transactional emails (non-blocking)
-      const offerTitle = offer.generated_title || offer.description;
-      const businessName = offer.businesses?.name || 'a local business';
-      sendOfferClaimedCreatorEmail(userProfile.id, offerTitle, businessName).catch(() => {});
-      sendNewClaimBusinessEmail(offer.business_id, userProfile.display_name || userProfile.name, offerTitle).catch(() => {});
-      return true;
-    } catch (error: any) {
-      setClaimError(friendlyError(error.message));
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClaimOffer = async (offerId: string) => {
-    const offer = offers.find(o => o.id === offerId);
-    if (offer) {
-      await handleClaim(offer);
-    }
-  };
-
-  const handleSubmitReel = async (): Promise<boolean> => {
-    if (!reelUrl || !selectedClaim) return false;
-    setReelError(null);
-
-    if (selectedClaim.reel_due_at && new Date() > new Date(selectedClaim.reel_due_at)) {
-      setReelError('The posting deadline has passed. Contact us if you think this is an error.');
-      return false;
-    }
-
-    const instagramReelPattern = /^https:\/\/(www\.)?instagram\.com\/(reel|p)\/[A-Za-z0-9_-]+\/?/i;
-    if (!instagramReelPattern.test(reelUrl)) {
-      setReelError('Please enter a valid Instagram post URL (https://instagram.com/reel/... or /p/...)');
-      return false;
-    }
-
-    setLoading(true);
-    try {
-      const { error } = await supabase
-        .from('claims')
-        .update({ reel_url: reelUrl, reel_submitted_at: new Date().toISOString(), status: 'completed' })
-        .eq('id', selectedClaim.id);
-      if (error) throw error;
-
-      // Update creator stats: total_reels, streak, last_reel_month
-      const currentMonth = getCurrentMonth();
-      const newTotalReels = (userProfile.total_reels || 0) + 1;
-      const isNewMonth = userProfile.last_reel_month !== currentMonth;
-      const newStreak = isNewMonth ? (userProfile.current_streak || 0) + 1 : (userProfile.current_streak || 0);
-      const newLongest = Math.max(newStreak, userProfile.longest_streak || 0);
-
-      await supabase
-        .from('creators')
-        .update({
-          total_reels: newTotalReels,
-          current_streak: newStreak,
-          longest_streak: newLongest,
-          last_reel_month: currentMonth,
-        })
-        .eq('id', userProfile.id);
-
-      // Show celebration overlay
-      const celebOfferName = selectedClaim.snapshot_generated_title || selectedClaim.offers.generated_title || selectedClaim.offers.description || '';
-      const celebBizName = selectedClaim.businesses?.name || '';
-
-      setReelUrl('');
-      setReelError(null);
-      fetchClaims();
-      fetchCollabsCompleted();
-
-      // Send collab-complete email to creator (non-blocking)
-      sendReelSubmittedCreatorEmail(userProfile.id, celebOfferName, celebBizName).catch(() => {});
-
-      setShowReelCelebration({ offerName: celebOfferName, businessName: celebBizName });
-      return true;
-    } catch (error: any) {
-      setReelError(friendlyError(error.message));
-      return false;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReleaseOffer = async (claimId: string) => {
-    setReleasingClaim(true);
-    setReleaseError(null);
-    try {
-      const { data, error } = await supabase.rpc('unclaim_offer', {
-        p_claim_id: claimId,
-        p_creator_id: userProfile.id,
-      });
-
-      if (error) throw error;
-      if (data?.error) {
-        setReleaseError(friendlyError(data.error));
-        return;
-      }
-
-      setReleaseConfirmId(null);
-      fetchOffers();
-      fetchClaims();
-    } catch (error: any) {
-      setReleaseError(friendlyError(error.message));
-    } finally {
-      setReleasingClaim(false);
-    }
-  };
-
-  const canReleaseOffer = (claim: Claim) => {
-    if (claim.status !== 'active') return { allowed: false, reason: null };
-    const claimedTime = new Date(claim.claimed_at).getTime();
-    const now = new Date().getTime();
-    const hoursSinceClaim = (now - claimedTime) / (1000 * 60 * 60);
-    if (hoursSinceClaim > 24) {
-      return { allowed: false, reason: 'Release window expired' };
-    }
-    return { allowed: true, reason: null };
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploadingAvatar(true);
-    setUploadError(null);
-    const { url, error } = await uploadAvatar(file, userProfile.id, 'creators');
-    if (error) {
-      setUploadError(error);
-    } else if (url) {
-      setAvatarUrl(url);
-    }
-    setUploadingAvatar(false);
-    if (avatarInputRef.current) avatarInputRef.current.value = '';
-  };
-
-  const copyCode = () => {
-    navigator.clipboard.writeText(userProfile.code).catch(() => {});
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
-  };
-
-  const unreadCount = notifications.filter(n => !n.read).length;
-
-  const isPendingApproval = !userProfile?.approved;
-
-  // If pending approval and not on profile view, force to profile
-  if (isPendingApproval && view !== 'profile') {
-    setView('profile' as any);
-  }
-
-  // Compute past claims for the Past section
-  const pastClaims = claims.filter(c => {
-    if (!c.businesses || !c.offers) return false;
-    if (c.status === 'completed' || c.status === 'submitted' || c.status === 'expired' || c.status === 'disputed') return true;
-    // Overdue: redeemed but reel deadline passed
-    if (c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()) return true;
-    return false;
+    return true;
   });
 
-  const getActiveUrgency = () => {
-    if (activeClaims.length === 0) return 'none';
-    const now = new Date().getTime();
-    const hasOverdue = activeClaims.some(claim => {
-      if (!claim.reel_due_at || claim.reel_url) return false;
-      return new Date(claim.reel_due_at).getTime() < now;
-    });
-    if (hasOverdue) return 'overdue';
-    const hasSoon = activeClaims.some(claim => {
-      if (!claim.reel_due_at || claim.reel_url) return false;
-      const hoursLeft = (new Date(claim.reel_due_at).getTime() - now) / (1000 * 60 * 60);
-      return hoursLeft <= 12;
-    });
-    if (hasSoon) return 'soon';
-    return 'normal';
-  };
-
-  const activeUrgency = getActiveUrgency();
-  const activeBadgeColor = 'bg-[var(--terra)]';
-
-  const foodCategories = ['restaurant', 'cafe', 'bakery', 'bar', 'food truck', 'food', 'coffee', 'juice bar', 'dessert', 'pizza', 'brunch'];
-  const beautyCategories = ['salon', 'spa', 'beauty', 'nails', 'hair', 'skincare', 'barbershop', 'wellness'];
-
-  const getCategoryGroup = (category: string) => {
-    const lower = category.toLowerCase();
-    if (foodCategories.some(c => lower.includes(c))) return 'food';
-    if (beautyCategories.some(c => lower.includes(c))) return 'beauty';
-    return 'more';
-  };
-
-  const categoryTabs = [
-    { key: 'all', label: 'All', icon: 'home' as const },
-    { key: 'food', label: 'Food', icon: 'coffee' as const },
-    { key: 'beauty', label: 'Beauty', icon: 'sparkles' as const },
-    { key: 'more', label: 'More', icon: 'grid' as const },
-  ];
-
-  const categoryTabIconMap: Record<string, ComponentType<{ size?: number; strokeWidth?: number; color?: string; className?: string }>> = {
-    home: Home,
-    coffee: Coffee,
-    sparkles: Sparkles,
-    grid: LayoutGrid,
-  };
-
-  const tabs = [
-    { key: 'offers' as const, label: 'Explore', icon: 'explore' as const },
-    { key: 'saved' as const, label: 'Saved', icon: 'saved' as const },
-    { key: 'passes' as const, label: 'Passes', icon: 'passes' as const, badge: activeClaims.length > 0 ? activeClaims.length : 0 },
-    { key: 'profile' as const, label: 'Profile', icon: 'profile' as const },
-  ];
-
-  // ─── Discovery feed helpers ────────────────────────────────────────
-
-  const getGreeting = () => {
-    const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
-  };
-
-  // toggleSave is an alias for toggleSaved — unified in pre-launch audit
-  const toggleSave = toggleSaved;
-
-  // Helper to render business avatar
-  const renderBusinessAvatar = (name: string, category: string, logoUrl?: string | null, size = 46) => {
-    return (
-      <div
-        className="rounded-[12px] flex items-center justify-center"
-        style={{ width: size, height: size, background: 'var(--card)' }}
-      >
-        <CategoryIcon category={category} className="w-[20px] h-[20px]" style={{ color: 'rgba(34,34,34,0.5)' }} />
+  return (
+    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4">
+        <Logo size={24} variant="wordmark" />
       </div>
-    );
+
+      {/* Active campaign banner */}
+      {activeParticipations > 0 && (
+        <button onClick={onGoToCampaigns}
+          className="w-full flex items-center justify-between px-4 py-3 rounded-[var(--r-card)] bg-[rgba(45,122,79,0.08)] border border-[rgba(45,122,79,0.15)] mb-4">
+          <span className="text-[14px] font-medium text-[var(--success)]">You're in a campaign — view it</span>
+          <ChevronRight size={16} className="text-[var(--success)]" />
+        </button>
+      )}
+
+      {/* Search */}
+      <div className="relative mb-3">
+        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search campaigns..."
+          className="w-full pl-9 pr-4 py-2.5 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+      </div>
+
+      {/* Category chips */}
+      <div className="flex gap-2 overflow-x-auto pb-3 hide-scrollbar">
+        {categories.map(c => (
+          <button key={c} onClick={() => setCategory(c)}
+            className={`flex-shrink-0 px-3 py-1.5 rounded-[var(--r-pill)] text-[13px] font-medium transition-colors ${category === c ? 'bg-[var(--terra)] text-white' : 'bg-white border border-[var(--ink-10)] text-[var(--ink-60)]'}`}>
+            {c}
+          </button>
+        ))}
+      </div>
+
+      {/* Campaign cards */}
+      <div className="space-y-3">
+        {filtered.map(c => {
+          const appStatus = applications[c.id];
+          return (
+            <button key={c.id} onClick={() => onOpenCampaign(c.id)}
+              className="w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
+              <p className="text-[13px] font-semibold text-[var(--ink-60)] mb-0.5">{c.businesses?.name}</p>
+              <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
+              {/* Perk pill */}
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2">
+                <Gift size={13} className="text-[var(--terra)]" />
+                <span className="text-[13px] font-medium text-[var(--terra)]">
+                  {c.perk_description?.split('—')[0]?.split(',')[0]?.trim().slice(0, 40) || 'Perk included'}
+                  {c.perk_value ? ` — worth £${c.perk_value}` : ''}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                {c.target_city && <span>{c.target_city}</span>}
+                {c.expression_deadline && <span className="flex items-center gap-1"><Clock size={12} /> Apply by {fmtDate(c.expression_deadline)}</span>}
+              </div>
+              {/* Applied state */}
+              {appStatus && (
+                <div className="mt-2">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold ${appStatus === 'interested' ? 'bg-[var(--terra-light)] text-[var(--terra)]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]' : 'bg-[var(--ink-10)] text-[var(--ink-60)]'}`}>
+                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                  </span>
+                </div>
+              )}
+            </button>
+          );
+        })}
+        {filtered.length === 0 && (
+          <div className="py-12 text-center">
+            <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No campaigns in your area yet</p>
+            <p className="text-[14px] text-[var(--ink-35)]">New campaigns drop regularly — check back soon</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Campaigns Tab ───
+function CampaignsTab({ profile }: { profile: CreatorProfile }) {
+  const [subTab, setSubTab] = useState<'active' | 'past'>('active');
+  const [participations, setParticipations] = useState<Participation[]>([]);
+  const [pastApps, setPastApps] = useState<Application[]>([]);
+  const [showReelModal, setShowReelModal] = useState<string | null>(null);
+  const [reelUrl, setReelUrl] = useState('');
+  const [submittingReel, setSubmittingReel] = useState(false);
+
+  useEffect(() => { fetchCampaigns(); }, []);
+
+  const fetchCampaigns = async () => {
+    const { data: parts } = await supabase.from('participations')
+      .select('*, campaigns(title, headline, content_deadline, businesses(name))')
+      .eq('creator_id', profile.id).order('created_at', { ascending: false });
+    if (parts) setParticipations(parts as Participation[]);
+
+    const { data: apps } = await supabase.from('applications')
+      .select('*, campaigns(title, headline, businesses(name))')
+      .eq('creator_id', profile.id).in('status', ['declined']).order('applied_at', { ascending: false });
+    if (apps) setPastApps(apps as Application[]);
+  };
+
+  const handleSubmitReel = async () => {
+    if (!showReelModal || !reelUrl) return;
+    setSubmittingReel(true);
+    await supabase.from('participations').update({
+      reel_url: reelUrl,
+      reel_submitted_at: new Date().toISOString(),
+      status: 'content_submitted',
+    }).eq('id', showReelModal);
+    setShowReelModal(null);
+    setReelUrl('');
+    setSubmittingReel(false);
+    fetchCampaigns();
+  };
+
+  const activeParts = participations.filter(p => p.status !== 'completed');
+  const completedParts = participations.filter(p => p.status === 'completed');
+  const statusSteps = ['Selected', 'Confirmed', 'Perk Received', 'Content Due', 'Submitted', 'Complete'];
+
+  const getStepIndex = (p: Participation) => {
+    if (p.status === 'completed') return 5;
+    if (p.status === 'content_submitted') return 4;
+    if (p.reel_url) return 4;
+    if (p.perk_sent) return 2;
+    if (p.status === 'confirmed' || p.status === 'visited') return 1;
+    return 0;
   };
 
   return (
-    <div className="h-[100dvh] flex flex-col bg-[var(--shell)]">
-      {showOnboarding && (
-        <CreatorOnboarding
-          profile={userProfile}
-          onComplete={() => setShowOnboarding(false)}
-        />
-      )}
-      {disputeClaimId && (
-        <DisputeModal
-          claimId={disputeClaimId}
-          reporterRole="creator"
-          onClose={() => setDisputeClaimId(null)}
-        />
-      )}
+    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      <h1 className="text-[24px] font-bold text-[var(--ink)] mb-4" style={{ letterSpacing: '-0.4px' }}>Campaigns</h1>
+      {/* Sub tabs */}
+      <div className="flex gap-1 mb-4 border-b border-[var(--ink-10)]">
+        {(['active', 'past'] as const).map(t => (
+          <button key={t} onClick={() => setSubTab(t)}
+            className={`px-4 py-2.5 text-[14px] font-semibold border-b-2 -mb-px transition-colors ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
+            {t === 'active' ? 'Active' : 'Past'}
+          </button>
+        ))}
+      </div>
 
-      {/* Undo toast */}
-      {undoToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--ink)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg">
-          {undoToast}
-        </div>
-      )}
-
-      {redeemToast && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-[var(--ink)] text-white text-[15px] font-semibold px-5 py-2.5 rounded-full shadow-lg flex items-center gap-2">
-          <Check size={16} strokeWidth={1.5} />
-          {redeemToast}
-        </div>
-      )}
-
-
-      {/* Delete Account Confirmation Modal */}
-      {showDeleteAccount && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center" style={{ background: 'rgba(34,34,34,0.85)' }}>
-          <div className="bg-[var(--card)] rounded-[18px] p-[36px_28px] text-center max-w-[320px] mx-4">
-            <h2 className="text-[22px] text-[var(--ink)] mb-[8px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>
-              Delete your account?
-            </h2>
-            <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
-              This will permanently delete your account and all your data. This cannot be undone.
-            </p>
-            {deleteError && (
-              <p className="text-[13px] text-[var(--terra)] mb-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>
-                {deleteError}
-              </p>
-            )}
-            <div className="flex gap-[12px]">
-              <button
-                onClick={() => setShowDeleteAccount(false)}
-                disabled={deletingAccount}
-                className="flex-1 py-[13px] rounded-[999px] text-[15px] text-[var(--ink)] bg-[var(--shell)] hover:bg-[var(--ink-08)] transition-all min-h-[48px]"
-                style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}
-              >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  setDeletingAccount(true);
-                  setDeleteError(null);
-                  try {
-                    const { error } = await supabase.rpc('delete_user_account');
-                    if (error) throw error;
-                    await signOut();
-                  } catch {
-                    setDeleteError(friendlyError(null));
-                    setDeletingAccount(false);
-                  }
-                }}
-                disabled={deletingAccount}
-                className="flex-1 py-[13px] rounded-[999px] text-[15px] text-white transition-all min-h-[48px] disabled:opacity-50"
-                style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
-              >
-                {deletingAccount ? 'Deleting...' : 'Delete account'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Fullscreen QR Pass Overlay */}
-      {showQrFullscreen && selectedClaim && (() => {
-        const qrClaim = selectedClaim;
-        const qrOfferTitle = qrClaim.snapshot_generated_title || qrClaim.offers.generated_title || qrClaim.offers.description || '';
-        const isReelDue = !!(qrClaim.redeemed_at && !qrClaim.reel_url);
-        const reelDueTimeLeft = (() => {
-          if (!qrClaim.reel_due_at) return '';
-          const diff = new Date(qrClaim.reel_due_at).getTime() - Date.now();
-          if (diff <= 0) return 'Overdue';
-          const h = Math.floor(diff / (1000 * 60 * 60));
-          const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-          return `${h}h ${m}m`;
-        })();
-        const activeTab = isReelDue ? qrScreenTab : 'pass' as const;
-        const isSubmitEnabled = reelUrl.startsWith('http') && reelUrl.length > 4;
-        return (
-          <div
-            className="fixed top-0 left-0 right-0 bottom-0"
-            style={{ zIndex: 9999, overflowY: 'auto', background: activeTab === 'pass' ? 'var(--terra)' : 'var(--shell)' }}
-          >
-            {/* Back button — fixed so it stays visible when scrolling */}
-            <button
-              onClick={() => { setShowQrFullscreen(false); setReelError(null); setReelUrl(''); }}
-              className="fixed top-[12px] left-[12px] flex items-center gap-1 text-[17px] font-semibold min-w-[44px] min-h-[44px] px-[8px]"
-              style={{ zIndex: 10000, borderRadius: 8, color: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)' }}
-            >
-              ← Back
-            </button>
-            <div className="flex flex-col items-center w-full px-[20px]" style={{ paddingTop: 48, paddingBottom: 40 }}>
-
-              {/* Segmented toggle — only for reel_due */}
-              {isReelDue && (
-                <div
-                  className="relative flex items-center"
-                  style={{ width: 240, height: 42, background: activeTab === 'pass' ? 'rgba(255,255,255,0.2)' : 'var(--card)', borderRadius: 999, padding: 3, marginBottom: 20 }}
-                >
-                  {/* Sliding active indicator */}
-                  <div
-                    className="absolute"
-                    style={{
-                      width: 'calc(50% - 3px)',
-                      height: 36,
-                      borderRadius: 999,
-                      background: activeTab === 'pass' ? '#FFFFFF' : 'var(--ink)',
-                      left: activeTab === 'pass' ? 3 : 'calc(50%)',
-                      transition: 'all 0.2s ease',
-                    }}
-                  />
-                  <button
-                    onClick={() => setQrScreenTab('pass')}
-                    className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'pass' ? 'var(--terra)' : 'rgba(34,34,34,0.88)', borderRadius: 999 }}
-                  >
-                    Show pass
-                  </button>
-                  <button
-                    onClick={() => setQrScreenTab('reel')}
-                    className="relative flex-1 text-center text-[18px] font-semibold"
-                    style={{ height: 36, lineHeight: '36px', color: activeTab === 'reel' ? '#FFFFFF' : 'rgba(255,255,255,0.7)', borderRadius: 999 }}
-                  >
-                    Submit reel
-                  </button>
-                </div>
-              )}
-
-              {/* === SHOW PASS STATE === */}
-              {activeTab === 'pass' && (
-                <div className="flex flex-col items-center w-full" style={{ marginTop: isReelDue ? 0 : 0, minHeight: isReelDue ? undefined : 'calc(100vh - 200px)', justifyContent: isReelDue ? undefined : 'center' }}>
-                  {/* QR card with offer title inside */}
-                  <div style={{ background: 'white', borderRadius: 24, padding: '24px 20px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', textAlign: 'center', margin: '0 0 2px', lineHeight: 1.2 }}>{qrOfferTitle}</p>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 16px' }}>{qrClaim.businesses.name}</p>
-                    <QRCodeDisplay
-                      token={qrClaim.qr_token}
-                      claimId={qrClaim.id}
-                      creatorCode={userProfile.code}
-                      size={220}
-                      hideExtras
-                    />
-                  </div>
-                  {/* Ref code pill */}
-                  <span
-                    className="text-[17px] text-white inline-block rounded-full mt-[20px]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '1.5px', background: 'var(--ink)', padding: '10px 20px' }}
-                  >
-                    {userProfile.code}
-                  </span>
-                  {/* Refresh countdown */}
-                  <p className="text-[15px] mt-[12px]" style={{ color: 'rgba(255,255,255,0.5)' }}>Auto-refreshes every 30s</p>
-                </div>
-              )}
-
-              {/* === SUBMIT REEL STATE === */}
-              {activeTab === 'reel' && isReelDue && (
-                <div className="flex flex-col w-full" style={{ marginTop: 24, minHeight: '75vh' }}>
-                  {/* Timer block */}
-                  {(() => {
-                    const isOverdue = qrClaim.reel_due_at && new Date() > new Date(qrClaim.reel_due_at);
-                    return (
-                      <div style={{ background: isOverdue ? 'rgba(196,103,74,0.08)' : 'rgba(245,196,160,0.12)', border: isOverdue ? '1.5px solid var(--terra)' : '1.5px solid #F5C4A0', borderRadius: 12, padding: 16 }}>
-                        <div className="flex items-center gap-[8px]">
-                          <Clock size={16} strokeWidth={1.5} className={isOverdue ? 'text-[var(--terra)]' : 'text-[var(--ink-60)]'} />
-                          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 18, color: isOverdue ? 'var(--terra)' : 'var(--ink)' }}>
-                            {isOverdue ? 'Deadline passed' : reelDueTimeLeft ? `${reelDueTimeLeft} remaining` : 'Post your reel now'}
-                          </span>
-                        </div>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16, color: isOverdue ? 'var(--terra)' : 'rgba(34,34,34,0.68)', marginTop: 8, lineHeight: 1.6 }}>
-                          {isOverdue
-                            ? 'The posting deadline has passed. Contact us if you think this is an error.'
-                            : 'Post your reel within this window — it must clearly feature the business.'}
-                        </p>
-                      </div>
-                    );
-                  })()}
-
-                  {/* Reel URL input — hidden when overdue */}
-                  {!(qrClaim.reel_due_at && new Date() > new Date(qrClaim.reel_due_at)) && (
-                  <>
-                  <div style={{ marginTop: 20 }}>
-                    <label className="text-[15px] font-semibold text-[var(--ink)]" style={{ marginBottom: 8, display: 'block' }}>
-                      Reel URL
-                    </label>
-                    <input
-                      type="url"
-                      value={reelUrl}
-                      onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
-                      placeholder="https://instagram.com/reel/"
-                      className="w-full text-[17px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none"
-                      style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: '16px' }}
-                      onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
-                      onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.15)'; }}
-                    />
-                    {reelError ? (
-                      <p className="text-[15px] text-[var(--ink-60)] mt-[8px]">Please check the URL and try again.</p>
-                    ) : (
-                      <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Paste the link from Instagram after you've posted.</p>
-                    )}
-                  </div>
-
-                  {/* Submit button */}
-                  <button
-                    onClick={async () => {
-                      const success = await handleSubmitReel();
-                      if (success) {
-                        setShowQrFullscreen(false);
-                      }
-                    }}
-                    disabled={loading || !isSubmitEnabled}
-                    className="w-full text-white text-[18px] font-bold flex items-center justify-center gap-2 transition-all"
-                    style={{
-                      background: isSubmitEnabled ? 'var(--terra)' : 'var(--terra-40)',
-                      height: 52,
-                      borderRadius: 999,
-                      marginTop: 16,
-                      cursor: isSubmitEnabled && !loading ? 'pointer' : 'not-allowed',
-                    }}
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Submitting…
-                      </>
-                    ) : 'Submit'}
-                  </button>
-                  </>
-                  )}
-
-                  {/* Spacer + report link */}
-                  <div style={{ flexGrow: 1 }} />
-                  <button
-                    onClick={() => setDisputeClaimId(qrClaim.id)}
-                    className="w-full text-center text-[14px] text-[var(--ink-35)] min-h-[44px]"
-                    style={{ marginTop: 24 }}
-                  >
-                    Report an issue
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })()}
-
-      {/* Reel Celebration Overlay */}
-      {showReelCelebration && (() => {
-        const celebrationStyles = `
-          @keyframes checkDraw {
-            0% { stroke-dashoffset: 48; }
-            100% { stroke-dashoffset: 0; }
-          }
-          @keyframes confettiFall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .confetti-piece { animation: none !important; display: none; }
-          }
-        `;
-        const confettiColors = ['#1A4A2E', '#F5C4A0', '#C8B8F0', '#F4A8C0'];
-        const confettiPieces = Array.from({ length: 30 }, (_, i) => ({
-          id: i,
-          left: Math.random() * 100,
-          size: 6 + Math.random() * 6,
-          color: confettiColors[Math.floor(Math.random() * confettiColors.length)],
-          delay: Math.random() * 1.5,
-          duration: 1.5 + Math.random() * 1.5,
-          drift: -20 + Math.random() * 40,
-        }));
-        return (
-          <div className="fixed top-0 left-0 right-0 bottom-0 flex flex-col items-center justify-center" style={{ zIndex: 9999, background: 'var(--terra)' }}>
-            <style>{celebrationStyles}</style>
-            {/* Confetti */}
-            {confettiPieces.map(p => (
-              <div
-                key={p.id}
-                className="confetti-piece"
-                style={{
-                  position: 'absolute',
-                  top: -10,
-                  left: `${p.left}%`,
-                  width: p.size,
-                  height: p.size,
-                  borderRadius: p.size > 9 ? '50%' : '2px',
-                  background: p.color,
-                  animation: `confettiFall ${p.duration}s ${p.delay}s ease-in forwards`,
-                  transform: `translateX(${p.drift}px)`,
-                  opacity: 0,
-                  animationFillMode: 'forwards',
-                }}
-              />
-            ))}
-            {/* Animated checkmark */}
-            <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-              <circle cx="40" cy="40" r="36" stroke="white" strokeWidth="3" opacity="0.3" />
-              <path
-                d="M24 40L35 51L56 30"
-                stroke="white"
-                strokeWidth="4"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                style={{
-                  strokeDasharray: 48,
-                  strokeDashoffset: 48,
-                  animation: 'checkDraw 0.6s 0.3s ease forwards',
-                }}
-              />
-            </svg>
-            <h2 className="text-[36px] text-white text-center mt-[24px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>
-              Reel submitted!
-            </h2>
-            <p className="text-[18px] text-white text-center mt-[8px]" style={{ opacity: 0.6 }}>
-              {showReelCelebration.offerName}
-            </p>
-            <p className="text-[18px] text-white text-center mt-[2px]" style={{ opacity: 0.6 }}>
-              {showReelCelebration.businessName}
-            </p>
-            <button
-              onClick={() => { setShowReelCelebration(null); setView('offers'); }}
-              className="mt-[32px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[48px]"
-              style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
-            >
-              Back to explore
-            </button>
-          </div>
-        );
-      })()}
-
-      {/* Expanded Offer Detail Modal */}
-      {expandedOffer && (() => {
-        const offer = offers.find(o => o.id === expandedOffer);
-        if (!offer) return null;
-        const isUnlimited = offer.monthly_cap === null;
-        const slotsUsed = offer.slotsUsed || 0;
-        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-        const full = !isUnlimited && slotsLeft === 0;
-        const alreadyClaimed = claims.some(c => c.offer_id === offer.id && c.status !== 'expired');
-        const hasActiveBusiness = activeClaims.some(c => c.business_id === offer.business_id);
-        const detailCreatorLevel = userProfile.level || 1;
-        const detailMinLevel = offer.min_level || 1;
-        const detailIsLocked = detailCreatorLevel < detailMinLevel;
-        const detailLockedName = detailMinLevel === 2 ? 'Explorer' : detailMinLevel === 3 ? 'Regular' : detailMinLevel === 4 ? 'Local' : detailMinLevel === 5 ? 'Trusted' : detailMinLevel === 6 ? 'Nayba' : 'Newcomer';
-        const detailReelsToUnlock = (() => {
-          const thresholds = [0, 1, 3, 6, 11, 21];
-          const needed = thresholds[detailMinLevel - 1] || 0;
-          return Math.max(0, needed - (userProfile.total_reels || 0));
-        })();
-
-        return (
-          <div className="fixed inset-0 z-50 bg-[var(--shell)] flex flex-col overflow-y-auto">
-            {/* Hero — full-bleed image */}
-            <div className="relative" style={{ minHeight: 300, flexShrink: 0 }}>
-              <div style={{ width: '100%', height: 300, background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <CategoryIcon category={offer.businesses.category} className="w-[48px] h-[48px]" style={{ color: '#C4674A' }} />
-                {offer.offer_photo_url && (
-                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
-                )}
-              </div>
-              {/* Gradient overlay */}
-              <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.80) 0%, rgba(34,34,34,0) 55%)', pointerEvents: 'none' }} />
-              {/* Locked overlay */}
-              {detailIsLocked && (
-                <div className="absolute inset-0" style={{ background: 'rgba(34,34,34,0.25)' }} />
-              )}
-              {/* Back button — frosted glass */}
-              <button
-                onClick={() => setExpandedOffer(null)}
-                className="absolute flex items-center justify-center"
-                style={{ top: 52, left: 16, width: 36, height: 36, borderRadius: '50%', background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}
-              >
-                <ChevronLeft size={18} strokeWidth={1.5} color="var(--ink)" />
-              </button>
-              {/* Heart button — frosted glass */}
-              <button
-                onClick={() => toggleSaved(offer.id)}
-                className="absolute flex items-center justify-center"
-                style={{ top: 52, right: 16, width: 36, height: 36, borderRadius: '50%', background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(6px)', border: 'none', cursor: 'pointer' }}
-              >
-                <Heart size={18} strokeWidth={1.5} color={savedOffers.has(offer.id) ? 'var(--terra)' : 'var(--ink)'} fill={savedOffers.has(offer.id) ? 'var(--terra)' : 'none'} />
-              </button>
-              {/* Text at bottom of image */}
-              <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '16px 20px 24px' }}>
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(255,255,255,0.75)', margin: '0 0 4px' }}>{offer.businesses.name}</p>
-                <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 26, color: 'white', letterSpacing: '-0.03em', lineHeight: 1.2, margin: 0 }}>
-                  {offer.generated_title || (offer.description.length > 50 ? offer.description.slice(0, 50) + '…' : offer.description)}
-                </p>
-              </div>
-            </div>
-
-            {/* Body */}
-            <div className="bg-[var(--shell)]" style={{ paddingBottom: 120 }}>
-              {/* Metadata row — below hero */}
-              <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 20px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Users size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>
-                    {isUnlimited ? 'Open availability' : full ? 'Sold out' : `${slotsLeft} left`}
-                  </span>
-                </div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-                  <Clock size={14} strokeWidth={1.5} color="var(--ink-60)" />
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-60)' }}>48hrs to post</span>
-                </div>
-              </div>
-              {/* Divider */}
-              <div style={{ height: 1, background: 'var(--ink-08)', margin: '0 20px' }} />
-
-              <div style={{ padding: '20px 20px 0' }}>
-                {/* Level requirement banner */}
-                {detailIsLocked && (
-                  <div className="flex items-start gap-3 rounded-[12px] p-[12px_14px] mb-[20px]" style={{ background: 'rgba(34,34,34,0.04)' }}>
-                    <Lock size={14} strokeWidth={1.5} className="text-[var(--ink-60)] mt-0.5 flex-shrink-0" />
-                    <div>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 15, color: 'var(--ink)', margin: 0 }}>{detailLockedName} creators only</p>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', marginTop: 2, margin: '2px 0 0' }}>You're Level {detailCreatorLevel} · {detailReelsToUnlock} more reel{detailReelsToUnlock !== 1 ? 's' : ''} to unlock</p>
-                    </div>
-                  </div>
-                )}
-
-                {/* WHAT TO POST label */}
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>WHAT TO POST</p>
-
-                {/* C) Primary post requirement */}
-                <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 17, color: 'var(--ink)', lineHeight: 1.3, margin: '0 0 14px' }}>One Instagram Reel</p>
-
-                {/* D) Checklist items — no duplicates */}
-                <div className="flex flex-col gap-[10px] mb-[24px]">
-                  {[
-                    'Post within 48 hours of your visit',
-                    'Tag the business in your reel',
-                    'Submit your reel link in the app',
-                  ].map((item) => (
-                    <div key={item} className="flex items-start gap-2.5">
-                      <Check size={14} strokeWidth={1.5} color="var(--terra)" style={{ marginTop: 3, flexShrink: 0 }} />
-                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65 }}>{item}</span>
+      {subTab === 'active' && (
+        <div className="space-y-3">
+          {activeParts.map(p => {
+            const stepIdx = getStepIndex(p);
+            const days = daysUntil(p.campaigns?.content_deadline || null);
+            return (
+              <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
+                <p className="text-[13px] font-semibold text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{p.campaigns?.headline || p.campaigns?.title}</p>
+                {/* Status stepper */}
+                <div className="flex items-center gap-0.5 mb-3">
+                  {statusSteps.map((s, i) => (
+                    <div key={s} className="flex-1">
+                      <div className={`h-1.5 rounded-full ${i <= stepIdx ? 'bg-[var(--terra)]' : 'bg-[var(--ink-10)]'}`} />
+                      <p className={`text-[10px] mt-1 ${i <= stepIdx ? 'text-[var(--terra)] font-semibold' : 'text-[var(--ink-35)]'}`}>{s}</p>
                     </div>
                   ))}
                 </div>
-
-                {/* E) They'd love if you… (only if specific_ask exists) */}
-                {offer.specific_ask && (
-                  <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>THEY'D LOVE IF YOU…</p>
-                    <div style={{ borderRadius: 12, padding: '14px 16px', background: 'var(--card)' }}>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink)', lineHeight: 1.65, margin: 0 }}>{offer.specific_ask}</p>
-                    </div>
+                <div className="flex items-center justify-between">
+                  <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
+                    {p.perk_sent && <span className="flex items-center gap-1 text-[var(--success)]"><Check size={12} /> Perk received</span>}
+                    {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days left</span>}
+                    {days !== null && days <= 0 && <span className="text-[var(--terra)]">Content overdue</span>}
                   </div>
-                )}
-
-                {/* F) About business */}
-                {(offer.businesses.bio || offer.businesses.address) && (
-                  <div style={{ marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11, color: 'var(--ink-60)', textTransform: 'uppercase' as const, letterSpacing: '1px', margin: '0 0 8px' }}>ABOUT</p>
-                    {offer.businesses.bio && (
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 12px', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical' as const, overflow: 'hidden' }}>{offer.businesses.bio}</p>
-                    )}
-                    {offer.businesses.address && (
-                      <div className="flex items-center gap-2">
-                        <MapPin size={14} strokeWidth={1.5} color="var(--ink-60)" style={{ flexShrink: 0 }} />
-                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)' }}>{offer.businesses.address}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-                {/* How this works — capped offers only, not yet on list */}
-                {!isUnlimited && !alreadyClaimed && !waitlistedOffers[offer.id] && (
-                  <div style={{ background: 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24 }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 14, color: 'var(--ink)', margin: '0 0 10px' }}>How this works</p>
-                    {[
-                      { icon: Clapperboard, text: 'Join the list to reserve your spot' },
-                      { icon: Bell, text: "We'll notify you when it's your turn" },
-                      { icon: Clock, text: "You'll have 5 days to visit once notified" },
-                      { icon: Clapperboard, text: 'Post your Reel within 48hrs of your visit' },
-                    ].map((item, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: i < 3 ? 8 : 0 }}>
-                        <item.icon size={14} strokeWidth={1.5} color="var(--terra)" style={{ flexShrink: 0, marginTop: 2 }} />
-                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', lineHeight: 1.4 }}>{item.text}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* On the list — capped offers, already queued */}
-                {!isUnlimited && waitlistedOffers[offer.id] && !alreadyClaimed && (
-                  <div style={{ background: waitlistedOffers[offer.id].promoted ? 'rgba(196,103,74,0.06)' : 'var(--card)', borderRadius: 12, padding: '14px 16px', marginBottom: 24, border: waitlistedOffers[offer.id].promoted ? '1.5px solid rgba(196,103,74,0.2)' : 'none' }}>
-                    {waitlistedOffers[offer.id].promoted ? (
-                      <>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--terra)', margin: '0 0 4px' }}>A spot is ready for you!</p>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
-                          Claim this collab now — your spot is held for 24 hours before it moves to the next person.
-                        </p>
-                      </>
-                    ) : (
-                      <>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: 'var(--ink)', margin: '0 0 4px' }}>You're on the list</p>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: '0 0 8px' }}>
-                          {(waitlistedOffers[offer.id].position || 0) <= 1 ? "You're next!" : `${waitlistedOffers[offer.id].position} people ahead of you`}
-                        </p>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.65 }}>
-                          We'll send you a notification when it's your turn. Keep an eye on your alerts.
-                        </p>
-                      </>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sticky bottom bar */}
-            <div style={{ position: 'fixed', bottom: 0, left: 0, right: 0, padding: '12px 20px', paddingBottom: 32, background: 'rgba(246,243,238,0.96)', backdropFilter: 'blur(20px)', borderTop: '1px solid var(--ink-08)', zIndex: 10 }}>
-              {detailIsLocked ? (
-                <div
-                  className="w-full py-[14px] rounded-[999px] text-center"
-                  style={{ background: 'rgba(34,34,34,0.04)', fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)' }}
-                >
-                  Unlocks at {detailLockedName}
-                </div>
-              ) : alreadyClaimed ? (
-                <button
-                  onClick={() => {
-                    const activeClaim = activeClaims.find(c => c.offer_id === offer.id);
-                    if (activeClaim) { setPassDetailClaim(activeClaim); setSelectedClaim(activeClaim); setExpandedOffer(null); setView('pass_detail'); }
-                    else { setExpandedOffer(null); setView('passes'); setPassesSection('active'); }
-                  }}
-                  className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                >
-                  <Check size={16} strokeWidth={1.5} color="white" /> View active pass
-                </button>
-              ) : hasActiveBusiness ? (
-                <button
-                  onClick={() => {
-                    const activeClaim = activeClaims.find(c => c.business_id === offer.business_id);
-                    if (activeClaim) { setPassDetailClaim(activeClaim); setSelectedClaim(activeClaim); setExpandedOffer(null); setView('pass_detail'); }
-                    else { setExpandedOffer(null); setView('passes'); setPassesSection('active'); }
-                  }}
-                  className="w-full py-[14px] rounded-[999px] text-center"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none', borderRadius: 999 }}
-                >
-                  View active pass
-                </button>
-              ) : waitlistedOffers[offer.id]?.promoted ? (
-                <div>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--terra)', textAlign: 'center', margin: '0 0 8px', lineHeight: 1.5 }}>
-                    A spot just opened — claim it before it goes to the next person!
-                  </p>
-                  <button
-                    onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
-                    disabled={loading}
-                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                  >
-                    {loading ? 'Claiming...' : 'Claim now'}
-                  </button>
-                </div>
-              ) : waitlistedOffers[offer.id] ? (
-                <div>
-                  <button
-                    className="w-full py-[14px] rounded-[999px] text-center flex items-center justify-center gap-1.5"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, background: '#8AAE92', color: 'white', border: 'none', cursor: 'default' }}
-                    disabled
-                  >
-                    <Check size={16} strokeWidth={2} /> You're on the list
-                  </button>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '8px 0 0', lineHeight: 1.5 }}>
-                    We'll notify you when a spot opens at {offer.businesses.name}.
-                  </p>
-                  {waitlistConfirmLeave === offer.id ? (
-                    <div className="flex items-center gap-2" style={{ marginTop: 8 }}>
-                      <button
-                        onClick={() => leaveWaitlist(offer.id)}
-                        disabled={waitlistLoading === offer.id}
-                        className="flex-1 py-[10px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', border: '1.5px solid rgba(34,34,34,0.15)', background: 'transparent' }}
-                      >
-                        {waitlistLoading === offer.id ? 'Leaving...' : 'Yes, leave'}
-                      </button>
-                      <button
-                        onClick={() => setWaitlistConfirmLeave(null)}
-                        className="flex-1 py-[10px] rounded-[999px] text-center"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'rgba(34,34,34,0.5)', background: 'transparent', border: 'none' }}
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      onClick={() => setWaitlistConfirmLeave(offer.id)}
-                      className="w-full py-[10px] text-center"
-                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)', background: 'transparent', border: 'none', cursor: 'pointer', marginTop: 4 }}
-                    >
-                      Leave the list
+                  {(p.status === 'confirmed' || p.status === 'visited') && !p.reel_url && (
+                    <button onClick={() => setShowReelModal(p.id)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold">
+                      <Film size={14} /> Submit Reel
                     </button>
                   )}
-                </div>
-              ) : !isUnlimited && full ? (
-                <div>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--ink-60)', textAlign: 'center', margin: '0 0 8px', lineHeight: 1.5 }}>
-                    This collab is full right now. Join the list and we'll notify you when a spot opens.
-                  </p>
-                  <button
-                    onClick={() => joinWaitlist(offer.id)}
-                    disabled={waitlistLoading === offer.id}
-                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                  >
-                    {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
-                  </button>
-                </div>
-              ) : !isUnlimited ? (
-                <button
-                  onClick={() => joinWaitlist(offer.id)}
-                  disabled={waitlistLoading === offer.id}
-                  className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                >
-                  {waitlistLoading === offer.id ? 'Joining...' : 'Join the list'}
-                </button>
-              ) : (
-                <div>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'rgba(34,34,34,0.5)', textAlign: 'center' as const, margin: '0 0 8px' }}>Post a reel within 48hrs</p>
-                  <button
-                    onClick={() => { handleClaim(offer); setExpandedOffer(null); }}
-                    disabled={loading}
-                    className="w-full py-[14px] rounded-[999px] text-center disabled:opacity-40 transition-all"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, background: 'var(--terra)', color: '#FFFFFF', border: 'none' }}
-                  >
-                    Claim collab
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })()}
-
-      <div className="flex-1 overflow-y-auto">
-      <div className="max-w-md mx-auto">
-
-        {/* Content */}
-        <div className="pb-6">
-
-          {/* -- DISCOVER — VERTICAL SCROLL FEED -- */}
-          {view === 'offers' && (() => {
-            // Filter available offers: exclude already claimed and full offers
-            const feedOffers = offers.filter(o => {
-              if (claims.some(c => c.offer_id === o.id && c.status !== 'expired')) return false;
-              const isUnlimited = o.monthly_cap === null;
-              if (!isUnlimited) {
-                const slotsLeft = Math.max(0, (o.monthly_cap as number) - (o.slotsUsed || 0));
-                if (slotsLeft === 0) return false;
-              }
-              return true;
-            });
-
-            // Apply category filter
-            const filteredOffers = selectedCategory === 'all'
-              ? feedOffers
-              : feedOffers.filter(o => getCategoryGroup(o.businesses.category) === selectedCategory);
-
-            // Apply search filter
-            const searchTerm = searchQuery.trim().toLowerCase();
-            const searchedOffers = searchTerm
-              ? filteredOffers.filter(o => {
-                  const title = (o.generated_title || o.description || '').toLowerCase();
-                  const biz = (o.businesses.name || '').toLowerCase();
-                  return title.includes(searchTerm) || biz.includes(searchTerm);
-                })
-              : filteredOffers;
-
-            // Split into near-you (horizontal row) and new-this-week (vertical list)
-            const nearYouOffers = searchedOffers.slice(0, 8);
-            const newThisWeekOffers = searchedOffers.slice(8);
-
-            // Extract city from first offer's address
-            const cityName = (() => {
-              const addr = offers[0]?.businesses?.address;
-              if (!addr) return '';
-              const parts = addr.split(',').map((s: string) => s.trim());
-              if (parts.length >= 3) return parts[parts.length - 2];
-              if (parts.length >= 2) return parts[1];
-              return parts[0];
-            })();
-
-            return (
-              <div style={{ background: 'var(--shell)' }}>
-                {/* ── Header: search bar + categories only ── */}
-                <div style={{ padding: '16px 20px 0' }}>
-                  {/* Full-width pill search bar */}
-                  <div
-                    style={{
-                      display: 'flex', alignItems: 'center',
-                      padding: '0 16px', height: 52, marginBottom: 12,
-                      background: 'var(--shell)', border: '1.5px solid var(--border)', borderRadius: 999,
-                    }}
-                  >
-                    <Search size={18} strokeWidth={1.5} color="var(--ink-35)" style={{ flexShrink: 0 }} />
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Find local collabs…"
-                      style={{
-                        flex: 1, border: 'none', background: 'transparent', outline: 'none',
-                        fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 16,
-                        color: 'var(--ink)', marginLeft: 10,
-                      }}
-                    />
-                    {searchQuery && (
-                      <button
-                        onClick={() => setSearchQuery('')}
-                        style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 4, flexShrink: 0 }}
-                      >
-                        <X size={16} strokeWidth={1.5} color="var(--ink-35)" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-
-                {/* ── Category tabs — Airbnb style with underline ── */}
-                <div style={{ display: 'flex', borderBottom: '1px solid var(--ink-08)', padding: '0 20px' }}>
-                  {categoryTabs.map(cat => {
-                    const isActive = selectedCategory === cat.key;
-                    return (
-                      <button
-                        key={cat.key}
-                        onClick={() => setSelectedCategory(cat.key)}
-                        style={{
-                          flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, padding: '10px 0 10px',
-                          background: 'none', border: 'none', cursor: 'pointer',
-                          borderBottom: isActive ? '2px solid var(--terra)' : '2px solid transparent',
-                          marginBottom: -1, transition: 'all 0.15s ease',
-                        }}
-                      >
-                        {(() => { const TabIcon = categoryTabIconMap[cat.icon]; return TabIcon ? <TabIcon size={22} strokeWidth={1.5} color={isActive ? 'var(--terra)' : 'var(--ink-35)'} /> : null; })()}
-                        <span style={{
-                          fontFamily: "'Instrument Sans', sans-serif", fontWeight: isActive ? 600 : 500, fontSize: 13,
-                          color: isActive ? 'var(--terra)' : 'var(--ink-35)',
-                        }}>{cat.label}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-
-                {/* ── Your passes — compact banner (hidden during search) ── */}
-                {!searchTerm && activeClaims.length > 0 && (() => {
-                  const filtered = activeClaims.filter(c => c.businesses && c.offers && !(c.redeemed_at && !c.reel_url && c.reel_due_at && new Date(c.reel_due_at) < new Date()));
-                  if (filtered.length === 0) return null;
-                  const sorted = [...filtered].sort((a, b) => new Date(a.qr_expires_at).getTime() - new Date(b.qr_expires_at).getTime());
-                  const urgentClaim = sorted[0];
-                  const claimTitle = urgentClaim.snapshot_generated_title || urgentClaim.offers.generated_title || urgentClaim.offers.description || '';
-                  const claimBiz = urgentClaim.businesses?.name || '';
-                  const msLeft = new Date(urgentClaim.qr_expires_at).getTime() - Date.now();
-                  const hoursLeft = Math.max(0, Math.floor(msLeft / (1000 * 60 * 60)));
-                  const timerLabel = hoursLeft >= 24 ? `${Math.floor(hoursLeft / 24)}d left` : `${hoursLeft}h left`;
-                  return (
-                    <div style={{ marginTop: 16, padding: '0 20px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Your passes</span>
-                        <button onClick={() => { setView('passes'); setPassesSection('active'); }} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>View all</button>
-                      </div>
-                      <button
-                        onClick={() => { setView('passes'); setPassesSection('active'); }}
-                        style={{
-                          width: '100%', background: 'var(--terra)', borderRadius: 14, padding: '12px 16px',
-                          border: 'none', cursor: 'pointer', textAlign: 'left',
-                          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-                        }}
-                      >
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'white', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '2px 0 0' }}>{claimBiz}</p>
-                        </div>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0, marginLeft: 12 }}>
-                          {hoursLeft > 0 && (
-                            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 11, color: 'var(--ink)', background: '#F5C4A0', borderRadius: 999, padding: '3px 10px' }}>{timerLabel}</span>
-                          )}
-                          <ChevronRight size={16} strokeWidth={1.5} color="rgba(255,255,255,0.75)" />
-                        </div>
-                      </button>
-                    </div>
-                  );
-                })()}
-
-                {/* ── Claim error toast ── */}
-                {claimError && (
-                  <div style={{ margin: '8px 20px 0', padding: '10px 14px', borderRadius: 12, background: 'rgba(34,34,34,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'var(--ink)', margin: 0 }}>{claimError}</p>
-                    <button onClick={() => setClaimError(null)} style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 600, color: 'var(--ink-35)', marginLeft: 12, background: 'none', border: 'none', cursor: 'pointer' }}>Dismiss</button>
-                  </div>
-                )}
-
-                {/* ── Loading state ── */}
-                {offersLoading && (
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '60px 0' }}>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-35)', fontSize: 14 }}>Loading collabs…</p>
-                  </div>
-                )}
-
-                {/* ── Empty state ── */}
-                {!offersLoading && searchedOffers.length === 0 && (
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '40px 20px', gap: 8 }}>
-                    {searchTerm ? (
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', margin: 0 }}>No collabs found for '{searchQuery.trim()}'</p>
-                    ) : (
-                      <>
-                        <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 24, color: 'var(--ink)', margin: 0, letterSpacing: '-0.03em' }}>All caught up</h2>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', textAlign: 'center', lineHeight: 1.65, margin: '0 0 16px' }}>No collabs available right now — check back soon.</p>
-                      </>
-                    )}
-                  </div>
-                )}
-
-                {/* ── Search results — flat grid when searching ── */}
-                {!offersLoading && searchTerm && searchedOffers.length > 0 && (
-                  <div style={{ padding: '16px 20px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                    {searchedOffers.map((offer) => {
-                      const offerTitle = offer.generated_title || offer.description;
-                      const isSaved = savedOffers.has(offer.id);
-                      return (
-                        <div
-                          key={offer.id}
-                          onClick={() => setExpandedOffer(offer.id)}
-                          style={{ cursor: 'pointer', position: 'relative' }}
-                        >
-                          <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
-                            <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                              <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
-                              {offer.offer_photo_url && (
-                                <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                              )}
-                            </div>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                              style={{
-                                position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
-                                background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                              }}
-                            >
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                              </svg>
-                            </button>
-                          </div>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-
-                {/* ── Near you — horizontal card row ── */}
-                {!offersLoading && !searchTerm && nearYouOffers.length > 0 && (
-                  <div style={{ marginTop: 20 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Near you</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                      </button>
-                    </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
-                      {nearYouOffers.map((offer) => {
-                        const offerTitle = offer.generated_title || offer.description;
-                        const isUnlimited = offer.monthly_cap === null;
-                        const slotsUsed = offer.slotsUsed || 0;
-                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                        const isSaved = savedOffers.has(offer.id);
-
-                        return (
-                          <div
-                            key={offer.id}
-                            onClick={() => setExpandedOffer(offer.id)}
-                            style={{
-                              width: 'calc(50vw - 24px)', flexShrink: 0,
-                              cursor: 'pointer', position: 'relative',
-                            }}
-                          >
-                            {/* Image area */}
-                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
-                                {offer.offer_photo_url && (
-                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                                )}
-                              </div>
-                              {/* Slot badge */}
-                              {!isUnlimited && (
-                                waitlistedOffers[offer.id] ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: 'var(--terra)', color: 'white',
-                                  }}>
-                                    On the list ✓
-                                  </span>
-                                ) : slotsLeft === 0 ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    Join the list
-                                  </span>
-                                ) : slotsLeft !== null ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                  </span>
-                                ) : null
-                              )}
-                              {/* Heart button */}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                style={{
-                                  position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
-                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                }}
-                              >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                              </button>
-                            </div>
-                            {/* Text below image — no container */}
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* ── New this week — horizontal scroll cards ── */}
-                {!offersLoading && !searchTerm && newThisWeekOffers.length > 0 && (
-                  <div style={{ marginTop: 24 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>New this week</span>
-                      <button onClick={() => setView('all_offers')} style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--terra)', background: 'none', border: 'none', cursor: 'pointer' }}>
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--terra)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M9 18l6-6-6-6"/></svg>
-                      </button>
-                    </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
-                      {newThisWeekOffers.map((offer) => {
-                        const offerTitle = offer.generated_title || offer.description;
-                        const isUnlimited = offer.monthly_cap === null;
-                        const slotsUsed = offer.slotsUsed || 0;
-                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                        const isSaved = savedOffers.has(offer.id);
-
-                        return (
-                          <div
-                            key={offer.id}
-                            onClick={() => setExpandedOffer(offer.id)}
-                            style={{
-                              width: 'calc(50vw - 24px)', flexShrink: 0,
-                              cursor: 'pointer', position: 'relative',
-                            }}
-                          >
-                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[32px] h-[32px]" style={{ color: '#C4674A' }} />
-                                {offer.offer_photo_url && (
-                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                                )}
-                              </div>
-                              {!isUnlimited && (
-                                waitlistedOffers[offer.id] ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: 'var(--terra)', color: 'white',
-                                  }}>
-                                    On the list ✓
-                                  </span>
-                                ) : slotsLeft === 0 ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    Join the list
-                                  </span>
-                                ) : slotsLeft !== null ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                  </span>
-                                ) : null
-                              )}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                style={{
-                                  position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
-                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                }}
-                              >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                              </button>
-                            </div>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* ── All offers — horizontal scroll row ── */}
-                {!offersLoading && !searchTerm && searchedOffers.length > 0 && (
-                  <div style={{ marginTop: 24 }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                      <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>All collabs</span>
-                      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink-35)' }}>{searchedOffers.length} available</span>
-                    </div>
-                    <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
-                      {searchedOffers.map((offer) => {
-                        const offerTitle = offer.generated_title || offer.description;
-                        const isUnlimited = offer.monthly_cap === null;
-                        const slotsUsed = offer.slotsUsed || 0;
-                        const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                        const isSaved = savedOffers.has(offer.id);
-                        return (
-                          <div
-                            key={offer.id}
-                            onClick={() => setExpandedOffer(offer.id)}
-                            style={{
-                              width: 'calc(50vw - 24px)', flexShrink: 0,
-                              cursor: 'pointer', position: 'relative',
-                            }}
-                          >
-                            <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
-                              <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
-                                {offer.offer_photo_url && (
-                                  <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                                )}
-                              </div>
-                              {!isUnlimited && (
-                                waitlistedOffers[offer.id] ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: 'var(--terra)', color: 'white',
-                                  }}>
-                                    On the list ✓
-                                  </span>
-                                ) : slotsLeft === 0 ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    Join the list
-                                  </span>
-                                ) : slotsLeft !== null ? (
-                                  <span style={{
-                                    position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                  </span>
-                                ) : null
-                              )}
-                              <button
-                                onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                style={{
-                                  position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
-                                  background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
-                                  display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                }}
-                              >
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                </svg>
-                              </button>
-                            </div>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* ── Trending — horizontal scroll row sorted by claims ── */}
-                {!offersLoading && !searchTerm && (() => {
-                  const trendingOffers = [...searchedOffers]
-                    .filter(o => (o.slotsUsed || 0) > 0)
-                    .sort((a, b) => (b.slotsUsed || 0) - (a.slotsUsed || 0))
-                    .slice(0, 10);
-                  if (trendingOffers.length === 0) return null;
-                  return (
-                    <div style={{ marginTop: 24 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px', marginBottom: 12 }}>
-                        <span style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 22, color: 'var(--ink)', letterSpacing: '-0.03em' }}>Trending</span>
-                      </div>
-                      <div className="hide-scrollbar" style={{ display: 'flex', gap: 12, overflowX: 'auto', padding: '0 20px 4px', scrollbarWidth: 'none', scrollSnapType: 'x proximity' }}>
-                        {trendingOffers.map((offer) => {
-                          const offerTitle = offer.generated_title || offer.description;
-                          const isUnlimited = offer.monthly_cap === null;
-                          const slotsUsed = offer.slotsUsed || 0;
-                          const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                          const isSaved = savedOffers.has(offer.id);
-                          return (
-                            <div
-                              key={offer.id}
-                              onClick={() => setExpandedOffer(offer.id)}
-                              style={{
-                                width: 'calc(50vw - 24px)', flexShrink: 0,
-                                cursor: 'pointer', position: 'relative',
-                              }}
-                            >
-                              <div style={{ position: 'relative', aspectRatio: '3/2', borderRadius: 12, overflow: 'hidden' }}>
-                                <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                  <CategoryIcon category={offer.businesses.category} className="w-[28px] h-[28px]" style={{ color: '#C4674A' }} />
-                                  {offer.offer_photo_url && (
-                                    <img src={offer.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                                  )}
-                                </div>
-                                {/* Slot badge top-left */}
-                                {!isUnlimited && (
-                                  waitlistedOffers[offer.id] ? (
-                                    <span style={{
-                                      position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                      background: 'var(--terra)', color: 'white',
-                                    }}>
-                                      On the list ✓
-                                    </span>
-                                  ) : slotsLeft === 0 ? (
-                                    <span style={{
-                                      position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                      background: '#F5C4A0', color: 'var(--ink)',
-                                    }}>
-                                      Join the list
-                                    </span>
-                                  ) : slotsLeft !== null ? (
-                                    <span style={{
-                                      position: 'absolute', top: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                      background: '#F5C4A0', color: 'var(--ink)',
-                                    }}>
-                                      {slotsLeft <= 1 ? 'Last slot' : `${slotsLeft} left`}
-                                    </span>
-                                  ) : null
-                                )}
-                                {/* Heart button top-right */}
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); toggleSave(offer.id); }}
-                                  style={{
-                                    position: 'absolute', top: 8, right: 8, width: 30, height: 30, borderRadius: '50%',
-                                    background: 'rgba(246,243,238,0.88)', backdropFilter: 'blur(4px)', border: 'none',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer',
-                                  }}
-                                >
-                                  <svg width="14" height="14" viewBox="0 0 24 24" fill={isSaved ? 'var(--terra)' : 'none'} stroke={isSaved ? 'var(--terra)' : 'var(--ink-60)'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                                  </svg>
-                                </button>
-                                {/* Claim count badge bottom-left */}
-                                <span style={{
-                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                  fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 11,
-                                  background: 'rgba(34,34,34,0.72)', color: 'white',
-                                }}>
-                                  {slotsUsed} claimed
-                                </span>
-                              </div>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{offer.businesses.name}</p>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  );
-                })()}
-
-                {/* Bottom spacer for nav clearance */}
-                <div style={{ height: 24 }} />
-              </div>
-            );
-          })()}
-
-          {/* -- SAVED TAB -- */}
-          {view === 'saved' && (() => {
-            const matchedSaved = offers.filter(o => savedOffers.has(o.id));
-            return (
-            <div className="px-[20px] pt-5">
-              <div className="flex items-center justify-between mb-5">
-                <div className="flex items-center gap-3">
-                  <button onClick={() => setView('offers')} className="p-1 -ml-1">
-                    <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
-                  </button>
-                  <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Saved</h1>
-                </div>
-                <span className="text-[15px] text-[var(--ink-60)]">{matchedSaved.length} saved</span>
-              </div>
-
-              {matchedSaved.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-20 px-[40px]">
-                  <Heart size={48} strokeWidth={1.5} color="#C4674A" fill="none" />
-                  <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing saved yet</p>
-                  <p className="text-[15px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, lineHeight: 1.65 }}>
-                    Heart a collab on the explore feed to save it for later.
-                  </p>
-                  <button
-                    onClick={() => setView('offers')}
-                    className="mt-[20px] px-[24px] py-[13px] rounded-full text-white text-[15px] min-h-[44px]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)', borderRadius: 999 }}
-                  >
-                    Find collabs
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-[12px]">
-                  {matchedSaved.map(offer => {
-                    const isUnlimited = offer.monthly_cap === null;
-                    const slotsUsed = offer.slotsUsed || 0;
-                    const slotsLeft = isUnlimited ? null : Math.max(0, (offer.monthly_cap as number) - slotsUsed);
-                    return (
-                      <button
-                        key={offer.id}
-                        onClick={() => setExpandedOffer(offer.id)}
-                        className="w-full text-left"
-                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'var(--card)', borderRadius: 16, padding: '14px 16px' }}
-                      >
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.generated_title || offer.description}</p>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offer.businesses.name}</p>
-                          <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>
-                            {isUnlimited ? 'Open availability' : getSlotsBadgeStyle(slotsLeft as number, offer.monthly_cap as number).text}
-                          </p>
-                        </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); toggleSaved(offer.id); }}
-                          className="flex-shrink-0"
-                          style={{ padding: 8, background: 'none', border: 'none', cursor: 'pointer' }}
-                        >
-                          <Heart size={20} strokeWidth={1.5} className="text-[var(--terra)] fill-[var(--terra)]" />
-                        </button>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-            );
-          })()}
-
-          {/* -- PASSES TAB (merged Active + Claims) -- */}
-          {view === 'passes' && (
-            <div style={{ background: 'var(--shell)' }}>
-              {/* Header */}
-              <div style={{ padding: '14px 20px 0' }}>
-                <div className="flex items-center gap-3 mb-4">
-                  <button onClick={() => setView('offers')} className="p-1 -ml-1">
-                    <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                  </button>
-                  <h1 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 28, color: 'var(--ink)', letterSpacing: '-0.03em', margin: 0 }}>Passes</h1>
-                </div>
-                {/* Pill toggle */}
-                <div style={{ display: 'flex', background: 'var(--card)', borderRadius: 999, padding: 3, marginBottom: 16 }}>
-                  {(['active', 'past'] as const).map(section => {
-                    const isActive = passesSection === section;
-                    return (
-                      <button
-                        key={section}
-                        onClick={() => setPassesSection(section)}
-                        style={{
-                          flex: 1, height: 40, borderRadius: 999, border: 'none', cursor: 'pointer',
-                          background: isActive ? 'var(--ink)' : 'transparent',
-                          color: isActive ? 'white' : 'var(--ink-60)',
-                          fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 15,
-                          transition: 'all 0.2s ease',
-                        }}
-                      >
-                        {section === 'active' ? 'Active' : 'Past'}
-                      </button>
-                    );
-                  })}
+                  {p.reel_url && (
+                    <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                      className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
+                      <Film size={14} /> View Reel <ExternalLink size={12} />
+                    </a>
+                  )}
                 </div>
               </div>
-
-              {/* Active section — 2 column grid with search */}
-              {passesSection === 'active' && (
-                <div style={{ padding: '0 20px' }}>
-                  {activeClaims.filter(c => c.businesses && c.offers).length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 px-6">
-                      <Zap size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mb-4" />
-                      <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 4px' }}>No active passes</p>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: '0 0 20px' }}>Claim a collab to get started</p>
-                      <button
-                        onClick={() => setView('offers')}
-                        className="bg-[var(--terra)] text-white text-[15px] rounded-[999px] px-[24px] py-[13px] hover:bg-[var(--terra-hover)] transition-all"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
-                      >
-                        Browse collabs
-                      </button>
-                    </div>
-                  ) : (
-                    <>
-                      {/* Search bar */}
-                      <div style={{ position: 'relative', marginBottom: 14 }}>
-                        <Search size={16} strokeWidth={1.5} style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'rgba(34,34,34,0.35)' }} />
-                        <input
-                          value={passesSearch}
-                          onChange={(e) => setPassesSearch(e.target.value)}
-                          placeholder="Search passes..."
-                          className="w-full focus:outline-none"
-                          style={{ background: 'var(--card)', borderRadius: 999, padding: '11px 14px 11px 38px', fontSize: 15, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)', border: 'none' }}
-                        />
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                      {(() => {
-                        const filtered = activeClaims
-                          .filter(c => c.businesses && c.offers)
-                          .filter(c => {
-                            if (!passesSearch.trim()) return true;
-                            const q = passesSearch.toLowerCase();
-                            const title = (c.snapshot_generated_title || c.offers.generated_title || c.offers.description || '').toLowerCase();
-                            const biz = (c.businesses?.name || '').toLowerCase();
-                            return title.includes(q) || biz.includes(q);
-                          })
-                          .sort((a, b) => {
-                            // Sort: reel_due first, then visited, then claimed
-                            const urgency = (c: typeof a) => {
-                              const isReelDue = !!(c.redeemed_at && !c.reel_url);
-                              const isVisited = c.status === 'redeemed' || c.status === 'visited';
-                              if (isReelDue) return 0;
-                              if (isVisited) return 1;
-                              return 2;
-                            };
-                            const diff = urgency(a) - urgency(b);
-                            if (diff !== 0) return diff;
-                            // Within group, sort by deadline ascending (most urgent first)
-                            const aTime = a.reel_due_at ? new Date(a.reel_due_at).getTime() : a.qr_expires_at ? new Date(a.qr_expires_at).getTime() : Infinity;
-                            const bTime = b.reel_due_at ? new Date(b.reel_due_at).getTime() : b.qr_expires_at ? new Date(b.qr_expires_at).getTime() : Infinity;
-                            return aTime - bTime;
-                          });
-                        return filtered.map((claim) => {
-                        const claimTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
-                        const bizName = claim.businesses?.name || '';
-                        const bizCategory = claim.businesses?.category || '';
-                        const isClaimed = claim.status === 'active' && !claim.redeemed_at;
-                        const isReelDue = !!(claim.redeemed_at && !claim.reel_url);
-                        const isVisited = claim.status === 'redeemed' || claim.status === 'visited';
-                        const statusColor = isReelDue ? 'var(--terra)' : isVisited ? '#8AAE92' : isClaimed ? '#F5C4A0' : '#F5C4A0';
-                        const statusTextColor = isReelDue ? 'white' : 'var(--ink)';
-                        const statusLabel = isReelDue ? 'Reel due' : isVisited ? 'Visited' : 'Active';
-                        // Timer for reel due
-                        const timerLabel = (() => {
-                          if (!isReelDue || !claim.reel_due_at) return '';
-                          const diff = new Date(claim.reel_due_at).getTime() - Date.now();
-                          if (diff <= 0) return '';
-                          const hrs = Math.floor(diff / (1000 * 60 * 60));
-                          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                          return `${hrs}h ${mins}m`;
-                        })();
-
-                        return (
-                          <button
-                            key={claim.id}
-                            onClick={() => { setPassDetailClaim(claim); setSelectedClaim(claim); setView('pass_detail'); }}
-                            style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                          >
-                            {/* Image card */}
-                            <div style={{ position: 'relative', borderRadius: 14, overflow: 'hidden' }}>
-                              <div style={{ height: 140, position: 'relative' }}>
-                                <div style={{ width: '100%', height: '100%', background: '#EDE9E3', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                                  <CategoryIcon category={bizCategory} className="w-[28px] h-[28px]" style={{ color: 'var(--terra)' }} />
-                                  {claim.offers?.offer_photo_url && (
-                                    <img src={claim.offers.offer_photo_url} alt="" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
-                                  )}
-                                </div>
-                                {/* Gradient overlay */}
-                                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(34,34,34,0.6) 0%, rgba(34,34,34,0) 50%)', pointerEvents: 'none' }} />
-                                {/* Status pill bottom left */}
-                                <span style={{
-                                  position: 'absolute', bottom: 8, left: 8, borderRadius: 999, padding: '3px 8px',
-                                  fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                  background: statusColor, color: statusTextColor,
-                                }}>
-                                  {statusLabel}
-                                </span>
-                                {/* Timer pill bottom right */}
-                                {isReelDue && timerLabel && (
-                                  <span style={{
-                                    position: 'absolute', bottom: 8, right: 8, borderRadius: 999, padding: '3px 8px',
-                                    fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 10,
-                                    background: '#F5C4A0', color: 'var(--ink)',
-                                  }}>
-                                    {timerLabel}
-                                  </span>
-                                )}
-                              </div>
-                            </div>
-                            {/* Text below */}
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 14, color: 'var(--ink)', margin: '6px 0 0', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claimTitle}</p>
-                            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: 'var(--ink-60)', margin: '2px 0 0', lineHeight: 1.3 }}>{bizName}</p>
-                          </button>
-                        );
-                      });
-                      })()}
-                    </div>
-                    </>
-                  )}
-                </div>
-              )}
-
-              {/* Past section — simple list cards */}
-              {passesSection === 'past' && (
-                <div style={{ padding: '0 20px' }}>
-                  {pastClaims.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-20 px-6">
-                      <Clock size={48} strokeWidth={1.5} className="text-[var(--ink-35)] mb-4" />
-                      <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 20, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 4px' }}>No past passes</p>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 15, color: 'var(--ink-60)', margin: 0 }}>Completed and expired passes will appear here</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-[12px]">
-                      {pastClaims.map((claim) => {
-                        const isOverdue = !!(claim.redeemed_at && !claim.reel_url && claim.reel_due_at && new Date(claim.reel_due_at) < new Date());
-                        const displayStatus = isOverdue ? 'overdue' : claim.status;
-                        const leftBorderColor = displayStatus === 'completed' || displayStatus === 'submitted' ? '#8AAE92' : displayStatus === 'overdue' ? 'rgba(34,34,34,0.35)' : displayStatus === 'expired' ? 'rgba(34,34,34,0.15)' : displayStatus === 'disputed' ? '#F5C4A0' : 'rgba(34,34,34,0.15)';
-                        return (
-                          <div
-                            key={claim.id}
-                            style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', background: 'var(--card)', borderRadius: 16, padding: '14px 16px', borderLeft: `3px solid ${leftBorderColor}` }}
-                          >
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: 3, flex: 1, minWidth: 0 }}>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{claim.offers.generated_title || claim.offers.description}</p>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 14, color: 'var(--ink-60)', margin: 0 }}>{claim.businesses.name}</p>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', margin: 0 }}>{formatDate(claim.claimed_at)}</p>
-                            </div>
-                            <div style={{ flexShrink: 0, marginLeft: 12 }}>
-                              <StatusPill status={displayStatus} />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              )}
-              <div style={{ height: 24 }} />
-            </div>
-          )}
-
-          {/* -- PASS DETAIL (individual pass action screen) -- */}
-          {view === 'pass_detail' && passDetailClaim && (() => {
-            const claim = activeClaims.find(c => c.id === passDetailClaim.id) || passDetailClaim;
-            if (!claim.businesses || !claim.offers) return null;
-            const isClaimed = claim.status === 'active' && !claim.redeemed_at;
-            const isReelDue = !!(claim.redeemed_at && !claim.reel_url);
-
-            const currentStage = claim.reel_url ? 'submitted' : claim.redeemed_at ? 'reel_due' : 'claimed';
-            const stageIndex = currentStage === 'claimed' ? 0 : currentStage === 'reel_due' ? 2 : currentStage === 'submitted' ? 3 : 1;
-            const stageLabels = ['Claimed', 'Visited', 'Reel Due', 'Done'];
-            const offerTitle = claim.snapshot_generated_title || claim.offers.generated_title || claim.offers.description || '';
-
-            return (
-              <div style={{ background: isClaimed ? '#C4674A' : 'var(--shell)', minHeight: 'calc(100vh - 80px)', transition: 'background 0.3s ease' }}>
-                {/* Back button */}
-                <div style={{ padding: '14px 20px 0' }}>
-                  <button
-                    onClick={() => { setView('passes'); setPassesSection('active'); }}
-                    style={{ display: 'flex', alignItems: 'center', gap: 4, background: 'none', border: 'none', cursor: 'pointer', padding: '4px 0', color: isClaimed ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)', fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15 }}
-                  >
-                    <ChevronLeft size={18} strokeWidth={1.5} /> Back
-                  </button>
-                </div>
-
-                <div style={{ padding: '12px 20px 0' }}>
-                  {/* Pass navigator card */}
-                  <div style={{ display: 'flex', alignItems: 'center', background: isClaimed ? 'rgba(255,255,255,0.15)' : 'var(--card)', borderRadius: 12, padding: '14px 16px' }}>
-                    <div style={{ flex: 1, minWidth: 0, textAlign: 'center' }}>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 15, color: isClaimed ? 'white' : 'var(--ink)', margin: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{offerTitle}</p>
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 12, color: isClaimed ? 'rgba(255,255,255,0.6)' : 'rgba(34,34,34,0.45)', margin: '2px 0 0' }}>{claim.businesses.name}</p>
-                    </div>
-                  </div>
-
-                  {/* Stepper */}
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 0, marginTop: 10 }}>
-                    {stageLabels.map((label, sIdx) => (
-                      <span key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, fontWeight: sIdx === stageIndex ? 700 : 400, color: isClaimed ? (sIdx === stageIndex ? 'white' : 'rgba(255,255,255,0.5)') : (sIdx === stageIndex ? '#C4674A' : 'rgba(34,34,34,0.35)') }}>{label}</span>
-                        {sIdx < stageLabels.length - 1 && (
-                          <span style={{ fontSize: 10, margin: '0 6px', color: isClaimed ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.35)' }}>›</span>
-                        )}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Content based on status */}
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '0 4px' }}>
-
-                    {/* CLAIMED — not yet visited */}
-                    {isClaimed && (
-                      <div className="flex flex-col items-center text-center" style={{ paddingTop: 40 }}>
-                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'white', letterSpacing: '-0.03em', margin: '0 0 6px', lineHeight: 1.1 }}>Show this to staff</p>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(255,255,255,0.7)', margin: '0 auto 28px', maxWidth: 260, lineHeight: 1.5 }}>
-                          Ask them to tap the button to confirm your visit
-                        </p>
-                        <button
-                          onClick={() => { setConfirmVisitError(null); setConfirmVisitClaimId(claim.id); }}
-                          disabled={loading}
-                          className="!w-[200px] !h-[200px] rounded-full border-none cursor-pointer !text-[24px] !font-extrabold !tracking-tight !leading-none"
-                          style={{
-                            background: '#8B3D28', color: 'white',
-                            opacity: loading ? 0.6 : 1,
-                            animation: loading ? 'none' : 'pulse-ring-white 2s ease-in-out infinite',
-                            transform: loading ? 'scale(0.95)' : 'scale(1)',
-                            transition: 'transform 0.1s ease',
-                          }}
-                        >
-                          {loading ? (
-                            <svg className="animate-spin" width="32" height="32" viewBox="0 0 24 24" fill="none" style={{ margin: '0 auto' }}>
-                              <circle cx="12" cy="12" r="10" stroke="rgba(255,255,255,0.3)" strokeWidth="3" />
-                              <path d="M12 2a10 10 0 0 1 10 10" stroke="white" strokeWidth="3" strokeLinecap="round" />
-                            </svg>
-                          ) : <>Confirm</>}
-                        </button>
-                        {confirmVisitError && (
-                          <p className="!text-[13px] !font-medium !mt-3 text-center" style={{ color: 'rgba(255,255,255,0.8)' }}>{confirmVisitError}</p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Confirm visit dialog */}
-                    {confirmVisitClaimId === claim.id && (
-                      <div
-                        style={{ position: 'fixed', inset: 0, zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(34,34,34,0.45)' }}
-                        onClick={() => setConfirmVisitClaimId(null)}
-                      >
-                        <div
-                          onClick={(e) => e.stopPropagation()}
-                          style={{ background: 'var(--shell)', borderRadius: 24, padding: '28px 24px', width: 'calc(100vw - 48px)', maxWidth: 340, textAlign: 'center', boxShadow: '0 8px 32px rgba(34,34,34,0.14)' }}
-                        >
-                          <p className="!text-[18px] !font-semibold !text-[var(--ink)] !leading-tight" style={{ margin: '0 0 10px', letterSpacing: '-0.02em' }}>Confirm this visit?</p>
-                          <p className="!text-[15px] !font-normal !text-[var(--ink-60)]" style={{ margin: '0 0 24px', lineHeight: 1.65 }}>
-                            Only confirm if you are at {claim.businesses.name} and a staff member is present.
-                          </p>
-                          <div style={{ display: 'flex', gap: 12 }}>
-                            <button
-                              onClick={() => setConfirmVisitClaimId(null)}
-                              className="!text-[15px] !font-semibold !text-[var(--ink)]"
-                              style={{ flex: 1, height: 48, borderRadius: 999, border: '1.5px solid var(--border)', background: 'transparent', cursor: 'pointer' }}
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              onClick={async () => {
-                                try {
-                                  setLoading(true);
-                                  setConfirmVisitClaimId(null);
-                                  setConfirmVisitError(null);
-                                  const { error } = await supabase
-                                    .from('claims')
-                                    .update({ status: 'redeemed', redeemed_at: new Date().toISOString() })
-                                    .eq('id', claim.id);
-                                  if (error) throw error;
-                                  const updated = { ...claim, status: 'redeemed', redeemed_at: new Date().toISOString() } as any;
-                                  setActiveClaims(prev => prev.map(c => c.id === claim.id ? updated : c));
-                                  setClaims(prev => prev.map(c => c.id === claim.id ? updated : c));
-                                  setPassDetailClaim(updated);
-                                  if (selectedClaim?.id === claim.id) setSelectedClaim(updated);
-                                } catch (err: any) {
-                                  setConfirmVisitError('Something went wrong — please try again');
-                                } finally {
-                                  setLoading(false);
-                                }
-                              }}
-                              disabled={loading}
-                              className="!text-[15px] !font-bold !text-white"
-                              style={{ flex: 1, height: 48, borderRadius: 999, border: 'none', background: 'var(--terra)', cursor: 'pointer', opacity: loading ? 0.6 : 1 }}
-                            >
-                              Yes, confirm
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* VISITED / REEL DUE */}
-                    {claim.redeemed_at && !claim.reel_url && (
-                      <div style={{ textAlign: 'center', paddingTop: 40, width: '100%' }}>
-                        <p style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: 38, color: 'var(--ink)', letterSpacing: '-0.03em', margin: '0 0 10px', lineHeight: 1.1 }}>Visit confirmed!</p>
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'rgba(34,34,34,0.5)', margin: '0 auto 16px', maxWidth: 280, lineHeight: 1.65 }}>
-                          Post your Reel within 48 hours and submit the link below
-                        </p>
-                        {/* Timer pill or overdue warning */}
-                        {(() => {
-                          const due = claim.reel_due_at ? new Date(claim.reel_due_at).getTime() : 0;
-                          const now = Date.now();
-                          const diff = due - now;
-                          const isOverdue = due > 0 && diff <= 0;
-                          const hrs = Math.floor(diff / (1000 * 60 * 60));
-                          const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-                          const tl = due > 0 && diff > 0 ? `${hrs}h ${mins}m remaining` : '';
-                          if (isOverdue) {
-                            return (
-                              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: 'rgba(196,103,74,0.12)', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
-                                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--terra)' }}>The posting deadline has passed</span>
-                              </div>
-                            );
-                          }
-                          if (!tl) return null;
-                          return (
-                            <div style={{ display: 'inline-flex', alignItems: 'center', gap: 6, background: '#F5C4A0', borderRadius: 999, padding: '6px 14px', marginBottom: 20 }}>
-                              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink)' }}>{tl}</span>
-                            </div>
-                          );
-                        })()}
-                        {/* Reel URL input — hidden when overdue */}
-                        {!(claim.reel_due_at && new Date() > new Date(claim.reel_due_at)) ? (
-                        <div style={{ textAlign: 'left' }}>
-                          <input
-                            type="url"
-                            value={reelUrl}
-                            onChange={(e) => { setReelUrl(e.target.value); setReelError(null); }}
-                            placeholder="Paste your Instagram Reel link here"
-                            className="w-full focus:outline-none"
-                            style={{ background: 'var(--card)', border: '1.5px solid rgba(34,34,34,0.08)', borderRadius: 999, padding: '14px 16px', fontSize: 16, fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink)' }}
-                            onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'var(--ink)'; }}
-                            onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(34,34,34,0.08)'; }}
-                          />
-                          {reelError && <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', marginTop: 8 }}>Please check the URL and try again.</p>}
-                          <button
-                            onClick={handleSubmitReel}
-                            disabled={loading || !reelUrl}
-                            style={{
-                              width: '100%', height: 56, borderRadius: 999, border: 'none', marginTop: 14,
-                              background: 'var(--terra)',
-                              fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: 16, color: 'white', cursor: 'pointer',
-                            }}
-                          >
-                            Submit Reel
-                          </button>
-                        </div>
-                        ) : (
-                        <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 14, color: 'var(--terra)', margin: '0 auto', maxWidth: 280, lineHeight: 1.65 }}>
-                          Contact us if you think this is an error.
-                        </p>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Reel already submitted */}
-                    {claim.reel_url && (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '40px 16px 16px' }}>
-                        <Check size={20} strokeWidth={1.5} color="var(--terra)" />
-                        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 16, color: 'var(--ink)' }}>Reel submitted!</span>
-                      </div>
-                    )}
-
-                    {/* Report / Release links */}
-                    <div className="flex flex-col items-center" style={{ marginTop: 32 }}>
-                      <div style={{ width: 48, height: 1, background: isClaimed ? 'rgba(255,255,255,0.2)' : 'var(--ink-08)', marginBottom: 16 }} />
-                    </div>
-                    <div className={`flex items-center justify-center !text-[13px] pb-1 ${isClaimed ? '' : '[&_button]:!text-[13px] [&_button]:!font-normal [&_button]:!text-[var(--ink-35)] [&_span]:!text-[13px] [&_span]:!text-[var(--ink-35)]'}`}>
-                      <button
-                        onClick={() => setDisputeClaimId(claim.id)}
-                        className="flex items-center gap-1 font-medium transition-colors"
-                        style={{ color: isClaimed ? 'rgba(255,255,255,0.4)' : 'rgba(34,34,34,0.35)' }}
-                      >
-                        <Flag size={11} strokeWidth={1.5} /> Report an issue
-                      </button>
-                      {(() => {
-                        const releaseStatus = canReleaseOffer(claim);
-                        if (releaseStatus.allowed) {
-                          return (
-                            <>
-                              <span className="mx-2" style={{ color: isClaimed ? 'rgba(255,255,255,0.3)' : 'rgba(34,34,34,0.2)' }}>·</span>
-                              <button
-                                onClick={() => setReleaseConfirmId(claim.id)}
-                                className="flex items-center gap-1 font-medium transition-colors"
-                                style={{ color: isClaimed ? 'rgba(255,255,255,0.5)' : 'rgba(34,34,34,0.45)' }}
-                              >
-                                <X size={11} strokeWidth={1.5} /> Release collab
-                              </button>
-                            </>
-                          );
-                        }
-                        return null;
-                      })()}
-                    </div>
-                    {releaseConfirmId === claim.id && (
-                      <div className="flex items-center gap-3 mt-2">
-                        <span style={{ color: isClaimed ? 'rgba(255,255,255,0.6)' : 'var(--ink-60)', fontSize: 13 }}>Release this slot?</span>
-                        <button onClick={() => handleReleaseOffer(claim.id)} disabled={releasingClaim} className={`font-bold text-[13px] ${isClaimed ? 'text-white' : 'text-[var(--ink)]'}`}>
-                          {releasingClaim ? '...' : 'Confirm'}
-                        </button>
-                        <button onClick={() => setReleaseConfirmId(null)} className="font-semibold text-[13px]" style={{ color: isClaimed ? 'rgba(255,255,255,0.5)' : 'var(--ink-35)' }}>Cancel</button>
-                      </div>
-                    )}
-                    {releaseError && (
-                      <p className="text-[15px] text-center pb-2" style={{ color: isClaimed ? 'rgba(255,255,255,0.7)' : 'var(--ink-60)' }}>{releaseError}</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            );
-          })()}
-
-          {/* -- ALL OFFERS (placeholder — Chunk 6 builds full screen) -- */}
-          {view === 'all_offers' && (
-            <div className="px-[20px] pt-5">
-              <h1 className="text-[26px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>All collabs</h1>
-              <p className="text-[13px] mt-1" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
-                {offers.length} live this week
-              </p>
-              <div className="text-center py-20">
-                <p className="text-[14px]" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
-                  Full list coming in Chunk 6.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* -- PROFILE -- */}
-          {view === 'profile' && (
-            <div className="px-[20px] pt-5">
-              <div className="mb-3">
-                <button onClick={() => setView('offers')} className="p-1 -ml-1">
-                  <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
-                </button>
-              </div>
-              {isPendingApproval && (
-                <div className="mb-6 rounded-[18px] p-5 text-center" style={{ background: 'rgba(34,34,34,0.04)' }}>
-                  <Clock size={28} strokeWidth={1.5} className="text-[var(--ink-60)] mx-auto mb-2.5" />
-                  <h3 className="text-[19px] font-bold text-[var(--ink)] mb-1">Application received</h3>
-                  <p className="text-[15px] text-[var(--ink-60)] leading-[1.5]">We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
-                  <p className="text-[13px] text-[var(--ink-35)] mt-[8px]">Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
-                </div>
-              )}
-              {profileSubView === 'main' ? (
-                <>
-                  {/* ═══ Profile card (Airbnb-style) ═══ */}
-                  <div className="rounded-[18px] p-[24px] mb-[24px]" style={{ background: 'var(--card)' }}>
-                    <div className="flex items-start gap-[16px]">
-                      {/* Avatar */}
-                      <div className="relative flex-shrink-0">
-                        <input
-                          ref={avatarInputRef}
-                          type="file"
-                          accept="image/jpeg,image/png,image/webp"
-                          className="hidden"
-                          onChange={handleAvatarUpload}
-                        />
-                        {uploadingAvatar ? (
-                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--shell)] flex items-center justify-center" style={{ border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }}>
-                            <div className="w-6 h-6 border-2 border-[var(--ink)] border-t-transparent rounded-full animate-spin" />
-                          </div>
-                        ) : avatarUrl ? (
-                          <button onClick={() => avatarInputRef.current?.click()}>
-                            <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" style={{ border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => avatarInputRef.current?.click()}
-                            className="w-[80px] h-[80px] rounded-full flex items-center justify-center"
-                            style={{ background: getCategorySolidColor(null), border: '3px solid var(--card)', boxShadow: 'var(--shadow-md)' }}
-                          >
-                            <span className="text-white text-[28px] font-extrabold">{getInitials(userProfile.name)}</span>
-                          </button>
-                        )}
-                        <button
-                          onClick={() => avatarInputRef.current?.click()}
-                          className="absolute -bottom-1 -right-1 w-[24px] h-[24px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
-                        >
-                          <Camera size={11} strokeWidth={1.5} className="text-white" />
-                        </button>
-                      </div>
-
-                      {/* Name + meta */}
-                      <div className="flex-1 min-w-0 pt-[2px]">
-                        <h2 className="text-[22px] text-[var(--ink)] leading-tight" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>{userProfile.name}</h2>
-                        <div className="flex items-center gap-[6px] mt-[4px] flex-wrap">
-                          {userProfile.profile_complete && (
-                            <span className="flex items-center gap-[3px] text-[13px] font-semibold text-[var(--terra)]">
-                              <BadgeCheck size={13} strokeWidth={1.5} /> Verified
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-[10px] mt-[6px]">
-                          {userProfile.instagram_handle && (
-                            <a
-                              href={`https://instagram.com/${userProfile.instagram_handle.replace(/^@/, '')}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] transition-colors"
-                              style={{ textDecoration: 'none' }}
-                            >
-                              <AtSign size={12} strokeWidth={1.5} /> {userProfile.instagram_handle}
-                              <ExternalLink size={10} strokeWidth={1.5} />
-                            </a>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    {uploadError && <p className="text-[15px] text-[var(--ink-60)] mt-2">{uploadError}</p>}
-
-                    {/* Stats row inside card */}
-                    <div className="flex items-center gap-[8px] mt-[20px] pt-[16px] border-t border-[var(--ink-08)]">
-                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{claims.length}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Claimed</p>
-                      </div>
-                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{collabsCompleted}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Posted</p>
-                      </div>
-                      <div className="flex-1 text-center rounded-[14px] py-[10px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)' }}>
-                        <p className="text-[20px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>{userProfile.average_rating ? userProfile.average_rating.toFixed(1) : '—'}</p>
-                        <p className="text-[11px] text-[var(--ink-60)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Rating</p>
-                      </div>
-                    </div>
-
-                    {/* Ref code — small at bottom of card */}
-                    <div className="flex items-center justify-center gap-1 mt-[12px] pt-[12px] border-t border-[var(--ink-08)]">
-                      <button onClick={copyCode} className="flex items-center gap-1 text-[12px] text-[var(--ink-35)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>
-                        Ref: {userProfile.code}
-                        {copiedCode ? (
-                          <span className="text-[var(--terra)] text-[11px]">Copied!</span>
-                        ) : (
-                          <Copy size={10} strokeWidth={1.5} />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* ═══ Profile completeness ═══ */}
-                  {(() => {
-                    const completeness = getProfileCompleteness(userProfile);
-                    if (completeness.score === 100) {
-                      return (
-                        <div className="flex items-center gap-[10px] rounded-[18px] p-[14px_16px] mb-[16px]" style={{ background: 'var(--card)' }}>
-                          <div className="w-[36px] h-[36px] rounded-full bg-[rgba(26,60,52,0.06)] flex items-center justify-center flex-shrink-0">
-                            <BadgeCheck size={18} strokeWidth={1.5} className="text-[var(--terra)]" />
-                          </div>
-                          <div>
-                            <p className="text-[18px] font-bold text-[var(--ink)]">Profile complete</p>
-                            <p className="text-[14px] text-[var(--ink-60)]">Your profile is ready for businesses</p>
-                          </div>
-                        </div>
-                      );
-                    }
-                    return (
-                      <div className="rounded-[18px] p-[16px] mb-[16px]" style={{ background: 'var(--card)' }}>
-                        <div className="flex items-center justify-between mb-[10px]">
-                          <span className="text-[18px] font-bold text-[var(--ink)]">Complete your profile</span>
-                          <span className="text-[14px] font-semibold text-[var(--ink)]">{completeness.score}%</span>
-                        </div>
-                        <div className="h-[6px] rounded-[999px] mb-[12px]" style={{ background: 'var(--ink-08)' }}>
-                          <div className="h-full rounded-[999px] transition-all" style={{ width: `${completeness.score}%`, background: 'var(--terra)' }} />
-                        </div>
-                        <div className="flex flex-wrap gap-[6px]">
-                          {completeness.missing.map(field => (
-                            field.key === 'bio' ? (
-                              <button
-                                key={field.key}
-                                onClick={() => { setEditName(userProfile.name || ''); setEditHandle(userProfile.instagram_handle || ''); setProfileSubView('edit'); }}
-                                className="text-[14px] font-semibold text-[var(--terra)]"
-                                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
-                              >
-                                Add a short bio →
-                              </button>
-                            ) : (
-                              <span key={field.key} className="flex items-center gap-1 px-[10px] py-[6px] rounded-[999px] text-[14px] font-semibold text-[var(--ink-60)] bg-[var(--shell)]">
-                                <Plus size={16} strokeWidth={1.5} className="w-[10px] h-[10px]" /> {field.label}
-                              </span>
-                            )
-                          ))}
-                        </div>
-                      </div>
-                    );
-                  })()}
-
-
-                  {/* ═══ Settings ═══ */}
-                  <div className="mt-[8px]">
-                    <button
-                      onClick={() => { setEditName(userProfile.name || ''); setEditHandle(userProfile.instagram_handle || ''); setProfileSubView('edit'); }}
-                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
-                    >
-                      <div className="flex items-center gap-[12px]">
-                        <User size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Edit profile</span>
-                      </div>
-                      <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
-                    </button>
-                    <button
-                      onClick={() => { setProfileSubView('alerts'); markAllNotificationsRead(); }}
-                      className="w-full flex items-center justify-between py-[16px] border-b border-[var(--ink-08)] text-left"
-                    >
-                      <div className="flex items-center gap-[12px]">
-                        <Bell size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
-                        <span className="text-[15px] text-[var(--ink)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}>Notifications</span>
-                        {unreadCount > 0 && (
-                          <span className="min-w-[20px] h-5 px-1.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-bold flex items-center justify-center">
-                            {unreadCount}
-                          </span>
-                        )}
-                      </div>
-                      <ChevronRight size={18} strokeWidth={1.5} className="text-[var(--ink-35)]" />
-                    </button>
-                    <button
-                      onClick={signOut}
-                      className="w-full flex items-center gap-[12px] py-[16px] text-left"
-                    >
-                      <LogOut size={20} strokeWidth={1.5} className="text-[var(--terra)]" />
-                      <span className="text-[15px] text-[var(--terra)]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}>Sign out</span>
-                    </button>
-
-                    <div className="border-t border-[var(--ink-08)] pt-[16px] mt-[8px]">
-                      <button
-                        onClick={() => { setDeleteError(null); setShowDeleteAccount(true); }}
-                        className="text-[13px] text-[var(--ink-35)] hover:text-[var(--terra)] transition-colors"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500 }}
-                      >
-                        Delete my account
-                      </button>
-                    </div>
-                  </div>
-                </>
-              ) : profileSubView === 'alerts' ? (
-                /* Alerts/Notifications sub-view */
-                <>
-                  <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
-                      <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
-                    </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Notifications</h1>
-                  </div>
-                  {notifications.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-16 px-[40px]">
-                      {/* Envelope with spark SVG */}
-                      <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
-                        <rect x="12" y="24" width="56" height="36" rx="4" stroke="var(--peach)" strokeWidth="2.5" fill="none" />
-                        <path d="M12 28L40 48L68 28" stroke="var(--peach)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-                        <path d="M58 18L62 14" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
-                        <path d="M62 20L64 16" stroke="var(--peach)" strokeWidth="2" strokeLinecap="round" />
-                        <circle cx="60" cy="16" r="1.5" fill="var(--peach)" />
-                      </svg>
-                      <p className="text-[20px] text-[var(--ink)] mt-[16px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Nothing yet</p>
-                      <p className="text-[17px] text-[var(--ink-60)] text-center mt-[8px] max-w-[260px]" style={{ lineHeight: 1.65 }}>
-                        You'll see a notification when a business confirms your visit or when a new collab drops nearby.
-                      </p>
-                      <button
-                        onClick={() => setView('offers')}
-                        className="mt-[20px] px-[24px] py-[13px] rounded-[999px] text-white text-[15px] min-h-[44px]"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, background: 'var(--terra)' }}
-                      >
-                        Browse collabs
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-3">
-                      {notifications.map((notif) => (
-                        <button
-                          key={notif.id}
-                          onClick={() => !notif.read && markNotificationRead(notif.id)}
-                          className="w-full text-left transition-all"
-                          style={{ background: 'var(--card)', borderRadius: 16, padding: '14px 16px' }}
-                        >
-                          <div className="flex items-start gap-3">
-                            <div style={{ width: 8, height: 8, borderRadius: '50%', background: notif.read ? 'var(--ink-08)' : 'var(--terra)', flexShrink: 0, marginTop: 4 }} />
-                            <div className="flex-1 min-w-0">
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 15, color: 'var(--ink)', lineHeight: 1.5, margin: 0 }}>{notif.message.replace(/\b[a-z]+-[a-z]+(-[a-z]+)*/g, (slug: string) => slug.split('-').map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(' '))}</p>
-                              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: 13, color: 'var(--ink-60)', marginTop: 4, margin: '4px 0 0' }}>{formatDate(notif.created_at)}</p>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </>
-              ) : (
-                /* Edit Profile sub-view */
-                <>
-                  <div className="flex items-center gap-3 mb-5">
-                    <button onClick={() => setProfileSubView('main')} className="p-2 -ml-2 hover:bg-[var(--shell)] rounded-[12px] transition-colors">
-                      <ChevronLeft size={20} strokeWidth={1.5} className="text-[var(--ink)]" />
-                    </button>
-                    <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em' }}>Edit profile</h1>
-                  </div>
-                  <div className="space-y-[16px]">
-                    {/* Avatar upload */}
-                    <div className="flex flex-col items-center mb-[8px]">
-                      <input
-                        ref={avatarInputRef}
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarUpload}
-                      />
-                      <button
-                        onClick={() => avatarInputRef.current?.click()}
-                        className="relative"
-                        disabled={uploadingAvatar}
-                      >
-                        {uploadingAvatar ? (
-                          <div className="w-[80px] h-[80px] rounded-full bg-[var(--shell)] flex items-center justify-center">
-                            <div className="w-6 h-6 border-2 border-[var(--ink)] border-t-transparent rounded-full animate-spin" />
-                          </div>
-                        ) : avatarUrl ? (
-                          <img src={avatarUrl} alt="Avatar" className="w-[80px] h-[80px] rounded-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-                        ) : (
-                          <div
-                            className="w-[80px] h-[80px] rounded-full flex items-center justify-center"
-                            style={{ background: getCategorySolidColor(null) }}
-                          >
-                            <span className="text-white text-[32px] font-extrabold">{getInitials(userProfile.name)}</span>
-                          </div>
-                        )}
-                        <div
-                          className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-[var(--shell)]"
-                        >
-                          <Camera size={13} strokeWidth={1.5} className="text-white" />
-                        </div>
-                      </button>
-                      <p className="text-[14px] text-[var(--ink-35)] mt-[8px]">Tap to change photo</p>
-                      {uploadError && <p className="text-[14px] text-[var(--ink-60)] mt-[4px]">{uploadError}</p>}
-                    </div>
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink-60)] mb-[6px]">Name</label>
-                      <input
-                        type="text"
-                        value={editName}
-                        onChange={(e) => setEditName(e.target.value)}
-                        className="w-full px-[16px] py-[12px] rounded-[999px] bg-[var(--card)] border-[1.5px] border-[rgba(34,34,34,0.08)] text-[16px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none focus:border-[var(--ink)]"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink-60)] mb-[6px]">Instagram handle</label>
-                      <input
-                        type="text"
-                        value={editHandle}
-                        onChange={(e) => setEditHandle(e.target.value)}
-                        placeholder="@yourhandle"
-                        className="w-full px-[16px] py-[12px] rounded-[999px] bg-[var(--card)] border-[1.5px] border-[rgba(34,34,34,0.08)] text-[16px] text-[var(--ink)] placeholder:text-[var(--ink)]/40 focus:outline-none focus:border-[var(--ink)]"
-                      />
-                    </div>
-                    <button
-                      disabled={editSaving || !editName.trim()}
-                      onClick={async () => {
-                        setEditSaving(true);
-                        await supabase.from('creators').update({
-                          name: editName.trim(),
-                          instagram_handle: editHandle.trim() || null,
-                        }).eq('id', userProfile.id);
-                        setEditSaving(false);
-                        setProfileSubView('main');
-                        window.location.reload();
-                      }}
-                      className="w-full py-[13px] rounded-[999px] bg-[var(--terra)] text-white text-[15px] disabled:opacity-50 hover:bg-[var(--terra-hover)] transition-all"
-                      style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
-                    >
-                      {editSaving ? 'Saving...' : 'Save changes'}
-                    </button>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      </div>{/* end scroll container */}
-
-      {/* Bottom Navigation Bar */}
-      <div
-        className="flex-shrink-0"
-        style={{
-          background: 'rgba(246,243,238,0.96)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          borderTop: '1px solid var(--ink-08)',
-          padding: '14px 0 28px',
-          paddingBottom: 'env(safe-area-inset-bottom, 28px)',
-        }}
-      >
-        <div className="max-w-md mx-auto flex">
-          {tabs.map(tab => {
-            const isActive = view === tab.key || (tab.key === 'passes' && view === 'pass_detail');
-            const iconColor = isActive ? 'var(--terra)' : 'var(--ink-35)';
-            return (
-              <button
-                key={tab.key}
-                onClick={() => { setView(tab.key); if (tab.key === 'passes') setPassesSection('active'); }}
-                className="flex-1 flex flex-col items-center gap-[3px] min-h-[44px]"
-                style={{
-                  fontFamily: "'Instrument Sans', sans-serif",
-                  fontWeight: isActive ? 600 : 500,
-                  fontSize: 12,
-                  color: isActive ? 'var(--terra)' : 'var(--ink-35)',
-                  background: 'none', border: 'none', cursor: 'pointer',
-                }}
-              >
-                <div className="relative flex items-center justify-center" style={{ width: 24, height: 24 }}>
-                  {/* Explore — magnifying glass */}
-                  {tab.icon === 'explore' && (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-                    </svg>
-                  )}
-                  {/* Saved — heart */}
-                  {tab.icon === 'saved' && (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                    </svg>
-                  )}
-                  {/* Passes — ticket/bookmark icon */}
-                  {tab.icon === 'passes' && (
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v2"/><path d="M13 17v2"/><path d="M13 11v2"/>
-                    </svg>
-                  )}
-                  {/* Profile — avatar circle or person icon */}
-                  {tab.icon === 'profile' && (
-                    avatarUrl ? (
-                      <img src={avatarUrl} alt="" style={{ width: 24, height: 24, borderRadius: '50%', objectFit: 'cover', border: isActive ? '2px solid var(--terra)' : '2px solid transparent' }} />
-                    ) : (
-                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={iconColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-                      </svg>
-                    )
-                  )}
-                  {/* Badge count for Active tab */}
-                  {'badge' in tab && (tab as any).badge > 0 && (
-                    <span style={{
-                      position: 'absolute', top: -4, right: -8,
-                      minWidth: 16, height: 16, borderRadius: '50%',
-                      background: 'var(--terra)', border: '2px solid var(--shell)',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontFamily: "'Instrument Sans', sans-serif", fontWeight: 800, fontSize: 10, color: 'white',
-                    }}>
-                      {(tab as any).badge}
-                    </span>
-                  )}
-                </div>
-                {tab.label}
-              </button>
             );
           })}
+          {activeParts.length === 0 && (
+            <div className="py-12 text-center">
+              <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No active campaigns</p>
+              <p className="text-[14px] text-[var(--ink-35)]">Express interest in a campaign to get started</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {subTab === 'past' && (
+        <div className="space-y-2">
+          {completedParts.map(p => (
+            <div key={p.id} className="flex items-center justify-between bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
+              <div>
+                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
+              </div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[rgba(45,122,79,0.1)] text-[var(--success)]">Completed</span>
+            </div>
+          ))}
+          {pastApps.map(a => (
+            <div key={a.id} className="flex items-center justify-between bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
+              <div>
+                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
+              </div>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[var(--ink-10)] text-[var(--ink-60)]">Declined</span>
+            </div>
+          ))}
+          {completedParts.length === 0 && pastApps.length === 0 && (
+            <div className="py-12 text-center">
+              <p className="text-[14px] text-[var(--ink-35)]">No past campaigns</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Reel submission modal */}
+      {showReelModal && (
+        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center">
+          <div className="bg-[var(--card)] w-full max-w-[480px] rounded-t-[16px] sm:rounded-[var(--r-card)] p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Submit your Reel</h3>
+              <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
+            </div>
+            <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below</p>
+            <input value={reelUrl} onChange={e => setReelUrl(e.target.value)}
+              placeholder="https://www.instagram.com/reel/..."
+              className="w-full px-4 py-3 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[15px] focus:outline-none focus:border-[var(--terra)] mb-4" />
+            <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
+              className="w-full py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] disabled:opacity-50"
+              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+              {submittingReel ? 'Submitting...' : 'Submit Reel'}
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Naybahood Tab ───
+function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
+  const unlocked = profile.completed_campaigns >= 1;
+
+  if (!unlocked) {
+    return (
+      <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+        <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-[var(--ink-10)] flex items-center justify-center mx-auto mb-4">
+            <Lock size={28} className="text-[var(--ink-35)]" />
+          </div>
+          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Complete your first campaign to unlock</p>
+          <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto">
+            The Naybahood is our community of active local creators. Complete a campaign to gain access to exclusive events, brand connections, and the creator WhatsApp community.
+          </p>
         </div>
       </div>
+    );
+  }
+
+  return (
+    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
+        <div className="w-16 h-16 rounded-full bg-[rgba(45,122,79,0.1)] flex items-center justify-center mx-auto mb-4">
+          <Users size={28} className="text-[var(--success)]" />
+        </div>
+        <p className="text-[20px] font-bold text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
+        <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
+          You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
+        </p>
+        <a href="#" onClick={e => { e.preventDefault(); alert('WhatsApp Community link coming soon'); }}
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]"
+          style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          Join the WhatsApp Community
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ─── Profile Tab ───
+function ProfileTab({ profile }: { profile: CreatorProfile }) {
+  const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
+
+  return (
+    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
+
+      {/* Avatar + name */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+          <span className="text-[24px] font-bold text-white">{initial}</span>
+        </div>
+        <div>
+          <p className="text-[20px] font-bold text-[var(--ink)]">{profile.display_name || profile.name}</p>
+          <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+            className="text-[14px] text-[var(--terra)] font-medium hover:underline">{profile.instagram_handle}</a>
+        </div>
+      </div>
+
+      {/* Completion rate */}
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 mb-3">
+        <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
+        <div className="flex items-center gap-3">
+          <p className="text-[28px] font-bold text-[var(--ink)]">{profile.completion_rate}%</p>
+          <span className="text-[14px] text-[var(--ink-60)]">{profile.completed_campaigns} of {profile.total_campaigns} campaigns completed</span>
+        </div>
+        {profile.total_campaigns > 0 && (
+          <div className="h-2 bg-[var(--ink-10)] rounded-full mt-2 overflow-hidden">
+            <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${profile.completion_rate}%` }} />
+          </div>
+        )}
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-3 gap-3 mb-3">
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <p className="text-[22px] font-bold text-[var(--ink)]">{profile.total_campaigns}</p>
+          <p className="text-[12px] text-[var(--ink-35)] font-medium">Campaigns</p>
+        </div>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <p className="text-[22px] font-bold text-[var(--ink)]">{profile.total_reels}</p>
+          <p className="text-[12px] text-[var(--ink-35)] font-medium">Reels</p>
+        </div>
+        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <p className="text-[22px] font-bold text-[var(--ink)]">L{profile.level}</p>
+          <p className="text-[12px] text-[var(--ink-35)] font-medium">{profile.level_name}</p>
+        </div>
+      </div>
+
+      {/* Instagram connection */}
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Instagram size={20} className="text-[var(--ink-60)]" />
+            <div>
+              <p className="text-[15px] font-medium text-[var(--ink)]">Instagram</p>
+              <p className="text-[13px] text-[var(--ink-35)]">{profile.instagram_connected ? 'Connected' : 'Not connected'}</p>
+            </div>
+          </div>
+          {!profile.instagram_connected && (
+            <button onClick={() => alert('Instagram connection coming soon')}
+              className="px-3 py-1.5 rounded-[var(--r-pill)] border border-[var(--border)] text-[13px] font-semibold text-[var(--terra)]">
+              Connect
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── More Tab ───
+function MoreTab({ onSignOut }: { onSignOut: () => void }) {
+  const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+
+  const items = [
+    { icon: History, label: 'Campaign history', action: () => {} },
+    { icon: Settings, label: 'Account settings', action: () => {} },
+    { icon: Link2, label: 'Refer a friend', action: () => { navigator.clipboard.writeText('https://app.nayba.app').catch(() => {}); alert('Referral link copied!'); } },
+    { icon: HelpCircle, label: 'Help', action: () => {} },
+  ];
+
+  return (
+    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>More</h1>
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
+        {items.map((item, i) => (
+          <button key={i} onClick={item.action}
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border-[var(--ink-10)] last:border-0">
+            <item.icon size={18} className="text-[var(--ink-35)]" />
+            <span className="text-[15px] text-[var(--ink)] font-medium">{item.label}</span>
+            <ChevronRight size={16} className="text-[var(--ink-35)] ml-auto" />
+          </button>
+        ))}
+      </div>
+
+      <button onClick={() => setShowSignOutConfirm(true)}
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] hover:bg-[var(--shell)]">
+        <LogOut size={18} className="text-[var(--terra)]" />
+        <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
+      </button>
+
+      {showSignOutConfirm && (
+        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4">
+          <div className="bg-[var(--card)] rounded-[var(--r-card)] p-6 max-w-sm w-full text-center">
+            <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Sign out?</p>
+            <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowSignOutConfirm(false)}
+                className="flex-1 py-2.5 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] font-semibold text-[15px]">Cancel</button>
+              <button onClick={onSignOut}
+                className="flex-1 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]">Sign out</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Main CreatorApp ───
+export default function CreatorApp() {
+  const { user, signOut } = useAuth();
+  const [tab, setTab] = useState<Tab>('discover');
+  const [profile, setProfile] = useState<CreatorProfile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (user) fetchProfile();
+  }, [user]);
+
+  const fetchProfile = async () => {
+    const { data } = await supabase.from('creators').select('*').eq('id', user!.id).single();
+    if (data) setProfile(data as CreatorProfile);
+    setLoading(false);
+  };
+
+  if (loading || !profile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
+        <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Campaign detail view
+  if (viewingCampaign) {
+    return <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />;
+  }
+
+  return (
+    <div className="min-h-screen bg-[var(--shell)]">
+      {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+      {tab === 'campaigns' && <CampaignsTab profile={profile} />}
+      {tab === 'naybahood' && <NaybahoodTab profile={profile} />}
+      {tab === 'profile' && <ProfileTab profile={profile} />}
+      {tab === 'more' && <MoreTab onSignOut={signOut} />}
+      <BottomNav active={tab} onNavigate={setTab} />
     </div>
   );
 }

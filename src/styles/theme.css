@@ -1,64 +1,47 @@
 :root {
   /* ── Backgrounds ── */
-  --shell:   #F6F3EE;
-  --card:    #EDE8DF;
-  --border:  #E5DFD4;
+  --shell:   #F7F7F5;
+  --card:    #FFFFFF;
 
   /* ── Brand ── */
   --terra:        #C4674A;
-  --terra-hover:  #A8573E;
-  --terra-5:      rgba(196,103,74,0.05);
-  --terra-10:     rgba(196,103,74,0.10);
-  --terra-15:     rgba(196,103,74,0.15);
-  --terra-20:     rgba(196,103,74,0.20);
-  --terra-40:     rgba(196,103,74,0.40);
-  --terra-ring:   rgba(196,103,74,0.30);
-  --forest:       #1A3C34;
-  --peach:        #F5C4A0;
-  --ochre:        #E8A020;
+  --terra-light:  rgba(196,103,74,0.08);
 
   /* ── Ink scale ── */
   --ink:     #222222;
-  --ink-60:  rgba(34,34,34,0.62);
-  --ink-35:  rgba(34,34,34,0.40);
-  --ink-15:  rgba(34,34,34,0.15);
-  --ink-08:  rgba(34,34,34,0.09);
+  --ink-60:  rgba(34,34,34,0.60);
+  --ink-35:  rgba(34,34,34,0.35);
+  --ink-10:  rgba(34,34,34,0.10);
 
-  /* ── Shadows — NEVER rgba(0,0,0,…) ── */
-  --shadow-sm: 0 1px 3px rgba(34,34,34,0.05);
-  --shadow-md: 0 2px 12px rgba(34,34,34,0.07);
-  --shadow-lg: 0 4px 20px rgba(34,34,34,0.11);
+  /* ── Borders ── */
+  --border:  #E8E3DC;
+
+  /* ── Status ── */
+  --success: #2D7A4F;
+  --neutral: #6B7280;
 
   /* ── Radii ── */
-  --r-card: 16px;
-  --r-pill: 999px;
+  --r-pill:  999px;
+  --r-card:  12px;
+  --r-sm:    8px;
+  --r-input: 8px;
 
-  /* ── Category gradients (offer card image zones) ── */
-  --grad-food:      linear-gradient(160deg, #C07858, #9A5C40);
-  --grad-beauty:    linear-gradient(160deg, #5A9470, #3E7254);
-  --grad-cafe:      linear-gradient(160deg, #C09840, #8C6E20);
-  --grad-wellness:  linear-gradient(160deg, #6A8EAE, #4A6E8E);
-  --grad-experience:linear-gradient(160deg, #9068A8, #6A4880);
-
-  /* ── Flat category colours — Oliver Bonas dusted pastels ── */
-  --cat-food:     #D4897A;
-  --cat-beauty:   #7AAE8C;
-  --cat-cafe:     #C9A96E;
-  --cat-wellness: #7A9EBE;
-  --cat-fitness:  #A888BE;
-
-  /* ── Legacy aliases — keep these, update their targets ── */
-  --white:         var(--shell);
-  --bg:            var(--shell);
-  --elevated:      var(--card);
-  --pressed:       var(--border);
-  --near-black:    var(--ink);
-  --mid:           var(--ink-60);
-  --soft:          var(--ink-35);
-  --faint:         var(--ink-08);
-  --warm-mid-grey: var(--ink-35);
-  --card-bg:       var(--card);
-  --card-border:   var(--ink-08);
+  /* ── Compat aliases (removed in V2 — kept until components rebuilt) ── */
+  --ink-08:      rgba(34,34,34,0.10);
+  --ink-15:      rgba(34,34,34,0.10);
+  --forest:      var(--ink);
+  --peach:       var(--terra-light);
+  --ochre:       var(--terra);
+  --terra-hover: #A8573E;
+  --terra-5:     rgba(196,103,74,0.05);
+  --terra-10:    rgba(196,103,74,0.10);
+  --terra-15:    rgba(196,103,74,0.15);
+  --terra-20:    rgba(196,103,74,0.20);
+  --terra-40:    rgba(196,103,74,0.40);
+  --terra-ring:  rgba(196,103,74,0.30);
+  --shadow-sm:   0 1px 3px rgba(34,34,34,0.05);
+  --shadow-md:   0 2px 8px rgba(34,34,34,0.06);
+  --shadow-lg:   0 4px 20px rgba(34,34,34,0.11);
 }
 
 @layer base {
@@ -75,5 +58,3 @@
     line-height: 1.65;
   }
 }
-
-#claims-slider::-webkit-scrollbar { display: none; }
