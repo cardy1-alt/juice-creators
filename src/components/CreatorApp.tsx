@@ -515,7 +515,7 @@ function MoreTab({ onSignOut }: { onSignOut: () => void }) {
 
 // ─── Main CreatorApp ───
 export default function CreatorApp() {
-  const { user, signOut } = useAuth();
+  const { user, userProfile, signOut } = useAuth();
   const [tab, setTab] = useState<Tab>('discover');
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -526,8 +526,14 @@ export default function CreatorApp() {
   }, [user]);
 
   const fetchProfile = async () => {
-    const { data } = await supabase.from('creators').select('*').eq('id', user!.id).single();
-    if (data) setProfile(data as CreatorProfile);
+    // Query by email since creators.id may not match auth.uid()
+    const { data } = await supabase.from('creators').select('*').eq('email', user!.email!).single();
+    if (data) {
+      setProfile(data as CreatorProfile);
+    } else if (userProfile) {
+      // Fallback to AuthContext profile (demo mode or if query fails)
+      setProfile(userProfile as CreatorProfile);
+    }
     setLoading(false);
   };
 
