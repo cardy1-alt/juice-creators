@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
-import { Plus, Check, X, Eye, EyeOff, UserPlus } from 'lucide-react';
+import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight } from 'lucide-react';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
@@ -11,17 +11,113 @@ interface Creator {
   follower_count: string | null;
 }
 
+const BORDER = '#E6E2DB';
+const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[14px] focus:outline-none focus:border-[#C4674A] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)]";
+const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)] mb-1.5";
+const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
+const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
+
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function AdminCreatorsTab() {
-  const [creators, setCreators] = useState<Creator[]>([]);
-  const [showCreate, setShowCreate] = useState(false);
+// ─── Create Creator Modal ───
+function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1' });
   const [creating, setCreating] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!form.displayName || !form.email) return;
+    setCreating(true);
+    const tempPassword = 'nayba-' + Math.random().toString(36).slice(2, 10);
+    const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: tempPassword });
+    if (authError || !authData.user) { setCreating(false); return; }
+    const code = form.displayName.replace(/\s+/g, '').toUpperCase().slice(0, 6) + Math.floor(Math.random() * 100);
+    await supabase.from('creators').insert({
+      id: authData.user.id, name: form.displayName, display_name: form.displayName,
+      email: form.email, instagram_handle: form.instagram || '@' + form.displayName.toLowerCase().replace(/\s+/g, ''),
+      code, address: form.city || null, level: parseInt(form.level) || 1,
+      level_name: parseInt(form.level) === 1 ? 'Newcomer' : parseInt(form.level) === 3 ? 'Regular' : 'Trusted',
+      approved: true, onboarding_complete: true, profile_complete: true,
+    });
+    await supabase.from('notifications').insert({
+      user_id: authData.user.id, user_type: 'creator',
+      message: `Welcome to nayba! Your temporary password is: ${tempPassword}`,
+      email_type: 'creator_welcome', email_meta: { temp_password: tempPassword },
+    });
+    setCreatedPassword(tempPassword);
+    setCreating(false);
+    onCreated();
+  };
+
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center">
+      <div className="absolute inset-0 bg-[rgba(34,34,34,0.4)]" onClick={onClose} />
+      <div className="relative bg-white rounded-[12px] w-full max-w-[520px] mx-4" style={{ boxShadow: '0 8px 40px rgba(34,34,34,0.12)' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E2DB]">
+          <h2 className="text-[17px] font-bold text-[#222]">Create Creator</h2>
+          <button onClick={onClose} className="w-8 h-8 rounded-full border border-[#E6E2DB] flex items-center justify-center text-[rgba(34,34,34,0.35)] hover:text-[#222]"><X size={16} /></button>
+        </div>
+        <div className="px-6 py-5">
+          {createdPassword ? (
+            <div className="text-center py-4">
+              <div className="w-12 h-12 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center mx-auto mb-3">
+                <Check size={22} className="text-[#2D7A4F]" />
+              </div>
+              <p className="text-[16px] font-bold text-[#222] mb-2">Account created</p>
+              <p className="text-[14px] text-[rgba(34,34,34,0.60)] mb-3">A welcome email has been sent. Temporary password:</p>
+              <div className="inline-flex items-center gap-2 bg-[#F7F7F5] border border-[#E6E2DB] rounded-[8px] px-4 py-2.5">
+                <code className="text-[15px] font-mono text-[#C4674A]">{showPassword ? createdPassword : '••••••••••'}</code>
+                <button onClick={() => setShowPassword(!showPassword)} className="text-[rgba(34,34,34,0.35)]">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+              <div className="mt-5">
+                <button onClick={onClose} className="px-5 py-2.5 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold">Done</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <p className="text-[13px] text-[rgba(34,34,34,0.60)] mb-5 leading-[1.6]">
+                A Supabase account will be created automatically. A welcome email with login credentials will be sent.
+              </p>
+              <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => setForm(p => ({ ...p, displayName: e.target.value }))} className={inputCls} required /></div>
+                <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className={inputCls} required /></div>
+                <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
+                <div><label className={labelCls}>City</label><input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
+                <div className="md:col-span-2">
+                  <label className={labelCls}>Starting Level</label>
+                  <select value={form.level} onChange={e => setForm(p => ({ ...p, level: e.target.value }))} className={inputCls}>
+                    <option value="1">1 — Newcomer</option><option value="2">2 — Explorer</option>
+                    <option value="3">3 — Regular</option><option value="4">4 — Local</option><option value="5">5 — Trusted</option>
+                  </select>
+                </div>
+              </form>
+            </>
+          )}
+        </div>
+        {!createdPassword && (
+          <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB]">
+            <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)]">Cancel</button>
+            <button onClick={handleCreate as any} disabled={creating}
+              className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90"
+              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+              {creating ? 'Creating...' : 'Create Account & Send Email'}
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Main Export ───
+export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
+  const [creators, setCreators] = useState<Creator[]>([]);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => { fetchCreators(); }, []);
@@ -40,75 +136,6 @@ export default function AdminCreatorsTab() {
     fetchCreators();
   };
 
-  const handleCreateCreator = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!form.displayName || !form.email) return;
-    setCreating(true);
-
-    // Generate a temporary password
-    const tempPassword = 'nayba-' + Math.random().toString(36).slice(2, 10);
-
-    // Create Supabase auth user via admin API (edge function would be needed for production)
-    // For now, sign up the user directly
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: form.email,
-      password: tempPassword,
-    });
-
-    if (authError || !authData.user) {
-      setToast(authError?.message || 'Failed to create auth user');
-      setCreating(false);
-      return;
-    }
-
-    // Create creator profile
-    const code = form.displayName.replace(/\s+/g, '').toUpperCase().slice(0, 6) + Math.floor(Math.random() * 100);
-    const { error: profileError } = await supabase.from('creators').insert({
-      id: authData.user.id,
-      name: form.displayName,
-      display_name: form.displayName,
-      email: form.email,
-      instagram_handle: form.instagram || '@' + form.displayName.toLowerCase().replace(/\s+/g, ''),
-      code,
-      address: form.city || null,
-      level: parseInt(form.level) || 1,
-      level_name: parseInt(form.level) === 1 ? 'Newcomer' : parseInt(form.level) === 3 ? 'Regular' : 'Trusted',
-      approved: true,
-      onboarding_complete: true,
-      profile_complete: true,
-    });
-
-    if (profileError) {
-      setToast('Auth user created but profile failed: ' + profileError.message);
-      setCreating(false);
-      return;
-    }
-
-    // Send welcome email via notification
-    await supabase.from('notifications').insert({
-      user_id: authData.user.id,
-      user_type: 'creator',
-      message: `Welcome to nayba! Your temporary password is: ${tempPassword}`,
-      email_type: 'creator_welcome',
-      email_meta: { temp_password: tempPassword },
-    });
-
-    setCreatedPassword(tempPassword);
-    setCreating(false);
-    fetchCreators();
-  };
-
-  const resetForm = () => {
-    setForm({ displayName: '', email: '', instagram: '', city: '', level: '1' });
-    setCreatedPassword(null);
-    setShowCreate(false);
-  };
-
-  const inputCls = 'w-full px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[var(--ink)] text-[15px] focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]';
-  const labelCls = 'block text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1.5';
-  const thCls = 'text-left text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] py-3 px-3 border-b border-[var(--ink-10)]';
-  const tdCls = 'py-3 px-3 text-[14px] text-[var(--ink)] border-b border-[var(--ink-10)]';
-
   const pendingCreators = creators.filter(c => !c.approved);
   const approvedCreators = creators.filter(c => c.approved);
 
@@ -116,156 +143,96 @@ export default function AdminCreatorsTab() {
     <div>
       {/* Toast */}
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[var(--r-sm)] text-[14px] font-medium shadow-lg">
+        <div className="fixed top-4 right-4 z-50 bg-[#222] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium" style={{ boxShadow: '0 4px 20px rgba(34,34,34,0.15)' }}>
           {toast}
         </div>
       )}
 
-      <div className="flex items-center justify-between mb-5">
-        <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Creators</h1>
-        <button onClick={() => setShowCreate(!showCreate)}
-          className="flex items-center gap-1.5 px-4 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity"
-          style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
-          <UserPlus size={16} /> Create Creator
-        </button>
-      </div>
-
-      {/* Create Creator Form */}
-      {showCreate && (
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-6 mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-[18px] font-semibold text-[var(--ink)]">Create Creator</h2>
-            <button onClick={resetForm} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
-          </div>
-
-          {createdPassword ? (
-            <div className="text-center py-4">
-              <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[rgba(45,122,79,0.1)] mb-3">
-                <Check size={24} className="text-[var(--success)]" />
-              </div>
-              <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">Creator account created</p>
-              <p className="text-[14px] text-[var(--ink-60)] mb-3">A welcome email has been sent. Temporary password:</p>
-              <div className="inline-flex items-center gap-2 bg-[var(--shell)] border border-[var(--border)] rounded-[var(--r-sm)] px-4 py-2">
-                <code className="text-[15px] font-mono text-[var(--terra)]">{showPassword ? createdPassword : '••••••••••'}</code>
-                <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink)]">
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-              <div className="mt-4">
-                <button onClick={resetForm} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] font-semibold text-[14px]">Done</button>
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleCreateCreator} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className={labelCls}>Display name *</label>
-                <input value={form.displayName} onChange={e => setForm(p => ({ ...p, displayName: e.target.value }))} className={inputCls} required />
-              </div>
-              <div>
-                <label className={labelCls}>Email *</label>
-                <input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className={inputCls} required />
-              </div>
-              <div>
-                <label className={labelCls}>Instagram handle</label>
-                <input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" />
-              </div>
-              <div>
-                <label className={labelCls}>City</label>
-                <input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="e.g. Bury St Edmunds" />
-              </div>
-              <div>
-                <label className={labelCls}>Level</label>
-                <select value={form.level} onChange={e => setForm(p => ({ ...p, level: e.target.value }))} className={inputCls}>
-                  <option value="1">1 — Newcomer</option>
-                  <option value="2">2 — Explorer</option>
-                  <option value="3">3 — Regular</option>
-                  <option value="4">4 — Local</option>
-                  <option value="5">5 — Trusted</option>
-                </select>
-              </div>
-              <div className="flex items-end">
-                <button type="submit" disabled={creating}
-                  className="px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50">
-                  {creating ? 'Creating...' : 'Create Account'}
-                </button>
-              </div>
-            </form>
-          )}
-        </div>
-      )}
-
-      {/* Pending Approvals */}
+      {/* Pending approvals banner */}
       {pendingCreators.length > 0 && (
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto mb-6">
-          <div className="px-4 py-3 border-b border-[var(--ink-10)]">
-            <h3 className="text-[14px] font-semibold text-[var(--terra)]">Pending Approvals ({pendingCreators.length})</h3>
+        <div className="flex items-center gap-3 px-4 py-3 mb-5 rounded-[12px] border border-[rgba(196,103,74,0.2)]" style={{ background: 'rgba(196,103,74,0.04)' }}>
+          <AlertCircle size={18} className="text-[#C4674A] flex-shrink-0" />
+          <div className="flex-1">
+            <p className="text-[14px] font-semibold text-[#C4674A]">{pendingCreators.length} pending approval{pendingCreators.length > 1 ? 's' : ''}</p>
+            <p className="text-[13px] text-[rgba(34,34,34,0.60)]">
+              {pendingCreators.slice(0, 3).map(c => c.display_name || c.name).join(', ')}
+              {pendingCreators.length > 3 ? ` +${pendingCreators.length - 3} more` : ''}
+            </p>
           </div>
-          <table className="w-full min-w-[600px]">
-            <thead><tr>
-              <th className={thCls}>Name</th><th className={thCls}>Email</th><th className={thCls}>Instagram</th>
-              <th className={thCls}>Joined</th><th className={thCls}>Actions</th>
-            </tr></thead>
-            <tbody>
-              {pendingCreators.map(c => (
-                <tr key={c.id} className="hover:bg-[var(--shell)]">
-                  <td className={`${tdCls} font-medium`}>{c.display_name || c.name}</td>
-                  <td className={`${tdCls} text-[var(--ink-60)]`}>{c.email}</td>
-                  <td className={`${tdCls} text-[var(--ink-60)]`}>{c.instagram_handle}</td>
-                  <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(c.created_at)}</td>
-                  <td className={tdCls}>
-                    <div className="flex gap-1">
-                      <button onClick={() => handleApprove(c.id, true)} className="p-1.5 rounded hover:bg-[rgba(45,122,79,0.1)] text-[var(--success)]" title="Approve"><Check size={16} /></button>
-                      <button onClick={() => handleApprove(c.id, false)} className="p-1.5 rounded hover:bg-[rgba(220,38,38,0.1)] text-[#DC2626]" title="Deny"><X size={16} /></button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <div className="flex gap-1 flex-shrink-0">
+            {pendingCreators.slice(0, 3).map(c => (
+              <div key={c.id} className="flex items-center gap-1">
+                <button onClick={() => handleApprove(c.id, true)} className="w-7 h-7 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)]"><Check size={14} /></button>
+                <button onClick={() => handleApprove(c.id, false)} className="w-7 h-7 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.15)]"><X size={14} /></button>
+              </div>
+            ))}
+          </div>
+          <ChevronRight size={16} className="text-[#C4674A] flex-shrink-0" />
         </div>
       )}
 
-      {/* All Creators */}
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
-        <table className="w-full min-w-[800px]">
+      {/* Creators table */}
+      <div className="bg-white border border-[#E6E2DB] rounded-[12px] overflow-x-auto">
+        <table className="w-full min-w-[900px]">
           <thead><tr>
-            <th className={thCls}>Name</th><th className={thCls}>Instagram</th><th className={thCls}>City</th>
+            <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>City</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
             <th className={thCls}>Instagram</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
           </tr></thead>
           <tbody>
             {approvedCreators.map(c => (
-              <tr key={c.id} className="hover:bg-[var(--shell)]">
-                <td className={`${tdCls} font-medium`}>{c.display_name || c.name}</td>
-                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.instagram_handle}</td>
-                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.address || '—'}</td>
+              <tr key={c.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 52 }}>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-7 h-7 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                      <span className="text-[11px] font-bold text-white">{(c.display_name || c.name || '?')[0].toUpperCase()}</span>
+                    </div>
+                    <span className="font-medium">{c.display_name || c.name}</span>
+                  </div>
+                </td>
+                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.instagram_handle}</td>
+                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.address || '—'}</td>
+                <td className={tdCls}>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>
                     L{c.level}
                   </span>
                 </td>
-                <td className={tdCls}>{c.completion_rate}%</td>
-                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
+                <td className={tdCls}>
+                  {c.total_campaigns > 0 ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-16 h-1.5 bg-[rgba(34,34,34,0.06)] rounded-full overflow-hidden" style={{ maxWidth: 80 }}>
+                        <div className="h-full bg-[#C4674A] rounded-full" style={{ width: `${c.completion_rate}%` }} />
+                      </div>
+                      <span className="text-[13px] text-[rgba(34,34,34,0.60)]">{c.completion_rate}%</span>
+                    </div>
+                  ) : (
+                    <span className="text-[13px] text-[rgba(34,34,34,0.35)]">—</span>
+                  )}
+                </td>
+                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
                 <td className={tdCls}>
                   {c.instagram_connected
-                    ? <span className="text-[12px] text-[var(--success)] font-medium">Connected</span>
-                    : <span className="text-[12px] text-[var(--ink-35)]">Not connected</span>
+                    ? <span className="text-[12px] text-[#2D7A4F] font-medium">Connected</span>
+                    : <span className="text-[12px] text-[rgba(34,34,34,0.35)]">Not connected</span>
                   }
                 </td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[rgba(45,122,79,0.1)] text-[var(--success)]">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
                     Approved
                   </span>
                 </td>
-                <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(c.created_at)}</td>
+                <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>{fmtDate(c.created_at)}</td>
               </tr>
             ))}
             {approvedCreators.length === 0 && (
-              <tr><td colSpan={9} className="py-8 text-center text-[14px] text-[var(--ink-35)]">No approved creators yet</td></tr>
+              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[rgba(34,34,34,0.35)]">No approved creators yet</td></tr>
             )}
           </tbody>
         </table>
       </div>
+
+      {/* Modal */}
+      {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} />}
     </div>
   );
 }
