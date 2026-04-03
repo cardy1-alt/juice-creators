@@ -29,10 +29,20 @@ interface Creator { id: string; name: string; display_name: string | null; insta
 
 // ─── Shared styling ───
 const BORDER = '#E6E2DB';
-const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[14px] focus:outline-none focus:border-[#C4674A] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)]";
-const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)] mb-1.5";
+const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[13.5px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)]" + " font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.60)] mb-1.5";
 const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
+const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
+const modalBackdrop = "absolute inset-0 bg-[rgba(34,34,34,0.4)]";
+const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F7F5] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3] transition-colors";
+const modalHeader = "flex items-center justify-between px-6 py-5 border-b border-[#E6E2DB] flex-shrink-0";
+const modalBody = "flex-1 overflow-y-auto px-6 py-6";
+const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] bg-[#F7F7F5] flex-shrink-0";
+const ghostBtn = "text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222] transition-colors";
+const primaryBtn = "px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40 transition-opacity";
+const secondaryBtn = "px-5 py-2.5 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold hover:bg-[#F7F7F5]";
+const modalShadow = '0 20px 60px rgba(28,28,26,0.15)';
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, { bg: string; color: string }> = {
@@ -66,10 +76,11 @@ function fmtShortDate(d: string | null) {
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-// ─── Campaign Modal ───
+// ─── 3-Step Campaign Modal ───
 function CampaignModal({ brands, campaign, onSave, onClose }: {
   brands: Brand[]; campaign: Campaign | null; onSave: () => void; onClose: () => void;
 }) {
+  const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     brand_id: campaign?.brand_id || '', title: campaign?.title || '', headline: campaign?.headline || '',
     about_brand: campaign?.about_brand || '', perk_description: campaign?.perk_description || '',
@@ -85,30 +96,37 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   });
   const [saving, setSaving] = useState(false);
   const [aiLoading, setAiLoading] = useState(false);
-  const [aiDone, setAiDone] = useState(false);
+  const [aiRan, setAiRan] = useState(!!campaign?.about_brand);
   const [aiError, setAiError] = useState('');
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
 
+  const brandName = brands.find(b => b.id === form.brand_id)?.name || '';
+
   const handleAiGenerate = async () => {
-    const brandName = brands.find(b => b.id === form.brand_id)?.name || '';
     if (!brandName && !form.title) return;
-    setAiLoading(true); setAiError(''); setAiDone(false);
+    setAiLoading(true); setAiError('');
     try {
       const res = await fetch('/api/ai/generate', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          prompt: `You are helping create a campaign brief for a hyperlocal creator marketing platform called nayba, modelled on Hummingbirds. Brand: ${brandName}. Campaign: ${form.title}. Headline: ${form.headline}. Generate a campaign brief in JSON with these exact keys: about_brand (string), content_requirements (string), talking_points (array of 3 strings), inspiration (array of 2 objects with title and description keys). Return only valid JSON, no markdown, no preamble.`,
+          prompt: `You are creating a campaign brief for nayba, a hyperlocal creator marketing platform in the UK. Brand: ${brandName}. Brand region: ${form.target_county || 'Suffolk'}. Campaign title: ${form.title}. Headline: ${form.headline || 'not provided'}. Perk: ${form.perk_description || 'not provided'}. Generate a complete campaign brief as JSON with these exact keys: - headline: suggested headline, short and punchy, max 10 words. Only suggest if the provided headline is empty or 'not provided'. - target_city: the city where this campaign should run, inferred from brand region. UK city name only. - about_brand: 2-3 sentence description of the brand and what makes it special, 50-80 words. - content_requirements: specific Reel instructions including required tags, what to show, tone, must-mention details, 40-60 words. - talking_points: array of exactly 3 strings, each a key message for creators to weave in naturally, max 15 words each. - inspiration: array of exactly 2 objects each with title (4-6 words) and description (one sentence, max 20 words). Return only valid JSON, no markdown, no preamble.`,
         }),
       });
       if (!res.ok) throw new Error('API error');
       const { text } = await res.json();
       const data = JSON.parse(text);
-      if (data.about_brand) set('about_brand', data.about_brand);
-      if (data.content_requirements) set('content_requirements', data.content_requirements);
-      if (data.talking_points?.[0]) setForm(p => ({ ...p, tp1: data.talking_points[0], tp2: data.talking_points[1] || '', tp3: data.talking_points[2] || '' }));
-      if (data.inspiration) setForm(p => ({ ...p, insp: data.inspiration.slice(0, 2).map((i: any) => ({ title: i.title || '', description: i.description || '' })) }));
-      setAiDone(true);
-      setTimeout(() => setAiDone(false), 3000);
+      setForm(p => ({
+        ...p,
+        headline: p.headline || data.headline || p.headline,
+        target_city: p.target_city || data.target_city || p.target_city,
+        about_brand: data.about_brand || p.about_brand,
+        content_requirements: data.content_requirements || p.content_requirements,
+        tp1: data.talking_points?.[0] || p.tp1,
+        tp2: data.talking_points?.[1] || p.tp2,
+        tp3: data.talking_points?.[2] || p.tp3,
+        insp: data.inspiration ? data.inspiration.slice(0, 2).map((i: any) => ({ title: i.title || '', description: i.description || '' })) : p.insp,
+      }));
+      setAiRan(true);
     } catch {
       setAiError('AI generation failed — fill in manually');
       setTimeout(() => setAiError(''), 4000);
@@ -140,88 +158,152 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     onSave();
   };
 
-  const sectionDivider = (title: string) => (
-    <div className="col-span-1 md:col-span-2 pt-4 pb-1 border-t border-[#E6E2DB]">
-      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>{title}</p>
-    </div>
-  );
+  const taCls = `${inputCls} min-h-[72px] resize-y`;
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(34,34,34,0.4)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] w-full max-w-[680px] mx-4 flex flex-col" style={{ maxHeight: '88vh', boxShadow: '0 8px 40px rgba(34,34,34,0.12)' }}>
-        {/* Sticky header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E2DB] flex-shrink-0">
-          <h2 className="text-[17px] font-bold text-[#222]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full border border-[#E6E2DB] flex items-center justify-center text-[rgba(34,34,34,0.35)] hover:text-[#222] hover:border-[#222] transition-colors">
-            <X size={16} />
-          </button>
+    <div className={modalOverlay}>
+      <div className={modalBackdrop} onClick={onClose} />
+      <div className="relative bg-white rounded-[16px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+        {/* Header */}
+        <div className={modalHeader}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#222', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
+          <div className="flex items-center gap-4">
+            <span className="text-[13px] text-[rgba(34,34,34,0.35)]">Step {step} of 3</span>
+            <button onClick={onClose} className={modalClose}><X size={15} /></button>
+          </div>
         </div>
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label className={labelCls}>Brand *</label><select value={form.brand_id} onChange={e => set('brand_id', e.target.value)} className={inputCls}><option value="">Select brand...</option>{brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
-            <div><label className={labelCls}>Title *</label><input value={form.title} onChange={e => set('title', e.target.value)} className={inputCls} placeholder="Campaign title" /></div>
-            <div className="md:col-span-2">
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)]">Headline</label>
-                <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                  className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[999px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
-                  {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
-                  {aiLoading ? 'Generating...' : aiDone ? '✓ Brief generated' : 'Generate brief with AI'}
+        {/* Progress bar */}
+        <div className="h-[3px] bg-[rgba(34,34,34,0.06)]"><div className="h-full bg-[#C4674A] transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} /></div>
+
+        {/* Body */}
+        <div className={modalBody}>
+          {/* STEP 1 — Basics */}
+          {step === 1 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><label className={labelCls}>Brand *</label><select value={form.brand_id} onChange={e => set('brand_id', e.target.value)} className={inputCls}><option value="">Select brand...</option>{brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
+              <div><label className={labelCls}>Title *</label><input value={form.title} onChange={e => set('title', e.target.value)} className={inputCls} placeholder="Campaign title" /></div>
+              <div className="md:col-span-2">
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={labelCls} style={{ marginBottom: 0 }}>Headline</label>
+                  <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
+                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[999px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
+                    {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
+                    {aiLoading ? 'Generating...' : 'Generate brief with AI'}
+                  </button>
+                </div>
+                <input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
+                {aiError && <p className="text-[12px] text-[#C4674A] mt-1">{aiError}</p>}
+              </div>
+              <div className="md:col-span-2"><label className={labelCls}>Perk Description</label><textarea value={form.perk_description} onChange={e => set('perk_description', e.target.value)} className={taCls} placeholder="What the creator receives" /></div>
+              <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={form.perk_value} onChange={e => set('perk_value', e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Perk Type</label><select value={form.perk_type} onChange={e => set('perk_type', e.target.value)} className={inputCls}><option value="experience">Experience</option><option value="product">Product</option><option value="gift_card">Gift Card</option></select></div>
+              <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
+              <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
+              <div><label className={labelCls}>Creator Target</label><input type="number" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
+            </div>
+          )}
+
+          {/* STEP 2 — Brief */}
+          {step === 2 && (
+            <div>
+              {aiRan ? (
+                <>
+                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-5" style={{ background: 'rgba(196,103,74,0.06)', color: '#C4674A' }}>
+                    <span className="text-[12px] font-medium">✦ These fields were generated by AI — review and edit before publishing.</span>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
+                    <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
+                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[#E6E2DB]">
+                      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
+                    </div>
+                    {[form.tp1, form.tp2, form.tp3].map((tp, i) => (
+                      <div key={i} className="md:col-span-2 flex items-center gap-3">
+                        <span className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>{i + 1}</span>
+                        <input value={tp} onChange={e => set(`tp${i + 1}`, e.target.value)} className={`${inputCls} flex-1`} placeholder={`Key message ${i + 1}`} />
+                      </div>
+                    ))}
+                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[#E6E2DB]">
+                      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Inspiration</p>
+                    </div>
+                    {form.insp.map((item: any, i: number) => (
+                      <div key={i} className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div><label className={labelCls}>Title</label><input value={item.title} onChange={e => { const n = [...form.insp]; n[i] = { ...n[i], title: e.target.value }; set('insp', n); }} className={inputCls} /></div>
+                        <div className="md:col-span-2"><label className={labelCls}>Description</label><input value={item.description} onChange={e => { const n = [...form.insp]; n[i] = { ...n[i], description: e.target.value }; set('insp', n); }} className={inputCls} /></div>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12">
+                  <button onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
+                    className={`${primaryBtn} inline-flex items-center gap-2 mb-3`}
+                    style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                    {aiLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✦'}{' '}
+                    {aiLoading ? 'Generating brief...' : 'Generate brief with AI'}
+                  </button>
+                  <p className="text-[13px] text-[rgba(34,34,34,0.45)]">Fill in Step 1 first, then let AI write your brief.</p>
+                  {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* STEP 3 — Dates & Publish */}
+          {step === 3 && (
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                <div><label className={labelCls}>Open Date</label><input type="date" value={form.open_date} onChange={e => set('open_date', e.target.value)} className={inputCls} /></div>
+                <div><label className={labelCls}>Expression Deadline</label><input type="date" value={form.expression_deadline} onChange={e => set('expression_deadline', e.target.value)} className={inputCls} /></div>
+                <div><label className={labelCls}>Content Deadline</label><input type="date" value={form.content_deadline} onChange={e => set('content_deadline', e.target.value)} className={inputCls} /></div>
+                <div>
+                  <label className={labelCls}>Deliverables</label>
+                  <div className="flex gap-4 pt-2">
+                    <label className="flex items-center gap-2 text-[13.5px] text-[#222]"><input type="checkbox" checked={form.reel} onChange={e => set('reel', e.target.checked)} className="accent-[#C4674A]" /> Reel</label>
+                    <label className="flex items-center gap-2 text-[13.5px] text-[#222]"><input type="checkbox" checked={form.story} onChange={e => set('story', e.target.checked)} className="accent-[#C4674A]" /> Story</label>
+                  </div>
+                </div>
+              </div>
+              {/* Summary card */}
+              <div className="bg-[#F7F7F5] border border-[#E6E2DB] rounded-[12px] p-5">
+                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
+                <div className="space-y-2 text-[14px]">
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Brand</span><span className="text-[#222] font-medium">{brandName || '—'}</span></div>
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Title</span><span className="text-[#222] font-medium">{form.title || '—'}</span></div>
+                  {form.perk_description && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Perk</span><span className="text-[#222]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
+                  {form.target_city && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">City</span><span className="text-[#222]">{form.target_city}</span></div>}
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Creators</span><span className="text-[#222]">{form.creator_target}</span></div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className={modalFooterCls}>
+          {step === 1 && (
+            <>
+              <button onClick={onClose} className={ghostBtn}>Cancel</button>
+              <button onClick={() => setStep(2)} disabled={!form.brand_id || !form.title} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>Next: Brief →</button>
+            </>
+          )}
+          {step === 2 && (
+            <>
+              <button onClick={() => setStep(1)} className={ghostBtn}>← Back</button>
+              <button onClick={() => setStep(3)} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>Next: Dates →</button>
+            </>
+          )}
+          {step === 3 && (
+            <>
+              <button onClick={() => setStep(2)} className={ghostBtn}>← Back</button>
+              <div className="flex gap-3">
+                <button onClick={() => handleSave('draft')} disabled={saving} className={secondaryBtn}>Save as Draft</button>
+                <button onClick={() => handleSave('active')} disabled={saving} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                  {saving ? 'Publishing...' : 'Publish Campaign'}
                 </button>
               </div>
-              <input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
-              {aiError && <p className="text-[12px] text-[#C4674A] mt-1">{aiError}</p>}
-            </div>
-            <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${inputCls} h-20 resize-none`} /></div>
-            <div className="md:col-span-2"><label className={labelCls}>Perk Description</label><textarea value={form.perk_description} onChange={e => set('perk_description', e.target.value)} className={`${inputCls} h-16 resize-none`} placeholder="What the creator receives" /></div>
-            <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={form.perk_value} onChange={e => set('perk_value', e.target.value)} className={inputCls} /></div>
-            <div><label className={labelCls}>Perk Type</label><select value={form.perk_type} onChange={e => set('perk_type', e.target.value)} className={inputCls}><option value="experience">Experience</option><option value="product">Product</option><option value="gift_card">Gift Card</option></select></div>
-            <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
-            <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
-            <div><label className={labelCls}>Creator Target</label><input type="number" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
-            <div />  {/* spacer for grid alignment */}
-            <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${inputCls} h-20 resize-none`} /></div>
-
-            {sectionDivider('Talking Points')}
-            {[form.tp1, form.tp2, form.tp3].map((tp, i) => (
-              <div key={i} className="md:col-span-2 flex items-center gap-3">
-                <span className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>{i + 1}</span>
-                <input value={tp} onChange={e => set(`tp${i + 1}`, e.target.value)} className={`${inputCls} flex-1`} placeholder={`Key message ${i + 1}`} />
-              </div>
-            ))}
-
-            {sectionDivider('Inspiration')}
-            {form.insp.map((item: any, i: number) => (
-              <div key={i} className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div><label className={labelCls}>Title</label><input value={item.title} onChange={e => { const n = [...form.insp]; n[i] = { ...n[i], title: e.target.value }; set('insp', n); }} className={inputCls} /></div>
-                <div className="md:col-span-2"><label className={labelCls}>Description</label><input value={item.description} onChange={e => { const n = [...form.insp]; n[i] = { ...n[i], description: e.target.value }; set('insp', n); }} className={inputCls} /></div>
-              </div>
-            ))}
-
-            {sectionDivider('Campaign Dates')}
-            <div><label className={labelCls}>Open Date</label><input type="date" value={form.open_date} onChange={e => set('open_date', e.target.value)} className={inputCls} /></div>
-            <div><label className={labelCls}>Expression Deadline</label><input type="date" value={form.expression_deadline} onChange={e => set('expression_deadline', e.target.value)} className={inputCls} /></div>
-            <div><label className={labelCls}>Content Deadline</label><input type="date" value={form.content_deadline} onChange={e => set('content_deadline', e.target.value)} className={inputCls} /></div>
-            <div>
-              <label className={labelCls}>Deliverables</label>
-              <div className="flex gap-4 pt-2">
-                <label className="flex items-center gap-2 text-[14px] text-[#222]"><input type="checkbox" checked={form.reel} onChange={e => set('reel', e.target.checked)} className="accent-[#C4674A]" /> Reel</label>
-                <label className="flex items-center gap-2 text-[14px] text-[#222]"><input type="checkbox" checked={form.story} onChange={e => set('story', e.target.checked)} className="accent-[#C4674A]" /> Story</label>
-              </div>
-            </div>
-          </div>
-        </div>
-        {/* Sticky footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] flex-shrink-0">
-          <button onClick={onClose} className="px-4 py-2 text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
-          <div className="flex gap-3">
-            <button onClick={() => handleSave('draft')} disabled={saving} className="px-5 py-2.5 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold hover:bg-[#F7F7F5]">Save as Draft</button>
-            <button onClick={() => handleSave('active')} disabled={saving} className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
-              {saving ? 'Publishing...' : 'Publish Campaign'}
-            </button>
-          </div>
+            </>
+          )}
         </div>
       </div>
     </div>
