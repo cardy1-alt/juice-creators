@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
@@ -11,96 +12,177 @@ import AdminSettingsTab from './admin/AdminSettingsTab';
 
 type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
 
-const TABS: { key: Tab; label: string; icon: typeof Megaphone }[] = [
-  { key: 'campaigns', label: 'Campaigns', icon: Megaphone },
-  { key: 'creators', label: 'Creators', icon: Users },
-  { key: 'brands', label: 'Brands', icon: Store },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
-  { key: 'notifications', label: 'Notifications', icon: Bell },
-  { key: 'settings', label: 'Settings', icon: Settings },
+const NAV_SECTIONS = [
+  {
+    label: 'Platform',
+    items: [
+      { key: 'campaigns' as Tab, label: 'Campaigns', icon: Megaphone },
+      { key: 'creators' as Tab, label: 'Creators', icon: Users },
+      { key: 'brands' as Tab, label: 'Brands', icon: Store },
+    ],
+  },
+  {
+    label: 'Insights',
+    items: [
+      { key: 'analytics' as Tab, label: 'Analytics', icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Tools',
+    items: [
+      { key: 'notifications' as Tab, label: 'Notifications', icon: Bell },
+      { key: 'settings' as Tab, label: 'Settings', icon: Settings },
+    ],
+  },
 ];
 
+const PAGE_TITLES: Record<Tab, string> = {
+  campaigns: 'Campaigns',
+  creators: 'Creators',
+  brands: 'Brands',
+  analytics: 'Analytics',
+  notifications: 'Notifications',
+  settings: 'Settings',
+};
+
+const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
+  campaigns: { label: '+ New Campaign', show: true },
+  creators: { label: '+ Create Creator', show: true },
+  brands: { label: '+ Create Brand', show: true },
+  analytics: { label: '', show: false },
+  notifications: { label: '', show: false },
+  settings: { label: '', show: false },
+};
+
 export default function AdminDashboard() {
-  const { signOut } = useAuth();
+  const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('campaigns');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+  const [showModal, setShowModal] = useState(false);
+
+  useEffect(() => {
+    supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
+      .then(({ count }) => setPendingCount(count || 0));
+  }, [activeTab]);
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
     setSidebarOpen(false);
   };
 
+  const adminInitial = (user?.email?.[0] || 'A').toUpperCase();
+  const adminName = user?.email?.split('@')[0] || 'Admin';
+  const cta = CTA_CONFIG[activeTab];
+
   return (
-    <div className="flex min-h-screen bg-[var(--shell)]">
+    <div className="flex min-h-screen bg-[#F7F7F5]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
-      {/* Sidebar — hidden on mobile by default, overlay when open */}
+      {/* ─── Sidebar ─── */}
       <aside className={`
-        w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex flex-col flex-shrink-0
+        w-[240px] bg-white border-r border-[#E6E2DB] flex flex-col flex-shrink-0
         fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        {/* Logo */}
-        <div className="px-5 py-5 border-b border-[var(--border)] flex items-center justify-between">
+        {/* Wordmark */}
+        <div className="px-5 pt-5 pb-4 flex items-center justify-between">
           <div>
-            <Logo size={28} variant="wordmark" />
-            <p className="text-[11px] font-semibold uppercase tracking-[0.8px] text-[var(--ink-35)] mt-1">Admin</p>
+            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+            <div className="flex items-center gap-1.5 mt-1">
+              <span className="w-[6px] h-[6px] rounded-full bg-[#C4674A]" />
+              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Admin</span>
+            </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--ink-35)] hover:text-[var(--ink)]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
             <X size={20} />
           </button>
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 py-3 px-3">
-          {TABS.map(tab => {
-            const active = activeTab === tab.key;
-            return (
-              <button
-                key={tab.key}
-                onClick={() => handleTabClick(tab.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] font-medium mb-0.5 transition-colors ${
-                  active
-                    ? 'bg-[var(--terra-light)] text-[var(--terra)]'
-                    : 'text-[var(--ink-60)] hover:bg-[var(--shell)] hover:text-[var(--ink)]'
-                }`}
-              >
-                <tab.icon size={18} strokeWidth={active ? 2 : 1.5} />
-                {tab.label}
-              </button>
-            );
-          })}
+        {/* Nav sections */}
+        <nav className="flex-1 px-3 pb-3 overflow-y-auto">
+          {NAV_SECTIONS.map(section => (
+            <div key={section.label} className="mb-3">
+              <p style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
+                {section.label}
+              </p>
+              {section.items.map(item => {
+                const active = activeTab === item.key;
+                return (
+                  <button
+                    key={item.key}
+                    onClick={() => handleTabClick(item.key)}
+                    className="w-full flex items-center gap-3 px-3 py-2 rounded-[8px] text-[14px] mb-0.5 transition-colors"
+                    style={{
+                      fontWeight: active ? 600 : 500,
+                      background: active ? 'rgba(196,103,74,0.08)' : 'transparent',
+                      color: active ? '#C4674A' : 'rgba(34,34,34,0.60)',
+                    }}
+                  >
+                    <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
+                    <span className="flex-1 text-left">{item.label}</span>
+                    {item.key === 'creators' && pendingCount > 0 && (
+                      <span className="min-w-[20px] h-[20px] rounded-full bg-[#C4674A] text-white text-[11px] font-bold flex items-center justify-center px-1.5">
+                        {pendingCount}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
-        {/* Sign out */}
-        <div className="px-3 py-4 border-t border-[var(--border)]">
-          <button
-            onClick={signOut}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] font-medium text-[var(--ink-35)] hover:bg-[var(--shell)] hover:text-[var(--ink)] transition-colors"
-          >
-            <LogOut size={18} strokeWidth={1.5} />
-            Sign out
-          </button>
+        {/* User row */}
+        <div className="px-3 py-3 border-t border-[#E6E2DB]">
+          <div className="flex items-center gap-3 px-2 py-2 rounded-[8px] hover:bg-[#F7F7F5] transition-colors group cursor-pointer" onClick={signOut}>
+            <div className="w-8 h-8 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+              <span className="text-[13px] font-bold text-white">{adminInitial}</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[13px] font-semibold text-[#222] truncate">{adminName}</p>
+              <p className="text-[11px] text-[rgba(34,34,34,0.35)] truncate">{user?.email}</p>
+            </div>
+            <LogOut size={14} className="text-[rgba(34,34,34,0.35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+          </div>
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* ─── Main area ─── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-[var(--card)] border-b border-[var(--border)]">
-          <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
+        <div className="md:hidden flex items-center gap-3 px-4 h-[56px] bg-white border-b border-[#E6E2DB]">
+          <button onClick={() => setSidebarOpen(true)} className="text-[rgba(34,34,34,0.60)]">
             <Menu size={22} />
           </button>
-          <Logo size={22} variant="wordmark" />
+          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 18, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
         </div>
 
-        <main className="flex-1 p-4 md:p-8 overflow-auto">
-          {activeTab === 'campaigns' && <AdminCampaignsTab />}
-          {activeTab === 'creators' && <AdminCreatorsTab />}
-          {activeTab === 'brands' && <AdminBrandsTab />}
+        {/* Desktop topbar */}
+        <div className="hidden md:flex items-center justify-between h-[56px] px-8 bg-white border-b border-[#E6E2DB] flex-shrink-0">
+          <h1 style={{ fontSize: 17, fontWeight: 700, color: '#222', letterSpacing: '-0.2px', margin: 0 }}>
+            {PAGE_TITLES[activeTab]}
+          </h1>
+          {cta.show && (
+            <button
+              onClick={() => setShowModal(true)}
+              className="flex items-center gap-1.5 px-4 py-2 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
+            >
+              <Plus size={15} strokeWidth={2} />
+              {cta.label}
+            </button>
+          )}
+        </div>
+
+        {/* Content */}
+        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
+          {activeTab === 'campaigns' && <AdminCampaignsTab showModal={showModal} onCloseModal={() => setShowModal(false)} onOpenModal={() => setShowModal(true)} />}
+          {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
+          {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
           {activeTab === 'notifications' && <AdminNotificationsTab />}
           {activeTab === 'settings' && <AdminSettingsTab />}
