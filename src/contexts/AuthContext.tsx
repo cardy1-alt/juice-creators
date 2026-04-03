@@ -242,6 +242,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Now we have an authenticated session — INSERT the profile row
       if (role === 'creator') {
         const insertPayload: Record<string, any> = {
+          id: data.user.id,
           email: normEmail,
           name: additionalData.name,
           instagram_handle: additionalData.instagramHandle,
