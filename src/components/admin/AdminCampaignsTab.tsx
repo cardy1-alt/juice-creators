@@ -310,6 +310,229 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   );
 }
 
+// ─── Participation Management Modal ───
+function ParticipationModal({ campaign, onClose, onRefresh }: {
+  campaign: Campaign; onClose: () => void; onRefresh: () => void;
+}) {
+  const [parts, setParts] = useState<Participation[]>([]);
+  const [toast, setToast] = useState<string | null>(null);
+
+  useEffect(() => { fetchParts(); }, [campaign.id]);
+
+  const fetchParts = async () => {
+    const { data } = await supabase.from('participations')
+      .select('*, creators(name, display_name, instagram_handle)')
+      .eq('campaign_id', campaign.id).order('created_at', { ascending: false });
+    if (data) setParts(data as Participation[]);
+  };
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 2500); };
+
+  const updateField = async (partId: string, field: string, value: any) => {
+    // Optimistic update
+    setParts(prev => prev.map(p => p.id === partId ? { ...p, [field]: value } : p));
+    const { error } = await supabase.from('participations').update({ [field]: value }).eq('id', partId);
+    if (error) {
+      showToast('Update failed');
+      fetchParts(); // revert
+    }
+  };
+
+  const updatePerkSent = async (partId: string, sent: boolean) => {
+    const updates: any = { perk_sent: sent };
+    if (sent) updates.perk_sent_at = new Date().toISOString();
+    else updates.perk_sent_at = null;
+    setParts(prev => prev.map(p => p.id === partId ? { ...p, ...updates } : p));
+    const { error } = await supabase.from('participations').update(updates).eq('id', partId);
+    if (error) { showToast('Update failed'); fetchParts(); }
+    else showToast(sent ? 'Perk marked as sent' : 'Perk unmarked');
+  };
+
+  const updateReelUrl = async (partId: string, url: string) => {
+    const updates: any = { reel_url: url || null };
+    if (url && !parts.find(p => p.id === partId)?.reel_submitted_at) {
+      updates.reel_submitted_at = new Date().toISOString();
+      updates.status = 'content_submitted';
+    }
+    setParts(prev => prev.map(p => p.id === partId ? { ...p, ...updates } : p));
+    const { error } = await supabase.from('participations').update(updates).eq('id', partId);
+    if (error) { showToast('Update failed'); fetchParts(); }
+    else if (url) showToast('Reel URL saved');
+  };
+
+  const updateNumeric = async (partId: string, field: string, raw: string) => {
+    const value = raw ? parseInt(raw) : null;
+    setParts(prev => prev.map(p => p.id === partId ? { ...p, [field]: value } : p));
+    const { error } = await supabase.from('participations').update({ [field]: value }).eq('id', partId);
+    if (error) { showToast('Update failed'); fetchParts(); }
+  };
+
+  const markComplete = async (partId: string) => {
+    const part = parts.find(p => p.id === partId);
+    if (!part) return;
+
+    // Update participation
+    const updates = { status: 'completed', completed_at: new Date().toISOString() };
+    setParts(prev => prev.map(p => p.id === partId ? { ...p, ...updates } : p));
+    const { error } = await supabase.from('participations').update(updates).eq('id', partId);
+    if (error) { showToast('Failed to mark complete'); fetchParts(); return; }
+
+    // Update creator stats
+    const { data: creator } = await supabase.from('creators')
+      .select('total_campaigns, completed_campaigns')
+      .eq('id', part.creator_id).single();
+    if (creator) {
+      const newCompleted = (creator.completed_campaigns || 0) + 1;
+      const total = creator.total_campaigns || 1;
+      const rate = Math.round((newCompleted / total) * 100);
+      await supabase.from('creators').update({
+        completed_campaigns: newCompleted,
+        completion_rate: rate,
+      }).eq('id', part.creator_id);
+    }
+
+    showToast('Participation marked complete');
+    onRefresh();
+  };
+
+  const pThCls = "text-left text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.35)] py-2.5 px-3 bg-[#F7F7F5] whitespace-nowrap";
+  const pTdCls = "py-2 px-3 text-[13px] text-[#222] border-b border-[#E6E2DB] align-middle";
+  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[#F7F7F5] border border-[#E6E2DB] text-[13px] text-[#222] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_2px_rgba(196,103,74,0.1)]";
+
+  return (
+    <div className={modalOverlay}>
+      <div className={modalBackdrop} onClick={onClose} />
+      <div className="relative bg-white rounded-[16px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+        {/* Header */}
+        <div className={modalHeader}>
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#222', letterSpacing: '-0.2px' }}>
+            Manage Participation — {campaign.title}
+          </h2>
+          <button onClick={onClose} className={modalClose}><X size={15} /></button>
+        </div>
+
+        {/* Toast */}
+        {toast && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[#222] text-white px-4 py-2 rounded-[8px] text-[13px] font-medium" style={{ boxShadow: '0 4px 16px rgba(34,34,34,0.15)' }}>
+            {toast}
+          </div>
+        )}
+
+        {/* Body */}
+        <div className={modalBody}>
+          {parts.length > 0 ? (
+            <div className="overflow-x-auto -mx-6 px-6">
+              <table className="w-full min-w-[860px]">
+                <thead><tr>
+                  <th className={pThCls}>Creator</th>
+                  <th className={pThCls}>Status</th>
+                  <th className={pThCls}>Perk Sent</th>
+                  <th className={pThCls}>Reel URL</th>
+                  <th className={pThCls}>Reach</th>
+                  <th className={pThCls}>Likes</th>
+                  <th className={pThCls}>Comments</th>
+                  <th className={pThCls}>Views</th>
+                  <th className={pThCls}>Actions</th>
+                </tr></thead>
+                <tbody>
+                  {parts.map(p => (
+                    <tr key={p.id} className="hover:bg-[#FAFAF8]">
+                      <td className={`${pTdCls} font-medium whitespace-nowrap`}>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                            <span className="text-[10px] font-bold text-white">{(p.creators?.display_name || p.creators?.name || '?')[0].toUpperCase()}</span>
+                          </div>
+                          {p.creators?.display_name || p.creators?.name}
+                        </div>
+                      </td>
+                      <td className={pTdCls}>
+                        <select value={p.status}
+                          onChange={e => updateField(p.id, 'status', e.target.value)}
+                          className="text-[12px] px-2 py-1.5 rounded-[6px] border border-[#E6E2DB] bg-[#F7F7F5] focus:outline-none focus:border-[#C4674A]">
+                          <option value="confirmed">Confirmed</option>
+                          <option value="visited">Visited</option>
+                          <option value="content_submitted">Content Submitted</option>
+                          <option value="completed">Completed</option>
+                          <option value="overdue">Overdue</option>
+                        </select>
+                      </td>
+                      <td className={pTdCls}>
+                        <input type="checkbox" checked={p.perk_sent}
+                          onChange={e => updatePerkSent(p.id, e.target.checked)}
+                          className="accent-[#C4674A] w-4 h-4" />
+                      </td>
+                      <td className={pTdCls}>
+                        <div className="flex items-center gap-1.5">
+                          <input
+                            defaultValue={p.reel_url || ''}
+                            onBlur={e => updateReelUrl(p.id, e.target.value)}
+                            onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
+                            placeholder="Paste URL"
+                            className="w-[140px] px-2 py-1.5 rounded-[6px] bg-[#F7F7F5] border border-[#E6E2DB] text-[12px] focus:outline-none focus:border-[#C4674A]"
+                          />
+                          {p.reel_url && (
+                            <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                              className="text-[11px] text-[#C4674A] font-medium whitespace-nowrap hover:underline">
+                              View →
+                            </a>
+                          )}
+                        </div>
+                      </td>
+                      <td className={pTdCls}>
+                        <input type="number" defaultValue={p.reach ?? ''}
+                          onBlur={e => updateNumeric(p.id, 'reach', e.target.value)}
+                          className={numInput} />
+                      </td>
+                      <td className={pTdCls}>
+                        <input type="number" defaultValue={p.likes ?? ''}
+                          onBlur={e => updateNumeric(p.id, 'likes', e.target.value)}
+                          className={numInput} />
+                      </td>
+                      <td className={pTdCls}>
+                        <input type="number" defaultValue={p.comments ?? ''}
+                          onBlur={e => updateNumeric(p.id, 'comments', e.target.value)}
+                          className={numInput} />
+                      </td>
+                      <td className={pTdCls}>
+                        <input type="number" defaultValue={p.views ?? ''}
+                          onBlur={e => updateNumeric(p.id, 'views', e.target.value)}
+                          className={numInput} />
+                      </td>
+                      <td className={pTdCls}>
+                        <button
+                          onClick={() => markComplete(p.id)}
+                          disabled={p.status === 'completed'}
+                          className="px-3 py-1.5 rounded-[999px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
+                          style={{
+                            background: p.status === 'completed' ? 'rgba(34,34,34,0.06)' : 'rgba(45,122,79,0.08)',
+                            color: p.status === 'completed' ? 'rgba(34,34,34,0.40)' : '#2D7A4F',
+                          }}
+                        >
+                          {p.status === 'completed' ? 'Completed' : 'Mark Complete'}
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="py-12 text-center">
+              <p className="text-[14px] text-[rgba(34,34,34,0.35)]">No confirmed participations yet</p>
+            </div>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className={modalFooterCls}>
+          <div />
+          <button onClick={onClose} className={secondaryBtn}>Close</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ─── Inline Campaign Detail Panel ───
 function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipation, onEdit }: {
   campaign: Campaign; onManageApplicants: () => void; onViewParticipation: () => void; onEdit: () => void;
@@ -432,6 +655,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [brands, setBrands] = useState<Brand[]>([]);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
+  const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
 
@@ -549,7 +773,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       <CampaignInlineDetail
                         campaign={c}
                         onManageApplicants={() => {}}
-                        onViewParticipation={() => {}}
+                        onViewParticipation={() => setParticipationCampaign(c)}
                         onEdit={() => { setEditingCampaign(c); onOpenModal(); }}
                       />
                     )}
@@ -573,13 +797,22 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         </div>
       )}
 
-      {/* Modal */}
+      {/* Campaign Modal */}
       {(showModal || editingCampaign) && (
         <CampaignModal
           brands={brands}
           campaign={editingCampaign}
           onSave={() => { onCloseModal(); setEditingCampaign(null); fetchCampaigns(); }}
           onClose={() => { onCloseModal(); setEditingCampaign(null); }}
+        />
+      )}
+
+      {/* Participation Modal */}
+      {participationCampaign && (
+        <ParticipationModal
+          campaign={participationCampaign}
+          onClose={() => setParticipationCampaign(null)}
+          onRefresh={fetchCampaigns}
         />
       )}
     </div>
