@@ -159,11 +159,12 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               {pendingCreators.length > 3 ? ` +${pendingCreators.length - 3} more` : ''}
             </p>
           </div>
-          <div className="flex gap-1 flex-shrink-0">
+          <div className="flex gap-3 flex-shrink-0">
             {pendingCreators.slice(0, 3).map(c => (
-              <div key={c.id} className="flex items-center gap-1">
-                <button onClick={() => handleApprove(c.id, true)} className="w-7 h-7 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)]"><Check size={14} /></button>
-                <button onClick={() => handleApprove(c.id, false)} className="w-7 h-7 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.15)]"><X size={14} /></button>
+              <div key={c.id} className="flex items-center gap-1.5 bg-white rounded-[999px] border border-[rgba(196,103,74,0.15)] px-1.5 py-1">
+                <span className="text-[12px] font-medium text-[#222] pl-2">{(c.display_name || c.name).split(' ')[0]}</span>
+                <button onClick={() => handleApprove(c.id, true)} className="w-6 h-6 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)]"><Check size={12} /></button>
+                <button onClick={() => handleApprove(c.id, false)} className="w-6 h-6 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.15)]"><X size={12} /></button>
               </div>
             ))}
           </div>

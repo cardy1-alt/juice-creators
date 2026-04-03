@@ -75,7 +75,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     about_brand: campaign?.about_brand || '', perk_description: campaign?.perk_description || '',
     perk_value: campaign?.perk_value?.toString() || '', perk_type: campaign?.perk_type || 'experience',
     target_city: campaign?.target_city || '', target_county: campaign?.target_county || 'Suffolk',
-    creator_target: campaign?.creator_target?.toString() || '10', min_level: campaign?.min_level?.toString() || '1',
+    creator_target: campaign?.creator_target?.toString() || '10',
     content_requirements: campaign?.content_requirements || '',
     tp1: campaign?.talking_points?.[0] || '', tp2: campaign?.talking_points?.[1] || '', tp3: campaign?.talking_points?.[2] || '',
     insp: campaign?.inspiration || [{ title: '', description: '' }, { title: '', description: '' }],
@@ -84,7 +84,37 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     content_deadline: campaign?.content_deadline?.slice(0, 10) || '',
   });
   const [saving, setSaving] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiDone, setAiDone] = useState(false);
+  const [aiError, setAiError] = useState('');
   const set = (k: string, v: any) => setForm(p => ({ ...p, [k]: v }));
+
+  const handleAiGenerate = async () => {
+    const brandName = brands.find(b => b.id === form.brand_id)?.name || '';
+    if (!brandName && !form.title) return;
+    setAiLoading(true); setAiError(''); setAiDone(false);
+    try {
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `You are helping create a campaign brief for a hyperlocal creator marketing platform called nayba, modelled on Hummingbirds. Brand: ${brandName}. Campaign: ${form.title}. Headline: ${form.headline}. Generate a campaign brief in JSON with these exact keys: about_brand (string), content_requirements (string), talking_points (array of 3 strings), inspiration (array of 2 objects with title and description keys). Return only valid JSON, no markdown, no preamble.`,
+        }),
+      });
+      if (!res.ok) throw new Error('API error');
+      const { text } = await res.json();
+      const data = JSON.parse(text);
+      if (data.about_brand) set('about_brand', data.about_brand);
+      if (data.content_requirements) set('content_requirements', data.content_requirements);
+      if (data.talking_points?.[0]) setForm(p => ({ ...p, tp1: data.talking_points[0], tp2: data.talking_points[1] || '', tp3: data.talking_points[2] || '' }));
+      if (data.inspiration) setForm(p => ({ ...p, insp: data.inspiration.slice(0, 2).map((i: any) => ({ title: i.title || '', description: i.description || '' })) }));
+      setAiDone(true);
+      setTimeout(() => setAiDone(false), 3000);
+    } catch {
+      setAiError('AI generation failed — fill in manually');
+      setTimeout(() => setAiError(''), 4000);
+    }
+    setAiLoading(false);
+  };
 
   const handleSave = async (asStatus: string) => {
     if (!form.brand_id || !form.title) return;
@@ -94,7 +124,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       about_brand: form.about_brand || null, perk_description: form.perk_description || null,
       perk_value: form.perk_value ? parseFloat(form.perk_value) : null, perk_type: form.perk_type,
       target_city: form.target_city || null, target_county: form.target_county || null,
-      creator_target: parseInt(form.creator_target) || 10, min_level: parseInt(form.min_level) || 1,
+      creator_target: parseInt(form.creator_target) || 10, min_level: 1,
       content_requirements: form.content_requirements || null,
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
@@ -132,7 +162,18 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={labelCls}>Brand *</label><select value={form.brand_id} onChange={e => set('brand_id', e.target.value)} className={inputCls}><option value="">Select brand...</option>{brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
             <div><label className={labelCls}>Title *</label><input value={form.title} onChange={e => set('title', e.target.value)} className={inputCls} placeholder="Campaign title" /></div>
-            <div className="md:col-span-2"><label className={labelCls}>Headline</label><input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" /></div>
+            <div className="md:col-span-2">
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)]">Headline</label>
+                <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
+                  className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[999px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
+                  {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
+                  {aiLoading ? 'Generating...' : aiDone ? '✓ Brief generated' : 'Generate brief with AI'}
+                </button>
+              </div>
+              <input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
+              {aiError && <p className="text-[12px] text-[#C4674A] mt-1">{aiError}</p>}
+            </div>
             <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${inputCls} h-20 resize-none`} /></div>
             <div className="md:col-span-2"><label className={labelCls}>Perk Description</label><textarea value={form.perk_description} onChange={e => set('perk_description', e.target.value)} className={`${inputCls} h-16 resize-none`} placeholder="What the creator receives" /></div>
             <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={form.perk_value} onChange={e => set('perk_value', e.target.value)} className={inputCls} /></div>
@@ -140,7 +181,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
             <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
             <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
             <div><label className={labelCls}>Creator Target</label><input type="number" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
-            <div><label className={labelCls}>Min Level</label><select value={form.min_level} onChange={e => set('min_level', e.target.value)} className={inputCls}><option value="1">1 — Newcomer</option><option value="3">3 — Regular</option><option value="5">5 — Trusted</option></select></div>
+            <div />  {/* spacer for grid alignment */}
             <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${inputCls} h-20 resize-none`} /></div>
 
             {sectionDivider('Talking Points')}
@@ -191,6 +232,45 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
 function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipation, onEdit }: {
   campaign: Campaign; onManageApplicants: () => void; onViewParticipation: () => void; onEdit: () => void;
 }) {
+  const [aiLoading, setAiLoading] = useState(false);
+  const [recommendations, setRecommendations] = useState<{ creator_id: string; name: string; reason: string; score: number }[] | null>(null);
+  const [aiError, setAiError] = useState('');
+
+  const handleAiRecommend = async () => {
+    setAiLoading(true); setAiError(''); setRecommendations(null);
+    try {
+      const { data: apps } = await supabase.from('applications')
+        .select('creator_id, creators(id, name, display_name, instagram_handle, level, completion_rate, total_campaigns, address)')
+        .eq('campaign_id', campaign.id).eq('status', 'interested');
+      if (!apps || apps.length === 0) { setAiError('No applicants to recommend from'); setAiLoading(false); return; }
+      const applicants = apps.map((a: any) => ({
+        creator_id: a.creator_id, name: a.creators?.display_name || a.creators?.name,
+        instagram: a.creators?.instagram_handle, level: a.creators?.level,
+        completion_rate: a.creators?.completion_rate, campaigns: a.creators?.total_campaigns, city: a.creators?.address,
+      }));
+      const res = await fetch('/api/ai/generate', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: `You are helping select creators for a hyperlocal marketing campaign. Campaign: ${campaign.title}. Brand: ${campaign.businesses?.name}. City: ${campaign.target_city}. Perk: ${campaign.perk_description}. Here are the applicants: ${JSON.stringify(applicants)}. Rank the top applicants by fit. Consider: location match to target city, completion rate (higher is better), level (higher is better), campaign experience. Return a JSON array of the top applicants ordered by recommendation score, each with fields: creator_id, name, reason (one sentence explaining why they're a good fit), score (1-10). Return only valid JSON.`,
+          max_tokens: 1000,
+        }),
+      });
+      if (!res.ok) throw new Error('API error');
+      const { text } = await res.json();
+      setRecommendations(JSON.parse(text));
+    } catch {
+      setAiError('AI recommendation failed');
+      setTimeout(() => setAiError(''), 4000);
+    }
+    setAiLoading(false);
+  };
+
+  const handleSelectCreator = async (creatorId: string) => {
+    await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() })
+      .eq('campaign_id', campaign.id).eq('creator_id', creatorId);
+    setRecommendations(prev => prev ? prev.filter(r => r.creator_id !== creatorId) : null);
+  };
+
   return (
     <tr>
       <td colSpan={10} className="p-0">
@@ -218,11 +298,44 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               </div>
             )}
           </div>
-          <div className="flex gap-2 mt-4 pt-4 border-t border-[#E6E2DB]">
+          <div className="flex gap-2 mt-4 pt-4 border-t border-[#E6E2DB] flex-wrap">
             <button onClick={onManageApplicants} className="px-4 py-2 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90">Manage Applicants</button>
+            <button onClick={handleAiRecommend} disabled={aiLoading}
+              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[999px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
+              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
+              {aiLoading ? 'Analysing...' : 'AI Recommend'}
+            </button>
             <button onClick={onViewParticipation} className="px-4 py-2 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold hover:bg-[#F7F7F5]">View Participation</button>
             <button onClick={onEdit} className="px-4 py-2 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold hover:bg-[#F7F7F5]">Edit Campaign</button>
           </div>
+          {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
+
+          {/* AI Recommendations panel */}
+          {recommendations && recommendations.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-[#E6E2DB]">
+              <p className="text-[12px] font-bold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] mb-3">AI Recommendations</p>
+              <div className="space-y-2">
+                {recommendations.map(r => (
+                  <div key={r.creator_id} className="flex items-center gap-3 bg-white rounded-[8px] border border-[#E6E2DB] px-4 py-3">
+                    <div className="w-8 h-8 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                      <span className="text-[12px] font-bold text-white">{r.name[0]}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[#222]">{r.name}</p>
+                      <p className="text-[13px] text-[rgba(34,34,34,0.60)] truncate">{r.reason}</p>
+                    </div>
+                    <div className="flex items-center gap-3 flex-shrink-0">
+                      <span className="text-[14px] font-bold text-[#C4674A]">{r.score}/10</span>
+                      <button onClick={() => handleSelectCreator(r.creator_id)}
+                        className="px-3 py-1.5 rounded-[999px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-90">
+                        Select
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </td>
     </tr>
