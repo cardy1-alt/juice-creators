@@ -10,8 +10,8 @@ interface Brand {
 }
 
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
-const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[14px] focus:outline-none focus:border-[#C4674A] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)]";
-const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)] mb-1.5";
+const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[13.5px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)] font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.60)] mb-1.5";
 const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
 
@@ -43,12 +43,12 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgba(34,34,34,0.4)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] w-full max-w-[520px] mx-4" style={{ boxShadow: '0 8px 40px rgba(34,34,34,0.12)' }}>
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#E6E2DB]">
-          <h2 className="text-[17px] font-bold text-[#222]">Create Brand</h2>
-          <button onClick={onClose} className="w-8 h-8 rounded-full border border-[#E6E2DB] flex items-center justify-center text-[rgba(34,34,34,0.35)] hover:text-[#222]"><X size={16} /></button>
+      <div className="relative bg-white rounded-[16px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: '0 20px 60px rgba(28,28,26,0.15)' }}>
+        <div className="flex items-center justify-between px-6 py-5 border-b border-[#E6E2DB] flex-shrink-0">
+          <h2 style={{ fontSize: 16, fontWeight: 700, color: '#222', letterSpacing: '-0.2px' }}>Create Brand</h2>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F7F5] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
-        <div className="px-6 py-5">
+        <div className="flex-1 overflow-y-auto px-6 py-6">
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={labelCls}>Brand Name *</label><input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className={inputCls} required /></div>
             <div><label className={labelCls}>Owner Email *</label><input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className={inputCls} required /></div>
@@ -56,12 +56,12 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div><label className={labelCls}>Region</label><select value={form.region} onChange={e => setForm(p => ({ ...p, region: e.target.value }))} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
             <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
             <div><label className={labelCls}>Address</label><input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className={inputCls} /></div>
-            <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} h-16 resize-none`} /></div>
+            <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} min-h-[72px] resize-y`} /></div>
           </form>
         </div>
-        <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB]">
-          <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)]">Cancel</button>
-          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] bg-[#F7F7F5] flex-shrink-0">
+          <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
+          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
             {creating ? 'Creating...' : 'Create Brand'}
           </button>
         </div>
