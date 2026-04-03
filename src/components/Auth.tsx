@@ -144,232 +144,185 @@ export default function Auth() {
   return (
     <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
-        /* ─── SIGN IN: two-column on desktop, single on mobile ─── */
-        <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden" style={{ minHeight: '100dvh' }}>
-          <style>{`
-            @media(min-width:768px){.auth-left{flex:0 0 54%;height:100vh;overflow-y:auto;padding:0 64px 0 72px !important}}
-            @media(min-width:768px){.auth-right{flex:0 0 46%;height:100vh;overflow-y:auto;padding:48px !important}}
-            @media(min-width:768px){.auth-wordmark-abs{position:absolute !important;top:32px;left:72px}}
-            @media(min-width:768px) and (min-height:700px){.auth-grid-tall{display:block !important}}
-            @keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}
-          `}</style>
+        /* ─── SIGN IN: single centred column ─── */
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6 md:py-12" style={{ background: '#F7F7F5' }}>
+          <style>{`@keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}`}</style>
+          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 480 }}>
 
-          {/* Left column — hero */}
-          <div className="auth-left bg-[#F7F7F5] flex flex-col justify-center relative" style={{ padding: '32px 24px' }}>
-            {/* Wordmark — absolute on desktop, inline on mobile */}
-            <div className="auth-wordmark-abs flex justify-center md:justify-start mb-8 md:mb-0" style={{ position: 'relative' }}>
-              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 26, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
-            </div>
+            {/* 1. Wordmark */}
+            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
 
-            <div className="max-w-[480px] w-full mx-auto md:mx-0">
-              {/* Live pill */}
-              <div className="flex justify-center md:justify-start mb-4">
-                <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
-                  <span className="relative flex h-[8px] w-[8px]">
-                    <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)', animation: 'nayba-pulse 2s ease-in-out infinite' }} />
-                  </span>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
-                </div>
-              </div>
-
-              {/* Headline */}
-              <div className="text-center md:text-left mb-4 md:mt-4">
-                <h1 className="text-[38px] md:text-[36px] lg:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.2px', color: '#1C1C1A', lineHeight: 1.1, margin: 0 }}>
-                  Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
-                </h1>
-              </div>
-
-              {/* Subheadline */}
-              <p className="text-center md:text-left" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 17, fontWeight: 400, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, margin: '20px 0 0', maxWidth: 420 }}>
-                New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
-              </p>
-
-              {/* Social proof */}
-              <div className="flex justify-center md:justify-start mt-8">
-                <div className="inline-flex items-center gap-[10px] px-3.5 py-2 rounded-[999px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
-                  <div className="flex -space-x-[10px]">
-                    {['S', 'M', 'J', 'R'].map((initial, i) => (
-                      <div
-                        key={initial}
-                        className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
-                        style={{
-                          background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
-                          zIndex: 4 - i,
-                          fontFamily: "'Instrument Sans', sans-serif",
-                          fontWeight: 700,
-                          fontSize: 12,
-                          color: i === 0 ? 'white' : 'rgba(34,34,34,0.60)',
-                        }}
-                      >
-                        {initial}
-                      </div>
-                    ))}
-                  </div>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.60)' }}>
-                    Real creators · real local brands · no follower minimums
-                  </span>
-                </div>
-              </div>
-
-              {/* Campaign preview grid — only on tall desktop screens */}
-              <div className="hidden auth-grid-tall relative mt-8" style={{ maxHeight: 220, overflow: 'hidden', display: 'none' }}>
-                <div className="grid grid-cols-2 gap-2">
-                  {[
-                    { color: '#F5C4A0', brand: 'Wildcraft Coffee', perk: 'Free cold brew' },
-                    { color: '#C4674A', brand: 'Studio Flow', perk: 'Free yoga class' },
-                    { color: '#2A7A4F', brand: 'The Nail Room', perk: 'Free nail set' },
-                    { color: '#E8E3DC', brand: 'Ember & Rye', perk: 'Free brunch for 2' },
-                    { color: '#D4A847', brand: 'Bloom Beauty', perk: 'Free facial' },
-                    { color: '#C8B8F0', brand: 'The Larder', perk: 'Free deli hamper' },
-                  ].map((c, i) => (
-                    <div key={i} className="bg-white rounded-[10px] border border-[#E6E2DB] p-3 overflow-hidden">
-                      <div className="rounded-[6px]" style={{ background: c.color, aspectRatio: '16/9' }} />
-                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, fontWeight: 600, color: '#222', marginTop: 8, marginBottom: 0 }}>{c.brand}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded-[999px] text-[10px] font-medium" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>{c.perk}</span>
-                    </div>
-                  ))}
-                </div>
-                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 60%, #F7F7F5 100%)' }} />
-              </div>
-            </div>
-            {/* Gradient divider — right edge (desktop only) */}
-            <div className="hidden md:block absolute right-0 top-0 w-[1px] h-full" style={{ background: 'linear-gradient(to bottom, transparent, #E6E2DB 20%, #E6E2DB 80%, transparent)' }} />
-          </div>
-
-          {/* Right column — form */}
-          <div className="auth-right flex flex-col justify-center items-center" style={{ padding: '32px 24px', background: '#FAFAF9' }}>
-            <div className="w-full md:bg-white md:border md:border-[#E6E2DB] md:rounded-[16px] md:p-10 md:max-w-[400px]" style={{ boxShadow: 'var(--auth-card-shadow, none)' }}>
-              <style>{`@media(min-width:768px){:root{--auth-card-shadow:0 4px 24px rgba(28,28,26,0.06)}}`}</style>
-
-          {/* ─── FORGOT PASSWORD ─── */}
-          {forgotPassword ? (
-            <div>
-            <button
-              type="button"
-              onClick={() => setForgotPassword(false)}
-              className="flex items-center gap-[6px] text-[13px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
-            >
-              <ChevronLeft size={14} strokeWidth={1.5} /> Back to sign in
-            </button>
-
-            {resetSent ? (
-              <div className="text-center py-[32px]">
-                <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
-                  <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
-                </div>
-                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em', fontWeight: 400 }}>Check your email</p>
-                <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
-              </div>
-            ) : (
-              <form onSubmit={handleResetPassword} className="space-y-[14px]">
-                <div className="mb-[4px]">
-                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em', fontWeight: 400 }}>Reset password</p>
-                  <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
-                </div>
-                <FloatingInput
-                  label="Email"
-                  type="email"
-                  value={resetEmail}
-                  onChange={setResetEmail}
-                  placeholder="you@example.com"
-                  required
-                />
-                {resetError && (
-                  <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                    <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
-                    {resetError}
-                  </div>
-                )}
-                <button
-                  type="submit"
-                  disabled={resetLoading}
-                  className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
-                >
-                  {resetLoading ? 'Sending...' : 'Send Reset Link'}
-                </button>
-              </form>
-            )}
-          </div>
-        ) : (
-          <>
-          {/* Sign in heading */}
-          <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#222', letterSpacing: '-0.3px', margin: '0 0 24px', textAlign: 'center' }}>Sign in</h2>
-
-          {/* Sign in form */}
-          <form onSubmit={handleSubmit} className="space-y-[12px]">
-            {/* 7. Email input */}
-            <FloatingInput
-              label="Email"
-              type="email"
-              value={email}
-              onChange={setEmail}
-              placeholder="you@example.com"
-              required
-            />
-            {/* 8. Password input with eye toggle */}
-            <FloatingInput
-              label="Password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={setPassword}
-              placeholder="Enter your password"
-              required
-              minLength={8}
-              rightElement={
-                <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                  {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-                </button>
-              }
-            />
-
-            {error && (
-              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
-                {error}
-              </div>
-            )}
-
-            {/* 9. Sign in button */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
-              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-            >
-              {loading ? (
-                <span className="inline-flex items-center gap-2">
-                  <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            {/* 2. Location pill */}
+            <div className="mb-6">
+              <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'white', border: '1px solid #E6E2DB', borderRadius: '999px' }}>
+                <span className="relative flex h-[8px] w-[8px]">
+                  <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: '#C4674A', animation: 'nayba-pulse 2s ease-in-out infinite' }} />
                 </span>
-              ) : 'Sign In'}
-            </button>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(28,28,26,0.55)' }}>Now live in Bury St Edmunds</span>
+              </div>
+            </div>
 
-            {/* 10. Apply for access */}
-            <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
-              Not a member?{' '}
-              <button
-                type="button"
-                onClick={() => { setMode('roleselect'); setError(''); setSelectedRole(null); setForgotPassword(false); }}
-                className="text-[#C4674A] font-bold hover:underline transition-colors"
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
-              >
-                Apply for access
-              </button>
+            {/* 3. Headline */}
+            <h1 className="text-[38px] md:text-[48px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1C1A', textAlign: 'center' }}>
+              <span style={{ display: 'block' }}>Discover local brands.</span>
+              Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
+            </h1>
+
+            {/* 4. Subheadline */}
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 16, fontWeight: 400, color: 'rgba(28,28,26,0.55)', lineHeight: 1.65, maxWidth: 380, margin: '0 0 36px' }}>
+              New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
             </p>
 
-            {/* 11. Forgot password — de-emphasised */}
-            <button
-              type="button"
-              onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-              className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
-              style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-            >
-              Forgot password?
-            </button>
-          </form>
-          </>
-        )}
+            {/* 5. Form card */}
+            <div className="w-full bg-white border border-[#E6E2DB] rounded-[16px] p-6 md:p-8 text-left" style={{ boxShadow: '0 4px 24px rgba(28,28,26,0.06)' }}>
+
+              {/* ─── FORGOT PASSWORD ─── */}
+              {forgotPassword ? (
+                <div>
+                  <button
+                    type="button"
+                    onClick={() => setForgotPassword(false)}
+                    className="flex items-center gap-[6px] text-[13px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
+                  >
+                    <ChevronLeft size={14} strokeWidth={1.5} /> Back to sign in
+                  </button>
+
+                  {resetSent ? (
+                    <div className="text-center py-[32px]">
+                      <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
+                        <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
+                      </div>
+                      <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em' }}>Check your email</p>
+                      <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleResetPassword} className="space-y-[14px]">
+                      <div className="mb-[4px]">
+                        <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em' }}>Reset password</p>
+                        <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
+                      </div>
+                      <FloatingInput
+                        label="Email"
+                        type="email"
+                        value={resetEmail}
+                        onChange={setResetEmail}
+                        placeholder="you@example.com"
+                        required
+                      />
+                      {resetError && (
+                        <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
+                          <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                          {resetError}
+                        </div>
+                      )}
+                      <button
+                        type="submit"
+                        disabled={resetLoading}
+                        className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+                      >
+                        {resetLoading ? 'Sending...' : 'Send Reset Link'}
+                      </button>
+                    </form>
+                  )}
+                </div>
+              ) : (
+                <>
+                {/* Sign in form */}
+                <form onSubmit={handleSubmit} className="space-y-[12px]">
+                  <FloatingInput
+                    label="Email"
+                    type="email"
+                    value={email}
+                    onChange={setEmail}
+                    placeholder="you@example.com"
+                    required
+                  />
+                  <FloatingInput
+                    label="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={setPassword}
+                    placeholder="Enter your password"
+                    required
+                    minLength={8}
+                    rightElement={
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
+                        {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                      </button>
+                    }
+                  />
+
+                  {error && (
+                    <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
+                      <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  >
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      </span>
+                    ) : 'Sign In'}
+                  </button>
+
+                  <p className="text-center mt-[16px] text-sm" style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-60)' }}>
+                    Not a member?{' '}
+                    <button
+                      type="button"
+                      onClick={() => { setMode('roleselect'); setError(''); setSelectedRole(null); setForgotPassword(false); }}
+                      className="text-[#C4674A] font-bold hover:underline transition-colors"
+                      style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
+                    >
+                      Apply for access
+                    </button>
+                  </p>
+
+                  <button
+                    type="button"
+                    onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
+                    className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  >
+                    Forgot password?
+                  </button>
+                </form>
+                </>
+              )}
             </div>
+
+            {/* 6. Social proof */}
+            <div className="flex items-center justify-center gap-[10px] mt-6">
+              <div className="flex -space-x-[10px]">
+                {['S', 'M', 'J', 'R'].map((initial, i) => (
+                  <div
+                    key={initial}
+                    className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
+                    style={{
+                      background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
+                      zIndex: 4 - i,
+                      fontFamily: "'Instrument Sans', sans-serif",
+                      fontWeight: 700,
+                      fontSize: 12,
+                      color: i === 0 ? 'white' : 'rgba(34,34,34,0.60)',
+                    }}
+                  >
+                    {initial}
+                  </div>
+                ))}
+              </div>
+              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.35)' }}>
+                Real creators · real local brands · no follower minimums
+              </span>
+            </div>
+
           </div>
         </div>
       ) : mode === 'roleselect' ? (
