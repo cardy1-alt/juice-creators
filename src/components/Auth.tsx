@@ -217,13 +217,13 @@ export default function Auth() {
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
             <h1 className="text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
-              Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
+              Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
             </h1>
           </div>
 
           {/* 4. Subtext */}
           <p className="text-center mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, margin: 0 }}>
-            Claim offers from businesses near you. Visit in person, post your Reel, get rewarded.
+            New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
           </p>
 
           {/* 5. Stacked avatars + social proof */}
@@ -247,7 +247,7 @@ export default function Auth() {
               ))}
             </div>
             <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
-              48 local businesses · vetted creators only
+              Real creators · real local brands · no follower minimums
             </span>
           </div>
 
