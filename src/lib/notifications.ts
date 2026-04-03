@@ -119,6 +119,147 @@ export async function sendAdminApprovalRequest(params: {
   });
 }
 
+// ─── Campaign Lifecycle Emails ──────────────────────────────────────────
+
+export async function sendCreatorSelectedEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  campaign_id: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `You've been selected for ${meta.brand_name}'s campaign — confirm your spot!`,
+    emailType: 'creator_selected',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      campaign_id: meta.campaign_id,
+      cta_url: `https://app.nayba.app?campaign=${meta.campaign_id}`,
+    },
+  });
+}
+
+export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  perk_description: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `You're confirmed for ${meta.brand_name} — here's what happens next`,
+    emailType: 'creator_confirmed',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      perk_description: meta.perk_description,
+    },
+  });
+}
+
+export async function sendCreatorDeadlineReminderEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  campaign_id: string;
+  content_deadline: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `Heads up — your Reel for ${meta.brand_name} is due in 48 hours`,
+    emailType: 'creator_deadline_reminder',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      campaign_id: meta.campaign_id,
+      content_deadline: meta.content_deadline,
+      cta_url: `https://app.nayba.app?campaign=${meta.campaign_id}`,
+    },
+  });
+}
+
+export async function sendCreatorContentReceivedEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `We got your Reel for ${meta.brand_name} — thanks for sharing your experience!`,
+    emailType: 'creator_content_received',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+    },
+  });
+}
+
+export async function sendCreatorCampaignCompleteEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  total_campaigns: number;
+  completion_rate: number;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `Campaign complete — nice work on ${meta.brand_name}!`,
+    emailType: 'creator_campaign_complete',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      total_campaigns: meta.total_campaigns.toString(),
+      completion_rate: meta.completion_rate.toString(),
+    },
+  });
+}
+
+// ─── Weekly Digest ──────────────────────────────────────────────────────
+
+export async function sendWeeklyDigestEmail(creatorId: string, meta: {
+  creator_name: string;
+  campaigns: { title: string; brand_name: string; perk_summary: string; campaign_id: string }[];
+  city: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `This week's campaigns in ${meta.city} — ${meta.campaigns.length} new opportunities`,
+    emailType: 'weekly_digest',
+    emailMeta: {
+      creator_name: meta.creator_name,
+      city: meta.city,
+      campaign_count: meta.campaigns.length.toString(),
+      campaigns_json: JSON.stringify(meta.campaigns),
+    },
+  });
+}
+
+// ─── Admin: Content Submitted ───────────────────────────────────────────
+
+export async function sendAdminContentSubmittedEmail(meta: {
+  creator_name: string;
+  campaign_title: string;
+  brand_name: string;
+  reel_url: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `${meta.creator_name} submitted a Reel for ${meta.brand_name}: ${meta.campaign_title}`,
+    emailType: 'admin_content_submitted',
+    emailMeta: {
+      creator_name: meta.creator_name,
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      reel_url: meta.reel_url,
+    },
+  });
+}
+
+// ─── Feedback ───────────────────────────────────────────────────────────
+
 export async function sendFeedbackEmail(params: {
   userId: string;
   userType: 'creator' | 'business';

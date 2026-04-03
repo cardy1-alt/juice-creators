@@ -80,6 +80,8 @@ export type Database = {
           open_date: string | null;
           expression_deadline: string | null;
           content_deadline: string | null;
+          campaign_type: 'brand' | 'community';
+          campaign_image: string | null;
           status: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level: number;
           created_at: string;
@@ -104,6 +106,8 @@ export type Database = {
           open_date?: string | null;
           expression_deadline?: string | null;
           content_deadline?: string | null;
+          campaign_type?: 'brand' | 'community';
+          campaign_image?: string | null;
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
           created_at?: string;
@@ -128,6 +132,8 @@ export type Database = {
           open_date?: string | null;
           expression_deadline?: string | null;
           content_deadline?: string | null;
+          campaign_type?: 'brand' | 'community';
+          campaign_image?: string | null;
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
           created_at?: string;
@@ -252,6 +258,8 @@ export type Database = {
           completed_campaigns: number;
           instagram_connected: boolean;
           instagram_access_token: string | null;
+          phone: string | null;
+          referred_by: string | null;
         };
         Insert: {
           id?: string;
@@ -282,6 +290,8 @@ export type Database = {
           completed_campaigns?: number;
           instagram_connected?: boolean;
           instagram_access_token?: string | null;
+          phone?: string | null;
+          referred_by?: string | null;
         };
         Update: {
           id?: string;
@@ -312,6 +322,8 @@ export type Database = {
           completed_campaigns?: number;
           instagram_connected?: boolean;
           instagram_access_token?: string | null;
+          phone?: string | null;
+          referred_by?: string | null;
         };
       };
       notifications: {

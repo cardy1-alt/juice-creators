@@ -72,6 +72,7 @@ export default function Auth() {
   const dateOfBirth = dobDay && dobMonth && dobYear
     ? `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`
     : '';
+  const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
@@ -87,6 +88,9 @@ export default function Auth() {
   const [showPrivacy, setShowPrivacy] = useState(false);
 
   const { signIn, signUp } = useAuth();
+
+  // Capture referral code from URL
+  const referredBy = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('ref') : null;
 
   const generateCreatorCode = (name: string): string => {
     const base = name.split(' ')[0].toUpperCase().replace(/[^A-Z]/g, '');
@@ -122,7 +126,7 @@ export default function Auth() {
       if (mode === 'signin') {
         await signIn(email, password);
       } else {
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude };
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
@@ -466,6 +470,19 @@ export default function Auth() {
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
+                </div>
+
+                {/* Phone number */}
+                <div>
+                  <input
+                    type="tel"
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    placeholder="Phone number"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
                 </div>
 
                 {/* City */}

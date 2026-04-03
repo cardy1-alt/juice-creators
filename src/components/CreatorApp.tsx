@@ -21,7 +21,8 @@ interface CreatorProfile {
 interface Campaign {
   id: string; title: string; headline: string | null; perk_description: string | null;
   perk_value: number | null; target_city: string | null; expression_deadline: string | null;
-  status: string; businesses?: { name: string };
+  status: string; campaign_type: 'brand' | 'community'; campaign_image: string | null;
+  businesses?: { name: string };
 }
 interface Application {
   id: string; campaign_id: string; status: string; applied_at: string;
@@ -129,36 +130,49 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
           const appStatus = applications[c.id];
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
-              <p className="text-[13px] font-semibold text-[var(--ink-60)] mb-0.5">{c.businesses?.name}</p>
-              <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
-              {/* Perk pill */}
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2">
-                <Gift size={13} className="text-[var(--terra)]" />
-                <span className="text-[13px] font-medium text-[var(--terra)]">
-                  {c.perk_description?.split('—')[0]?.split(',')[0]?.trim().slice(0, 40) || 'Perk included'}
-                  {c.perk_value ? ` — worth £${c.perk_value}` : ''}
-                </span>
-              </div>
-              <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
-                {c.target_city && <span>{c.target_city}</span>}
-                {c.expression_deadline && <span className="flex items-center gap-1"><Clock size={12} /> Apply by {fmtDate(c.expression_deadline)}</span>}
-              </div>
-              {/* Applied state */}
-              {appStatus && (
-                <div className="mt-2">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold ${appStatus === 'interested' ? 'bg-[var(--terra-light)] text-[var(--terra)]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]' : 'bg-[var(--ink-10)] text-[var(--ink-60)]'}`}>
-                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                  </span>
+              className="w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
+              {/* Hero image */}
+              {c.campaign_image && (
+                <div className="w-full aspect-video bg-[var(--shell)] overflow-hidden">
+                  <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                 </div>
               )}
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="text-[13px] font-semibold text-[var(--ink-60)]">{c.businesses?.name}</p>
+                  {c.campaign_type === 'community' && (
+                    <span className="inline-flex items-center px-2 py-0.5 rounded-[var(--r-sm)] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                  )}
+                </div>
+                <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
+                {/* Perk pill */}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2">
+                  <Gift size={13} className="text-[var(--terra)]" />
+                  <span className="text-[13px] font-medium text-[var(--terra)]">
+                    {c.perk_description?.split('—')[0]?.split(',')[0]?.trim().slice(0, 40) || 'Perk included'}
+                    {c.perk_value ? ` — worth £${c.perk_value}` : ''}
+                  </span>
+                </div>
+                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                  {c.target_city && <span>{c.target_city}</span>}
+                  {c.expression_deadline && <span className="flex items-center gap-1"><Clock size={12} /> Apply by {fmtDate(c.expression_deadline)}</span>}
+                </div>
+                {/* Applied state */}
+                {appStatus && (
+                  <div className="mt-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold ${appStatus === 'interested' ? 'bg-[var(--terra-light)] text-[var(--terra)]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]' : 'bg-[var(--ink-10)] text-[var(--ink-60)]'}`}>
+                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                    </span>
+                  </div>
+                )}
+              </div>
             </button>
           );
         })}
         {filtered.length === 0 && (
           <div className="py-12 text-center">
-            <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No campaigns in your area yet</p>
-            <p className="text-[14px] text-[var(--ink-35)]">New campaigns drop regularly — check back soon</p>
+            <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">Nothing here yet</p>
+            <p className="text-[14px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
       </div>
@@ -205,15 +219,16 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
   const activeParts = participations.filter(p => p.status !== 'completed');
   const completedParts = participations.filter(p => p.status === 'completed');
-  const statusSteps = ['Selected', 'Confirmed', 'Perk Received', 'Content Due', 'Submitted', 'Complete'];
 
-  const getStepIndex = (p: Participation) => {
-    if (p.status === 'completed') return 5;
-    if (p.status === 'content_submitted') return 4;
-    if (p.reel_url) return 4;
-    if (p.perk_sent) return 2;
-    if (p.status === 'confirmed' || p.status === 'visited') return 1;
-    return 0;
+  const getTodos = (p: Participation) => {
+    const todos = [
+      { label: 'Selected by brand', done: true },
+      { label: 'Confirm your spot', done: p.status !== 'confirmed' || p.perk_sent || !!p.reel_url || p.status === 'visited' },
+      { label: 'Receive your perk', done: p.perk_sent },
+      { label: 'Share your experience', done: !!p.reel_url, action: !p.reel_url && p.perk_sent ? () => setShowReelModal(p.id) : undefined },
+      { label: 'Done — nice work!', done: p.status === 'content_submitted' || p.status === 'completed' },
+    ];
+    return todos;
   };
 
   return (
@@ -232,33 +247,34 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {subTab === 'active' && (
         <div className="space-y-3">
           {activeParts.map(p => {
-            const stepIdx = getStepIndex(p);
+            const todos = getTodos(p);
             const days = daysUntil(p.campaigns?.content_deadline || null);
             return (
               <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4">
                 <p className="text-[13px] font-semibold text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
-                <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{p.campaigns?.headline || p.campaigns?.title}</p>
-                {/* Status stepper */}
-                <div className="flex items-center gap-0.5 mb-3">
-                  {statusSteps.map((s, i) => (
-                    <div key={s} className="flex-1">
-                      <div className={`h-1.5 rounded-full ${i <= stepIdx ? 'bg-[var(--terra)]' : 'bg-[var(--ink-10)]'}`} />
-                      <p className={`text-[10px] mt-1 ${i <= stepIdx ? 'text-[var(--terra)] font-semibold' : 'text-[var(--ink-35)]'}`}>{s}</p>
+                <p className="text-[16px] font-semibold text-[var(--ink)] mb-3">{p.campaigns?.headline || p.campaigns?.title}</p>
+                {/* To-do checklist */}
+                <div className="space-y-2 mb-3">
+                  {todos.map((t, i) => (
+                    <div key={i} className="flex items-center gap-2.5">
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${t.done ? 'bg-[var(--terra)]' : 'border-2 border-[var(--ink-10)]'}`}>
+                        {t.done && <Check size={12} className="text-white" />}
+                      </div>
+                      <span className={`text-[14px] ${t.done ? 'text-[var(--ink-35)] line-through' : 'text-[var(--ink)] font-medium'}`}>{t.label}</span>
+                      {t.action && (
+                        <button onClick={t.action}
+                          className="ml-auto flex items-center gap-1 px-3 py-1 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[12px] font-semibold">
+                          <Film size={12} /> Share Reel
+                        </button>
+                      )}
                     </div>
                   ))}
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between pt-2 border-t border-[var(--ink-10)]">
                   <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
-                    {p.perk_sent && <span className="flex items-center gap-1 text-[var(--success)]"><Check size={12} /> Perk received</span>}
-                    {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days left</span>}
+                    {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
                     {days !== null && days <= 0 && <span className="text-[var(--terra)]">Content overdue</span>}
                   </div>
-                  {(p.status === 'confirmed' || p.status === 'visited') && !p.reel_url && (
-                    <button onClick={() => setShowReelModal(p.id)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold">
-                      <Film size={14} /> Submit Reel
-                    </button>
-                  )}
                   {p.reel_url && (
                     <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
                       className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
@@ -271,8 +287,8 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No active campaigns</p>
-              <p className="text-[14px] text-[var(--ink-35)]">Express interest in a campaign to get started</p>
+              <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No active campaigns yet</p>
+              <p className="text-[14px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>
           )}
         </div>
@@ -311,17 +327,17 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center">
           <div className="bg-[var(--card)] w-full max-w-[480px] rounded-t-[16px] sm:rounded-[var(--r-card)] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Submit your Reel</h3>
+              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
             </div>
-            <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below</p>
+            <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
             <input value={reelUrl} onChange={e => setReelUrl(e.target.value)}
               placeholder="https://www.instagram.com/reel/..."
               className="w-full px-4 py-3 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[15px] focus:outline-none focus:border-[var(--terra)] mb-4" />
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
               className="w-full py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] disabled:opacity-50"
               style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
-              {submittingReel ? 'Submitting...' : 'Submit Reel'}
+              {submittingReel ? 'Sharing...' : 'Share Reel'}
             </button>
           </div>
         </div>
@@ -362,11 +378,13 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
-        <a href="#" onClick={e => { e.preventDefault(); showToast('WhatsApp Community coming soon'); }}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]"
-          style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+        <a href="https://chat.whatsapp.com/nayba-suffolk" target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-[var(--r-pill)] bg-[#25D366] text-white font-semibold text-[15px]"
+          style={{ boxShadow: '0 4px 16px rgba(37,211,102,0.28)' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Join the WhatsApp Community
         </a>
+        <p className="text-[13px] text-[var(--ink-35)] mt-3">Connect with other Suffolk creators, share tips, and hear about campaigns first</p>
       </div>
     </div>
   );
@@ -445,13 +463,15 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 }
 
 // ─── More Tab ───
-function MoreTab({ onSignOut, showToast }: { onSignOut: () => void; showToast: (msg: string) => void }) {
+function MoreTab({ onSignOut, showToast, creatorId }: { onSignOut: () => void; showToast: (msg: string) => void; creatorId?: string }) {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
+
+  const referralLink = creatorId ? `https://app.nayba.app?ref=${creatorId}` : 'https://app.nayba.app';
 
   const items = [
     { icon: History, label: 'Campaign history', action: () => {} },
     { icon: Settings, label: 'Account settings', action: () => {} },
-    { icon: Link2, label: 'Refer a friend', action: () => { navigator.clipboard.writeText('https://app.nayba.app').catch(() => {}); showToast('Link copied to clipboard'); } },
+    { icon: Link2, label: 'Refer a friend', action: () => { navigator.clipboard.writeText(referralLink).catch(() => {}); showToast('Referral link copied — share it with friends!'); } },
     { icon: HelpCircle, label: 'Help', action: () => {} },
   ];
 
@@ -493,6 +513,44 @@ function MoreTab({ onSignOut, showToast }: { onSignOut: () => void; showToast: (
   );
 }
 
+// ─── How It Works Overlay ───
+function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
+  const steps = [
+    { icon: Compass, title: 'Browse campaigns', desc: 'Discover local brands looking for creators like you' },
+    { icon: Megaphone, title: "Tap I'm Interested", desc: "This won't commit you — the brand will review and select" },
+    { icon: Gift, title: 'Get your perk', desc: 'Receive a free experience, product, or gift card' },
+    { icon: Film, title: 'Share your experience', desc: 'Post an Instagram Reel and share the link here' },
+  ];
+
+  return (
+    <div className="fixed inset-0 bg-[rgba(34,34,34,0.5)] z-[60] flex items-center justify-center px-4">
+      <div className="bg-[var(--card)] rounded-[16px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 20px 60px rgba(28,28,26,0.15)' }}>
+        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+        <h2 className="text-[20px] font-bold text-[var(--ink)] mt-3 mb-1" style={{ letterSpacing: '-0.4px' }}>How it works</h2>
+        <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
+        <div className="space-y-3 mb-6 text-left">
+          {steps.map((s, i) => (
+            <div key={i} className="flex items-start gap-3">
+              <div className="w-9 h-9 rounded-full bg-[var(--terra-light)] flex items-center justify-center flex-shrink-0 mt-0.5">
+                <s.icon size={18} className="text-[var(--terra)]" />
+              </div>
+              <div>
+                <p className="text-[15px] font-semibold text-[var(--ink)]">{s.title}</p>
+                <p className="text-[13px] text-[var(--ink-60)] leading-[1.5]">{s.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button onClick={onDismiss}
+          className="w-full py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]"
+          style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          Start exploring
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main CreatorApp ───
 export default function CreatorApp() {
   const { user, userProfile, signOut } = useAuth();
@@ -502,6 +560,7 @@ export default function CreatorApp() {
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   useEffect(() => {
@@ -512,6 +571,11 @@ export default function CreatorApp() {
     const { data } = await supabase.from('creators').select('*').eq('email', user!.email!).single();
     if (data) {
       setProfile(data as CreatorProfile);
+      // Show onboarding overlay for new creators who haven't seen it
+      const onboardingKey = `nayba_onboarding_seen_${data.id}`;
+      if (!localStorage.getItem(onboardingKey) && data.total_campaigns === 0) {
+        setShowOnboarding(true);
+      }
     } else if (userProfile) {
       setProfile(userProfile as CreatorProfile);
     }
@@ -632,9 +696,17 @@ export default function CreatorApp() {
           {tab === 'campaigns' && <CampaignsTab profile={profile} />}
           {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
           {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
-          {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} />}
+          {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} />}
         </div>
       </div>
+
+      {/* How It Works onboarding */}
+      {showOnboarding && profile && (
+        <HowItWorksOverlay onDismiss={() => {
+          setShowOnboarding(false);
+          localStorage.setItem(`nayba_onboarding_seen_${profile.id}`, 'true');
+        }} />
+      )}
 
       {/* Toast */}
       {toast && (

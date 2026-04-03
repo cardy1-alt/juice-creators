@@ -10,7 +10,8 @@ interface Campaign {
   target_city: string | null; target_county: string | null; content_requirements: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   creator_target: number; open_date: string | null; expression_deadline: string | null;
-  content_deadline: string | null; status: string; min_level: number; created_at: string;
+  content_deadline: string | null; campaign_type: 'brand' | 'community'; campaign_image: string | null;
+  status: string; min_level: number; created_at: string;
   businesses?: { name: string };
 }
 interface Application {
@@ -87,6 +88,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     perk_value: campaign?.perk_value?.toString() || '', perk_type: campaign?.perk_type || 'experience',
     target_city: campaign?.target_city || '', target_county: campaign?.target_county || 'Suffolk',
     creator_target: campaign?.creator_target?.toString() || '10',
+    campaign_type: campaign?.campaign_type || 'brand',
+    campaign_image: campaign?.campaign_image || '',
     content_requirements: campaign?.content_requirements || '',
     tp1: campaign?.talking_points?.[0] || '', tp2: campaign?.talking_points?.[1] || '', tp3: campaign?.talking_points?.[2] || '',
     insp: campaign?.inspiration || [{ title: '', description: '' }, { title: '', description: '' }],
@@ -147,6 +150,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
       deliverables: { reel: form.reel, story: form.story },
+      campaign_type: form.campaign_type,
+      campaign_image: form.campaign_image || null,
       open_date: form.open_date ? new Date(form.open_date).toISOString() : null,
       expression_deadline: form.expression_deadline ? new Date(form.expression_deadline).toISOString() : null,
       content_deadline: form.content_deadline ? new Date(form.content_deadline).toISOString() : null,
@@ -200,6 +205,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
               <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
               <div><label className={labelCls}>Creator Target</label><input type="number" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Campaign Type</label><select value={form.campaign_type} onChange={e => set('campaign_type', e.target.value)} className={inputCls}><option value="brand">Brand Campaign</option><option value="community">Community Campaign</option></select></div>
+              <div className="md:col-span-2"><label className={labelCls}>Campaign Image URL</label><input value={form.campaign_image} onChange={e => set('campaign_image', e.target.value)} className={inputCls} placeholder="https://... (hero image for campaign card)" /></div>
             </div>
           )}
 
@@ -748,7 +755,14 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         </div>
                       </td>
                       <td className={`${tdCls} font-medium`}>{c.title}</td>
-                      <td className={tdCls}><StatusBadge status={c.status} /></td>
+                      <td className={tdCls}>
+                        <div className="flex items-center gap-1.5">
+                          <StatusBadge status={c.status} />
+                          {c.campaign_type === 'community' && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                          )}
+                        </div>
+                      </td>
                       <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.target_city || '—'}</td>
                       <td className={tdCls}>{c.creator_target}</td>
                       <td className={tdCls}>

@@ -251,6 +251,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           approved: false
         };
         if (additionalData.dateOfBirth) insertPayload.date_of_birth = additionalData.dateOfBirth;
+        if (additionalData.phone) insertPayload.phone = additionalData.phone;
+        if (additionalData.referred_by) insertPayload.referred_by = additionalData.referred_by;
         if (additionalData.address) {
           insertPayload.address = additionalData.address;
           insertPayload.latitude = additionalData.latitude;

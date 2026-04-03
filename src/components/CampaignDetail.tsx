@@ -262,13 +262,16 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       <div className="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] px-4 py-4 z-40">
         <div className="max-w-[600px] mx-auto">
           {!application && (
-            <button
-              onClick={() => setShowPitchModal(true)}
-              className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
-            >
-              I'm Interested
-            </button>
+            <div>
+              <button
+                onClick={() => setShowPitchModal(true)}
+                className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity"
+                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
+              >
+                I'm Interested
+              </button>
+              <p className="text-[12px] text-[var(--ink-35)] text-center mt-1.5">This won't commit you — the brand will review and select</p>
+            </div>
           )}
           {application?.status === 'interested' && (
             <div className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--shell)] text-center text-[var(--ink-60)] font-medium text-[15px] border border-[var(--border)]">
@@ -304,10 +307,10 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center">
           <div className="bg-[var(--card)] w-full max-w-[480px] rounded-t-[16px] sm:rounded-[var(--r-card)] p-6">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Express interest</h3>
+              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Tell them why you</h3>
               <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
             </div>
-            <p className="text-[14px] text-[var(--ink-60)] mb-4">Tell the brand why you're a great fit — optional</p>
+            <p className="text-[14px] text-[var(--ink-60)] mb-4">Write a short pitch to stand out — totally optional but helps your chances</p>
             <textarea
               value={pitch}
               onChange={e => setPitch(e.target.value)}
