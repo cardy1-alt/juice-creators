@@ -143,12 +143,77 @@ export default function Auth() {
   return (
     <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
-        /* ─── SIGN IN: vertically centred brand + hero + form ─── */
-        <div className="flex-1 flex flex-col justify-center px-6 max-w-md mx-auto w-full">
+        /* ─── SIGN IN: two-column on desktop, single on mobile ─── */
+        <div className="flex-1 flex flex-col md:flex-row" style={{ minHeight: '100dvh' }}>
 
-        {/* ─── FORGOT PASSWORD ─── */}
-        {forgotPassword ? (
-          <div>
+          {/* Left column — hero */}
+          <div className="md:w-[55%] bg-[#F7F7F5] flex flex-col justify-center px-6 md:px-12 py-10 md:py-12">
+            <div className="max-w-[520px] w-full mx-auto md:mx-0">
+              {/* Wordmark */}
+              <div className="flex justify-center md:justify-start mb-8 md:mb-12">
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 26, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+              </div>
+
+              {/* Live pill */}
+              <div className="flex justify-center md:justify-start mb-4">
+                <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
+                  <span className="relative flex h-[8px] w-[8px]">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--terra)' }} />
+                    <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
+                  </span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
+                </div>
+              </div>
+
+              {/* Headline */}
+              <div className="text-center md:text-left mb-4 md:mt-4">
+                <h1 className="text-[36px] md:text-[56px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.5px', color: '#1C1C1A', lineHeight: 1.1, margin: 0 }}>
+                  Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
+                </h1>
+              </div>
+
+              {/* Subheadline */}
+              <p className="text-center md:text-left" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 17, fontWeight: 400, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, margin: '20px 0 0', maxWidth: 420 }}>
+                New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
+              </p>
+
+              {/* Social proof */}
+              <div className="flex items-center justify-center md:justify-start gap-[10px] mt-8">
+                <div className="flex -space-x-[10px]">
+                  {['S', 'M', 'J', 'R'].map((initial, i) => (
+                    <div
+                      key={initial}
+                      className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
+                      style={{
+                        background: ['var(--terra)', 'var(--peach)', 'var(--card)', 'var(--ink-15)'][i],
+                        zIndex: 4 - i,
+                        fontFamily: "'Instrument Sans', sans-serif",
+                        fontWeight: 700,
+                        fontSize: 12,
+                        color: i === 0 ? 'white' : 'var(--ink-60)',
+                      }}
+                    >
+                      {initial}
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
+                  Real creators · real local brands · no follower minimums
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Divider */}
+          <div className="hidden md:block w-[1px] bg-[#E6E2DB]" />
+
+          {/* Right column — form */}
+          <div className="md:w-[45%] bg-white flex flex-col justify-center px-6 md:px-12 py-10 md:py-12">
+            <div className="max-w-[380px] w-full mx-auto">
+
+          {/* ─── FORGOT PASSWORD ─── */}
+          {forgotPassword ? (
+            <div>
             <button
               type="button"
               onClick={() => setForgotPassword(false)}
@@ -198,67 +263,10 @@ export default function Auth() {
           </div>
         ) : (
           <>
-          {/* 1. Wordmark */}
-          <div className="flex flex-col items-center mb-[20px]">
-            <span className="text-[26px] font-bold" style={{ fontFamily: "'Instrument Sans', sans-serif", color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
-          </div>
+          {/* Sign in heading */}
+          <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#222', letterSpacing: '-0.3px', margin: '0 0 24px', textAlign: 'center' }}>Sign in</h2>
 
-          {/* 2. Live pill */}
-          <div className="flex justify-center mb-[24px]">
-            <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
-              <span className="relative flex h-[8px] w-[8px]">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--terra)' }} />
-                <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
-              </span>
-              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
-            </div>
-          </div>
-
-          {/* 3. Headline */}
-          <div className="text-center mb-[16px]">
-            <h1 className="text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
-              Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
-            </h1>
-          </div>
-
-          {/* 4. Subtext */}
-          <p className="text-center mb-[24px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, margin: 0 }}>
-            New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
-          </p>
-
-          {/* 5. Stacked avatars + social proof */}
-          <div className="flex items-center justify-center gap-[10px] mt-4 mb-[28px]">
-            <div className="flex -space-x-[10px]">
-              {['S', 'M', 'J', 'R'].map((initial, i) => (
-                <div
-                  key={initial}
-                  className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[var(--shell)]"
-                  style={{
-                    background: ['var(--terra)', 'var(--peach)', 'var(--card)', 'var(--ink-15)'][i],
-                    zIndex: 4 - i,
-                    fontFamily: "'Instrument Sans', sans-serif",
-                    fontWeight: 700,
-                    fontSize: 12,
-                    color: i === 0 ? 'white' : 'var(--ink-60)',
-                  }}
-                >
-                  {initial}
-                </div>
-              ))}
-            </div>
-            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
-              Real creators · real local brands · no follower minimums
-            </span>
-          </div>
-
-          {/* 6. Divider with "Sign in" label */}
-          <div className="flex items-center gap-[12px] mb-[20px]">
-            <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
-            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-35)' }}>Sign in</span>
-            <div className="flex-1 h-[1px]" style={{ background: 'var(--ink-08)' }} />
-          </div>
-
-          {/* 7–9. Sign in form */}
+          {/* Sign in form */}
           <form onSubmit={handleSubmit} className="space-y-[12px]">
             {/* 7. Email input */}
             <FloatingInput
@@ -331,6 +339,8 @@ export default function Auth() {
           </form>
           </>
         )}
+            </div>
+          </div>
         </div>
       ) : (
         /* ─── SIGN UP: scrollable form ─── */
