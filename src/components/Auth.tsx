@@ -147,8 +147,10 @@ export default function Auth() {
         <div className="flex-1 flex flex-col md:flex-row" style={{ minHeight: '100dvh' }}>
 
           {/* Left column — hero */}
-          <div className="md:w-[55%] bg-[#F7F7F5] flex flex-col justify-center px-6 md:px-12 py-10 md:py-12">
-            <div className="max-w-[520px] w-full mx-auto md:mx-0">
+          <div className="md:w-[55%] bg-[#F7F7F5] flex flex-col justify-center relative" style={{ padding: '32px 24px' }}>
+            {/* Desktop padding override */}
+            <style>{`@media(min-width:768px){.auth-hero-col{padding:72px 60px 96px 96px !important}}`}</style>
+            <div className="auth-hero-col max-w-[560px] w-full mx-auto md:mx-0" style={{ padding: 0 }}>
               {/* Wordmark */}
               <div className="flex justify-center md:justify-start mb-8 md:mb-12">
                 <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 26, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
@@ -158,16 +160,16 @@ export default function Auth() {
               <div className="flex justify-center md:justify-start mb-4">
                 <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
                   <span className="relative flex h-[8px] w-[8px]">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75" style={{ background: 'var(--terra)' }} />
-                    <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
+                    <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)', animation: 'nayba-pulse 2s ease-in-out infinite' }} />
                   </span>
                   <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
                 </div>
               </div>
+              <style>{`@keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}`}</style>
 
               {/* Headline */}
               <div className="text-center md:text-left mb-4 md:mt-4">
-                <h1 className="text-[36px] md:text-[56px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.5px', color: '#1C1C1A', lineHeight: 1.1, margin: 0 }}>
+                <h1 className="text-[42px] md:text-[68px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-2px', color: '#1C1C1A', lineHeight: 1.05, margin: 0 }}>
                   Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
                 </h1>
               </div>
@@ -202,14 +204,15 @@ export default function Auth() {
                 </span>
               </div>
             </div>
+            {/* Gradient divider — right edge (desktop only) */}
+            <div className="hidden md:block absolute right-0 top-0 w-[1px] h-full" style={{ background: 'linear-gradient(to bottom, transparent, #E6E2DB 20%, #E6E2DB 80%, transparent)' }} />
           </div>
 
-          {/* Divider */}
-          <div className="hidden md:block w-[1px] bg-[#E6E2DB]" />
-
           {/* Right column — form */}
-          <div className="md:w-[45%] bg-white flex flex-col justify-center px-6 md:px-12 py-10 md:py-12">
-            <div className="max-w-[380px] w-full mx-auto">
+          <div className="md:w-[45%] flex flex-col justify-center items-center" style={{ padding: '32px 24px', background: '#FAFAF9' }}>
+            <style>{`@media(min-width:768px){.auth-form-col{padding:48px !important}}`}</style>
+            <div className="auth-form-col w-full md:bg-white md:border md:border-[#E6E2DB] md:rounded-[16px] md:p-10 md:max-w-[400px]" style={{ boxShadow: 'none' }}>
+              <style>{`@media(min-width:768px){.auth-form-col{box-shadow:0 4px 24px rgba(28,28,26,0.06) !important}}`}</style>
 
           {/* ─── FORGOT PASSWORD ─── */}
           {forgotPassword ? (
