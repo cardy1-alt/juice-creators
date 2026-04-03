@@ -23,7 +23,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative transition-all duration-200 bg-white rounded-2xl ${focused ? 'border border-[#C4674A] ring-2 ring-[rgba(196,103,74,0.12)]' : 'border border-[rgba(34,34,34,0.10)]'}`}>
+    <div className={`relative transition-all duration-200 rounded-2xl ${focused ? 'border border-[#C4674A] ring-2 ring-[rgba(196,103,74,0.12)]' : 'border border-[rgba(34,34,34,0.10)]'}`} style={{ background: '#F7F7F5' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -147,7 +147,7 @@ export default function Auth() {
         /* ─── SIGN IN: single centred column ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6 md:py-12" style={{ background: '#F7F7F5' }}>
           <style>{`@keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}`}</style>
-          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 480 }}>
+          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* 1. Wordmark */}
             <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
@@ -163,7 +163,7 @@ export default function Auth() {
             </div>
 
             {/* 3. Headline */}
-            <h1 className="text-[38px] md:text-[48px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.5px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1C1A', textAlign: 'center' }}>
+            <h1 className="text-[38px] md:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.2px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1C1A', textAlign: 'center' }}>
               <span style={{ display: 'block' }}>Discover local brands.</span>
               Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
             </h1>
@@ -299,12 +299,12 @@ export default function Auth() {
             </div>
 
             {/* 6. Social proof */}
-            <div className="flex items-center justify-center gap-[10px] mt-6">
-              <div className="flex -space-x-[10px]">
+            <div className="inline-flex items-center justify-center gap-2 mt-7">
+              <div className="flex -space-x-[9px]">
                 {['S', 'M', 'J', 'R'].map((initial, i) => (
                   <div
                     key={initial}
-                    className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
+                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
                     style={{
                       background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
                       zIndex: 4 - i,
@@ -318,7 +318,7 @@ export default function Auth() {
                   </div>
                 ))}
               </div>
-              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.35)' }}>
+              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(28,28,26,0.5)' }}>
                 Real creators · real local brands · no follower minimums
               </span>
             </div>
@@ -390,7 +390,7 @@ export default function Auth() {
       ) : (
         /* ─── SIGN UP: single page form ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6" style={{ background: '#F7F7F5', minHeight: '100dvh' }}>
-          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 480 }}>
+          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* Wordmark */}
             <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 12 }}>nayba</span>
