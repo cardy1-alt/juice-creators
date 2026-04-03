@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
 import { friendlyError } from '../lib/errors';
-import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X, Camera, Building2 } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 
@@ -57,8 +57,9 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
 }
 
 export default function Auth() {
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'roleselect' | 'signup' | 'brand-contact'>('signin');
   const [role, setRole] = useState<UserRole>('creator');
+  const [selectedRole, setSelectedRole] = useState<'creator' | 'brand' | null>(null);
   const [signupStep, setSignupStep] = useState(1);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -180,28 +181,52 @@ export default function Auth() {
               </p>
 
               {/* Social proof */}
-              <div className="flex items-center justify-center md:justify-start gap-[10px] mt-8">
-                <div className="flex -space-x-[10px]">
-                  {['S', 'M', 'J', 'R'].map((initial, i) => (
-                    <div
-                      key={initial}
-                      className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
-                      style={{
-                        background: ['var(--terra)', 'var(--peach)', 'var(--card)', 'var(--ink-15)'][i],
-                        zIndex: 4 - i,
-                        fontFamily: "'Instrument Sans', sans-serif",
-                        fontWeight: 700,
-                        fontSize: 12,
-                        color: i === 0 ? 'white' : 'var(--ink-60)',
-                      }}
-                    >
-                      {initial}
+              <div className="flex justify-center md:justify-start mt-8">
+                <div className="inline-flex items-center gap-[10px] px-3.5 py-2 rounded-[999px]" style={{ background: 'rgba(196,103,74,0.06)' }}>
+                  <div className="flex -space-x-[10px]">
+                    {['S', 'M', 'J', 'R'].map((initial, i) => (
+                      <div
+                        key={initial}
+                        className="w-[32px] h-[32px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
+                        style={{
+                          background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
+                          zIndex: 4 - i,
+                          fontFamily: "'Instrument Sans', sans-serif",
+                          fontWeight: 700,
+                          fontSize: 12,
+                          color: i === 0 ? 'white' : 'rgba(34,34,34,0.60)',
+                        }}
+                      >
+                        {initial}
+                      </div>
+                    ))}
+                  </div>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'rgba(34,34,34,0.60)' }}>
+                    Real creators · real local brands · no follower minimums
+                  </span>
+                </div>
+              </div>
+
+              {/* Campaign preview grid (desktop only) */}
+              <div className="hidden md:block relative mt-10">
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { color: '#F5C4A0', brand: 'Wildcraft Coffee', perk: 'Free cold brew' },
+                    { color: '#C4674A', brand: 'Studio Flow', perk: 'Free yoga class' },
+                    { color: '#2A7A4F', brand: 'The Nail Room', perk: 'Free nail set' },
+                    { color: '#E8E3DC', brand: 'Ember & Rye', perk: 'Free brunch for 2' },
+                    { color: '#D4A847', brand: 'Bloom Beauty', perk: 'Free facial' },
+                    { color: '#C8B8F0', brand: 'The Larder', perk: 'Free deli hamper' },
+                  ].map((c, i) => (
+                    <div key={i} className="bg-white rounded-[10px] border border-[#E6E2DB] p-3 overflow-hidden">
+                      <div className="rounded-[6px]" style={{ background: c.color, aspectRatio: '16/9' }} />
+                      <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, fontWeight: 600, color: '#222', marginTop: 8, marginBottom: 0 }}>{c.brand}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-[999px] text-[10px] font-medium" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>{c.perk}</span>
                     </div>
                   ))}
                 </div>
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
-                  Real creators · real local brands · no follower minimums
-                </span>
+                {/* Fade overlay */}
+                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 60%, #F7F7F5 100%)' }} />
               </div>
             </div>
             {/* Gradient divider — right edge (desktop only) */}
@@ -322,7 +347,7 @@ export default function Auth() {
               Not a member?{' '}
               <button
                 type="button"
-                onClick={() => { setMode('signup'); setError(''); setSignupStep(1); setForgotPassword(false); }}
+                onClick={() => { setMode('roleselect'); setError(''); setSelectedRole(null); setForgotPassword(false); }}
                 className="text-[#C4674A] font-bold hover:underline transition-colors"
                 style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
               >
@@ -343,6 +368,68 @@ export default function Auth() {
           </>
         )}
             </div>
+          </div>
+        </div>
+      ) : mode === 'roleselect' ? (
+        /* ─── ROLE SELECTION ─── */
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F7F5]">
+          <div className="max-w-[440px] w-full text-center">
+            <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#222] mx-auto">
+              <ChevronLeft size={14} /> Back to sign in
+            </button>
+            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#222', margin: '0 0 6px' }}>Join nayba</h2>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>Which best describes you?</p>
+            <div className="flex gap-3">
+              {([
+                { key: 'creator' as const, icon: Camera, label: "I'm a Creator", sub: 'I create content and want brand collabs' },
+                { key: 'brand' as const, icon: Building2, label: "I'm a Brand", sub: 'I want creators to promote my business' },
+              ]).map(opt => {
+                const selected = selectedRole === opt.key;
+                return (
+                  <button key={opt.key} onClick={() => setSelectedRole(opt.key)}
+                    className="flex-1 text-left p-5 rounded-[12px] border transition-all"
+                    style={{
+                      background: selected ? 'rgba(196,103,74,0.06)' : 'white',
+                      borderColor: selected ? '#C4674A' : '#E6E2DB',
+                    }}>
+                    <opt.icon size={22} style={{ color: selected ? '#C4674A' : 'rgba(34,34,34,0.45)', marginBottom: 10 }} />
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 600, color: '#222', margin: '0 0 4px' }}>{opt.label}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(34,34,34,0.50)', margin: 0, lineHeight: 1.4 }}>{opt.sub}</p>
+                  </button>
+                );
+              })}
+            </div>
+            {selectedRole && (
+              <button onClick={() => {
+                if (selectedRole === 'creator') { setRole('creator'); setMode('signup'); setSignupStep(1); }
+                else { setMode('brand-contact'); }
+              }}
+                className="mt-6 px-8 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-semibold hover:opacity-90 transition-opacity"
+                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                Continue
+              </button>
+            )}
+          </div>
+        </div>
+      ) : mode === 'brand-contact' ? (
+        /* ─── BRAND CONTACT ─── */
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F7F5]">
+          <div className="max-w-[400px] w-full text-center">
+            <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#222] mx-auto">
+              <ChevronLeft size={14} /> Back
+            </button>
+            <div className="w-14 h-14 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center mx-auto mb-5">
+              <Building2 size={24} className="text-[#C4674A]" />
+            </div>
+            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#222', margin: '0 0 10px' }}>Get your brand on nayba</h2>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, margin: '0 0 28px' }}>
+              Get in touch at hello@nayba.app to get your brand set up. We'll have you live within 24 hours.
+            </p>
+            <a href="mailto:hello@nayba.app"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-semibold hover:opacity-90 transition-opacity"
+              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)', textDecoration: 'none' }}>
+              <Mail size={16} /> Email hello@nayba.app
+            </a>
           </div>
         </div>
       ) : (
