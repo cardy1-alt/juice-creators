@@ -46,9 +46,9 @@ const PAGE_TITLES: Record<Tab, string> = {
 };
 
 const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
-  campaigns: { label: '+ New Campaign', show: true },
-  creators: { label: '+ Create Creator', show: true },
-  brands: { label: '+ Create Brand', show: true },
+  campaigns: { label: 'New Campaign', show: true },
+  creators: { label: 'Create Creator', show: true },
+  brands: { label: 'Create Brand', show: true },
   analytics: { label: '', show: false },
   notifications: { label: '', show: false },
   settings: { label: '', show: false },
