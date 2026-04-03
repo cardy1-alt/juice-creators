@@ -145,18 +145,23 @@ export default function Auth() {
     <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
         /* ─── SIGN IN: two-column on desktop, single on mobile ─── */
-        <div className="flex-1 flex flex-col md:flex-row" style={{ minHeight: '100dvh' }}>
+        <div className="flex-1 flex flex-col md:flex-row md:overflow-hidden" style={{ minHeight: '100dvh' }}>
+          <style>{`
+            @media(min-width:768px){.auth-left{flex:0 0 54%;height:100vh;overflow-y:auto;padding:0 64px 0 72px !important}}
+            @media(min-width:768px){.auth-right{flex:0 0 46%;height:100vh;overflow-y:auto;padding:48px !important}}
+            @media(min-width:768px){.auth-wordmark-abs{position:absolute !important;top:32px;left:72px}}
+            @media(min-width:768px) and (min-height:700px){.auth-grid-tall{display:block !important}}
+            @keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}
+          `}</style>
 
           {/* Left column — hero */}
-          <div className="md:w-[55%] bg-[#F7F7F5] flex flex-col justify-center relative" style={{ padding: '32px 24px' }}>
-            {/* Desktop padding override */}
-            <style>{`@media(min-width:768px){.auth-hero-col{padding:72px 60px 96px 96px !important}}`}</style>
-            <div className="auth-hero-col max-w-[560px] w-full mx-auto md:mx-0" style={{ padding: 0 }}>
-              {/* Wordmark */}
-              <div className="flex justify-center md:justify-start mb-8 md:mb-12">
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 26, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
-              </div>
+          <div className="auth-left bg-[#F7F7F5] flex flex-col justify-center relative" style={{ padding: '32px 24px' }}>
+            {/* Wordmark — absolute on desktop, inline on mobile */}
+            <div className="auth-wordmark-abs flex justify-center md:justify-start mb-8 md:mb-0" style={{ position: 'relative' }}>
+              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 26, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+            </div>
 
+            <div className="max-w-[480px] w-full mx-auto md:mx-0">
               {/* Live pill */}
               <div className="flex justify-center md:justify-start mb-4">
                 <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'var(--card)', border: '1px solid var(--ink-08)', borderRadius: '999px' }}>
@@ -166,11 +171,10 @@ export default function Auth() {
                   <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
                 </div>
               </div>
-              <style>{`@keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}`}</style>
 
               {/* Headline */}
               <div className="text-center md:text-left mb-4 md:mt-4">
-                <h1 className="text-[42px] md:text-[68px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-2px', color: '#1C1C1A', lineHeight: 1.05, margin: 0 }}>
+                <h1 className="text-[38px] md:text-[36px] lg:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.2px', color: '#1C1C1A', lineHeight: 1.1, margin: 0 }}>
                   Discover local brands.<br />Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
                 </h1>
               </div>
@@ -207,8 +211,8 @@ export default function Auth() {
                 </div>
               </div>
 
-              {/* Campaign preview grid (desktop only) */}
-              <div className="hidden md:block relative mt-10">
+              {/* Campaign preview grid — only on tall desktop screens */}
+              <div className="hidden auth-grid-tall relative mt-8" style={{ maxHeight: 220, overflow: 'hidden', display: 'none' }}>
                 <div className="grid grid-cols-2 gap-2">
                   {[
                     { color: '#F5C4A0', brand: 'Wildcraft Coffee', perk: 'Free cold brew' },
@@ -225,7 +229,6 @@ export default function Auth() {
                     </div>
                   ))}
                 </div>
-                {/* Fade overlay */}
                 <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, transparent 60%, #F7F7F5 100%)' }} />
               </div>
             </div>
@@ -234,10 +237,9 @@ export default function Auth() {
           </div>
 
           {/* Right column — form */}
-          <div className="md:w-[45%] flex flex-col justify-center items-center" style={{ padding: '32px 24px', background: '#FAFAF9' }}>
-            <style>{`@media(min-width:768px){.auth-form-col{padding:48px !important}}`}</style>
-            <div className="auth-form-col w-full md:bg-white md:border md:border-[#E6E2DB] md:rounded-[16px] md:p-10 md:max-w-[400px]" style={{ boxShadow: 'none' }}>
-              <style>{`@media(min-width:768px){.auth-form-col{box-shadow:0 4px 24px rgba(28,28,26,0.06) !important}}`}</style>
+          <div className="auth-right flex flex-col justify-center items-center" style={{ padding: '32px 24px', background: '#FAFAF9' }}>
+            <div className="w-full md:bg-white md:border md:border-[#E6E2DB] md:rounded-[16px] md:p-10 md:max-w-[400px]" style={{ boxShadow: 'var(--auth-card-shadow, none)' }}>
+              <style>{`@media(min-width:768px){:root{--auth-card-shadow:0 4px 24px rgba(28,28,26,0.06)}}`}</style>
 
           {/* ─── FORGOT PASSWORD ─── */}
           {forgotPassword ? (
