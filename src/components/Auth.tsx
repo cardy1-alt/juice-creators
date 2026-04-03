@@ -162,13 +162,13 @@ export default function Auth() {
                 <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                   <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                 </div>
-                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.03em', fontWeight: 400 }}>Check your email</p>
+                <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em', fontWeight: 400 }}>Check your email</p>
                 <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
               </div>
             ) : (
               <form onSubmit={handleResetPassword} className="space-y-[14px]">
                 <div className="mb-[4px]">
-                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Corben', serif", letterSpacing: '-0.03em', fontWeight: 400 }}>Reset password</p>
+                  <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em', fontWeight: 400 }}>Reset password</p>
                   <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                 </div>
                 <FloatingInput
@@ -200,7 +200,7 @@ export default function Auth() {
           <>
           {/* 1. Wordmark */}
           <div className="flex flex-col items-center mb-[20px]">
-            <span className="font-[Corben] text-[#1A3C34] text-[26px]" style={{ letterSpacing: '-0.5px' }}>nayba</span>
+            <span className="text-[26px] font-bold" style={{ fontFamily: "'Instrument Sans', sans-serif", color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
           </div>
 
           {/* 2. Live pill */}
@@ -216,7 +216,7 @@ export default function Auth() {
 
           {/* 3. Headline */}
           <div className="text-center mb-[16px]">
-            <h1 className="text-[44px]" style={{ fontFamily: "'Corben', serif", fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
+            <h1 className="text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontWeight: 400, letterSpacing: '-0.03em', color: 'var(--ink)', lineHeight: 1.15, margin: 0 }}>
               Local offers.<br /><span style={{ color: '#C4674A' }}>Yours</span> to claim.
             </h1>
           </div>
@@ -359,7 +359,7 @@ export default function Auth() {
 
             {/* Step header */}
             <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Corben', serif", fontWeight: 400, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
+              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontWeight: 400, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
                 {stepTitles[signupStep - 1].title}
               </h2>
               <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>

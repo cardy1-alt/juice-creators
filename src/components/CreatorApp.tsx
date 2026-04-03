@@ -331,7 +331,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 }
 
 // ─── Naybahood Tab ───
-function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
+function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const unlocked = profile.completed_campaigns >= 1;
 
   if (!unlocked) {
@@ -362,7 +362,7 @@ function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
-        <a href="#" onClick={e => { e.preventDefault(); alert('WhatsApp Community link coming soon'); }}
+        <a href="#" onClick={e => { e.preventDefault(); showToast('WhatsApp Community coming soon'); }}
           className="inline-flex items-center gap-2 px-5 py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]"
           style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
           Join the WhatsApp Community
@@ -373,7 +373,7 @@ function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
 }
 
 // ─── Profile Tab ───
-function ProfileTab({ profile }: { profile: CreatorProfile }) {
+function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
 
   return (
@@ -433,7 +433,7 @@ function ProfileTab({ profile }: { profile: CreatorProfile }) {
             </div>
           </div>
           {!profile.instagram_connected && (
-            <button onClick={() => alert('Instagram connection coming soon')}
+            <button onClick={() => showToast('Instagram connection coming soon')}
               className="px-3 py-1.5 rounded-[var(--r-pill)] border border-[var(--border)] text-[13px] font-semibold text-[var(--terra)]">
               Connect
             </button>
@@ -445,13 +445,13 @@ function ProfileTab({ profile }: { profile: CreatorProfile }) {
 }
 
 // ─── More Tab ───
-function MoreTab({ onSignOut }: { onSignOut: () => void }) {
+function MoreTab({ onSignOut, showToast }: { onSignOut: () => void; showToast: (msg: string) => void }) {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
 
   const items = [
     { icon: History, label: 'Campaign history', action: () => {} },
     { icon: Settings, label: 'Account settings', action: () => {} },
-    { icon: Link2, label: 'Refer a friend', action: () => { navigator.clipboard.writeText('https://app.nayba.app').catch(() => {}); alert('Referral link copied!'); } },
+    { icon: Link2, label: 'Refer a friend', action: () => { navigator.clipboard.writeText('https://app.nayba.app').catch(() => {}); showToast('Link copied to clipboard'); } },
     { icon: HelpCircle, label: 'Help', action: () => {} },
   ];
 
@@ -501,6 +501,8 @@ export default function CreatorApp() {
   const [loading, setLoading] = useState(true);
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   useEffect(() => {
     if (user) fetchProfile();
@@ -525,6 +527,22 @@ export default function CreatorApp() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5]">
         <div className="w-10 h-10 border-[3px] border-[#C4674A] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  // Approval gate — unapproved creators see a pending screen
+  if (!profile.approved) {
+    return (
+      <div className="min-h-screen bg-[#F7F7F5] flex flex-col items-center justify-center px-6 text-center">
+        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
+        <h1 style={{ fontSize: 20, fontWeight: 700, color: '#222', marginBottom: 8 }}>You're on the list</h1>
+        <p style={{ fontSize: 15, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, maxWidth: 360, marginBottom: 40 }}>
+          We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
+        </p>
+        <button onClick={signOut} style={{ fontSize: 14, color: 'rgba(34,34,34,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}>
+          Sign out
+        </button>
       </div>
     );
   }
@@ -612,11 +630,19 @@ export default function CreatorApp() {
         <div className="p-4 lg:p-5">
           {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
           {tab === 'campaigns' && <CampaignsTab profile={profile} />}
-          {tab === 'naybahood' && <NaybahoodTab profile={profile} />}
-          {tab === 'profile' && <ProfileTab profile={profile} />}
-          {tab === 'more' && <MoreTab onSignOut={signOut} />}
+          {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
+          {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
+          {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} />}
         </div>
       </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-medium"
+          style={{ boxShadow: '0 4px 20px rgba(196,103,74,0.3)' }}>
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
