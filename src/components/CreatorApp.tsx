@@ -7,7 +7,7 @@ import {
   Compass, Megaphone, Users, User, MoreHorizontal,
   Search, Clock, Gift, Film, Check, Lock, LogOut,
   ChevronRight, Settings, History, Link2, HelpCircle,
-  AtSign, ExternalLink, X, Image
+  AtSign, ExternalLink, X, Image, Menu
 } from 'lucide-react';
 
 // ─── Types ───
@@ -46,29 +46,14 @@ function daysUntil(d: string | null) {
   return diff;
 }
 
-// ─── Bottom Nav ───
-function BottomNav({ active, onNavigate }: { active: Tab; onNavigate: (t: Tab) => void }) {
-  const tabs: { key: Tab; label: string; icon: typeof Compass }[] = [
-    { key: 'discover', label: 'Discover', icon: Compass },
-    { key: 'campaigns', label: 'Campaigns', icon: Megaphone },
-    { key: 'naybahood', label: 'Naybahood', icon: Users },
-    { key: 'profile', label: 'Profile', icon: User },
-    { key: 'more', label: 'More', icon: MoreHorizontal },
-  ];
-  return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] z-40 px-2 pb-[env(safe-area-inset-bottom)]">
-      <div className="flex max-w-[600px] mx-auto">
-        {tabs.map(t => (
-          <button key={t.key} onClick={() => onNavigate(t.key)}
-            className={`flex-1 flex flex-col items-center py-2 pt-2.5 text-[11px] font-medium transition-colors ${active === t.key ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>
-            <t.icon size={20} strokeWidth={active === t.key ? 2 : 1.5} />
-            <span className="mt-0.5">{t.label}</span>
-          </button>
-        ))}
-      </div>
-    </nav>
-  );
-}
+// ─── Nav Items ───
+const NAV_ITEMS: { key: Tab; label: string; icon: typeof Compass }[] = [
+  { key: 'discover', label: 'Discover', icon: Compass },
+  { key: 'campaigns', label: 'Campaigns', icon: Megaphone },
+  { key: 'naybahood', label: 'Naybahood', icon: Users },
+  { key: 'profile', label: 'Profile', icon: User },
+  { key: 'more', label: 'More', icon: MoreHorizontal },
+];
 
 // ─── Discover Tab ───
 function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
@@ -110,12 +95,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   });
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <Logo size={24} variant="wordmark" />
-      </div>
-
+    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
@@ -237,7 +217,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   };
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-4" style={{ letterSpacing: '-0.4px' }}>Campaigns</h1>
       {/* Sub tabs */}
       <div className="flex gap-1 mb-4 border-b border-[var(--ink-10)]">
@@ -356,7 +336,7 @@ function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
 
   if (!unlocked) {
     return (
-      <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+      <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
         <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-[var(--ink-10)] flex items-center justify-center mx-auto mb-4">
@@ -372,7 +352,7 @@ function NaybahoodTab({ profile }: { profile: CreatorProfile }) {
   }
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-[rgba(45,122,79,0.1)] flex items-center justify-center mx-auto mb-4">
@@ -397,7 +377,7 @@ function ProfileTab({ profile }: { profile: CreatorProfile }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
 
       {/* Avatar + name */}
@@ -476,7 +456,7 @@ function MoreTab({ onSignOut }: { onSignOut: () => void }) {
   ];
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-24 pt-4">
+    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>More</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
         {items.map((item, i) => (
@@ -520,44 +500,123 @@ export default function CreatorApp() {
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (user) fetchProfile();
   }, [user]);
 
   const fetchProfile = async () => {
-    // Query by email since creators.id may not match auth.uid()
     const { data } = await supabase.from('creators').select('*').eq('email', user!.email!).single();
     if (data) {
       setProfile(data as CreatorProfile);
     } else if (userProfile) {
-      // Fallback to AuthContext profile (demo mode or if query fails)
       setProfile(userProfile as CreatorProfile);
     }
     setLoading(false);
   };
 
+  const handleNav = (t: Tab) => {
+    setTab(t);
+    setSidebarOpen(false);
+  };
+
   if (loading || !profile) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
-        <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F7F5]">
+        <div className="w-10 h-10 border-[3px] border-[#C4674A] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
-  // Campaign detail view
   if (viewingCampaign) {
     return <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />;
   }
 
+  const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
+
   return (
-    <div className="min-h-screen bg-[var(--shell)]">
-      {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
-      {tab === 'campaigns' && <CampaignsTab profile={profile} />}
-      {tab === 'naybahood' && <NaybahoodTab profile={profile} />}
-      {tab === 'profile' && <ProfileTab profile={profile} />}
-      {tab === 'more' && <MoreTab onSignOut={signOut} />}
-      <BottomNav active={tab} onNavigate={setTab} />
+    <div className="min-h-screen bg-[#F7F7F5]">
+      {/* Mobile/tablet overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-[rgba(28,28,26,0.4)] z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* ─── Sidebar ─── */}
+      <aside className={`
+        w-[220px] bg-white border-r border-[#E6E2DB] flex flex-col flex-shrink-0
+        fixed inset-y-0 left-0 z-50 transition-transform duration-200
+        lg:translate-x-0
+        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        {/* Wordmark */}
+        <div className="px-5 pt-6 pb-5 border-b border-[#E6E2DB] flex items-center justify-between">
+          <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
+            <X size={20} />
+          </button>
+        </div>
+
+        {/* Nav */}
+        <nav className="flex-1 p-3">
+          {NAV_ITEMS.map(item => {
+            const active = tab === item.key;
+            return (
+              <button
+                key={item.key}
+                onClick={() => handleNav(item.key)}
+                className="w-full flex items-center gap-3 px-2.5 py-2 rounded-[8px] mb-0.5 transition-colors"
+                style={{
+                  fontSize: 13.5,
+                  fontWeight: active ? 600 : 500,
+                  background: active ? 'rgba(196,103,74,0.08)' : 'transparent',
+                  color: active ? '#C4674A' : 'rgba(34,34,34,0.60)',
+                }}
+                onMouseEnter={e => { if (!active) (e.currentTarget.style.background = 'rgba(34,34,34,0.04)'); }}
+                onMouseLeave={e => { if (!active) (e.currentTarget.style.background = 'transparent'); }}
+              >
+                <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        {/* Creator info */}
+        <div className="px-3 py-4 border-t border-[#E6E2DB]">
+          <div className="flex items-center gap-2.5 px-2">
+            <div className="w-[30px] h-[30px] rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+              <span className="text-[12px] font-bold text-white">{initial}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[13px] font-semibold text-[#222] truncate">{profile.display_name || profile.name}</p>
+              <p className="text-[11px] text-[rgba(34,34,34,0.35)] truncate">{profile.instagram_handle}</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      {/* ─── Hamburger button (mobile/tablet only) ─── */}
+      {!sidebarOpen && (
+        <button
+          onClick={() => setSidebarOpen(true)}
+          className="fixed top-3 left-3 z-50 w-[44px] h-[44px] flex items-center justify-center rounded-[8px] lg:hidden"
+          style={{ background: 'rgba(255,255,255,0.9)', boxShadow: '0 1px 4px rgba(34,34,34,0.08)' }}
+        >
+          <Menu size={22} className="text-[#222]" />
+        </button>
+      )}
+
+      {/* ─── Main content ─── */}
+      <div className="lg:ml-[220px] min-h-screen">
+        <div className="p-4 lg:p-5">
+          {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+          {tab === 'campaigns' && <CampaignsTab profile={profile} />}
+          {tab === 'naybahood' && <NaybahoodTab profile={profile} />}
+          {tab === 'profile' && <ProfileTab profile={profile} />}
+          {tab === 'more' && <MoreTab onSignOut={signOut} />}
+        </div>
+      </div>
     </div>
   );
 }
