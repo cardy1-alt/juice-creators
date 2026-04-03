@@ -388,282 +388,137 @@ export default function Auth() {
           </div>
         </div>
       ) : (
-        /* ─── SIGN UP: scrollable form ─── */
-        <div className="flex-1 flex flex-col">
-          {/* Signup header */}
-          <div className="flex flex-col items-center pt-[44px] pb-[24px] px-6">
-            <Logo variant="wordmark" size={24} />
-          </div>
+        /* ─── SIGN UP: single page form ─── */
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6" style={{ background: '#F7F7F5', minHeight: '100dvh' }}>
+          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 480 }}>
 
-          <div className="flex-1 px-5 pb-8 max-w-md mx-auto w-full">
-          <form onSubmit={handleSubmit}>
-            {/* Step indicator */}
-            <div className="flex items-center gap-[6px] mb-[20px]">
-              {[1, 2, 3].map((step) => (
-                <div key={step} className="flex items-center gap-[6px]">
-                  <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center text-[13px] font-bold transition-all duration-300" style={{
-                    background: signupStep >= step ? 'var(--terra)' : 'var(--ink-08)',
-                    color: signupStep >= step ? 'white' : 'var(--ink-35)',
-                  }}>
-                    {signupStep > step ? <Check size={13} strokeWidth={1.5} /> : step}
-                  </div>
-                  {step < 3 && <div className="w-[24px] h-[2px] rounded-full transition-colors duration-300" style={{ background: signupStep > step ? 'var(--terra)' : 'var(--ink-08)' }} />}
+            {/* Wordmark */}
+            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 12 }}>nayba</span>
+
+            {/* Back link */}
+            <button
+              type="button"
+              onClick={() => { setMode('roleselect'); setError(''); }}
+              className="flex items-center gap-1 text-[13px] mb-8 transition-colors"
+              style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'rgba(34,34,34,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
+            >
+              <ChevronLeft size={14} /> Back
+            </button>
+
+            {/* Heading */}
+            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#222', letterSpacing: '-0.5px', margin: '0 0 6px' }}>Create your account</h1>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>You'll be reviewed by our team before getting access.</p>
+
+            {/* Form card */}
+            <div className="w-full bg-white border border-[#E6E2DB] rounded-[16px] p-6 md:p-8 text-left" style={{ boxShadow: '0 4px 24px rgba(28,28,26,0.06)' }}>
+              <form onSubmit={handleSubmit} className="space-y-3">
+                {/* Full Name */}
+                <div>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="Your full name"
+                    required
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
                 </div>
-              ))}
-            </div>
 
-            {/* Step header */}
-            <div className="mb-[20px]">
-              <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontWeight: 400, fontSize: '26px', color: '#222222', letterSpacing: '-0.03em' }}>
-                {stepTitles[signupStep - 1].title}
-              </h2>
-              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, fontSize: '15px', color: 'var(--ink-60)', lineHeight: 1.65, marginTop: 2 }}>{stepTitles[signupStep - 1].subtitle}</p>
-            </div>
+                {/* Email */}
+                <div>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="your@email.com"
+                    required
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
+                </div>
 
-            {/* ── Creator signup (multi-step) ── */}
-            {role === 'creator' && (
-              <>
-                {/* Step 1: Name, Instagram, Follower Count */}
-                {signupStep === 1 && (
-                  <div className="space-y-[12px]">
-                    <FloatingInput label="Full Name" icon="user" value={name} onChange={setName} placeholder="Sophie Taylor" required />
-                    <FloatingInput label="Instagram Handle" icon="instagram" value={instagramHandle} onChange={setInstagramHandle} placeholder="@yourusername" required />
+                {/* Password */}
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    placeholder="At least 8 characters"
+                    required
+                    minLength={8}
+                    className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)] hover:text-[rgba(34,34,34,0.60)]">
+                    {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                  </button>
+                </div>
 
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Instagram following</label>
-                      <div className="flex gap-[8px]">
-                        {['Under 1k', '1k–5k', '5k–10k', '10k+'].map((opt) => (
-                          <button
-                            key={opt}
-                            type="button"
-                            onClick={() => setFollowerCount(opt)}
-                            className="flex-1 py-[10px] text-[14px] transition-all"
-                            style={{
-                              fontFamily: "'Instrument Sans', sans-serif",
-                              fontWeight: followerCount === opt ? 700 : 600,
-                              borderRadius: '999px',
-                              background: followerCount === opt ? 'var(--terra)' : 'var(--card)',
-                              color: followerCount === opt ? 'white' : 'var(--ink-35)',
-                              border: followerCount === opt ? '1.5px solid var(--terra)' : '1.5px solid var(--ink-08)',
-                            }}
-                          >
-                            {opt}
-                          </button>
-                        ))}
-                      </div>
-                      <p className="text-[13px] text-[var(--ink-60)] mt-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Don't worry — we welcome all sizes</p>
-                    </div>
+                {/* Instagram handle */}
+                <div>
+                  <input
+                    type="text"
+                    value={instagramHandle}
+                    onChange={e => setInstagramHandle(e.target.value)}
+                    placeholder="@yourhandle"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
+                </div>
+
+                {/* City */}
+                <div>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={e => setAddress(e.target.value)}
+                    placeholder="e.g. Bury St Edmunds"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                  />
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>So we can show you local campaigns</p>
+                </div>
+
+                {error && (
+                  <div className="flex items-center gap-2.5 bg-[rgba(196,103,74,0.08)] text-[#C4674A] px-3.5 py-3 rounded-[10px] text-[14px] font-medium">
+                    <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-[#C4674A]" />
+                    {error}
                   </div>
                 )}
 
-                {/* Step 2: Date of Birth & Address */}
-                {signupStep === 2 && (
-                  <div className="space-y-[12px]">
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Date of Birth</label>
-                      <div className="flex items-center gap-[8px]">
-                        <Cake size={16} strokeWidth={1.5} className="text-[var(--ink-35)] flex-shrink-0" />
-                        <select
-                          value={dobDay}
-                          onChange={(e) => setDobDay(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
-                          required
-                        >
-                          <option value="" disabled>Day</option>
-                          {Array.from({ length: 31 }, (_, i) => (
-                            <option key={i + 1} value={String(i + 1)}>{i + 1}</option>
-                          ))}
-                        </select>
-                        <select
-                          value={dobMonth}
-                          onChange={(e) => setDobMonth(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
-                          required
-                        >
-                          <option value="" disabled>Month</option>
-                          {['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'].map((m, i) => (
-                            <option key={i + 1} value={String(i + 1)}>{m}</option>
-                          ))}
-                        </select>
-                        <select
-                          value={dobYear}
-                          onChange={(e) => setDobYear(e.target.value)}
-                          className="flex-1 px-[10px] py-[14px] rounded-[12px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                          style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 10px center' }}
-                          required
-                        >
-                          <option value="" disabled>Year</option>
-                          {Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - 13 - i).map((y) => (
-                            <option key={y} value={String(y)}>{y}</option>
-                          ))}
-                        </select>
-                      </div>
-                      <p className="text-[13px] text-[var(--ink-35)] mt-[6px]">We use this to verify your age. You must be 13 or over.</p>
-                    </div>
-
-                    <div>
-                      <label className="block text-[15px] font-semibold text-[var(--ink)] mb-[8px]">Your town</label>
-                      <select
-                        value={address}
-                        onChange={(e) => setAddress(e.target.value)}
-                        className="w-full px-[14px] py-[15px] rounded-[14px] border-[1.5px] border-[var(--ink-08)] bg-[var(--card)] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] transition-all appearance-none"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400, backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`, backgroundRepeat: 'no-repeat', backgroundPosition: 'right 14px center' }}
-                        required
-                      >
-                        <option value="" disabled>Select your town</option>
-                        <option value="Bury St Edmunds">Bury St Edmunds</option>
-                        <option value="Ipswich" disabled style={{ color: 'var(--ink-35)' }}>Ipswich — coming soon</option>
-                        <option value="Norwich" disabled style={{ color: 'var(--ink-35)' }}>Norwich — coming soon</option>
-                        <option value="Cambridge" disabled style={{ color: 'var(--ink-35)' }}>Cambridge — coming soon</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                {/* Step 3: Email & Password */}
-                {signupStep === 3 && (
-                  <div className="space-y-[12px]">
-                    <FloatingInput label="Email" icon="mail" type="email" value={email} onChange={setEmail} placeholder="you@example.com" required />
-                    <FloatingInput
-                      label="Password"
-                      icon="lock"
-                      type={showPassword ? 'text' : 'password'}
-                      value={password}
-                      onChange={setPassword}
-                      placeholder="Min 8 characters"
-                      required
-                      minLength={8}
-                      rightElement={
-                        <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
-                          {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-                        </button>
-                      }
-                    />
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* ── Business signup disabled for pilot ── */}
-            {role === 'business' && (
-              <div className="text-center py-[32px]">
-                <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
-                  <Store size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
-                </div>
-                <p className="text-[15px] text-[var(--ink-60)] leading-[1.65]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
-                  Want to list your business on nayba? Get in touch at{' '}
-                  <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a>
-                </p>
-              </div>
-            )}
-
-            {error && (
-              <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium mt-[14px]">
-                <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
-                {error}
-              </div>
-            )}
-
-            {/* Navigation buttons */}
-            <div className="mt-[20px]">
-              {signupStep < 3 ? (
-                <div className="flex gap-[10px]">
-                  {signupStep > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                      className="flex items-center gap-[4px] text-[13px] font-medium text-[var(--ink-60)] transition-colors hover:text-[var(--ink)]"
-                    >
-                      <ArrowLeft size={14} strokeWidth={1.5} /> Back
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (role === 'creator' && signupStep === 1 && (!name || !instagramHandle)) {
-                        setError('Please enter your name and Instagram handle');
-                        return;
-                      }
-                      if (role === 'creator' && signupStep === 2 && !dateOfBirth) {
-                        setError('Please enter your date of birth');
-                        return;
-                      }
-                      setError('');
-                      setSignupStep(signupStep + 1);
-                    }}
-                    className="flex-1 min-h-[52px] text-white transition-all active:scale-[0.98] inline-flex items-center justify-center gap-[6px]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
-                  >
-                    Continue <ChevronRight size={16} strokeWidth={1.5} />
-                  </button>
-                </div>
-              ) : (
-                <>
-                <div className="text-center mb-[14px]">
-                  <p className="text-[15px] font-bold text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Application received</p>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: '13px', fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.5 }}>We review every application personally. You'll hear from us within 24 hours — check your email (and your spam folder just in case).</p>
-                  <p className="text-[12px] text-[var(--ink-35)] mt-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] font-semibold hover:underline">hello@nayba.app</a></p>
-                </div>
-                <div className="flex gap-[10px]">
-                  <button
-                    type="button"
-                    onClick={() => { setSignupStep(signupStep - 1); setError(''); }}
-                    className="flex items-center gap-[4px] text-[13px] font-medium text-[var(--ink-60)] transition-colors hover:text-[var(--ink)]"
-                  >
-                    <ArrowLeft size={14} strokeWidth={1.5} /> Back
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="flex-1 min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
-                  >
-                    {loading ? (
-                      <span className="inline-flex items-center gap-2">
-                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      </span>
-                    ) : 'Create Account'}
-                  </button>
-                </div>
-                </>
-              )}
+                {/* Submit */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+                  style={{ fontFamily: "'Instrument Sans', sans-serif" }}
+                >
+                  {loading ? (
+                    <span className="inline-flex items-center gap-2">
+                      <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    </span>
+                  ) : 'Apply for access'}
+                </button>
+              </form>
             </div>
 
-            <p className="text-center mt-[16px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 400, color: 'var(--ink-35)', lineHeight: 1.5 }}>
+            {/* Footer links */}
+            <p className="text-center mt-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(34,34,34,0.35)', lineHeight: 1.5 }}>
               Already have an account?{' '}
               <button
                 type="button"
-                onClick={() => { setMode('signin'); setError(''); setSignupStep(1); setForgotPassword(false); }}
-                className="hover:text-[var(--ink)] transition-colors"
-                style={{ color: 'var(--terra)', fontWeight: 500, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
+                onClick={() => { setMode('signin'); setError(''); }}
+                style={{ color: '#C4674A', fontWeight: 500, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
               >
                 Sign in
               </button>
             </p>
-            <p className="text-[13px] text-[var(--ink-35)] text-center mt-[8px] leading-[1.5]">
-              By signing up you agree to{' '}
-              <button
-                type="button"
-                onClick={() => setShowTerms(true)}
-                className="underline text-[var(--terra)] hover:text-[var(--terra-hover)] transition-colors"
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
-              >
-                our terms
-              </button>
-              {' '}and{' '}
-              <button
-                type="button"
-                onClick={() => setShowPrivacy(true)}
-                className="underline text-[var(--terra)] hover:text-[var(--terra-hover)] transition-colors"
-                style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit', fontFamily: 'inherit' }}
-              >
-                privacy policy
-              </button>
-              . Your account will be reviewed by our team.
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', textAlign: 'center', marginTop: 8, lineHeight: 1.5 }}>
+              By signing up you agree to our terms and privacy policy. Your account will be reviewed by our team.
             </p>
-          </form>
+
           </div>
         </div>
       )}
