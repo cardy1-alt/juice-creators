@@ -8,7 +8,7 @@ import {
   Compass, Megaphone, Users, User, MoreHorizontal,
   Search, Clock, Gift, Film, Check, Lock, LogOut,
   ChevronRight, Settings, History, Link2, HelpCircle,
-  AtSign, ExternalLink, X, Menu, ArrowLeft,
+  AtSign, ExternalLink, X, ArrowLeft,
   Eye, EyeOff, Mail, MapPin, Save, Star, Award,
   AlertCircle, RefreshCw
 } from 'lucide-react';
@@ -177,7 +177,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   });
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
@@ -371,7 +371,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   };
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-4" style={{ letterSpacing: '-0.4px' }}>Campaigns</h1>
       {/* Sub tabs */}
       <div className="flex gap-1 mb-4 border-b border-[var(--ink-10)]">
@@ -515,7 +515,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   if (!unlocked) {
     return (
-      <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[var(--ink-10)]">
@@ -536,7 +536,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   if (unlocked && showCelebration) {
     return (
-      <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.5)] z-[60] flex items-center justify-center px-4">
@@ -577,7 +577,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   }
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4" style={{ boxShadow: '0 4px 20px rgba(45,122,79,0.3)' }}>
@@ -609,7 +609,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
   const ringOffset = ringC - (completionPct / 100) * ringC;
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       {/* Gradient hero header */}
       <div className="relative bg-gradient-to-br from-[var(--terra)] to-[#A8573E] rounded-[var(--r-card)] p-6 pb-8 mb-[-28px]">
         <h1 className="text-[24px] font-bold text-white mb-0" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
@@ -758,7 +758,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
   const partCampaignIds = new Set(participations.map(p => p.campaign_id));
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
@@ -857,7 +857,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
   };
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
@@ -974,7 +974,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   ];
 
   return (
-    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>More</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
         {items.map((item, i) => (
@@ -1057,7 +1057,6 @@ export default function CreatorApp() {
   const [loading, setLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -1098,7 +1097,6 @@ export default function CreatorApp() {
 
   const handleNav = (t: Tab) => {
     setTab(t);
-    setSidebarOpen(false);
     if (t !== 'discover') setViewingCampaign(null);
   };
 
@@ -1149,24 +1147,11 @@ export default function CreatorApp() {
 
   return (
     <div className="min-h-screen bg-[#F7F7F5]">
-      {/* Mobile/tablet overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(28,28,26,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* ─── Sidebar ─── */}
-      <aside className={`
-        w-[220px] bg-white border-r border-[#E6E2DB] flex flex-col flex-shrink-0
-        fixed inset-y-0 left-0 z-50 transition-transform duration-200
-        md:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      {/* ─── Sidebar (desktop only) ─── */}
+      <aside className="w-[220px] bg-white border-r border-[#E6E2DB] flex-col flex-shrink-0 fixed inset-y-0 left-0 z-50 hidden md:flex">
         {/* Wordmark */}
-        <div className="px-5 pt-6 pb-5 border-b border-[#E6E2DB] flex items-center justify-between">
+        <div className="px-5 pt-6 pb-5 border-b border-[#E6E2DB]">
           <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
-            <X size={20} />
-          </button>
         </div>
 
         {/* Nav */}
@@ -1207,17 +1192,6 @@ export default function CreatorApp() {
           </div>
         </div>
       </aside>
-
-      {/* ─── Hamburger button (mobile/tablet only) ─── */}
-      {!sidebarOpen && (
-        <button
-          onClick={() => setSidebarOpen(true)}
-          className="fixed top-3 left-3 z-50 w-[44px] h-[44px] flex items-center justify-center rounded-[8px] md:hidden"
-          style={{ background: 'rgba(255,255,255,0.9)', boxShadow: '0 1px 4px rgba(34,34,34,0.08)' }}
-        >
-          <Menu size={22} className="text-[#222]" />
-        </button>
-      )}
 
       {/* ─── Main content ─── */}
       <div className="md:ml-[220px] min-h-screen flex">

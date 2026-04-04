@@ -60,7 +60,8 @@ const DEMO_PROFILES: Record<string, { role: UserRole; profile: any }> = {
 
 function getDemoRole(): string | null {
   if (typeof window === 'undefined') return null;
-  if (import.meta.env.PROD || import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
+  // Allow demo mode in prod when VITE_ENABLE_DEMO is set — needed for brand demos during pilot
+  if (import.meta.env.VITE_ENABLE_DEMO !== 'true') return null;
   const params = new URLSearchParams(window.location.search);
   const demo = params.get('demo');
   return demo && DEMO_PROFILES[demo] ? demo : null;
