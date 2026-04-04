@@ -91,7 +91,7 @@ export default function AdminDashboard() {
         {/* Wordmark */}
         <div className="px-5 pt-5 pb-4 flex items-center justify-between">
           <div>
-            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>
+            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 24, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'rgba(0,0,0,0.25)' }} />
               <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.8px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Admin</span>
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
           <button onClick={() => setSidebarOpen(true)} className="text-[rgba(34,34,34,0.60)]">
             <Menu size={22} />
           </button>
-          <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 18, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>
+          <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 20, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>
         </div>
 
         {/* Desktop topbar */}
