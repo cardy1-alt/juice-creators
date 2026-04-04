@@ -33,7 +33,7 @@ interface Creator { id: string; name: string; display_name: string | null; insta
 const BORDER = 'var(--border)';
 const inputCls = "w-full px-3 py-2.5 rounded-[var(--r-input)] bg-[var(--shell)] border border-[var(--border)] text-[var(--ink)] text-[13.5px] focus:outline-none focus:border-[var(--terra)] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--ink-60)] mb-1.5";
-const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] py-3 px-4 bg-[var(--shell)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.6px] py-3 px-4 bg-[var(--shell)]" + " " + "text-[rgba(0,0,0,0.45)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[var(--border)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(34,34,34,0.4)]";
@@ -42,8 +42,8 @@ const modalHeader = "flex items-center justify-between px-6 py-5 border-b border
 const modalBody = "flex-1 overflow-y-auto px-6 py-6";
 const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t border-[var(--border)] bg-[var(--shell)] flex-shrink-0";
 const ghostBtn = "text-[14px] font-semibold text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors";
-const primaryBtn = "px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40 transition-opacity";
-const secondaryBtn = "px-5 py-2.5 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]";
+const primaryBtn = "px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40 transition-opacity";
+const secondaryBtn = "px-5 py-2.5 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]";
 const modalShadow = 'var(--shadow-lg)';
 
 function StatusBadge({ status }: { status: string }) {
@@ -215,7 +215,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className={labelCls} style={{ marginBottom: 0 }}>Headline</label>
                   <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[var(--r-pill)] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
+                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[6px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
                     {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Generating...' : 'Generate brief with AI'}
                   </button>
@@ -560,7 +560,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                         <button
                           onClick={() => markComplete(p.id)}
                           disabled={p.status === 'completed'}
-                          className="px-3 py-1.5 rounded-[var(--r-pill)] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 rounded-[6px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{
                             background: p.status === 'completed' ? 'rgba(34,34,34,0.06)' : 'rgba(45,122,79,0.08)',
                             color: p.status === 'completed' ? 'rgba(34,34,34,0.40)' : '#2D7A4F',
@@ -721,20 +721,20 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
               if (error) showInlineToast('Failed to update status');
               else { showInlineToast(`Status → ${e.target.value}`); onEdit(); /* triggers refresh */ }
-            }} className="px-3 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[13px] font-semibold text-[var(--ink)] bg-white">
+            }} className="px-3 py-2 rounded-[6px] border border-[var(--border)] text-[13px] font-semibold text-[var(--ink)] bg-white">
               <option value="draft">Draft</option><option value="active">Active</option>
               <option value="selecting">Selecting</option><option value="live">Live</option>
               <option value="completed">Completed</option>
             </select>
-            <button onClick={onManageApplicants} className="px-4 py-2 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90">Manage Applicants</button>
+            <button onClick={onManageApplicants} className="px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90">Manage Applicants</button>
             <button onClick={handleAiRecommend} disabled={aiLoading}
-              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[var(--r-pill)] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
+              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[6px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
               {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}
               {aiLoading ? 'Analysing...' : 'AI Recommend'}
             </button>
-            <button onClick={onViewParticipation} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">View Participation</button>
-            <button onClick={onEdit} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">Edit Campaign</button>
-            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+            <button onClick={onViewParticipation} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">View Participation</button>
+            <button onClick={onEdit} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">Edit Campaign</button>
+            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
               <span className="flex items-center gap-1"><UserPlus size={14} /> Add Applicant</span>
             </button>
             <button onClick={async () => {
@@ -746,7 +746,7 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               });
               if (error) showInlineToast('Failed to duplicate');
               else { showInlineToast('Campaign duplicated as draft'); onEdit(); }
-            }} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+            }} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
               Duplicate
             </button>
           </div>
@@ -769,7 +769,7 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
                     <div className="flex items-center gap-3 flex-shrink-0">
                       <span className="text-[14px] font-bold text-[var(--terra)]">{r.score}/10</span>
                       <button onClick={() => handleSelectCreator(r.creator_id)}
-                        className="px-3 py-1.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[12px] font-semibold hover:opacity-90">
+                        className="px-3 py-1.5 rounded-[6px] bg-[var(--terra)] text-white text-[12px] font-semibold hover:opacity-90">
                         Select
                       </button>
                     </div>
@@ -792,7 +792,7 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
                       <span className="text-[12px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
                     </div>
                     <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
-                      className="px-3 py-1 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[11px] font-semibold disabled:opacity-40">
+                      className="px-3 py-1 rounded-[6px] bg-[var(--terra)] text-white text-[11px] font-semibold disabled:opacity-40">
                       {addingCreator === cr.id ? 'Adding...' : 'Add'}
                     </button>
                   </div>
@@ -868,14 +868,9 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[var(--border)] rounded-[var(--r-card)] p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-[var(--r-sm)] flex items-center justify-center" style={{ background: 'var(--terra-light)' }}>
-                <s.icon size={18} className="text-[var(--terra)]" />
-              </div>
-            </div>
-            <p className="text-[28px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>{s.value}</p>
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, marginTop: 2 }}>{s.label}</p>
+          <div key={s.label} className="bg-white border border-[var(--border)] rounded-[var(--r-card)]" style={{ padding: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
+            <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
         ))}
       </div>
@@ -897,7 +892,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 return (
                   <>
                     <tr key={c.id} onClick={() => setExpandedId(expanded ? null : c.id)}
-                      className="hover:bg-[var(--shell)] cursor-pointer transition-colors" style={{ height: 52 }}>
+                      className="hover:bg-[var(--shell)] cursor-pointer transition-colors" style={{ height: 44 }}>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-full bg-[var(--terra-light)] flex items-center justify-center flex-shrink-0">
@@ -957,7 +952,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           </div>
           <p className="text-[17px] font-bold text-[var(--ink)] mb-1">No campaigns yet</p>
           <p className="text-[14px] text-[var(--ink-60)] mb-5">Create your first campaign to get started</p>
-          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
             + New Campaign
           </button>
         </div>

@@ -15,8 +15,19 @@ const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: '
 
 const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[13.5px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.60)] mb-1.5";
-const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.6px] text-[rgba(0,0,0,0.45)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
+
+function getAvatarColors(letter: string): { bg: string; text: string } {
+  const ch = letter.toUpperCase();
+  if ('AGMSY'.includes(ch)) return { bg: '#E8EDF2', text: '#3D5A7A' };
+  if ('BHNTZ'.includes(ch)) return { bg: '#EDF2E8', text: '#3A6B3A' };
+  if ('CIOU'.includes(ch))  return { bg: '#F2EDE8', text: '#7A5A3D' };
+  if ('DJPV'.includes(ch))  return { bg: '#EDE8F2', text: '#5A3D7A' };
+  if ('EKQW'.includes(ch))  return { bg: '#F2E8ED', text: '#7A3D5A' };
+  if ('FLRX'.includes(ch))  return { bg: '#E8F2EF', text: '#2D6B5A' };
+  return { bg: '#E8EDF2', text: '#3D5A7A' };
+}
 
 function normalizeInstagram(raw: string): string {
   if (!raw) return '';
@@ -102,7 +113,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 </button>
               </div>
               <div className="mt-5">
-                <button onClick={onClose} className="px-5 py-2.5 rounded-[999px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold">Done</button>
+                <button onClick={onClose} className="px-5 py-2.5 rounded-[6px] border border-[#E6E2DB] text-[#222] text-[13px] font-semibold">Done</button>
               </div>
             </div>
           ) : (
@@ -136,7 +147,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
           <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] bg-[#F7F7F5] flex-shrink-0">
             <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
             <button onClick={handleCreate as any} disabled={creating}
-              className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40"
+              className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40"
               style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
               {creating ? 'Creating...' : 'Create Account'}
             </button>
@@ -240,11 +251,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               {selectedPending.size > 0 && (
                 <>
                   <button onClick={() => bulkApprove(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[999px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
                     <CheckCircle2 size={13} /> Approve {selectedPending.size}
                   </button>
                   <button onClick={() => bulkApprove(false)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[999px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
                     <XCircle size={13} /> Deny {selectedPending.size}
                   </button>
                 </>
@@ -265,9 +276,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                     className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#C4674A] border-[#C4674A]' : 'border-[rgba(34,34,34,0.20)] hover:border-[#C4674A]'}`}>
                     {selected && <Check size={12} className="text-white" />}
                   </button>
-                  <div className="w-9 h-9 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
-                    <span className="text-[13px] font-bold text-white">{(c.display_name || c.name || '?')[0].toUpperCase()}</span>
+                  {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                    <span className="text-[13px] font-bold" style={{ color: colors.text }}>{initial}</span>
                   </div>
+                  ); })()}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[14px] font-semibold text-[#222]">{c.display_name || c.name}</p>
@@ -319,14 +332,16 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           </tr></thead>
           <tbody>
             {filteredCreators.map(c => (
-              <tr key={c.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 52 }}>
+              <tr key={c.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 44 }}>
                 <td className={tdCls}>
+                  {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-bold text-white">{(c.display_name || c.name || '?')[0].toUpperCase()}</span>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                      <span className="text-[11px] font-bold" style={{ color: colors.text }}>{initial}</span>
                     </div>
                     <span className="font-medium">{c.display_name || c.name}</span>
                   </div>
+                  ); })()}
                 </td>
                 <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.instagram_handle}</td>
                 <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.address || '—'}</td>
@@ -351,7 +366,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 <td className={tdCls}>
                   {c.instagram_connected
                     ? <span className="text-[12px] text-[#2D7A4F] font-medium">Connected</span>
-                    : <span className="text-[12px] text-[rgba(34,34,34,0.35)]">Not connected</span>
+                    : <span className="text-[12px] text-[rgba(34,34,34,0.25)]">—</span>
                   }
                 </td>
                 <td className={tdCls}>

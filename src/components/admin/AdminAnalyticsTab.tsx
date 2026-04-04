@@ -134,14 +134,9 @@ export default function AdminAnalyticsTab() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-9 h-9 rounded-[var(--r-sm)] flex items-center justify-center bg-[var(--terra-light)]">
-                <s.icon size={18} className="text-[var(--terra)]" />
-              </div>
-            </div>
-            <p className="text-[28px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>{s.value}</p>
-            <p className="text-[11px] font-semibold tracking-[0.6px] text-[var(--ink-35)] uppercase mt-0.5">{s.label}</p>
+          <div key={s.label} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)]" style={{ padding: 16 }}>
+            <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
+            <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
         ))}
       </div>

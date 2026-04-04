@@ -12,7 +12,7 @@ interface NotificationLog {
   created_at: string; user_type: string;
 }
 
-const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.6px] text-[rgba(0,0,0,0.45)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
 
 function fmtDate(d: string) {
@@ -109,7 +109,7 @@ export default function AdminNotificationsTab() {
             {selectedCampaignId && (
               <button onClick={handleSend} disabled={sending}
                 disabled={sending || recipientCount === 0}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
+                className="flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
                 style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
                 <Send size={14} /> {sending ? 'Sending...' : `Send to ${recipientCount} creators`}
               </button>
@@ -134,7 +134,7 @@ export default function AdminNotificationsTab() {
                 {selectedCampaign.perk_description && <p className="text-[rgba(34,34,34,0.60)]">{selectedCampaign.perk_description.slice(0, 80)}{selectedCampaign.perk_value ? ` — worth £${selectedCampaign.perk_value}` : ''}</p>}
                 {selectedCampaign.expression_deadline && <p className="text-[rgba(34,34,34,0.60)]">Apply by {fmtShort(selectedCampaign.expression_deadline)}</p>}
                 <div className="pt-3">
-                  <span className="inline-block px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-semibold">
+                  <span className="inline-block px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[14px] font-semibold">
                     See the campaign →
                   </span>
                 </div>
@@ -152,7 +152,7 @@ export default function AdminNotificationsTab() {
           </tr></thead>
           <tbody>
             {logs.map(n => (
-              <tr key={n.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 52 }}>
+              <tr key={n.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 44 }}>
                 <td className={`${tdCls} text-[rgba(34,34,34,0.35)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
                 <td className={`${tdCls} text-[rgba(34,34,34,0.60)] max-w-[300px] truncate`}>{n.message}</td>
                 <td className={tdCls}>1</td>

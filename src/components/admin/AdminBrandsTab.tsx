@@ -12,7 +12,7 @@ interface Brand {
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
 const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[13.5px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.60)] mb-1.5";
-const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.6px] text-[rgba(0,0,0,0.45)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
 
 function fmtDate(d: string) {
@@ -76,7 +76,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] bg-[#F7F7F5] flex-shrink-0">
           <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
-          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
             {creating ? 'Creating...' : 'Create Brand'}
           </button>
         </div>
@@ -129,7 +129,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           </tr></thead>
           <tbody>
             {brands.map(b => (
-              <tr key={b.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 52 }}>
+              <tr key={b.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 44 }}>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">

@@ -85,7 +85,7 @@ export default function AdminSettingsTab() {
             <p className={`text-[14px] ${passwordMessage.type === 'success' ? 'text-[#2D7A4F]' : 'text-[#C4674A]'}`}>{passwordMessage.text}</p>
           )}
           <button type="submit" disabled={saving}
-            className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
+            className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
             style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
             {saving ? 'Updating...' : 'Update Password'}
           </button>
