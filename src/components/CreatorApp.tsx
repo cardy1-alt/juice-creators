@@ -257,12 +257,12 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
                   )}
                 </div>
                 <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
-                {/* Perk pill */}
-                <div className="flex items-start gap-1.5 px-2.5 py-1.5 rounded-[var(--r-sm)] bg-[var(--terra-light)] mb-2">
-                  <Gift size={13} className="text-[var(--terra)] flex-shrink-0 mt-0.5" />
-                  <span className="text-[13px] font-medium text-[var(--terra)] leading-[1.4]">
+                {/* Perk line */}
+                <div className="flex items-start gap-1.5 mb-2">
+                  <Gift size={14} className="text-[var(--terra)] flex-shrink-0 mt-[2px]" />
+                  <p className="text-[13px] text-[var(--terra)] font-medium leading-[1.45]">
                     {c.perk_description || 'Perk included'}{c.perk_value ? ` — worth £${c.perk_value}` : ''}
-                  </span>
+                  </p>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap text-[12px] text-[var(--ink-35)]">
                   {c.target_city && <span className="flex items-center gap-1"><MapPin size={11} />{c.target_city}</span>}
