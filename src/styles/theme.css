@@ -58,3 +58,110 @@
     line-height: 1.65;
   }
 }
+
+/* ── Tab / page transition ── */
+.tab-fade-in {
+  animation: tabFadeIn 0.22s ease-out;
+}
+@keyframes tabFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Slide-in from right (detail pane) ── */
+.slide-in-right {
+  animation: slideInRight 0.25s ease-out;
+}
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(24px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ── Skeleton shimmer ── */
+.skeleton {
+  background: linear-gradient(90deg, var(--ink-10) 25%, rgba(34,34,34,0.04) 50%, var(--ink-10) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--r-sm);
+}
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ── Toast slide-in ── */
+.toast-enter {
+  animation: toastSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes toastSlideIn {
+  from { opacity: 0; transform: translate(-50%, 20px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+/* ── Card press effect ── */
+.card-press {
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+.card-press:active {
+  transform: scale(0.98);
+}
+
+/* ── Checklist tick animation ── */
+.check-pop {
+  animation: checkPop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes checkPop {
+  0%   { transform: scale(0); }
+  70%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* ── Confetti burst (I'm Interested) ── */
+.confetti-burst {
+  position: relative;
+  overflow: visible;
+}
+.confetti-burst::after {
+  content: '🎉';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  font-size: 20px;
+  animation: confettiFade 1s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes confettiFade {
+  0%   { opacity: 1; transform: scale(0.5) translateY(0); }
+  50%  { opacity: 1; transform: scale(1.2) translateY(-12px); }
+  100% { opacity: 0; transform: scale(1) translateY(-24px); }
+}
+
+/* ── Level ring progress ── */
+.level-ring {
+  transform: rotate(-90deg);
+}
+
+/* ── Celebration bounce ── */
+.celebrate-bounce {
+  animation: celebrateBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes celebrateBounce {
+  0%   { transform: scale(0.3); opacity: 0; }
+  60%  { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* ── SVG chart bar entrance ── */
+.chart-bar-enter {
+  animation: chartBarGrow 0.6s ease-out forwards;
+  transform-origin: bottom;
+}
+@keyframes chartBarGrow {
+  from { transform: scaleY(0); }
+  to   { transform: scaleY(1); }
+}
+
+/* ── Hero gradient overlay ── */
+.hero-gradient {
+  background: linear-gradient(to bottom, transparent 40%, var(--shell) 100%);
+}

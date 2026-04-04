@@ -14,7 +14,8 @@ interface Campaign {
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
-  status: string; businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
+  status: string; campaign_image: string | null;
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
 }
 
 interface Application {
@@ -140,6 +141,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
             <ArrowLeft size={16} /> Back
           </button>
+        )}
+
+        {/* Hero image */}
+        {campaign.campaign_image && (
+          <div className="relative w-full aspect-video rounded-[var(--r-card)] overflow-hidden mb-3">
+            <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
+            <div className="hero-gradient absolute inset-0" />
+          </div>
         )}
 
         {/* 1. Header */}
@@ -278,7 +287,8 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
           {application?.status === 'interested' && (
-            <div className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--shell)] text-center text-[var(--ink-60)] font-medium text-[15px] border border-[var(--border)]">
+            <div className="confetti-burst w-full py-3.5 rounded-[var(--r-pill)] bg-[rgba(45,122,79,0.08)] text-center text-[var(--success)] font-semibold text-[15px] border border-[rgba(45,122,79,0.15)]">
+              <Check size={16} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
               Interest registered — we'll be in touch
             </div>
           )}

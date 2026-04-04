@@ -235,7 +235,8 @@ export default function BusinessPortal() {
           <Logo size={22} variant="wordmark" />
         </div>
 
-        <main className="flex-1 p-4 md:p-8 overflow-auto">
+        <main className="flex-1 p-4 md:p-8 overflow-auto" key={activeTab}>
+        <div className="tab-fade-in">
         {/* Summary Tab */}
         {activeTab === 'summary' && campaign && (
           <div>
@@ -531,12 +532,12 @@ export default function BusinessPortal() {
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
                 return withReach.length > 0 ? (
                   <div className="space-y-3">
-                    {withReach.map(p => (
+                    {withReach.map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3">
                         <span className="text-[14px] text-[var(--ink)] w-32 truncate">{p.creators?.display_name || p.creators?.name}</span>
                         <div className="flex-1 h-6 bg-[var(--ink-10)] rounded-[var(--r-sm)] overflow-hidden">
-                          <div className="h-full rounded-[var(--r-sm)] bg-[var(--terra)] flex items-center justify-end pr-2"
-                            style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32 }}>
+                          <div className="h-full rounded-[var(--r-sm)] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
+                            style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
                             <span className="text-[11px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
                           </div>
                         </div>
@@ -550,6 +551,7 @@ export default function BusinessPortal() {
             </div>
           </div>
         )}
+        </div>
       </main>
       </div>
     </div>

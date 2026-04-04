@@ -1,15 +1,37 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import CampaignDetail from './CampaignDetail';
+import LevelBadge from './LevelBadge';
 import {
   Compass, Megaphone, Users, User, MoreHorizontal,
   Search, Clock, Gift, Film, Check, Lock, LogOut,
   ChevronRight, Settings, History, Link2, HelpCircle,
   AtSign, ExternalLink, X, Image, Menu, ArrowLeft,
-  Eye, EyeOff, Mail, MapPin, Save, Info
+  Eye, EyeOff, Mail, MapPin, Save, Info, Star, Award
 } from 'lucide-react';
+
+// ─── Skeleton Loader ───
+function SkeletonCard() {
+  return (
+    <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
+      <div className="skeleton h-36 w-full" />
+      <div className="p-4 space-y-2.5">
+        <div className="skeleton h-3 w-24" />
+        <div className="skeleton h-4 w-full" />
+        <div className="skeleton h-3 w-32" />
+      </div>
+    </div>
+  );
+}
+function SkeletonList({ count = 3 }: { count?: number }) {
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
+    </div>
+  );
+}
 
 // ─── Types ───
 interface CreatorProfile {
@@ -98,11 +120,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [loading, setLoading] = useState(true);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
 
   useEffect(() => { fetchDiscover(); }, []);
 
   const fetchDiscover = async () => {
+    setLoading(true);
     const { data: camps } = await supabase.from('campaigns').select('*, businesses(name, category, bio, instagram_handle)')
       .in('status', ['active', 'live']).order('created_at', { ascending: false });
     if (camps) setCampaigns(camps as Campaign[]);
@@ -117,6 +141,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
     const { count } = await supabase.from('participations').select('id', { count: 'exact', head: true })
       .eq('creator_id', profile.id).in('status', ['confirmed', 'visited', 'content_submitted']);
     setActiveParticipations(count || 0);
+    setLoading(false);
   };
 
   const categories = ['All', 'Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
@@ -172,12 +197,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
       </div>
 
       {/* Campaign cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      {loading && <SkeletonList count={6} />}
+      {!loading && <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(c => {
           const appStatus = applications[c.id];
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
+              className="card-press w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
               {/* Hero image */}
               {c.campaign_image && (
                 <div className="w-full aspect-video bg-[var(--shell)] overflow-hidden">
@@ -219,11 +245,18 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
         })}
         {filtered.length === 0 && (
           <div className="py-12 text-center">
+            <Compass size={40} className="text-[var(--ink-10)] mx-auto mb-3" />
             <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">Nothing here yet</p>
             <p className="text-[14px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
-      </div>
+        {filtered.length > 0 && (
+          <div className="col-span-full py-8 text-center">
+            <Check size={20} className="text-[var(--ink-10)] mx-auto mb-2" />
+            <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon for new campaigns</p>
+          </div>
+        )}
+      </div>}
 
       {/* Brand info modal */}
       {brandModal && <BrandInfoModal brand={brandModal} onClose={() => setBrandModal(null)} />}
@@ -308,7 +341,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <div className="space-y-2 mb-3">
                   {todos.map((t, i) => (
                     <div key={i} className="flex items-center gap-2.5">
-                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${t.done ? 'bg-[var(--terra)]' : 'border-2 border-[var(--ink-10)]'}`}>
+                      <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 ${t.done ? 'bg-[var(--terra)] check-pop' : 'border-2 border-[var(--ink-10)]'}`}>
                         {t.done && <Check size={12} className="text-white" />}
                       </div>
                       <span className={`text-[14px] ${t.done ? 'text-[var(--ink-35)] line-through' : 'text-[var(--ink)] font-medium'}`}>{t.label}</span>
@@ -338,6 +371,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.length === 0 && (
             <div className="py-12 text-center">
+              <Megaphone size={40} className="text-[var(--ink-10)] mx-auto mb-3" />
               <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No active campaigns yet</p>
               <p className="text-[14px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>
@@ -406,13 +440,17 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
       <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
         <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-[var(--ink-10)] flex items-center justify-center mx-auto mb-4">
+          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[var(--ink-10)]">
             <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
-          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Complete your first campaign to unlock</p>
-          <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto">
-            The Naybahood is our community of active local creators. Complete a campaign to gain access to exclusive events, brand connections, and the creator WhatsApp community.
+          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Almost there...</p>
+          <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-4">
+            Complete your first campaign to unlock The Naybahood — our community of active local creators with exclusive events, brand connections, and the creator WhatsApp group.
           </p>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[var(--r-pill)] bg-[var(--terra-light)]">
+            <Megaphone size={14} className="text-[var(--terra)]" />
+            <span className="text-[13px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
+          </div>
         </div>
       </div>
     );
@@ -422,8 +460,8 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
-        <div className="w-16 h-16 rounded-full bg-[rgba(45,122,79,0.1)] flex items-center justify-center mx-auto mb-4">
-          <Users size={28} className="text-[var(--success)]" />
+        <div className="celebrate-bounce w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4" style={{ boxShadow: '0 4px 20px rgba(45,122,79,0.3)' }}>
+          <Star size={32} className="text-white" />
         </div>
         <p className="text-[20px] font-bold text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
@@ -444,25 +482,52 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 // ─── Profile Tab ───
 function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
+  const completionPct = profile.completion_rate;
+  // SVG ring progress
+  const ringR = 38;
+  const ringC = 2 * Math.PI * ringR;
+  const ringOffset = ringC - (completionPct / 100) * ringC;
 
   return (
     <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
+      {/* Gradient hero header */}
+      <div className="relative bg-gradient-to-br from-[var(--terra)] to-[#A8573E] rounded-[var(--r-card)] p-6 pb-8 mb-[-28px]">
+        <h1 className="text-[24px] font-bold text-white mb-0" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
+      </div>
 
-      {/* Avatar + name */}
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-          <span className="text-[24px] font-bold text-white">{initial}</span>
-        </div>
-        <div>
-          <p className="text-[20px] font-bold text-[var(--ink)]">{profile.display_name || profile.name}</p>
-          <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-            className="text-[14px] text-[var(--terra)] font-medium hover:underline">{profile.instagram_handle}</a>
+      {/* Avatar card overlapping hero */}
+      <div className="relative bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 mx-2">
+        <div className="flex items-center gap-4">
+          {/* Avatar with ring progress */}
+          <div className="relative flex-shrink-0">
+            <svg width="88" height="88" viewBox="0 0 88 88" className="level-ring">
+              <circle cx="44" cy="44" r={ringR} fill="none" stroke="var(--ink-10)" strokeWidth="4" />
+              <circle cx="44" cy="44" r={ringR} fill="none" stroke="var(--terra)" strokeWidth="4"
+                strokeDasharray={ringC} strokeDashoffset={ringOffset} strokeLinecap="round"
+                style={{ transition: 'stroke-dashoffset 0.8s ease-out' }} />
+            </svg>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center">
+                <span className="text-[24px] font-bold text-white">{initial}</span>
+              </div>
+            </div>
+          </div>
+          <div className="min-w-0">
+            <p className="text-[20px] font-bold text-[var(--ink)]">{profile.display_name || profile.name}</p>
+            <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+              className="text-[14px] text-[var(--terra)] font-medium hover:underline">{profile.instagram_handle}</a>
+            <div className="flex items-center gap-2 mt-1.5">
+              <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
+              {profile.address && (
+                <span className="text-[12px] text-[var(--ink-35)] flex items-center gap-1"><MapPin size={11} />{profile.address}</span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Completion rate */}
-      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 mb-3">
+      <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 mt-3 mb-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
         <div className="flex items-center gap-3">
           <p className="text-[28px] font-bold text-[var(--ink)]">{profile.completion_rate}%</p>
@@ -470,7 +535,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         </div>
         {profile.total_campaigns > 0 && (
           <div className="h-2 bg-[var(--ink-10)] rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${profile.completion_rate}%` }} />
+            <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
           </div>
         )}
       </div>
@@ -478,14 +543,17 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <Megaphone size={18} className="text-[var(--terra)] mx-auto mb-1" />
           <p className="text-[22px] font-bold text-[var(--ink)]">{profile.total_campaigns}</p>
           <p className="text-[12px] text-[var(--ink-35)] font-medium">Campaigns</p>
         </div>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <Film size={18} className="text-[var(--terra)] mx-auto mb-1" />
           <p className="text-[22px] font-bold text-[var(--ink)]">{profile.total_reels}</p>
           <p className="text-[12px] text-[var(--ink-35)] font-medium">Reels</p>
         </div>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
+          <Award size={18} className="text-[var(--terra)] mx-auto mb-1" />
           <p className="text-[22px] font-bold text-[var(--ink)]">L{profile.level}</p>
           <p className="text-[12px] text-[var(--ink-35)] font-medium">{profile.level_name}</p>
         </div>
@@ -977,18 +1045,20 @@ export default function CreatorApp() {
       <div className="lg:ml-[220px] min-h-screen flex">
         {/* Left: main feed */}
         <div className={`flex-1 min-w-0 ${viewingCampaign && !isMobile ? 'max-w-[55%]' : ''} transition-all duration-200`}>
-          <div className="p-4 lg:p-5">
-            {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
-            {tab === 'campaigns' && <CampaignsTab profile={profile} />}
-            {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
-            {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
-            {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} />}
+          <div className="p-4 lg:p-5" key={tab}>
+            <div className="tab-fade-in">
+              {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+              {tab === 'campaigns' && <CampaignsTab profile={profile} />}
+              {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
+              {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
+              {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} />}
+            </div>
           </div>
         </div>
 
         {/* Right: campaign detail pane (desktop only) */}
         {viewingCampaign && !isMobile && (
-          <div className="hidden lg:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0">
+          <div className="hidden lg:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0 slide-in-right">
             <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
           </div>
         )}
@@ -1004,7 +1074,7 @@ export default function CreatorApp() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-medium"
+        <div className="toast-enter fixed bottom-6 left-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[var(--terra)] text-white text-[14px] font-medium"
           style={{ boxShadow: '0 4px 20px rgba(196,103,74,0.3)' }}>
           {toast}
         </div>
