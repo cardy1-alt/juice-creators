@@ -68,7 +68,8 @@ export default function AdminNotificationsTab() {
       email_type: 'campaign_notification', campaign_id: selectedCampaign.id,
       email_meta: { campaign_id: selectedCampaign.id, campaign_title: selectedCampaign.title, brand_name: selectedCampaign.businesses?.name || '' },
     }));
-    await supabase.from('notifications').insert(notifications);
+    const { error } = await supabase.from('notifications').insert(notifications);
+    if (error) { setToast('Failed to send notifications — try again'); setSending(false); return; }
     setToast(`Sent to ${creators.length} creator${creators.length !== 1 ? 's' : ''}`);
     setTimeout(() => setToast(null), 4000);
     setSending(false);
@@ -98,6 +99,7 @@ export default function AdminNotificationsTab() {
           <div className="flex items-end">
             {selectedCampaignId && (
               <button onClick={handleSend} disabled={sending}
+                disabled={sending || recipientCount === 0}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
                 style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
                 <Send size={14} /> {sending ? 'Sending...' : `Send to ${recipientCount} creators`}

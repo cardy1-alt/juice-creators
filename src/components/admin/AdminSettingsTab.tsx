@@ -46,7 +46,7 @@ export default function AdminSettingsTab() {
     const { error } = await supabase.auth.updateUser({ password: newPassword });
     setSaving(false);
     if (error) {
-      setPasswordMessage({ type: 'error', text: error.message.includes('same') ? 'New password must be different from current password' : friendlyError(error.message) });
+      setPasswordMessage({ type: 'error', text: friendlyError(error.message) });
     } else {
       setPasswordMessage({ type: 'success', text: 'Password updated successfully' });
       setCurrentPassword(''); setNewPassword(''); setConfirmPassword('');

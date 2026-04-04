@@ -64,7 +64,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
       .then(({ count }) => setPendingCount(count || 0));
-  }, [activeTab]);
+  }, []);
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);

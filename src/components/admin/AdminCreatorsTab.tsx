@@ -1,53 +1,79 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
-import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle } from 'lucide-react';
+import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
-  email: string; code: string; approved: boolean; level: number; level_name: string;
+  email: string; approved: boolean; level: number; level_name: string;
   completion_rate: number; total_campaigns: number; completed_campaigns: number;
   instagram_connected: boolean; address: string | null; created_at: string;
   follower_count: string | null;
 }
 
-const BORDER = '#E6E2DB';
+const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
+
 const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[13.5px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(34,34,34,0.35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[rgba(34,34,34,0.60)] mb-1.5";
 const thCls = "text-left text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] py-3 px-4 bg-[#F7F7F5]";
 const tdCls = "py-0 px-4 text-[14px] text-[#222] border-b border-[#E6E2DB]";
+
+function normalizeInstagram(raw: string): string {
+  if (!raw) return '';
+  return raw.replace(/^@/, '').replace(/^https?:\/\/(www\.)?instagram\.com\//, '').replace(/\/$/, '');
+}
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // ─── Create Creator Modal ───
-function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => void; onCreated: () => void; showToast: (msg: string) => void }) {
   const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1' });
   const [creating, setCreating] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.displayName || !form.email) return;
+    setError('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) { setError('Please enter a valid email address'); return; }
+
     setCreating(true);
-    const tempPassword = 'nayba-' + Math.random().toString(36).slice(2, 10);
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
+    const tempPassword = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+
     const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: tempPassword });
-    if (authError || !authData.user) { setCreating(false); return; }
-    const code = form.displayName.replace(/\s+/g, '').toUpperCase().slice(0, 6) + Math.floor(Math.random() * 100);
-    await supabase.from('creators').insert({
+    if (authError) {
+      setError(authError.message === 'User already registered' ? 'This email is already registered' : authError.message);
+      setCreating(false);
+      return;
+    }
+    if (!authData.user) { setError('Failed to create account — try again'); setCreating(false); return; }
+
+    const level = parseInt(form.level) || 1;
+    const handle = normalizeInstagram(form.instagram);
+
+    const { error: insertErr } = await supabase.from('creators').insert({
       id: authData.user.id, name: form.displayName, display_name: form.displayName,
-      email: form.email, instagram_handle: form.instagram || '@' + form.displayName.toLowerCase().replace(/\s+/g, ''),
-      code, address: form.city || null, level: parseInt(form.level) || 1,
-      level_name: parseInt(form.level) === 1 ? 'Newcomer' : parseInt(form.level) === 3 ? 'Regular' : 'Trusted',
+      email: form.email, instagram_handle: handle || '',
+      address: form.city || null, level,
+      level_name: LEVEL_NAMES[level] || 'Newcomer',
       approved: true, onboarding_complete: true, profile_complete: true,
     });
-    await supabase.from('notifications').insert({
+    if (insertErr) { setError('Account created but profile save failed — contact support'); setCreating(false); return; }
+
+    const { error: notifErr } = await supabase.from('notifications').insert({
       user_id: authData.user.id, user_type: 'creator',
-      message: `Welcome to nayba! Your temporary password is: ${tempPassword}`,
-      email_type: 'creator_welcome', email_meta: { temp_password: tempPassword },
+      message: 'Welcome to nayba! Your account has been created. Check your email for login details.',
+      email_type: 'creator_welcome', email_meta: {},
     });
+    if (notifErr) showToast('Account created but welcome notification failed');
+
     setCreatedPassword(tempPassword);
     setCreating(false);
     onCreated();
@@ -68,9 +94,9 @@ function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCre
                 <Check size={22} className="text-[#2D7A4F]" />
               </div>
               <p className="text-[16px] font-bold text-[#222] mb-2">Account created</p>
-              <p className="text-[14px] text-[rgba(34,34,34,0.60)] mb-3">A welcome email has been sent. Temporary password:</p>
+              <p className="text-[14px] text-[rgba(34,34,34,0.60)] mb-3">Share this temporary password with the creator:</p>
               <div className="inline-flex items-center gap-2 bg-[#F7F7F5] border border-[#E6E2DB] rounded-[8px] px-4 py-2.5">
-                <code className="text-[15px] font-mono text-[#C4674A]">{showPassword ? createdPassword : '••••••••••'}</code>
+                <code className="text-[15px] font-mono text-[#C4674A]">{showPassword ? createdPassword : '••••••••••••'}</code>
                 <button onClick={() => setShowPassword(!showPassword)} className="text-[rgba(34,34,34,0.35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
@@ -82,11 +108,17 @@ function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCre
           ) : (
             <>
               <p className="text-[12px] text-[rgba(34,34,34,0.60)] mb-5 leading-[1.6]">
-                A Supabase auth account will be created automatically. Login credentials will be emailed to the creator.
+                A Supabase auth account will be created automatically. Share the temporary password with the creator directly.
               </p>
+              {error && (
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+                  <AlertCircle size={14} />
+                  <span className="text-[13px] font-medium">{error}</span>
+                </div>
+              )}
               <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => setForm(p => ({ ...p, displayName: e.target.value }))} className={inputCls} required /></div>
-                <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className={inputCls} required /></div>
+                <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => { setForm(p => ({ ...p, displayName: e.target.value })); setError(''); }} className={inputCls} required /></div>
+                <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
                 <div><label className={labelCls}>City</label><input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
                 <div className="md:col-span-2">
@@ -106,7 +138,7 @@ function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCre
             <button onClick={handleCreate as any} disabled={creating}
               className="px-5 py-2.5 rounded-[999px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40"
               style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
-              {creating ? 'Creating...' : 'Create Account & Send Email'}
+              {creating ? 'Creating...' : 'Create Account'}
             </button>
           </div>
         )}
@@ -119,6 +151,9 @@ function CreateCreatorModal({ onClose, onCreated }: { onClose: () => void; onCre
 export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [toast, setToast] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   useEffect(() => { fetchCreators(); }, []);
 
@@ -128,11 +163,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
-    await supabase.from('creators').update({ approved }).eq('id', id);
+    const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
+    if (error) { showToast('Update failed — try again'); return; }
     if (approved) sendCreatorApprovedEmail(id).catch(() => {});
     else sendCreatorDeniedEmail(id).catch(() => {});
-    setToast(`Creator ${approved ? 'approved' : 'denied'}`);
-    setTimeout(() => setToast(null), 3000);
+    showToast(`Creator ${approved ? 'approved' : 'denied'}`);
     fetchCreators();
   };
 
@@ -140,6 +175,14 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   const approvedCreators = creators.filter(c => c.approved);
   const [showApprovalPane, setShowApprovalPane] = useState(false);
   const [selectedPending, setSelectedPending] = useState<Set<string>>(new Set());
+
+  const filteredCreators = approvedCreators.filter(c => {
+    if (!search) return true;
+    const q = search.toLowerCase();
+    return (c.display_name || '').toLowerCase().includes(q) || c.name.toLowerCase().includes(q) ||
+      c.email.toLowerCase().includes(q) || (c.instagram_handle || '').toLowerCase().includes(q) ||
+      (c.address || '').toLowerCase().includes(q);
+  });
 
   const toggleSelectPending = (id: string) => {
     setSelectedPending(prev => {
@@ -164,14 +207,12 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
   return (
     <div>
-      {/* Toast */}
       {toast && (
         <div className="fixed top-4 right-4 z-50 bg-[#222] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium" style={{ boxShadow: '0 4px 20px rgba(34,34,34,0.15)' }}>
           {toast}
         </div>
       )}
 
-      {/* Pending approvals banner — opens pane */}
       {pendingCreators.length > 0 && !showApprovalPane && (
         <button onClick={() => setShowApprovalPane(true)}
           className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] border border-[rgba(196,103,74,0.2)] hover:border-[#C4674A] transition-colors text-left" style={{ background: 'rgba(196,103,74,0.04)' }}>
@@ -184,10 +225,8 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </button>
       )}
 
-      {/* Approval pane — scrollable list with bulk actions */}
       {showApprovalPane && pendingCreators.length > 0 && (
         <div className="bg-white border border-[#E6E2DB] rounded-[12px] mb-5 overflow-hidden">
-          {/* Pane header */}
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E6E2DB] bg-[#F7F7F5]">
             <div className="flex items-center gap-3">
               <h3 className="text-[14px] font-bold text-[#222]">Pending Approvals</h3>
@@ -216,25 +255,19 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               </button>
             </div>
           </div>
-          {/* Scrollable creator list */}
           <div className="max-h-[400px] overflow-y-auto divide-y divide-[#E6E2DB]">
             {pendingCreators.map(c => {
               const handle = c.instagram_handle?.replace('@', '') || '';
               const selected = selectedPending.has(c.id);
               return (
                 <div key={c.id} className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[#FAFAF8]'}`}>
-                  {/* Checkbox */}
                   <button onClick={() => toggleSelectPending(c.id)}
                     className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#C4674A] border-[#C4674A]' : 'border-[rgba(34,34,34,0.20)] hover:border-[#C4674A]'}`}>
                     {selected && <Check size={12} className="text-white" />}
                   </button>
-
-                  {/* Avatar */}
                   <div className="w-9 h-9 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
                     <span className="text-[13px] font-bold text-white">{(c.display_name || c.name || '?')[0].toUpperCase()}</span>
                   </div>
-
-                  {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-[14px] font-semibold text-[#222]">{c.display_name || c.name}</p>
@@ -251,17 +284,13 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                       <span className="text-[12px] text-[rgba(34,34,34,0.35)]">Joined {fmtDate(c.created_at)}</span>
                     </div>
                   </div>
-
-                  {/* Individual actions */}
                   <div className="flex items-center gap-2 flex-shrink-0">
                     <button onClick={() => handleApprove(c.id, true)}
-                      className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors"
-                      title="Approve">
+                      className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
                       <Check size={15} />
                     </button>
                     <button onClick={() => handleApprove(c.id, false)}
-                      className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors"
-                      title="Deny">
+                      className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors" title="Deny">
                       <X size={15} />
                     </button>
                   </div>
@@ -272,16 +301,24 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </div>
       )}
 
+      {/* Search bar */}
+      <div className="relative mb-4">
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)]" />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search creators by name, email, Instagram, or city..."
+          className="w-full pl-9 pr-4 py-2.5 rounded-[8px] bg-white border border-[#E6E2DB] text-[14px] text-[#222] focus:outline-none focus:border-[#C4674A]" />
+      </div>
+
       {/* Creators table */}
       <div className="bg-white border border-[#E6E2DB] rounded-[12px] overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>City</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
-            <th className={thCls}>Instagram</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
+            <th className={thCls}>IG Status</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
           </tr></thead>
           <tbody>
-            {approvedCreators.map(c => (
+            {filteredCreators.map(c => (
               <tr key={c.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 52 }}>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
@@ -325,15 +362,14 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>{fmtDate(c.created_at)}</td>
               </tr>
             ))}
-            {approvedCreators.length === 0 && (
-              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[rgba(34,34,34,0.35)]">No approved creators yet</td></tr>
+            {filteredCreators.length === 0 && (
+              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[rgba(34,34,34,0.35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
             )}
           </tbody>
         </table>
       </div>
 
-      {/* Modal */}
-      {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} />}
+      {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} showToast={showToast} />}
     </div>
   );
 }
