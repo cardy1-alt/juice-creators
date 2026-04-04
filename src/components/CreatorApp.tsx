@@ -221,11 +221,14 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
                 </div>
                 <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
                 {/* Perk pill */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2">
-                  <Gift size={13} className="text-[var(--terra)]" />
-                  <span className="text-[13px] font-medium text-[var(--terra)]">
-                    {c.perk_description?.split('—')[0]?.split(',')[0]?.trim().slice(0, 40) || 'Perk included'}
-                    {c.perk_value ? ` — worth £${c.perk_value}` : ''}
+                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2" style={{ maxWidth: '100%' }}>
+                  <Gift size={13} className="text-[var(--terra)] flex-shrink-0" />
+                  <span className="text-[13px] font-medium text-[var(--terra)]" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: '220px' }}>
+                    {(() => {
+                      const raw = c.perk_description?.split('—')[0]?.split(',')[0]?.trim() || 'Perk included';
+                      const suffix = c.perk_value ? ` — worth £${c.perk_value}` : '';
+                      return raw + suffix;
+                    })()}
                   </span>
                 </div>
                 <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
@@ -594,7 +597,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
             <div className="flex items-center gap-2 mt-1.5">
               <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
               {profile.address && (
-                <span className="text-[12px] text-[var(--ink-35)] flex items-center gap-1"><MapPin size={11} />{profile.address}</span>
+                <span className="text-[12px] text-[var(--ink-35)] flex items-center gap-1"><MapPin size={11} />{profile.address.split(',')[0].trim()}</span>
               )}
             </div>
           </div>
@@ -1032,6 +1035,7 @@ export default function CreatorApp() {
   const handleNav = (t: Tab) => {
     setTab(t);
     setSidebarOpen(false);
+    if (t !== 'discover') setViewingCampaign(null);
   };
 
   if (loading || !profile) {
@@ -1058,9 +1062,9 @@ export default function CreatorApp() {
     );
   }
 
-  // On mobile (< lg), campaign detail is a full-page overlay
-  // On desktop (>= lg), campaign detail slides in as a right pane
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+  // On mobile (< md), campaign detail is a full-page overlay
+  // On desktop (>= md), campaign detail slides in as a right pane
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   if (viewingCampaign && isMobile) {
     return <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />;
@@ -1072,20 +1076,20 @@ export default function CreatorApp() {
     <div className="min-h-screen bg-[#F7F7F5]">
       {/* Mobile/tablet overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(28,28,26,0.4)] z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(28,28,26,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ─── Sidebar ─── */}
       <aside className={`
         w-[220px] bg-white border-r border-[#E6E2DB] flex flex-col flex-shrink-0
         fixed inset-y-0 left-0 z-50 transition-transform duration-200
-        lg:translate-x-0
+        md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Wordmark */}
         <div className="px-5 pt-6 pb-5 border-b border-[#E6E2DB] flex items-center justify-between">
           <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
-          <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
             <X size={20} />
           </button>
         </div>
@@ -1133,7 +1137,7 @@ export default function CreatorApp() {
       {!sidebarOpen && (
         <button
           onClick={() => setSidebarOpen(true)}
-          className="fixed top-3 left-3 z-50 w-[44px] h-[44px] flex items-center justify-center rounded-[8px] lg:hidden"
+          className="fixed top-3 left-3 z-50 w-[44px] h-[44px] flex items-center justify-center rounded-[8px] md:hidden"
           style={{ background: 'rgba(255,255,255,0.9)', boxShadow: '0 1px 4px rgba(34,34,34,0.08)' }}
         >
           <Menu size={22} className="text-[#222]" />
@@ -1141,9 +1145,9 @@ export default function CreatorApp() {
       )}
 
       {/* ─── Main content ─── */}
-      <div className="lg:ml-[220px] min-h-screen flex">
+      <div className="md:ml-[220px] min-h-screen flex">
         {/* Left: main feed */}
-        <div className={`flex-1 min-w-0 ${viewingCampaign && !isMobile ? 'max-w-[55%]' : ''} transition-all duration-200`}>
+        <div className={`flex-1 min-w-0 ${viewingCampaign && !isMobile && tab === 'discover' ? 'max-w-[55%]' : ''} transition-all duration-200`}>
           <div className="p-4 lg:p-5" key={tab}>
             <div className="tab-fade-in">
               {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
@@ -1155,9 +1159,9 @@ export default function CreatorApp() {
           </div>
         </div>
 
-        {/* Right: campaign detail pane (desktop only) */}
-        {viewingCampaign && !isMobile && (
-          <div className="hidden lg:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0 slide-in-right">
+        {/* Right: campaign detail pane (desktop only, discover tab only) */}
+        {viewingCampaign && !isMobile && tab === 'discover' && (
+          <div className="hidden md:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0 slide-in-right">
             <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
           </div>
         )}
