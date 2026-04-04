@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
+import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, ChevronDown, ChevronRight, Eye } from 'lucide-react';
 
 // ─── Types ───
@@ -11,7 +12,7 @@ interface Campaign {
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   creator_target: number; open_date: string | null; expression_deadline: string | null;
   content_deadline: string | null; campaign_type: 'brand' | 'community'; campaign_image: string | null;
-  status: string; min_level: number; created_at: string;
+  status: string; min_level: number; required_tags: string[] | null; created_at: string;
   businesses?: { name: string };
 }
 interface Application {
@@ -90,6 +91,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     campaign_type: campaign?.campaign_type || 'brand',
     campaign_image: campaign?.campaign_image || '',
     content_requirements: campaign?.content_requirements || '',
+    required_tags: campaign?.required_tags?.join(', ') || '',
     tp1: campaign?.talking_points?.[0] || '', tp2: campaign?.talking_points?.[1] || '', tp3: campaign?.talking_points?.[2] || '',
     insp: campaign?.inspiration || [{ title: '', description: '' }, { title: '', description: '' }],
     reel: campaign?.deliverables?.reel !== false, story: campaign?.deliverables?.story === true,
@@ -146,6 +148,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       target_city: form.target_city || null, target_county: form.target_county || null,
       creator_target: parseInt(form.creator_target) || 10, min_level: 1,
       content_requirements: form.content_requirements || null,
+      required_tags: form.required_tags ? form.required_tags.split(',').map((t: string) => t.trim()).filter(Boolean) : null,
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
       deliverables: { reel: form.reel, story: form.story },
@@ -220,6 +223,12 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
                     <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>Required Tags / Hashtags</label>
+                      <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
+                        className={inputCls} placeholder="#brandname, @brand, #campaign" />
+                      <p className="text-[11px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
+                    </div>
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[var(--border)]">
                       <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
                     </div>
@@ -391,10 +400,29 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
       const newCompleted = (creator.completed_campaigns || 0) + 1;
       const total = creator.total_campaigns || 1;
       const rate = Math.round((newCompleted / total) * 100);
+      // Auto-promote level
+      let newLevel = 1, newLevelName = 'Newcomer';
+      if (newCompleted >= 21 && rate >= 95) { newLevel = 6; newLevelName = 'Nayba ✦'; }
+      else if (newCompleted >= 11) { newLevel = 5; newLevelName = 'Trusted'; }
+      else if (newCompleted >= 6) { newLevel = 4; newLevelName = 'Local'; }
+      else if (newCompleted >= 3) { newLevel = 3; newLevelName = 'Regular'; }
+      else if (newCompleted >= 1) { newLevel = 2; newLevelName = 'Explorer'; }
       await supabase.from('creators').update({
         completed_campaigns: newCompleted,
         completion_rate: rate,
+        level: newLevel,
+        level_name: newLevelName,
       }).eq('id', part.creator_id);
+      // Send completion email
+      const { data: campInfo } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', part.campaign_id).single();
+      if (campInfo) {
+        sendCreatorCampaignCompleteEmail(part.creator_id, {
+          campaign_title: campInfo.title,
+          brand_name: (campInfo as any).businesses?.name || '',
+          total_campaigns: total,
+          completion_rate: rate,
+        });
+      }
     }
 
     showToast('Participation marked complete');
@@ -546,6 +574,26 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
   const [aiLoading, setAiLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<{ creator_id: string; name: string; reason: string; score: number }[] | null>(null);
   const [aiError, setAiError] = useState('');
+  const [showAddApplicant, setShowAddApplicant] = useState(false);
+  const [allCreators, setAllCreators] = useState<{id:string;name:string;display_name:string|null;instagram_handle:string}[]>([]);
+  const [addingCreator, setAddingCreator] = useState<string | null>(null);
+
+  const fetchCreatorsForAdd = async () => {
+    const { data } = await supabase.from('creators').select('id, name, display_name, instagram_handle').eq('approved', true).order('name');
+    if (data) setAllCreators(data);
+    setShowAddApplicant(true);
+  };
+
+  const handleAddApplicant = async (creatorId: string) => {
+    setAddingCreator(creatorId);
+    await supabase.from('applications').insert({
+      campaign_id: campaign.id,
+      creator_id: creatorId,
+      status: 'interested',
+    });
+    setAddingCreator(null);
+    setShowAddApplicant(false);
+  };
 
   const handleAiRecommend = async () => {
     setAiLoading(true); setAiError(''); setRecommendations(null);
@@ -579,6 +627,15 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
   const handleSelectCreator = async (creatorId: string) => {
     await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() })
       .eq('campaign_id', campaign.id).eq('creator_id', creatorId);
+    // Fetch campaign + brand info for email
+    const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).single();
+    if (campData) {
+      sendCreatorSelectedEmail(creatorId, {
+        campaign_title: campData.title,
+        brand_name: (campData as any).businesses?.name || '',
+        campaign_id: campaign.id,
+      });
+    }
     setRecommendations(prev => prev ? prev.filter(r => r.creator_id !== creatorId) : null);
   };
 
@@ -618,6 +675,9 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
             </button>
             <button onClick={onViewParticipation} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">View Participation</button>
             <button onClick={onEdit} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">Edit Campaign</button>
+            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+              <span className="flex items-center gap-1"><UserPlus size={14} /> Add Applicant</span>
+            </button>
           </div>
           {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
 
@@ -642,6 +702,28 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
                         Select
                       </button>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          {showAddApplicant && (
+            <div className="mt-4 pt-4 border-t border-[var(--border)]">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[12px] font-bold uppercase tracking-[0.6px] text-[var(--ink-35)]">Add Creator as Applicant</p>
+                <button onClick={() => setShowAddApplicant(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={16} /></button>
+              </div>
+              <div className="max-h-[200px] overflow-y-auto space-y-1">
+                {allCreators.map(cr => (
+                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[var(--r-sm)] hover:bg-[var(--shell)]">
+                    <div>
+                      <span className="text-[14px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
+                      <span className="text-[12px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
+                    </div>
+                    <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
+                      className="px-3 py-1 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[11px] font-semibold disabled:opacity-40">
+                      {addingCreator === cr.id ? 'Adding...' : 'Add'}
+                    </button>
                   </div>
                 ))}
               </div>

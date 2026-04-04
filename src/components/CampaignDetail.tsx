@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { sendCreatorConfirmedEmail } from '../lib/notifications';
 import { ArrowLeft, Calendar, Gift, Film, Image, MessageCircle, Clock, Check, X, AtSign, ExternalLink } from 'lucide-react';
 
 interface CampaignDetailProps {
@@ -13,6 +14,7 @@ interface Campaign {
   about_brand: string | null; perk_description: string | null; perk_value: number | null;
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
+  required_tags: string[] | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
   status: string; campaign_image: string | null;
   businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
@@ -107,6 +109,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       campaign_id: campaign.id,
       creator_id: creatorId,
     });
+    // Send confirmation email
+    if (campaign.businesses?.name) {
+      sendCreatorConfirmedEmail(creatorId, {
+        campaign_title: campaign.title,
+        brand_name: campaign.businesses.name,
+        perk_description: campaign.perk_description || '',
+      });
+    }
     setSubmitting(false);
     fetchCampaign();
   };
@@ -213,6 +223,18 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           </div>
           {campaign.content_requirements && (
             <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
+          )}
+          {campaign.required_tags && campaign.required_tags.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-[var(--ink-10)]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-2">Required Tags</p>
+              <div className="flex flex-wrap gap-2">
+                {campaign.required_tags.map((tag, i) => (
+                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-[var(--r-sm)] bg-[var(--shell)] text-[13px] font-medium text-[var(--ink)]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 

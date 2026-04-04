@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { sendAdminContentSubmittedEmail } from '../lib/notifications';
 import { Logo } from './Logo';
 import CampaignDetail from './CampaignDetail';
 import LevelBadge from './LevelBadge';
@@ -45,7 +46,7 @@ interface Campaign {
   id: string; title: string; headline: string | null; perk_description: string | null;
   perk_value: number | null; target_city: string | null; expression_deadline: string | null;
   status: string; campaign_type: 'brand' | 'community'; campaign_image: string | null;
-  about_brand: string | null;
+  about_brand: string | null; min_level: number;
   businesses?: { name: string; category: string; bio: string | null; instagram_handle: string | null };
 }
 interface Application {
@@ -129,7 +130,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
     setLoading(true);
     const { data: camps } = await supabase.from('campaigns').select('*, businesses(name, category, bio, instagram_handle)')
       .in('status', ['active', 'live']).order('created_at', { ascending: false });
-    if (camps) setCampaigns(camps as Campaign[]);
+    if (camps) setCampaigns((camps as Campaign[]).filter(c => !c.min_level || c.min_level <= profile.level));
 
     const { data: apps } = await supabase.from('applications').select('campaign_id, status').eq('creator_id', profile.id);
     if (apps) {
@@ -271,6 +272,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   const [pastApps, setPastApps] = useState<Application[]>([]);
   const [showReelModal, setShowReelModal] = useState<string | null>(null);
   const [reelUrl, setReelUrl] = useState('');
+  const [reelUrlError, setReelUrlError] = useState('');
   const [submittingReel, setSubmittingReel] = useState(false);
 
   useEffect(() => { fetchCampaigns(); }, []);
@@ -290,13 +292,33 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   const handleSubmitReel = async () => {
     if (!showReelModal || !reelUrl) return;
     setSubmittingReel(true);
+    setReelUrlError('');
+    // Validate Instagram URL
+    const isValidReelUrl = /^https?:\/\/(www\.)?(instagram\.com|instagr\.am)\/(reel|p)\//.test(reelUrl);
+    if (!isValidReelUrl) {
+      setReelUrlError('Please enter a valid Instagram Reel or post URL');
+      setSubmittingReel(false);
+      return;
+    }
     await supabase.from('participations').update({
       reel_url: reelUrl,
       reel_submitted_at: new Date().toISOString(),
       status: 'content_submitted',
     }).eq('id', showReelModal);
+    // Notify admin of content submission
+    const { data: partData } = await supabase.from('participations')
+      .select('campaigns(title, businesses(name))').eq('id', showReelModal).single();
+    if (partData) {
+      sendAdminContentSubmittedEmail({
+        creator_name: profile.display_name || profile.name,
+        campaign_title: (partData as any).campaigns?.title || '',
+        brand_name: (partData as any).campaigns?.businesses?.name || '',
+        reel_url: reelUrl,
+      });
+    }
     setShowReelModal(null);
     setReelUrl('');
+    setReelUrlError('');
     setSubmittingReel(false);
     fetchCampaigns();
   };
@@ -416,9 +438,11 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
             </div>
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
-            <input value={reelUrl} onChange={e => setReelUrl(e.target.value)}
+            <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
-              className="w-full px-4 py-3 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[15px] focus:outline-none focus:border-[var(--terra)] mb-4" />
+              className={`w-full px-4 py-3 rounded-[var(--r-input)] border ${reelUrlError ? 'border-[var(--terra)]' : 'border-[var(--ink-10)]'} bg-white text-[15px] focus:outline-none focus:border-[var(--terra)] mb-1`} />
+            {reelUrlError && <p className="text-[13px] text-[var(--terra)] mb-3">{reelUrlError}</p>}
+            {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
               className="w-full py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] disabled:opacity-50"
               style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
@@ -434,6 +458,15 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 // ─── Naybahood Tab ───
 function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const unlocked = profile.completed_campaigns >= 1;
+  const [showCelebration, setShowCelebration] = useState(() => {
+    const key = `nayba_naybahood_celebrated_${profile.id}`;
+    return !localStorage.getItem(key);
+  });
+
+  const dismissCelebration = () => {
+    setShowCelebration(false);
+    localStorage.setItem(`nayba_naybahood_celebrated_${profile.id}`, 'true');
+  };
 
   if (!unlocked) {
     return (
@@ -456,11 +489,53 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     );
   }
 
+  if (unlocked && showCelebration) {
+    return (
+      <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
+        <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
+        {/* Celebration overlay */}
+        <div className="fixed inset-0 bg-[rgba(34,34,34,0.5)] z-[60] flex items-center justify-center px-4">
+          <div className="bg-[var(--card)] rounded-[16px] max-w-[400px] w-full p-8 text-center relative overflow-hidden" style={{ boxShadow: '0 20px 60px rgba(28,28,26,0.15)' }}>
+            {/* Confetti-like decorative dots */}
+            <div className="absolute inset-0 pointer-events-none overflow-hidden">
+              {[...Array(20)].map((_, i) => (
+                <div key={i} className="absolute rounded-full animate-ping" style={{
+                  width: `${6 + (i % 4) * 3}px`,
+                  height: `${6 + (i % 4) * 3}px`,
+                  backgroundColor: ['var(--terra)', 'var(--success)', '#3B82F6', '#F59E0B', '#8B5CF6'][i % 5],
+                  opacity: 0.4,
+                  left: `${5 + (i * 17) % 90}%`,
+                  top: `${5 + (i * 23) % 85}%`,
+                  animationDuration: `${1.5 + (i % 3) * 0.5}s`,
+                  animationDelay: `${(i % 5) * 0.2}s`,
+                }} />
+              ))}
+            </div>
+            <div className="relative z-10">
+              <div className="celebrate-bounce w-24 h-24 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-5" style={{ boxShadow: '0 4px 24px rgba(45,122,79,0.35)' }}>
+                <Star size={40} className="text-white" />
+              </div>
+              <p className="text-[24px] font-bold text-[var(--ink)] mb-2" style={{ letterSpacing: '-0.4px' }}>You're in!</p>
+              <p className="text-[16px] text-[var(--ink-60)] leading-[1.65] max-w-xs mx-auto mb-6">
+                Welcome to The Naybahood — our community of active local creators. You've earned your place.
+              </p>
+              <button onClick={dismissCelebration}
+                className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity"
+                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                Let's go
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
-        <div className="celebrate-bounce w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4" style={{ boxShadow: '0 4px 20px rgba(45,122,79,0.3)' }}>
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4" style={{ boxShadow: '0 4px 20px rgba(45,122,79,0.3)' }}>
           <Star size={32} className="text-white" />
         </div>
         <p className="text-[20px] font-bold text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
@@ -583,6 +658,30 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
           <p className="text-[12px] text-[var(--ink-35)] mt-2 ml-8">Right now your IG handle is linked manually. We're working on auto-connecting via the Instagram API so your stats update automatically.</p>
         )}
       </div>
+
+      {/* Profile completeness indicator */}
+      {(() => {
+        const completeness = [
+          !!profile.display_name,
+          !!profile.instagram_handle,
+          !!profile.address,
+          !!profile.bio,
+          profile.total_campaigns > 0,
+        ].filter(Boolean).length;
+        const completePct = Math.round((completeness / 5) * 100);
+        return completePct < 100 ? (
+          <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 mt-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
+              <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
+            </div>
+            <div className="h-2 bg-[var(--ink-10)] rounded-full overflow-hidden">
+              <div className="h-full bg-[var(--terra)] rounded-full transition-all" style={{ width: `${completePct}%` }} />
+            </div>
+            <p className="text-[12px] text-[var(--ink-35)] mt-1.5">Add your {!profile.address ? 'city' : !profile.bio ? 'bio' : 'details'} to complete your profile</p>
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

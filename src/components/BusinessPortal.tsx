@@ -78,6 +78,8 @@ export default function BusinessPortal() {
   const [activeTab, setActiveTab] = useState<Tab>('summary');
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
+  const [filterLevel, setFilterLevel] = useState<string>('all');
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
@@ -304,25 +306,59 @@ export default function BusinessPortal() {
         )}
 
         {/* Selection Tab */}
-        {activeTab === 'selection' && (
+        {activeTab === 'selection' && (() => {
+          const filteredApps = applications.filter(a => {
+            if (filterLevel !== 'all' && a.creators?.level && a.creators.level < parseInt(filterLevel)) return false;
+            return true;
+          });
+          const toggleCreator = (id: string) => {
+            setSelectedCreators(prev => {
+              const next = new Set(prev);
+              if (next.has(id)) next.delete(id); else next.add(id);
+              return next;
+            });
+          };
+          const toggleAll = () => {
+            if (selectedCreators.size === filteredApps.length) setSelectedCreators(new Set());
+            else setSelectedCreators(new Set(filteredApps.map(a => a.id)));
+          };
+          return (
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Selection</h1>
-              <span className="text-[14px] text-[var(--ink-35)]">{applications.length} applicant{applications.length !== 1 ? 's' : ''}</span>
+              <span className="text-[14px] text-[var(--ink-35)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
+            </div>
+
+            {/* Filters + bulk actions */}
+            <div className="flex items-center gap-3 mb-4 flex-wrap">
+              <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
+                className="px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[13px] text-[var(--ink)]">
+                <option value="all">All levels</option>
+                {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
+              </select>
+              <button onClick={toggleAll}
+                className="px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]">
+                {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
+              </button>
+              {selectedCreators.size > 0 && (
+                <span className="text-[13px] text-[var(--terra)] font-medium">{selectedCreators.size} selected</span>
+              )}
             </div>
 
             {/* Creator cards grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              {applications.map(a => {
+              {filteredApps.map(a => {
                 const name = a.creators?.display_name || a.creators?.name || 'Creator';
                 const initial = name[0].toUpperCase();
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
                 return (
-                  <div key={a.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
-                    {/* Header: avatar + name + status */}
+                  <div key={a.id} className={`bg-[var(--card)] border rounded-[var(--r-card)] p-5 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow ${selectedCreators.has(a.id) ? 'border-[var(--terra)]' : 'border-[var(--border)]'}`}>
+                    {/* Header: checkbox + avatar + name + status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
+                        <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
+                          className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
                         <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                           <span className="text-[15px] font-bold text-white">{initial}</span>
                         </div>
@@ -367,7 +403,7 @@ export default function BusinessPortal() {
                   </div>
                 );
               })}
-              {applications.length === 0 && (
+              {filteredApps.length === 0 && (
                 <div className="col-span-3 py-12 text-center">
                   <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
                   <p className="text-[14px] text-[var(--ink-35)]">Creators will appear here once they express interest</p>
@@ -375,7 +411,8 @@ export default function BusinessPortal() {
               )}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Participation Tab — renamed to "Creator Progress" */}
         {activeTab === 'participation' && (
@@ -487,6 +524,12 @@ export default function BusinessPortal() {
                     {p.reach != null && <p>Reach: {p.reach.toLocaleString()}</p>}
                     {p.likes != null && <p>Likes: {p.likes.toLocaleString()}</p>}
                     {p.reel_submitted_at && <p>Posted: {fmtDate(p.reel_submitted_at)}</p>}
+                  </div>
+                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--ink-10)]">
+                    <a href={p.reel_url!} target="_blank" rel="noopener noreferrer" download
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--r-sm)] border border-[var(--border)] text-[12px] font-medium text-[var(--ink-60)] hover:bg-[var(--shell)]">
+                      Download
+                    </a>
                   </div>
                 </div>
               ))}

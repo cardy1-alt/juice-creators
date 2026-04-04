@@ -72,6 +72,7 @@ export default function Auth() {
   const dateOfBirth = dobDay && dobMonth && dobYear
     ? `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`
     : '';
+  const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -126,7 +127,7 @@ export default function Auth() {
       if (mode === 'signin') {
         await signIn(email, password);
       } else {
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, gender: gender || null, address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
@@ -470,6 +471,20 @@ export default function Auth() {
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
+                </div>
+
+                {/* Gender */}
+                <div>
+                  <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
+                  <select value={gender} onChange={e => setGender(e.target.value)}
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
+                    <option value="">Prefer not to say</option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                    <option value="non-binary">Non-binary</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
 
                 {/* Phone number */}
