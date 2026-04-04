@@ -58,10 +58,12 @@ export default function AdminAnalyticsTab() {
     completionRate: 0, avgFillRate: 0, avgProfileComplete: 0,
     creatorsByCity: [], creatorsByMonth: [], campaignPerformance: [],
   });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => { fetchStats(); }, []);
 
   const fetchStats = async () => {
+    setLoading(true);
     const [campaignsRes, creatorsRes, participationsRes] = await Promise.all([
       supabase.from('campaigns').select('id, status, title, creator_target'),
       supabase.from('creators').select('id, address, created_at, approved, profile_complete'),
@@ -75,10 +77,15 @@ export default function AdminAnalyticsTab() {
     const completed = participations.filter((p: any) => p.status === 'completed').length;
     const completionRate = participations.length > 0 ? Math.round((completed / participations.length) * 100) : 0;
 
+    // Batch application counts instead of N+1
+    const { data: allApps } = await supabase.from('applications').select('campaign_id');
+    const appCountMap: Record<string, number> = {};
+    (allApps || []).forEach((a: any) => { appCountMap[a.campaign_id] = (appCountMap[a.campaign_id] || 0) + 1; });
+
     let fillRateSum = 0, fillCount = 0;
     for (const c of campaigns.filter((x: any) => x.status === 'active' || x.status === 'live')) {
-      const { count } = await supabase.from('applications').select('id', { count: 'exact', head: true }).eq('campaign_id', c.id);
-      fillRateSum += Math.min(((count || 0) / Math.max(c.creator_target, 1)) * 100, 100);
+      const appCount = appCountMap[c.id] || 0;
+      fillRateSum += Math.min((appCount / Math.max(c.creator_target, 1)) * 100, 100);
       fillCount++;
     }
     const avgFillRate = fillCount > 0 ? Math.round(fillRateSum / fillCount) : 0;
@@ -102,6 +109,7 @@ export default function AdminAnalyticsTab() {
       totalCampaigns: campaigns.length, totalCreators: creators.length, totalReels: reels.length, totalReach,
       completionRate, avgFillRate, avgProfileComplete, creatorsByCity, creatorsByMonth, campaignPerformance,
     });
+    setLoading(false);
   };
 
   const statCards = [
@@ -112,6 +120,14 @@ export default function AdminAnalyticsTab() {
   ];
 
   const chartLabel = "text-[12px] font-bold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-4";
+
+  if (loading) {
+    return (
+      <div className="py-20 flex justify-center">
+        <div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   return (
     <div className="tab-fade-in">

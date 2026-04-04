@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
-import { Check, X } from 'lucide-react';
+import { Check, X, AlertCircle } from 'lucide-react';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
-  region: string; approved: boolean; is_live: boolean; instagram_handle: string | null;
+  region: string; approved: boolean; instagram_handle: string | null;
   address: string | null; bio: string | null; created_at: string;
 }
 
@@ -22,20 +22,29 @@ function fmtDate(d: string) {
 function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   const [form, setForm] = useState({ name: '', email: '', category: '', region: 'Suffolk', instagram: '', address: '', bio: '' });
   const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.category) return;
+    setError('');
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) { setError('Please enter a valid email address'); return; }
+
     setCreating(true);
     const slug = slugify(form.name);
     const { data: existing } = await supabase.from('businesses').select('id').eq('slug', slug).limit(1);
-    if (existing && existing.length > 0) { setCreating(false); return; }
-    await supabase.from('businesses').insert({
+    if (existing && existing.length > 0) { setError('A brand with this name already exists'); setCreating(false); return; }
+
+    const { error: insertErr } = await supabase.from('businesses').insert({
       name: form.name, slug, owner_email: form.email, category: form.category, region: form.region,
-      instagram_handle: form.instagram || null, address: form.address || null, bio: form.bio || null,
-      approved: true, is_live: true, onboarding_complete: true, onboarding_step: 4,
+      instagram_handle: form.instagram ? form.instagram.replace(/^@/, '') : null,
+      address: form.address || null, bio: form.bio || null,
+      approved: true, onboarding_complete: true,
     });
+    if (insertErr) { setError('Failed to create brand — ' + insertErr.message); setCreating(false); return; }
     setCreating(false);
     onCreated();
   };
@@ -49,9 +58,15 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F7F5] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-6">
+          {error && (
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+              <AlertCircle size={14} />
+              <span className="text-[13px] font-medium">{error}</span>
+            </div>
+          )}
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label className={labelCls}>Brand Name *</label><input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className={inputCls} required /></div>
-            <div><label className={labelCls}>Owner Email *</label><input type="email" value={form.email} onChange={e => setForm(p => ({ ...p, email: e.target.value }))} className={inputCls} required /></div>
+            <div><label className={labelCls}>Brand Name *</label><input value={form.name} onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setError(''); }} className={inputCls} required /></div>
+            <div><label className={labelCls}>Owner Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
             <div><label className={labelCls}>Category *</label><select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className={inputCls} required><option value="">Select...</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
             <div><label className={labelCls}>Region</label><select value={form.region} onChange={e => setForm(p => ({ ...p, region: e.target.value }))} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
             <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
@@ -81,17 +96,17 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
     const { data } = await supabase.from('businesses').select('*').order('created_at', { ascending: false });
     if (data) {
       setBrands(data as Brand[]);
+      // Batch query instead of N+1
+      const { data: campData } = await supabase.from('campaigns').select('brand_id');
       const counts: Record<string, number> = {};
-      for (const b of data) {
-        const { count } = await supabase.from('campaigns').select('id', { count: 'exact', head: true }).eq('brand_id', b.id);
-        counts[b.id] = count || 0;
-      }
+      (campData || []).forEach((c: any) => { counts[c.brand_id] = (counts[c.brand_id] || 0) + 1; });
       setCampaignCounts(counts);
     }
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
-    await supabase.from('businesses').update({ approved }).eq('id', id);
+    const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
+    if (error) { setToast('Update failed'); setTimeout(() => setToast(null), 3000); return; }
     if (approved) sendBusinessApprovedEmail(id).catch(() => {});
     else sendBusinessDeniedEmail(id).catch(() => {});
     setToast(`Brand ${approved ? 'approved' : 'denied'}`);

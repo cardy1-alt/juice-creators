@@ -90,6 +90,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     creator_target: campaign?.creator_target?.toString() || '10',
     campaign_type: campaign?.campaign_type || 'brand',
     campaign_image: campaign?.campaign_image || '',
+    min_level: campaign?.min_level?.toString() || '1',
     content_requirements: campaign?.content_requirements || '',
     required_tags: campaign?.required_tags?.join(', ') || '',
     tp1: campaign?.talking_points?.[0] || '', tp2: campaign?.talking_points?.[1] || '', tp3: campaign?.talking_points?.[2] || '',
@@ -99,6 +100,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     content_deadline: campaign?.content_deadline?.slice(0, 10) || '',
   });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [formError, setFormError] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRan, setAiRan] = useState(!!campaign?.about_brand);
   const [aiError, setAiError] = useState('');
@@ -139,14 +142,25 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   };
 
   const handleSave = async (asStatus: string) => {
-    if (!form.brand_id || !form.title) return;
+    if (!form.brand_id || !form.title) { setFormError('Brand and title are required'); return; }
+    setFormError(''); setSaveError('');
+    // Validate perk_value
+    const perkVal = form.perk_value ? parseFloat(form.perk_value) : null;
+    if (form.perk_value && (isNaN(perkVal!) || perkVal! < 0)) { setFormError('Perk value must be a positive number'); return; }
+    // Validate creator_target
+    const creatorTarget = parseInt(form.creator_target) || 10;
+    if (creatorTarget < 1) { setFormError('Creator target must be at least 1'); return; }
+    // Validate date ordering
+    if (form.expression_deadline && form.content_deadline && form.expression_deadline > form.content_deadline) {
+      setFormError('Expression deadline must be before content deadline'); return;
+    }
     setSaving(true);
     const payload: any = {
       brand_id: form.brand_id, title: form.title, headline: form.headline || null,
       about_brand: form.about_brand || null, perk_description: form.perk_description || null,
-      perk_value: form.perk_value ? parseFloat(form.perk_value) : null, perk_type: form.perk_type,
+      perk_value: perkVal, perk_type: form.perk_type,
       target_city: form.target_city || null, target_county: form.target_county || null,
-      creator_target: parseInt(form.creator_target) || 10, min_level: 1,
+      creator_target: creatorTarget, min_level: parseInt(form.min_level as any) || 1,
       content_requirements: form.content_requirements || null,
       required_tags: form.required_tags ? form.required_tags.split(',').map((t: string) => t.trim()).filter(Boolean) : null,
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
@@ -159,9 +173,11 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       content_deadline: form.content_deadline ? new Date(form.content_deadline).toISOString() : null,
       status: asStatus,
     };
-    if (campaign) { await supabase.from('campaigns').update(payload).eq('id', campaign.id); }
-    else { await supabase.from('campaigns').insert(payload); }
+    const { error } = campaign
+      ? await supabase.from('campaigns').update(payload).eq('id', campaign.id)
+      : await supabase.from('campaigns').insert(payload);
     setSaving(false);
+    if (error) { setSaveError('Failed to save campaign — ' + error.message); return; }
     onSave();
   };
 
@@ -184,6 +200,11 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
 
         {/* Body */}
         <div className={modalBody}>
+          {(formError || saveError) && (
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[var(--r-sm)] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+              <span className="text-[13px] font-medium">{formError || saveError}</span>
+            </div>
+          )}
           {/* STEP 1 — Basics */}
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -206,7 +227,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div><label className={labelCls}>Perk Type</label><select value={form.perk_type} onChange={e => set('perk_type', e.target.value)} className={inputCls}><option value="experience">Experience</option><option value="product">Product</option><option value="gift_card">Gift Card</option></select></div>
               <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
               <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
-              <div><label className={labelCls}>Creator Target</label><input type="number" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Creator Target</label><input type="number" min="1" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
+              <div><label className={labelCls}>Min Creator Level</label><select value={form.min_level} onChange={e => set('min_level', e.target.value)} className={inputCls}><option value="1">Any (Level 1+)</option><option value="3">Regular+ (Level 3+)</option><option value="5">Trusted+ (Level 5+)</option></select></div>
               <div><label className={labelCls}>Campaign Type</label><select value={form.campaign_type} onChange={e => set('campaign_type', e.target.value)} className={inputCls}><option value="brand">Brand Campaign</option><option value="community">Community Campaign</option></select></div>
               <div className="md:col-span-2"><label className={labelCls}>Campaign Image URL</label><input value={form.campaign_image} onChange={e => set('campaign_image', e.target.value)} className={inputCls} placeholder="https://... (hero image for campaign card)" /></div>
             </div>
@@ -407,12 +429,13 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
       else if (newCompleted >= 6) { newLevel = 4; newLevelName = 'Local'; }
       else if (newCompleted >= 3) { newLevel = 3; newLevelName = 'Regular'; }
       else if (newCompleted >= 1) { newLevel = 2; newLevelName = 'Explorer'; }
-      await supabase.from('creators').update({
+      const { error: levelErr } = await supabase.from('creators').update({
         completed_campaigns: newCompleted,
         completion_rate: rate,
         level: newLevel,
         level_name: newLevelName,
       }).eq('id', part.creator_id);
+      if (levelErr) { showToast('Completed but failed to update creator stats'); onRefresh(); return; }
       // Send completion email
       const { data: campInfo } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', part.campaign_id).single();
       if (campInfo) {
@@ -584,15 +607,20 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
     setShowAddApplicant(true);
   };
 
+  const [inlineToast, setInlineToast] = useState('');
+  const showInlineToast = (msg: string) => { setInlineToast(msg); setTimeout(() => setInlineToast(''), 3000); };
+
   const handleAddApplicant = async (creatorId: string) => {
     setAddingCreator(creatorId);
-    await supabase.from('applications').insert({
+    const { error } = await supabase.from('applications').insert({
       campaign_id: campaign.id,
       creator_id: creatorId,
       status: 'interested',
     });
     setAddingCreator(null);
+    if (error) { showInlineToast(error.message.includes('duplicate') ? 'Creator already applied' : 'Failed to add applicant'); return; }
     setShowAddApplicant(false);
+    showInlineToast('Applicant added');
   };
 
   const handleAiRecommend = async () => {
@@ -625,9 +653,25 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
   };
 
   const handleSelectCreator = async (creatorId: string) => {
-    await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() })
-      .eq('campaign_id', campaign.id).eq('creator_id', creatorId);
-    // Fetch campaign + brand info for email
+    // Update application to confirmed (admin bypasses the confirm step)
+    const { error: appErr } = await supabase.from('applications').update({
+      status: 'confirmed', selected_at: new Date().toISOString(), confirmed_at: new Date().toISOString(),
+    }).eq('campaign_id', campaign.id).eq('creator_id', creatorId);
+    if (appErr) { showInlineToast('Failed to select creator'); return; }
+
+    // Get the application ID for the participation record
+    const { data: appData } = await supabase.from('applications').select('id')
+      .eq('campaign_id', campaign.id).eq('creator_id', creatorId).single();
+
+    // Create participation record
+    if (appData) {
+      await supabase.from('participations').insert({
+        campaign_id: campaign.id, creator_id: creatorId,
+        application_id: appData.id, status: 'confirmed', perk_sent: false,
+      });
+    }
+
+    // Send selection email
     const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).single();
     if (campData) {
       sendCreatorSelectedEmail(creatorId, {
@@ -637,6 +681,7 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
       });
     }
     setRecommendations(prev => prev ? prev.filter(r => r.creator_id !== creatorId) : null);
+    showInlineToast('Creator selected and confirmed');
   };
 
   return (
@@ -666,7 +711,20 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               </div>
             )}
           </div>
-          <div className="flex gap-2 mt-4 pt-4 border-t border-[var(--border)] flex-wrap">
+          {inlineToast && (
+            <div className="mt-3 px-3.5 py-2 rounded-[var(--r-sm)] bg-[#222] text-white text-[13px] font-medium inline-block">{inlineToast}</div>
+          )}
+          <div className="flex gap-2 mt-4 pt-4 border-t border-[var(--border)] flex-wrap items-center">
+            {/* Campaign status */}
+            <select value={campaign.status} onChange={async e => {
+              const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
+              if (error) showInlineToast('Failed to update status');
+              else { showInlineToast(`Status → ${e.target.value}`); onEdit(); /* triggers refresh */ }
+            }} className="px-3 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[13px] font-semibold text-[var(--ink)] bg-white">
+              <option value="draft">Draft</option><option value="active">Active</option>
+              <option value="selecting">Selecting</option><option value="live">Live</option>
+              <option value="completed">Completed</option>
+            </select>
             <button onClick={onManageApplicants} className="px-4 py-2 rounded-[var(--r-pill)] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90">Manage Applicants</button>
             <button onClick={handleAiRecommend} disabled={aiLoading}
               className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[var(--r-pill)] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
@@ -677,6 +735,18 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
             <button onClick={onEdit} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">Edit Campaign</button>
             <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
               <span className="flex items-center gap-1"><UserPlus size={14} /> Add Applicant</span>
+            </button>
+            <button onClick={async () => {
+              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, required_tags, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
+              const { error } = await supabase.from('campaigns').insert({
+                brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
+                target_city, target_county, creator_target, min_level, content_requirements, required_tags,
+                talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
+              });
+              if (error) showInlineToast('Failed to duplicate');
+              else { showInlineToast('Campaign duplicated as draft'); onEdit(); }
+            }} className="px-4 py-2 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+              Duplicate
             </button>
           </div>
           {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
