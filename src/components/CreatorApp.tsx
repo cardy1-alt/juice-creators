@@ -52,7 +52,7 @@ interface Campaign {
   perk_value: number | null; target_city: string | null; expression_deadline: string | null;
   status: string; campaign_type: 'brand' | 'community'; campaign_image: string | null;
   about_brand: string | null; min_level: number;
-  businesses?: { name: string; category: string; bio: string | null; instagram_handle: string | null };
+  businesses?: { name: string; category: string; bio: string | null; instagram_handle: string | null; logo_url: string | null };
 }
 interface Application {
   id: string; campaign_id: string; status: string; applied_at: string;
@@ -88,7 +88,7 @@ const NAV_ITEMS: { key: Tab; label: string; icon: typeof Compass }[] = [
 
 // ─── Brand Info Modal ───
 function BrandInfoModal({ brand, onClose }: {
-  brand: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
+  brand: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null };
   onClose: () => void;
 }) {
   const handle = brand.instagram_handle?.replace('@', '') || '';
@@ -96,7 +96,16 @@ function BrandInfoModal({ brand, onClose }: {
     <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-[var(--card)] rounded-[var(--r-card)] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-[18px] font-semibold text-[var(--ink)]">{brand.name}</h3>
+          <div className="flex items-center gap-3">
+            {brand.logo_url ? (
+              <img src={brand.logo_url} alt={brand.name} className="w-10 h-10 rounded-full object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-[var(--terra-light)] flex items-center justify-center">
+                <span className="text-[16px] font-bold text-[var(--terra)]">{brand.name[0]}</span>
+              </div>
+            )}
+            <h3 className="text-[18px] font-semibold text-[var(--ink)]">{brand.name}</h3>
+          </div>
           <button onClick={onClose} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
         </div>
         {brand.category && (
@@ -135,7 +144,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   const fetchDiscover = async () => {
     setLoading(true);
     setFetchError(false);
-    const { data: camps, error: campsErr } = await supabase.from('campaigns').select('*, businesses(name, category, bio, instagram_handle)')
+    const { data: camps, error: campsErr } = await supabase.from('campaigns').select('*, businesses(name, category, bio, instagram_handle, logo_url)')
       .in('status', ['active', 'live']).order('created_at', { ascending: false });
     if (campsErr) { setFetchError(true); setLoading(false); return; }
     if (camps) setCampaigns((camps as Campaign[]).filter(c => !c.min_level || c.min_level <= profile.level));
@@ -224,11 +233,21 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
               className="card-press w-full text-left bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
               {/* Hero image */}
-              {c.campaign_image && (
-                <div className="w-full aspect-video bg-[var(--shell)] overflow-hidden">
+              <div className="w-full aspect-video bg-[var(--shell)] overflow-hidden">
+                {c.campaign_image ? (
                   <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
-                </div>
-              )}
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra-light)] to-[var(--shell)] flex items-center justify-center">
+                    {c.businesses?.logo_url ? (
+                      <img src={c.businesses.logo_url} alt={c.businesses.name} className="w-16 h-16 rounded-full object-cover border-2 border-white" style={{ boxShadow: '0 2px 8px rgba(34,34,34,0.1)' }} />
+                    ) : (
+                      <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center border-2 border-white" style={{ boxShadow: '0 2px 8px rgba(34,34,34,0.1)' }}>
+                        <span className="text-[24px] font-bold text-white">{(c.businesses?.name || '?')[0]}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
               <div className="p-4">
                 <div className="flex items-center gap-2 mb-0.5">
                   <button onClick={e => { e.stopPropagation(); if (c.businesses) setBrandModal(c.businesses); }}
@@ -627,9 +646,13 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
                 style={{ transition: 'stroke-dashoffset 0.8s ease-out' }} />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center">
-                <span className="text-[24px] font-bold text-white">{initial}</span>
-              </div>
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-16 h-16 rounded-full object-cover" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-[var(--terra)] flex items-center justify-center">
+                  <span className="text-[24px] font-bold text-white">{initial}</span>
+                </div>
+              )}
             </div>
           </div>
           <div className="min-w-0">

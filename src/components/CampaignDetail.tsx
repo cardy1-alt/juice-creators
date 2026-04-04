@@ -17,7 +17,7 @@ interface Campaign {
   required_tags: string[] | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
   status: string; campaign_image: string | null;
-  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null };
 }
 
 interface Application {
@@ -55,7 +55,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     setLoading(true);
     const { data: campData, error: campErr } = await supabase
       .from('campaigns')
-      .select('*, businesses(name, category, bio, instagram_handle)')
+      .select('*, businesses(name, category, bio, instagram_handle, logo_url)')
       .eq('id', campaignId)
       .single();
     if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
@@ -166,12 +166,22 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         )}
 
         {/* Hero image */}
-        {campaign.campaign_image && (
-          <div className="relative w-full aspect-video rounded-[var(--r-card)] overflow-hidden mb-3">
+        <div className="relative w-full aspect-video rounded-[var(--r-card)] overflow-hidden mb-3">
+          {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
-            <div className="hero-gradient absolute inset-0" />
-          </div>
-        )}
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#A8573E] flex items-center justify-center">
+              {campaign.businesses?.logo_url ? (
+                <img src={campaign.businesses.logo_url} alt={campaign.businesses.name} className="w-20 h-20 rounded-full object-cover border-3 border-white/30" />
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
+                  <span className="text-[32px] font-bold text-white">{(campaign.businesses?.name || '?')[0]}</span>
+                </div>
+              )}
+            </div>
+          )}
+          <div className="hero-gradient absolute inset-0" />
+        </div>
 
         {/* 1. Header */}
         <div className={sectionCls}>
