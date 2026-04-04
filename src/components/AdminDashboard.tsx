@@ -170,7 +170,6 @@ export default function AdminDashboard() {
             <button
               onClick={() => setShowModal(true)}
               className="flex items-center gap-1.5 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
             >
               <Plus size={15} strokeWidth={2} />
               {cta.label}

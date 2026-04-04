@@ -76,7 +76,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t border-[#E6E2DB] bg-[#F7F7F5] flex-shrink-0">
           <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
-          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          <button onClick={handleCreate as any} disabled={creating} className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40">
             {creating ? 'Creating...' : 'Create Brand'}
           </button>
         </div>

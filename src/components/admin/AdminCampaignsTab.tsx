@@ -276,7 +276,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div className="flex flex-col items-center justify-center py-12">
                   <button onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
                     className={`${primaryBtn} inline-flex items-center gap-2 mb-3`}
-                    style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                   >
                     {aiLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Generating brief...' : 'Generate brief with AI'}
                   </button>
@@ -322,13 +322,13 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           {step === 1 && (
             <>
               <button onClick={onClose} className={ghostBtn}>Cancel</button>
-              <button onClick={() => setStep(2)} disabled={!form.brand_id || !form.title} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>Next: Brief →</button>
+              <button onClick={() => setStep(2)} disabled={!form.brand_id || !form.title} className={primaryBtn}>Next: Brief →</button>
             </>
           )}
           {step === 2 && (
             <>
               <button onClick={() => setStep(1)} className={ghostBtn}>← Back</button>
-              <button onClick={() => setStep(3)} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>Next: Dates →</button>
+              <button onClick={() => setStep(3)} className={primaryBtn}>Next: Dates →</button>
             </>
           )}
           {step === 3 && (
@@ -336,7 +336,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <button onClick={() => setStep(2)} className={ghostBtn}>← Back</button>
               <div className="flex gap-3">
                 <button onClick={() => handleSave('draft')} disabled={saving} className={secondaryBtn}>Save as Draft</button>
-                <button onClick={() => handleSave('active')} disabled={saving} className={primaryBtn} style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                <button onClick={() => handleSave('active')} disabled={saving} className={primaryBtn}>
                   {saving ? 'Publishing...' : 'Publish Campaign'}
                 </button>
               </div>
@@ -952,7 +952,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           </div>
           <p className="text-[17px] font-bold text-[var(--ink)] mb-1">No campaigns yet</p>
           <p className="text-[14px] text-[var(--ink-60)] mb-5">Create your first campaign to get started</p>
-          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold" style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold">
             + New Campaign
           </button>
         </div>

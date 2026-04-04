@@ -86,7 +86,7 @@ export default function AdminSettingsTab() {
           )}
           <button type="submit" disabled={saving}
             className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
-            style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+>
             {saving ? 'Updating...' : 'Update Password'}
           </button>
         </form>

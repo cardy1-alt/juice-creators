@@ -110,7 +110,7 @@ export default function AdminNotificationsTab() {
               <button onClick={handleSend} disabled={sending}
                 disabled={sending || recipientCount === 0}
                 className="flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
-                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+               >
                 <Send size={14} /> {sending ? 'Sending...' : `Send to ${recipientCount} creators`}
               </button>
             )}

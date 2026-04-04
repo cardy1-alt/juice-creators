@@ -148,7 +148,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
             <button onClick={onClose} className="text-[14px] font-semibold text-[rgba(34,34,34,0.60)] hover:text-[#222]">Cancel</button>
             <button onClick={handleCreate as any} disabled={creating}
               className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+             >
               {creating ? 'Creating...' : 'Create Account'}
             </button>
           </div>
@@ -226,7 +226,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
       {pendingCreators.length > 0 && !showApprovalPane && (
         <button onClick={() => setShowApprovalPane(true)}
-          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] border border-[rgba(196,103,74,0.2)] hover:border-[#C4674A] transition-colors text-left" style={{ background: 'rgba(196,103,74,0.04)' }}>
+          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] transition-colors text-left" style={{ background: 'rgba(0,0,0,0.04)', border: '0.5px solid rgba(0,0,0,0.08)' }}>
           <AlertCircle size={18} className="text-[#C4674A] flex-shrink-0" />
           <div className="flex-1">
             <p className="text-[14px] font-semibold text-[#C4674A]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
@@ -335,11 +335,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               <tr key={c.id} className="hover:bg-[#F7F7F5] transition-colors" style={{ height: 44 }}>
                 <td className={tdCls}>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
-                  <div className="flex items-center gap-2.5">
+                  <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
                     <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
                       <span className="text-[11px] font-bold" style={{ color: colors.text }}>{initial}</span>
                     </div>
-                    <span className="font-medium">{c.display_name || c.name}</span>
+                    <span className="font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.display_name || c.name}</span>
                   </div>
                   ); })()}
                 </td>
