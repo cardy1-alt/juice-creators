@@ -258,14 +258,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
                 </div>
                 <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">{c.headline || c.title}</p>
                 {/* Perk pill */}
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-pill)] bg-[var(--terra-light)] mb-2" style={{ maxWidth: '100%' }}>
-                  <Gift size={13} className="text-[var(--terra)] flex-shrink-0" />
-                  <span className="text-[13px] font-medium text-[var(--terra)] overflow-hidden text-ellipsis whitespace-nowrap" style={{ maxWidth: 'calc(100% - 24px)' }}>
-                    {(() => {
-                      const raw = c.perk_description?.split('—')[0]?.split(',')[0]?.trim() || 'Perk included';
-                      const suffix = c.perk_value ? ` — worth £${c.perk_value}` : '';
-                      return raw + suffix;
-                    })()}
+                <div className="flex items-start gap-1.5 px-2.5 py-1.5 rounded-[var(--r-sm)] bg-[var(--terra-light)] mb-2">
+                  <Gift size={13} className="text-[var(--terra)] flex-shrink-0 mt-0.5" />
+                  <span className="text-[13px] font-medium text-[var(--terra)] leading-[1.4]">
+                    {c.perk_description || 'Perk included'}{c.perk_value ? ` — worth £${c.perk_value}` : ''}
                   </span>
                 </div>
                 <div className="flex items-center gap-2 flex-wrap text-[12px] text-[var(--ink-35)]">
@@ -1217,27 +1213,28 @@ export default function CreatorApp() {
       </aside>
 
       {/* ─── Main content ─── */}
-      <div className="md:ml-[220px] min-h-screen flex">
-        {/* Left: main feed */}
-        <div className={`flex-1 min-w-0 ${viewingCampaign && !isMobile && tab === 'discover' ? 'max-w-[55%]' : ''} transition-all duration-200`}>
-          <div className="p-4 lg:p-5 pb-20 md:pb-5" key={tab}>
-            <div className="tab-fade-in">
-              {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
-              {tab === 'campaigns' && <CampaignsTab profile={profile} />}
-              {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
-              {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
-              {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} />}
-            </div>
+      <div className="md:ml-[220px] min-h-screen">
+        <div className="p-4 lg:p-5 pb-20 md:pb-5" key={tab}>
+          <div className="tab-fade-in">
+            {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+            {tab === 'campaigns' && <CampaignsTab profile={profile} />}
+            {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
+            {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
+            {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} />}
           </div>
         </div>
+      </div>
 
-        {/* Right: campaign detail pane (desktop only, discover tab only) */}
-        {viewingCampaign && !isMobile && tab === 'discover' && (
-          <div className="hidden md:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0 slide-in-right">
+      {/* ─── Campaign detail pane — Notion-style overlay (desktop only) ─── */}
+      {viewingCampaign && !isMobile && tab === 'discover' && (
+        <>
+          <div className="hidden md:block fixed inset-0 bg-[rgba(34,34,34,0.15)] z-30" onClick={() => setViewingCampaign(null)} />
+          <div className="hidden md:block fixed top-0 right-0 bottom-0 w-[520px] lg:w-[580px] xl:w-[640px] z-40 bg-white border-l border-[var(--border)] overflow-y-auto slide-in-right"
+            style={{ boxShadow: '-4px 0 24px rgba(34,34,34,0.08)' }}>
             <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
           </div>
-        )}
-      </div>
+        </>
+      )}
 
       {/* ─── Mobile bottom tab bar ─── */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[var(--border)] md:hidden"
