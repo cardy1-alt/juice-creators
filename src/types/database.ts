@@ -84,6 +84,7 @@ export type Database = {
           campaign_image: string | null;
           status: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level: number;
+          required_tags: string[] | null;
           created_at: string;
           created_by: string | null;
         };
@@ -110,6 +111,7 @@ export type Database = {
           campaign_image?: string | null;
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
+          required_tags?: string[] | null;
           created_at?: string;
           created_by?: string | null;
         };
@@ -136,6 +138,7 @@ export type Database = {
           campaign_image?: string | null;
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
+          required_tags?: string[] | null;
           created_at?: string;
           created_by?: string | null;
         };

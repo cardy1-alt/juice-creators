@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { ArrowLeft, Calendar, Gift, Film, Image, MessageCircle, Clock, Check, X } from 'lucide-react';
+import { sendCreatorConfirmedEmail } from '../lib/notifications';
+import { ArrowLeft, Calendar, Gift, Film, Image, MessageCircle, Clock, Check, X, AtSign, ExternalLink } from 'lucide-react';
 
 interface CampaignDetailProps {
   campaignId: string;
@@ -13,8 +14,10 @@ interface Campaign {
   about_brand: string | null; perk_description: string | null; perk_value: number | null;
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
+  required_tags: string[] | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
-  status: string; businesses?: { name: string };
+  status: string; campaign_image: string | null;
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null };
 }
 
 interface Application {
@@ -41,6 +44,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
   const [showPitchModal, setShowPitchModal] = useState(false);
   const [pitch, setPitch] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [showBrandInfo, setShowBrandInfo] = useState(false);
 
   useEffect(() => {
     fetchCampaign();
@@ -50,7 +54,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     setLoading(true);
     const { data: campData } = await supabase
       .from('campaigns')
-      .select('*, businesses(name)')
+      .select('*, businesses(name, category, bio, instagram_handle)')
       .eq('id', campaignId)
       .single();
     if (campData) setCampaign(campData as Campaign);
@@ -105,6 +109,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       campaign_id: campaign.id,
       creator_id: creatorId,
     });
+    // Send confirmation email
+    if (campaign.businesses?.name) {
+      sendCreatorConfirmedEmail(creatorId, {
+        campaign_title: campaign.title,
+        brand_name: campaign.businesses.name,
+        perk_description: campaign.perk_description || '',
+      });
+    }
     setSubmitting(false);
     fetchCampaign();
   };
@@ -141,9 +153,20 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           </button>
         )}
 
+        {/* Hero image */}
+        {campaign.campaign_image && (
+          <div className="relative w-full aspect-video rounded-[var(--r-card)] overflow-hidden mb-3">
+            <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
+            <div className="hero-gradient absolute inset-0" />
+          </div>
+        )}
+
         {/* 1. Header */}
         <div className={sectionCls}>
-          <p className="text-[14px] font-semibold text-[var(--ink-60)] mb-1">{campaign.businesses?.name}</p>
+          <button onClick={() => setShowBrandInfo(true)}
+            className="text-[14px] font-semibold text-[var(--ink-60)] mb-1 hover:text-[var(--terra)] hover:underline transition-colors">
+            {campaign.businesses?.name}
+          </button>
           <h1 className="text-[24px] font-bold text-[var(--ink)] mb-3" style={{ letterSpacing: '-0.4px', lineHeight: 1.2 }}>
             {campaign.headline || campaign.title}
           </h1>
@@ -200,6 +223,18 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           </div>
           {campaign.content_requirements && (
             <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
+          )}
+          {campaign.required_tags && campaign.required_tags.length > 0 && (
+            <div className="mt-3 pt-3 border-t border-[var(--ink-10)]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-2">Required Tags</p>
+              <div className="flex flex-wrap gap-2">
+                {campaign.required_tags.map((tag, i) => (
+                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-[var(--r-sm)] bg-[var(--shell)] text-[13px] font-medium text-[var(--ink)]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
           )}
         </div>
 
@@ -274,7 +309,8 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
           {application?.status === 'interested' && (
-            <div className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--shell)] text-center text-[var(--ink-60)] font-medium text-[15px] border border-[var(--border)]">
+            <div className="confetti-burst w-full py-3.5 rounded-[var(--r-pill)] bg-[rgba(45,122,79,0.08)] text-center text-[var(--success)] font-semibold text-[15px] border border-[rgba(45,122,79,0.15)]">
+              <Check size={16} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
               Interest registered — we'll be in touch
             </div>
           )}
@@ -301,6 +337,35 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           )}
         </div>
       </div>
+
+      {/* Brand info modal */}
+      {showBrandInfo && campaign.businesses && (
+        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
+          <div className="bg-[var(--card)] rounded-[var(--r-card)] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[18px] font-semibold text-[var(--ink)]">{campaign.businesses.name}</h3>
+              <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+            </div>
+            {campaign.businesses.category && (
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)] mb-3">
+                {campaign.businesses.category}
+              </span>
+            )}
+            {(campaign.about_brand || campaign.businesses.bio) && (
+              <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
+            )}
+            {!campaign.about_brand && !campaign.businesses.bio && (
+              <p className="text-[14px] text-[var(--ink-35)] mb-4">No description available yet.</p>
+            )}
+            {campaign.businesses.instagram_handle && (
+              <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                <AtSign size={14} /> @{campaign.businesses.instagram_handle.replace('@', '')} <ExternalLink size={12} />
+              </a>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Pitch modal */}
       {showPitchModal && (

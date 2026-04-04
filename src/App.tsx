@@ -339,8 +339,18 @@ function App() {
     try {
       sessionStorage.removeItem('nayba_pending_campaign');
     } catch {}
-    window.location.search = `?campaign=${pendingCampaign}`;
-    return null;
+    return (
+      <React.Suspense fallback={
+        <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
+          <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }>
+        {isDemo && <DemoBanner />}
+        <div className={isDemo ? 'pt-10' : ''}>
+          <CampaignDetail campaignId={pendingCampaign} />
+        </div>
+      </React.Suspense>
+    );
   }
 
   const suspenseFallback = (
