@@ -133,7 +133,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
   return (
     <div className="min-h-screen bg-[var(--shell)]">
-      <div className="max-w-[600px] mx-auto px-4 pb-28 pt-4">
+      <div className="max-w-[720px] mx-auto px-4 pb-28 pt-4">
         {/* Back button */}
         {onBack && (
           <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
@@ -260,7 +260,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
       {/* Sticky bottom bar */}
       <div className="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] px-4 py-4 z-40">
-        <div className="max-w-[600px] mx-auto">
+        <div className="max-w-[720px] mx-auto">
           {!application && (
             <div>
               <button

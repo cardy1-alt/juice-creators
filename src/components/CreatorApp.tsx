@@ -96,7 +96,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   });
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
@@ -125,7 +125,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
       </div>
 
       {/* Campaign cards */}
-      <div className="space-y-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(c => {
           const appStatus = applications[c.id];
           return (
@@ -232,7 +232,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   };
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-4" style={{ letterSpacing: '-0.4px' }}>Campaigns</h1>
       {/* Sub tabs */}
       <div className="flex gap-1 mb-4 border-b border-[var(--ink-10)]">
@@ -352,7 +352,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   if (!unlocked) {
     return (
-      <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+      <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
         <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
         <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
           <div className="w-16 h-16 rounded-full bg-[var(--ink-10)] flex items-center justify-center mx-auto mb-4">
@@ -368,7 +368,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   }
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>The Naybahood</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 text-center">
         <div className="w-16 h-16 rounded-full bg-[rgba(45,122,79,0.1)] flex items-center justify-center mx-auto mb-4">
@@ -395,7 +395,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>Profile</h1>
 
       {/* Avatar + name */}
@@ -476,7 +476,7 @@ function MoreTab({ onSignOut, showToast, creatorId }: { onSignOut: () => void; s
   ];
 
   return (
-    <div className="max-w-[600px] mx-auto px-4 pb-8 pt-4">
+    <div className="max-w-[960px] mx-auto px-4 lg:px-8 pb-8 pt-4">
       <h1 className="text-[24px] font-bold text-[var(--ink)] mb-6" style={{ letterSpacing: '-0.4px' }}>More</h1>
       <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-hidden">
         {items.map((item, i) => (
@@ -611,7 +611,11 @@ export default function CreatorApp() {
     );
   }
 
-  if (viewingCampaign) {
+  // On mobile (< lg), campaign detail is a full-page overlay
+  // On desktop (>= lg), campaign detail slides in as a right pane
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
+
+  if (viewingCampaign && isMobile) {
     return <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />;
   }
 
@@ -690,14 +694,24 @@ export default function CreatorApp() {
       )}
 
       {/* ─── Main content ─── */}
-      <div className="lg:ml-[220px] min-h-screen">
-        <div className="p-4 lg:p-5">
-          {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
-          {tab === 'campaigns' && <CampaignsTab profile={profile} />}
-          {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
-          {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
-          {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} />}
+      <div className="lg:ml-[220px] min-h-screen flex">
+        {/* Left: main feed */}
+        <div className={`flex-1 min-w-0 ${viewingCampaign && !isMobile ? 'max-w-[55%]' : ''} transition-all duration-200`}>
+          <div className="p-4 lg:p-5">
+            {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+            {tab === 'campaigns' && <CampaignsTab profile={profile} />}
+            {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
+            {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
+            {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} />}
+          </div>
         </div>
+
+        {/* Right: campaign detail pane (desktop only) */}
+        {viewingCampaign && !isMobile && (
+          <div className="hidden lg:block w-[45%] border-l border-[var(--border)] bg-[var(--shell)] overflow-y-auto h-screen sticky top-0">
+            <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
+          </div>
+        )}
       </div>
 
       {/* How It Works onboarding */}

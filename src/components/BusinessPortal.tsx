@@ -305,112 +305,167 @@ export default function BusinessPortal() {
         {/* Selection Tab */}
         {activeTab === 'selection' && (
           <div>
-            <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Selection</h1>
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
-              <table className="w-full min-w-[700px]">
-                <thead><tr>
-                  <th className={thCls}>Creator</th><th className={thCls}>Instagram</th>
-                  <th className={thCls}>Completion</th><th className={thCls}>Level</th>
-                  <th className={thCls}>Applied</th><th className={thCls}>Pitch</th>
-                  <th className={thCls}>Status</th>
-                </tr></thead>
-                <tbody>
-                  {applications.map(a => (
-                    <tr key={a.id} className="hover:bg-[var(--shell)]">
-                      <td className={`${tdCls} font-medium`}>{a.creators?.display_name || a.creators?.name}</td>
-                      <td className={tdCls}>
-                        <a href={`https://instagram.com/${a.creators?.instagram_handle?.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                          className="text-[var(--terra)] hover:underline flex items-center gap-1">
-                          {a.creators?.instagram_handle} <ExternalLink size={12} />
-                        </a>
-                      </td>
-                      <td className={tdCls}>
-                        <span className={a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60 ? 'text-[var(--terra)] font-semibold' : ''}>
-                          {a.creators?.completion_rate}%
-                        </span>
-                      </td>
-                      <td className={tdCls}>L{a.creators?.level}</td>
-                      <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(a.applied_at)}</td>
-                      <td className={`${tdCls} text-[var(--ink-60)] max-w-[200px]`}>
-                        {a.pitch ? <span className="truncate block" title={a.pitch}>{a.pitch}</span> : '—'}
-                      </td>
-                      <td className={tdCls}><StatusBadge status={a.status} /></td>
-                    </tr>
-                  ))}
-                  {applications.length === 0 && (
-                    <tr><td colSpan={7} className="py-8 text-center text-[14px] text-[var(--ink-35)]">No applicants yet</td></tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="flex items-center justify-between mb-5">
+              <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Selection</h1>
+              <span className="text-[14px] text-[var(--ink-35)]">{applications.length} applicant{applications.length !== 1 ? 's' : ''}</span>
             </div>
-            {/* Selected creators */}
-            {applications.filter(a => a.status === 'selected' || a.status === 'confirmed').length > 0 && (
-              <div className="mt-6">
-                <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-3">Confirmed Creators</h2>
-                <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
-                  <table className="w-full min-w-[400px]">
-                    <thead><tr>
-                      <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>Status</th>
-                    </tr></thead>
-                    <tbody>
-                      {applications.filter(a => a.status === 'selected' || a.status === 'confirmed').map(a => (
-                        <tr key={a.id}>
-                          <td className={`${tdCls} font-medium`}>{a.creators?.display_name || a.creators?.name}</td>
-                          <td className={tdCls}>{a.creators?.instagram_handle}</td>
-                          <td className={tdCls}><StatusBadge status={a.status} /></td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+
+            {/* Creator cards grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
+              {applications.map(a => {
+                const name = a.creators?.display_name || a.creators?.name || 'Creator';
+                const initial = name[0].toUpperCase();
+                const handle = a.creators?.instagram_handle?.replace('@', '') || '';
+                const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
+                return (
+                  <div key={a.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow">
+                    {/* Header: avatar + name + status */}
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                          <span className="text-[15px] font-bold text-white">{initial}</span>
+                        </div>
+                        <div>
+                          <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
+                          <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                            className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
+                            @{handle} <ExternalLink size={11} />
+                          </a>
+                        </div>
+                      </div>
+                      <StatusBadge status={a.status} />
+                    </div>
+
+                    {/* Stats row */}
+                    <div className="flex items-center gap-4 mb-3">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Level</span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[11px] font-bold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Rate</span>
+                        <span className={`text-[13px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
+                      </div>
+                      {a.creators?.follower_count && (
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Followers</span>
+                          <span className="text-[13px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Pitch */}
+                    {a.pitch && (
+                      <div className="bg-[var(--shell)] rounded-[var(--r-sm)] px-3 py-2 mb-3">
+                        <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
+                      </div>
+                    )}
+
+                    {/* Applied date */}
+                    <p className="text-[12px] text-[var(--ink-35)]">Applied {fmtDate(a.applied_at)}</p>
+                  </div>
+                );
+              })}
+              {applications.length === 0 && (
+                <div className="col-span-3 py-12 text-center">
+                  <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
+                  <p className="text-[14px] text-[var(--ink-35)]">Creators will appear here once they express interest</p>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
-        {/* Participation Tab */}
+        {/* Participation Tab — renamed to "Creator Progress" */}
         {activeTab === 'participation' && (
           <div>
-            <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Participation</h1>
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
-              <table className="w-full min-w-[700px]">
-                <thead><tr>
-                  <th className={thCls}>Creator</th><th className={thCls}>Status</th>
-                  <th className={thCls}>Perk Sent</th><th className={thCls}>Content Deadline</th>
-                  <th className={thCls}>Reel</th><th className={thCls}>Reach</th><th className={thCls}>Engagement</th>
-                </tr></thead>
-                <tbody>
-                  {participations.map(p => (
-                    <tr key={p.id} className="hover:bg-[var(--shell)]">
-                      <td className={`${tdCls} font-medium`}>{p.creators?.display_name || p.creators?.name}</td>
-                      <td className={tdCls}><StatusBadge status={p.status} /></td>
-                      <td className={tdCls}>
-                        {p.perk_sent
-                          ? <span className="flex items-center gap-1 text-[var(--success)] text-[13px]"><Check size={14} /> Sent</span>
-                          : <span className="text-[var(--ink-35)] text-[13px]"><Clock size={14} className="inline" /> Pending</span>
-                        }
-                      </td>
-                      <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(campaign?.content_deadline || null)}</td>
-                      <td className={tdCls}>
-                        {p.reel_url
-                          ? <a href={p.reel_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1 text-[var(--terra)] text-[13px] hover:underline"><Film size={14} /> View <ExternalLink size={12} /></a>
-                          : <span className="text-[var(--ink-35)] text-[13px]">Not submitted</span>
-                        }
-                      </td>
-                      <td className={tdCls}>{p.reach?.toLocaleString() || '—'}</td>
-                      <td className={`${tdCls} text-[var(--ink-60)]`}>
-                        {p.likes != null || p.comments != null
-                          ? `${p.likes || 0} likes, ${p.comments || 0} comments`
-                          : '—'
-                        }
-                      </td>
-                    </tr>
-                  ))}
-                  {participations.length === 0 && (
-                    <tr><td colSpan={7} className="py-8 text-center text-[14px] text-[var(--ink-35)]">No participations yet</td></tr>
-                  )}
-                </tbody>
-              </table>
+            <div className="flex items-center justify-between mb-5">
+              <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Creator Progress</h1>
+              <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
+            </div>
+
+            <div className="space-y-3">
+              {participations.map(p => {
+                const name = p.creators?.display_name || p.creators?.name || 'Creator';
+                const initial = name[0].toUpperCase();
+                const handle = p.creators?.instagram_handle?.replace('@', '') || '';
+                // Progress steps
+                const steps = [
+                  { label: 'Confirmed', done: true },
+                  { label: 'Perk sent', done: p.perk_sent },
+                  { label: 'Reel shared', done: !!p.reel_url },
+                  { label: 'Complete', done: p.status === 'completed' },
+                ];
+                const doneCount = steps.filter(s => s.done).length;
+                const progressPct = (doneCount / steps.length) * 100;
+                return (
+                  <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+                    <div className="flex items-start gap-4">
+                      {/* Avatar */}
+                      <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[16px] font-bold text-white">{initial}</span>
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="flex items-center gap-2">
+                            <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
+                            <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                              className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
+                              @{handle} <ExternalLink size={11} />
+                            </a>
+                          </div>
+                          <StatusBadge status={p.status} />
+                        </div>
+
+                        {/* Progress bar */}
+                        <div className="h-2 bg-[var(--ink-10)] rounded-full overflow-hidden mb-2.5 mt-2">
+                          <div className="h-full rounded-full transition-all duration-500"
+                            style={{
+                              width: `${progressPct}%`,
+                              background: p.status === 'completed' ? 'var(--success)' : p.status === 'overdue' ? '#DC2626' : 'var(--terra)',
+                            }} />
+                        </div>
+
+                        {/* Step indicators */}
+                        <div className="flex items-center gap-4">
+                          {steps.map((s, i) => (
+                            <div key={i} className="flex items-center gap-1.5">
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : 'border border-[var(--ink-10)]'}`}>
+                                {s.done && <Check size={10} className="text-white" />}
+                              </div>
+                              <span className={`text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Data row */}
+                        {(p.reach != null || p.reel_url) && (
+                          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[var(--ink-10)]">
+                            {p.reel_url && (
+                              <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                                className="flex items-center gap-1.5 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                                <Film size={14} /> View Reel <ExternalLink size={11} />
+                              </a>
+                            )}
+                            {p.reach != null && <span className="text-[13px] text-[var(--ink-60)]"><Eye size={13} className="inline mr-1" />{p.reach.toLocaleString()} reach</span>}
+                            {(p.likes != null || p.comments != null) && (
+                              <span className="text-[13px] text-[var(--ink-60)]">{p.likes || 0} likes &middot; {p.comments || 0} comments</span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+              {participations.length === 0 && (
+                <div className="py-12 text-center">
+                  <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No creators confirmed yet</p>
+                  <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, their progress will appear here</p>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
-import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight } from 'lucide-react';
+import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle } from 'lucide-react';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
@@ -138,6 +138,29 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
   const pendingCreators = creators.filter(c => !c.approved);
   const approvedCreators = creators.filter(c => c.approved);
+  const [showApprovalPane, setShowApprovalPane] = useState(false);
+  const [selectedPending, setSelectedPending] = useState<Set<string>>(new Set());
+
+  const toggleSelectPending = (id: string) => {
+    setSelectedPending(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllPending = () => {
+    if (selectedPending.size === pendingCreators.length) setSelectedPending(new Set());
+    else setSelectedPending(new Set(pendingCreators.map(c => c.id)));
+  };
+
+  const bulkApprove = async (approved: boolean) => {
+    for (const id of selectedPending) {
+      await handleApprove(id, approved);
+    }
+    setSelectedPending(new Set());
+  };
 
   return (
     <div>
@@ -148,27 +171,104 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </div>
       )}
 
-      {/* Pending approvals banner */}
-      {pendingCreators.length > 0 && (
-        <div className="flex items-center gap-3 px-4 py-3 mb-5 rounded-[12px] border border-[rgba(196,103,74,0.2)]" style={{ background: 'rgba(196,103,74,0.04)' }}>
+      {/* Pending approvals banner — opens pane */}
+      {pendingCreators.length > 0 && !showApprovalPane && (
+        <button onClick={() => setShowApprovalPane(true)}
+          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] border border-[rgba(196,103,74,0.2)] hover:border-[#C4674A] transition-colors text-left" style={{ background: 'rgba(196,103,74,0.04)' }}>
           <AlertCircle size={18} className="text-[#C4674A] flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-[14px] font-semibold text-[#C4674A]">{pendingCreators.length} pending approval{pendingCreators.length > 1 ? 's' : ''}</p>
-            <p className="text-[13px] text-[rgba(34,34,34,0.60)]">
-              {pendingCreators.slice(0, 3).map(c => c.display_name || c.name).join(', ')}
-              {pendingCreators.length > 3 ? ` +${pendingCreators.length - 3} more` : ''}
-            </p>
-          </div>
-          <div className="flex gap-3 flex-shrink-0">
-            {pendingCreators.slice(0, 3).map(c => (
-              <div key={c.id} className="flex items-center gap-1.5 bg-white rounded-[999px] border border-[rgba(196,103,74,0.15)] px-1.5 py-1">
-                <span className="text-[12px] font-medium text-[#222] pl-2">{(c.display_name || c.name).split(' ')[0]}</span>
-                <button onClick={() => handleApprove(c.id, true)} className="w-6 h-6 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)]"><Check size={12} /></button>
-                <button onClick={() => handleApprove(c.id, false)} className="w-6 h-6 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.15)]"><X size={12} /></button>
-              </div>
-            ))}
+            <p className="text-[14px] font-semibold text-[#C4674A]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
+            <p className="text-[13px] text-[rgba(34,34,34,0.60)]">Click to review and approve or deny</p>
           </div>
           <ChevronRight size={16} className="text-[#C4674A] flex-shrink-0" />
+        </button>
+      )}
+
+      {/* Approval pane — scrollable list with bulk actions */}
+      {showApprovalPane && pendingCreators.length > 0 && (
+        <div className="bg-white border border-[#E6E2DB] rounded-[12px] mb-5 overflow-hidden">
+          {/* Pane header */}
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[#E6E2DB] bg-[#F7F7F5]">
+            <div className="flex items-center gap-3">
+              <h3 className="text-[14px] font-bold text-[#222]">Pending Approvals</h3>
+              <span className="text-[12px] text-[rgba(34,34,34,0.45)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={selectAllPending}
+                className="px-3 py-1.5 rounded-[8px] text-[12px] font-semibold text-[rgba(34,34,34,0.60)] hover:bg-[rgba(34,34,34,0.06)]">
+                {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
+              </button>
+              {selectedPending.size > 0 && (
+                <>
+                  <button onClick={() => bulkApprove(true)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[999px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
+                    <CheckCircle2 size={13} /> Approve {selectedPending.size}
+                  </button>
+                  <button onClick={() => bulkApprove(false)}
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[999px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+                    <XCircle size={13} /> Deny {selectedPending.size}
+                  </button>
+                </>
+              )}
+              <button onClick={() => { setShowApprovalPane(false); setSelectedPending(new Set()); }}
+                className="ml-2 w-7 h-7 rounded-full bg-[rgba(34,34,34,0.06)] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[rgba(34,34,34,0.1)]">
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+          {/* Scrollable creator list */}
+          <div className="max-h-[400px] overflow-y-auto divide-y divide-[#E6E2DB]">
+            {pendingCreators.map(c => {
+              const handle = c.instagram_handle?.replace('@', '') || '';
+              const selected = selectedPending.has(c.id);
+              return (
+                <div key={c.id} className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[#FAFAF8]'}`}>
+                  {/* Checkbox */}
+                  <button onClick={() => toggleSelectPending(c.id)}
+                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#C4674A] border-[#C4674A]' : 'border-[rgba(34,34,34,0.20)] hover:border-[#C4674A]'}`}>
+                    {selected && <Check size={12} className="text-white" />}
+                  </button>
+
+                  {/* Avatar */}
+                  <div className="w-9 h-9 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                    <span className="text-[13px] font-bold text-white">{(c.display_name || c.name || '?')[0].toUpperCase()}</span>
+                  </div>
+
+                  {/* Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-[14px] font-semibold text-[#222]">{c.display_name || c.name}</p>
+                      <span className="text-[12px] text-[rgba(34,34,34,0.35)]">{c.email}</span>
+                    </div>
+                    <div className="flex items-center gap-3 mt-0.5">
+                      {handle && (
+                        <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[13px] text-[#C4674A] font-medium hover:underline">
+                          @{handle} <ExternalLink size={11} />
+                        </a>
+                      )}
+                      {c.address && <span className="text-[12px] text-[rgba(34,34,34,0.45)]">{c.address}</span>}
+                      <span className="text-[12px] text-[rgba(34,34,34,0.35)]">Joined {fmtDate(c.created_at)}</span>
+                    </div>
+                  </div>
+
+                  {/* Individual actions */}
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <button onClick={() => handleApprove(c.id, true)}
+                      className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors"
+                      title="Approve">
+                      <Check size={15} />
+                    </button>
+                    <button onClick={() => handleApprove(c.id, false)}
+                      className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors"
+                      title="Deny">
+                      <X size={15} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       )}
 
