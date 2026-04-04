@@ -1,0 +1,147 @@
+/* ──────────────────────────────────────────────────────────
+   NAYBA DESIGN TOKENS
+   Single source of truth for all visual values.
+   Referenced by theme.css and all components.
+   ────────────────────────────────────────────────────────── */
+
+:root {
+  /* ── Backgrounds ── */
+  --shell: #F7F6F3;
+  --card: #FFFFFF;
+  --sidebar-bg: #F7F6F3;
+
+  /* ── Brand ── */
+  --terra: #C4674A;
+  --terra-light: rgba(196,103,74,0.08);
+
+  /* ── Ink scale ── */
+  --ink: #1C1917;
+  --ink-80: rgba(0,0,0,0.8);
+  --ink-60: rgba(0,0,0,0.6);
+  --ink-55: rgba(0,0,0,0.55);
+  --ink-50: rgba(0,0,0,0.5);
+  --ink-45: rgba(0,0,0,0.45);
+  --ink-40: rgba(0,0,0,0.4);
+  --ink-35: rgba(0,0,0,0.35);
+  --ink-18: rgba(0,0,0,0.18);
+  --ink-12: rgba(0,0,0,0.12);
+  --ink-10: rgba(0,0,0,0.10);
+  --ink-08: rgba(0,0,0,0.08);
+  --ink-06: rgba(0,0,0,0.06);
+  --ink-04: rgba(0,0,0,0.04);
+  --ink-03: rgba(0,0,0,0.03);
+  --ink-02: rgba(0,0,0,0.02);
+  --ink-15: rgba(0,0,0,0.15);
+
+  /* ── Status ── */
+  --status-active-bg: #E1F5EE;
+  --status-active-text: #0F6E56;
+  --status-pending-bg: #FAEEDA;
+  --status-pending-text: #854F0B;
+  --status-approved-bg: #E8F4E8;
+  --status-approved-text: #2D6B2D;
+  --status-closed-bg: #F1EFE8;
+  --status-closed-text: #5F5E5A;
+  --status-denied-bg: #FCEBEB;
+  --status-denied-text: #A32D2D;
+  --status-blue-bg: rgba(59,130,246,0.1);
+  --status-blue-text: #3B82F6;
+
+  /* ── Notification badge ── */
+  --badge-bg: #F6EDE9;
+  --badge-text: #993C1D;
+  --badge-border: rgba(196,103,74,0.2);
+
+  /* ── Destructive ── */
+  --destructive: #C0392B;
+  --destructive-border: rgba(192,57,43,0.3);
+
+  /* ── Shadows ── */
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-fab: 0 2px 8px rgba(0,0,0,0.15);
+  --shadow-none: none;
+
+  /* ── Borders ── */
+  --border-default: 0.5px solid rgba(0,0,0,0.08);
+  --border-width: 0.5px;
+  --border-color: rgba(0,0,0,0.08);
+  --border-color-hover: rgba(0,0,0,0.18);
+  --border-color-input: rgba(0,0,0,0.18);
+  --border-color-subtle: rgba(0,0,0,0.06);
+
+  /* ── Radii ── */
+  --r-card: 10px;
+  --r-button: 6px;
+  --r-pill: 999px;
+  --r-input: 8px;
+  --r-avatar: 50%;
+
+  /* ── Typography — Font families ── */
+  --font-sans: 'Instrument Sans', sans-serif;
+  --font-serif: 'Instrument Serif', serif;
+
+  /* ── Typography — Sizes ── */
+  --text-wordmark: 22px;
+  --text-page-title: 16px;
+  --text-section-label: 10px;
+  --text-nav: 14px;
+  --text-table-header: 11px;
+  --text-table-primary: 14px;
+  --text-table-secondary: 13px;
+  --text-body: 14px;
+  --text-label: 11px;
+  --text-meta: 12px;
+  --text-stat-value: 24px;
+  --text-button: 13px;
+
+  /* ── Typography — Weights ── */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+
+  /* ── Typography — Colours ── */
+  --text-primary: #1C1917;
+  --text-secondary: rgba(0,0,0,0.5);
+  --text-muted: rgba(0,0,0,0.4);
+  --text-faint: rgba(0,0,0,0.15);
+
+  /* ── Spacing ── */
+  --space-section: 24px;
+  --space-card-padding: 16px;
+
+  /* ── Touch targets ── */
+  --touch-min: 44px;
+
+  /* ── Transitions ── */
+  --transition-fast: 0.12s ease;
+
+  /* ── Focus ring ── */
+  --focus-ring: 0 0 0 3px rgba(196,103,74,0.12);
+
+  /* ── Skeleton ── */
+  --skeleton-bg: rgba(0,0,0,0.06);
+
+  /* ── Progress ── */
+  --progress-track: rgba(0,0,0,0.08);
+  --progress-fill: #C4674A;
+
+  /* ── Completion rate bar ── */
+  --bar-height: 4px;
+
+  /* ── Bottom nav (creator) ── */
+  --nav-height: 56px;
+  --nav-bg: rgba(247,246,243,0.95);
+  --nav-active: #C4674A;
+  --nav-inactive: rgba(0,0,0,0.35);
+}
+
+/* ── Skeleton pulse animation ── */
+@keyframes skeleton-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.skeleton-pulse {
+  background: var(--skeleton-bg);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}

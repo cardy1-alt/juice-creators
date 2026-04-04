@@ -18,9 +18,9 @@ export default function LevelBadge({ level, levelName, size = 'sm' }: LevelBadge
       className="inline-block rounded-full whitespace-nowrap"
       style={{
         fontFamily: "'Instrument Sans', sans-serif",
-        fontWeight: 700,
-        background: level === 1 ? 'var(--ink-35)' : getLevelColour(level),
-        color: level === 1 ? 'var(--ink)' : 'var(--shell)',
+        fontWeight: 500,
+        background: level === 1 ? '#F1EFE8' : getLevelColour(level),
+        color: level === 1 ? 'rgba(0,0,0,0.55)' : '#ffffff',
         ...sizeStyles[size],
       }}
     >

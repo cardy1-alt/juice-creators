@@ -1,4 +1,5 @@
 @import './styles/fonts.css';
+@import './styles/tokens.css';
 @import './styles/theme.css';
 
 @tailwind base;
@@ -43,13 +44,4 @@
   }
 }
 
-@keyframes pulse-ring {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(196,103,74,0.4); }
-  70% { transform: scale(1.02); box-shadow: 0 0 0 16px rgba(196,103,74,0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(196,103,74,0); }
-}
-
-@keyframes pulse-ring-white {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
-  50% { box-shadow: 0 0 0 16px rgba(255,255,255,0); }
-}
+/* Pulse ring removed — no coloured glow shadows */
