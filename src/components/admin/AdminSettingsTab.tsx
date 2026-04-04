@@ -3,8 +3,8 @@ import { supabase } from '../../lib/supabase';
 import { friendlyError } from '../../lib/errors';
 import { Eye, EyeOff } from 'lucide-react';
 
-const inputCls = "w-full px-3 py-2.5 rounded-[8px] bg-[#F7F7F5] border border-[#E6E2DB] text-[#222] text-[14px] focus:outline-none focus:border-[#C4674A] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)]";
-const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.60)] mb-1.5";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1.5";
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
@@ -61,8 +61,8 @@ export default function AdminSettingsTab() {
   return (
     <div className="max-w-[520px]">
       {/* Change Password */}
-      <div className="bg-white border border-[#E6E2DB] rounded-[12px] p-6 mb-4">
-        <h2 className="text-[16px] font-bold text-[#222] mb-4">Change Password</h2>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-6 mb-4">
+        <h2 className="text-[16px] font-semibold text-[#1C1917] mb-4">Change Password</h2>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
             <label className={labelCls}>Current Password</label>
@@ -85,7 +85,7 @@ export default function AdminSettingsTab() {
             <p className={`text-[14px] ${passwordMessage.type === 'success' ? 'text-[#2D7A4F]' : 'text-[#C4674A]'}`}>{passwordMessage.text}</p>
           )}
           <button type="submit" disabled={saving}
-            className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-50"
+            className="px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-50"
 >
             {saving ? 'Updating...' : 'Update Password'}
           </button>
@@ -93,20 +93,20 @@ export default function AdminSettingsTab() {
       </div>
 
       {/* Feature Flags */}
-      <div className="bg-white border border-[#E6E2DB] rounded-[12px] p-6">
-        <h2 className="text-[16px] font-bold text-[#222] mb-4">Feature Flags</h2>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-6">
+        <h2 className="text-[16px] font-semibold text-[#1C1917] mb-4">Feature Flags</h2>
         <div className="space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[15px] font-medium text-[#222]">Instagram API</p>
+              <p className="text-[15px] font-medium text-[#1C1917]">Instagram API</p>
               <p className="text-[13px] text-[rgba(34,34,34,0.60)] leading-[1.5]">Enable Instagram OAuth and automatic reach/engagement data</p>
             </div>
             <Toggle enabled={instagramEnabled} onToggle={() => toggleFlag('instagram_api', !instagramEnabled, setInstagramEnabled)} />
           </div>
-          <div className="border-t border-[#E6E2DB]" />
+          <div className="border-t-[0.5px] border-t-[rgba(0,0,0,0.08)]" />
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[15px] font-medium text-[#222]">The Naybahood</p>
+              <p className="text-[15px] font-medium text-[#1C1917]">The Naybahood</p>
               <p className="text-[13px] text-[rgba(34,34,34,0.60)] leading-[1.5]">Show the Naybahood tab in the creator app</p>
             </div>
             <Toggle enabled={naybahoodEnabled} onToggle={() => toggleFlag('naybahood', !naybahoodEnabled, setNaybahoodEnabled)} />

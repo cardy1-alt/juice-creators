@@ -30,38 +30,37 @@ interface Participation {
 interface Creator { id: string; name: string; display_name: string | null; instagram_handle: string; level: number; completion_rate: number; }
 
 // ─── Shared styling (using CSS variables from theme.css) ───
-const BORDER = 'var(--border)';
-const inputCls = "w-full px-3 py-2.5 rounded-[var(--r-input)] bg-[var(--shell)] border border-[var(--border)] text-[var(--ink)] text-[13.5px] focus:outline-none focus:border-[var(--terra)] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--ink-60)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.6px] py-3 px-4 bg-[var(--shell)]" + " " + "text-[rgba(0,0,0,0.45)]";
-const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[var(--border)]";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1.5";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]";
+const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(34,34,34,0.4)]";
-const modalClose = "w-[30px] h-[30px] rounded-full bg-[var(--shell)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[var(--border)] transition-colors";
-const modalHeader = "flex items-center justify-between px-6 py-5 border-b border-[var(--border)] flex-shrink-0";
+const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3] transition-colors";
+const modalHeader = "flex items-center justify-between px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-6 py-6";
-const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t border-[var(--border)] bg-[var(--shell)] flex-shrink-0";
-const ghostBtn = "text-[14px] font-semibold text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors";
-const primaryBtn = "px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90 disabled:opacity-40 transition-opacity";
-const secondaryBtn = "px-5 py-2.5 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]";
-const modalShadow = 'var(--shadow-lg)';
+const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0";
+const ghostBtn = "text-[14px] font-medium text-[rgba(34,34,34,0.60)] hover:text-[#1C1917] transition-colors";
+const primaryBtn = "px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
+const secondaryBtn = "px-5 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]";
+const modalShadow = '0 1px 3px rgba(0,0,0,0.06)';
 
 function StatusBadge({ status }: { status: string }) {
   const cls: Record<string, string> = {
-    draft: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
-    active: 'bg-[var(--terra-light)] text-[var(--terra)]',
+    draft: 'bg-[#F1EFE8] text-[#5F5E5A]',
+    active: 'bg-[#FAEEDA] text-[#854F0B]',
     selecting: 'bg-[rgba(59,130,246,0.08)] text-[#3B82F6]',
-    live: 'bg-[rgba(45,122,79,0.08)] text-[var(--success)]',
-    completed: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
-    interested: 'bg-[var(--terra-light)] text-[var(--terra)]',
-    selected: 'bg-[rgba(45,122,79,0.08)] text-[var(--success)]',
-    confirmed: 'bg-[rgba(45,122,79,0.08)] text-[var(--success)]',
-    declined: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
+    live: 'bg-[#E1F5EE] text-[#0F6E56]',
+    completed: 'bg-[#F1EFE8] text-[#5F5E5A]',
+    interested: 'bg-[#FAEEDA] text-[#854F0B]',
+    selected: 'bg-[#E1F5EE] text-[#0F6E56]',
+    confirmed: 'bg-[#E1F5EE] text-[#0F6E56]',
+    declined: 'bg-[#F1EFE8] text-[#5F5E5A]',
     content_submitted: 'bg-[rgba(59,130,246,0.08)] text-[#3B82F6]',
-    overdue: 'bg-[rgba(220,38,38,0.08)] text-[#DC2626]',
+    overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-1 rounded-[var(--r-sm)] text-[11px] font-semibold ${cls[status] || cls.draft}`}>
+    <span className={`inline-flex items-center rounded-[999px] text-[11px] font-medium ${cls[status] || cls.draft}`} style={{ padding: '3px 9px' }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -187,22 +186,22 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-[var(--ink-35)]">Step {step} of 3</span>
+            <span className="text-[13px] text-[rgba(34,34,34,0.35)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
           </div>
         </div>
         {/* Progress bar */}
-        <div className="h-[3px] bg-[rgba(34,34,34,0.06)]"><div className="h-full bg-[var(--terra)] transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} /></div>
+        <div className="h-[3px] bg-[rgba(34,34,34,0.06)]"><div className="h-full bg-[#C4674A] transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} /></div>
 
         {/* Body */}
         <div className={modalBody}>
           {(formError || saveError) && (
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[var(--r-sm)] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
               <span className="text-[13px] font-medium">{formError || saveError}</span>
             </div>
           )}
@@ -215,13 +214,13 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className={labelCls} style={{ marginBottom: 0 }}>Headline</label>
                   <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[6px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
-                    {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
+                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[6px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
+                    {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Generating...' : 'Generate brief with AI'}
                   </button>
                 </div>
                 <input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
-                {aiError && <p className="text-[12px] text-[var(--terra)] mt-1">{aiError}</p>}
+                {aiError && <p className="text-[12px] text-[#C4674A] mt-1">{aiError}</p>}
               </div>
               <div className="md:col-span-2"><label className={labelCls}>Perk Description</label><textarea value={form.perk_description} onChange={e => set('perk_description', e.target.value)} className={taCls} placeholder="What the creator receives" /></div>
               <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={form.perk_value} onChange={e => set('perk_value', e.target.value)} className={inputCls} /></div>
@@ -240,7 +239,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
             <div>
               {aiRan ? (
                 <>
-                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[var(--r-sm)] mb-5" style={{ background: 'rgba(196,103,74,0.06)', color: 'var(--terra)' }}>
+                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-5" style={{ background: 'rgba(196,103,74,0.06)', color: '#C4674A' }}>
                     <span className="text-[12px] font-medium">✦ These fields were generated by AI — review and edit before publishing.</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -250,19 +249,19 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
                         className={inputCls} placeholder="#brandname, @brand, #campaign" />
-                      <p className="text-[11px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
+                      <p className="text-[11px] text-[rgba(34,34,34,0.35)] mt-1">Comma-separated tags creators must include</p>
                     </div>
-                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[var(--border)]">
-                      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
+                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(0,0,0,0.08)]">
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
                     </div>
                     {[form.tp1, form.tp2, form.tp3].map((tp, i) => (
                       <div key={i} className="md:col-span-2 flex items-center gap-3">
-                        <span className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-bold flex-shrink-0" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}>{i + 1}</span>
+                        <span className="w-7 h-7 rounded-full flex items-center justify-center text-[12px] font-semibold flex-shrink-0" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>{i + 1}</span>
                         <input value={tp} onChange={e => set(`tp${i + 1}`, e.target.value)} className={`${inputCls} flex-1`} placeholder={`Key message ${i + 1}`} />
                       </div>
                     ))}
-                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[var(--border)]">
-                      <p style={{ fontSize: 12, fontWeight: 700, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Inspiration</p>
+                    <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(0,0,0,0.08)]">
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Inspiration</p>
                     </div>
                     {form.insp.map((item: any, i: number) => (
                       <div key={i} className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -281,7 +280,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                     {aiLoading ? 'Generating brief...' : 'Generate brief with AI'}
                   </button>
                   <p className="text-[13px] text-[rgba(34,34,34,0.45)]">Fill in Step 1 first, then let AI write your brief.</p>
-                  {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
+                  {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
                 </div>
               )}
             </div>
@@ -297,20 +296,20 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div>
                   <label className={labelCls}>Deliverables</label>
                   <div className="flex gap-4 pt-2">
-                    <label className="flex items-center gap-2 text-[13.5px] text-[var(--ink)]"><input type="checkbox" checked={form.reel} onChange={e => set('reel', e.target.checked)} className="accent-[var(--terra)]" /> Reel</label>
-                    <label className="flex items-center gap-2 text-[13.5px] text-[var(--ink)]"><input type="checkbox" checked={form.story} onChange={e => set('story', e.target.checked)} className="accent-[var(--terra)]" /> Story</label>
+                    <label className="flex items-center gap-2 text-[13.5px] text-[#1C1917]"><input type="checkbox" checked={form.reel} onChange={e => set('reel', e.target.checked)} className="accent-[#C4674A]" /> Reel</label>
+                    <label className="flex items-center gap-2 text-[13.5px] text-[#1C1917]"><input type="checkbox" checked={form.story} onChange={e => set('story', e.target.checked)} className="accent-[#C4674A]" /> Story</label>
                   </div>
                 </div>
               </div>
               {/* Summary card */}
-              <div className="bg-[var(--shell)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+              <div className="bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
                 <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Title</span><span className="text-[var(--ink)] font-medium">{form.title || '—'}</span></div>
-                  {form.perk_description && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Perk</span><span className="text-[var(--ink)]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
-                  {form.target_city && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">City</span><span className="text-[var(--ink)]">{form.target_city}</span></div>}
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Creators</span><span className="text-[var(--ink)]">{form.creator_target}</span></div>
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Brand</span><span className="text-[#1C1917] font-medium">{brandName || '—'}</span></div>
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Title</span><span className="text-[#1C1917] font-medium">{form.title || '—'}</span></div>
+                  {form.perk_description && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Perk</span><span className="text-[#1C1917]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
+                  {form.target_city && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">City</span><span className="text-[#1C1917]">{form.target_city}</span></div>}
+                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Creators</span><span className="text-[#1C1917]">{form.creator_target}</span></div>
                 </div>
               </div>
             </div>
@@ -453,17 +452,17 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     onRefresh();
   };
 
-  const pThCls = "text-left text-[11px] font-semibold uppercase tracking-[0.5px] text-[var(--ink-35)] py-2.5 px-3 bg-[var(--shell)] whitespace-nowrap";
-  const pTdCls = "py-2 px-3 text-[13px] text-[var(--ink)] border-b border-[var(--border)] align-middle";
-  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[var(--shell)] border border-[var(--border)] text-[13px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] focus:shadow-[0_0_0_2px_rgba(196,103,74,0.1)]";
+  const pThCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-2.5 px-3 bg-[#F7F6F3] whitespace-nowrap";
+  const pTdCls = "py-2 px-3 text-[13px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)] align-middle";
+  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] text-[#1C1917] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_2px_rgba(196,103,74,0.1)]";
 
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 style={{ fontSize: 16, fontWeight: 700, color: 'var(--ink)', letterSpacing: '-0.2px' }}>
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>
             Manage Participation — {campaign.title}
           </h2>
           <button onClick={onClose} className={modalClose}><X size={15} /></button>
@@ -471,7 +470,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
         {/* Toast */}
         {toast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[#222] text-white px-4 py-2 rounded-[var(--r-sm)] text-[13px] font-medium" style={{ boxShadow: '0 4px 16px rgba(34,34,34,0.15)' }}>
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[#1C1917] text-white px-4 py-2 rounded-[8px] text-[13px] font-medium" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             {toast}
           </div>
         )}
@@ -494,11 +493,11 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                 </tr></thead>
                 <tbody>
                   {parts.map(p => (
-                    <tr key={p.id} className="hover:bg-[#FAFAF8]">
+                    <tr key={p.id} className="hover:bg-[rgba(0,0,0,0.02)]">
                       <td className={`${pTdCls} font-medium whitespace-nowrap`}>
                         <div className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                            <span className="text-[10px] font-bold text-white">{(p.creators?.display_name || p.creators?.name || '?')[0].toUpperCase()}</span>
+                          <div className="w-6 h-6 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                            <span className="text-[10px] font-semibold text-white">{(p.creators?.display_name || p.creators?.name || '?')[0].toUpperCase()}</span>
                           </div>
                           {p.creators?.display_name || p.creators?.name}
                         </div>
@@ -506,7 +505,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                       <td className={pTdCls}>
                         <select value={p.status}
                           onChange={e => updateField(p.id, 'status', e.target.value)}
-                          className="text-[12px] px-2 py-1.5 rounded-[6px] border border-[var(--border)] bg-[var(--shell)] focus:outline-none focus:border-[var(--terra)]">
+                          className="text-[12px] px-2 py-1.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] focus:outline-none focus:border-[#C4674A]">
                           <option value="confirmed">Confirmed</option>
                           <option value="visited">Visited</option>
                           <option value="content_submitted">Content Submitted</option>
@@ -517,7 +516,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                       <td className={pTdCls}>
                         <input type="checkbox" checked={p.perk_sent}
                           onChange={e => updatePerkSent(p.id, e.target.checked)}
-                          className="accent-[var(--terra)] w-4 h-4" />
+                          className="accent-[#C4674A] w-4 h-4" />
                       </td>
                       <td className={pTdCls}>
                         <div className="flex items-center gap-1.5">
@@ -526,11 +525,11 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                             onBlur={e => updateReelUrl(p.id, e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                             placeholder="Paste URL"
-                            className="w-[140px] px-2 py-1.5 rounded-[6px] bg-[var(--shell)] border border-[var(--border)] text-[12px] focus:outline-none focus:border-[var(--terra)]"
+                            className="w-[140px] px-2 py-1.5 rounded-[6px] bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[12px] focus:outline-none focus:border-[#C4674A]"
                           />
                           {p.reel_url && (
                             <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                              className="text-[11px] text-[var(--terra)] font-medium whitespace-nowrap hover:underline">
+                              className="text-[11px] text-[#C4674A] font-medium whitespace-nowrap hover:underline">
                               View →
                             </a>
                           )}
@@ -576,7 +575,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <p className="text-[14px] text-[var(--ink-35)]">No confirmed participations yet</p>
+              <p className="text-[14px] text-[rgba(34,34,34,0.35)]">No confirmed participations yet</p>
             </div>
           )}
         </div>
@@ -688,53 +687,53 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
   return (
     <tr>
       <td colSpan={10} className="p-0">
-        <div className="bg-[#FAFAF8] border-t border-[var(--border)] px-6 py-5">
+        <div className="bg-[#FAFAF8] border-t border-[rgba(0,0,0,0.08)] px-6 py-5">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {campaign.perk_description && (
               <div>
                 <p className={labelCls}>Perk</p>
-                <p className="text-[14px] text-[var(--ink)]">{campaign.perk_description}</p>
-                {campaign.perk_value && <p className="text-[13px] text-[var(--ink-60)] mt-1">£{campaign.perk_value} · {campaign.perk_type?.replace('_', ' ')}</p>}
+                <p className="text-[14px] text-[#1C1917]">{campaign.perk_description}</p>
+                {campaign.perk_value && <p className="text-[13px] text-[rgba(34,34,34,0.60)] mt-1">£{campaign.perk_value} · {campaign.perk_type?.replace('_', ' ')}</p>}
               </div>
             )}
             {campaign.content_requirements && (
               <div>
                 <p className={labelCls}>Content Required</p>
-                <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{campaign.content_requirements.slice(0, 150)}{campaign.content_requirements.length > 150 ? '...' : ''}</p>
+                <p className="text-[14px] text-[#1C1917] leading-[1.6]">{campaign.content_requirements.slice(0, 150)}{campaign.content_requirements.length > 150 ? '...' : ''}</p>
               </div>
             )}
             {campaign.talking_points && campaign.talking_points.length > 0 && (
               <div>
                 <p className={labelCls}>Talking Points</p>
-                <ol className="text-[14px] text-[var(--ink)] space-y-1 list-decimal list-inside">
+                <ol className="text-[14px] text-[#1C1917] space-y-1 list-decimal list-inside">
                   {campaign.talking_points.map((tp, i) => <li key={i}>{tp}</li>)}
                 </ol>
               </div>
             )}
           </div>
           {inlineToast && (
-            <div className="mt-3 px-3.5 py-2 rounded-[var(--r-sm)] bg-[#222] text-white text-[13px] font-medium inline-block">{inlineToast}</div>
+            <div className="mt-3 px-3.5 py-2 rounded-[8px] bg-[#1C1917] text-white text-[13px] font-medium inline-block">{inlineToast}</div>
           )}
-          <div className="flex gap-2 mt-4 pt-4 border-t border-[var(--border)] flex-wrap items-center">
+          <div className="flex gap-2 mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)] flex-wrap items-center">
             {/* Campaign status */}
             <select value={campaign.status} onChange={async e => {
               const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
               if (error) showInlineToast('Failed to update status');
               else { showInlineToast(`Status → ${e.target.value}`); onEdit(); /* triggers refresh */ }
-            }} className="px-3 py-2 rounded-[6px] border border-[var(--border)] text-[13px] font-semibold text-[var(--ink)] bg-white">
+            }} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] font-semibold text-[#1C1917] bg-white">
               <option value="draft">Draft</option><option value="active">Active</option>
               <option value="selecting">Selecting</option><option value="live">Live</option>
               <option value="completed">Completed</option>
             </select>
-            <button onClick={onManageApplicants} className="px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-90">Manage Applicants</button>
+            <button onClick={onManageApplicants} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">Manage Applicants</button>
             <button onClick={handleAiRecommend} disabled={aiLoading}
-              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[6px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
-              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}
+              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[6px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
+              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
               {aiLoading ? 'Analysing...' : 'AI Recommend'}
             </button>
-            <button onClick={onViewParticipation} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">View Participation</button>
-            <button onClick={onEdit} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">Edit Campaign</button>
-            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+            <button onClick={onViewParticipation} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">View Participation</button>
+            <button onClick={onEdit} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">Edit Campaign</button>
+            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
               <span className="flex items-center gap-1"><UserPlus size={14} /> Add Applicant</span>
             </button>
             <button onClick={async () => {
@@ -746,30 +745,30 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               });
               if (error) showInlineToast('Failed to duplicate');
               else { showInlineToast('Campaign duplicated as draft'); onEdit(); }
-            }} className="px-4 py-2 rounded-[6px] border border-[var(--border)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--shell)]">
+            }} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
               Duplicate
             </button>
           </div>
-          {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
+          {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
 
           {/* AI Recommendations panel */}
           {recommendations && recommendations.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[var(--border)]">
-              <p className="text-[12px] font-bold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-3">AI Recommendations</p>
+            <div className="mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)]">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] mb-3">AI Recommendations</p>
               <div className="space-y-2">
                 {recommendations.map(r => (
-                  <div key={r.creator_id} className="flex items-center gap-3 bg-white rounded-[var(--r-sm)] border border-[var(--border)] px-4 py-3">
-                    <div className="w-8 h-8 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[12px] font-bold text-white">{r.name[0]}</span>
+                  <div key={r.creator_id} className="flex items-center gap-3 bg-white rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.08)] px-4 py-3">
+                    <div className="w-8 h-8 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                      <span className="text-[12px] font-semibold text-white">{r.name[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[var(--ink)]">{r.name}</p>
-                      <p className="text-[13px] text-[var(--ink-60)] truncate">{r.reason}</p>
+                      <p className="text-[14px] font-semibold text-[#1C1917]">{r.name}</p>
+                      <p className="text-[13px] text-[rgba(34,34,34,0.60)] truncate">{r.reason}</p>
                     </div>
                     <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-[14px] font-bold text-[var(--terra)]">{r.score}/10</span>
+                      <span className="text-[14px] font-semibold text-[#C4674A]">{r.score}/10</span>
                       <button onClick={() => handleSelectCreator(r.creator_id)}
-                        className="px-3 py-1.5 rounded-[6px] bg-[var(--terra)] text-white text-[12px] font-semibold hover:opacity-90">
+                        className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
                         Select
                       </button>
                     </div>
@@ -779,20 +778,20 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
             </div>
           )}
           {showAddApplicant && (
-            <div className="mt-4 pt-4 border-t border-[var(--border)]">
+            <div className="mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)]">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[12px] font-bold uppercase tracking-[0.6px] text-[var(--ink-35)]">Add Creator as Applicant</p>
-                <button onClick={() => setShowAddApplicant(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={16} /></button>
+                <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)]">Add Creator as Applicant</p>
+                <button onClick={() => setShowAddApplicant(false)} className="text-[rgba(34,34,34,0.35)] hover:text-[#1C1917]"><X size={16} /></button>
               </div>
               <div className="max-h-[200px] overflow-y-auto space-y-1">
                 {allCreators.map(cr => (
-                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[var(--r-sm)] hover:bg-[var(--shell)]">
+                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[8px] hover:bg-[#F7F6F3]">
                     <div>
-                      <span className="text-[14px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
-                      <span className="text-[12px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
+                      <span className="text-[14px] font-medium text-[#1C1917]">{cr.display_name || cr.name}</span>
+                      <span className="text-[12px] text-[rgba(34,34,34,0.35)] ml-2">{cr.instagram_handle}</span>
                     </div>
                     <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
-                      className="px-3 py-1 rounded-[6px] bg-[var(--terra)] text-white text-[11px] font-semibold disabled:opacity-40">
+                      className="px-3 py-1 rounded-[6px] bg-[#C4674A] text-white text-[11px] font-semibold disabled:opacity-40">
                       {addingCreator === cr.id ? 'Adding...' : 'Add'}
                     </button>
                   </div>
@@ -868,8 +867,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[var(--border)] rounded-[var(--r-card)]" style={{ padding: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
+          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
         ))}
@@ -877,7 +876,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
       {/* Campaign table */}
       {campaigns.length > 0 ? (
-        <div className="bg-white border border-[var(--border)] rounded-[var(--r-card)] overflow-x-auto">
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
@@ -892,11 +891,11 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 return (
                   <>
                     <tr key={c.id} onClick={() => setExpandedId(expanded ? null : c.id)}
-                      className="hover:bg-[var(--shell)] cursor-pointer transition-colors" style={{ height: 44 }}>
+                      className="hover:bg-[rgba(0,0,0,0.02)] cursor-pointer transition-colors" style={{ height: 44 }}>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full bg-[var(--terra-light)] flex items-center justify-center flex-shrink-0">
-                            <span className="text-[11px] font-bold text-[var(--terra)]">{(c.businesses?.name || '?')[0]}</span>
+                          <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
+                            <span className="text-[11px] font-semibold text-[#C4674A]">{(c.businesses?.name || '?')[0]}</span>
                           </div>
                           <span className="font-medium text-[14px]">{c.businesses?.name || '—'}</span>
                         </div>
@@ -910,20 +909,20 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           )}
                         </div>
                       </td>
-                      <td className={`${tdCls} text-[var(--ink-60)]`}>{c.target_city || '—'}</td>
+                      <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.target_city || '—'}</td>
                       <td className={tdCls}>{c.creator_target}</td>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2">
                           <div className="w-16 h-1.5 bg-[rgba(34,34,34,0.06)] rounded-full overflow-hidden">
-                            <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
+                            <div className="h-full bg-[#C4674A] rounded-full" style={{ width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
                           </div>
-                          <span className="text-[13px] text-[var(--ink-60)]">{counts.applicants}/{c.creator_target}</span>
+                          <span className="text-[13px] text-[rgba(34,34,34,0.60)]">{counts.applicants}/{c.creator_target}</span>
                         </div>
                       </td>
                       <td className={tdCls}>{counts.selected}</td>
                       <td className={tdCls}>{counts.submitted}</td>
                       <td className={tdCls}>{counts.completed}</td>
-                      <td className={`${tdCls} text-[var(--ink-35)]`}>
+                      <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>
                         <div className="flex items-center gap-2">
                           {fmtShortDate(c.expression_deadline)}
                           {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
@@ -946,13 +945,13 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         </div>
       ) : (
         /* Empty state */
-        <div className="bg-white border border-[var(--border)] rounded-[var(--r-card)] p-12 text-center">
-          <div className="w-12 h-12 rounded-[var(--r-sm)] flex items-center justify-center mx-auto mb-4" style={{ background: 'var(--terra-light)' }}>
-            <Megaphone size={22} className="text-[var(--terra)]" />
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-12 text-center">
+          <div className="w-12 h-12 rounded-[8px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>
+            <Megaphone size={22} className="text-[#C4674A]" />
           </div>
-          <p className="text-[17px] font-bold text-[var(--ink)] mb-1">No campaigns yet</p>
-          <p className="text-[14px] text-[var(--ink-60)] mb-5">Create your first campaign to get started</p>
-          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold">
+          <p className="text-[17px] font-semibold text-[#1C1917] mb-1">No campaigns yet</p>
+          <p className="text-[14px] text-[rgba(34,34,34,0.60)] mb-5">Create your first campaign to get started</p>
+          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold">
             + New Campaign
           </button>
         </div>

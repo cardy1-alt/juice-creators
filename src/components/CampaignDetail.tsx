@@ -30,9 +30,9 @@ function fmtDate(d: string | null) {
 }
 
 function PerkIcon({ type }: { type: string | null }) {
-  if (type === 'experience') return <Gift size={18} className="text-[var(--terra)]" />;
-  if (type === 'product') return <Gift size={18} className="text-[var(--terra)]" />;
-  return <Gift size={18} className="text-[var(--terra)]" />;
+  if (type === 'experience') return <Gift size={18} className="text-[#C4674A]" />;
+  if (type === 'product') return <Gift size={18} className="text-[#C4674A]" />;
+  return <Gift size={18} className="text-[#C4674A]" />;
 }
 
 export default function CampaignDetail({ campaignId, onBack }: CampaignDetailProps) {
@@ -125,7 +125,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F6F3]">
         <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
@@ -133,40 +133,40 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
   if (notFound || !campaign) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--shell)] px-6 text-center">
-        <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Campaign not available</p>
-        <p className="text-[14px] text-[var(--ink-60)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
-        {onBack && <button onClick={onBack} className="px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[14px]">Go back</button>}
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F6F3] px-6 text-center">
+        <p className="text-[15px] font-medium text-[#1C1917] mb-2">Campaign not available</p>
+        <p className="text-[13px] text-[rgba(0,0,0,0.4)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
+        {onBack && <button onClick={onBack} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
       </div>
     );
   }
 
   if (!campaign) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
+      <div className="min-h-screen flex items-center justify-center bg-[#F7F6F3] px-4">
         <div className="text-center">
-          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Campaign not found</p>
-          <p className="text-[14px] text-[var(--ink-60)]">This campaign may have been removed or the link is invalid.</p>
-          {onBack && <button onClick={onBack} className="mt-4 text-[var(--terra)] font-semibold text-[14px]">Go back</button>}
+          <p className="text-[18px] font-semibold text-[#1C1917] mb-2">Campaign not found</p>
+          <p className="text-[14px] text-[rgba(0,0,0,0.5)]">This campaign may have been removed or the link is invalid.</p>
+          {onBack && <button onClick={onBack} className="mt-4 text-[#C4674A] font-semibold text-[14px]">Go back</button>}
         </div>
       </div>
     );
   }
 
-  const sectionCls = 'bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5 mb-3';
+  const sectionCls = 'bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-3';
 
   return (
-    <div className="min-h-screen bg-[var(--shell)]">
+    <div className="min-h-screen bg-[#F7F6F3]">
       <div className="max-w-[720px] mx-auto px-4 pb-28 pt-4">
         {/* Back button */}
         {onBack && (
-          <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
+          <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[rgba(0,0,0,0.4)] hover:text-[#C4674A] mb-3">
             <ArrowLeft size={16} /> Back
           </button>
         )}
 
         {/* Hero image */}
-        <div className="relative w-full aspect-video rounded-[var(--r-card)] overflow-hidden mb-3">
+        <div className="relative w-full aspect-video rounded-[10px] overflow-hidden mb-3">
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
@@ -175,7 +175,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
                 <img src={campaign.businesses.logo_url} alt={campaign.businesses.name} className="w-20 h-20 rounded-full object-cover border-3 border-white/30" />
               ) : (
                 <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                  <span className="text-[32px] font-bold text-white">{(campaign.businesses?.name || '?')[0]}</span>
+                  <span className="text-[32px] font-semibold text-white">{(campaign.businesses?.name || '?')[0]}</span>
                 </div>
               )}
             </div>
@@ -186,22 +186,22 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 1. Header */}
         <div className={sectionCls}>
           <button onClick={() => setShowBrandInfo(true)}
-            className="text-[14px] font-semibold text-[var(--ink-60)] mb-1 hover:text-[var(--terra)] hover:underline transition-colors">
+            className="text-[14px] font-semibold text-[rgba(0,0,0,0.5)] mb-1 hover:text-[#C4674A] hover:underline transition-colors">
             {campaign.businesses?.name}
           </button>
-          <h1 className="text-[24px] font-bold text-[var(--ink)] mb-3" style={{ letterSpacing: '-0.4px', lineHeight: 1.2 }}>
+          <h1 className="text-[16px] font-semibold text-[#1C1917] mb-3" style={{ lineHeight: 1.3 }}>
             {campaign.headline || campaign.title}
           </h1>
           {/* Perk pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--r-pill)] bg-[var(--terra-light)]">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--r-pill)] bg-[rgba(196,103,74,0.08)]">
             <PerkIcon type={campaign.perk_type} />
-            <span className="text-[14px] font-semibold text-[var(--terra)]">
+            <span className="text-[14px] font-semibold text-[#C4674A]">
               {campaign.perk_description?.split('—')[0]?.trim() || 'Perk included'}
               {campaign.perk_value ? ` — worth £${campaign.perk_value}` : ''}
             </span>
           </div>
           {campaign.expression_deadline && (
-            <p className="text-[13px] text-[var(--ink-35)] mt-3 flex items-center gap-1.5">
+            <p className="text-[13px] text-[rgba(0,0,0,0.4)] mt-3 flex items-center gap-1.5">
               <Clock size={14} /> Apply by {fmtDate(campaign.expression_deadline)}
             </p>
           )}
@@ -210,17 +210,17 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 2. About the brand */}
         {campaign.about_brand && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">About the brand</h2>
-            <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.about_brand}</p>
+            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">About the brand</h2>
+            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.about_brand}</p>
           </div>
         )}
 
         {/* 3. What's in it for you */}
         {campaign.perk_description && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">What's in it for you</h2>
-            <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.perk_description}</p>
-            <div className="flex items-center gap-4 mt-3 text-[13px] text-[var(--ink-60)]">
+            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">What's in it for you</h2>
+            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.perk_description}</p>
+            <div className="flex items-center gap-4 mt-3 text-[13px] text-[rgba(0,0,0,0.5)]">
               {campaign.perk_value && <span className="flex items-center gap-1"><Gift size={14} /> Worth £{campaign.perk_value}</span>}
               {campaign.perk_type && <span className="capitalize">{campaign.perk_type.replace('_', ' ')}</span>}
             </div>
@@ -229,29 +229,29 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
         {/* 4. What to post */}
         <div className={sectionCls}>
-          <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">What to post</h2>
+          <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">What to post</h2>
           {/* Deliverables */}
           <div className="flex gap-3 mb-3">
             {campaign.deliverables?.reel && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-sm)] bg-[var(--shell)] text-[13px] font-medium text-[var(--ink)]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
                 <Film size={14} /> Reel
               </span>
             )}
             {campaign.deliverables?.story && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[var(--r-sm)] bg-[var(--shell)] text-[13px] font-medium text-[var(--ink)]">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
                 <Image size={14} /> Story
               </span>
             )}
           </div>
           {campaign.content_requirements && (
-            <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
+            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.content_requirements}</p>
           )}
           {campaign.required_tags && campaign.required_tags.length > 0 && (
-            <div className="mt-3 pt-3 border-t border-[var(--ink-10)]">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-2">Required Tags</p>
+            <div className="mt-3 pt-3 border-t-[0.5px] border-[rgba(0,0,0,0.08)]">
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Required Tags</p>
               <div className="flex flex-wrap gap-2">
                 {campaign.required_tags.map((tag, i) => (
-                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-[var(--r-sm)] bg-[var(--shell)] text-[13px] font-medium text-[var(--ink)]">
+                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
                     {tag}
                   </span>
                 ))}
@@ -263,11 +263,11 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 5. Talking points */}
         {campaign.talking_points && campaign.talking_points.length > 0 && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">Talking points</h2>
+            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">Talking points</h2>
             <ol className="space-y-2">
               {campaign.talking_points.map((tp, i) => (
-                <li key={i} className="flex gap-3 text-[15px] text-[var(--ink)] leading-[1.65]">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--terra-light)] text-[var(--terra)] text-[12px] font-semibold flex items-center justify-center mt-0.5">
+                <li key={i} className="flex gap-3 text-[15px] text-[#1C1917] leading-[1.65]">
+                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[rgba(196,103,74,0.08)] text-[#C4674A] text-[12px] font-semibold flex items-center justify-center mt-0.5">
                     {i + 1}
                   </span>
                   {tp}
@@ -280,12 +280,12 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 6. Inspiration */}
         {campaign.inspiration && campaign.inspiration.length > 0 && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-3">Inspiration</h2>
+            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-3">Inspiration</h2>
             <div className="space-y-3">
               {campaign.inspiration.map((item: any, i: number) => (
-                <div key={i} className="bg-[var(--shell)] rounded-[var(--r-sm)] p-4">
-                  <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{item.title}</p>
-                  <p className="text-[14px] text-[var(--ink-60)] leading-[1.6]">{item.description}</p>
+                <div key={i} className="bg-[#F7F6F3] rounded-[8px] p-4">
+                  <p className="text-[15px] font-semibold text-[#1C1917] mb-1">{item.title}</p>
+                  <p className="text-[14px] text-[rgba(0,0,0,0.5)] leading-[1.6]">{item.description}</p>
                 </div>
               ))}
             </div>
@@ -294,44 +294,43 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
         {/* 7. Campaign dates */}
         <div className={sectionCls}>
-          <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-3">Campaign dates</h2>
+          <h2 className="text-[16px] font-semibold text-[#1C1917] mb-3">Campaign dates</h2>
           <div className="grid grid-cols-3 gap-3">
             <div className="text-center">
-              <Calendar size={16} className="text-[var(--ink-35)] mx-auto mb-1" />
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-0.5">Opens</p>
-              <p className="text-[14px] font-medium text-[var(--ink)]">{fmtDate(campaign.open_date)}</p>
+              <Calendar size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Opens</p>
+              <p className="text-[14px] font-medium text-[#1C1917]">{fmtDate(campaign.open_date)}</p>
             </div>
             <div className="text-center">
-              <MessageCircle size={16} className="text-[var(--ink-35)] mx-auto mb-1" />
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-0.5">Apply by</p>
-              <p className="text-[14px] font-medium text-[var(--terra)]">{fmtDate(campaign.expression_deadline)}</p>
+              <MessageCircle size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Apply by</p>
+              <p className="text-[14px] font-medium text-[#C4674A]">{fmtDate(campaign.expression_deadline)}</p>
             </div>
             <div className="text-center">
-              <Film size={16} className="text-[var(--ink-35)] mx-auto mb-1" />
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-0.5">Content due</p>
-              <p className="text-[14px] font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</p>
+              <Film size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Content due</p>
+              <p className="text-[14px] font-medium text-[#1C1917]">{fmtDate(campaign.content_deadline)}</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Sticky bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-[var(--card)] border-t border-[var(--border)] px-4 py-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-[0.5px] border-[rgba(0,0,0,0.08)] px-4 py-4 z-40">
         <div className="max-w-[720px] mx-auto">
           {!application && (
             <div>
               <button
                 onClick={() => setShowPitchModal(true)}
-                className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity"
-                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
+                className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity"
               >
                 I'm Interested
               </button>
-              <p className="text-[12px] text-[var(--ink-35)] text-center mt-1.5">This won't commit you — the brand will review and select</p>
+              <p className="text-[12px] text-[rgba(0,0,0,0.4)] text-center mt-1.5">This won't commit you — the brand will review and select</p>
             </div>
           )}
           {application?.status === 'interested' && (
-            <div className="confetti-burst w-full py-3.5 rounded-[var(--r-pill)] bg-[rgba(45,122,79,0.08)] text-center text-[var(--success)] font-semibold text-[15px] border border-[rgba(45,122,79,0.15)]">
+            <div className="confetti-burst w-full min-h-[44px] py-3 rounded-[6px] bg-[#E1F5EE] text-center text-[#0F6E56] font-semibold text-[13px] border-[0.5px] border-[rgba(0,0,0,0.08)]">
               <Check size={16} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
               Interest registered — we'll be in touch
             </div>
@@ -340,20 +339,19 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             <button
               onClick={handleConfirm}
               disabled={submitting}
-              className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 transition-opacity disabled:opacity-50"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
+              className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity disabled:opacity-50"
             >
               {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
             </button>
           )}
           {application?.status === 'confirmed' && (
-            <div className="w-full py-3.5 rounded-[var(--r-pill)] bg-[rgba(45,122,79,0.1)] text-center text-[var(--success)] font-semibold text-[15px] border border-[rgba(45,122,79,0.2)]">
+            <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#E1F5EE] text-center text-[#0F6E56] font-semibold text-[13px] border-[0.5px] border-[rgba(0,0,0,0.08)]">
               <Check size={16} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
               You're in — view your campaign
             </div>
           )}
           {application?.status === 'declined' && (
-            <div className="w-full py-3.5 rounded-[var(--r-pill)] bg-[var(--shell)] text-center text-[var(--ink-35)] font-medium text-[15px] border border-[var(--border)]">
+            <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#F7F6F3] text-center text-[rgba(0,0,0,0.4)] font-medium text-[13px] border-[0.5px] border-[rgba(0,0,0,0.08)]">
               Not selected for this campaign
             </div>
           )}
@@ -363,25 +361,25 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {/* Brand info modal */}
       {showBrandInfo && campaign.businesses && (
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
-          <div className="bg-[var(--card)] rounded-[var(--r-card)] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-[var(--ink)]">{campaign.businesses.name}</h3>
-              <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+              <h3 className="text-[16px] font-semibold text-[#1C1917]">{campaign.businesses.name}</h3>
+              <button onClick={() => setShowBrandInfo(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>
             </div>
             {campaign.businesses.category && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)] mb-3">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[8px] text-[12px] font-semibold bg-[rgba(196,103,74,0.08)] text-[#C4674A] mb-3">
                 {campaign.businesses.category}
               </span>
             )}
             {(campaign.about_brand || campaign.businesses.bio) && (
-              <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
+              <p className="text-[15px] text-[#1C1917] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
             )}
             {!campaign.about_brand && !campaign.businesses.bio && (
-              <p className="text-[14px] text-[var(--ink-35)] mb-4">No description available yet.</p>
+              <p className="text-[14px] text-[rgba(0,0,0,0.4)] mb-4">No description available yet.</p>
             )}
             {campaign.businesses.instagram_handle && (
               <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                className="inline-flex items-center gap-1.5 text-[14px] text-[#C4674A] font-medium hover:underline">
                 <AtSign size={14} /> @{campaign.businesses.instagram_handle.replace('@', '')} <ExternalLink size={12} />
               </a>
             )}
@@ -392,30 +390,29 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {/* Pitch modal */}
       {showPitchModal && (
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-[var(--card)] w-full max-w-[480px] rounded-t-[16px] sm:rounded-[var(--r-card)] p-6">
+          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-[var(--ink)]">Tell them why you</h3>
-              <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+              <h3 className="text-[16px] font-semibold text-[#1C1917]">Tell them why you</h3>
+              <button onClick={() => setShowPitchModal(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>
             </div>
-            <p className="text-[14px] text-[var(--ink-60)] mb-4">Write a short pitch to stand out — totally optional but helps your chances</p>
+            <p className="text-[14px] text-[rgba(0,0,0,0.5)] mb-4">Write a short pitch to stand out — totally optional but helps your chances</p>
             <textarea
               value={pitch}
               onChange={e => setPitch(e.target.value)}
               placeholder="I'd love to be part of this because..."
-              className="w-full px-4 py-3 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[var(--ink)] text-[15px] h-24 resize-none focus:outline-none focus:border-[var(--terra)] focus:ring-2 focus:ring-[rgba(196,103,74,0.12)] mb-4"
+              className="w-full px-4 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[#1C1917] text-[14px] h-24 resize-none focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] mb-4"
             />
             <div className="flex gap-3">
               <button
                 onClick={() => handleApply()}
-                className="flex-1 py-3 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] font-semibold text-[15px] hover:bg-[var(--shell)]"
+                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] font-medium text-[13px] hover:bg-[rgba(0,0,0,0.04)]"
               >
                 Skip
               </button>
               <button
                 onClick={() => handleApply(pitch)}
                 disabled={submitting}
-                className="flex-1 py-3 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px] hover:opacity-90 disabled:opacity-50"
-                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}
+                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 disabled:opacity-50"
               >
                 {submitting ? 'Submitting...' : 'Submit'}
               </button>

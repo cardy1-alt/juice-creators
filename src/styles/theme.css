@@ -1,59 +1,38 @@
+/* ──────────────────────────────────────────────────────────
+   NAYBA THEME — global base styles
+   Tokens are in tokens.css. This file uses them.
+   ────────────────────────────────────────────────────────── */
+
 :root {
-  /* ── Backgrounds ── */
-  --shell:   #F7F7F5;
-  --card:    #FFFFFF;
-
-  /* ── Brand ── */
-  --terra:        #C4674A;
-  --terra-light:  rgba(196,103,74,0.08);
-
-  /* ── Ink scale ── */
-  --ink:     #222222;
-  --ink-60:  rgba(34,34,34,0.60);
-  --ink-35:  rgba(34,34,34,0.35);
-  --ink-10:  rgba(34,34,34,0.10);
-
-  /* ── Borders ── */
-  --border:  #E8E3DC;
-
-  /* ── Status ── */
-  --success: #2D7A4F;
+  /* ── Compat aliases — legacy variable references resolve here ── */
+  --border: var(--border-color);
+  --success: var(--status-active-text);
   --neutral: #6B7280;
-
-  /* ── Radii ── */
-  --r-pill:  999px;
-  --r-card:  12px;
-  --r-sm:    8px;
-  --r-input: 8px;
-
-  /* ── Compat aliases (removed in V2 — kept until components rebuilt) ── */
-  --ink-08:      rgba(34,34,34,0.10);
-  --ink-15:      rgba(34,34,34,0.10);
-  /* V1 aliases removed: --forest, --peach, --ochre */
+  --r-sm: var(--r-input);
   --terra-hover: #A8573E;
-  --terra-5:     rgba(196,103,74,0.05);
-  --terra-10:    rgba(196,103,74,0.10);
-  --terra-15:    rgba(196,103,74,0.15);
-  --terra-20:    rgba(196,103,74,0.20);
-  --terra-40:    rgba(196,103,74,0.40);
-  --terra-ring:  rgba(196,103,74,0.30);
-  --shadow-sm:   0 1px 3px rgba(34,34,34,0.05);
-  --shadow-md:   0 2px 8px rgba(34,34,34,0.06);
-  --shadow-lg:   0 4px 20px rgba(34,34,34,0.11);
+  --terra-5: rgba(196,103,74,0.05);
+  --terra-10: rgba(196,103,74,0.10);
+  --terra-15: rgba(196,103,74,0.15);
+  --terra-20: rgba(196,103,74,0.20);
+  --terra-40: rgba(196,103,74,0.40);
+  --terra-ring: rgba(196,103,74,0.30);
+  --shadow-sm: var(--shadow-card);
+  --shadow-md: var(--shadow-card);
+  --shadow-lg: var(--shadow-fab);
 }
 
 @layer base {
   h1, h2, h3, h4, h5 {
-    font-family: 'Instrument Sans', sans-serif;
-    font-weight: 600;
-    letter-spacing: -0.03em;
+    font-family: var(--font-sans);
+    font-weight: var(--weight-semibold);
+    letter-spacing: -0.01em;
   }
   body, p, button, input, label, select, textarea, a {
-    font-family: 'Instrument Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 400;
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    font-weight: var(--weight-regular);
     color: var(--ink);
-    line-height: 1.65;
+    line-height: 1.6;
   }
 }
 
@@ -77,14 +56,9 @@
 
 /* ── Skeleton shimmer ── */
 .skeleton {
-  background: linear-gradient(90deg, var(--ink-10) 25%, rgba(34,34,34,0.04) 50%, var(--ink-10) 75%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  border-radius: var(--r-sm);
-}
-@keyframes shimmer {
-  0%   { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  background: var(--skeleton-bg);
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+  border-radius: var(--r-input);
 }
 
 /* ── Toast slide-in ── */
@@ -98,7 +72,7 @@
 
 /* ── Card press effect ── */
 .card-press {
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
 }
 .card-press:active {
   transform: scale(0.98);
@@ -120,7 +94,7 @@
   overflow: visible;
 }
 .confetti-burst::after {
-  content: '🎉';
+  content: '';
   position: absolute;
   top: -8px;
   right: -8px;

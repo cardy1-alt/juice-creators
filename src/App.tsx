@@ -42,7 +42,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
             )}
             <button
               onClick={() => window.location.reload()}
-              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] text-white font-semibold bg-[var(--terra)] hover:opacity-85 transition-colors"
             >
               <RefreshCw size={16} strokeWidth={1.5} />
               Refresh
@@ -188,7 +188,7 @@ function ResetPassword() {
           <p className="text-[var(--ink-60)] text-base mb-6">This password reset link has expired or is invalid. Please request a new one.</p>
           <a
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] text-white font-semibold bg-[var(--terra)] hover:opacity-85 transition-colors"
           >
             Back to Sign In
           </a>
@@ -262,7 +262,7 @@ function ResetPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+            className="w-full py-3 rounded-[6px] text-white font-semibold bg-[var(--terra)] hover:opacity-85 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -355,7 +355,7 @@ function App() {
 
   const suspenseFallback = (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--shell)' }}>
-      <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, color: 'var(--terra)', fontSize: '2rem' }}>nayba</span>
+      <span style={{ fontFamily: "'Instrument Serif', serif", fontWeight: 400, color: '#1C1917', fontSize: 22 }}>nayba</span>
     </div>
   );
 
@@ -386,7 +386,7 @@ function App() {
         </p>
         <button
           onClick={signOut}
-          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-2.5 rounded-[6px] text-white font-semibold bg-[var(--terra)] hover:opacity-85 transition-colors"
         >
           <LogOut size={16} strokeWidth={1.5} />
           Sign Out
@@ -404,7 +404,7 @@ function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -4px 24px rgba(34,34,34,0.08)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -1px 3px rgba(0,0,0,0.06)' }}>
       <div className="bg-white px-[16px] py-[16px] flex items-center justify-between gap-[16px] max-w-[600px] mx-auto" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
         <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] m-0" style={{ fontWeight: 400 }}>
           We use cookies to keep you signed in and improve your experience.
@@ -414,8 +414,8 @@ function CookieConsent() {
             try { localStorage.setItem('nayba_cookie_consent', 'true'); } catch {}
             setVisible(false);
           }}
-          className="flex-shrink-0 px-[20px] py-[8px] text-[13px] text-white rounded-[999px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
-          style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700 }}
+          className="flex-shrink-0 px-[16px] py-[8px] text-[13px] text-white rounded-[6px] bg-[var(--terra)] hover:opacity-85 transition-opacity"
+          style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600 }}
         >
           Got it
         </button>

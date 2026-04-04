@@ -23,7 +23,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative transition-all duration-200 rounded-2xl ${focused ? 'border border-[#C4674A] ring-2 ring-[rgba(196,103,74,0.12)]' : 'border border-[rgba(34,34,34,0.10)]'}`} style={{ background: '#F7F7F5' }}>
+    <div className={`relative transition-all duration-200 rounded-[8px] ${focused ? 'border-[0.5px] border-[#C4674A]' : 'border-[0.5px] border-[rgba(0,0,0,0.18)]'}`} style={{ background: '#ffffff', boxShadow: focused ? '0 0 0 3px rgba(196,103,74,0.12)' : 'none' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -42,7 +42,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[15px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
+        className={`w-full min-h-[44px] ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[10px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
         style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
         required={required}
         minLength={minLength}
@@ -150,25 +150,24 @@ export default function Auth() {
     <div className="flex flex-col bg-[#F6F3EE] overscroll-none" style={{ minHeight: '100dvh' }}>
       {mode === 'signin' ? (
         /* ─── SIGN IN: single centred column ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6 md:py-12" style={{ background: '#F7F7F5' }}>
-          <style>{`@keyframes nayba-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.6;transform:scale(0.85)}}`}</style>
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6 md:py-12" style={{ background: '#F7F6F3' }}>
           <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* 1. Wordmark */}
-            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
+            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
 
             {/* 2. Location pill */}
             <div className="mb-6">
-              <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'white', border: '1px solid #E6E2DB', borderRadius: '999px' }}>
+              <div className="inline-flex items-center gap-[8px] px-[14px] py-[7px]" style={{ background: 'white', border: '0.5px solid rgba(0,0,0,0.08)', borderRadius: '999px' }}>
                 <span className="relative flex h-[8px] w-[8px]">
-                  <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: '#C4674A', animation: 'nayba-pulse 2s ease-in-out infinite' }} />
+                  <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: '#C4674A' }} />
                 </span>
                 <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'rgba(28,28,26,0.55)' }}>Now live in Bury St Edmunds</span>
               </div>
             </div>
 
             {/* 3. Headline */}
-            <h1 className="text-[38px] md:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-1.2px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1C1A', textAlign: 'center' }}>
+            <h1 className="text-[38px] md:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-1.2px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1C1A', textAlign: 'center' }}>
               <span style={{ display: 'block' }}>Discover local brands.</span>
               Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
             </h1>
@@ -179,7 +178,7 @@ export default function Auth() {
             </p>
 
             {/* 5. Form card */}
-            <div className="w-full bg-white border border-[#E6E2DB] rounded-[16px] p-6 md:p-8 text-left" style={{ boxShadow: '0 4px 24px rgba(28,28,26,0.06)' }}>
+            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
@@ -197,13 +196,13 @@ export default function Auth() {
                       <div className="w-[56px] h-[56px] rounded-full bg-[var(--terra-10)] flex items-center justify-center mx-auto mb-[16px]">
                         <Mail size={24} strokeWidth={1.5} className="text-[var(--terra)]" />
                       </div>
-                      <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em' }}>Check your email</p>
+                      <p className="text-[19px] text-[var(--ink)] mb-[6px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Check your email</p>
                       <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">We sent a reset link to<br /><span className="font-semibold text-[var(--ink)]">{resetEmail}</span></p>
                     </div>
                   ) : (
                     <form onSubmit={handleResetPassword} className="space-y-[14px]">
                       <div className="mb-[4px]">
-                        <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, letterSpacing: '-0.03em' }}>Reset password</p>
+                        <p className="text-[19px] text-[var(--ink)] mb-[4px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-0.03em' }}>Reset password</p>
                         <p className="text-[14px] text-[var(--ink-60)]">Enter your email and we'll send a reset link.</p>
                       </div>
                       <FloatingInput
@@ -223,8 +222,8 @@ export default function Auth() {
                       <button
                         type="submit"
                         disabled={resetLoading}
-                        className="w-full min-h-[52px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '15px', background: 'var(--terra)', borderRadius: '999px', padding: '13px 24px' }}
+                        className="w-full h-[44px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: '13px', background: 'var(--terra)', borderRadius: '6px', padding: '8px 16px' }}
                       >
                         {resetLoading ? 'Sending...' : 'Send Reset Link'}
                       </button>
@@ -268,7 +267,7 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+                    className="w-full h-[44px] bg-[#C4674A] text-white rounded-[6px] font-semibold text-[13px] transition-all disabled:opacity-50 active:scale-[0.98]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   >
                     {loading ? (
@@ -283,7 +282,7 @@ export default function Auth() {
                     <button
                       type="button"
                       onClick={() => { setMode('roleselect'); setError(''); setSelectedRole(null); setForgotPassword(false); }}
-                      className="text-[#C4674A] font-bold hover:underline transition-colors"
+                      className="text-[#C4674A] font-semibold hover:underline transition-colors"
                       style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 'inherit' }}
                     >
                       Apply for access
@@ -309,12 +308,12 @@ export default function Auth() {
                 {['S', 'M', 'J', 'R'].map((initial, i) => (
                   <div
                     key={initial}
-                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center border-2 border-[#F7F7F5]"
+                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center border-2 border-[#F7F6F3]"
                     style={{
                       background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
                       zIndex: 4 - i,
                       fontFamily: "'Instrument Sans', sans-serif",
-                      fontWeight: 700,
+                      fontWeight: 600,
                       fontSize: 12,
                       color: i === 0 ? 'white' : 'rgba(34,34,34,0.60)',
                     }}
@@ -332,12 +331,12 @@ export default function Auth() {
         </div>
       ) : mode === 'roleselect' ? (
         /* ─── ROLE SELECTION ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F7F5]">
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F6F3]">
           <div className="max-w-[440px] w-full text-center">
             <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#222] mx-auto">
               <ChevronLeft size={14} /> Back to sign in
             </button>
-            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#222', margin: '0 0 6px' }}>Join nayba</h2>
+            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#222', margin: '0 0 6px' }}>Join nayba</h2>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>Which best describes you?</p>
             <div className="flex gap-3">
               {([
@@ -347,10 +346,10 @@ export default function Auth() {
                 const selected = selectedRole === opt.key;
                 return (
                   <button key={opt.key} onClick={() => setSelectedRole(opt.key)}
-                    className="flex-1 text-left p-5 rounded-[12px] border transition-all"
+                    className="flex-1 text-left p-5 rounded-[10px] transition-all"
                     style={{
-                      background: selected ? 'rgba(196,103,74,0.06)' : 'white',
-                      borderColor: selected ? '#C4674A' : '#E6E2DB',
+                      background: selected ? 'rgba(196,103,74,0.05)' : 'white',
+                      border: selected ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)',
                     }}>
                     <opt.icon size={22} style={{ color: selected ? '#C4674A' : 'rgba(34,34,34,0.45)', marginBottom: 10 }} />
                     <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 600, color: '#222', margin: '0 0 4px' }}>{opt.label}</p>
@@ -364,8 +363,7 @@ export default function Auth() {
                 if (selectedRole === 'creator') { setRole('creator'); setMode('signup'); setSignupStep(1); }
                 else { setMode('brand-contact'); }
               }}
-                className="mt-6 px-8 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-semibold hover:opacity-90 transition-opacity"
-                style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)' }}>
+                className="mt-6 px-8 py-3 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity">
                 Continue
               </button>
             )}
@@ -373,7 +371,7 @@ export default function Auth() {
         </div>
       ) : mode === 'brand-contact' ? (
         /* ─── BRAND CONTACT ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F7F5]">
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F6F3]">
           <div className="max-w-[400px] w-full text-center">
             <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#222] mx-auto">
               <ChevronLeft size={14} /> Back
@@ -381,24 +379,24 @@ export default function Auth() {
             <div className="w-14 h-14 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center mx-auto mb-5">
               <Building2 size={24} className="text-[#C4674A]" />
             </div>
-            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 700, color: '#222', margin: '0 0 10px' }}>Get your brand on nayba</h2>
+            <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#222', margin: '0 0 10px' }}>Get your brand on nayba</h2>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, margin: '0 0 28px' }}>
               Get in touch at hello@nayba.app to get your brand set up. We'll have you live within 24 hours.
             </p>
             <a href="mailto:hello@nayba.app"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-semibold hover:opacity-90 transition-opacity"
-              style={{ boxShadow: '0 4px 16px rgba(196,103,74,0.28)', textDecoration: 'none' }}>
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-90 transition-opacity"
+              style={{ textDecoration: 'none' }}>
               <Mail size={16} /> Email hello@nayba.app
             </a>
           </div>
         </div>
       ) : (
         /* ─── SIGN UP: single page form ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6" style={{ background: '#F7F7F5', minHeight: '100dvh' }}>
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6" style={{ background: '#F7F6F3', minHeight: '100dvh' }}>
           <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* Wordmark */}
-            <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 12 }}>nayba</span>
+            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px', marginBottom: 12 }}>nayba</span>
 
             {/* Back link */}
             <button
@@ -411,11 +409,11 @@ export default function Auth() {
             </button>
 
             {/* Heading */}
-            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 700, color: '#222', letterSpacing: '-0.5px', margin: '0 0 6px' }}>Create your account</h1>
+            <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 600, color: '#222', letterSpacing: '-0.5px', margin: '0 0 6px' }}>Create your account</h1>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>You'll be reviewed by our team before getting access.</p>
 
             {/* Form card */}
-            <div className="w-full bg-white border border-[#E6E2DB] rounded-[16px] p-6 md:p-8 text-left" style={{ boxShadow: '0 4px 24px rgba(28,28,26,0.06)' }}>
+            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Full Name */}
                 <div>
@@ -425,7 +423,7 @@ export default function Auth() {
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
                     required
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -438,7 +436,7 @@ export default function Auth() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -452,7 +450,7 @@ export default function Auth() {
                     placeholder="At least 8 characters"
                     required
                     minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 pr-11 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)] hover:text-[rgba(34,34,34,0.60)]">
@@ -467,7 +465,7 @@ export default function Auth() {
                     value={instagramHandle}
                     onChange={e => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
@@ -477,7 +475,7 @@ export default function Auth() {
                 <div>
                   <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
                   <select value={gender} onChange={e => setGender(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     <option value="">Prefer not to say</option>
                     <option value="female">Female</option>
@@ -494,7 +492,7 @@ export default function Auth() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
@@ -507,7 +505,7 @@ export default function Auth() {
                     value={address}
                     onChange={e => setAddress(e.target.value)}
                     placeholder="e.g. Bury St Edmunds"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[#E6E2DB] bg-[#F7F7F5] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>So we can show you local campaigns</p>
@@ -524,7 +522,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-14 bg-[#C4674A] text-white rounded-full font-bold text-base transition-all disabled:opacity-50 active:scale-[0.98]"
+                  className="w-full h-[44px] bg-[#C4674A] text-white rounded-[6px] font-semibold text-[13px] transition-all disabled:opacity-50 active:scale-[0.98]"
                   style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                 >
                   {loading ? (
@@ -560,14 +558,15 @@ export default function Auth() {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowTerms(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div
-            className="relative bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            className="relative bg-white rounded-[10px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-sans font-semibold text-[var(--near-black)]">Terms of Service</h2>
               <button
                 onClick={() => setShowTerms(false)}
-                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
+                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[rgba(0,0,0,0.04)] transition-colors"
               >
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
               </button>
@@ -613,7 +612,7 @@ export default function Auth() {
 
             <button
               onClick={() => setShowTerms(false)}
-              className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+              className="w-full mt-6 py-2.5 rounded-[6px] text-white font-semibold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
             >
               Close
             </button>
@@ -626,14 +625,15 @@ export default function Auth() {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowPrivacy(false)}>
           <div className="absolute inset-0 bg-black/40" />
           <div
-            className="relative bg-[var(--card)] rounded-[16px] shadow-[var(--shadow-md)] border border-[var(--ink-08)] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            className="relative bg-white rounded-[10px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-sans font-semibold text-[var(--near-black)]">Privacy Policy</h2>
               <button
                 onClick={() => setShowPrivacy(false)}
-                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[var(--ink-08)] transition-colors"
+                className="w-[36px] h-[36px] flex items-center justify-center rounded-full hover:bg-[rgba(0,0,0,0.04)] transition-colors"
               >
                 <X size={20} strokeWidth={1.5} className="text-[var(--ink-60)]" />
               </button>
@@ -688,7 +688,7 @@ export default function Auth() {
 
             <button
               onClick={() => setShowPrivacy(false)}
-              className="w-full mt-6 py-2.5 rounded-full text-white font-semibold bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
+              className="w-full mt-6 py-2.5 rounded-[6px] text-white font-semibold text-[13px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors"
             >
               Close
             </button>

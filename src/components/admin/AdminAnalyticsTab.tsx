@@ -13,14 +13,14 @@ interface Stats {
 // Animated SVG bar chart
 function AnimatedBarChart({ items, color }: { items: { label: string; value: number }[]; color: string }) {
   const max = Math.max(...items.map(i => i.value), 1);
-  if (items.length === 0) return <p className="text-[13px] text-[var(--ink-35)]">No data yet</p>;
+  if (items.length === 0) return <p className="text-[13px] text-[rgba(34,34,34,0.35)]">No data yet</p>;
 
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
         <div key={item.label} className="flex items-center gap-3">
-          <span className="text-[13px] text-[var(--ink)] truncate" style={{ width: 90, flexShrink: 0 }}>{item.label}</span>
-          <div className="flex-1 h-6 bg-[var(--ink-10)] rounded-[6px] overflow-hidden">
+          <span className="text-[13px] text-[#1C1917] truncate" style={{ width: 90, flexShrink: 0 }}>{item.label}</span>
+          <div className="flex-1 h-6 bg-[rgba(0,0,0,0.08)] rounded-[6px] overflow-hidden">
             <div className="h-full rounded-[6px] flex items-center justify-end pr-2 chart-bar-enter"
               style={{
                 width: `${Math.max((item.value / max) * 100, 8)}%`,
@@ -42,11 +42,11 @@ function ProgressMetric({ label, value }: { label: string; value: number }) {
   return (
     <div className="mb-4 last:mb-0">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[13px] text-[var(--ink)] font-medium">{label}</span>
-        <span className="text-[13px] font-semibold text-[var(--ink)]">{value}%</span>
+        <span className="text-[13px] text-[#1C1917] font-medium">{label}</span>
+        <span className="text-[13px] font-semibold text-[#1C1917]">{value}%</span>
       </div>
-      <div className="h-2 bg-[var(--ink-10)] rounded-full overflow-hidden">
-        <div className="h-full rounded-full bg-[var(--terra)] transition-all duration-700" style={{ width: `${value}%` }} />
+      <div className="h-1 bg-[rgba(0,0,0,0.08)] rounded-full overflow-hidden">
+        <div className="h-full rounded-full bg-[#C4674A] transition-all duration-700" style={{ width: `${value}%` }} />
       </div>
     </div>
   );
@@ -119,12 +119,12 @@ export default function AdminAnalyticsTab() {
     { label: 'Estimated Reach', value: stats.totalReach.toLocaleString(), icon: Eye },
   ];
 
-  const chartLabel = "text-[12px] font-bold uppercase tracking-[0.6px] text-[var(--ink-35)] mb-4";
+  const chartLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-4";
 
   if (loading) {
     return (
       <div className="py-20 flex justify-center">
-        <div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+        <div className="w-8 h-8 border-[3px] border-[#C4674A] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
@@ -134,8 +134,8 @@ export default function AdminAnalyticsTab() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)]" style={{ padding: 16 }}>
-            <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
+          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
         ))}
@@ -143,26 +143,26 @@ export default function AdminAnalyticsTab() {
 
       {/* Charts: row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
           <p className={chartLabel}>Creators by City</p>
-          <AnimatedBarChart items={stats.creatorsByCity.map(c => ({ label: c.city, value: c.count }))} color="var(--terra)" />
+          <AnimatedBarChart items={stats.creatorsByCity.map(c => ({ label: c.city, value: c.count }))} color="#C4674A" />
         </div>
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
           <p className={chartLabel}>New Creators Over Time</p>
           <AnimatedBarChart items={stats.creatorsByMonth.map(m => ({
             label: new Date(m.month + '-01').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
             value: m.count,
-          }))} color="var(--success)" />
+          }))} color="#2D7A4F" />
         </div>
       </div>
 
       {/* Charts: row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
           <p className={chartLabel}>Campaign Performance</p>
-          <AnimatedBarChart items={stats.campaignPerformance.map(c => ({ label: c.title.slice(0, 20), value: c.reach }))} color="var(--terra)" />
+          <AnimatedBarChart items={stats.campaignPerformance.map(c => ({ label: c.title.slice(0, 20), value: c.reach }))} color="#C4674A" />
         </div>
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
           <p className={chartLabel}>Platform Health</p>
           <ProgressMetric label="Avg Completion Rate" value={stats.completionRate} />
           <ProgressMetric label="Campaign Fill Rate" value={stats.avgFillRate} />

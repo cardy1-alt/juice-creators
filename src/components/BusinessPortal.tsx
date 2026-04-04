@@ -41,20 +41,21 @@ function fmtDate(d: string | null) {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    draft: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
-    active: 'bg-[var(--terra-light)] text-[var(--terra)]',
+    draft: 'bg-[#F1EFE8] text-[#5F5E5A]',
+    active: 'bg-[#E1F5EE] text-[#0F6E56]',
     selecting: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
-    live: 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]',
-    completed: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
-    interested: 'bg-[var(--terra-light)] text-[var(--terra)]',
-    selected: 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]',
-    confirmed: 'bg-[rgba(45,122,79,0.1)] text-[var(--success)]',
-    declined: 'bg-[var(--ink-10)] text-[var(--ink-60)]',
+    live: 'bg-[#E8F4E8] text-[#2D6B2D]',
+    completed: 'bg-[#F1EFE8] text-[#5F5E5A]',
+    interested: 'bg-[#FAEEDA] text-[#854F0B]',
+    pending: 'bg-[#FAEEDA] text-[#854F0B]',
+    selected: 'bg-[#E8F4E8] text-[#2D6B2D]',
+    confirmed: 'bg-[#E8F4E8] text-[#2D6B2D]',
+    declined: 'bg-[#F1EFE8] text-[#5F5E5A]',
     content_submitted: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
-    overdue: 'bg-[rgba(220,38,38,0.1)] text-[#DC2626]',
+    overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[var(--r-sm)] text-[12px] font-semibold ${styles[status] || styles.draft}`}>
+    <span className={`inline-flex items-center rounded-[999px] text-[11px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -125,10 +126,10 @@ export default function BusinessPortal() {
   if (!brand) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-8 max-w-md text-center">
-          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">No brand account found</p>
-          <p className="text-[14px] text-[var(--ink-60)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]">
+        <div className="bg-white rounded-[10px] p-8 max-w-md text-center" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
+          <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get set up.</p>
+          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
             <Mail size={16} /> Contact nayba
           </a>
         </div>
@@ -142,30 +143,30 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] py-3 px-3 border-b border-[var(--ink-10)]';
-  const tdCls = 'py-3 px-3 text-[14px] text-[var(--ink)] border-b border-[var(--ink-10)]';
+  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-[16px] bg-[#F7F6F3]';
+  const tdCls = 'py-3 px-[16px] text-[14px] text-[var(--ink)]';
 
   // Empty state
   if (campaigns.length === 0) {
     return (
       <div className="flex min-h-screen bg-[var(--shell)]">
-        <aside className="hidden md:flex w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex-col flex-shrink-0">
-          <div className="px-5 py-5 border-b border-[var(--border)]">
+        <aside className="hidden md:flex w-[240px] bg-[#F7F6F3] flex-col flex-shrink-0" style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
+          <div className="px-5 py-5" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+            <p className="text-[13px] font-medium text-[rgba(0,0,0,0.55)] mt-1">{brand.name}</p>
           </div>
           <div className="flex-1" />
-          <div className="px-3 py-4 border-t border-[var(--border)]">
-            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] text-[var(--ink-35)] hover:bg-[var(--shell)]">
+          <div className="px-3 py-4" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
+            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.02)]">
               <LogOut size={18} /> Sign out
             </button>
           </div>
         </aside>
         <main className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div className="text-center max-w-md">
-            <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">Your campaigns will appear here</p>
-            <p className="text-[14px] text-[var(--ink-60)] mb-4">Contact nayba to get started with your first campaign.</p>
-            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[15px]">
+            <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
+            <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get started with your first campaign.</p>
+            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
               <Mail size={16} /> Contact nayba
             </a>
           </div>
@@ -183,25 +184,25 @@ export default function BusinessPortal() {
 
       {/* Sidebar — hidden on mobile by default, overlay when open */}
       <aside className={`
-        w-[240px] bg-[var(--card)] border-r border-[var(--border)] flex flex-col flex-shrink-0
+        w-[240px] bg-[#F7F6F3] flex flex-col flex-shrink-0
         fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="px-5 py-5 border-b border-[var(--border)] flex items-center justify-between">
+      `} style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
+        <div className="px-5 py-5 flex items-center justify-between" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
           <div>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+            <p className="text-[13px] font-medium text-[rgba(0,0,0,0.55)] mt-1">{brand.name}</p>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--ink-35)] hover:text-[var(--ink)]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(0,0,0,0.55)] hover:text-[var(--ink)]">
             <X size={20} />
           </button>
         </div>
 
         {/* Campaign selector */}
         {campaigns.length > 1 && (
-          <div className="px-3 py-3 border-b border-[var(--border)]">
+          <div className="px-3 py-3" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
             <select value={selectedCampaignId || ''} onChange={e => setSelectedCampaignId(e.target.value)}
-              className="w-full px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[14px] text-[var(--ink)]">
+              className="w-full px-3 py-2 rounded-[6px] bg-white text-[14px] text-[var(--ink)]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
           </div>
@@ -212,7 +213,7 @@ export default function BusinessPortal() {
             const active = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => handleTabClick(tab.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] font-medium mb-0.5 transition-colors ${active ? 'bg-[var(--terra-light)] text-[var(--terra)]' : 'text-[var(--ink-60)] hover:bg-[var(--shell)]'}`}>
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] mb-0.5 transition-colors ${active ? 'bg-[rgba(0,0,0,0.06)] text-[#1C1917] font-semibold' : 'text-[rgba(0,0,0,0.55)] font-medium hover:bg-[rgba(0,0,0,0.02)]'}`}>
                 <tab.icon size={18} strokeWidth={active ? 2 : 1.5} />
                 {tab.label}
               </button>
@@ -220,8 +221,8 @@ export default function BusinessPortal() {
           })}
         </nav>
 
-        <div className="px-3 py-4 border-t border-[var(--border)]">
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[var(--r-sm)] text-[14px] text-[var(--ink-35)] hover:bg-[var(--shell)]">
+        <div className="px-3 py-4" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.02)]">
             <LogOut size={18} /> Sign out
           </button>
         </div>
@@ -230,7 +231,7 @@ export default function BusinessPortal() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-[var(--card)] border-b border-[var(--border)]">
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
           <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
             <Menu size={22} />
           </button>
@@ -243,7 +244,7 @@ export default function BusinessPortal() {
         {activeTab === 'summary' && campaign && (
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>{campaign.title}</h1>
+              <h1 className="text-[16px] font-semibold text-[var(--ink)]">{campaign.title}</h1>
               <StatusBadge status={campaign.status} />
             </div>
 
@@ -263,15 +264,15 @@ export default function BusinessPortal() {
                 { label: 'Completed', value: completedCount },
                 { label: 'Total Reach', value: totalReach.toLocaleString() },
               ].map(s => (
-                <div key={s.label} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-4 text-center">
-                  <p className="text-[24px] font-bold text-[var(--ink)]">{s.value}</p>
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)]">{s.label}</p>
+                <div key={s.label} className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">{s.label}</p>
+                  <p className="text-[24px] font-semibold text-[#1C1917]">{s.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Campaign brief */}
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-6">
+            <div className="bg-white rounded-[10px] p-6" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Campaign Brief</h2>
               {campaign.perk_description && (
                 <div className="mb-4">
@@ -298,7 +299,7 @@ export default function BusinessPortal() {
 
             <div className="mt-4">
               <a href="mailto:jacob@nayba.app"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[var(--r-pill)] border border-[var(--border)] text-[var(--ink)] font-semibold text-[14px] hover:bg-[var(--shell)]">
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
                 <Mail size={15} /> Contact nayba
               </a>
             </div>
@@ -325,19 +326,19 @@ export default function BusinessPortal() {
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Selection</h1>
+              <h1 className="text-[16px] font-semibold text-[var(--ink)]">Selection</h1>
               <span className="text-[14px] text-[var(--ink-35)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
             </div>
 
             {/* Filters + bulk actions */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
-                className="px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[13px] text-[var(--ink)]">
+                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink)]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                 <option value="all">All levels</option>
                 {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
               </select>
               <button onClick={toggleAll}
-                className="px-3 py-2 rounded-[var(--r-input)] border border-[var(--ink-10)] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]">
+                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
                 {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
               </button>
               {selectedCreators.size > 0 && (
@@ -353,14 +354,14 @@ export default function BusinessPortal() {
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
                 return (
-                  <div key={a.id} className={`bg-[var(--card)] border rounded-[var(--r-card)] p-5 hover:shadow-[0_2px_8px_rgba(34,34,34,0.06)] transition-shadow ${selectedCreators.has(a.id) ? 'border-[var(--terra)]' : 'border-[var(--border)]'}`}>
+                  <div key={a.id} className={`bg-white rounded-[10px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                     {/* Header: checkbox + avatar + name + status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
                           className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
                         <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                          <span className="text-[15px] font-bold text-white">{initial}</span>
+                          <span className="text-[15px] font-semibold text-white">{initial}</span>
                         </div>
                         <div>
                           <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
@@ -377,7 +378,7 @@ export default function BusinessPortal() {
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Level</span>
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[11px] font-bold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Rate</span>
@@ -418,7 +419,7 @@ export default function BusinessPortal() {
         {activeTab === 'participation' && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[24px] font-bold text-[var(--ink)]" style={{ letterSpacing: '-0.4px' }}>Creator Progress</h1>
+              <h1 className="text-[16px] font-semibold text-[var(--ink)]">Creator Progress</h1>
               <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -437,11 +438,11 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+                  <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
                       <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                        <span className="text-[16px] font-bold text-white">{initial}</span>
+                        <span className="text-[16px] font-semibold text-white">{initial}</span>
                       </div>
 
                       {/* Content */}
@@ -458,7 +459,7 @@ export default function BusinessPortal() {
                         </div>
 
                         {/* Progress bar */}
-                        <div className="h-2 bg-[var(--ink-10)] rounded-full overflow-hidden mb-2.5 mt-2">
+                        <div className="h-[4px] bg-[rgba(0,0,0,0.08)] rounded-full overflow-hidden mb-2.5 mt-2">
                           <div className="h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${progressPct}%`,
@@ -470,7 +471,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-4">
                           {steps.map((s, i) => (
                             <div key={i} className="flex items-center gap-1.5">
-                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : 'border border-[var(--ink-10)]'}`}>
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { border: '0.5px solid rgba(0,0,0,0.08)' }}>
                                 {s.done && <Check size={10} className="text-white" />}
                               </div>
                               <span className={`text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
@@ -480,7 +481,7 @@ export default function BusinessPortal() {
 
                         {/* Data row */}
                         {(p.reach != null || p.reel_url) && (
-                          <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[var(--ink-10)]">
+                          <div className="flex items-center gap-4 mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
                             {p.reel_url && (
                               <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
                                 className="flex items-center gap-1.5 text-[13px] text-[var(--terra)] font-medium hover:underline">
@@ -511,10 +512,10 @@ export default function BusinessPortal() {
         {/* Content Tab */}
         {activeTab === 'content' && (
           <div>
-            <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Content</h1>
+            <h1 className="text-[16px] font-semibold text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
+                <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
@@ -525,9 +526,9 @@ export default function BusinessPortal() {
                     {p.likes != null && <p>Likes: {p.likes.toLocaleString()}</p>}
                     {p.reel_submitted_at && <p>Posted: {fmtDate(p.reel_submitted_at)}</p>}
                   </div>
-                  <div className="flex items-center gap-2 mt-3 pt-3 border-t border-[var(--ink-10)]">
+                  <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
                     <a href={p.reel_url!} target="_blank" rel="noopener noreferrer" download
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-[var(--r-sm)] border border-[var(--border)] text-[12px] font-medium text-[var(--ink-60)] hover:bg-[var(--shell)]">
+                      className="flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-[12px] font-medium text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
                       Download
                     </a>
                   </div>
@@ -543,21 +544,21 @@ export default function BusinessPortal() {
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
           <div>
-            <h1 className="text-[24px] font-bold text-[var(--ink)] mb-5" style={{ letterSpacing: '-0.4px' }}>Analytics</h1>
+            <h1 className="text-[16px] font-semibold text-[var(--ink)] mb-5">Analytics</h1>
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Total Reach</p>
-                <p className="text-[28px] font-bold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Total Reach</p>
+                <p className="text-[24px] font-semibold text-[#1C1917]">{totalReach.toLocaleString()}</p>
               </div>
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Content Pieces</p>
-                <p className="text-[28px] font-bold text-[var(--ink)]">{submittedCount}</p>
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Content Pieces</p>
+                <p className="text-[24px] font-semibold text-[#1C1917]">{submittedCount}</p>
               </div>
-              <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Avg Engagement</p>
-                <p className="text-[28px] font-bold text-[var(--ink)]">
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Avg Engagement</p>
+                <p className="text-[24px] font-semibold text-[#1C1917]">
                   {participations.filter(p => p.reach && p.reach > 0).length > 0
                     ? (participations.reduce((s, p) => s + ((p.likes || 0) + (p.comments || 0)), 0) / Math.max(totalReach, 1) * 100).toFixed(1) + '%'
                     : '—'
@@ -568,8 +569,8 @@ export default function BusinessPortal() {
             </div>
 
             {/* Reach by creator */}
-            <div className="bg-[var(--card)] border border-[var(--border)] rounded-[var(--r-card)] p-5">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-4">Reach by Creator</p>
+            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
@@ -578,8 +579,8 @@ export default function BusinessPortal() {
                     {withReach.map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3">
                         <span className="text-[14px] text-[var(--ink)] w-32 truncate">{p.creators?.display_name || p.creators?.name}</span>
-                        <div className="flex-1 h-6 bg-[var(--ink-10)] rounded-[var(--r-sm)] overflow-hidden">
-                          <div className="h-full rounded-[var(--r-sm)] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
+                        <div className="flex-1 h-6 bg-[rgba(0,0,0,0.08)] rounded-[6px] overflow-hidden">
+                          <div className="h-full rounded-[6px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
                             style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
                             <span className="text-[11px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
                           </div>
