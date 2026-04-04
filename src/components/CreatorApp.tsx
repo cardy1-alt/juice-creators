@@ -15,6 +15,7 @@ import {
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
+// TODO(jacob): Replace with real WhatsApp Community invite link before launch
 const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 
 // ─── Skeleton Loader ───

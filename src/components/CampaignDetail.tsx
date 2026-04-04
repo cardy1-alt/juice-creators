@@ -41,6 +41,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
   const [application, setApplication] = useState<Application | null>(null);
   const [creatorId, setCreatorId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
   const [pitch, setPitch] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -52,12 +53,13 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
   const fetchCampaign = async () => {
     setLoading(true);
-    const { data: campData } = await supabase
+    const { data: campData, error: campErr } = await supabase
       .from('campaigns')
       .select('*, businesses(name, category, bio, instagram_handle)')
       .eq('id', campaignId)
       .single();
-    if (campData) setCampaign(campData as Campaign);
+    if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
+    setCampaign(campData as Campaign);
 
     // Look up real creator ID by email (creators.id != auth.uid())
     if (user?.email) {
@@ -125,6 +127,16 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
         <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (notFound || !campaign) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--shell)] px-6 text-center">
+        <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Campaign not available</p>
+        <p className="text-[14px] text-[var(--ink-60)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
+        {onBack && <button onClick={onBack} className="px-5 py-2.5 rounded-[var(--r-pill)] bg-[var(--terra)] text-white font-semibold text-[14px]">Go back</button>}
       </div>
     );
   }

@@ -114,7 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (creatorError) {
-      // TODO: add error tracking
+      console.warn('[nayba] Failed to fetch creator profile:', creatorError.message);
     }
 
     if (creator) {
@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .maybeSingle();
 
     if (businessError) {
-      // TODO: add error tracking
+      console.warn('[nayba] Failed to fetch business profile:', businessError.message);
     }
 
     if (business) {
@@ -261,7 +261,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { error: insertError } = await supabase.from('creators').insert(insertPayload);
 
         if (insertError) {
-          // TODO: add error tracking
+          console.warn('[nayba] Creator insert failed:', insertError.message, insertError.code);
           // Try to recover — the profile may already exist from a previous
           // attempt (23505) or the INSERT may have been blocked by RLS (42501).
           // Either way, check if a profile row exists for this email.
@@ -329,7 +329,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { error: insertError } = await supabase.from('businesses').insert(insertPayload);
 
         if (insertError) {
-          // TODO: add error tracking
+          console.warn('[nayba] Creator insert failed:', insertError.message, insertError.code);
           // Try to recover — the profile may already exist from a previous
           // attempt (23505) or the INSERT may have been blocked by RLS (42501).
           // Either way, check if a profile row exists for this email.

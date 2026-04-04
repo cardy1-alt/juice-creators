@@ -121,7 +121,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       });
       if (!res.ok) throw new Error('API error');
       const { text } = await res.json();
-      const data = JSON.parse(text);
+      let data;
+      try { data = JSON.parse(text); } catch { throw new Error('Invalid AI response'); }
       setForm(p => ({
         ...p,
         headline: p.headline || data.headline || p.headline,

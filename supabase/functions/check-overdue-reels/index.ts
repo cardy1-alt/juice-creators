@@ -90,7 +90,13 @@ Deno.serve(async (_req: Request) => {
           user_id: part.creator_id,
           user_type: 'creator',
           message: `Your Reel for ${brandName} is overdue. The content deadline has passed.`,
+          email_type: 'content_overdue',
           campaign_id: part.campaign_id,
+          email_meta: {
+            brand_name: brandName,
+            campaign_id: part.campaign_id,
+            campaign_title: (part as any).campaigns?.title || '',
+          },
         });
         markedOverdue++;
       }

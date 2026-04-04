@@ -48,7 +48,13 @@ export default function AdminNotificationsTab() {
     if (!selectedCampaign) { setRecipientCount(0); return; }
     const fetchRecipients = async () => {
       let query = supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', true);
-      if (selectedCampaign.target_city) query = query.ilike('address', `%${selectedCampaign.target_city}%`);
+      // Note: ilike substring match can be broad (e.g. "Bury" matches "Sudbury").
+      // Acceptable for pilot — creator addresses are short city names. For scale,
+      // add a dedicated city column with normalized values.
+      if (selectedCampaign.target_city) {
+        const escaped = selectedCampaign.target_city.replace(/[%_]/g, '\\$&');
+        query = query.ilike('address', `%${escaped}%`);
+      }
       const { count } = await query;
       setRecipientCount(count || 0);
     };
@@ -59,7 +65,10 @@ export default function AdminNotificationsTab() {
     if (!selectedCampaign) return;
     setSending(true);
     let query = supabase.from('creators').select('id, email, display_name, name').eq('approved', true);
-    if (selectedCampaign.target_city) query = query.ilike('address', `%${selectedCampaign.target_city}%`);
+    if (selectedCampaign.target_city) {
+      const escaped = selectedCampaign.target_city.replace(/[%_]/g, '\\$&');
+      query = query.ilike('address', `%${escaped}%`);
+    }
     const { data: creators } = await query;
     if (!creators || creators.length === 0) { setToast('No eligible creators found'); setSending(false); return; }
     const notifications = creators.map((c: any) => ({
