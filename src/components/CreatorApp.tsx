@@ -22,20 +22,18 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 function SkeletonCard() {
   return (
     <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-      <div className="flex flex-row">
-        <div className="skeleton w-[72px] sm:w-[88px] flex-shrink-0" />
-        <div className="flex-1 p-3 space-y-2.5">
-          <div className="skeleton h-3 w-24" />
-          <div className="skeleton h-4 w-full" />
-          <div className="skeleton h-3 w-32" />
-        </div>
+      <div className="skeleton w-full" style={{ height: 140 }} />
+      <div className="p-3.5 space-y-2.5">
+        <div className="skeleton h-3 w-20" />
+        <div className="skeleton h-4 w-full" />
+        <div className="skeleton h-3 w-28" />
       </div>
     </div>
   );
 }
 function SkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
     </div>
   );
@@ -228,46 +226,43 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
           </button>
         </div>
       )}
-      {!loading && !fetchError && <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      {!loading && !fetchError && <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {filtered.map(c => {
           const appStatus = applications[c.id];
+          const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-row min-h-[44px]" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
-              {/* Left thumbnail */}
-              <div className="w-[72px] sm:w-[88px] flex-shrink-0 bg-[#F7F6F3] flex items-center justify-center">
-                {c.businesses?.logo_url ? (
-                  <img src={c.businesses.logo_url} alt={c.businesses.name} className="w-10 h-10 rounded-full object-cover" />
+              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              {/* Cover image */}
+              <div className="w-full relative" style={{ height: 140 }}>
+                {c.campaign_image ? (
+                  <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-10 h-10 rounded-full bg-[rgba(0,0,0,0.06)] flex items-center justify-center">
-                    <span className="text-[16px] font-semibold text-[rgba(0,0,0,0.35)]">{(c.businesses?.name || '?')[0]}</span>
+                  <div className="w-full h-full bg-gradient-to-br from-[#C4674A] to-[#A8573E] flex items-center justify-center">
+                    {c.businesses?.logo_url ? (
+                      <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
+                    ) : (
+                      <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
+                    )}
                   </div>
                 )}
+                {appStatus && (
+                  <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                  </span>
+                )}
+                {c.campaign_type === 'community' && (
+                  <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                )}
               </div>
-              <div className="flex-1 py-[12px] px-4 flex flex-col justify-between">
-                <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <button onClick={e => { e.stopPropagation(); if (c.businesses) setBrandModal(c.businesses); }}
-                      className="text-[11px] font-medium uppercase tracking-[0.04em] text-[rgba(0,0,0,0.4)] hover:text-[var(--terra)] hover:underline transition-colors">{c.businesses?.name}</button>
-                    {c.campaign_type === 'community' && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
-                    )}
-                  </div>
-                  <p className="text-[15px] font-semibold text-[#1C1917] leading-[1.3] mb-1">{c.headline || c.title}</p>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 flex-wrap text-[12px] text-[rgba(0,0,0,0.35)]">
-                    {c.expression_deadline && (
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} /> Apply by {fmtDate(c.expression_deadline)}
-                      </span>
-                    )}
-                    {c.target_city && <span className="flex items-center gap-1"><MapPin size={11} />{c.target_city}</span>}
-                  </div>
-                  {appStatus && (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                    </span>
+              {/* Content */}
+              <div className="flex-1 p-3.5 flex flex-col">
+                <p className="text-[11px] font-medium text-[rgba(0,0,0,0.4)] mb-0.5">{c.businesses?.name}</p>
+                <p className="text-[14px] font-semibold text-[#1C1917] leading-[1.3] mb-2 line-clamp-2">{c.headline || c.title}</p>
+                <div className="mt-auto space-y-1">
+                  {perkShort && <p className="text-[12px] font-medium text-[#C4674A]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
+                  {c.expression_deadline && (
+                    <p className="text-[11px] text-[rgba(0,0,0,0.35)]">Apply by {fmtDate(c.expression_deadline)}</p>
                   )}
                 </div>
               </div>
