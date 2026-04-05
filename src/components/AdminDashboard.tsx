@@ -97,7 +97,7 @@ export default function AdminDashboard() {
               <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const }}>Admin</span>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#222]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#1C1917]">
             <X size={20} />
           </button>
         </div>

@@ -43,7 +43,7 @@ function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
     draft: 'bg-[#F1EFE8] text-[#5F5E5A]',
     active: 'bg-[#E1F5EE] text-[#0F6E56]',
-    selecting: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
+    selecting: 'bg-[rgba(59,130,246,0.08)] text-[#3B82F6]',
     live: 'bg-[#E1F5EE] text-[#0F6E56]',
     completed: 'bg-[#F1EFE8] text-[#5F5E5A]',
     interested: 'bg-[#FAEEDA] text-[#854F0B]',
@@ -51,7 +51,7 @@ function StatusBadge({ status }: { status: string }) {
     selected: 'bg-[#E1F5EE] text-[#0F6E56]',
     confirmed: 'bg-[#E1F5EE] text-[#0F6E56]',
     declined: 'bg-[#F1EFE8] text-[#5F5E5A]',
-    content_submitted: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
+    content_submitted: 'bg-[rgba(59,130,246,0.08)] text-[#3B82F6]',
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
@@ -143,8 +143,8 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-[16px] bg-[#F7F6F3]';
-  const tdCls = 'py-3 px-[16px] text-[14px] text-[var(--ink)]';
+  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]';
+  const tdCls = 'py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]';
 
   // Empty state
   if (campaigns.length === 0) {

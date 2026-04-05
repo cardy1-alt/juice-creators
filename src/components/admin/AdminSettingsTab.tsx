@@ -12,7 +12,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
       className="relative w-[44px] h-[24px] rounded-full transition-colors duration-200 flex-shrink-0"
       style={{ background: enabled ? '#C4674A' : 'rgba(34,34,34,0.10)' }}>
       <span className="absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full transition-transform duration-200"
-        style={{ transform: enabled ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgba(34,34,34,0.15)' }} />
+        style={{ transform: enabled ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }} />
     </button>
   );
 }

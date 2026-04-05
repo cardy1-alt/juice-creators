@@ -233,7 +233,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
           const appStatus = applications[c.id];
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-row min-h-[44px]" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
+              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-row min-h-[44px]" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               {/* Left thumbnail */}
               <div className="w-[88px] flex-shrink-0 bg-[#F7F6F3] flex items-center justify-center">
                 {c.businesses?.logo_url ? (
@@ -265,7 +265,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
                     {c.target_city && <span className="flex items-center gap-1"><MapPin size={11} />{c.target_city}</span>}
                   </div>
                   {appStatus && (
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E8F4E8] text-[#2D6B2D]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
                       {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
                     </span>
                   )}
@@ -464,7 +464,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#E8F4E8] text-[#2D6B2D]">Completed</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#E1F5EE] text-[#0F6E56]">Completed</span>
             </div>
           ))}
           {pastApps.map(a => (
@@ -487,7 +487,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {/* Reel submission modal */}
       {showReelModal && (
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
-          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[10px] p-6" onClick={e => e.stopPropagation()}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[18px] font-semibold text-[#1C1917]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
@@ -685,7 +685,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
             </div>
           </div>
           {profile.instagram_connected ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E8F4E8] text-[12px] font-medium text-[#2D6B2D]">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56]">
               <Check size={12} /> Connected
             </span>
           ) : (
@@ -767,7 +767,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
                 <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(p.created_at)}</p>
               </div>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
-                p.status === 'completed' ? 'bg-[#E8F4E8] text-[#2D6B2D]' :
+                p.status === 'completed' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 p.status === 'content_submitted' ? 'bg-[#FAEEDA] text-[#854F0B]' :
                 p.status === 'overdue' ? 'bg-[#FCEBEB] text-[#A32D2D]' :
                 'bg-[#E1F5EE] text-[#0F6E56]'
@@ -786,7 +786,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
               </div>
               <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
                 a.status === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' :
-                a.status === 'selected' ? 'bg-[#E8F4E8] text-[#2D6B2D]' :
+                a.status === 'selected' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 'bg-[#F1EFE8] text-[#5F5E5A]'
               }`}>
                 {a.status === 'interested' ? 'Applied' : a.status.charAt(0).toUpperCase() + a.status.slice(1)}
@@ -1205,7 +1205,7 @@ export default function CreatorApp() {
         <>
           <div className="hidden md:block fixed inset-0 bg-[rgba(34,34,34,0.15)] z-30" onClick={() => setViewingCampaign(null)} />
           <div className="hidden md:block fixed top-0 right-0 bottom-0 w-[520px] lg:w-[580px] xl:w-[640px] z-40 bg-white border-l border-[0.5px] border-[rgba(0,0,0,0.08)] overflow-y-auto slide-in-right"
-            style={{ boxShadow: '-4px 0 24px rgba(34,34,34,0.08)' }}>
+            style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
             <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
           </div>
         </>
