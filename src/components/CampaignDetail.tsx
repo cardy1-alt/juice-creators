@@ -130,7 +130,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F6F3] px-6 text-center">
         <p className="text-[15px] font-medium text-[#1C1917] mb-2">Campaign not available</p>
         <p className="text-[13px] text-[rgba(0,0,0,0.4)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
-        {onBack && <button onClick={onBack} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
+        {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
       </div>
     );
   }
