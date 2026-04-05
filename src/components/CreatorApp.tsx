@@ -21,7 +21,7 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+    <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden">
       <div className="skeleton w-full" style={{ height: 140 }} />
       <div className="p-3.5 space-y-2.5">
         <div className="skeleton h-3 w-20" />
@@ -201,7 +201,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="w-full pl-9 pr-4 h-[40px] rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]" />
+          className="w-full pl-9 pr-4 h-[40px] rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A]" />
       </div>
 
       {/* Category chips */}
@@ -232,7 +232,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
           const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-col">
               {/* Cover image */}
               <div className="w-full relative" style={{ height: 140 }}>
                 {c.campaign_image ? (
@@ -394,7 +394,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div key={p.id} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[rgba(0,0,0,0.4)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[#1C1917] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
@@ -454,7 +454,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
@@ -463,7 +463,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
@@ -490,7 +490,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
             <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
-              className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border-[0.5px] ${reelUrlError ? 'border-[#C0392B]' : 'border-[rgba(0,0,0,0.18)]'} bg-white text-[15px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] mb-1`} />
+              className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border-[0.5px] ${reelUrlError ? 'border-[#C0392B]' : 'border-[rgba(0,0,0,0.18)]'} bg-white text-[15px] focus:outline-none focus:border-[#C4674A] mb-1`} />
             {reelUrlError && <p className="text-[13px] text-[#C0392B] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
@@ -521,7 +521,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(0,0,0,0.08)]">
             <Lock size={28} className="text-[rgba(0,0,0,0.35)]" />
           </div>
@@ -544,7 +544,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
         <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
-          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-8 text-center relative overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
             {/* Confetti-like decorative dots */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               {[...Array(20)].map((_, i) => (
@@ -582,7 +582,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
@@ -635,7 +635,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       </div>
 
       {/* Completion rate */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mt-3 mb-3" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mt-3 mb-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
         <div className="flex items-center gap-3">
           <p className="text-[28px] font-semibold text-[#1C1917]">{profile.completion_rate}%</p>
@@ -655,22 +655,22 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
           <p className="text-[20px] font-semibold text-[#1C1917]">{profile.total_campaigns}</p>
           <p className="text-[11px] text-[rgba(0,0,0,0.45)]">Campaigns</p>
         </div>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
           <p className="text-[20px] font-semibold text-[#1C1917]">{profile.total_reels}</p>
           <p className="text-[11px] text-[rgba(0,0,0,0.45)]">Reels</p>
         </div>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
           <p className="text-[20px] font-semibold text-[#1C1917]">L{profile.level}</p>
           <p className="text-[11px] text-[rgba(0,0,0,0.45)]">{profile.level_name}</p>
         </div>
       </div>
 
       {/* Instagram connection */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
@@ -705,7 +705,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 mt-3" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 mt-3">
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-[13px] font-medium text-[#1C1917]">Profile completeness</p>
               <span className="text-[13px] font-semibold text-[#C4674A]">{completePct}%</span>
@@ -755,7 +755,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
@@ -773,7 +773,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
@@ -849,23 +849,23 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4">
         <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]">
+              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]">
               <option value="">Select county</option>
               <option value="Suffolk">Suffolk</option>
               <option value="Norfolk">Norfolk</option>
@@ -887,7 +887,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Password */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4">
         <div className="flex items-center justify-between">
           <h2 className="text-[16px] font-semibold text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
@@ -902,7 +902,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
-                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
+                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -913,7 +913,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
+                className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
             </div>
             {passwordError && <p className="text-[13px] text-[#C0392B]">{passwordError}</p>}
             <div className="flex gap-3">
@@ -929,7 +929,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
         <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -966,7 +966,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">More</h1>
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
             className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border-[0.5px] border-[rgba(0,0,0,0.08)] last:border-0 min-h-[44px]">
@@ -1012,7 +1012,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
-      <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+      <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6 text-center">
         <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 600, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
         <h2 className="text-[20px] font-semibold text-[#1C1917] mt-3 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
@@ -1236,7 +1236,7 @@ export default function CreatorApp() {
       {/* Toast */}
       {toast && (
         <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-medium"
-          style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+         >
           {toast}
         </div>
       )}

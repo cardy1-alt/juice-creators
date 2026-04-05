@@ -159,7 +159,7 @@ export default function BusinessPortal() {
   if (!brand) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-white rounded-[10px] p-8 max-w-md text-center" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+        <div className="bg-white rounded-[10px] p-8 max-w-md text-center" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get set up.</p>
           <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
@@ -211,7 +211,7 @@ export default function BusinessPortal() {
   return (
     <div className="flex min-h-screen bg-[var(--shell)]">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>{toast}</div>
+        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium">{toast}</div>
       )}
 
       {/* Mobile overlay */}
@@ -286,10 +286,10 @@ export default function BusinessPortal() {
             </div>
 
             {/* Dates */}
-            <div className="flex flex-wrap gap-2 sm:gap-4 text-[13px] text-[var(--ink-35)] mb-6">
-              <span>Opens: {fmtDate(campaign.open_date)}</span>
-              <span>Deadline: {fmtDate(campaign.expression_deadline)}</span>
-              <span>Content due: {fmtDate(campaign.content_deadline)}</span>
+            <div className="space-y-1.5 text-[13px] mb-6 max-w-[280px]">
+              {campaign.open_date && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Opens</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.open_date)}</span></div>}
+              {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Apply by</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.expression_deadline)}</span></div>}
+              {campaign.content_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Content due</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.content_deadline)}</span></div>}
             </div>
 
             {/* Stats row */}
@@ -301,7 +301,7 @@ export default function BusinessPortal() {
                 { label: 'Completed', value: completedCount },
                 { label: 'Total Reach', value: totalReach.toLocaleString() },
               ].map(s => (
-                <div key={s.label} className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div key={s.label} className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                   <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">{s.label}</p>
                   <p className="text-[24px] font-semibold text-[#1C1917]">{s.value}</p>
                 </div>
@@ -309,7 +309,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Campaign brief */}
-            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
               <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Campaign Brief</h2>
               {campaign.perk_description && (
                 <div className="mb-4">
@@ -429,7 +429,7 @@ export default function BusinessPortal() {
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
                 return (
-                  <div key={a.id} className={`bg-white rounded-[10px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <div key={a.id} className={`bg-white rounded-[10px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)' }}>
                     {/* Header: checkbox + avatar + name + status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -527,7 +527,7 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                  <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
                       <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
@@ -611,7 +611,7 @@ export default function BusinessPortal() {
             <h1 className="text-[16px] font-semibold text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+                <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
@@ -654,15 +654,15 @@ export default function BusinessPortal() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Total Reach</p>
                 <p className="text-[24px] font-semibold text-[#1C1917]">{totalReach.toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Content Pieces</p>
                 <p className="text-[24px] font-semibold text-[#1C1917]">{submittedCount}</p>
               </div>
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Avg Engagement</p>
                 <p className="text-[24px] font-semibold text-[#1C1917]">
                   {participations.filter(p => p.reach && p.reach > 0).length > 0
@@ -675,7 +675,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Reach by creator */}
-            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);

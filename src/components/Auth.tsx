@@ -23,7 +23,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative transition-all duration-200 rounded-[8px] ${focused ? 'border-[0.5px] border-[#C4674A]' : 'border-[0.5px] border-[rgba(0,0,0,0.18)]'}`} style={{ background: '#ffffff', boxShadow: focused ? '0 0 0 3px rgba(196,103,74,0.12)' : 'none' }}>
+    <div className={`relative transition-all duration-200 rounded-[8px] ${focused ? 'border-[0.5px] border-[#C4674A]' : 'border-[0.5px] border-[rgba(0,0,0,0.18)]'}`} style={{ background: '#ffffff' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -178,7 +178,7 @@ export default function Auth() {
             </p>
 
             {/* 5. Form card */}
-            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
@@ -413,7 +413,7 @@ export default function Auth() {
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(0,0,0,0.55)', margin: '0 0 28px' }}>You'll be reviewed by our team before getting access.</p>
 
             {/* Form card */}
-            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
               <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Full Name */}
                 <div>
@@ -423,7 +423,7 @@ export default function Auth() {
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
                     required
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -436,7 +436,7 @@ export default function Auth() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -450,7 +450,7 @@ export default function Auth() {
                     placeholder="At least 8 characters"
                     required
                     minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 pr-11 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,0.35)] hover:text-[rgba(0,0,0,0.55)]">
@@ -465,7 +465,7 @@ export default function Auth() {
                     value={instagramHandle}
                     onChange={e => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
@@ -475,7 +475,7 @@ export default function Auth() {
                 <div>
                   <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
                   <select value={gender} onChange={e => setGender(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     <option value="">Prefer not to say</option>
                     <option value="female">Female</option>
@@ -492,7 +492,7 @@ export default function Auth() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
@@ -503,7 +503,7 @@ export default function Auth() {
                   <select
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   >
                     <option value="">Select your county</option>
@@ -563,7 +563,7 @@ export default function Auth() {
           <div className="absolute inset-0 bg-black/40" />
           <div
             className="relative bg-white rounded-[10px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
-            style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+            style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
@@ -630,7 +630,7 @@ export default function Auth() {
           <div className="absolute inset-0 bg-black/40" />
           <div
             className="relative bg-white rounded-[10px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
-            style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}
+            style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">

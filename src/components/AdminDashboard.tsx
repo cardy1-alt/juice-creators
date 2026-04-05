@@ -173,7 +173,7 @@ export default function AdminDashboard() {
             <button
               onClick={() => setShowModal(true)}
               className="flex items-center gap-1.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold transition-opacity mr-6"
-              style={{ padding: '8px 16px', boxShadow: 'none' }}
+              style={{ padding: '8px 16px' }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
             >

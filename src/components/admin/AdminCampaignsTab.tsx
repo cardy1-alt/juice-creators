@@ -30,7 +30,7 @@ interface Participation {
 interface Creator { id: string; name: string; display_name: string | null; instagram_handle: string; level: number; completion_rate: number; }
 
 // ─── Shared styling (using CSS variables from theme.css) ───
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1.5";
 const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]";
 const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]";
@@ -39,11 +39,11 @@ const modalBackdrop = "absolute inset-0 bg-[rgba(0,0,0,0.4)]";
 const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3] transition-colors";
 const modalHeader = "flex items-center justify-between px-4 md:px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
-const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0";
+const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
 const ghostBtn = "text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917] transition-colors";
 const primaryBtn = "px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
 const secondaryBtn = "px-5 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]";
-const modalShadow = '0 1px 3px rgba(0,0,0,0.06)';
+// shadows removed — border alone;
 
 function StatusBadge({ status }: { status: string }) {
   const cls: Record<string, string> = {
@@ -187,7 +187,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
@@ -456,12 +456,12 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
   const pThCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-2.5 px-3 bg-[#F7F6F3] whitespace-nowrap";
   const pTdCls = "py-2 px-3 text-[13px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)] align-middle";
-  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] text-[#1C1917] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_2px_rgba(196,103,74,0.1)]";
+  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] text-[#1C1917] focus:outline-none focus:border-[#C4674A]";
 
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: modalShadow }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>
@@ -472,7 +472,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
         {/* Toast */}
         {toast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[#1C1917] text-white px-4 py-2 rounded-[8px] text-[13px] font-medium" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[#1C1917] text-white px-4 py-2 rounded-[8px] text-[13px] font-medium">
             {toast}
           </div>
         )}
@@ -922,7 +922,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>

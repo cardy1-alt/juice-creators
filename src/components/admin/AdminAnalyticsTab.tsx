@@ -156,7 +156,7 @@ export default function AdminAnalyticsTab() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16, boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div key={s.label} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'rgba(0,0,0,0.45)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>

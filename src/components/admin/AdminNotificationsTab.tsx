@@ -86,12 +86,12 @@ export default function AdminNotificationsTab() {
     fetchData();
   };
 
-  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
+  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
 
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>{toast}</div>
+        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium">{toast}</div>
       )}
 
       {/* Send notification card */}

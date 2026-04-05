@@ -328,7 +328,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {/* Brand info modal */}
       {showBrandInfo && campaign.businesses && (
         <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
-          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }} onClick={e => e.stopPropagation()}>
+          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[#1C1917]">{campaign.businesses.name}</h3>
               <button onClick={() => setShowBrandInfo(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>
@@ -357,7 +357,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {/* Pitch modal */}
       {showPitchModal && (
         <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-4 sm:p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[#1C1917]">Tell them why you</h3>
               <button onClick={() => setShowPitchModal(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>
@@ -367,7 +367,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               value={pitch}
               onChange={e => setPitch(e.target.value)}
               placeholder="I'd love to be part of this because..."
-              className="w-full px-4 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[#1C1917] text-[14px] h-24 resize-none focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] mb-1"
+              className="w-full px-4 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[#1C1917] text-[14px] h-24 resize-none focus:outline-none focus:border-[#C4674A] mb-1"
             />
             <p className="text-[12px] text-[rgba(0,0,0,0.35)] text-right mb-3">{pitch.length}/500</p>
             <div className="flex gap-3">
