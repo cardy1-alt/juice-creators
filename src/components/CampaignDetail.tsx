@@ -135,149 +135,136 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     );
   }
 
-  if (!campaign) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7F6F3] px-4">
-        <div className="text-center">
-          <p className="text-[18px] font-semibold text-[#1C1917] mb-2">Campaign not found</p>
-          <p className="text-[14px] text-[rgba(0,0,0,0.5)]">This campaign may have been removed or the link is invalid.</p>
-          {onBack && <button onClick={onBack} className="mt-4 text-[#C4674A] font-semibold text-[14px]">Go back</button>}
-        </div>
-      </div>
-    );
-  }
-
-  const sectionCls = 'bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-3';
+  const dividerCls = 'border-t-[0.5px] border-[rgba(0,0,0,0.06)] pt-5 mt-5';
 
   return (
-    <div className="min-h-screen bg-[#F7F6F3]">
-      <div className="max-w-[720px] mx-auto px-4 pb-28 pt-4">
+    <div className="min-h-screen bg-white">
+      <div className="max-w-[720px] mx-auto pb-28">
         {/* Back button */}
         {onBack && (
-          <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[rgba(0,0,0,0.4)] hover:text-[#C4674A] mb-3">
-            <ArrowLeft size={16} /> Back
-          </button>
+          <div className="px-4 pt-4 pb-2">
+            <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[rgba(0,0,0,0.4)] hover:text-[#1C1917] transition-colors">
+              <ArrowLeft size={16} /> Back
+            </button>
+          </div>
         )}
 
-        {/* Hero image */}
-        <div className="relative w-full aspect-video rounded-[10px] overflow-hidden mb-3">
-          {campaign.campaign_image ? (
-            <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#A8573E] flex items-center justify-center">
-              {campaign.businesses?.logo_url ? (
-                <img src={campaign.businesses.logo_url} alt={campaign.businesses.name} className="w-20 h-20 rounded-full object-cover border-3 border-white/30" />
-              ) : (
-                <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center">
-                  <span className="text-[32px] font-semibold text-white">{(campaign.businesses?.name || '?')[0]}</span>
-                </div>
-              )}
-            </div>
-          )}
-          <div className="hero-gradient absolute inset-0" />
-        </div>
+        {/* Cover image — full width, no border-radius, no gradient overlay */}
+        {(campaign.campaign_image || !campaign.campaign_image) && (
+          <div className="w-full" style={{ height: 220 }}>
+            {campaign.campaign_image ? (
+              <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-gradient-to-br from-[#C4674A] to-[#A8573E] flex items-center justify-center">
+                {campaign.businesses?.logo_url ? (
+                  <img src={campaign.businesses.logo_url} alt={campaign.businesses.name} className="w-16 h-16 rounded-full object-cover" />
+                ) : (
+                  <span className="text-[36px] font-semibold text-white/50">{(campaign.businesses?.name || '?')[0]}</span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
 
-        {/* 1. Header */}
-        <div className={sectionCls}>
+        {/* Page content — single flowing surface */}
+        <div className="px-5 pt-5">
+          {/* Header */}
           <button onClick={() => setShowBrandInfo(true)}
             className="text-[13px] font-medium text-[rgba(0,0,0,0.45)] mb-1 hover:text-[#C4674A] hover:underline transition-colors">
             {campaign.businesses?.name}
           </button>
-          <h1 className="text-[18px] font-semibold text-[#1C1917] mb-3" style={{ lineHeight: 1.3 }}>
+          <h1 className="text-[22px] font-semibold text-[#1C1917] mb-3" style={{ lineHeight: 1.25, letterSpacing: '-0.3px' }}>
             {campaign.headline || campaign.title}
           </h1>
-          {/* Perk */}
           {campaign.perk_description && (
             <p className="text-[14px] font-medium text-[#C4674A] mb-3">
               {campaign.perk_description?.split('—')[0]?.trim() || 'Perk included'}
               {campaign.perk_value ? ` — worth £${campaign.perk_value}` : ''}
             </p>
           )}
-          {/* Dates row */}
           <div className="flex flex-col gap-1 sm:flex-row sm:gap-4 text-[13px] text-[rgba(0,0,0,0.4)]">
             {campaign.expression_deadline && <span>Apply by {fmtDate(campaign.expression_deadline)}</span>}
             {campaign.content_deadline && <span>Content due {fmtDate(campaign.content_deadline)}</span>}
           </div>
-        </div>
 
-        {/* 2. About the brand */}
-        {campaign.about_brand && (
-          <div className={sectionCls}>
-            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">About the brand</p>
-            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.about_brand}</p>
-          </div>
-        )}
-
-        {/* 3. The perk */}
-        {campaign.perk_description && (
-          <div className={sectionCls}>
-            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">The perk</p>
-            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.perk_description}</p>
-            <div className="flex items-center gap-4 mt-3 text-[13px] text-[rgba(0,0,0,0.45)]">
-              {campaign.perk_value && <span>Worth £{campaign.perk_value}</span>}
-              {campaign.perk_type && <span className="capitalize">{campaign.perk_type.replace('_', ' ')}</span>}
+          {/* About the brand */}
+          {campaign.about_brand && (
+            <div className={dividerCls}>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">About the brand</p>
+              <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.about_brand}</p>
             </div>
-          </div>
-        )}
-
-        {/* 4. What to post */}
-        <div className={sectionCls}>
-          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">What to post</p>
-          {/* Deliverables */}
-          <p className="text-[14px] text-[rgba(0,0,0,0.5)] mb-3">
-            {[campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean).join(' + ') || 'Reel'}
-          </p>
-          {campaign.content_requirements && (
-            <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.content_requirements}</p>
           )}
-          {campaign.required_tags && campaign.required_tags.length > 0 && (
-            <div className="mt-3 pt-3 border-t-[0.5px] border-[rgba(0,0,0,0.08)]">
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Required tags</p>
-              <div className="flex flex-wrap gap-2">
-                {campaign.required_tags.map((tag, i) => (
-                  <span key={i} className="px-2.5 py-1 rounded-[6px] bg-[rgba(196,103,74,0.08)] text-[13px] font-medium text-[#C4674A]">
-                    {tag}
-                  </span>
+
+          {/* The perk */}
+          {campaign.perk_description && (
+            <div className={dividerCls}>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">The perk</p>
+              <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.perk_description}</p>
+              <div className="flex items-center gap-4 mt-2 text-[13px] text-[rgba(0,0,0,0.4)]">
+                {campaign.perk_value && <span>Worth £{campaign.perk_value}</span>}
+                {campaign.perk_type && <span className="capitalize">{campaign.perk_type.replace('_', ' ')}</span>}
+              </div>
+            </div>
+          )}
+
+          {/* What to post */}
+          <div className={dividerCls}>
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">What to post</p>
+            <p className="text-[14px] text-[rgba(0,0,0,0.45)] mb-3">
+              {[campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean).join(' + ') || 'Reel'}
+            </p>
+            {campaign.content_requirements && (
+              <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.content_requirements}</p>
+            )}
+            {campaign.required_tags && campaign.required_tags.length > 0 && (
+              <div className="mt-4">
+                <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">Required tags</p>
+                <div className="flex flex-wrap gap-2">
+                  {campaign.required_tags.map((tag, i) => (
+                    <span key={i} className="px-2.5 py-1 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-[13px] font-medium text-[#1C1917]">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Talking points */}
+          {campaign.talking_points && campaign.talking_points.length > 0 && (
+            <div className={dividerCls}>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">Talking points</p>
+              <ol className="space-y-1.5 list-decimal list-inside">
+                {campaign.talking_points.map((tp, i) => (
+                  <li key={i} className="text-[15px] text-[#1C1917] leading-[1.65]">{tp}</li>
+                ))}
+              </ol>
+            </div>
+          )}
+
+          {/* Inspiration */}
+          {campaign.inspiration && campaign.inspiration.length > 0 && (
+            <div className={dividerCls}>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">Inspiration</p>
+              <div className="space-y-2">
+                {campaign.inspiration.map((item: any, i: number) => (
+                  <div key={i}>
+                    <p className="text-[14px] font-semibold text-[#1C1917]">{item.title}</p>
+                    <p className="text-[14px] text-[rgba(0,0,0,0.4)] leading-[1.6]">{item.description}</p>
+                  </div>
                 ))}
               </div>
             </div>
           )}
-        </div>
 
-        {/* 5. Talking points */}
-        {campaign.talking_points && campaign.talking_points.length > 0 && (
-          <div className={sectionCls}>
-            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Talking points</p>
-            <ol className="space-y-1.5 list-decimal list-inside">
-              {campaign.talking_points.map((tp, i) => (
-                <li key={i} className="text-[15px] text-[#1C1917] leading-[1.65]">{tp}</li>
-              ))}
-            </ol>
-          </div>
-        )}
-
-        {/* 6. Inspiration */}
-        {campaign.inspiration && campaign.inspiration.length > 0 && (
-          <div className={sectionCls}>
-            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Inspiration</p>
-            <div className="space-y-2">
-              {campaign.inspiration.map((item: any, i: number) => (
-                <div key={i}>
-                  <p className="text-[14px] font-semibold text-[#1C1917]">{item.title}</p>
-                  <p className="text-[14px] text-[rgba(0,0,0,0.45)] leading-[1.6]">{item.description}</p>
-                </div>
-              ))}
+          {/* Key dates */}
+          <div className={dividerCls}>
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.4)] mb-2">Key dates</p>
+            <div className="space-y-1.5 text-[14px]">
+              {campaign.open_date && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.4)]">Opens</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.open_date)}</span></div>}
+              {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.4)]">Apply by</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.expression_deadline)}</span></div>}
+              {campaign.content_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.4)]">Content due</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.content_deadline)}</span></div>}
             </div>
-          </div>
-        )}
-
-        {/* 7. Key dates */}
-        <div className={sectionCls}>
-          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Key dates</p>
-          <div className="space-y-1.5 text-[14px]">
-            {campaign.open_date && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Opens</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.open_date)}</span></div>}
-            {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Apply by</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.expression_deadline)}</span></div>}
-            {campaign.content_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Content due</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.content_deadline)}</span></div>}
           </div>
         </div>
       </div>
@@ -297,7 +284,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
           {application?.status === 'interested' && (
-            <div className="confetti-burst w-full min-h-[44px] py-3 rounded-[6px] bg-[#E1F5EE] text-center text-[#0F6E56] font-semibold text-[13px] border-[0.5px] border-[rgba(0,0,0,0.08)]">
+            <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#E1F5EE] text-center text-[#0F6E56] font-semibold text-[13px] border-[0.5px] border-[rgba(0,0,0,0.08)]">
               <Check size={16} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
               Interest registered — we'll be in touch
             </div>
@@ -334,9 +321,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               <button onClick={() => setShowBrandInfo(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>
             </div>
             {campaign.businesses.category && (
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[8px] text-[12px] font-semibold bg-[rgba(196,103,74,0.08)] text-[#C4674A] mb-3">
-                {campaign.businesses.category}
-              </span>
+              <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-3">{campaign.businesses.category}</p>
             )}
             {(campaign.about_brand || campaign.businesses.bio) && (
               <p className="text-[15px] text-[#1C1917] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>

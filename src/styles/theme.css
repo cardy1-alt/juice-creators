@@ -133,7 +133,7 @@
   to   { transform: scaleY(1); }
 }
 
-/* ── Hero gradient overlay ── */
+/* ── Hero gradient overlay (disabled — clean edge like Notion) ── */
 .hero-gradient {
-  background: linear-gradient(to bottom, transparent 40%, var(--shell) 100%);
+  display: none;
 }
