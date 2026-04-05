@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
-import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, ChevronDown, ChevronRight, Eye } from 'lucide-react';
+import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye } from 'lucide-react';
 
 // ─── Types ───
 interface Brand { id: string; name: string; }
@@ -590,9 +590,9 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
   );
 }
 
-// ─── Inline Campaign Detail Panel ───
-function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipation, onEdit }: {
-  campaign: Campaign; onManageApplicants: () => void; onViewParticipation: () => void; onEdit: () => void;
+// ─── Campaign Peek Panel (right side) ───
+function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
+  campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void;
 }) {
   const [aiLoading, setAiLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<{ creator_id: string; name: string; reason: string; score: number }[] | null>(null);
@@ -607,20 +607,18 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
     setShowAddApplicant(true);
   };
 
-  const [inlineToast, setInlineToast] = useState('');
-  const showInlineToast = (msg: string) => { setInlineToast(msg); setTimeout(() => setInlineToast(''), 3000); };
+  const [toast, setToast] = useState('');
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   const handleAddApplicant = async (creatorId: string) => {
     setAddingCreator(creatorId);
     const { error } = await supabase.from('applications').insert({
-      campaign_id: campaign.id,
-      creator_id: creatorId,
-      status: 'interested',
+      campaign_id: campaign.id, creator_id: creatorId, status: 'interested',
     });
     setAddingCreator(null);
-    if (error) { showInlineToast(error.message.includes('duplicate') ? 'Creator already applied' : 'Failed to add applicant'); return; }
+    if (error) { showToast(error.message.includes('duplicate') ? 'Creator already applied' : 'Failed to add applicant'); return; }
     setShowAddApplicant(false);
-    showInlineToast('Applicant added');
+    showToast('Applicant added');
   };
 
   const handleAiRecommend = async () => {
@@ -653,25 +651,18 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
   };
 
   const handleSelectCreator = async (creatorId: string) => {
-    // Update application to confirmed (admin bypasses the confirm step)
     const { error: appErr } = await supabase.from('applications').update({
       status: 'confirmed', selected_at: new Date().toISOString(), confirmed_at: new Date().toISOString(),
     }).eq('campaign_id', campaign.id).eq('creator_id', creatorId);
-    if (appErr) { showInlineToast('Failed to select creator'); return; }
-
-    // Get the application ID for the participation record
+    if (appErr) { showToast('Failed to select creator'); return; }
     const { data: appData } = await supabase.from('applications').select('id')
       .eq('campaign_id', campaign.id).eq('creator_id', creatorId).single();
-
-    // Create participation record
     if (appData) {
       await supabase.from('participations').insert({
         campaign_id: campaign.id, creator_id: creatorId,
         application_id: appData.id, status: 'confirmed', perk_sent: false,
       });
     }
-
-    // Send selection email
     const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).single();
     if (campData) {
       sendCreatorSelectedEmail(creatorId, {
@@ -681,94 +672,119 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
       });
     }
     setRecommendations(prev => prev ? prev.filter(r => r.creator_id !== creatorId) : null);
-    showInlineToast('Creator selected and confirmed');
+    showToast('Creator selected and confirmed');
   };
 
+  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
+
   return (
-    <tr>
-      <td colSpan={10} className="p-0">
-        <div className="bg-[#FAFAF8] border-t border-[rgba(0,0,0,0.08)] px-6 py-5">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-            {campaign.perk_description && (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-[420px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+          <div className="min-w-0 flex-1">
+            <p className="text-[16px] font-semibold text-[#1C1917] truncate">{campaign.title}</p>
+            <p className="text-[13px] text-[rgba(0,0,0,0.45)] mt-0.5">{campaign.businesses?.name || '—'}</p>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[rgba(0,0,0,0.35)] hover:bg-[rgba(0,0,0,0.06)] transition-colors flex-shrink-0 ml-3">
+            <X size={16} />
+          </button>
+        </div>
+
+        {toast && (
+          <div className="mx-5 mt-3 px-3.5 py-2 rounded-[6px] bg-[#1C1917] text-white text-[13px] font-medium">{toast}</div>
+        )}
+
+        {/* Scrollable body */}
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+            <div>
+              <p className={peekLabel}>Status</p>
+              <StatusBadge status={campaign.status} />
+            </div>
+            <div>
+              <p className={peekLabel}>City</p>
+              <p className="text-[14px] text-[#1C1917]">{campaign.target_city || '—'}</p>
+            </div>
+            <div>
+              <p className={peekLabel}>Target</p>
+              <p className="text-[14px] text-[#1C1917]">{campaign.creator_target} creators</p>
+            </div>
+            <div>
+              <p className={peekLabel}>Deadline</p>
+              <p className="text-[14px] text-[#1C1917]">{fmtDate(campaign.expression_deadline)}</p>
+            </div>
+            {campaign.perk_value && (
               <div>
-                <p className={labelCls}>Perk</p>
-                <p className="text-[14px] text-[#1C1917]">{campaign.perk_description}</p>
-                {campaign.perk_value && <p className="text-[13px] text-[rgba(34,34,34,0.60)] mt-1">£{campaign.perk_value} · {campaign.perk_type?.replace('_', ' ')}</p>}
+                <p className={peekLabel}>Perk Value</p>
+                <p className="text-[14px] text-[#1C1917]">£{campaign.perk_value}</p>
               </div>
             )}
-            {campaign.content_requirements && (
+            {campaign.campaign_type === 'community' && (
               <div>
-                <p className={labelCls}>Content Required</p>
-                <p className="text-[14px] text-[#1C1917] leading-[1.6]">{campaign.content_requirements.slice(0, 150)}{campaign.content_requirements.length > 150 ? '...' : ''}</p>
-              </div>
-            )}
-            {campaign.talking_points && campaign.talking_points.length > 0 && (
-              <div>
-                <p className={labelCls}>Talking Points</p>
-                <ol className="text-[14px] text-[#1C1917] space-y-1 list-decimal list-inside">
-                  {campaign.talking_points.map((tp, i) => <li key={i}>{tp}</li>)}
-                </ol>
+                <p className={peekLabel}>Type</p>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
               </div>
             )}
           </div>
-          {inlineToast && (
-            <div className="mt-3 px-3.5 py-2 rounded-[8px] bg-[#1C1917] text-white text-[13px] font-medium inline-block">{inlineToast}</div>
+
+          {campaign.perk_description && (
+            <div className="mb-4">
+              <p className={peekLabel}>Perk</p>
+              <p className="text-[14px] text-[#1C1917] leading-[1.6]">{campaign.perk_description}</p>
+              {campaign.perk_type && <p className="text-[13px] text-[rgba(0,0,0,0.45)] mt-1">{campaign.perk_type.replace('_', ' ')}</p>}
+            </div>
           )}
-          <div className="flex gap-2 mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)] flex-wrap items-center">
-            {/* Campaign status */}
+
+          {campaign.content_requirements && (
+            <div className="mb-4">
+              <p className={peekLabel}>Content Required</p>
+              <p className="text-[14px] text-[#1C1917] leading-[1.6]">{campaign.content_requirements}</p>
+            </div>
+          )}
+
+          {campaign.talking_points && campaign.talking_points.length > 0 && (
+            <div className="mb-4">
+              <p className={peekLabel}>Talking Points</p>
+              <ol className="text-[14px] text-[#1C1917] space-y-1 list-decimal list-inside">
+                {campaign.talking_points.map((tp, i) => <li key={i}>{tp}</li>)}
+              </ol>
+            </div>
+          )}
+
+          <div className="mb-4">
+            <p className={peekLabel}>Change Status</p>
             <select value={campaign.status} onChange={async e => {
               const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
-              if (error) showInlineToast('Failed to update status');
-              else { showInlineToast(`Status → ${e.target.value}`); onEdit(); /* triggers refresh */ }
-            }} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] font-semibold text-[#1C1917] bg-white">
+              if (error) showToast('Failed to update status');
+              else { showToast(`Status → ${e.target.value}`); onEdit(); }
+            }} className="w-full px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[13px] font-medium text-[#1C1917] bg-white">
               <option value="draft">Draft</option><option value="active">Active</option>
               <option value="selecting">Selecting</option><option value="live">Live</option>
               <option value="completed">Completed</option>
             </select>
-            <button onClick={onManageApplicants} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">Manage Applicants</button>
-            <button onClick={handleAiRecommend} disabled={aiLoading}
-              className="inline-flex items-center gap-1 px-3.5 py-2 rounded-[6px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
-              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
-              {aiLoading ? 'Analysing...' : 'AI Recommend'}
-            </button>
-            <button onClick={onViewParticipation} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">View Participation</button>
-            <button onClick={onEdit} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">Edit Campaign</button>
-            <button onClick={fetchCreatorsForAdd} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
-              <span className="flex items-center gap-1"><UserPlus size={14} /> Add Applicant</span>
-            </button>
-            <button onClick={async () => {
-              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, required_tags, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
-              const { error } = await supabase.from('campaigns').insert({
-                brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
-                target_city, target_county, creator_target, min_level, content_requirements, required_tags,
-                talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
-              });
-              if (error) showInlineToast('Failed to duplicate');
-              else { showInlineToast('Campaign duplicated as draft'); onEdit(); }
-            }} className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
-              Duplicate
-            </button>
           </div>
-          {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
 
-          {/* AI Recommendations panel */}
+          {aiError && <p className="text-[12px] text-[#C4674A] mb-3">{aiError}</p>}
+
           {recommendations && recommendations.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)]">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)] mb-3">AI Recommendations</p>
+            <div className="mb-4 pt-3 border-t border-[rgba(0,0,0,0.08)]">
+              <p className={`${peekLabel} mb-3`}>AI Recommendations</p>
               <div className="space-y-2">
                 {recommendations.map(r => (
-                  <div key={r.creator_id} className="flex items-center gap-3 bg-white rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.08)] px-4 py-3">
-                    <div className="w-8 h-8 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[12px] font-semibold text-white">{r.name[0]}</span>
+                  <div key={r.creator_id} className="flex items-center gap-3 bg-[#F7F6F3] rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] px-3 py-2.5">
+                    <div className="w-7 h-7 rounded-full bg-[#C4674A] flex items-center justify-center flex-shrink-0">
+                      <span className="text-[11px] font-semibold text-white">{r.name[0]}</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[#1C1917]">{r.name}</p>
-                      <p className="text-[13px] text-[rgba(34,34,34,0.60)] truncate">{r.reason}</p>
+                      <p className="text-[13px] font-semibold text-[#1C1917]">{r.name}</p>
+                      <p className="text-[12px] text-[rgba(0,0,0,0.45)] truncate">{r.reason}</p>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
-                      <span className="text-[14px] font-semibold text-[#C4674A]">{r.score}/10</span>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-[13px] font-semibold text-[#C4674A]">{r.score}/10</span>
                       <button onClick={() => handleSelectCreator(r.creator_id)}
-                        className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                        className="px-2.5 py-1 rounded-[6px] bg-[#C4674A] text-white text-[11px] font-semibold hover:opacity-[0.85]">
                         Select
                       </button>
                     </div>
@@ -777,22 +793,23 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
               </div>
             </div>
           )}
+
           {showAddApplicant && (
-            <div className="mt-4 pt-4 border-t border-[rgba(0,0,0,0.08)]">
+            <div className="mb-4 pt-3 border-t border-[rgba(0,0,0,0.08)]">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[rgba(34,34,34,0.35)]">Add Creator as Applicant</p>
-                <button onClick={() => setShowAddApplicant(false)} className="text-[rgba(34,34,34,0.35)] hover:text-[#1C1917]"><X size={16} /></button>
+                <p className={peekLabel}>Add Creator as Applicant</p>
+                <button onClick={() => setShowAddApplicant(false)} className="text-[rgba(0,0,0,0.35)] hover:text-[#1C1917]"><X size={14} /></button>
               </div>
               <div className="max-h-[200px] overflow-y-auto space-y-1">
                 {allCreators.map(cr => (
-                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[8px] hover:bg-[#F7F6F3]">
-                    <div>
-                      <span className="text-[14px] font-medium text-[#1C1917]">{cr.display_name || cr.name}</span>
-                      <span className="text-[12px] text-[rgba(34,34,34,0.35)] ml-2">{cr.instagram_handle}</span>
+                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[6px] hover:bg-[#F7F6F3]">
+                    <div className="min-w-0">
+                      <span className="text-[13px] font-medium text-[#1C1917]">{cr.display_name || cr.name}</span>
+                      <span className="text-[11px] text-[rgba(0,0,0,0.35)] ml-2">{cr.instagram_handle}</span>
                     </div>
                     <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
-                      className="px-3 py-1 rounded-[6px] bg-[#C4674A] text-white text-[11px] font-semibold disabled:opacity-40">
-                      {addingCreator === cr.id ? 'Adding...' : 'Add'}
+                      className="px-2.5 py-1 rounded-[6px] bg-[#C4674A] text-white text-[11px] font-semibold disabled:opacity-40">
+                      {addingCreator === cr.id ? '...' : 'Add'}
                     </button>
                   </div>
                 ))}
@@ -800,8 +817,38 @@ function CampaignInlineDetail({ campaign, onManageApplicants, onViewParticipatio
             </div>
           )}
         </div>
-      </td>
-    </tr>
+
+        {/* Action buttons */}
+        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 space-y-2">
+          <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">Edit Campaign</button>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={handleAiRecommend} disabled={aiLoading}
+              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-[6px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
+              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
+              {aiLoading ? 'Analysing...' : 'AI Recommend'}
+            </button>
+            <button onClick={onViewParticipation} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">Participation</button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <button onClick={fetchCreatorsForAdd} className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">
+              <UserPlus size={13} /> Add Applicant
+            </button>
+            <button onClick={async () => {
+              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, required_tags, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
+              const { error } = await supabase.from('campaigns').insert({
+                brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
+                target_city, target_county, creator_target, min_level, content_requirements, required_tags,
+                talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
+              });
+              if (error) showToast('Failed to duplicate');
+              else { showToast('Campaign duplicated as draft'); onEdit(); }
+            }} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">
+              Duplicate
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -811,7 +858,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [peekCampaign, setPeekCampaign] = useState<Campaign | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
@@ -887,11 +934,10 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             <tbody>
               {campaigns.map(c => {
                 const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
-                const expanded = expandedId === c.id;
+                const selected = peekCampaign?.id === c.id;
                 return (
-                  <>
-                    <tr key={c.id} onClick={() => setExpandedId(expanded ? null : c.id)}
-                      className="hover:bg-[rgba(0,0,0,0.02)] cursor-pointer transition-colors" style={{ height: 44 }}>
+                    <tr key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
+                      className={`cursor-pointer transition-colors ${selected ? 'bg-[rgba(0,0,0,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`} style={{ height: 44 }}>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
@@ -922,22 +968,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       <td className={tdCls}>{counts.selected}</td>
                       <td className={tdCls}>{counts.submitted}</td>
                       <td className={tdCls}>{counts.completed}</td>
-                      <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>
-                        <div className="flex items-center gap-2">
-                          {fmtShortDate(c.expression_deadline)}
-                          {expanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                        </div>
-                      </td>
+                      <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>{fmtShortDate(c.expression_deadline)}</td>
                     </tr>
-                    {expanded && (
-                      <CampaignInlineDetail
-                        campaign={c}
-                        onManageApplicants={() => {}}
-                        onViewParticipation={() => setParticipationCampaign(c)}
-                        onEdit={() => { setEditingCampaign(c); onOpenModal(); }}
-                      />
-                    )}
-                  </>
                 );
               })}
             </tbody>
@@ -955,6 +987,16 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             + New Campaign
           </button>
         </div>
+      )}
+
+      {/* Campaign Peek Panel */}
+      {peekCampaign && (
+        <CampaignPeekPanel
+          campaign={peekCampaign}
+          onClose={() => setPeekCampaign(null)}
+          onViewParticipation={() => { setParticipationCampaign(peekCampaign); setPeekCampaign(null); }}
+          onEdit={() => { setEditingCampaign(peekCampaign); onOpenModal(); setPeekCampaign(null); }}
+        />
       )}
 
       {/* Campaign Modal */}
