@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffectiveAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { sendAdminContentSubmittedEmail } from '../lib/notifications';
 import CampaignDetail from './CampaignDetail';
@@ -1037,7 +1037,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
 
 // ─── Main CreatorApp ───
 export default function CreatorApp() {
-  const { user, userProfile, signOut } = useAuth();
+  const { user, userProfile, signOut } = useEffectiveAuth();
   const [tab, setTab] = useState<Tab>('discover');
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
@@ -159,7 +160,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
 }
 
 // ─── Creator Peek Panel ───
-function CreatorPeekPanel({ creator, onClose }: { creator: Creator; onClose: () => void }) {
+function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void }) {
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
   const handle = creator.instagram_handle?.replace('@', '') || '';
@@ -245,6 +246,14 @@ function CreatorPeekPanel({ creator, onClose }: { creator: Creator; onClose: () 
             </div>
           </div>
         </div>
+
+        {/* View as */}
+        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+          <button onClick={() => { onViewAs(creator); onClose(); }}
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3] transition-colors">
+            <Eye size={14} /> View as Creator
+          </button>
+        </div>
       </div>
     </>
   );
@@ -252,6 +261,7 @@ function CreatorPeekPanel({ creator, onClose }: { creator: Creator; onClose: () 
 
 // ─── Main Export ───
 export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
+  const authCtx = useAuth();
   const [creators, setCreators] = useState<Creator[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -478,7 +488,10 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </table>
       </div>
 
-      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} />}
+      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} onViewAs={(c) => {
+        const { setViewAs } = authCtx;
+        setViewAs('creator', { ...c, display_name: c.display_name || c.name });
+      }} />}
       {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} showToast={showToast} />}
     </div>
   );

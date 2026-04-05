@@ -277,8 +277,26 @@ function ResetPassword() {
   );
 }
 
+function ViewAsBanner() {
+  const { viewAsRole, viewAsProfile, exitViewAs } = useAuth();
+  if (!viewAsRole) return null;
+  const name = viewAsProfile?.display_name || viewAsProfile?.name || viewAsProfile?.email || '—';
+  return (
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[#1C1917] text-white px-4 py-2 flex items-center justify-between text-[13px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
+      <div className="flex items-center gap-2">
+        <Eye size={14} className="opacity-60" />
+        <span className="font-medium">Viewing as {viewAsRole === 'creator' ? 'creator' : 'brand'}:</span>
+        <span className="font-semibold">{name}</span>
+      </div>
+      <button onClick={exitViewAs} className="px-3 py-1 rounded-[6px] bg-white/10 hover:bg-white/20 font-medium transition-colors">
+        Back to Admin
+      </button>
+    </div>
+  );
+}
+
 function App() {
-  const { user, userRole, loading, signOut } = useAuth();
+  const { user, userRole, loading, signOut, viewAsRole, viewAsProfile } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
   const campaignId = getCampaignIdFromUrl();
 
@@ -358,6 +376,19 @@ function App() {
       <span style={{ fontFamily: "'Instrument Serif', serif", fontWeight: 400, color: '#1C1917', fontSize: 22 }}>nayba</span>
     </div>
   );
+
+  // Admin "View as" mode — render creator or business view with exit banner
+  if (userRole === 'admin' && viewAsRole) {
+    return (
+      <React.Suspense fallback={suspenseFallback}>
+        <ViewAsBanner />
+        <div className="pt-10">
+          {viewAsRole === 'creator' && <CreatorApp />}
+          {viewAsRole === 'business' && <BusinessPortal />}
+        </div>
+      </React.Suspense>
+    );
+  }
 
   if (userRole === 'admin') {
     return <React.Suspense fallback={suspenseFallback}>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><AdminDashboard /></div></React.Suspense>;

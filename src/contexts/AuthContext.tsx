@@ -12,6 +12,10 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, role: UserRole, additionalData: any) => Promise<void>;
   signOut: () => Promise<void>;
+  viewAsRole: UserRole | null;
+  viewAsProfile: any | null;
+  setViewAs: (role: UserRole, profile: any) => void;
+  exitViewAs: () => void;
 }
 
 const ADMIN_EMAIL = (import.meta.env.VITE_ADMIN_EMAIL || 'hello@nayba.app').toLowerCase();
@@ -90,6 +94,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [userRole, setUserRole] = useState<UserRole | null>(demo ? demo.role : null);
   const [userProfile, setUserProfile] = useState<any | null>(demo ? demo.profile : null);
   const [loading, setLoading] = useState(demo ? false : true);
+  const [viewAsRole, setViewAsRole] = useState<UserRole | null>(null);
+  const [viewAsProfile, setViewAsProfileState] = useState<any | null>(null);
+
+  const setViewAs = (role: UserRole, profile: any) => {
+    setViewAsRole(role);
+    setViewAsProfileState(profile);
+  };
+
+  const exitViewAs = () => {
+    setViewAsRole(null);
+    setViewAsProfileState(null);
+  };
 
   // Guard: prevent onAuthStateChange from overwriting state during signup
   const signingUpRef = useRef(false);
@@ -421,7 +437,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, userRole, userProfile, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, userRole, userProfile, loading, signIn, signUp, signOut, viewAsRole, viewAsProfile, setViewAs, exitViewAs }}>
       {children}
     </AuthContext.Provider>
   );
@@ -433,4 +449,20 @@ export function useAuth() {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
+}
+
+/**
+ * Use inside creator/business views when admin is "viewing as" someone.
+ * Returns viewAsProfile/viewAsRole when active, otherwise falls back to real auth.
+ */
+export function useEffectiveAuth() {
+  const ctx = useAuth();
+  if (ctx.viewAsRole && ctx.viewAsProfile) {
+    return {
+      ...ctx,
+      userRole: ctx.viewAsRole,
+      userProfile: ctx.viewAsProfile,
+    };
+  }
+  return ctx;
 }

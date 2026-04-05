@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useEffectiveAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
@@ -70,7 +70,7 @@ const TABS: { key: Tab; label: string; icon: typeof LayoutDashboard }[] = [
 ];
 
 export default function BusinessPortal() {
-  const { user, signOut } = useAuth();
+  const { user, signOut } = useEffectiveAuth();
   const [brand, setBrand] = useState<Brand | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);

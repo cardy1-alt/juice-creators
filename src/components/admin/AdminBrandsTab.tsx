@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
-import { Check, X, AlertCircle, ExternalLink } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink, Eye } from 'lucide-react';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
@@ -86,9 +87,10 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 }
 
 // ─── Brand Peek Panel ───
-function BrandPeekPanel({ brand, campaignCount, onClose, onApprove }: {
+function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: {
   brand: Brand; campaignCount: number; onClose: () => void;
   onApprove: (id: string, approved: boolean) => void;
+  onViewAs: (brand: Brand) => void;
 }) {
   const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
 
@@ -164,24 +166,31 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove }: {
           )}
         </div>
 
-        {!brand.approved && (
-          <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 flex gap-2">
-            <button onClick={() => { onApprove(brand.id, true); onClose(); }}
-              className="flex-1 px-4 py-2.5 rounded-[6px] bg-[#2D7A4F] text-white text-[13px] font-semibold hover:opacity-[0.85]">
-              Approve
-            </button>
-            <button onClick={() => { onApprove(brand.id, false); onClose(); }}
-              className="flex-1 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
-              Deny
-            </button>
-          </div>
-        )}
+        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 space-y-2">
+          {!brand.approved && (
+            <div className="flex gap-2">
+              <button onClick={() => { onApprove(brand.id, true); onClose(); }}
+                className="flex-1 px-4 py-2.5 rounded-[6px] bg-[#2D7A4F] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                Approve
+              </button>
+              <button onClick={() => { onApprove(brand.id, false); onClose(); }}
+                className="flex-1 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
+                Deny
+              </button>
+            </div>
+          )}
+          <button onClick={() => { onViewAs(brand); onClose(); }}
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3] transition-colors">
+            <Eye size={14} /> View as Brand
+          </button>
+        </div>
       </div>
     </>
   );
 }
 
 export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
+  const authCtx = useAuth();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [campaignCounts, setCampaignCounts] = useState<Record<string, number>>({});
   const [toast, setToast] = useState<string | null>(null);
@@ -269,6 +278,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           campaignCount={campaignCounts[peekBrand.id] || 0}
           onClose={() => setPeekBrand(null)}
           onApprove={handleApprove}
+          onViewAs={(b) => authCtx.setViewAs('business', b)}
         />
       )}
       {showModal && <CreateBrandModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchBrands(); }} />}
