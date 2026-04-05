@@ -498,16 +498,20 @@ export default function Auth() {
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
                 </div>
 
-                {/* City */}
+                {/* County */}
                 <div>
-                  <input
-                    type="text"
+                  <select
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    placeholder="e.g. Bury St Edmunds"
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#222] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                  />
+                  >
+                    <option value="">Select your county</option>
+                    <option value="Suffolk">Suffolk</option>
+                    <option value="Norfolk">Norfolk</option>
+                    <option value="Cambridgeshire">Cambridgeshire</option>
+                    <option value="Essex">Essex</option>
+                  </select>
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>So we can show you local campaigns</p>
                 </div>
 

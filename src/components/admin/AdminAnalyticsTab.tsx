@@ -144,7 +144,7 @@ export default function AdminAnalyticsTab() {
       {/* Charts: row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
-          <p className={chartLabel}>Creators by City</p>
+          <p className={chartLabel}>Creators by County</p>
           <AnimatedBarChart items={stats.creatorsByCity.map(c => ({ label: c.city, value: c.count }))} color="#C4674A" />
         </div>
         <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">

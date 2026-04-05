@@ -133,7 +133,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => { setForm(p => ({ ...p, displayName: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
-                <div><label className={labelCls}>City</label><input value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
+                <div><label className={labelCls}>County</label><select value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls}><option value="">Select county</option><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
                 <div className="md:col-span-2">
                   <label className={labelCls}>Starting Level</label>
                   <select value={form.level} onChange={e => setForm(p => ({ ...p, level: e.target.value }))} className={inputCls}>
@@ -202,7 +202,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
               </span>
             </div>
             <div>
-              <p className={peekLabel}>City</p>
+              <p className={peekLabel}>County</p>
               <p className="text-[14px] text-[#1C1917]">{creator.address || '—'}</p>
             </div>
             <div>
@@ -423,7 +423,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       <div className="relative mb-4">
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search creators by name, email, Instagram, or city..."
+          placeholder="Search creators by name, email, Instagram, or county..."
           className="w-full pl-9 pr-4 py-2.5 rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A]" />
       </div>
 
@@ -431,7 +431,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
-            <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>City</th>
+            <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
             <th className={thCls}>IG Status</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
           </tr></thead>

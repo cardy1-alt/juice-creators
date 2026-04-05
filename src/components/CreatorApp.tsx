@@ -866,9 +866,15 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">City</label>
-            <input value={city} onChange={e => setCity(e.target.value)} placeholder="e.g. Bury St Edmunds"
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]" />
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
+            <select value={city} onChange={e => setCity(e.target.value)}
+              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] min-h-[44px]">
+              <option value="">Select county</option>
+              <option value="Suffolk">Suffolk</option>
+              <option value="Norfolk">Norfolk</option>
+              <option value="Cambridgeshire">Cambridgeshire</option>
+              <option value="Essex">Essex</option>
+            </select>
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
