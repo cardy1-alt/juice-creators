@@ -80,6 +80,7 @@ function fmtShortDate(d: string | null) {
 function CampaignModal({ brands, campaign, onSave, onClose }: {
   brands: Brand[]; campaign: Campaign | null; onSave: () => void; onClose: () => void;
 }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     brand_id: campaign?.brand_id || '', title: campaign?.title || '', headline: campaign?.headline || '',
@@ -351,6 +352,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
 function ParticipationModal({ campaign, onClose, onRefresh }: {
   campaign: Campaign; onClose: () => void; onRefresh: () => void;
 }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [parts, setParts] = useState<Participation[]>([]);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -594,6 +596,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
   campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void;
 }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [aiLoading, setAiLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<{ creator_id: string; name: string; reason: string; score: number }[] | null>(null);
   const [aiError, setAiError] = useState('');

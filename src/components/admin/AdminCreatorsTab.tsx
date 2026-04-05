@@ -41,6 +41,7 @@ function fmtDate(d: string) {
 
 // ─── Create Creator Modal ───
 function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => void; onCreated: () => void; showToast: (msg: string) => void }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1' });
   const [creating, setCreating] = useState(false);
   const [createdPassword, setCreatedPassword] = useState<string | null>(null);
@@ -161,6 +162,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
 
 // ─── Creator Peek Panel ───
 function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
   const handle = creator.instagram_handle?.replace('@', '') || '';

@@ -21,6 +21,7 @@ function fmtDate(d: string) {
 }
 
 function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [form, setForm] = useState({ name: '', email: '', category: '', region: 'Suffolk', instagram: '', address: '', bio: '' });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
@@ -92,6 +93,7 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
   onApprove: (id: string, approved: boolean) => void;
   onViewAs: (brand: Brand) => void;
 }) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
 
   return (
