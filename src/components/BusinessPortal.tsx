@@ -238,7 +238,7 @@ export default function BusinessPortal() {
           <Logo size={22} variant="wordmark" />
         </div>
 
-        <main className="flex-1 p-4 md:p-8 overflow-auto" key={activeTab}>
+        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-0 overflow-auto" key={activeTab}>
         <div className="tab-fade-in">
         {/* Summary Tab */}
         {activeTab === 'summary' && campaign && (
@@ -367,11 +367,11 @@ export default function BusinessPortal() {
                 <>
                   <span className="text-[13px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
                   <button onClick={handleBulkSelect}
-                    className="px-3 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                    className="min-h-[44px] px-3 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
                     Select {selectedCreators.size}
                   </button>
                   <button onClick={handleBulkDecline}
-                    className="px-3 py-2 rounded-[6px] text-[13px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] hover:bg-[rgba(0,0,0,0.04)]">
+                    className="min-h-[44px] px-3 py-2 rounded-[6px] text-[13px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] hover:bg-[rgba(0,0,0,0.04)]">
                     Decline
                   </button>
                 </>
@@ -437,11 +437,11 @@ export default function BusinessPortal() {
                       {a.status === 'interested' && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
-                            className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                            className="min-h-[44px] px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
                             Select
                           </button>
                           <button onClick={() => handleDecline(a.id)}
-                            className="text-[12px] font-medium text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]">
+                            className="min-h-[44px] flex items-center text-[12px] font-medium text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]">
                             Decline
                           </button>
                         </div>
@@ -658,6 +658,22 @@ export default function BusinessPortal() {
         )}
         </div>
       </main>
+      </div>
+
+      {/* Mobile bottom nav */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white z-30" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex items-center justify-around py-2">
+          {TABS.map(tab => {
+            const active = activeTab === tab.key;
+            return (
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px] ${active ? 'text-[#C4674A]' : 'text-[rgba(0,0,0,0.35)]'}`}>
+                <tab.icon size={20} strokeWidth={active ? 2 : 1.5} />
+                <span className={`text-[10px] ${active ? 'font-semibold' : 'font-medium'}`}>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
