@@ -137,3 +137,8 @@
 .hero-gradient {
   display: none;
 }
+
+/* ── Hidden scrollbar (Notion-style) ── */
+[style*="scrollbar-width: none"]::-webkit-scrollbar {
+  display: none;
+}
