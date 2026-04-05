@@ -81,6 +81,9 @@ export default function BusinessPortal() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   const [filterLevel, setFilterLevel] = useState<string>('all');
+  const [toast, setToast] = useState<string | null>(null);
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
@@ -129,7 +132,7 @@ export default function BusinessPortal() {
         <div className="bg-white rounded-[10px] p-8 max-w-md text-center" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
+          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
             <Mail size={16} /> Contact nayba
           </a>
         </div>
@@ -166,7 +169,7 @@ export default function BusinessPortal() {
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
             <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get started with your first campaign.</p>
-            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
+            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
               <Mail size={16} /> Contact nayba
             </a>
           </div>
@@ -177,6 +180,10 @@ export default function BusinessPortal() {
 
   return (
     <div className="flex min-h-screen bg-[var(--shell)]">
+      {toast && (
+        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>{toast}</div>
+      )}
+
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
@@ -272,7 +279,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Campaign brief */}
-            <div className="bg-white rounded-[10px] p-6" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Campaign Brief</h2>
               {campaign.perk_description && (
                 <div className="mb-4">
@@ -326,10 +333,12 @@ export default function BusinessPortal() {
           const handleSelect = async (appId: string) => {
             await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() }).eq('id', appId);
             fetchCampaignData();
+            showToast('Creator selected');
           };
           const handleDecline = async (appId: string) => {
             await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
             fetchCampaignData();
+            showToast('Creator declined');
           };
           const handleBulkSelect = async () => {
             for (const id of selectedCreators) {
@@ -337,6 +346,7 @@ export default function BusinessPortal() {
             }
             setSelectedCreators(new Set());
             fetchCampaignData();
+            showToast(`${selectedCreators.size} creator${selectedCreators.size !== 1 ? 's' : ''} selected`);
           };
           const handleBulkDecline = async () => {
             for (const id of selectedCreators) {
@@ -344,6 +354,7 @@ export default function BusinessPortal() {
             }
             setSelectedCreators(new Set());
             fetchCampaignData();
+            showToast(`${selectedCreators.size} creator${selectedCreators.size !== 1 ? 's' : ''} declined`);
           };
           return (
           <div>
@@ -531,7 +542,8 @@ export default function BusinessPortal() {
                             <button onClick={async () => {
                               await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
                               fetchCampaignData();
-                            }} className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                              showToast('Perk marked as sent');
+                            }} className="min-h-[44px] px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
                               Mark perk sent
                             </button>
                           )}
@@ -583,7 +595,8 @@ export default function BusinessPortal() {
                       <button onClick={async () => {
                         await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                         fetchCampaignData();
-                      }} className="px-3 py-1.5 rounded-[6px] bg-[#0F6E56] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                        showToast('Content approved');
+                      }} className="min-h-[44px] px-3 py-1.5 rounded-[6px] bg-[#0F6E56] text-white text-[12px] font-semibold hover:opacity-[0.85]">
                         Approve
                       </button>
                     )}
