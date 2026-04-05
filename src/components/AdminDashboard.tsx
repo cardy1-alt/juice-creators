@@ -106,7 +106,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-3 pb-3 overflow-y-auto">
           {NAV_SECTIONS.map(section => (
             <div key={section.label} className="mb-3">
-              <p style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
+              <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
                 {section.label}
               </p>
               {section.items.map(item => {
@@ -118,7 +118,8 @@ export default function AdminDashboard() {
                     className="w-full flex items-center gap-[9px] rounded-[6px] text-[14px] transition-colors"
                     style={{
                       fontWeight: active ? 600 : 400,
-                      background: active ? 'rgba(0,0,0,0.06)' : 'transparent',
+                      background: active ? 'rgba(0,0,0,0.04)' : 'transparent',
+                      borderLeft: active ? '3px solid #C4674A' : '3px solid transparent',
                       color: active ? '#1C1917' : 'rgba(0,0,0,0.55)',
                       padding: '7px 12px',
                       margin: '1px 8px',
@@ -141,12 +142,12 @@ export default function AdminDashboard() {
         {/* User row */}
         <div className="border-t border-[rgba(0,0,0,0.08)]" style={{ padding: '12px 8px 16px' }}>
           <div className="flex items-center gap-3 px-2 py-2 rounded-[8px] hover:bg-[rgba(0,0,0,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
-            <div className="w-[26px] h-[26px] rounded-full bg-[#E8E6E2] flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 rounded-full bg-[#E8E6E2] flex items-center justify-center flex-shrink-0">
               <span className="text-[11px] font-medium text-[#1C1917]">{adminInitial}</span>
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[13px] font-medium text-[#1C1917] truncate">{adminName}</p>
-              <p className="text-[11px] text-[rgba(0,0,0,0.4)] truncate">{user?.email}</p>
+              <p className="text-[12px] text-[rgba(0,0,0,0.4)] truncate">{user?.email}</p>
             </div>
             <LogOut size={14} className="text-[rgba(34,34,34,0.35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
           </div>

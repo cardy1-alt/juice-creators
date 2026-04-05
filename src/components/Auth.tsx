@@ -167,13 +167,13 @@ export default function Auth() {
             </div>
 
             {/* 3. Headline */}
-            <h1 className="text-[38px] md:text-[44px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-1.2px', lineHeight: 1.1, margin: '0 0 20px', color: '#1C1917', textAlign: 'center' }}>
+            <h1 className="text-[32px] md:text-[38px]" style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, letterSpacing: '-1.2px', lineHeight: 1.1, margin: '0 0 14px', color: '#1C1917', textAlign: 'center' }}>
               <span style={{ display: 'block' }}>Discover local brands.</span>
               Get <span style={{ color: '#C4674A' }}>rewarded</span> for sharing.
             </h1>
 
             {/* 4. Subheadline */}
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 16, fontWeight: 400, color: 'rgba(28,28,26,0.55)', lineHeight: 1.65, maxWidth: 380, margin: '0 0 36px' }}>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 16, fontWeight: 400, color: 'rgba(28,28,26,0.55)', lineHeight: 1.65, maxWidth: 380, margin: '0 0 24px' }}>
               New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
             </p>
 
