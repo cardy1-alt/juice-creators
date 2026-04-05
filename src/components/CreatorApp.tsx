@@ -95,7 +95,7 @@ function BrandInfoModal({ brand, onClose }: {
 }) {
   const handle = brand.instagram_handle?.replace('@', '') || '';
   return (
-    <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4" onClick={onClose}>
       <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
@@ -486,7 +486,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
       {/* Reel submission modal */}
       {showReelModal && (
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
           <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[18px] font-semibold text-[#1C1917]">Share your experience</h3>
@@ -548,7 +548,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.5)] z-[60] flex items-center justify-center px-4">
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
           <div className="bg-white rounded-[10px] max-w-[400px] w-full p-8 text-center relative overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             {/* Confetti-like decorative dots */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -989,7 +989,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </button>
 
       {showSignOutConfirm && (
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4">
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4">
           <div className="bg-white rounded-[10px] p-6 max-w-sm w-full text-center">
             <p className="text-[18px] font-semibold text-[#1C1917] mb-2">Sign out?</p>
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
@@ -1016,7 +1016,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-[rgba(34,34,34,0.5)] z-[60] flex items-center justify-center px-4">
+    <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
       <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 600, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
         <h2 className="text-[20px] font-semibold text-[#1C1917] mt-3 mb-1">How it works</h2>
@@ -1203,7 +1203,7 @@ export default function CreatorApp() {
       {/* ─── Campaign detail pane — Notion-style overlay (desktop only) ─── */}
       {viewingCampaign && !isMobile && tab === 'discover' && (
         <>
-          <div className="hidden md:block fixed inset-0 bg-[rgba(34,34,34,0.15)] z-30" onClick={() => setViewingCampaign(null)} />
+          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.15)] z-30" onClick={() => setViewingCampaign(null)} />
           <div className="hidden md:block fixed top-0 right-0 bottom-0 w-[520px] lg:w-[580px] xl:w-[640px] z-40 bg-white border-l border-[0.5px] border-[rgba(0,0,0,0.08)] overflow-y-auto slide-in-right"
             style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
             <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />

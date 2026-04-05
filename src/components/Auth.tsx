@@ -292,7 +292,7 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
-                    className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(34,34,34,0.35)]"
+                    className="block text-sm text-center mt-[4px] transition-colors mx-auto text-[rgba(0,0,0,0.35)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   >
                     Forgot password?
@@ -310,12 +310,12 @@ export default function Auth() {
                     key={initial}
                     className="w-[30px] h-[30px] rounded-full flex items-center justify-center border-2 border-[#F7F6F3]"
                     style={{
-                      background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(34,34,34,0.10)'][i],
+                      background: ['#C4674A', '#F5C4A0', '#FFFFFF', 'rgba(0,0,0,0.10)'][i],
                       zIndex: 4 - i,
                       fontFamily: "'Instrument Sans', sans-serif",
                       fontWeight: 600,
                       fontSize: 12,
-                      color: i === 0 ? 'white' : 'rgba(34,34,34,0.60)',
+                      color: i === 0 ? 'white' : 'rgba(0,0,0,0.55)',
                     }}
                   >
                     {initial}
@@ -333,11 +333,11 @@ export default function Auth() {
         /* ─── ROLE SELECTION ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F6F3]">
           <div className="max-w-[440px] w-full text-center">
-            <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#1C1917] mx-auto">
+            <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(0,0,0,0.55)] mb-8 hover:text-[#1C1917] mx-auto">
               <ChevronLeft size={14} /> Back to sign in
             </button>
             <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#1C1917', margin: '0 0 6px' }}>Join nayba</h2>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>Which best describes you?</p>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(0,0,0,0.55)', margin: '0 0 28px' }}>Which best describes you?</p>
             <div className="flex gap-3">
               {([
                 { key: 'creator' as const, icon: Camera, label: "I'm a Creator", sub: 'I create content and want brand collabs' },
@@ -351,9 +351,9 @@ export default function Auth() {
                       background: selected ? 'rgba(196,103,74,0.05)' : 'white',
                       border: selected ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)',
                     }}>
-                    <opt.icon size={22} style={{ color: selected ? '#C4674A' : 'rgba(34,34,34,0.45)', marginBottom: 10 }} />
+                    <opt.icon size={22} style={{ color: selected ? '#C4674A' : 'rgba(0,0,0,0.45)', marginBottom: 10 }} />
                     <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 600, color: '#1C1917', margin: '0 0 4px' }}>{opt.label}</p>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(34,34,34,0.50)', margin: 0, lineHeight: 1.4 }}>{opt.sub}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(0,0,0,0.50)', margin: 0, lineHeight: 1.4 }}>{opt.sub}</p>
                   </button>
                 );
               })}
@@ -373,14 +373,14 @@ export default function Auth() {
         /* ─── BRAND CONTACT ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-[#F7F6F3]">
           <div className="max-w-[400px] w-full text-center">
-            <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(34,34,34,0.60)] mb-8 hover:text-[#1C1917] mx-auto">
+            <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[13px] font-medium text-[rgba(0,0,0,0.55)] mb-8 hover:text-[#1C1917] mx-auto">
               <ChevronLeft size={14} /> Back
             </button>
             <div className="w-14 h-14 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center mx-auto mb-5">
               <Building2 size={24} className="text-[#C4674A]" />
             </div>
             <h2 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 20, fontWeight: 600, color: '#1C1917', margin: '0 0 10px' }}>Get your brand on nayba</h2>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'rgba(34,34,34,0.60)', lineHeight: 1.65, margin: '0 0 28px' }}>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'rgba(0,0,0,0.55)', lineHeight: 1.65, margin: '0 0 28px' }}>
               Get in touch at hello@nayba.app to get your brand set up. We'll have you live within 24 hours.
             </p>
             <a href="mailto:hello@nayba.app"
@@ -403,14 +403,14 @@ export default function Auth() {
               type="button"
               onClick={() => { setMode('roleselect'); setError(''); }}
               className="flex items-center gap-1 text-[13px] mb-8 transition-colors"
-              style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'rgba(34,34,34,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
+              style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'rgba(0,0,0,0.35)', background: 'none', border: 'none', cursor: 'pointer' }}
             >
               <ChevronLeft size={14} /> Back
             </button>
 
             {/* Heading */}
             <h1 style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.5px', margin: '0 0 6px' }}>Create your account</h1>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(34,34,34,0.60)', margin: '0 0 28px' }}>You'll be reviewed by our team before getting access.</p>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'rgba(0,0,0,0.55)', margin: '0 0 28px' }}>You'll be reviewed by our team before getting access.</p>
 
             {/* Form card */}
             <div className="w-full bg-white rounded-[10px] p-6 md:p-8 text-left" style={{ border: '0.5px solid rgba(0,0,0,0.08)', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
@@ -423,7 +423,7 @@ export default function Auth() {
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
                     required
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -436,7 +436,7 @@ export default function Auth() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -450,10 +450,10 @@ export default function Auth() {
                     placeholder="At least 8 characters"
                     required
                     minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 pr-11 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)] hover:text-[rgba(34,34,34,0.60)]">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,0.35)] hover:text-[rgba(0,0,0,0.55)]">
                     {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                   </button>
                 </div>
@@ -465,10 +465,10 @@ export default function Auth() {
                     value={instagramHandle}
                     onChange={e => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>Optional — you can add this later</p>
                 </div>
 
                 {/* Gender */}
@@ -492,10 +492,10 @@ export default function Auth() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(34,34,34,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
+                    className="w-full px-3.5 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white min-h-[44px] text-[14px] text-[#1C1917] placeholder:text-[rgba(0,0,0,0.35)] focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>For WhatsApp campaign notifications</p>
                 </div>
 
                 {/* County */}
@@ -512,7 +512,7 @@ export default function Auth() {
                     <option value="Cambridgeshire">Cambridgeshire</option>
                     <option value="Essex">Essex</option>
                   </select>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', marginTop: 4 }}>So we can show you local campaigns</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', marginTop: 4 }}>So we can show you local campaigns</p>
                 </div>
 
                 {error && (
@@ -539,7 +539,7 @@ export default function Auth() {
             </div>
 
             {/* Footer links */}
-            <p className="text-center mt-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(34,34,34,0.35)', lineHeight: 1.5 }}>
+            <p className="text-center mt-5" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'rgba(0,0,0,0.35)', lineHeight: 1.5 }}>
               Already have an account?{' '}
               <button
                 type="button"
@@ -549,7 +549,7 @@ export default function Auth() {
                 Sign in
               </button>
             </p>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(34,34,34,0.35)', textAlign: 'center', marginTop: 8, lineHeight: 1.5 }}>
+            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'rgba(0,0,0,0.35)', textAlign: 'center', marginTop: 8, lineHeight: 1.5 }}>
               By signing up you agree to our terms and privacy policy. Your account will be reviewed by our team.
             </p>
 

@@ -53,11 +53,11 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(34,34,34,0.4)]" onClick={onClose} />
+      <div className="absolute inset-0 bg-[rgba(0,0,0,0.4)]" onClick={onClose} />
       <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
         <div className="flex items-center justify-between px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
           <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>Create Brand</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-6 py-6">
           {error && (
@@ -77,7 +77,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
           </form>
         </div>
         <div className="flex items-center justify-between px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0">
-          <button onClick={onClose} className="text-[14px] font-medium text-[rgba(34,34,34,0.60)] hover:text-[#1C1917]">Cancel</button>
+          <button onClick={onClose} className="text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917]">Cancel</button>
           <button onClick={handleCreate as any} disabled={creating} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
             {creating ? 'Creating...' : 'Create Brand'}
           </button>
@@ -248,9 +248,9 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                     <span className="font-medium">{b.name}</span>
                   </div>
                 </td>
-                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{b.category}</td>
-                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{b.region}</td>
-                <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{b.instagram_handle || '—'}</td>
+                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.category}</td>
+                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.region}</td>
+                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.instagram_handle || '—'}</td>
                 <td className={tdCls}>{campaignCounts[b.id] || 0}</td>
                 <td className={tdCls}>
                   {b.approved
@@ -269,7 +269,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
               </tr>
             ))}
             {brands.length === 0 && (
-              <tr><td colSpan={7} className="py-12 text-center text-[14px] text-[rgba(34,34,34,0.35)]">No brands yet</td></tr>
+              <tr><td colSpan={7} className="py-12 text-center text-[14px] text-[rgba(0,0,0,0.35)]">No brands yet</td></tr>
             )}
           </tbody>
         </table>

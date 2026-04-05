@@ -327,7 +327,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
       {/* Brand info modal */}
       {showBrandInfo && campaign.businesses && (
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
           <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[#1C1917]">{campaign.businesses.name}</h3>
@@ -356,7 +356,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
       {/* Pitch modal */}
       {showPitchModal && (
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-50 flex items-end sm:items-center justify-center">
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-end sm:items-center justify-center">
           <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[#1C1917]">Tell them why you</h3>

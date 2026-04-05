@@ -117,22 +117,22 @@ export default function AdminNotificationsTab() {
           </div>
         </div>
         {selectedCampaignId && recipientCount > 0 && (
-          <p className="text-[13px] text-[rgba(34,34,34,0.60)] mb-4">{recipientCount} approved creator{recipientCount !== 1 ? 's' : ''} in {selectedCampaign?.target_city || 'all locations'}</p>
+          <p className="text-[13px] text-[rgba(0,0,0,0.55)] mb-4">{recipientCount} approved creator{recipientCount !== 1 ? 's' : ''} in {selectedCampaign?.target_city || 'all locations'}</p>
         )}
 
         {/* Email preview */}
         {selectedCampaign && (
           <div className="border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[8px] bg-[#F7F6F3] p-5">
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
+            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(0,0,0,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
             <div className="bg-white rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.08)] p-5 max-w-lg">
-              <p className="text-[12px] text-[rgba(34,34,34,0.35)] mb-1">Subject</p>
+              <p className="text-[12px] text-[rgba(0,0,0,0.35)] mb-1">Subject</p>
               <p className="text-[15px] font-semibold text-[#1C1917] mb-4">New campaign just dropped — {selectedCampaign.businesses?.name}</p>
               <div className="text-[14px] text-[#1C1917] space-y-2 leading-[1.65]">
                 <p>Hey [creator name]!</p>
                 <p>A new campaign is live on nayba:</p>
                 <p className="font-semibold text-[16px]">{selectedCampaign.title}</p>
-                {selectedCampaign.perk_description && <p className="text-[rgba(34,34,34,0.60)]">{selectedCampaign.perk_description.slice(0, 80)}{selectedCampaign.perk_value ? ` — worth £${selectedCampaign.perk_value}` : ''}</p>}
-                {selectedCampaign.expression_deadline && <p className="text-[rgba(34,34,34,0.60)]">Apply by {fmtShort(selectedCampaign.expression_deadline)}</p>}
+                {selectedCampaign.perk_description && <p className="text-[rgba(0,0,0,0.55)]">{selectedCampaign.perk_description.slice(0, 80)}{selectedCampaign.perk_value ? ` — worth £${selectedCampaign.perk_value}` : ''}</p>}
+                {selectedCampaign.expression_deadline && <p className="text-[rgba(0,0,0,0.55)]">Apply by {fmtShort(selectedCampaign.expression_deadline)}</p>}
                 <div className="pt-3">
                   <span className="inline-block px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[14px] font-semibold">
                     See the campaign →
@@ -153,8 +153,8 @@ export default function AdminNotificationsTab() {
           <tbody>
             {logs.map(n => (
               <tr key={n.id} className="hover:bg-[rgba(0,0,0,0.02)] transition-colors" style={{ height: 44 }}>
-                <td className={`${tdCls} text-[rgba(34,34,34,0.35)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
-                <td className={`${tdCls} text-[rgba(34,34,34,0.60)] max-w-[300px] truncate`}>{n.message}</td>
+                <td className={`${tdCls} text-[rgba(0,0,0,0.35)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
+                <td className={`${tdCls} text-[rgba(0,0,0,0.55)] max-w-[300px] truncate`}>{n.message}</td>
                 <td className={tdCls}>1</td>
                 <td className={tdCls}>
                   <span className="inline-flex items-center px-2.5 py-1 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>
@@ -164,7 +164,7 @@ export default function AdminNotificationsTab() {
               </tr>
             ))}
             {logs.length === 0 && (
-              <tr><td colSpan={4} className="py-12 text-center text-[14px] text-[rgba(34,34,34,0.35)]">No notifications sent yet</td></tr>
+              <tr><td colSpan={4} className="py-12 text-center text-[14px] text-[rgba(0,0,0,0.35)]">No notifications sent yet</td></tr>
             )}
           </tbody>
         </table>

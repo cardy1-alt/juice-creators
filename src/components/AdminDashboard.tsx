@@ -79,7 +79,7 @@ export default function AdminDashboard() {
     <div className="flex min-h-screen bg-[var(--shell)]">
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(34,34,34,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ─── Sidebar ─── */}
@@ -97,7 +97,7 @@ export default function AdminDashboard() {
               <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const }}>Admin</span>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(34,34,34,0.35)] hover:text-[#1C1917]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(0,0,0,0.35)] hover:text-[#1C1917]">
             <X size={20} />
           </button>
         </div>
@@ -149,7 +149,7 @@ export default function AdminDashboard() {
               <p className="text-[13px] font-medium text-[#1C1917] truncate">{adminName}</p>
               <p className="text-[12px] text-[rgba(0,0,0,0.4)] truncate">{user?.email}</p>
             </div>
-            <LogOut size={14} className="text-[rgba(34,34,34,0.35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            <LogOut size={14} className="text-[rgba(0,0,0,0.35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
           </div>
         </div>
       </aside>
@@ -158,7 +158,7 @@ export default function AdminDashboard() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
         <div className="md:hidden flex items-center gap-3 px-4 h-[56px] bg-white border-b border-[rgba(0,0,0,0.08)]">
-          <button onClick={() => setSidebarOpen(true)} className="text-[rgba(34,34,34,0.60)]">
+          <button onClick={() => setSidebarOpen(true)} className="text-[rgba(0,0,0,0.55)]">
             <Menu size={22} />
           </button>
           <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 20, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>

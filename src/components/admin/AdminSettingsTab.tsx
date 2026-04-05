@@ -10,7 +10,7 @@ function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void 
   return (
     <button onClick={onToggle}
       className="relative w-[44px] h-[24px] rounded-full transition-colors duration-200 flex-shrink-0"
-      style={{ background: enabled ? '#C4674A' : 'rgba(34,34,34,0.10)' }}>
+      style={{ background: enabled ? '#C4674A' : 'rgba(0,0,0,0.10)' }}>
       <span className="absolute top-[2px] left-[2px] w-[20px] h-[20px] bg-white rounded-full transition-transform duration-200"
         style={{ transform: enabled ? 'translateX(20px)' : 'translateX(0)', boxShadow: '0 1px 3px rgba(0,0,0,0.15)' }} />
     </button>
@@ -68,7 +68,7 @@ export default function AdminSettingsTab() {
             <label className={labelCls}>Current Password</label>
             <div className="relative">
               <input type={showPassword ? 'text' : 'password'} value={currentPassword} onChange={e => setCurrentPassword(e.target.value)} className={inputCls} required />
-              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(34,34,34,0.35)]">
+              <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,0.35)]">
                 {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
               </button>
             </div>
@@ -99,7 +99,7 @@ export default function AdminSettingsTab() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[15px] font-medium text-[#1C1917]">Instagram API</p>
-              <p className="text-[13px] text-[rgba(34,34,34,0.60)] leading-[1.5]">Enable Instagram OAuth and automatic reach/engagement data</p>
+              <p className="text-[13px] text-[rgba(0,0,0,0.55)] leading-[1.5]">Enable Instagram OAuth and automatic reach/engagement data</p>
             </div>
             <Toggle enabled={instagramEnabled} onToggle={() => toggleFlag('instagram_api', !instagramEnabled, setInstagramEnabled)} />
           </div>
@@ -107,7 +107,7 @@ export default function AdminSettingsTab() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[15px] font-medium text-[#1C1917]">The Naybahood</p>
-              <p className="text-[13px] text-[rgba(34,34,34,0.60)] leading-[1.5]">Show the Naybahood tab in the creator app</p>
+              <p className="text-[13px] text-[rgba(0,0,0,0.55)] leading-[1.5]">Show the Naybahood tab in the creator app</p>
             </div>
             <Toggle enabled={naybahoodEnabled} onToggle={() => toggleFlag('naybahood', !naybahoodEnabled, setNaybahoodEnabled)} />
           </div>

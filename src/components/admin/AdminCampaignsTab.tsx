@@ -35,12 +35,12 @@ const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text
 const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]";
 const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
-const modalBackdrop = "absolute inset-0 bg-[rgba(34,34,34,0.4)]";
-const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(34,34,34,0.45)] hover:bg-[#EDE9E3] transition-colors";
+const modalBackdrop = "absolute inset-0 bg-[rgba(0,0,0,0.4)]";
+const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3] transition-colors";
 const modalHeader = "flex items-center justify-between px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-6 py-6";
 const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0";
-const ghostBtn = "text-[14px] font-medium text-[rgba(34,34,34,0.60)] hover:text-[#1C1917] transition-colors";
+const ghostBtn = "text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917] transition-colors";
 const primaryBtn = "px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
 const secondaryBtn = "px-5 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]";
 const modalShadow = '0 1px 3px rgba(0,0,0,0.06)';
@@ -192,12 +192,12 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         <div className={modalHeader}>
           <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-[rgba(34,34,34,0.35)]">Step {step} of 3</span>
+            <span className="text-[13px] text-[rgba(0,0,0,0.35)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
           </div>
         </div>
         {/* Progress bar */}
-        <div className="h-[3px] bg-[rgba(34,34,34,0.06)]"><div className="h-full bg-[#C4674A] transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} /></div>
+        <div className="h-[3px] bg-[rgba(0,0,0,0.06)]"><div className="h-full bg-[#C4674A] transition-all duration-300" style={{ width: `${(step / 3) * 100}%` }} /></div>
 
         {/* Body */}
         <div className={modalBody}>
@@ -250,10 +250,10 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
                         className={inputCls} placeholder="#brandname, @brand, #campaign" />
-                      <p className="text-[11px] text-[rgba(34,34,34,0.35)] mt-1">Comma-separated tags creators must include</p>
+                      <p className="text-[11px] text-[rgba(0,0,0,0.35)] mt-1">Comma-separated tags creators must include</p>
                     </div>
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(0,0,0,0.08)]">
-                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(0,0,0,0.35)', textTransform: 'uppercase' as const }}>Talking Points</p>
                     </div>
                     {[form.tp1, form.tp2, form.tp3].map((tp, i) => (
                       <div key={i} className="md:col-span-2 flex items-center gap-3">
@@ -262,7 +262,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       </div>
                     ))}
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(0,0,0,0.08)]">
-                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const }}>Inspiration</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'rgba(0,0,0,0.35)', textTransform: 'uppercase' as const }}>Inspiration</p>
                     </div>
                     {form.insp.map((item: any, i: number) => (
                       <div key={i} className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -280,7 +280,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                     {aiLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Generating brief...' : 'Generate brief with AI'}
                   </button>
-                  <p className="text-[13px] text-[rgba(34,34,34,0.45)]">Fill in Step 1 first, then let AI write your brief.</p>
+                  <p className="text-[13px] text-[rgba(0,0,0,0.45)]">Fill in Step 1 first, then let AI write your brief.</p>
                   {aiError && <p className="text-[12px] text-[#C4674A] mt-2">{aiError}</p>}
                 </div>
               )}
@@ -304,13 +304,13 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               </div>
               {/* Summary card */}
               <div className="bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
-                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'rgba(34,34,34,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
+                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'rgba(0,0,0,0.35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Brand</span><span className="text-[#1C1917] font-medium">{brandName || '—'}</span></div>
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Title</span><span className="text-[#1C1917] font-medium">{form.title || '—'}</span></div>
-                  {form.perk_description && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Perk</span><span className="text-[#1C1917]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
-                  {form.target_city && <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">City</span><span className="text-[#1C1917]">{form.target_city}</span></div>}
-                  <div className="flex gap-2"><span className="text-[rgba(34,34,34,0.45)] w-24 flex-shrink-0">Creators</span><span className="text-[#1C1917]">{form.creator_target}</span></div>
+                  <div className="flex gap-2"><span className="text-[rgba(0,0,0,0.45)] w-24 flex-shrink-0">Brand</span><span className="text-[#1C1917] font-medium">{brandName || '—'}</span></div>
+                  <div className="flex gap-2"><span className="text-[rgba(0,0,0,0.45)] w-24 flex-shrink-0">Title</span><span className="text-[#1C1917] font-medium">{form.title || '—'}</span></div>
+                  {form.perk_description && <div className="flex gap-2"><span className="text-[rgba(0,0,0,0.45)] w-24 flex-shrink-0">Perk</span><span className="text-[#1C1917]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
+                  {form.target_city && <div className="flex gap-2"><span className="text-[rgba(0,0,0,0.45)] w-24 flex-shrink-0">City</span><span className="text-[#1C1917]">{form.target_city}</span></div>}
+                  <div className="flex gap-2"><span className="text-[rgba(0,0,0,0.45)] w-24 flex-shrink-0">Creators</span><span className="text-[#1C1917]">{form.creator_target}</span></div>
                 </div>
               </div>
             </div>
@@ -563,8 +563,8 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                           disabled={p.status === 'completed'}
                           className="px-3 py-1.5 rounded-[6px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{
-                            background: p.status === 'completed' ? 'rgba(34,34,34,0.06)' : 'rgba(45,122,79,0.08)',
-                            color: p.status === 'completed' ? 'rgba(34,34,34,0.40)' : '#2D7A4F',
+                            background: p.status === 'completed' ? 'rgba(0,0,0,0.06)' : 'rgba(45,122,79,0.08)',
+                            color: p.status === 'completed' ? 'rgba(0,0,0,0.40)' : '#2D7A4F',
                           }}
                         >
                           {p.status === 'completed' ? 'Completed' : 'Mark Complete'}
@@ -577,7 +577,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <p className="text-[14px] text-[rgba(34,34,34,0.35)]">No confirmed participations yet</p>
+              <p className="text-[14px] text-[rgba(0,0,0,0.35)]">No confirmed participations yet</p>
             </div>
           )}
         </div>
@@ -963,20 +963,20 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           )}
                         </div>
                       </td>
-                      <td className={`${tdCls} text-[rgba(34,34,34,0.60)]`}>{c.target_city || '—'}</td>
+                      <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{c.target_city || '—'}</td>
                       <td className={tdCls}>{c.creator_target}</td>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2">
-                          <div className="w-16 h-1.5 bg-[rgba(34,34,34,0.06)] rounded-full overflow-hidden">
+                          <div className="w-16 h-1.5 bg-[rgba(0,0,0,0.06)] rounded-full overflow-hidden">
                             <div className="h-full bg-[#C4674A] rounded-full" style={{ width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
                           </div>
-                          <span className="text-[13px] text-[rgba(34,34,34,0.60)]">{counts.applicants}/{c.creator_target}</span>
+                          <span className="text-[13px] text-[rgba(0,0,0,0.55)]">{counts.applicants}/{c.creator_target}</span>
                         </div>
                       </td>
                       <td className={tdCls}>{counts.selected}</td>
                       <td className={tdCls}>{counts.submitted}</td>
                       <td className={tdCls}>{counts.completed}</td>
-                      <td className={`${tdCls} text-[rgba(34,34,34,0.35)]`}>{fmtShortDate(c.expression_deadline)}</td>
+                      <td className={`${tdCls} text-[rgba(0,0,0,0.35)]`}>{fmtShortDate(c.expression_deadline)}</td>
                     </tr>
                 );
               })}
@@ -990,7 +990,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             <Megaphone size={22} className="text-[#C4674A]" />
           </div>
           <p className="text-[17px] font-semibold text-[#1C1917] mb-1">No campaigns yet</p>
-          <p className="text-[14px] text-[rgba(34,34,34,0.60)] mb-5">Create your first campaign to get started</p>
+          <p className="text-[14px] text-[rgba(0,0,0,0.55)] mb-5">Create your first campaign to get started</p>
           <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold">
             + New Campaign
           </button>
