@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail } from '../lib/notifications';
-import { ArrowLeft, Calendar, Gift, Film, Image, MessageCircle, Clock, Check, X, AtSign, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Check, X, AtSign, ExternalLink } from 'lucide-react';
 
 interface CampaignDetailProps {
   campaignId: string;
@@ -27,12 +27,6 @@ interface Application {
 function fmtDate(d: string | null) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
-}
-
-function PerkIcon({ type }: { type: string | null }) {
-  if (type === 'experience') return <Gift size={18} className="text-[#C4674A]" />;
-  if (type === 'product') return <Gift size={18} className="text-[#C4674A]" />;
-  return <Gift size={18} className="text-[#C4674A]" />;
 }
 
 export default function CampaignDetail({ campaignId, onBack }: CampaignDetailProps) {
@@ -186,42 +180,41 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 1. Header */}
         <div className={sectionCls}>
           <button onClick={() => setShowBrandInfo(true)}
-            className="text-[14px] font-semibold text-[rgba(0,0,0,0.5)] mb-1 hover:text-[#C4674A] hover:underline transition-colors">
+            className="text-[13px] font-medium text-[rgba(0,0,0,0.45)] mb-1 hover:text-[#C4674A] hover:underline transition-colors">
             {campaign.businesses?.name}
           </button>
-          <h1 className="text-[16px] font-semibold text-[#1C1917] mb-3" style={{ lineHeight: 1.3 }}>
+          <h1 className="text-[18px] font-semibold text-[#1C1917] mb-3" style={{ lineHeight: 1.3 }}>
             {campaign.headline || campaign.title}
           </h1>
-          {/* Perk pill */}
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-[var(--r-pill)] bg-[rgba(196,103,74,0.08)]">
-            <PerkIcon type={campaign.perk_type} />
-            <span className="text-[14px] font-semibold text-[#C4674A]">
+          {/* Perk */}
+          {campaign.perk_description && (
+            <p className="text-[14px] font-medium text-[#C4674A] mb-3">
               {campaign.perk_description?.split('—')[0]?.trim() || 'Perk included'}
               {campaign.perk_value ? ` — worth £${campaign.perk_value}` : ''}
-            </span>
-          </div>
-          {campaign.expression_deadline && (
-            <p className="text-[13px] text-[rgba(0,0,0,0.4)] mt-3 flex items-center gap-1.5">
-              <Clock size={14} /> Apply by {fmtDate(campaign.expression_deadline)}
             </p>
           )}
+          {/* Dates row */}
+          <div className="flex items-center gap-4 text-[13px] text-[rgba(0,0,0,0.4)]">
+            {campaign.expression_deadline && <span>Apply by {fmtDate(campaign.expression_deadline)}</span>}
+            {campaign.content_deadline && <span>Content due {fmtDate(campaign.content_deadline)}</span>}
+          </div>
         </div>
 
         {/* 2. About the brand */}
         {campaign.about_brand && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">About the brand</h2>
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">About the brand</p>
             <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.about_brand}</p>
           </div>
         )}
 
-        {/* 3. What's in it for you */}
+        {/* 3. The perk */}
         {campaign.perk_description && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">What's in it for you</h2>
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">The perk</p>
             <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.perk_description}</p>
-            <div className="flex items-center gap-4 mt-3 text-[13px] text-[rgba(0,0,0,0.5)]">
-              {campaign.perk_value && <span className="flex items-center gap-1"><Gift size={14} /> Worth £{campaign.perk_value}</span>}
+            <div className="flex items-center gap-4 mt-3 text-[13px] text-[rgba(0,0,0,0.45)]">
+              {campaign.perk_value && <span>Worth £{campaign.perk_value}</span>}
               {campaign.perk_type && <span className="capitalize">{campaign.perk_type.replace('_', ' ')}</span>}
             </div>
           </div>
@@ -229,33 +222,18 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
         {/* 4. What to post */}
         <div className={sectionCls}>
-          <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">What to post</h2>
+          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">What to post</p>
           {/* Deliverables */}
-          <div className="flex gap-3 mb-3">
-            {campaign.deliverables?.reel && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
-                <Film size={14} /> Reel
-              </span>
-            )}
-            {campaign.deliverables?.story && (
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
-                <Image size={14} /> Story
-              </span>
-            )}
-          </div>
+          <p className="text-[14px] text-[rgba(0,0,0,0.5)] mb-3">
+            {[campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean).join(' + ') || 'Reel'}
+          </p>
           {campaign.content_requirements && (
             <p className="text-[15px] text-[#1C1917] leading-[1.65]">{campaign.content_requirements}</p>
           )}
           {campaign.required_tags && campaign.required_tags.length > 0 && (
             <div className="mt-3 pt-3 border-t-[0.5px] border-[rgba(0,0,0,0.08)]">
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Required Tags</p>
-              <div className="flex flex-wrap gap-2">
-                {campaign.required_tags.map((tag, i) => (
-                  <span key={i} className="inline-flex items-center px-2.5 py-1 rounded-[8px] bg-[#F7F6F3] text-[13px] font-medium text-[#1C1917]">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Required tags</p>
+              <p className="text-[14px] text-[#1C1917]">{campaign.required_tags.join('  ')}</p>
             </div>
           )}
         </div>
@@ -263,15 +241,10 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 5. Talking points */}
         {campaign.talking_points && campaign.talking_points.length > 0 && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-2">Talking points</h2>
-            <ol className="space-y-2">
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Talking points</p>
+            <ol className="space-y-1.5 list-decimal list-inside">
               {campaign.talking_points.map((tp, i) => (
-                <li key={i} className="flex gap-3 text-[15px] text-[#1C1917] leading-[1.65]">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-[rgba(196,103,74,0.08)] text-[#C4674A] text-[12px] font-semibold flex items-center justify-center mt-0.5">
-                    {i + 1}
-                  </span>
-                  {tp}
-                </li>
+                <li key={i} className="text-[15px] text-[#1C1917] leading-[1.65]">{tp}</li>
               ))}
             </ol>
           </div>
@@ -280,37 +253,25 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         {/* 6. Inspiration */}
         {campaign.inspiration && campaign.inspiration.length > 0 && (
           <div className={sectionCls}>
-            <h2 className="text-[16px] font-semibold text-[#1C1917] mb-3">Inspiration</h2>
-            <div className="space-y-3">
+            <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Inspiration</p>
+            <div className="space-y-2">
               {campaign.inspiration.map((item: any, i: number) => (
-                <div key={i} className="bg-[#F7F6F3] rounded-[8px] p-4">
-                  <p className="text-[15px] font-semibold text-[#1C1917] mb-1">{item.title}</p>
-                  <p className="text-[14px] text-[rgba(0,0,0,0.5)] leading-[1.6]">{item.description}</p>
+                <div key={i}>
+                  <p className="text-[14px] font-semibold text-[#1C1917]">{item.title}</p>
+                  <p className="text-[14px] text-[rgba(0,0,0,0.45)] leading-[1.6]">{item.description}</p>
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* 7. Campaign dates */}
+        {/* 7. Key dates */}
         <div className={sectionCls}>
-          <h2 className="text-[16px] font-semibold text-[#1C1917] mb-3">Campaign dates</h2>
-          <div className="grid grid-cols-3 gap-3">
-            <div className="text-center">
-              <Calendar size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Opens</p>
-              <p className="text-[14px] font-medium text-[#1C1917]">{fmtDate(campaign.open_date)}</p>
-            </div>
-            <div className="text-center">
-              <MessageCircle size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Apply by</p>
-              <p className="text-[14px] font-medium text-[#C4674A]">{fmtDate(campaign.expression_deadline)}</p>
-            </div>
-            <div className="text-center">
-              <Film size={16} className="text-[rgba(0,0,0,0.4)] mx-auto mb-1" />
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-0.5">Content due</p>
-              <p className="text-[14px] font-medium text-[#1C1917]">{fmtDate(campaign.content_deadline)}</p>
-            </div>
+          <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Key dates</p>
+          <div className="space-y-1.5 text-[14px]">
+            {campaign.open_date && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Opens</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.open_date)}</span></div>}
+            {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Apply by</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.expression_deadline)}</span></div>}
+            {campaign.content_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Content due</span><span className="text-[#1C1917] font-medium">{fmtDate(campaign.content_deadline)}</span></div>}
           </div>
         </div>
       </div>

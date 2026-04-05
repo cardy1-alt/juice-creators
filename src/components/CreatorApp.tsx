@@ -235,11 +235,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
               className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-row min-h-[44px]" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.05)' }}>
               {/* Left thumbnail */}
-              <div className="w-[88px] flex-shrink-0 bg-[var(--terra-light)] flex items-center justify-center">
+              <div className="w-[88px] flex-shrink-0 bg-[#F7F6F3] flex items-center justify-center">
                 {c.businesses?.logo_url ? (
                   <img src={c.businesses.logo_url} alt={c.businesses.name} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
-                  <span className="text-[24px]">{c.campaign_type === 'community' ? '🤝' : c.businesses?.category?.includes('Food') ? '🍽️' : c.businesses?.category?.includes('Beauty') || c.businesses?.category?.includes('Hair') ? '💇' : c.businesses?.category?.includes('Wellness') || c.businesses?.category?.includes('Fitness') ? '🧘' : '🏪'}</span>
+                  <div className="w-10 h-10 rounded-full bg-[rgba(0,0,0,0.06)] flex items-center justify-center">
+                    <span className="text-[16px] font-semibold text-[rgba(0,0,0,0.35)]">{(c.businesses?.name || '?')[0]}</span>
+                  </div>
                 )}
               </div>
               <div className="flex-1 py-[12px] px-[14px] flex flex-col justify-between">
