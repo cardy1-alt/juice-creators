@@ -210,7 +210,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
       <div className="flex gap-2 overflow-x-auto pb-3 hide-scrollbar">
         {categories.map(c => (
           <button key={c} onClick={() => setCategory(c)}
-            className={`flex-shrink-0 px-[14px] py-[6px] rounded-[999px] text-[13px] font-medium transition-colors ${category === c ? 'bg-[#1C1917] text-white border-[0.5px] border-transparent' : 'bg-white border-[0.5px] border-[rgba(0,0,0,0.12)] text-[rgba(0,0,0,0.55)]'}`}>
+            className={`flex-shrink-0 px-[14px] py-[6px] rounded-[999px] text-[13px] font-medium transition-colors ${category === c ? 'bg-[#C4674A] text-white border-[0.5px] border-transparent' : 'bg-white border-[0.5px] border-[rgba(0,0,0,0.12)] text-[rgba(0,0,0,0.55)]'}`}>
             {c}
           </button>
         ))}
@@ -228,7 +228,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
           </button>
         </div>
       )}
-      {!loading && !fetchError && <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-2">
+      {!loading && !fetchError && <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
         {filtered.map(c => {
           const appStatus = applications[c.id];
           return (
@@ -244,7 +244,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
                   </div>
                 )}
               </div>
-              <div className="flex-1 py-[12px] px-[14px] flex flex-col justify-between">
+              <div className="flex-1 py-[12px] px-4 flex flex-col justify-between">
                 <div>
                   <div className="flex items-center gap-2 mb-0.5">
                     <button onClick={e => { e.stopPropagation(); if (c.businesses) setBrandModal(c.businesses); }}
@@ -417,7 +417,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                     return (
                       <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
                         <div className="flex flex-col items-center">
-                          <div className={`w-3 h-3 rounded-full flex-shrink-0 ${t.done ? 'bg-[#1D9E75]' : isCurrent ? 'bg-[#C4674A]' : 'bg-[rgba(0,0,0,0.15)]'}`} />
+                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[#1D9E75]' : isCurrent ? 'bg-[#C4674A]' : 'bg-[rgba(0,0,0,0.15)]'}`} />
                           <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[#1D9E75]' : isCurrent ? 'text-[#C4674A]' : 'text-[rgba(0,0,0,0.35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
                         </div>
                         {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[#1D9E75]' : 'bg-[rgba(0,0,0,0.12)]'}`} />}
@@ -427,14 +427,14 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 </div>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
-                    className="mb-3 flex items-center gap-1 px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold min-h-[44px]">
+                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold min-h-[44px]">
                     <Film size={12} /> Share Reel
                   </button>
                 )}
                 <div className="flex items-center justify-between pt-2 border-t border-[0.5px] border-[rgba(0,0,0,0.08)]">
                   <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
-                    {days !== null && days <= 0 && <span className="text-[var(--terra)]">Content overdue</span>}
+                    {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[12px] font-medium">Content overdue</span>}
                   </div>
                   {p.reel_url && (
                     <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
@@ -473,7 +473,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Declined</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
             </div>
           ))}
           {completedParts.length === 0 && pastApps.length === 0 && (
