@@ -137,6 +137,43 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
   const sectionGap = 'mt-6';
 
+  const ctaContent = (
+    <>
+      {!application && (
+        <div>
+          <button onClick={() => setShowPitchModal(true)}
+            className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
+            I'm Interested
+          </button>
+          <p className="text-[12px] text-[rgba(0,0,0,0.35)] text-center mt-2">This won't commit you — the brand will review and select</p>
+        </div>
+      )}
+      {application?.status === 'interested' && (
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
+          <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+          Interest registered — we'll be in touch
+        </div>
+      )}
+      {application?.status === 'selected' && (
+        <button onClick={handleConfirm} disabled={submitting}
+          className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
+          {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
+        </button>
+      )}
+      {application?.status === 'confirmed' && (
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
+          <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+          You're confirmed
+        </div>
+      )}
+      {application?.status === 'declined' && (
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[rgba(0,0,0,0.4)] font-medium text-[13px]">
+          Not selected for this campaign
+        </div>
+      )}
+    </>
+  );
+
   return (
     <div className="bg-white">
       <div className="max-w-[720px] mx-auto">
@@ -161,7 +198,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
         </div>
 
         {/* Content */}
-        <div className="px-6 pt-5 pb-8">
+        <div className="px-6 pt-5 pb-24 md:pb-8">
           {/* Header */}
           <button onClick={() => setShowBrandInfo(true)}
             className="text-[13px] font-medium text-[rgba(0,0,0,0.45)] mb-1 hover:text-[#C4674A] hover:underline transition-colors">
@@ -254,44 +291,16 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
 
-          {/* CTA — inline, not sticky */}
-          <div className="mt-8 pt-6 border-t-[0.5px] border-[rgba(0,0,0,0.06)]">
-            {!application && (
-              <div>
-                <button
-                  onClick={() => setShowPitchModal(true)}
-                  className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity"
-                >
-                  I'm Interested
-                </button>
-                <p className="text-[12px] text-[rgba(0,0,0,0.35)] text-center mt-2">This won't commit you — the brand will review and select</p>
-              </div>
-            )}
-            {application?.status === 'interested' && (
-              <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
-                <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-                Interest registered — we'll be in touch
-              </div>
-            )}
-            {application?.status === 'selected' && (
-              <button onClick={handleConfirm} disabled={submitting}
-                className="w-full min-h-[44px] py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
-                {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
-              </button>
-            )}
-            {application?.status === 'confirmed' && (
-              <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
-                <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-                You're confirmed
-              </div>
-            )}
-            {application?.status === 'declined' && (
-              <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(0,0,0,0.04)] text-center text-[rgba(0,0,0,0.4)] font-medium text-[13px]">
-                Not selected for this campaign
-              </div>
-            )}
+          {/* CTA — inline on desktop */}
+          <div className="hidden md:block mt-8 pt-6 border-t-[0.5px] border-[rgba(0,0,0,0.06)]">
+            {ctaContent}
           </div>
         </div>
+      </div>
+
+      {/* CTA — fixed bottom bar on mobile */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white px-4 py-3 z-40 border-t-[0.5px] border-[rgba(0,0,0,0.06)]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
+        {ctaContent}
       </div>
 
       {/* Brand info modal */}
