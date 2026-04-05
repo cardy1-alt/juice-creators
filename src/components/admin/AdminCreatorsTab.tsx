@@ -279,6 +279,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
+    if (!approved && !window.confirm('Deny this creator?')) return;
     const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
     if (error) { showToast('Update failed — try again'); return; }
     if (approved) sendCreatorApprovedEmail(id).catch(() => {});
@@ -315,6 +316,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   };
 
   const bulkApprove = async (approved: boolean) => {
+    if (!approved && !window.confirm(`Deny ${selectedPending.size} creator${selectedPending.size > 1 ? 's' : ''}?`)) return;
     for (const id of selectedPending) {
       await handleApprove(id, approved);
     }
