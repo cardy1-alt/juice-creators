@@ -821,21 +821,25 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
           )}
         </div>
 
-        {/* Action buttons */}
-        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 space-y-2">
-          <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">Edit Campaign</button>
-          <div className="grid grid-cols-2 gap-2">
+        {/* Actions */}
+        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+          <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] mb-3">Edit Campaign</button>
+          <div className="flex items-center justify-center gap-1 flex-wrap">
             <button onClick={handleAiRecommend} disabled={aiLoading}
-              className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-[6px] border border-[#C4674A] text-[#C4674A] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40">
-              {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[#C4674A] border-t-transparent rounded-full animate-spin" /> : '✦'}
+              className="text-[12px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] disabled:opacity-40 transition-colors px-1 py-0.5">
               {aiLoading ? 'Analysing...' : 'AI Recommend'}
             </button>
-            <button onClick={onViewParticipation} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">Participation</button>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            <button onClick={fetchCreatorsForAdd} className="inline-flex items-center justify-center gap-1 px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">
-              <UserPlus size={13} /> Add Applicant
+            <span className="text-[rgba(0,0,0,0.2)]">·</span>
+            <button onClick={onViewParticipation}
+              className="text-[12px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] transition-colors px-1 py-0.5">
+              Participation
             </button>
+            <span className="text-[rgba(0,0,0,0.2)]">·</span>
+            <button onClick={fetchCreatorsForAdd}
+              className="text-[12px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] transition-colors px-1 py-0.5">
+              Add Applicant
+            </button>
+            <span className="text-[rgba(0,0,0,0.2)]">·</span>
             <button onClick={async () => {
               const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, required_tags, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
               const { error } = await supabase.from('campaigns').insert({
@@ -845,7 +849,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
               });
               if (error) showToast('Failed to duplicate');
               else { showToast('Campaign duplicated as draft'); onEdit(); }
-            }} className="px-3 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[12px] font-semibold hover:bg-[#F7F6F3]">
+            }} className="text-[12px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] transition-colors px-1 py-0.5">
               Duplicate
             </button>
           </div>
