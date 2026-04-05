@@ -7,6 +7,24 @@ import {
   LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X
 } from 'lucide-react';
 
+// ─── Skeleton Loaders ───
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse bg-[rgba(0,0,0,0.06)] rounded-[8px] ${className || ''}`} />;
+}
+
+function StatCardsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+          <Skeleton className="h-3 w-24 mb-3" />
+          <Skeleton className="h-7 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 // ─── Types ───
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
@@ -120,8 +138,20 @@ export default function BusinessPortal() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)]">
-        <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+      <div className="flex min-h-screen bg-[var(--shell)]">
+        <aside className="hidden md:flex w-[240px] bg-[#F7F6F3] flex-col flex-shrink-0" style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
+          <div className="px-5 py-5" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+            <Skeleton className="h-7 w-20 mb-2" />
+            <Skeleton className="h-4 w-28" />
+          </div>
+          <div className="flex-1 py-3 px-3 space-y-2">
+            {Array.from({ length: 5 }).map((_, i) => <Skeleton key={i} className="h-9 w-full" />)}
+          </div>
+        </aside>
+        <div className="flex-1 p-4 md:p-8">
+          <StatCardsSkeleton count={4} />
+          <Skeleton className="h-[300px] rounded-[10px]" />
+        </div>
       </div>
     );
   }

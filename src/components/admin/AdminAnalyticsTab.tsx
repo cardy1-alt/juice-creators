@@ -2,6 +2,24 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Megaphone, Users, Film, Eye } from 'lucide-react';
 
+// ─── Skeleton Loaders ───
+function Skeleton({ className }: { className?: string }) {
+  return <div className={`animate-pulse bg-[rgba(0,0,0,0.06)] rounded-[8px] ${className || ''}`} />;
+}
+
+function StatCardsSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+          <Skeleton className="h-3 w-24 mb-3" />
+          <Skeleton className="h-7 w-16" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 interface Stats {
   totalCampaigns: number; totalCreators: number; totalReels: number; totalReach: number;
   completionRate: number; avgFillRate: number; avgProfileComplete: number;
@@ -123,8 +141,12 @@ export default function AdminAnalyticsTab() {
 
   if (loading) {
     return (
-      <div className="py-20 flex justify-center">
-        <div className="w-8 h-8 border-[3px] border-[#C4674A] border-t-transparent rounded-full animate-spin" />
+      <div className="tab-fade-in">
+        <StatCardsSkeleton count={4} />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <Skeleton className="h-[200px] rounded-[10px]" />
+          <Skeleton className="h-[200px] rounded-[10px]" />
+        </div>
       </div>
     );
   }
