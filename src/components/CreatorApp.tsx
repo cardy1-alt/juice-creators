@@ -1051,6 +1051,13 @@ export default function CreatorApp() {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
+  // Close campaign detail on Escape
+  useEffect(() => {
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && viewingCampaign) setViewingCampaign(null); };
+    document.addEventListener('keydown', h);
+    return () => document.removeEventListener('keydown', h);
+  }, [viewingCampaign]);
+
   // Reactive isMobile
   useEffect(() => {
     const check = () => setIsMobile(window.innerWidth < 768);
@@ -1195,13 +1202,15 @@ export default function CreatorApp() {
         </div>
       </div>
 
-      {/* ─── Campaign detail pane — Notion-style overlay (desktop only) ─── */}
+      {/* ─── Campaign detail — centered modal (desktop) ─── */}
       {viewingCampaign && !isMobile && tab === 'discover' && (
         <>
-          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.15)] z-30" onClick={() => setViewingCampaign(null)} />
-          <div className="hidden md:block fixed top-0 right-0 bottom-0 w-[520px] lg:w-[580px] xl:w-[640px] z-40 bg-white border-l border-[0.5px] border-[rgba(0,0,0,0.08)] overflow-y-auto slide-in-right"
-            style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
-            <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
+          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.25)] z-30" onClick={() => setViewingCampaign(null)} />
+          <div className="hidden md:flex fixed inset-0 z-40 items-center justify-center pointer-events-none">
+            <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto border-[0.5px] border-[rgba(0,0,0,0.08)]"
+              style={{ margin: '0 24px' }}>
+              <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
+            </div>
           </div>
         </>
       )}
