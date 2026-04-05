@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
-import { Check, X, AlertCircle } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink } from 'lucide-react';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
@@ -85,10 +85,107 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
   );
 }
 
+// ─── Brand Peek Panel ───
+function BrandPeekPanel({ brand, campaignCount, onClose, onApprove }: {
+  brand: Brand; campaignCount: number; onClose: () => void;
+  onApprove: (id: string, approved: boolean) => void;
+}) {
+  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-[380px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
+              <span className="text-[15px] font-semibold text-[#C4674A]">{brand.name[0]}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[16px] font-semibold text-[#1C1917] truncate">{brand.name}</p>
+              <p className="text-[13px] text-[rgba(0,0,0,0.45)]">{brand.category}</p>
+            </div>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[rgba(0,0,0,0.35)] hover:bg-[rgba(0,0,0,0.06)] transition-colors flex-shrink-0 ml-3">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+            <div>
+              <p className={peekLabel}>Status</p>
+              {brand.approved
+                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                : <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>Pending</span>
+              }
+            </div>
+            <div>
+              <p className={peekLabel}>Region</p>
+              <p className="text-[14px] text-[#1C1917]">{brand.region}</p>
+            </div>
+            <div>
+              <p className={peekLabel}>Campaigns</p>
+              <p className="text-[14px] text-[#1C1917]">{campaignCount}</p>
+            </div>
+            <div>
+              <p className={peekLabel}>Added</p>
+              <p className="text-[14px] text-[#1C1917]">{fmtDate(brand.created_at)}</p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <p className={peekLabel}>Owner Email</p>
+            <p className="text-[14px] text-[#1C1917]">{brand.owner_email}</p>
+          </div>
+
+          {brand.instagram_handle && (
+            <div className="mb-4">
+              <p className={peekLabel}>Instagram</p>
+              <a href={`https://instagram.com/${brand.instagram_handle}`} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[14px] text-[#C4674A] font-medium hover:underline">
+                @{brand.instagram_handle} <ExternalLink size={12} />
+              </a>
+            </div>
+          )}
+
+          {brand.address && (
+            <div className="mb-4">
+              <p className={peekLabel}>Address</p>
+              <p className="text-[14px] text-[#1C1917]">{brand.address}</p>
+            </div>
+          )}
+
+          {brand.bio && (
+            <div className="mb-4">
+              <p className={peekLabel}>Bio</p>
+              <p className="text-[14px] text-[#1C1917] leading-[1.6]">{brand.bio}</p>
+            </div>
+          )}
+        </div>
+
+        {!brand.approved && (
+          <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 flex gap-2">
+            <button onClick={() => { onApprove(brand.id, true); onClose(); }}
+              className="flex-1 px-4 py-2.5 rounded-[6px] bg-[#2D7A4F] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+              Approve
+            </button>
+            <button onClick={() => { onApprove(brand.id, false); onClose(); }}
+              className="flex-1 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
+              Deny
+            </button>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [campaignCounts, setCampaignCounts] = useState<Record<string, number>>({});
   const [toast, setToast] = useState<string | null>(null);
+  const [peekBrand, setPeekBrand] = useState<Brand | null>(null);
 
   useEffect(() => { fetchBrands(); }, []);
 
@@ -129,7 +226,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           </tr></thead>
           <tbody>
             {brands.map(b => (
-              <tr key={b.id} className="hover:bg-[rgba(0,0,0,0.02)] transition-colors" style={{ height: 44 }}>
+              <tr key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
+                className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(0,0,0,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
@@ -150,7 +248,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 </td>
                 <td className={tdCls}>
                   {!b.approved && (
-                    <div className="flex gap-1">
+                    <div className="flex gap-1" onClick={e => e.stopPropagation()}>
                       <button onClick={() => handleApprove(b.id, true)} className="w-7 h-7 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)]"><Check size={14} /></button>
                       <button onClick={() => handleApprove(b.id, false)} className="w-7 h-7 rounded-full bg-[rgba(220,38,38,0.08)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.15)]"><X size={14} /></button>
                     </div>
@@ -165,6 +263,14 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
         </table>
       </div>
 
+      {peekBrand && (
+        <BrandPeekPanel
+          brand={peekBrand}
+          campaignCount={campaignCounts[peekBrand.id] || 0}
+          onClose={() => setPeekBrand(null)}
+          onApprove={handleApprove}
+        />
+      )}
       {showModal && <CreateBrandModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchBrands(); }} />}
     </div>
   );

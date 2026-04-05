@@ -158,11 +158,104 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
   );
 }
 
+// ─── Creator Peek Panel ───
+function CreatorPeekPanel({ creator, onClose }: { creator: Creator; onClose: () => void }) {
+  const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
+  const colors = getAvatarColors(initial);
+  const handle = creator.instagram_handle?.replace('@', '') || '';
+  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
+
+  return (
+    <>
+      <div className="fixed inset-0 z-40" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-[380px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+          <div className="flex items-center gap-3 min-w-0 flex-1">
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+              <span className="text-[15px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[16px] font-semibold text-[#1C1917] truncate">{creator.display_name || creator.name}</p>
+              {handle && <p className="text-[13px] text-[rgba(0,0,0,0.45)]">@{handle}</p>}
+            </div>
+          </div>
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[rgba(0,0,0,0.35)] hover:bg-[rgba(0,0,0,0.06)] transition-colors flex-shrink-0 ml-3">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto px-5 py-4">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+            <div>
+              <p className={peekLabel}>Level</p>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>
+                L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
+              </span>
+            </div>
+            <div>
+              <p className={peekLabel}>Status</p>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
+                {creator.approved ? 'Approved' : 'Pending'}
+              </span>
+            </div>
+            <div>
+              <p className={peekLabel}>City</p>
+              <p className="text-[14px] text-[#1C1917]">{creator.address || '—'}</p>
+            </div>
+            <div>
+              <p className={peekLabel}>Joined</p>
+              <p className="text-[14px] text-[#1C1917]">{fmtDate(creator.created_at)}</p>
+            </div>
+          </div>
+
+          <div className="mb-4">
+            <p className={peekLabel}>Email</p>
+            <p className="text-[14px] text-[#1C1917]">{creator.email}</p>
+          </div>
+
+          {handle && (
+            <div className="mb-4">
+              <p className={peekLabel}>Instagram</p>
+              <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 text-[14px] text-[#C4674A] font-medium hover:underline">
+                @{handle} <ExternalLink size={12} />
+              </a>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[13px] text-[rgba(0,0,0,0.45)]">
+                  {creator.instagram_connected ? 'Connected' : 'Not connected'}
+                </span>
+                {creator.follower_count && (
+                  <span className="text-[13px] text-[rgba(0,0,0,0.45)]">· {creator.follower_count} followers</span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className="border-t border-[rgba(0,0,0,0.08)] pt-4 mb-4">
+            <p className={`${peekLabel} mb-3`}>Performance</p>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-[#F7F6F3] rounded-[8px] px-3 py-2.5">
+                <p className="text-[20px] font-semibold text-[#1C1917]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
+                <p className="text-[11px] text-[rgba(0,0,0,0.45)] font-medium">Campaigns</p>
+              </div>
+              <div className="bg-[#F7F6F3] rounded-[8px] px-3 py-2.5">
+                <p className="text-[20px] font-semibold text-[#1C1917]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
+                <p className="text-[11px] text-[rgba(0,0,0,0.45)] font-medium">Completion</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
 // ─── Main Export ───
 export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
   const [creators, setCreators] = useState<Creator[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [peekCreator, setPeekCreator] = useState<Creator | null>(null);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -332,7 +425,8 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           </tr></thead>
           <tbody>
             {filteredCreators.map(c => (
-              <tr key={c.id} className="hover:bg-[rgba(0,0,0,0.02)] transition-colors" style={{ height: 44 }}>
+              <tr key={c.id} onClick={() => setPeekCreator(peekCreator?.id === c.id ? null : c)}
+                className={`cursor-pointer transition-colors ${peekCreator?.id === c.id ? 'bg-[rgba(0,0,0,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
                   <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
@@ -384,6 +478,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </table>
       </div>
 
+      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} />}
       {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} showToast={showToast} />}
     </div>
   );
