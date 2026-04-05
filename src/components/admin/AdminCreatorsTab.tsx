@@ -195,7 +195,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
             </div>
             <div>
               <p className={peekLabel}>Status</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
+              <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: creator.approved ? '#E1F5EE' : '#FAEEDA', color: creator.approved ? '#0F6E56' : '#854F0B' }}>
                 {creator.approved ? 'Approved' : 'Pending'}
               </span>
             </div>
@@ -474,7 +474,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                   }
                 </td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
+                  <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>
                     Approved
                   </span>
                 </td>

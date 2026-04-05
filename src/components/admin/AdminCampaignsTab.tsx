@@ -48,7 +48,7 @@ const modalShadow = '0 1px 3px rgba(0,0,0,0.06)';
 function StatusBadge({ status }: { status: string }) {
   const cls: Record<string, string> = {
     draft: 'bg-[#F1EFE8] text-[#5F5E5A]',
-    active: 'bg-[#FAEEDA] text-[#854F0B]',
+    active: 'bg-[#E1F5EE] text-[#0F6E56]',
     selecting: 'bg-[rgba(59,130,246,0.08)] text-[#3B82F6]',
     live: 'bg-[#E1F5EE] text-[#0F6E56]',
     completed: 'bg-[#F1EFE8] text-[#5F5E5A]',

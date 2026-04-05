@@ -118,8 +118,8 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
             <div>
               <p className={peekLabel}>Status</p>
               {brand.approved
-                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
-                : <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>Pending</span>
+                ? <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
+                : <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
               }
             </div>
             <div>
