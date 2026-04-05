@@ -127,8 +127,8 @@ function BrandInfoModal({ brand, onClose }: {
 }
 
 // ─── Discover Tab ───
-function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
-  profile: CreatorProfile; onOpenCampaign: (id: string) => void; onGoToCampaigns: () => void;
+function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
+  profile: CreatorProfile; onOpenCampaign: (id: string) => void; onGoToCampaigns: () => void; refreshKey?: number;
 }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [applications, setApplications] = useState<Record<string, string>>({});
@@ -139,7 +139,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
   const [fetchError, setFetchError] = useState(false);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
 
-  useEffect(() => { fetchDiscover(); }, []);
+  useEffect(() => { fetchDiscover(); }, [refreshKey]);
 
   const fetchDiscover = async () => {
     setLoading(true);
@@ -1046,6 +1046,8 @@ export default function CreatorApp() {
   const [loading, setLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
+  const [discoverRefresh, setDiscoverRefresh] = useState(0);
+  const closeCampaignDetail = () => { closeCampaignDetail(); setDiscoverRefresh(r => r + 1); };
   const [toast, setToast] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -1053,7 +1055,7 @@ export default function CreatorApp() {
 
   // Close campaign detail on Escape
   useEffect(() => {
-    const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && viewingCampaign) setViewingCampaign(null); };
+    const h = (e: KeyboardEvent) => { if (e.key === 'Escape' && viewingCampaign) closeCampaignDetail(); };
     document.addEventListener('keydown', h);
     return () => document.removeEventListener('keydown', h);
   }, [viewingCampaign]);
@@ -1093,7 +1095,7 @@ export default function CreatorApp() {
 
   const handleNav = (t: Tab) => {
     setTab(t);
-    if (t !== 'discover') setViewingCampaign(null);
+    if (t !== 'discover') closeCampaignDetail();
   };
 
   if (loading) {
@@ -1136,7 +1138,7 @@ export default function CreatorApp() {
   }
 
   if (viewingCampaign && isMobile) {
-    return <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />;
+    return <CampaignDetail campaignId={viewingCampaign} onBack={() => closeCampaignDetail()} />;
   }
 
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
@@ -1193,7 +1195,7 @@ export default function CreatorApp() {
       <div className="md:ml-[220px] min-h-screen">
         <div className="p-4 lg:p-5 pb-20 md:pb-5" key={tab}>
           <div className="tab-fade-in">
-            {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} />}
+            {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} refreshKey={discoverRefresh} />}
             {tab === 'campaigns' && <CampaignsTab profile={profile} />}
             {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
             {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
@@ -1205,11 +1207,11 @@ export default function CreatorApp() {
       {/* ─── Campaign detail — centered modal (desktop) ─── */}
       {viewingCampaign && !isMobile && tab === 'discover' && (
         <>
-          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.25)] z-30" onClick={() => setViewingCampaign(null)} />
+          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.25)] z-30" onClick={() => closeCampaignDetail()} />
           <div className="hidden md:flex fixed inset-0 z-40 items-center justify-center pointer-events-none">
             <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto border-[0.5px] border-[rgba(0,0,0,0.08)]"
               style={{ margin: '0 24px', scrollbarWidth: 'none' }}>
-              <CampaignDetail campaignId={viewingCampaign} onBack={() => setViewingCampaign(null)} />
+              <CampaignDetail campaignId={viewingCampaign} onBack={() => closeCampaignDetail()} />
             </div>
           </div>
         </>
