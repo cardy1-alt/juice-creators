@@ -213,6 +213,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
+    if (!approved && !window.confirm('Deny this brand?')) return;
     const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
     if (error) { setToast('Update failed'); setTimeout(() => setToast(null), 3000); return; }
     if (approved) sendBusinessApprovedEmail(id).catch(() => {});

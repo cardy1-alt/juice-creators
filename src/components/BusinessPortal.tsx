@@ -366,6 +366,7 @@ export default function BusinessPortal() {
             showToast('Creator selected');
           };
           const handleDecline = async (appId: string) => {
+            if (!window.confirm('Decline this creator?')) return;
             await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
             fetchCampaignData();
             showToast('Creator declined');
@@ -379,6 +380,7 @@ export default function BusinessPortal() {
             showToast(`${selectedCreators.size} creator${selectedCreators.size !== 1 ? 's' : ''} selected`);
           };
           const handleBulkDecline = async () => {
+            if (!window.confirm(`Decline ${selectedCreators.size} creator${selectedCreators.size > 1 ? 's' : ''}?`)) return;
             for (const id of selectedCreators) {
               await supabase.from('applications').update({ status: 'declined' }).eq('id', id);
             }

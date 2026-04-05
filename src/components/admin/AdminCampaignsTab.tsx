@@ -759,6 +759,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
           <div className="mb-4">
             <p className={peekLabel}>Change Status</p>
             <select value={campaign.status} onChange={async e => {
+              if (e.target.value === 'completed' && !window.confirm('Mark this campaign as completed?')) { e.target.value = campaign.status; return; }
               const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
               if (error) showToast('Failed to update status');
               else { showToast(`Status → ${e.target.value}`); onEdit(); }
