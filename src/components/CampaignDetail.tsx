@@ -283,7 +283,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       </div>
 
       {/* Sticky bottom bar */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-[0.5px] border-[rgba(0,0,0,0.08)] px-4 py-4 z-40">
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t-[0.5px] border-[rgba(0,0,0,0.08)] px-4 py-4 z-40" style={{ paddingBottom: 'calc(16px + env(safe-area-inset-bottom, 0px))' }}>
         <div className="max-w-[720px] mx-auto">
           {!application && (
             <div>
@@ -357,7 +357,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {/* Pitch modal */}
       {showPitchModal && (
         <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-4 sm:p-6" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[#1C1917]">Tell them why you</h3>
               <button onClick={() => setShowPitchModal(false)} className="text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]"><X size={20} /></button>

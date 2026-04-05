@@ -37,9 +37,9 @@ const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgb
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(0,0,0,0.4)]";
 const modalClose = "w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3] transition-colors";
-const modalHeader = "flex items-center justify-between px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
-const modalBody = "flex-1 overflow-y-auto px-6 py-6";
-const modalFooterCls = "flex items-center justify-between px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0";
+const modalHeader = "flex items-center justify-between px-4 md:px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0";
+const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
+const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3] flex-shrink-0";
 const ghostBtn = "text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917] transition-colors";
 const primaryBtn = "px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
 const secondaryBtn = "px-5 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]";
@@ -683,7 +683,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-[420px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">

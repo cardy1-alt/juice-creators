@@ -286,7 +286,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Dates */}
-            <div className="flex gap-4 text-[13px] text-[var(--ink-35)] mb-6">
+            <div className="flex flex-wrap gap-2 sm:gap-4 text-[13px] text-[var(--ink-35)] mb-6">
               <span>Opens: {fmtDate(campaign.open_date)}</span>
               <span>Deadline: {fmtDate(campaign.expression_deadline)}</span>
               <span>Content due: {fmtDate(campaign.content_deadline)}</span>

@@ -23,7 +23,7 @@ function SkeletonCard() {
   return (
     <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
       <div className="flex flex-row">
-        <div className="skeleton w-[88px] flex-shrink-0" />
+        <div className="skeleton w-[72px] sm:w-[88px] flex-shrink-0" />
         <div className="flex-1 p-3 space-y-2.5">
           <div className="skeleton h-3 w-24" />
           <div className="skeleton h-4 w-full" />
@@ -235,7 +235,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns }: {
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
               className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-row min-h-[44px]" style={{ boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               {/* Left thumbnail */}
-              <div className="w-[88px] flex-shrink-0 bg-[#F7F6F3] flex items-center justify-center">
+              <div className="w-[72px] sm:w-[88px] flex-shrink-0 bg-[#F7F6F3] flex items-center justify-center">
                 {c.businesses?.logo_url ? (
                   <img src={c.businesses.logo_url} alt={c.businesses.name} className="w-10 h-10 rounded-full object-cover" />
                 ) : (
