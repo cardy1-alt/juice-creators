@@ -194,7 +194,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </p>
           )}
           {/* Dates row */}
-          <div className="flex items-center gap-4 text-[13px] text-[rgba(0,0,0,0.4)]">
+          <div className="flex flex-col gap-1 sm:flex-row sm:gap-4 text-[13px] text-[rgba(0,0,0,0.4)]">
             {campaign.expression_deadline && <span>Apply by {fmtDate(campaign.expression_deadline)}</span>}
             {campaign.content_deadline && <span>Content due {fmtDate(campaign.content_deadline)}</span>}
           </div>
@@ -233,7 +233,13 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           {campaign.required_tags && campaign.required_tags.length > 0 && (
             <div className="mt-3 pt-3 border-t-[0.5px] border-[rgba(0,0,0,0.08)]">
               <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-2">Required tags</p>
-              <p className="text-[14px] text-[#1C1917]">{campaign.required_tags.join('  ')}</p>
+              <div className="flex flex-wrap gap-2">
+                {campaign.required_tags.map((tag, i) => (
+                  <span key={i} className="px-2.5 py-1 rounded-[6px] bg-[rgba(196,103,74,0.08)] text-[13px] font-medium text-[#C4674A]">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             </div>
           )}
         </div>
@@ -361,8 +367,9 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               value={pitch}
               onChange={e => setPitch(e.target.value)}
               placeholder="I'd love to be part of this because..."
-              className="w-full px-4 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[#1C1917] text-[14px] h-24 resize-none focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] mb-4"
+              className="w-full px-4 py-3 rounded-[8px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[#1C1917] text-[14px] h-24 resize-none focus:outline-none focus:border-[#C4674A] focus:shadow-[0_0_0_3px_rgba(196,103,74,0.12)] mb-1"
             />
+            <p className="text-[12px] text-[rgba(0,0,0,0.35)] text-right mb-3">{pitch.length}/500</p>
             <div className="flex gap-3">
               <button
                 onClick={() => handleApply()}
