@@ -44,12 +44,12 @@ function StatusBadge({ status }: { status: string }) {
     draft: 'bg-[#F1EFE8] text-[#5F5E5A]',
     active: 'bg-[#E1F5EE] text-[#0F6E56]',
     selecting: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
-    live: 'bg-[#E8F4E8] text-[#2D6B2D]',
+    live: 'bg-[#E1F5EE] text-[#0F6E56]',
     completed: 'bg-[#F1EFE8] text-[#5F5E5A]',
     interested: 'bg-[#FAEEDA] text-[#854F0B]',
     pending: 'bg-[#FAEEDA] text-[#854F0B]',
-    selected: 'bg-[#E8F4E8] text-[#2D6B2D]',
-    confirmed: 'bg-[#E8F4E8] text-[#2D6B2D]',
+    selected: 'bg-[#E1F5EE] text-[#0F6E56]',
+    confirmed: 'bg-[#E1F5EE] text-[#0F6E56]',
     declined: 'bg-[#F1EFE8] text-[#5F5E5A]',
     content_submitted: 'bg-[rgba(59,130,246,0.1)] text-[#3B82F6]',
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
@@ -323,6 +323,28 @@ export default function BusinessPortal() {
             if (selectedCreators.size === filteredApps.length) setSelectedCreators(new Set());
             else setSelectedCreators(new Set(filteredApps.map(a => a.id)));
           };
+          const handleSelect = async (appId: string) => {
+            await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() }).eq('id', appId);
+            fetchCampaignData();
+          };
+          const handleDecline = async (appId: string) => {
+            await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
+            fetchCampaignData();
+          };
+          const handleBulkSelect = async () => {
+            for (const id of selectedCreators) {
+              await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() }).eq('id', id);
+            }
+            setSelectedCreators(new Set());
+            fetchCampaignData();
+          };
+          const handleBulkDecline = async () => {
+            for (const id of selectedCreators) {
+              await supabase.from('applications').update({ status: 'declined' }).eq('id', id);
+            }
+            setSelectedCreators(new Set());
+            fetchCampaignData();
+          };
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
@@ -342,7 +364,17 @@ export default function BusinessPortal() {
                 {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
               </button>
               {selectedCreators.size > 0 && (
-                <span className="text-[13px] text-[var(--terra)] font-medium">{selectedCreators.size} selected</span>
+                <>
+                  <span className="text-[13px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
+                  <button onClick={handleBulkSelect}
+                    className="px-3 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                    Select {selectedCreators.size}
+                  </button>
+                  <button onClick={handleBulkDecline}
+                    className="px-3 py-2 rounded-[6px] text-[13px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] hover:bg-[rgba(0,0,0,0.04)]">
+                    Decline
+                  </button>
+                </>
               )}
             </div>
 
@@ -399,8 +431,22 @@ export default function BusinessPortal() {
                       </div>
                     )}
 
-                    {/* Applied date */}
-                    <p className="text-[12px] text-[var(--ink-35)]">Applied {fmtDate(a.applied_at)}</p>
+                    {/* Actions */}
+                    <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
+                      <p className="text-[12px] text-[var(--ink-35)]">Applied {fmtDate(a.applied_at)}</p>
+                      {a.status === 'interested' && (
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleSelect(a.id)}
+                            className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                            Select
+                          </button>
+                          <button onClick={() => handleDecline(a.id)}
+                            className="text-[12px] font-medium text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]">
+                            Decline
+                          </button>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 );
               })}
@@ -479,21 +525,27 @@ export default function BusinessPortal() {
                           ))}
                         </div>
 
-                        {/* Data row */}
-                        {(p.reach != null || p.reel_url) && (
-                          <div className="flex items-center gap-4 mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
-                            {p.reel_url && (
-                              <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                                className="flex items-center gap-1.5 text-[13px] text-[var(--terra)] font-medium hover:underline">
-                                <Film size={14} /> View Reel <ExternalLink size={11} />
-                              </a>
-                            )}
-                            {p.reach != null && <span className="text-[13px] text-[var(--ink-60)]"><Eye size={13} className="inline mr-1" />{p.reach.toLocaleString()} reach</span>}
-                            {(p.likes != null || p.comments != null) && (
-                              <span className="text-[13px] text-[var(--ink-60)]">{p.likes || 0} likes &middot; {p.comments || 0} comments</span>
-                            )}
-                          </div>
-                        )}
+                        {/* Actions + data */}
+                        <div className="flex items-center gap-4 mt-3 pt-3 flex-wrap" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
+                          {!p.perk_sent && (
+                            <button onClick={async () => {
+                              await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
+                              fetchCampaignData();
+                            }} className="px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                              Mark perk sent
+                            </button>
+                          )}
+                          {p.reel_url && (
+                            <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                              <Film size={14} /> View Reel <ExternalLink size={11} />
+                            </a>
+                          )}
+                          {p.reach != null && <span className="text-[13px] text-[var(--ink-60)]"><Eye size={13} className="inline mr-1" />{p.reach.toLocaleString()} reach</span>}
+                          {(p.likes != null || p.comments != null) && (
+                            <span className="text-[13px] text-[var(--ink-60)]">{p.likes || 0} likes &middot; {p.comments || 0} comments</span>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -527,10 +579,19 @@ export default function BusinessPortal() {
                     {p.reel_submitted_at && <p>Posted: {fmtDate(p.reel_submitted_at)}</p>}
                   </div>
                   <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
-                    <a href={p.reel_url!} target="_blank" rel="noopener noreferrer" download
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-[12px] font-medium text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
-                      Download
-                    </a>
+                    {p.status !== 'completed' && (
+                      <button onClick={async () => {
+                        await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
+                        fetchCampaignData();
+                      }} className="px-3 py-1.5 rounded-[6px] bg-[#0F6E56] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                        Approve
+                      </button>
+                    )}
+                    {p.status === 'completed' && (
+                      <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#0F6E56]">
+                        <Check size={13} /> Approved
+                      </span>
+                    )}
                   </div>
                 </div>
               ))}
