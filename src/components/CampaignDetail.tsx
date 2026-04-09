@@ -263,15 +263,19 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             )}
           </div>
 
-          {/* ── Divider ── */}
+          {/* ── What to post ── */}
           {campaign.content_requirements && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
               <div className="p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.025)' }}>
-                <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">
-                  What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
-                </p>
+                <div className="flex items-center gap-2.5 mb-3">
+                  <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                    <Film size={14} style={{ color: catPalette.color }} />
+                  </div>
+                  <p className="text-[13px] font-semibold text-[var(--ink)]">
+                    What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
+                  </p>
+                </div>
                 <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
-                {/* Tags inside the brief */}
                 {campaign.required_tags && campaign.required_tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {campaign.required_tags.map((tag, i) => (
@@ -285,14 +289,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
 
-          {/* ── Divider ── */}
+          {/* ── Key messages ── */}
           {campaign.talking_points && campaign.talking_points.length > 0 && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
               <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Key messages</p>
-              <ol className="space-y-2">
+              <ol className="space-y-2.5">
                 {campaign.talking_points.map((tp, i) => (
-                  <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.6]">
-                    <span className="text-[12px] font-medium text-[var(--ink-35)] mt-0.5 flex-shrink-0">{i + 1}.</span>
+                  <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.5]">
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px]" style={{ fontWeight: 700, background: catPalette.tint, color: catPalette.color }}>{i + 1}</span>
                     {tp}
                   </li>
                 ))}
@@ -300,15 +304,20 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
 
-          {/* Inspiration */}
+          {/* ── Inspiration ── */}
           {campaign.inspiration && campaign.inspiration.length > 0 && (
-            <div className="mb-6">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">Inspiration</p>
-              <div className="space-y-2">
+            <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
+              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Inspiration</p>
+              <div className="space-y-3">
                 {campaign.inspiration.map((item: any, i: number) => (
-                  <div key={i}>
-                    <p className="text-[14px] font-medium text-[var(--ink)]">{item.title}</p>
-                    <p className="text-[13px] text-[var(--ink-35)] leading-[1.6]">{item.description}</p>
+                  <div key={i} className="flex gap-3">
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                      <Film size={15} style={{ color: catPalette.color }} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[var(--ink)] mb-0.5">{item.title}</p>
+                      <p className="text-[13px] text-[var(--ink-60)] leading-[1.55]">{item.description}</p>
+                    </div>
                   </div>
                 ))}
               </div>
