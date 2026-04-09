@@ -12,6 +12,7 @@ import {
   Eye, EyeOff, Mail, MapPin, Save, Star, Award,
   AlertCircle, RefreshCw
 } from 'lucide-react';
+import NaybaLogo from '../assets/logomark.svg';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -1013,7 +1014,10 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
   return (
     <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
       <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6 text-center">
-        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 22, fontWeight: 600, color: '#C4674A', letterSpacing: '-0.5px' }}>nayba</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src={NaybaLogo} alt="" width={28} height={28} />
+          <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+        </div>
         <h2 className="text-[20px] font-semibold text-[#1C1917] mt-3 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
         <div className="space-y-3 mb-6 text-left">
@@ -1125,7 +1129,10 @@ export default function CreatorApp() {
   if (!profile.approved) {
     return (
       <div className="min-h-screen bg-[#F7F6F3] flex flex-col items-center justify-center px-6 text-center">
-        <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 28, fontWeight: 600, color: '#C4674A', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 32 }}>
+          <img src={NaybaLogo} alt="" width={28} height={28} />
+          <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+        </div>
         <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>You're on the list</h1>
         <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
           We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
@@ -1149,7 +1156,10 @@ export default function CreatorApp() {
       <aside className="w-[220px] bg-[#F7F6F3] border-r border-[rgba(0,0,0,0.08)] flex-col flex-shrink-0 fixed inset-y-0 left-0 z-50 hidden md:flex">
         {/* Wordmark */}
         <div className="px-5 pt-6 pb-5 border-b border-[rgba(0,0,0,0.08)]">
-          <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px' }}>nayba</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <img src={NaybaLogo} alt="" width={28} height={28} />
+            <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+          </div>
         </div>
 
         {/* Nav */}

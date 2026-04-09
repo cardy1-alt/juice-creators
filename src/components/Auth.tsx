@@ -6,6 +6,7 @@ import { friendlyError } from '../lib/errors';
 import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X, Camera, Building2 } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
+import NaybaLogo from '../assets/logomark.svg';
 
 /* Floating label input component */
 function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, placeholder, required, minLength, rightElement }: {
@@ -154,7 +155,10 @@ export default function Auth() {
           <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* 1. Wordmark */}
-            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px', marginBottom: 32 }}>nayba</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 32 }}>
+              <img src={NaybaLogo} alt="" width={28} height={28} />
+              <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+            </div>
 
             {/* 2. Location pill */}
             <div className="mb-6">
@@ -396,7 +400,10 @@ export default function Auth() {
           <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
 
             {/* Wordmark */}
-            <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, fontWeight: 400, color: '#1C1917', letterSpacing: '-0.5px', marginBottom: 12 }}>nayba</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 12 }}>
+              <img src={NaybaLogo} alt="" width={28} height={28} />
+              <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+            </div>
 
             {/* Back link */}
             <button

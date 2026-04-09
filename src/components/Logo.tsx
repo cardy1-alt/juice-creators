@@ -1,3 +1,5 @@
+import NaybaLogo from '../assets/logomark.svg';
+
 interface LogoProps {
   size?: number;
   color?: string;
@@ -6,19 +8,7 @@ interface LogoProps {
 
 function LogoIcon({ size }: { size: number }) {
   return (
-    <span
-      style={{
-        fontFamily: "'Instrument Serif', serif",
-        fontSize: size,
-        fontWeight: 400,
-        color: '#1C1917',
-        lineHeight: 1.1,
-        letterSpacing: '-0.5px',
-      }}
-      aria-hidden="true"
-    >
-      nayba
-    </span>
+    <img src={NaybaLogo} alt="" width={size} height={size} />
   );
 }
 
@@ -26,33 +16,44 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   return (
     <span
       style={{
-        fontFamily: "'Instrument Serif', serif",
+        fontFamily: 'Hornbill, Georgia, serif',
         fontSize: size,
-        fontWeight: 400,
+        fontWeight: 900,
         color,
         lineHeight: 1.1,
-        letterSpacing: '-0.5px',
+        letterSpacing: '-0.03em',
       }}
     >
-      nayba
+      Nayba
     </span>
   );
 }
 
-export function Logo({ size = 40, color = "#1C1917", variant = 'icon-word' }: LogoProps) {
+export function Logo({ size = 40, color = "var(--ink)", variant = 'icon-word' }: LogoProps) {
   if (variant === 'icon') {
     return <LogoIcon size={size} />;
   }
 
   if (variant === 'wordmark') {
-    return <LogoWordmark size={size} color={color} />;
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <img src={NaybaLogo} alt="" width={size} height={size} />
+        <span style={{
+          fontFamily: 'Hornbill, Georgia, serif',
+          fontWeight: 900,
+          fontSize: size * 0.71,
+          letterSpacing: '-0.03em',
+          color: 'var(--ink)'
+        }}>Nayba</span>
+      </div>
+    );
   }
 
   // icon-word: icon + wordmark side by side, vertically centred
   return (
-    <span style={{ display: 'inline-flex', alignItems: 'center', gap: size * 0.15 }}>
-      <LogoIcon size={size} />
+    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+      <img src={NaybaLogo} alt="" width={size} height={size} />
       <LogoWordmark size={size * 0.6} color={color} />
-    </span>
+    </div>
   );
 }
