@@ -188,16 +188,6 @@ export default function Auth() {
                 New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
               </p>
 
-              {/* Location pill */}
-              <div className="mb-6">
-                <div className="inline-flex items-center gap-[8px] px-[14px] py-[6px]" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
-                  <span className="relative flex h-[7px] w-[7px]">
-                    <span className="relative inline-flex rounded-full h-[7px] w-[7px]" style={{ background: 'var(--terra)' }} />
-                  </span>
-                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>Now live in Suffolk</span>
-                </div>
-              </div>
-
               {/* Social proof */}
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-[8px]">
