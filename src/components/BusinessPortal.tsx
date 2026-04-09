@@ -498,7 +498,7 @@ export default function BusinessPortal() {
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
                           className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
-                        <div className="w-10 h-10 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                           <span className="text-[15px] font-semibold text-white">{initial}</span>
                         </div>
                         <div>
@@ -590,49 +590,45 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                    <div className="flex items-start gap-4">
-                      {/* Avatar */}
-                      <div className="w-11 h-11 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                        <span className="text-[16px] font-semibold text-white">{initial}</span>
+                  <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                    {/* Header: avatar + name + status */}
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <span className="text-[14px] font-semibold text-white">{initial}</span>
                       </div>
-
-                      {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between mb-1">
-                          <div className="flex items-center gap-2">
-                            <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
-                            <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                              className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
-                              @{handle} <ExternalLink size={11} />
-                            </a>
+                        <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
+                        <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                          className="text-[12px] text-[var(--terra)] hover:underline flex items-center gap-1">
+                          @{handle} <ExternalLink size={10} />
+                        </a>
+                      </div>
+                      <StatusBadge status={p.status} />
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="h-[4px] bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden mb-3">
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${progressPct}%`,
+                          background: p.status === 'completed' ? 'var(--success)' : p.status === 'overdue' ? '#DC2626' : 'var(--terra)',
+                        }} />
+                    </div>
+
+                    {/* Steps — circles only on mobile, full labels on desktop */}
+                    <div className="flex items-center gap-2 md:gap-4 mb-3">
+                      {steps.map((s, i) => (
+                        <div key={i} className="flex items-center gap-1 md:gap-1.5">
+                          <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center flex-shrink-0 ${s.done ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.06)]'}`}>
+                            {s.done && <Check size={8} className="text-white" />}
                           </div>
-                          <StatusBadge status={p.status} />
+                          <span className={`hidden md:inline text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
                         </div>
+                      ))}
+                    </div>
 
-                        {/* Progress bar */}
-                        <div className="h-[4px] bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden mb-2.5 mt-2">
-                          <div className="h-full rounded-full transition-all duration-500"
-                            style={{
-                              width: `${progressPct}%`,
-                              background: p.status === 'completed' ? 'var(--success)' : p.status === 'overdue' ? '#DC2626' : 'var(--terra)',
-                            }} />
-                        </div>
-
-                        {/* Step indicators */}
-                        <div className="flex items-center gap-4">
-                          {steps.map((s, i) => (
-                            <div key={i} className="flex items-center gap-1.5">
-                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                                {s.done && <Check size={10} className="text-white" />}
-                              </div>
-                              <span className={`text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
-                            </div>
-                          ))}
-                        </div>
-
-                        {/* Actions + data */}
-                        <div className="flex items-center gap-4 mt-3 pt-3 flex-wrap" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
+                    {/* Actions + data */}
+                    <div className="flex items-center gap-3 pt-3 flex-wrap" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
                           {!p.perk_sent && (
                             <button onClick={async () => {
                               await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
@@ -652,8 +648,6 @@ export default function BusinessPortal() {
                           {(p.likes != null || p.comments != null) && (
                             <span className="text-[13px] text-[var(--ink-60)]">{p.likes || 0} likes &middot; {p.comments || 0} comments</span>
                           )}
-                        </div>
-                      </div>
                     </div>
                   </div>
                 );
@@ -717,24 +711,23 @@ export default function BusinessPortal() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Total Reach</p>
-                <p className="text-[24px] font-semibold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
+              {[
+                { label: 'Total Reach', value: totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+                { label: 'Content', value: submittedCount, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+                { label: 'Engagement', value: participations.filter(p => p.reach && p.reach > 0).length > 0 ? (participations.reduce((s, p) => s + ((p.likes || 0) + (p.comments || 0)), 0) / Math.max(totalReach, 1) * 100).toFixed(1) + '%' : '—', icon: BarChart3, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
+              ].map(s => (
+              <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div className="flex items-center gap-3">
+                  <div className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
+                    <s.icon size={15} style={{ color: s.color }} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                    <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                  </div>
+                </div>
               </div>
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Content Pieces</p>
-                <p className="text-[24px] font-semibold text-[var(--ink)]">{submittedCount}</p>
-              </div>
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Avg Engagement</p>
-                <p className="text-[24px] font-semibold text-[var(--ink)]">
-                  {participations.filter(p => p.reach && p.reach > 0).length > 0
-                    ? (participations.reduce((s, p) => s + ((p.likes || 0) + (p.comments || 0)), 0) / Math.max(totalReach, 1) * 100).toFixed(1) + '%'
-                    : '—'
-                  }
-                </p>
-                <p className="text-[12px] text-[var(--ink-35)] mt-1">Platform benchmark: 3-4%</p>
-              </div>
+              ))}
             </div>
 
             {/* Reach by creator */}
