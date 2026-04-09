@@ -151,15 +151,15 @@ export default function Auth() {
     <div className="flex flex-col overscroll-none" style={{ minHeight: '100dvh', background: 'var(--chalk)' }}>
       {mode === 'signin' ? (
         /* ─── SIGN IN: two-column on desktop ─── */
-        <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'var(--chalk)' }}>
-          {/* Left — branding */}
-          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:px-12 md:py-16" style={{ background: 'var(--chalk)' }}>
+        <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'white' }}>
+          {/* Left — branding (desktop only) */}
+          <div className="hidden md:flex flex-1 flex-col items-center justify-center px-12 py-16" style={{ background: 'var(--chalk)' }}>
             <div className="w-full max-w-[420px]">
               <div style={{ marginBottom: 32 }}>
                 <Logo size={28} variant="wordmark" />
               </div>
 
-              <h1 className="nayba-h1 text-[28px] md:text-[36px]" style={{ margin: '0 0 16px', color: 'var(--ink)' }}>
+              <h1 className="nayba-h1 text-[36px]" style={{ margin: '0 0 16px', color: 'var(--ink)' }}>
                 <span style={{ display: 'block' }}>Discover local brands.</span>
                 Get <span style={{ color: 'var(--terra)' }}>rewarded</span> for sharing.
               </h1>
@@ -170,7 +170,7 @@ export default function Auth() {
 
               {/* Location pill */}
               <div className="mb-6">
-                <div className="inline-flex items-center gap-[8px] px-[14px] py-[6px]" style={{ background: 'var(--chalk)', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
+                <div className="inline-flex items-center gap-[8px] px-[14px] py-[6px]" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
                   <span className="relative flex h-[7px] w-[7px]">
                     <span className="relative inline-flex rounded-full h-[7px] w-[7px]" style={{ background: 'var(--terra)' }} />
                   </span>
@@ -179,7 +179,7 @@ export default function Auth() {
               </div>
 
               {/* Social proof */}
-              <div className="hidden md:flex items-center gap-3">
+              <div className="flex items-center gap-3">
                 <div className="flex -space-x-[8px]">
                   {['S', 'M', 'J', 'R'].map((initial, i) => (
                     <div
@@ -206,11 +206,20 @@ export default function Auth() {
             </div>
           </div>
 
-          {/* Right — form */}
-          <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-12 md:py-16" style={{ background: 'white' }}>
+          {/* Right / main — form */}
+          <div className="flex-1 flex flex-col items-center justify-center px-5 py-10 md:px-12 md:py-16" style={{ background: 'white' }}>
             <div className="w-full max-w-[380px]">
-              <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
-              <p className="text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
+              {/* Mobile: compact brand header */}
+              <div className="md:hidden mb-8">
+                <div className="mb-4">
+                  <Logo size={28} variant="wordmark" />
+                </div>
+                <p className="text-[14px] text-[var(--ink-60)]">Discover local brands. Get rewarded for sharing.</p>
+              </div>
+
+              {/* Desktop heading */}
+              <h2 className="hidden md:block text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
+              <p className="hidden md:block text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
@@ -333,31 +342,6 @@ export default function Auth() {
                 </>
               )}
 
-              {/* Mobile social proof */}
-              <div className="flex md:hidden items-center justify-center gap-3 mt-8">
-                <div className="flex -space-x-[8px]">
-                  {['S', 'M', 'J', 'R'].map((initial, i) => (
-                    <div
-                      key={initial}
-                      className="w-[28px] h-[28px] rounded-full flex items-center justify-center border-2"
-                      style={{
-                        borderColor: 'white',
-                        background: ['var(--terra)', 'var(--sage)', 'var(--violet)', 'var(--baltic)'][i],
-                        zIndex: 4 - i,
-                        fontFamily: "'Instrument Sans', sans-serif",
-                        fontWeight: 600,
-                        fontSize: 11,
-                        color: 'white',
-                      }}
-                    >
-                      {initial}
-                    </div>
-                  ))}
-                </div>
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)' }}>
-                  Real creators · real local brands
-                </span>
-              </div>
             </div>
           </div>
         </div>
