@@ -152,10 +152,10 @@ export default function Auth() {
       {mode === 'signin' ? (
         /* ─── SIGN IN: two-column on desktop ─── */
         <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'white' }}>
-          {/* Left — branding (desktop only) */}
-          <div className="hidden md:flex flex-1 flex-col items-center justify-center px-12 py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
-            {/* Floating preview images */}
-            <div className="absolute inset-0 pointer-events-none">
+          {/* Left — branding */}
+          <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 md:px-12 md:py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
+            {/* Floating preview images — desktop only */}
+            <div className="hidden md:block absolute inset-0 pointer-events-none">
               {[
                 { src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop', top: '8%', right: '8%', size: 100, rotate: 3 },
                 { src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&h=200&fit=crop', top: '55%', right: '5%', size: 80, rotate: -4 },
@@ -229,17 +229,8 @@ export default function Auth() {
           {/* Right / main — form */}
           <div className="flex-1 flex flex-col items-center justify-center px-5 py-10 md:px-12 md:py-16" style={{ background: 'white' }}>
             <div className="w-full max-w-[380px]">
-              {/* Mobile: compact brand header */}
-              <div className="md:hidden mb-8">
-                <div className="mb-4">
-                  <Logo size={28} variant="wordmark" />
-                </div>
-                <p className="text-[14px] text-[var(--ink-60)]">Discover local brands. Get rewarded for sharing.</p>
-              </div>
-
-              {/* Desktop heading */}
-              <h2 className="hidden md:block text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
-              <p className="hidden md:block text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
+              <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
+              <p className="text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
