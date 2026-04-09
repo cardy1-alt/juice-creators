@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
   LayoutDashboard, Users, ClipboardList, Film, BarChart3,
-  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X
+  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft
 } from 'lucide-react';
 
 // ─── Skeleton Loaders ───
@@ -118,7 +118,9 @@ export default function BusinessPortal() {
       const { data: cData } = await supabase.from('campaigns').select('*').eq('brand_id', bData.id).order('created_at', { ascending: false });
       if (cData && cData.length > 0) {
         setCampaigns(cData as Campaign[]);
-        setSelectedCampaignId(cData[0].id);
+        // Don't auto-select — show campaign list as landing page
+        // If only one campaign, go straight to it
+        if (cData.length === 1) setSelectedCampaignId(cData[0].id);
       }
     }
     setLoading(false);
@@ -236,18 +238,18 @@ export default function BusinessPortal() {
           </button>
         </div>
 
-        {/* Campaign selector */}
-        {campaigns.length > 1 && (
+        {/* Back to campaigns (when viewing one) */}
+        {selectedCampaignId && campaigns.length > 1 && (
           <div className="px-3 py-3" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-            <select value={selectedCampaignId || ''} onChange={e => setSelectedCampaignId(e.target.value)}
-              className="w-full px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              {campaigns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+            <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }}
+              className="flex items-center gap-2 text-[13px] text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors">
+              <ArrowLeft size={14} /> All campaigns
+            </button>
           </div>
         )}
 
         <nav className="flex-1 py-3 px-3">
-          {TABS.map(tab => {
+          {selectedCampaignId ? TABS.map(tab => {
             const active = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => handleTabClick(tab.key)}
@@ -257,7 +259,11 @@ export default function BusinessPortal() {
                 {tab.label}
               </button>
             );
-          })}
+          }) : (
+            <div className="px-3 py-2">
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]">Your campaigns</p>
+            </div>
+          )}
         </nav>
 
         <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
@@ -271,16 +277,55 @@ export default function BusinessPortal() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-          <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
-            <Menu size={22} />
-          </button>
-          <Logo size={22} variant="wordmark" />
+          {selectedCampaignId ? (
+            <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
+              <ArrowLeft size={20} />
+            </button>
+          ) : (
+            <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
+              <Menu size={22} />
+            </button>
+          )}
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Logo size={20} variant="icon" />
+            <span className="text-[15px] font-semibold text-[var(--ink)] truncate">
+              {selectedCampaignId ? campaign?.title || 'Campaign' : brand.name}
+            </span>
+          </div>
         </div>
 
-        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-0 overflow-auto" key={activeTab}>
+        <main className="flex-1 p-4 md:p-8 pb-20 md:pb-0 overflow-auto" key={selectedCampaignId ? activeTab : 'campaigns'}>
         <div className="tab-fade-in">
+
+        {/* Campaign list landing page — when no campaign selected */}
+        {!selectedCampaignId && campaigns.length > 0 && (
+          <div>
+            <div className="mb-6">
+              <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {brand.name}</h1>
+              <p className="text-[14px] text-[var(--ink-60)] mt-1">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {campaigns.map(c => (
+                <button key={c.id} onClick={() => setSelectedCampaignId(c.id)}
+                  className="w-full text-left bg-white rounded-[12px] p-5 transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
+                  style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                  <div className="flex items-center justify-between mb-3">
+                    <h3 className="text-[16px] font-semibold text-[var(--ink)]">{c.title}</h3>
+                    <StatusBadge status={c.status} />
+                  </div>
+                  {c.headline && <p className="text-[13px] text-[var(--ink-60)] mb-3 line-clamp-2">{c.headline}</p>}
+                  <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                    {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
+                    <span>{c.creator_target} creators</span>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Summary Tab */}
-        {activeTab === 'summary' && campaign && (
+        {selectedCampaignId && activeTab === 'summary' && campaign && (
           <div>
             {/* Welcome */}
             <div className="mb-6">
@@ -362,7 +407,7 @@ export default function BusinessPortal() {
         )}
 
         {/* Selection Tab */}
-        {activeTab === 'selection' && (() => {
+        {selectedCampaignId && activeTab === 'selection' && (() => {
           const filteredApps = applications.filter(a => {
             if (filterLevel !== 'all' && a.creators?.level && a.creators.level < parseInt(filterLevel)) return false;
             return true;
@@ -523,7 +568,7 @@ export default function BusinessPortal() {
         })()}
 
         {/* Participation Tab — renamed to "Creator Progress" */}
-        {activeTab === 'participation' && (
+        {selectedCampaignId && activeTab === 'participation' && (
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="nayba-h2 text-[var(--ink)]">Creator Progress</h1>
@@ -624,7 +669,7 @@ export default function BusinessPortal() {
         )}
 
         {/* Content Tab */}
-        {activeTab === 'content' && (
+        {selectedCampaignId && activeTab === 'content' && (
           <div>
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -633,7 +678,7 @@ export default function BusinessPortal() {
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
-                    <Film size={15} /> View on Instagram <ExternalLink size={13} />
+                    <Film size={15} /> View Reel <ExternalLink size={13} />
                   </a>
                   <div className="space-y-1 text-[13px] text-[var(--ink-60)]">
                     {p.reach != null && <p>Reach: {p.reach.toLocaleString()}</p>}
@@ -666,7 +711,7 @@ export default function BusinessPortal() {
         )}
 
         {/* Analytics Tab */}
-        {activeTab === 'analytics' && (
+        {selectedCampaignId && activeTab === 'analytics' && (
           <div>
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Analytics</h1>
 
@@ -723,7 +768,8 @@ export default function BusinessPortal() {
       </main>
       </div>
 
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — only when viewing a campaign */}
+      {selectedCampaignId && (
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-30" style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-center justify-around py-2" style={{ height: 'var(--nav-height)' }}>
           {TABS.map(tab => {
@@ -739,6 +785,7 @@ export default function BusinessPortal() {
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }
