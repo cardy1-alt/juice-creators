@@ -9,14 +9,14 @@ import {
 
 // ─── Skeleton Loaders ───
 function Skeleton({ className }: { className?: string }) {
-  return <div className={`animate-pulse bg-[rgba(0,0,0,0.06)] rounded-[8px] ${className || ''}`} />;
+  return <div className={`animate-pulse bg-[rgba(42,32,24,0.06)] rounded-[8px] ${className || ''}`} />;
 }
 
 function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+        <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
           <Skeleton className="h-3 w-24 mb-3" />
           <Skeleton className="h-7 w-16" />
         </div>
@@ -139,8 +139,8 @@ export default function BusinessPortal() {
   if (loading) {
     return (
       <div className="flex min-h-screen bg-[var(--shell)]">
-        <aside className="hidden md:flex w-[240px] bg-[#F7F6F3] flex-col flex-shrink-0" style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
-          <div className="px-5 py-5" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+        <aside className="hidden md:flex w-[240px] bg-[var(--stone)] flex-col flex-shrink-0" style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
+          <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <Skeleton className="h-7 w-20 mb-2" />
             <Skeleton className="h-4 w-28" />
           </div>
@@ -150,7 +150,7 @@ export default function BusinessPortal() {
         </aside>
         <div className="flex-1 p-4 md:p-8">
           <StatCardsSkeleton count={4} />
-          <Skeleton className="h-[300px] rounded-[10px]" />
+          <Skeleton className="h-[300px] rounded-[12px]" />
         </div>
       </div>
     );
@@ -159,10 +159,10 @@ export default function BusinessPortal() {
   if (!brand) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-white rounded-[10px] p-8 max-w-md text-center" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+        <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
-          <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
+          <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
+          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             <Mail size={16} /> Contact nayba
           </a>
         </div>
@@ -176,21 +176,21 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]';
-  const tdCls = 'py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]';
+  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]';
+  const tdCls = 'py-0 px-4 text-[14px] text-[var(--ink)]' + " border-b border-[rgba(42,32,24,0.06)]";
 
   // Empty state
   if (campaigns.length === 0) {
     return (
       <div className="flex min-h-screen bg-[var(--shell)]">
-        <aside className="hidden md:flex w-[240px] bg-[#F7F6F3] flex-col flex-shrink-0" style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
-          <div className="px-5 py-5" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+        <aside className="hidden md:flex w-[240px] bg-[var(--stone)] flex-col flex-shrink-0" style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
+          <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[rgba(0,0,0,0.55)] mt-1">{brand.name}</p>
+            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
           </div>
           <div className="flex-1" />
-          <div className="px-3 py-4" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
-            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.02)]">
+          <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
+            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
               <LogOut size={18} /> Sign out
             </button>
           </div>
@@ -198,8 +198,8 @@ export default function BusinessPortal() {
         <main className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
-            <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Contact nayba to get started with your first campaign.</p>
-            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[44px] rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px]">
+            <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get started with your first campaign.</p>
+            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
               <Mail size={16} /> Contact nayba
             </a>
           </div>
@@ -211,35 +211,35 @@ export default function BusinessPortal() {
   return (
     <div className="flex min-h-screen bg-[var(--shell)]">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium">{toast}</div>
+        <div className="fixed top-4 right-4 z-50 text-white px-5 py-3 rounded-[999px] text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* Sidebar — hidden on mobile by default, overlay when open */}
       <aside className={`
-        w-[240px] bg-[#F7F6F3] flex flex-col flex-shrink-0
+        w-[240px] bg-[var(--stone)] flex flex-col flex-shrink-0
         fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `} style={{ borderRight: '0.5px solid rgba(0,0,0,0.08)' }}>
-        <div className="px-5 py-5 flex items-center justify-between" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+      `} style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
+        <div className="px-5 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
           <div>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[rgba(0,0,0,0.55)] mt-1">{brand.name}</p>
+            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(0,0,0,0.55)] hover:text-[var(--ink)]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--ink-60)] hover:text-[var(--ink)]">
             <X size={20} />
           </button>
         </div>
 
         {/* Campaign selector */}
         {campaigns.length > 1 && (
-          <div className="px-3 py-3" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+          <div className="px-3 py-3" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <select value={selectedCampaignId || ''} onChange={e => setSelectedCampaignId(e.target.value)}
-              className="w-full px-3 py-2 rounded-[6px] bg-white text-[14px] text-[var(--ink)]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+              className="w-full px-3 py-2 rounded-[6px] bg-white text-[14px] text-[var(--ink)]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
           </div>
@@ -250,7 +250,8 @@ export default function BusinessPortal() {
             const active = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => handleTabClick(tab.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] mb-0.5 transition-colors ${active ? 'bg-[rgba(0,0,0,0.06)] text-[#1C1917] font-semibold' : 'text-[rgba(0,0,0,0.55)] font-medium hover:bg-[rgba(0,0,0,0.02)]'}`}>
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] mb-1 transition-colors ${active ? 'text-[var(--terra)]' : 'text-[var(--ink-60)] font-medium hover:bg-[rgba(42,32,24,0.04)]'}`}
+                style={{ fontWeight: active ? 700 : 500, background: active ? 'var(--terra-10)' : 'transparent' }}>
                 <tab.icon size={18} strokeWidth={active ? 2 : 1.5} />
                 {tab.label}
               </button>
@@ -258,8 +259,8 @@ export default function BusinessPortal() {
           })}
         </nav>
 
-        <div className="px-3 py-4" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)' }}>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.02)]">
+        <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <LogOut size={18} /> Sign out
           </button>
         </div>
@@ -268,7 +269,7 @@ export default function BusinessPortal() {
       {/* Main content */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
+        <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
           <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
             <Menu size={22} />
           </button>
@@ -281,15 +282,15 @@ export default function BusinessPortal() {
         {activeTab === 'summary' && campaign && (
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <h1 className="text-[16px] font-semibold text-[var(--ink)]">{campaign.title}</h1>
+              <h1 className="nayba-h2 text-[var(--ink)]">{campaign.title}</h1>
               <StatusBadge status={campaign.status} />
             </div>
 
             {/* Dates */}
             <div className="space-y-1.5 text-[13px] mb-6 max-w-[280px]">
-              {campaign.open_date && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Opens</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.open_date)}</span></div>}
-              {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Apply by</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.expression_deadline)}</span></div>}
-              {campaign.content_deadline && <div className="flex justify-between"><span className="text-[rgba(0,0,0,0.45)]">Content due</span><span className="font-medium text-[#1C1917]">{fmtDate(campaign.content_deadline)}</span></div>}
+              {campaign.open_date && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Opens</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.open_date)}</span></div>}
+              {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Apply by</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></div>}
+              {campaign.content_deadline && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Content due</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></div>}
             </div>
 
             {/* Stats row */}
@@ -301,16 +302,16 @@ export default function BusinessPortal() {
                 { label: 'Completed', value: completedCount },
                 { label: 'Total Reach', value: totalReach.toLocaleString() },
               ].map(s => (
-                <div key={s.label} className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">{s.label}</p>
-                  <p className="text-[24px] font-semibold text-[#1C1917]">{s.value}</p>
+                <div key={s.label} className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                  <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">{s.label}</p>
+                  <p className="text-[24px] font-semibold text-[var(--ink)]">{s.value}</p>
                 </div>
               ))}
             </div>
 
             {/* Campaign brief */}
-            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-              <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Campaign Brief</h2>
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <h2 className="nayba-h3 text-[var(--ink)] mb-4">Campaign Brief</h2>
               {campaign.perk_description && (
                 <div className="mb-4">
                   <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Perk</p>
@@ -336,7 +337,7 @@ export default function BusinessPortal() {
 
             <div className="mt-4">
               <a href="mailto:jacob@nayba.app"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
                 <Mail size={15} /> Contact nayba
               </a>
             </div>
@@ -391,30 +392,30 @@ export default function BusinessPortal() {
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[16px] font-semibold text-[var(--ink)]">Selection</h1>
+              <h1 className="nayba-h2 text-[var(--ink)]">Selection</h1>
               <span className="text-[14px] text-[var(--ink-35)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
             </div>
 
             {/* Filters + bulk actions */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
-                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink)]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink)]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                 <option value="all">All levels</option>
                 {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
               </select>
               <button onClick={toggleAll}
-                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '0.5px solid rgba(0,0,0,0.18)' }}>
+                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
                 {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
               </button>
               {selectedCreators.size > 0 && (
                 <>
                   <span className="text-[13px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
                   <button onClick={handleBulkSelect}
-                    className="min-h-[44px] px-3 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                    className="min-h-[44px] px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[13px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                     Select {selectedCreators.size}
                   </button>
                   <button onClick={handleBulkDecline}
-                    className="min-h-[44px] px-3 py-2 rounded-[6px] text-[13px] font-medium text-[rgba(0,0,0,0.5)] hover:text-[#1C1917] hover:bg-[rgba(0,0,0,0.04)]">
+                    className="min-h-[44px] px-3 py-2 rounded-[6px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.04)]">
                     Decline
                   </button>
                 </>
@@ -429,7 +430,7 @@ export default function BusinessPortal() {
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
                 return (
-                  <div key={a.id} className={`bg-white rounded-[10px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '0.5px solid #C4674A' : '0.5px solid rgba(0,0,0,0.08)' }}>
+                  <div key={a.id} className={`bg-white rounded-[12px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.08)' }}>
                     {/* Header: checkbox + avatar + name + status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -475,16 +476,16 @@ export default function BusinessPortal() {
                     )}
 
                     {/* Actions */}
-                    <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
+                    <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
                       <p className="text-[12px] text-[var(--ink-35)]">Applied {fmtDate(a.applied_at)}</p>
                       {a.status === 'interested' && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
-                            className="min-h-[44px] px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                            className="min-h-[44px] px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85]">
                             Select
                           </button>
                           <button onClick={() => handleDecline(a.id)}
-                            className="min-h-[44px] flex items-center text-[12px] font-medium text-[rgba(0,0,0,0.4)] hover:text-[#1C1917]">
+                            className="min-h-[44px] flex items-center text-[12px] font-medium text-[var(--ink-35)] hover:text-[var(--ink)]">
                             Decline
                           </button>
                         </div>
@@ -495,7 +496,7 @@ export default function BusinessPortal() {
               })}
               {filteredApps.length === 0 && (
                 <div className="col-span-3 py-12 text-center">
-                  <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
+                  <p className="nayba-h2 text-[var(--ink)] mb-1">No applicants yet</p>
                   <p className="text-[14px] text-[var(--ink-35)]">Creators will appear here once they express interest</p>
                 </div>
               )}
@@ -508,7 +509,7 @@ export default function BusinessPortal() {
         {activeTab === 'participation' && (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[16px] font-semibold text-[var(--ink)]">Creator Progress</h1>
+              <h1 className="nayba-h2 text-[var(--ink)]">Creator Progress</h1>
               <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -527,7 +528,7 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                  <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
                       <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
@@ -538,7 +539,7 @@ export default function BusinessPortal() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
-                            <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
+                            <p className="nayba-h2 text-[var(--ink)]">{name}</p>
                             <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
                               className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
                               @{handle} <ExternalLink size={11} />
@@ -548,7 +549,7 @@ export default function BusinessPortal() {
                         </div>
 
                         {/* Progress bar */}
-                        <div className="h-[4px] bg-[rgba(0,0,0,0.08)] rounded-full overflow-hidden mb-2.5 mt-2">
+                        <div className="h-[4px] bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden mb-2.5 mt-2">
                           <div className="h-full rounded-full transition-all duration-500"
                             style={{
                               width: `${progressPct}%`,
@@ -560,7 +561,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-4">
                           {steps.map((s, i) => (
                             <div key={i} className="flex items-center gap-1.5">
-                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { border: '1px solid rgba(42,32,24,0.08)' }}>
                                 {s.done && <Check size={10} className="text-white" />}
                               </div>
                               <span className={`text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
@@ -569,13 +570,13 @@ export default function BusinessPortal() {
                         </div>
 
                         {/* Actions + data */}
-                        <div className="flex items-center gap-4 mt-3 pt-3 flex-wrap" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
+                        <div className="flex items-center gap-4 mt-3 pt-3 flex-wrap" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
                           {!p.perk_sent && (
                             <button onClick={async () => {
                               await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
                               fetchCampaignData();
                               showToast('Perk marked as sent');
-                            }} className="min-h-[44px] px-3 py-1.5 rounded-[6px] bg-[#C4674A] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                            }} className="min-h-[36px] px-4 py-1.5 rounded-full bg-[var(--terra)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                               Mark perk sent
                             </button>
                           )}
@@ -597,7 +598,7 @@ export default function BusinessPortal() {
               })}
               {participations.length === 0 && (
                 <div className="py-12 text-center">
-                  <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No creators confirmed yet</p>
+                  <p className="nayba-h2 text-[var(--ink)] mb-1">No creators confirmed yet</p>
                   <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, their progress will appear here</p>
                 </div>
               )}
@@ -608,10 +609,10 @@ export default function BusinessPortal() {
         {/* Content Tab */}
         {activeTab === 'content' && (
           <div>
-            <h1 className="text-[16px] font-semibold text-[var(--ink)] mb-5">Content</h1>
+            <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
+                <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
@@ -622,13 +623,13 @@ export default function BusinessPortal() {
                     {p.likes != null && <p>Likes: {p.likes.toLocaleString()}</p>}
                     {p.reel_submitted_at && <p>Posted: {fmtDate(p.reel_submitted_at)}</p>}
                   </div>
-                  <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '0.5px solid rgba(0,0,0,0.06)' }}>
+                  <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
                     {p.status !== 'completed' && (
                       <button onClick={async () => {
                         await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                         fetchCampaignData();
                         showToast('Content approved');
-                      }} className="min-h-[44px] px-3 py-1.5 rounded-[6px] bg-[#0F6E56] text-white text-[12px] font-semibold hover:opacity-[0.85]">
+                      }} className="min-h-[36px] px-4 py-1.5 rounded-full bg-[var(--status-active-text)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                         Approve
                       </button>
                     )}
@@ -650,21 +651,21 @@ export default function BusinessPortal() {
         {/* Analytics Tab */}
         {activeTab === 'analytics' && (
           <div>
-            <h1 className="text-[16px] font-semibold text-[var(--ink)] mb-5">Analytics</h1>
+            <h1 className="nayba-h2 text-[var(--ink)] mb-5">Analytics</h1>
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Total Reach</p>
-                <p className="text-[24px] font-semibold text-[#1C1917]">{totalReach.toLocaleString()}</p>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Total Reach</p>
+                <p className="text-[24px] font-semibold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Content Pieces</p>
-                <p className="text-[24px] font-semibold text-[#1C1917]">{submittedCount}</p>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Content Pieces</p>
+                <p className="text-[24px] font-semibold text-[var(--ink)]">{submittedCount}</p>
               </div>
-              <div className="bg-white rounded-[10px] p-[16px]" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1">Avg Engagement</p>
-                <p className="text-[24px] font-semibold text-[#1C1917]">
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Avg Engagement</p>
+                <p className="text-[24px] font-semibold text-[var(--ink)]">
                   {participations.filter(p => p.reach && p.reach > 0).length > 0
                     ? (participations.reduce((s, p) => s + ((p.likes || 0) + (p.comments || 0)), 0) / Math.max(totalReach, 1) * 100).toFixed(1) + '%'
                     : '—'
@@ -675,8 +676,8 @@ export default function BusinessPortal() {
             </div>
 
             {/* Reach by creator */}
-            <div className="bg-white rounded-[10px] p-5" style={{ border: '0.5px solid rgba(0,0,0,0.08)' }}>
-              <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-4">Reach by Creator</p>
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
@@ -685,7 +686,7 @@ export default function BusinessPortal() {
                     {withReach.map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3">
                         <span className="text-[14px] text-[var(--ink)] w-32 truncate">{p.creators?.display_name || p.creators?.name}</span>
-                        <div className="flex-1 h-6 bg-[rgba(0,0,0,0.08)] rounded-[6px] overflow-hidden">
+                        <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[6px] overflow-hidden">
                           <div className="h-full rounded-[6px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
                             style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
                             <span className="text-[11px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
@@ -706,15 +707,16 @@ export default function BusinessPortal() {
       </div>
 
       {/* Mobile bottom nav */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white z-30" style={{ borderTop: '0.5px solid rgba(0,0,0,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
-        <div className="flex items-center justify-around py-2">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-30" style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        <div className="flex items-center justify-around py-2" style={{ height: 'var(--nav-height)' }}>
           {TABS.map(tab => {
             const active = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                className={`flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px] ${active ? 'text-[#C4674A]' : 'text-[rgba(0,0,0,0.35)]'}`}>
+                className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px]"
+                style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }}>
                 <tab.icon size={20} strokeWidth={active ? 2 : 1.5} />
-                <span className={`text-[10px] ${active ? 'font-semibold' : 'font-medium'}`}>{tab.label}</span>
+                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
               </button>
             );
           })}

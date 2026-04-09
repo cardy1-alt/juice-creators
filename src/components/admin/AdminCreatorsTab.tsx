@@ -14,10 +14,10 @@ interface Creator {
 
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
 
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]";
-const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]";
+const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function getAvatarColors(letter: string): { bg: string; text: string } {
   const ch = letter.toUpperCase();
@@ -94,11 +94,11 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(0,0,0,0.4)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
-        <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>Create Creator</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
+      <div className="relative bg-white rounded-[12px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+        <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
+          <h2 className="nayba-h2 text-[var(--ink)]">Create Creator</h2>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
           {createdPassword ? (
@@ -106,25 +106,25 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
               <div className="w-12 h-12 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center mx-auto mb-3">
                 <Check size={22} className="text-[#2D7A4F]" />
               </div>
-              <p className="text-[16px] font-semibold text-[#1C1917] mb-2">Account created</p>
-              <p className="text-[14px] text-[rgba(0,0,0,0.55)] mb-3">Share this temporary password with the creator:</p>
-              <div className="inline-flex items-center gap-2 bg-[#F7F6F3] border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[8px] px-4 py-2.5">
-                <code className="text-[15px] font-mono text-[#C4674A]">{showPassword ? createdPassword : '••••••••••••'}</code>
-                <button onClick={() => setShowPassword(!showPassword)} className="text-[rgba(0,0,0,0.35)]">
+              <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">Account created</p>
+              <p className="text-[14px] text-[var(--ink-60)] mb-3">Share this temporary password with the creator:</p>
+              <div className="inline-flex items-center gap-2 bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] rounded-[12px] px-4 py-2.5">
+                <code className="text-[15px] font-mono text-[var(--terra)]">{showPassword ? createdPassword : '••••••••••••'}</code>
+                <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <div className="mt-5">
-                <button onClick={onClose} className="px-5 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold">Done</button>
+                <button onClick={onClose} className="px-5 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold">Done</button>
               </div>
             </div>
           ) : (
             <>
-              <p className="text-[12px] text-[rgba(0,0,0,0.55)] mb-5 leading-[1.6]">
+              <p className="text-[12px] text-[var(--ink-60)] mb-5 leading-[1.6]">
                 A Supabase auth account will be created automatically. Share the temporary password with the creator directly.
               </p>
               {error && (
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
                   <AlertCircle size={14} />
                   <span className="text-[13px] font-medium">{error}</span>
                 </div>
@@ -146,11 +146,11 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
           )}
         </div>
         {!createdPassword && (
-          <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
-            <button onClick={onClose} className="text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917]">Cancel</button>
+          <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
+            <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
             <button onClick={handleCreate as any} disabled={creating}
-              className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40"
-             >
+              className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-40"
+              style={{ fontWeight: 700 }}>
               {creating ? 'Creating...' : 'Create Account'}
             </button>
           </div>
@@ -166,23 +166,23 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
   const handle = creator.instagram_handle?.replace('@', '') || '';
-  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
+  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
 
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(42,32,24,0.06)' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
               <span className="text-[15px] font-semibold" style={{ color: colors.text }}>{initial}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[16px] font-semibold text-[#1C1917] truncate">{creator.display_name || creator.name}</p>
-              {handle && <p className="text-[13px] text-[rgba(0,0,0,0.45)]">@{handle}</p>}
+              <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{creator.display_name || creator.name}</p>
+              {handle && <p className="text-[13px] text-[var(--ink-35)]">@{handle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[rgba(0,0,0,0.35)] hover:bg-[rgba(0,0,0,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -191,7 +191,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
             <div>
               <p className={peekLabel}>Level</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                 L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
               </span>
             </div>
@@ -203,56 +203,56 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
             </div>
             <div>
               <p className={peekLabel}>County</p>
-              <p className="text-[14px] text-[#1C1917]">{creator.address || '—'}</p>
+              <p className="text-[14px] text-[var(--ink)]">{creator.address || '—'}</p>
             </div>
             <div>
               <p className={peekLabel}>Joined</p>
-              <p className="text-[14px] text-[#1C1917]">{fmtDate(creator.created_at)}</p>
+              <p className="text-[14px] text-[var(--ink)]">{fmtDate(creator.created_at)}</p>
             </div>
           </div>
 
           <div className="mb-4">
             <p className={peekLabel}>Email</p>
-            <p className="text-[14px] text-[#1C1917]">{creator.email}</p>
+            <p className="text-[14px] text-[var(--ink)]">{creator.email}</p>
           </div>
 
           {handle && (
             <div className="mb-4">
               <p className={peekLabel}>Instagram</p>
               <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[14px] text-[#C4674A] font-medium hover:underline">
+                className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
                 @{handle} <ExternalLink size={12} />
               </a>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[13px] text-[rgba(0,0,0,0.45)]">
+                <span className="text-[13px] text-[var(--ink-35)]">
                   {creator.instagram_connected ? 'Connected' : 'Not connected'}
                 </span>
                 {creator.follower_count && (
-                  <span className="text-[13px] text-[rgba(0,0,0,0.45)]">· {creator.follower_count} followers</span>
+                  <span className="text-[13px] text-[var(--ink-35)]">· {creator.follower_count} followers</span>
                 )}
               </div>
             </div>
           )}
 
-          <div className="border-t border-[rgba(0,0,0,0.08)] pt-4 mb-4">
+          <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-4">
             <p className={`${peekLabel} mb-3`}>Performance</p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#F7F6F3] rounded-[8px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[#1C1917]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
-                <p className="text-[11px] text-[rgba(0,0,0,0.45)] font-medium">Campaigns</p>
+              <div className="bg-[var(--chalk)] rounded-[12px] px-3 py-2.5">
+                <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
+                <p className="text-[11px] text-[var(--ink-35)] font-medium">Campaigns</p>
               </div>
-              <div className="bg-[#F7F6F3] rounded-[8px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[#1C1917]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
-                <p className="text-[11px] text-[rgba(0,0,0,0.45)] font-medium">Completion</p>
+              <div className="bg-[var(--chalk)] rounded-[12px] px-3 py-2.5">
+                <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
+                <p className="text-[11px] text-[var(--ink-35)] font-medium">Completion</p>
               </div>
             </div>
           </div>
         </div>
 
         {/* View as */}
-        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+        <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <button onClick={() => { onViewAs(creator); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3] transition-colors">
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--chalk)] transition-colors">
             <Eye size={14} /> View as Creator
           </button>
         </div>
@@ -326,33 +326,33 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium">
+        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[12px] text-[14px] font-medium">
           {toast}
         </div>
       )}
 
       {pendingCreators.length > 0 && !showApprovalPane && (
         <button onClick={() => setShowApprovalPane(true)}
-          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[10px] transition-colors text-left" style={{ background: 'rgba(0,0,0,0.04)', border: '0.5px solid rgba(0,0,0,0.08)' }}>
-          <AlertCircle size={18} className="text-[#C4674A] flex-shrink-0" />
+          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
+          <AlertCircle size={18} className="text-[var(--terra)] flex-shrink-0" />
           <div className="flex-1">
-            <p className="text-[14px] font-semibold text-[#C4674A]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
-            <p className="text-[13px] text-[rgba(0,0,0,0.55)]">Click to review and approve or deny</p>
+            <p className="text-[14px] font-semibold text-[var(--terra)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
+            <p className="text-[13px] text-[var(--ink-60)]">Click to review and approve or deny</p>
           </div>
-          <ChevronRight size={16} className="text-[#C4674A] flex-shrink-0" />
+          <ChevronRight size={16} className="text-[var(--terra)] flex-shrink-0" />
         </button>
       )}
 
       {showApprovalPane && pendingCreators.length > 0 && (
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] mb-5 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] bg-[#F7F6F3]">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] mb-5 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(42,32,24,0.08)] bg-[var(--chalk)]">
             <div className="flex items-center gap-3">
-              <h3 className="text-[14px] font-semibold text-[#1C1917]">Pending Approvals</h3>
-              <span className="text-[12px] text-[rgba(0,0,0,0.45)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''}</span>
+              <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending Approvals</h3>
+              <span className="text-[12px] text-[var(--ink-35)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''}</span>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={selectAllPending}
-                className="px-3 py-1.5 rounded-[8px] text-[12px] font-semibold text-[rgba(0,0,0,0.55)] hover:bg-[rgba(0,0,0,0.06)]">
+                className="px-3 py-1.5 rounded-[12px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
                 {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
               </button>
               {selectedPending.size > 0 && (
@@ -368,19 +368,19 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 </>
               )}
               <button onClick={() => { setShowApprovalPane(false); setSelectedPending(new Set()); }}
-                className="ml-2 w-7 h-7 rounded-full bg-[rgba(0,0,0,0.06)] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[rgba(0,0,0,0.1)]">
+                className="ml-2 w-7 h-7 rounded-full bg-[rgba(42,32,24,0.06)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.10)]">
                 <X size={14} />
               </button>
             </div>
           </div>
-          <div className="max-h-[400px] overflow-y-auto divide-y divide-[rgba(0,0,0,0.08)]">
+          <div className="max-h-[400px] overflow-y-auto divide-y divide-[rgba(42,32,24,0.08)]">
             {pendingCreators.map(c => {
               const handle = c.instagram_handle?.replace('@', '') || '';
               const selected = selectedPending.has(c.id);
               return (
-                <div key={c.id} className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`}>
+                <div key={c.id} className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`}>
                   <button onClick={() => toggleSelectPending(c.id)}
-                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[#C4674A] border-[#C4674A]' : 'border-[rgba(0,0,0,0.20)] hover:border-[#C4674A]'}`}>
+                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.15)] hover:border-[var(--terra)]'}`}>
                     {selected && <Check size={12} className="text-white" />}
                   </button>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
@@ -390,18 +390,18 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                   ); })()}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-[#1C1917]">{c.display_name || c.name}</p>
-                      <span className="text-[12px] text-[rgba(0,0,0,0.35)]">{c.email}</span>
+                      <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
+                      <span className="text-[12px] text-[var(--ink-35)]">{c.email}</span>
                     </div>
                     <div className="flex items-center gap-3 mt-0.5">
                       {handle && (
                         <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[13px] text-[#C4674A] font-medium hover:underline">
+                          className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
                           @{handle} <ExternalLink size={11} />
                         </a>
                       )}
-                      {c.address && <span className="text-[12px] text-[rgba(0,0,0,0.45)]">{c.address}</span>}
-                      <span className="text-[12px] text-[rgba(0,0,0,0.35)]">Joined {fmtDate(c.created_at)}</span>
+                      {c.address && <span className="text-[12px] text-[var(--ink-35)]">{c.address}</span>}
+                      <span className="text-[12px] text-[var(--ink-35)]">Joined {fmtDate(c.created_at)}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2 flex-shrink-0">
@@ -423,14 +423,14 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
       {/* Search bar */}
       <div className="relative mb-4">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[rgba(0,0,0,0.35)]" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search creators by name, email, Instagram, or county..."
-          className="w-full pl-9 pr-4 py-2.5 rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[14px] text-[#1C1917] focus:outline-none focus:border-[#C4674A]" />
+          className="w-full pl-9 pr-4 py-2.5 rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
       </div>
 
       {/* Creators table */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>
@@ -440,7 +440,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           <tbody>
             {filteredCreators.map(c => (
               <tr key={c.id} onClick={() => setPeekCreator(peekCreator?.id === c.id ? null : c)}
-                className={`cursor-pointer transition-colors ${peekCreator?.id === c.id ? 'bg-[rgba(0,0,0,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`} style={{ height: 44 }}>
+                className={`cursor-pointer transition-colors ${peekCreator?.id === c.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
                   <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
@@ -451,30 +451,30 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                   </div>
                   ); })()}
                 </td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{c.instagram_handle}</td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{c.address || '—'}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.instagram_handle}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.address || '—'}</td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                     L{c.level}
                   </span>
                 </td>
                 <td className={tdCls}>
                   {c.total_campaigns > 0 ? (
                     <div className="flex items-center gap-2">
-                      <div className="w-16 h-1.5 bg-[rgba(0,0,0,0.06)] rounded-full overflow-hidden" style={{ maxWidth: 80 }}>
-                        <div className="h-full bg-[#C4674A] rounded-full" style={{ width: `${c.completion_rate}%` }} />
+                      <div className="w-16 h-1.5 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden" style={{ maxWidth: 80 }}>
+                        <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${c.completion_rate}%` }} />
                       </div>
-                      <span className="text-[13px] text-[rgba(0,0,0,0.55)]">{c.completion_rate}%</span>
+                      <span className="text-[13px] text-[var(--ink-60)]">{c.completion_rate}%</span>
                     </div>
                   ) : (
-                    <span className="text-[13px] text-[rgba(0,0,0,0.35)]">—</span>
+                    <span className="text-[13px] text-[var(--ink-35)]">—</span>
                   )}
                 </td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
                 <td className={tdCls}>
                   {c.instagram_connected
                     ? <span className="text-[12px] text-[#2D7A4F] font-medium">Connected</span>
-                    : <span className="text-[12px] text-[rgba(0,0,0,0.25)]">—</span>
+                    : <span className="text-[12px] text-[rgba(42,32,24,0.20)]">—</span>
                   }
                 </td>
                 <td className={tdCls}>
@@ -482,11 +482,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                     Approved
                   </span>
                 </td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.35)]`}>{fmtDate(c.created_at)}</td>
+                <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(c.created_at)}</td>
               </tr>
             ))}
             {filteredCreators.length === 0 && (
-              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[rgba(0,0,0,0.35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
+              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
             )}
           </tbody>
         </table>

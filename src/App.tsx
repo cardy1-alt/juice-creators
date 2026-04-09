@@ -282,7 +282,7 @@ function ViewAsBanner() {
   if (!viewAsRole) return null;
   const name = viewAsProfile?.display_name || viewAsProfile?.name || viewAsProfile?.email || '—';
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[#1C1917] text-white px-4 py-2 flex items-center justify-between text-[13px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
+    <div className="fixed top-0 left-0 right-0 z-[9999] bg-[var(--ink)] text-white px-4 py-2 flex items-center justify-between text-[13px]" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
       <div className="flex items-center gap-2">
         <Eye size={14} className="opacity-60" />
         <span className="font-medium">Viewing as {viewAsRole === 'creator' ? 'creator' : 'brand'}:</span>
@@ -373,7 +373,7 @@ function App() {
 
   const suspenseFallback = (
     <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--shell)' }}>
-      <span style={{ fontFamily: "'Instrument Serif', serif", fontWeight: 400, color: '#1C1917', fontSize: 22 }}>nayba</span>
+      <span style={{ fontFamily: "'Instrument Serif', serif", fontWeight: 400, color: 'var(--ink)', fontSize: 22 }}>nayba</span>
     </div>
   );
 
@@ -435,7 +435,7 @@ function CookieConsent() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -1px 3px rgba(0,0,0,0.06)' }}>
+    <div className="fixed bottom-0 left-0 right-0 z-[9999]" style={{ boxShadow: '0 -1px 3px rgba(42,32,24,0.06)' }}>
       <div className="bg-white px-[16px] py-[16px] flex items-center justify-between gap-[16px] max-w-[600px] mx-auto" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
         <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] m-0" style={{ fontWeight: 400 }}>
           We use cookies to keep you signed in and improve your experience.
