@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail } from '../lib/notifications';
-import { ArrowLeft, Check, X, AtSign, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
 function CampaignFallbackImage({ category, name }: { category?: string | null; name?: string | null }) {
@@ -185,84 +185,117 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     </>
   );
 
+  const catPalette = getCategoryPalette(campaign.businesses?.category);
+  const deliverablesList = [campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean);
+
   return (
     <div className="bg-white">
       <div className="max-w-[720px] mx-auto">
-        {/* Cover image with close button overlaid */}
-        <div className="w-full relative" style={{ height: 200 }}>
+        {/* Hero image */}
+        <div className="w-full relative" style={{ height: 280 }}>
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
-            <CampaignFallbackImage category={campaign.businesses?.category} name={campaign.businesses?.name} />
+            <CampaignFallbackImage category={campaign.businesses?.category} />
           )}
           {onBack && (
-            <button onClick={onBack} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors">
-              <X size={16} />
+            <button onClick={onBack} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors">
+              <X size={18} />
             </button>
           )}
         </div>
 
-        {/* Content */}
         <div className="px-6 pt-5 pb-24 md:pb-8">
-          {/* Header */}
-          <button onClick={() => setShowBrandInfo(true)}
-            className="text-[13px] font-medium text-[var(--ink-35)] mb-1 hover:text-[var(--terra)] hover:underline transition-colors">
-            {campaign.businesses?.name}
-          </button>
-          <h1 className="text-[24px] font-semibold text-[var(--ink)] mb-2" style={{ lineHeight: 1.2, letterSpacing: '-0.3px' }}>
+          {/* Brand row */}
+          <div className="flex items-center gap-3 mb-4">
+            {campaign.businesses?.logo_url ? (
+              <img src={campaign.businesses.logo_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+            ) : (
+              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                <CategoryIcon category={campaign.businesses?.category} className="w-5 h-5" style={{ color: catPalette.color, opacity: 0.6 }} />
+              </div>
+            )}
+            <div className="flex-1 min-w-0">
+              <button onClick={() => setShowBrandInfo(true)} className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
+                {campaign.businesses?.name}
+              </button>
+              <div className="flex items-center gap-2">
+                {campaign.businesses?.category && (
+                  <span className="text-[11px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
+                )}
+                {campaign.businesses?.instagram_handle && (
+                  <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                    className="text-[11px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
+                    <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
+                  </a>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Title */}
+          <h1 className="nayba-h2 text-[var(--ink)] mb-4" style={{ fontSize: 22 }}>
             {campaign.headline || campaign.title}
           </h1>
 
-          {/* Properties — Notion-style label:value */}
-          <div className="space-y-1.5 text-[13px] mb-6">
+          {/* Quick info cards row */}
+          <div className="flex flex-wrap gap-3 mb-6">
             {campaign.perk_description && (
-              <div className="flex gap-3">
-                <span className="text-[var(--ink-35)] w-[80px] flex-shrink-0">Perk</span>
-                <span className="text-[var(--terra)] font-medium">
-                  {campaign.perk_description?.split('—')[0]?.trim()}{campaign.perk_value ? ` · £${campaign.perk_value}` : ''}
-                </span>
+              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] bg-[var(--terra-light)]">
+                <Gift size={15} className="text-[var(--terra)] flex-shrink-0" />
+                <div>
+                  <p className="text-[13px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
+                  {campaign.perk_value && <p className="text-[11px] text-[var(--terra)]" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
+                </div>
               </div>
             )}
             {campaign.expression_deadline && (
-              <div className="flex gap-3">
-                <span className="text-[var(--ink-35)] w-[80px] flex-shrink-0">Apply by</span>
-                <span className="text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span>
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.03)' }}>
+                <Clock size={14} className="text-[var(--ink-35)]" />
+                <div>
+                  <p className="text-[12px] text-[var(--ink-35)]">Apply by</p>
+                  <p className="text-[13px] font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</p>
+                </div>
               </div>
             )}
             {campaign.content_deadline && (
-              <div className="flex gap-3">
-                <span className="text-[var(--ink-35)] w-[80px] flex-shrink-0">Content due</span>
-                <span className="text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span>
-              </div>
-            )}
-            {campaign.perk_type && (
-              <div className="flex gap-3">
-                <span className="text-[var(--ink-35)] w-[80px] flex-shrink-0">Type</span>
-                <span className="text-[var(--ink)] capitalize">{campaign.perk_type.replace('_', ' ')}</span>
+              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.03)' }}>
+                <Film size={14} className="text-[var(--ink-35)]" />
+                <div>
+                  <p className="text-[12px] text-[var(--ink-35)]">Content due</p>
+                  <p className="text-[13px] font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</p>
+                </div>
               </div>
             )}
           </div>
 
           {/* About the brand */}
           {campaign.about_brand && (
-            <div className={sectionGap}>
+            <div className="mb-6">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">About</p>
               <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
             </div>
           )}
 
           {/* What to post */}
           {campaign.content_requirements && (
-            <div className={sectionGap}>
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">What to post · {[campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean).join(' + ') || 'Reel'}</p>
-              <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.content_requirements}</p>
+            <div className="mb-6 p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.02)', border: '1px solid rgba(42,32,24,0.06)' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <Film size={14} className="text-[var(--ink-35)]" />
+                <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">What to post</p>
+                {deliverablesList.length > 0 && (
+                  <span className="text-[11px] px-2 py-0.5 rounded-[999px] bg-white text-[var(--ink-35)]" style={{ fontWeight: 500 }}>{deliverablesList.join(' + ')}</span>
+                )}
+              </div>
+              <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
             </div>
           )}
 
           {/* Required tags */}
           {campaign.required_tags && campaign.required_tags.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-1.5">
+            <div className="flex flex-wrap gap-1.5 mb-6">
               {campaign.required_tags.map((tag, i) => (
-                <span key={i} className="px-2 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.04)] text-[13px] text-[var(--ink-60)]">
+                <span key={i} className="px-2.5 py-1 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-[13px] text-[var(--ink-60)]" style={{ fontWeight: 500 }}>
                   {tag}
                 </span>
               ))}
@@ -271,11 +304,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
           {/* Talking points */}
           {campaign.talking_points && campaign.talking_points.length > 0 && (
-            <div className={sectionGap}>
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">Key messages</p>
-              <ol className="space-y-1 list-decimal list-inside">
+            <div className="mb-6">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">Key messages</p>
+              <ol className="space-y-2">
                 {campaign.talking_points.map((tp, i) => (
-                  <li key={i} className="text-[15px] text-[var(--ink)] leading-[1.65]">{tp}</li>
+                  <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.6]">
+                    <span className="text-[12px] font-semibold text-[var(--ink-35)] mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[rgba(42,32,24,0.04)] flex items-center justify-center">{i + 1}</span>
+                    {tp}
+                  </li>
                 ))}
               </ol>
             </div>
@@ -283,13 +319,13 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
           {/* Inspiration */}
           {campaign.inspiration && campaign.inspiration.length > 0 && (
-            <div className={sectionGap}>
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">Inspiration</p>
+            <div className="mb-6">
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">Inspiration</p>
               <div className="space-y-2">
                 {campaign.inspiration.map((item: any, i: number) => (
                   <div key={i}>
                     <p className="text-[14px] font-medium text-[var(--ink)]">{item.title}</p>
-                    <p className="text-[14px] text-[var(--ink-35)] leading-[1.6]">{item.description}</p>
+                    <p className="text-[13px] text-[var(--ink-35)] leading-[1.6]">{item.description}</p>
                   </div>
                 ))}
               </div>
@@ -297,7 +333,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           )}
 
           {/* CTA — inline on desktop */}
-          <div className="hidden md:block mt-8 pt-6 border-t border-[rgba(42,32,24,0.06)]">
+          <div className="hidden md:block mt-6 pt-6 border-t border-[rgba(42,32,24,0.06)]">
             {ctaContent}
           </div>
         </div>
