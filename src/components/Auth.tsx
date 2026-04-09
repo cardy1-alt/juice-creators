@@ -255,7 +255,7 @@ export default function Auth() {
                       />
                       {resetError && (
                         <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                          <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                          <span className="flex-shrink-0 w-[6px] h-[6px] rounded-[10px] bg-[var(--terra)]" />
                           {resetError}
                         </div>
                       )}
@@ -263,7 +263,7 @@ export default function Auth() {
                         type="submit"
                         disabled={resetLoading}
                         className="w-full h-[48px] text-white transition-all disabled:opacity-50 active:scale-[0.98]"
-                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '14px', background: 'var(--terra)', borderRadius: '999px', padding: '8px 16px' }}
+                        style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '14px', background: 'var(--terra)', borderRadius: '10px', padding: '8px 16px' }}
                       >
                         {resetLoading ? 'Sending...' : 'Send Reset Link'}
                       </button>
@@ -299,7 +299,7 @@ export default function Auth() {
 
                   {error && (
                     <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                      <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
+                      <span className="flex-shrink-0 w-[6px] h-[6px] rounded-[10px] bg-[var(--terra)]" />
                       {error}
                     </div>
                   )}
@@ -379,7 +379,7 @@ export default function Auth() {
                 if (selectedRole === 'creator') { setRole('creator'); setMode('signup'); setSignupStep(1); }
                 else { setMode('brand-contact'); }
               }}
-                className="mt-8 px-10 h-[48px] rounded-full text-white transition-opacity hover:opacity-90"
+                className="mt-8 px-10 h-[48px] rounded-[10px] text-white transition-opacity hover:opacity-90"
                 style={{ background: 'var(--terra)', fontWeight: 700, fontSize: '14px' }}>
                 Continue
               </button>
@@ -401,7 +401,7 @@ export default function Auth() {
               Get in touch at hello@nayba.app to get your brand set up. We'll have you live within 24 hours.
             </p>
             <a href="mailto:hello@nayba.app"
-              className="inline-flex items-center gap-2 px-8 h-[48px] rounded-full text-white hover:opacity-90 transition-opacity"
+              className="inline-flex items-center gap-2 px-8 h-[48px] rounded-[10px] text-white hover:opacity-90 transition-opacity"
               style={{ textDecoration: 'none', background: 'var(--terra)', fontWeight: 700, fontSize: '14px', lineHeight: '48px' }}>
               <Mail size={16} /> Email hello@nayba.app
             </a>
@@ -635,7 +635,7 @@ export default function Auth() {
 
             <button
               onClick={() => setShowTerms(false)}
-              className="w-full mt-6 h-[48px] rounded-full text-white text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors" style={{ fontWeight: 700 }}
+              className="w-full mt-6 h-[48px] rounded-[10px] text-white text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors" style={{ fontWeight: 700 }}
             >
               Close
             </button>
@@ -711,7 +711,7 @@ export default function Auth() {
 
             <button
               onClick={() => setShowPrivacy(false)}
-              className="w-full mt-6 h-[48px] rounded-full text-white text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors" style={{ fontWeight: 700 }}
+              className="w-full mt-6 h-[48px] rounded-[10px] text-white text-[14px] bg-[var(--terra)] hover:bg-[var(--terra-hover)] transition-colors" style={{ fontWeight: 700 }}
             >
               Close
             </button>

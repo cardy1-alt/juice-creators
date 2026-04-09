@@ -64,7 +64,7 @@ function ProgressMetric({ label, value }: { label: string; value: number }) {
         <span className="text-[13px] font-semibold text-[var(--ink)]">{value}%</span>
       </div>
       <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
-        <div className="h-full rounded-full bg-[var(--terra)] transition-all duration-700" style={{ width: `${value}%` }} />
+        <div className="h-full rounded-[10px] bg-[var(--terra)] transition-all duration-700" style={{ width: `${value}%` }} />
       </div>
     </div>
   );

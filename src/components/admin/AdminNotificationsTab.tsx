@@ -109,7 +109,7 @@ export default function AdminNotificationsTab() {
             {selectedCampaignId && (
               <button onClick={handleSend} disabled={sending}
                 disabled={sending || recipientCount === 0}
-                className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-50"
                 style={{ fontWeight: 700 }}>
                 <Send size={14} /> {sending ? 'Sending...' : `Send to ${recipientCount} creators`}
               </button>
@@ -134,7 +134,7 @@ export default function AdminNotificationsTab() {
                 {selectedCampaign.perk_description && <p className="text-[var(--ink-60)]">{selectedCampaign.perk_description.slice(0, 80)}{selectedCampaign.perk_value ? ` — worth £${selectedCampaign.perk_value}` : ''}</p>}
                 {selectedCampaign.expression_deadline && <p className="text-[var(--ink-60)]">Apply by {fmtShort(selectedCampaign.expression_deadline)}</p>}
                 <div className="pt-3">
-                  <span className="inline-block px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+                  <span className="inline-block px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
                     See the campaign →
                   </span>
                 </div>

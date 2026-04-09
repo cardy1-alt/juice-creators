@@ -173,7 +173,7 @@ export default function AdminDashboard() {
           {cta.show && (
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-1.5 rounded-full text-white text-[14px] transition-opacity mr-6"
+              className="flex items-center gap-1.5 rounded-[10px] text-white text-[14px] transition-opacity mr-6"
               style={{ padding: '8px 20px', background: 'var(--terra)', fontWeight: 700 }}
               onMouseEnter={e => (e.currentTarget.style.opacity = '0.90')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}

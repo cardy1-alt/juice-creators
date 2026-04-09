@@ -99,8 +99,7 @@
 
   /* ── Radii ── */
   --r-card: 12px;
-  --r-button: 8px;
-  --r-button-pill: 999px;
+  --r-button: 10px;
   --r-pill: 999px;
   --r-input: 10px;
   --r-avatar: 50%;

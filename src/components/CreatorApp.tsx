@@ -286,7 +286,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
-          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>
@@ -481,7 +481,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 </div>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
-                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
                     <Film size={12} /> Share Reel
                   </button>
                 )}
@@ -553,7 +553,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
-              className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+              className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
               {submittingReel ? 'Sharing...' : 'Share Reel'}
             </button>
           </div>
@@ -620,7 +620,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
               ))}
             </div>
             <div className="relative z-10">
-              <div className="celebrate-bounce w-24 h-24 rounded-full bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-5">
+              <div className="celebrate-bounce w-24 h-24 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-5">
                 <Star size={40} className="text-white" />
               </div>
               <p className="nayba-h2 text-[var(--ink)] mb-2">You're in!</p>
@@ -642,7 +642,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
-        <div className="w-20 h-20 rounded-full bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
+        <div className="w-20 h-20 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
         <p className="nayba-h2 text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
@@ -940,7 +940,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           </div>
         </div>
         <button onClick={handleSaveProfile} disabled={saving}
-          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <Save size={15} /> {saving ? 'Saving...' : 'Save changes'}
         </button>
       </div>
@@ -979,7 +979,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
                 className="px-4 py-2 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={handleChangePassword} disabled={passwordSaving}
-                className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                className="px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                 {passwordSaving ? 'Updating...' : 'Update password'}
               </button>
             </div>
@@ -1051,7 +1051,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
               <button onClick={() => setShowSignOutConfirm(false)}
                 className="flex-1 py-2.5 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={onSignOut}
-                className="flex-1 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
+                className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
             </div>
           </div>
         </div>
@@ -1089,7 +1089,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
           ))}
         </div>
         <button onClick={onDismiss}
-          className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           Start exploring
         </button>
       </div>
@@ -1172,7 +1172,7 @@ export default function CreatorApp() {
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Something went wrong</p>
         <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
         <button onClick={() => { setProfileError(false); setLoading(true); fetchProfile(); }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <RefreshCw size={14} /> Retry
         </button>
         <button onClick={signOut} className="mt-4 text-[14px] text-[var(--ink-35)]">Sign out</button>

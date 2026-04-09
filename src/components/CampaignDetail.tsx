@@ -141,7 +141,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Campaign not available</p>
         <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
-        {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-full bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
+        {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
       </div>
     );
   }
@@ -153,7 +153,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       {!application && (
         <div>
           <button onClick={() => setShowPitchModal(true)}
-            className="w-full min-h-[44px] py-3 rounded-full bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
+            className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
           </button>
           <p className="text-[12px] text-[var(--ink-35)] text-center mt-2">This won't commit you — the brand will review and select</p>
@@ -167,7 +167,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       )}
       {application?.status === 'selected' && (
         <button onClick={handleConfirm} disabled={submitting}
-          className="w-full min-h-[44px] py-3 rounded-full bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
+          className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
           {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
         </button>
       )}
@@ -396,7 +396,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               <button
                 onClick={() => handleApply(pitch)}
                 disabled={submitting}
-                className="flex-1 min-h-[44px] py-2.5 rounded-full bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 disabled:opacity-50"
+                className="flex-1 min-h-[44px] py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 disabled:opacity-50"
               >
                 {submitting ? 'Submitting...' : 'Submit'}
               </button>

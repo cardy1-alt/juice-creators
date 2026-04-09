@@ -162,7 +162,7 @@ export default function BusinessPortal() {
         <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             <Mail size={16} /> Contact nayba
           </a>
         </div>
@@ -199,7 +199,7 @@ export default function BusinessPortal() {
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
             <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get started with your first campaign.</p>
-            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
               <Mail size={16} /> Contact nayba
             </a>
           </div>
@@ -411,7 +411,7 @@ export default function BusinessPortal() {
                 <>
                   <span className="text-[13px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
                   <button onClick={handleBulkSelect}
-                    className="min-h-[44px] px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[13px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                    className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[13px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                     Select {selectedCreators.size}
                   </button>
                   <button onClick={handleBulkDecline}
@@ -436,7 +436,7 @@ export default function BusinessPortal() {
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
                           className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
-                        <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                           <span className="text-[15px] font-semibold text-white">{initial}</span>
                         </div>
                         <div>
@@ -531,7 +531,7 @@ export default function BusinessPortal() {
                   <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
-                      <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                      <div className="w-11 h-11 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                         <span className="text-[16px] font-semibold text-white">{initial}</span>
                       </div>
 
@@ -576,7 +576,7 @@ export default function BusinessPortal() {
                               await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
                               fetchCampaignData();
                               showToast('Perk marked as sent');
-                            }} className="min-h-[36px] px-4 py-1.5 rounded-full bg-[var(--terra)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                            }} className="min-h-[36px] px-4 py-1.5 rounded-[10px] bg-[var(--terra)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                               Mark perk sent
                             </button>
                           )}
@@ -629,7 +629,7 @@ export default function BusinessPortal() {
                         await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                         fetchCampaignData();
                         showToast('Content approved');
-                      }} className="min-h-[36px] px-4 py-1.5 rounded-full bg-[var(--status-active-text)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                      }} className="min-h-[36px] px-4 py-1.5 rounded-[10px] bg-[var(--status-active-text)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                         Approve
                       </button>
                     )}
