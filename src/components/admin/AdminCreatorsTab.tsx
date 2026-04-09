@@ -14,9 +14,9 @@ interface Creator {
 
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
 
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function getAvatarColors(letter: string): { bg: string; text: string } {
@@ -95,10 +95,10 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="nayba-h2 text-[var(--ink)]">Create Creator</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
           {createdPassword ? (
@@ -108,14 +108,14 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
               </div>
               <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">Account created</p>
               <p className="text-[14px] text-[var(--ink-60)] mb-3">Share this temporary password with the creator:</p>
-              <div className="inline-flex items-center gap-2 bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] rounded-[12px] px-4 py-2.5">
+              <div className="inline-flex items-center gap-2 bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] px-4 py-2.5">
                 <code className="text-[15px] font-mono text-[var(--terra)]">{showPassword ? createdPassword : '••••••••••••'}</code>
                 <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
               <div className="mt-5">
-                <button onClick={onClose} className="px-5 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold">Done</button>
+                <button onClick={onClose} className="px-5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold">Done</button>
               </div>
             </div>
           ) : (
@@ -124,7 +124,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 A Supabase auth account will be created automatically. Share the temporary password with the creator directly.
               </p>
               {error && (
-                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+                <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
                   <AlertCircle size={14} />
                   <span className="text-[13px] font-medium">{error}</span>
                 </div>
@@ -171,7 +171,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(42,32,24,0.06)' }}>
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
@@ -182,7 +182,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
               {handle && <p className="text-[13px] text-[var(--ink-35)]">@{handle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -191,7 +191,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
             <div>
               <p className={peekLabel}>Level</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                 L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
               </span>
             </div>
@@ -237,11 +237,11 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
           <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-4">
             <p className={`${peekLabel} mb-3`}>Performance</p>
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[var(--chalk)] rounded-[12px] px-3 py-2.5">
+              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
                 <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
                 <p className="text-[11px] text-[var(--ink-35)] font-medium">Campaigns</p>
               </div>
-              <div className="bg-[var(--chalk)] rounded-[12px] px-3 py-2.5">
+              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
                 <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
                 <p className="text-[11px] text-[var(--ink-35)] font-medium">Completion</p>
               </div>
@@ -252,7 +252,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
         {/* View as */}
         <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <button onClick={() => { onViewAs(creator); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--chalk)] transition-colors">
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
             <Eye size={14} /> View as Creator
           </button>
         </div>
@@ -326,14 +326,14 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[12px] text-[14px] font-medium">
+        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[10px] text-[14px] font-medium">
           {toast}
         </div>
       )}
 
       {pendingCreators.length > 0 && !showApprovalPane && (
         <button onClick={() => setShowApprovalPane(true)}
-          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
+          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[10px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
           <AlertCircle size={18} className="text-[var(--terra)] flex-shrink-0" />
           <div className="flex-1">
             <p className="text-[14px] font-semibold text-[var(--terra)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
@@ -344,25 +344,25 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       )}
 
       {showApprovalPane && pendingCreators.length > 0 && (
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] mb-5 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(42,32,24,0.08)] bg-[var(--chalk)]">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] mb-5 overflow-hidden">
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)]">
             <div className="flex items-center gap-3">
               <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending Approvals</h3>
               <span className="text-[12px] text-[var(--ink-35)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''}</span>
             </div>
             <div className="flex items-center gap-2">
               <button onClick={selectAllPending}
-                className="px-3 py-1.5 rounded-[12px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
+                className="px-3 py-1.5 rounded-[10px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
                 {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
               </button>
               {selectedPending.size > 0 && (
                 <>
                   <button onClick={() => bulkApprove(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
                     <CheckCircle2 size={13} /> Approve {selectedPending.size}
                   </button>
                   <button onClick={() => bulkApprove(false)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
                     <XCircle size={13} /> Deny {selectedPending.size}
                   </button>
                 </>
@@ -426,11 +426,11 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search creators by name, email, Instagram, or county..."
-          className="w-full pl-9 pr-4 py-2.5 rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+          className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
       </div>
 
       {/* Creators table */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>
@@ -454,7 +454,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.instagram_handle}</td>
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.address || '—'}</td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                     L{c.level}
                   </span>
                 </td>

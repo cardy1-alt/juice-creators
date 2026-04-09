@@ -30,19 +30,19 @@ interface Participation {
 interface Creator { id: string; name: string; display_name: string | null; instagram_handle: string; level: number; completion_rate: number; }
 
 // ─── Shared styling (using CSS variables from theme.css) ───
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
 const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)]";
-const modalClose = "w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3] transition-colors";
+const modalClose = "w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3] transition-colors";
 const modalHeader = "flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
 const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0";
 const ghostBtn = "text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors";
 const primaryBtn = "px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
-const secondaryBtn = "px-5 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--chalk)]";
+const secondaryBtn = "px-5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[rgba(42,32,24,0.02)]";
 // shadows removed — border alone;
 
 function StatusBadge({ status }: { status: string }) {
@@ -187,7 +187,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="nayba-h2 text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
@@ -202,7 +202,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         {/* Body */}
         <div className={modalBody}>
           {(formError || saveError) && (
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
               <span className="text-[13px] font-medium">{formError || saveError}</span>
             </div>
           )}
@@ -215,7 +215,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div className="flex items-center justify-between mb-1.5">
                   <label className={labelCls} style={{ marginBottom: 0 }}>Headline</label>
                   <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[6px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
+                    className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[10px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
                     {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Generating...' : 'Generate brief with AI'}
                   </button>
@@ -240,7 +240,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
             <div>
               {aiRan ? (
                 <>
-                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] mb-5" style={{ background: 'rgba(196,103,74,0.06)', color: 'var(--terra)' }}>
+                  <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-5" style={{ background: 'rgba(196,103,74,0.06)', color: 'var(--terra)' }}>
                     <span className="text-[12px] font-medium">✦ These fields were generated by AI — review and edit before publishing.</span>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -303,7 +303,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 </div>
               </div>
               {/* Summary card */}
-              <div className="bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
+              <div className="bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] p-5">
                 <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
                   <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
@@ -454,14 +454,14 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     onRefresh();
   };
 
-  const pThCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-2.5 px-3 bg-[var(--chalk)] whitespace-nowrap";
+  const pThCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
   const pTdCls = "py-2 px-3 text-[13px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)] align-middle";
-  const numInput = "w-[72px] px-2 py-1.5 rounded-[6px] bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] text-[13px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
+  const numInput = "w-[72px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[13px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
 
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[12px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="nayba-h2 text-[var(--ink)]">
@@ -472,7 +472,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
         {/* Toast */}
         {toast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[var(--ink)] text-white px-4 py-2 rounded-[12px] text-[13px] font-medium">
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[var(--ink)] text-white px-4 py-2 rounded-[10px] text-[13px] font-medium">
             {toast}
           </div>
         )}
@@ -507,7 +507,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                       <td className={pTdCls}>
                         <select value={p.status}
                           onChange={e => updateField(p.id, 'status', e.target.value)}
-                          className="text-[12px] px-2 py-1.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] bg-[var(--chalk)] focus:outline-none focus:border-[var(--terra)]">
+                          className="text-[12px] px-2 py-1.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)] focus:outline-none focus:border-[var(--terra)]">
                           <option value="confirmed">Confirmed</option>
                           <option value="visited">Visited</option>
                           <option value="content_submitted">Content Submitted</option>
@@ -527,7 +527,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                             onBlur={e => updateReelUrl(p.id, e.target.value)}
                             onKeyDown={e => { if (e.key === 'Enter') (e.target as HTMLInputElement).blur(); }}
                             placeholder="Paste URL"
-                            className="w-[140px] px-2 py-1.5 rounded-[6px] bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] text-[12px] focus:outline-none focus:border-[var(--terra)]"
+                            className="w-[140px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[12px] focus:outline-none focus:border-[var(--terra)]"
                           />
                           {p.reel_url && (
                             <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
@@ -561,7 +561,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                         <button
                           onClick={() => markComplete(p.id)}
                           disabled={p.status === 'completed'}
-                          className="px-3 py-1.5 rounded-[6px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 rounded-[10px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{
                             background: p.status === 'completed' ? 'rgba(42,32,24,0.06)' : 'rgba(45,122,79,0.08)',
                             color: p.status === 'completed' ? 'var(--ink-35)' : '#2D7A4F',
@@ -683,20 +683,20 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(42,32,24,0.06)' }}>
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">
             <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{campaign.title}</p>
             <p className="text-[13px] text-[var(--ink-35)] mt-0.5">{campaign.businesses?.name || '—'}</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
 
         {toast && (
-          <div className="mx-5 mt-3 px-3.5 py-2 rounded-[6px] bg-[var(--ink)] text-white text-[13px] font-medium">{toast}</div>
+          <div className="mx-5 mt-3 px-3.5 py-2 rounded-[10px] bg-[var(--ink)] text-white text-[13px] font-medium">{toast}</div>
         )}
 
         {/* Scrollable body */}
@@ -727,7 +727,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
             {campaign.campaign_type === 'community' && (
               <div>
                 <p className={peekLabel}>Type</p>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
               </div>
             )}
           </div>
@@ -763,7 +763,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
               const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
               if (error) showToast('Failed to update status');
               else { showToast(`Status → ${e.target.value}`); onEdit(); }
-            }} className="w-full px-3 py-2 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[13px] font-medium text-[var(--ink)] bg-white">
+            }} className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[13px] font-medium text-[var(--ink)] bg-white">
               <option value="draft">Draft</option><option value="active">Active</option>
               <option value="selecting">Selecting</option><option value="live">Live</option>
               <option value="completed">Completed</option>
@@ -777,7 +777,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
               <p className={`${peekLabel} mb-3`}>AI Recommendations</p>
               <div className="space-y-2">
                 {recommendations.map(r => (
-                  <div key={r.creator_id} className="flex items-center gap-3 bg-[var(--chalk)] rounded-[6px] border border-[rgba(42,32,24,0.08)] px-3 py-2.5">
+                  <div key={r.creator_id} className="flex items-center gap-3 bg-[rgba(42,32,24,0.02)] rounded-[10px] border border-[rgba(42,32,24,0.08)] px-3 py-2.5">
                     <div className="w-7 h-7 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                       <span className="text-[11px] font-semibold text-white">{r.name[0]}</span>
                     </div>
@@ -806,7 +806,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
               </div>
               <div className="max-h-[200px] overflow-y-auto space-y-1">
                 {allCreators.map(cr => (
-                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[6px] hover:bg-[var(--chalk)]">
+                  <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.02)]">
                     <div className="min-w-0">
                       <span className="text-[13px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
                       <span className="text-[11px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
@@ -922,7 +922,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px]" style={{ padding: 16 }}>
+          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
@@ -931,7 +931,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
       {/* Campaign table */}
       {campaigns.length > 0 ? (
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
@@ -959,7 +959,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         <div className="flex items-center gap-1.5">
                           <StatusBadge status={c.status} />
                           {c.campaign_type === 'community' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
                           )}
                         </div>
                       </td>
@@ -985,8 +985,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         </div>
       ) : (
         /* Empty state */
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-12 text-center">
-          <div className="w-12 h-12 rounded-[12px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] p-12 text-center">
+          <div className="w-12 h-12 rounded-[10px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>
             <Megaphone size={22} className="text-[var(--terra)]" />
           </div>
           <p className="text-[17px] font-semibold text-[var(--ink)] mb-1">No campaigns yet</p>

@@ -12,7 +12,7 @@ interface NotificationLog {
   created_at: string; user_type: string;
 }
 
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
@@ -86,16 +86,16 @@ export default function AdminNotificationsTab() {
     fetchData();
   };
 
-  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
 
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[12px] text-[14px] font-medium">{toast}</div>
+        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[10px] text-[14px] font-medium">{toast}</div>
       )}
 
       {/* Send notification card */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-6 mb-6">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] p-6 mb-6">
         <h2 className="nayba-h2 text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
@@ -122,9 +122,9 @@ export default function AdminNotificationsTab() {
 
         {/* Email preview */}
         {selectedCampaign && (
-          <div className="border border-[rgba(42,32,24,0.08)] rounded-[12px] bg-[var(--chalk)] p-5">
+          <div className="border border-[rgba(42,32,24,0.08)] rounded-[10px] bg-[rgba(42,32,24,0.02)] p-5">
             <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
-            <div className="bg-white rounded-[12px] border border-[rgba(42,32,24,0.08)] p-5 max-w-lg">
+            <div className="bg-white rounded-[10px] border border-[rgba(42,32,24,0.08)] p-5 max-w-lg">
               <p className="text-[12px] text-[var(--ink-35)] mb-1">Subject</p>
               <p className="text-[15px] font-semibold text-[var(--ink)] mb-4">New campaign just dropped — {selectedCampaign.businesses?.name}</p>
               <div className="text-[14px] text-[var(--ink)] space-y-2 leading-[1.65]">
@@ -145,7 +145,7 @@ export default function AdminNotificationsTab() {
       </div>
 
       {/* Sent log */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[500px]">
           <thead><tr>
             <th className={thCls}>Sent</th><th className={thCls}>Campaign</th><th className={thCls}>Recipients</th><th className={thCls}>Type</th>
@@ -157,7 +157,7 @@ export default function AdminNotificationsTab() {
                 <td className={`${tdCls} text-[var(--ink-60)] max-w-[300px] truncate`}>{n.message}</td>
                 <td className={tdCls}>1</td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                     {n.email_type?.replace(/_/g, ' ') || 'notification'}
                   </span>
                 </td>

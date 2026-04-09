@@ -116,7 +116,7 @@ export default function AdminDashboard() {
                   <button
                     key={item.key}
                     onClick={() => handleTabClick(item.key)}
-                    className="w-full flex items-center gap-[9px] rounded-[12px] text-[14px] transition-colors"
+                    className="w-full flex items-center gap-[9px] rounded-[10px] text-[14px] transition-colors"
                     style={{
                       fontWeight: active ? 700 : 500,
                       background: active ? 'var(--terra-10)' : 'transparent',
@@ -142,7 +142,7 @@ export default function AdminDashboard() {
 
         {/* User row */}
         <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: '12px 8px 16px' }}>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-[12px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
+          <div className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
             <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
               <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
             </div>
