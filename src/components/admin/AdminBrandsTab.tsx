@@ -11,10 +11,10 @@ interface Brand {
 }
 
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[8px] bg-white border-[0.5px] border-[rgba(0,0,0,0.18)] text-[#1C1917] text-[14px] focus:outline-none focus:border-[#C4674A] placeholder:text-[rgba(0,0,0,0.4)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] py-[10px] px-4 bg-[#F7F6F3]";
-const tdCls = "py-0 px-4 text-[14px] text-[#1C1917] border-b-[0.5px] border-[rgba(0,0,0,0.06)]";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]";
+const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -53,15 +53,15 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(0,0,0,0.4)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
-        <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px' }}>Create Brand</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[#F7F6F3] flex items-center justify-center text-[rgba(0,0,0,0.45)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
+      <div className="relative bg-white rounded-[16px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+        <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
+          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.2px' }}>Create Brand</h2>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
           {error && (
-            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[8px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+            <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[12px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
               <AlertCircle size={14} />
               <span className="text-[13px] font-medium">{error}</span>
             </div>
@@ -76,9 +76,9 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} min-h-[72px] resize-y`} /></div>
           </form>
         </div>
-        <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
-          <button onClick={onClose} className="text-[14px] font-medium text-[rgba(0,0,0,0.55)] hover:text-[#1C1917]">Cancel</button>
-          <button onClick={handleCreate as any} disabled={creating} className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+        <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
+          <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
+          <button onClick={handleCreate as any} disabled={creating} className="px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
             {creating ? 'Creating...' : 'Create Brand'}
           </button>
         </div>
@@ -94,23 +94,23 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
   onViewAs: (brand: Brand) => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[rgba(0,0,0,0.45)] mb-1";
+  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
 
   return (
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(0,0,0,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(0,0,0,0.06)' }}>
-        <div className="flex items-center justify-between px-5 py-4 border-b-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0">
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-8px 0 30px rgba(42,32,24,0.06)' }}>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-              <span className="text-[15px] font-semibold text-[#C4674A]">{brand.name[0]}</span>
+              <span className="text-[15px] font-semibold text-[var(--terra)]">{brand.name[0]}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[16px] font-semibold text-[#1C1917] truncate">{brand.name}</p>
-              <p className="text-[13px] text-[rgba(0,0,0,0.45)]">{brand.category}</p>
+              <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{brand.name}</p>
+              <p className="text-[13px] text-[var(--ink-35)]">{brand.category}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[rgba(0,0,0,0.35)] hover:bg-[rgba(0,0,0,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[6px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -126,28 +126,28 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
             </div>
             <div>
               <p className={peekLabel}>Region</p>
-              <p className="text-[14px] text-[#1C1917]">{brand.region}</p>
+              <p className="text-[14px] text-[var(--ink)]">{brand.region}</p>
             </div>
             <div>
               <p className={peekLabel}>Campaigns</p>
-              <p className="text-[14px] text-[#1C1917]">{campaignCount}</p>
+              <p className="text-[14px] text-[var(--ink)]">{campaignCount}</p>
             </div>
             <div>
               <p className={peekLabel}>Added</p>
-              <p className="text-[14px] text-[#1C1917]">{fmtDate(brand.created_at)}</p>
+              <p className="text-[14px] text-[var(--ink)]">{fmtDate(brand.created_at)}</p>
             </div>
           </div>
 
           <div className="mb-4">
             <p className={peekLabel}>Owner Email</p>
-            <p className="text-[14px] text-[#1C1917]">{brand.owner_email}</p>
+            <p className="text-[14px] text-[var(--ink)]">{brand.owner_email}</p>
           </div>
 
           {brand.instagram_handle && (
             <div className="mb-4">
               <p className={peekLabel}>Instagram</p>
               <a href={`https://instagram.com/${brand.instagram_handle}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[14px] text-[#C4674A] font-medium hover:underline">
+                className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
                 @{brand.instagram_handle} <ExternalLink size={12} />
               </a>
             </div>
@@ -156,19 +156,19 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
           {brand.address && (
             <div className="mb-4">
               <p className={peekLabel}>Address</p>
-              <p className="text-[14px] text-[#1C1917]">{brand.address}</p>
+              <p className="text-[14px] text-[var(--ink)]">{brand.address}</p>
             </div>
           )}
 
           {brand.bio && (
             <div className="mb-4">
               <p className={peekLabel}>Bio</p>
-              <p className="text-[14px] text-[#1C1917] leading-[1.6]">{brand.bio}</p>
+              <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{brand.bio}</p>
             </div>
           )}
         </div>
 
-        <div className="px-5 py-4 border-t-[0.5px] border-[rgba(0,0,0,0.08)] flex-shrink-0 space-y-2">
+        <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 space-y-2">
           {!brand.approved && (
             <div className="flex gap-2">
               <button onClick={() => { onApprove(brand.id, true); onClose(); }}
@@ -176,13 +176,13 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
                 Approve
               </button>
               <button onClick={() => { onApprove(brand.id, false); onClose(); }}
-                className="flex-1 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3]">
+                className="flex-1 px-4 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--chalk)]">
                 Deny
               </button>
             </div>
           )}
           <button onClick={() => { onViewAs(brand); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.08)] text-[#1C1917] text-[13px] font-semibold hover:bg-[#F7F6F3] transition-colors">
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[var(--chalk)] transition-colors">
             <Eye size={14} /> View as Brand
           </button>
         </div>
@@ -226,10 +226,10 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[#1C1917] text-white px-4 py-2.5 rounded-[8px] text-[14px] font-medium">{toast}</div>
+        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[12px] text-[14px] font-medium">{toast}</div>
       )}
 
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead><tr>
             <th className={thCls}>Brand</th><th className={thCls}>Category</th><th className={thCls}>Region</th>
@@ -239,23 +239,23 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           <tbody>
             {brands.map(b => (
               <tr key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
-                className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(0,0,0,0.04)]' : 'hover:bg-[rgba(0,0,0,0.02)]'}`} style={{ height: 44 }}>
+                className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-semibold text-[#C4674A]">{b.name[0]}</span>
+                      <span className="text-[11px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
                     </div>
                     <span className="font-medium">{b.name}</span>
                   </div>
                 </td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.category}</td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.region}</td>
-                <td className={`${tdCls} text-[rgba(0,0,0,0.55)]`}>{b.instagram_handle || '—'}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{b.category}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{b.region}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{b.instagram_handle || '—'}</td>
                 <td className={tdCls}>{campaignCounts[b.id] || 0}</td>
                 <td className={tdCls}>
                   {b.approved
-                    ? <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
-                    : <span className="inline-flex items-center px-2 py-0.5 rounded-[8px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: '#C4674A' }}>Pending</span>
+                    ? <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                    : <span className="inline-flex items-center px-2 py-0.5 rounded-[12px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
                   }
                 </td>
                 <td className={tdCls}>
@@ -269,7 +269,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
               </tr>
             ))}
             {brands.length === 0 && (
-              <tr><td colSpan={7} className="py-12 text-center text-[14px] text-[rgba(0,0,0,0.35)]">No brands yet</td></tr>
+              <tr><td colSpan={7} className="py-12 text-center text-[14px] text-[var(--ink-35)]">No brands yet</td></tr>
             )}
           </tbody>
         </table>
