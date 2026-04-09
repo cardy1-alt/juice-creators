@@ -24,9 +24,11 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
-      <div className="skeleton w-full" style={{ height: 160 }} />
-      <div className="p-4 space-y-2.5">
+    <div className="rounded-[12px] bg-white" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+      <div className="px-2.5 pt-2.5">
+        <div className="skeleton w-full rounded-[8px]" style={{ height: 150 }} />
+      </div>
+      <div className="px-3.5 pb-3.5 pt-3 space-y-2.5">
         <div className="skeleton h-3 w-20" />
         <div className="skeleton h-4 w-full" />
         <div className="skeleton h-3 w-28" />
@@ -190,6 +192,9 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+      {/* Page heading */}
+      <h1 className="nayba-h2 text-[var(--ink)] mb-5">Discover</h1>
+
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
@@ -237,27 +242,28 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           </button>
         </div>
       )}
-      {!loading && !fetchError && <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      {!loading && !fetchError && <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
         {filtered.map(c => {
           const appStatus = applications[c.id];
           const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
           const catPalette = getCategoryPalette(c.businesses?.category);
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left rounded-[12px] overflow-hidden flex flex-col" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)', borderLeft: `3px solid ${catPalette.border}` }}>
-              {/* Cover image */}
-              <div className="w-full relative" style={{ height: 160 }}>
-                {c.campaign_image ? (
-                  <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
-                    {c.businesses?.logo_url ? (
-                      <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
-                    ) : (
-                      <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
-                    )}
-                  </div>
-                )}
+              className="card-press w-full text-left rounded-[12px] flex flex-col bg-white" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+              {/* Cover image — inset with rounded corners */}
+              <div className="px-2.5 pt-2.5">
+                <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>
+                  {c.campaign_image ? (
+                    <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
+                      {c.businesses?.logo_url ? (
+                        <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
+                      ) : (
+                        <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
+                      )}
+                    </div>
+                  )}
                 {appStatus && (
                   <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
                     {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
@@ -266,18 +272,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 {c.campaign_type === 'community' && (
                   <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
                 )}
+                </div>
               </div>
               {/* Content */}
-              <div className="flex-1 p-4 flex flex-col">
+              <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
                 <div className="flex items-center gap-2 mb-1.5">
                   <span className="inline-flex px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
                   <span className="text-[11px] text-[var(--ink-35)]">{c.businesses?.name}</span>
                 </div>
-                <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.headline || c.title}</p>
-                <div className="mt-auto space-y-1.5">
-                  {perkShort && <p className="text-[13px] font-semibold text-[var(--terra)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
+                <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
+                <div className="mt-auto space-y-1">
+                  {perkShort && <p className="text-[12px] font-medium text-[var(--ink-60)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
                   {c.expression_deadline && (
-                    <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
+                    <p className="text-[11px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
                   )}
                 </div>
               </div>
