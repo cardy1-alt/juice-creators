@@ -247,10 +247,10 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           </h1>
 
           {/* Dates — inline under title */}
-          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-35)] mb-3">
-            {campaign.expression_deadline && <span>Apply by <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span>}
+          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mb-3">
+            {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
             {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
-            {campaign.content_deadline && <span>Content due <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
+            {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
           </div>
 
           {/* Perk — part of header area */}
