@@ -201,26 +201,24 @@ export default function Auth() {
               {/* Social proof */}
               <div className="flex items-center gap-3">
                 <div className="flex -space-x-[8px]">
-                  {['S', 'M', 'J', 'R'].map((initial, i) => (
-                    <div
-                      key={initial}
-                      className="w-[28px] h-[28px] rounded-full flex items-center justify-center border-2"
-                      style={{
-                        borderColor: 'var(--chalk)',
-                        background: ['var(--terra)', 'var(--sage)', 'var(--violet)', 'var(--baltic)'][i],
-                        zIndex: 4 - i,
-                        fontFamily: "'Instrument Sans', sans-serif",
-                        fontWeight: 600,
-                        fontSize: 11,
-                        color: 'white',
-                      }}
-                    >
-                      {initial}
-                    </div>
+                  {[
+                    'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&h=80&fit=crop&crop=face',
+                    'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=80&h=80&fit=crop&crop=face',
+                  ].map((src, i) => (
+                    <img
+                      key={i}
+                      src={src}
+                      alt=""
+                      className="w-[30px] h-[30px] rounded-full object-cover border-2"
+                      style={{ borderColor: 'var(--chalk)', zIndex: 4 - i, position: 'relative' }}
+                      loading="lazy"
+                    />
                   ))}
                 </div>
                 <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)' }}>
-                  Real creators · real local brands
+                  Join 50+ Suffolk creators
                 </span>
               </div>
             </div>
