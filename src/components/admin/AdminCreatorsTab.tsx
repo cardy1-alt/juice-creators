@@ -345,15 +345,15 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
       {showApprovalPane && pendingCreators.length > 0 && (
         <div className="bg-white rounded-[12px] mb-5 overflow-hidden">
-          <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)]">
-            <div className="flex items-center gap-3">
-              <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending Approvals</h3>
-              <span className="text-[12px] text-[var(--ink-35)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''}</span>
-            </div>
+          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)]">
             <div className="flex items-center gap-2">
+              <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending</h3>
+              <span className="text-[12px] text-[var(--ink-35)]">{pendingCreators.length}</span>
+            </div>
+            <div className="flex items-center gap-1.5">
               <button onClick={selectAllPending}
-                className="px-3 py-1.5 rounded-[10px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
-                {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
+                className="px-2.5 py-1.5 rounded-[10px] text-[11px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
+                {selectedPending.size === pendingCreators.length ? 'Deselect' : 'Select all'}
               </button>
               {selectedPending.size > 0 && (
                 <>
@@ -378,9 +378,9 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               const handle = c.instagram_handle?.replace('@', '') || '';
               const selected = selectedPending.has(c.id);
               return (
-                <div key={c.id} className={`flex items-center gap-4 px-5 py-3.5 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`}>
+                <div key={c.id} className={`flex items-start gap-3 px-4 py-4 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`}>
                   <button onClick={() => toggleSelectPending(c.id)}
-                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.15)] hover:border-[var(--terra)]'}`}>
+                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.15)] hover:border-[var(--terra)]'}`}>
                     {selected && <Check size={12} className="text-white" />}
                   </button>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
@@ -389,22 +389,19 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                   </div>
                   ); })()}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
-                      <span className="text-[12px] text-[var(--ink-35)]">{c.email}</span>
-                    </div>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      {handle && (
-                        <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
-                          @{handle} <ExternalLink size={11} />
-                        </a>
-                      )}
-                      {c.address && <span className="text-[12px] text-[var(--ink-35)]">{c.address}</span>}
-                      <span className="text-[12px] text-[var(--ink-35)]">Joined {fmtDate(c.created_at)}</span>
+                    <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
+                    {handle && (
+                      <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                        @{handle} <ExternalLink size={11} />
+                      </a>
+                    )}
+                    <div className="flex items-center gap-2 mt-1 text-[12px] text-[var(--ink-35)]">
+                      {c.address && <span>{c.address}</span>}
+                      <span>Joined {fmtDate(c.created_at)}</span>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 flex-shrink-0">
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
                     <button onClick={() => handleApprove(c.id, true)}
                       className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
                       <Check size={15} />
