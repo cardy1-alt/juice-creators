@@ -138,6 +138,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [sortBy, setSortBy] = useState<'newest' | 'closing' | 'value'>('newest');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'applied'>('all');
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
@@ -185,7 +187,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       const allowedCats = categoryMap[category] || [];
       if (!allowedCats.some(cat => c.businesses?.category?.includes(cat))) return false;
     }
+    if (statusFilter === 'new' && applications[c.id]) return false;
+    if (statusFilter === 'applied' && !applications[c.id]) return false;
     return true;
+  }).sort((a, b) => {
+    if (sortBy === 'closing') {
+      if (!a.expression_deadline) return 1;
+      if (!b.expression_deadline) return -1;
+      return new Date(a.expression_deadline).getTime() - new Date(b.expression_deadline).getTime();
+    }
+    if (sortBy === 'value') {
+      return (b.perk_value || 0) - (a.perk_value || 0);
+    }
+    return 0; // newest is already the default order from supabase
   });
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
@@ -209,22 +223,51 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </button>
       )}
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search campaigns..."
-          className="w-full pl-10 pr-4 h-[44px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+      {/* Search + sort row */}
+      <div className="flex gap-3 mb-4">
+        <div className="relative flex-1">
+          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search campaigns..."
+            className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+        </div>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+          className="h-[40px] px-3 rounded-[8px] border border-[rgba(42,32,24,0.10)] bg-white text-[13px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
+          style={{ fontWeight: 500 }}>
+          <option value="newest">Newest</option>
+          <option value="closing">Closing soon</option>
+          <option value="value">Highest value</option>
+        </select>
       </div>
 
-      {/* Category chips */}
-      <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
+      {/* Status + category filters */}
+      <div className="flex items-center gap-4 mb-4">
+        {/* Status tabs */}
+        <div className="flex gap-0.5 bg-[rgba(42,32,24,0.04)] rounded-[8px] p-0.5">
+          {([['all', 'All'], ['new', 'New'], ['applied', 'Applied']] as const).map(([key, label]) => (
+            <button key={key} onClick={() => setStatusFilter(key)}
+              className="px-3 py-1.5 rounded-[6px] text-[12px] transition-colors"
+              style={{
+                fontWeight: statusFilter === key ? 600 : 500,
+                background: statusFilter === key ? 'white' : 'transparent',
+                color: statusFilter === key ? 'var(--ink)' : 'var(--ink-35)',
+                boxShadow: statusFilter === key ? '0 1px 2px rgba(42,32,24,0.06)' : 'none',
+              }}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        <div className="w-px h-5 bg-[rgba(42,32,24,0.08)]" />
+
+        {/* Category chips */}
+      <div className="flex gap-2 overflow-x-auto hide-scrollbar flex-1">
         {categories.map(c => {
           const isActive = category === c;
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
           return (
             <button key={c} onClick={() => setCategory(c)}
-              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+              className={`flex-shrink-0 px-[14px] py-[5px] rounded-[999px] text-[12px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
               style={{
                 fontWeight: isActive ? 700 : 600,
                 background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
@@ -233,6 +276,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             </button>
           );
         })}
+      </div>
       </div>
 
       {/* Campaign grid */}
@@ -254,8 +298,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className="w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <div className="w-full relative" style={{ height: 180 }}>
+                className={`w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] ${appStatus ? 'ring-1 ring-[rgba(42,32,24,0.06)]' : ''}`} style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div className="w-full relative" style={{ height: 180, opacity: appStatus ? 0.75 : 1 }}>
                   {c.campaign_image ? (
                     <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                   ) : (
