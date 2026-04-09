@@ -253,12 +253,17 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           )}
 
-          {/* ── Divider ── */}
+          {/* ── About ── */}
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
-            {/* About the brand */}
             {campaign.about_brand && (
-              <div>
-                <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
+              <div className="flex gap-3">
+                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                  <MapPin size={15} style={{ color: catPalette.color }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">About {campaign.businesses?.name}</p>
+                  <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
+                </div>
               </div>
             )}
           </div>
