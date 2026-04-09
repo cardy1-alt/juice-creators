@@ -14,7 +14,7 @@ function Skeleton({ className }: { className?: string }) {
 
 function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
+    <div className={`grid grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
           <Skeleton className="h-3 w-24 mb-3" />
@@ -610,7 +610,7 @@ export default function BusinessPortal() {
         {activeTab === 'content' && (
           <div>
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
                 <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
@@ -654,7 +654,7 @@ export default function BusinessPortal() {
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Analytics</h1>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
               <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Total Reach</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">{totalReach.toLocaleString()}</p>

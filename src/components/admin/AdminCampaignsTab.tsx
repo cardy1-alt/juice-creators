@@ -920,7 +920,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   return (
     <div>
       {/* Stats row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
           <div key={s.label} className="bg-white rounded-[12px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>

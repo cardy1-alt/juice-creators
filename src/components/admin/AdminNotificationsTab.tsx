@@ -96,7 +96,7 @@ export default function AdminNotificationsTab() {
 
       {/* Send notification card */}
       <div className="bg-white rounded-[12px] p-6 mb-6">
-        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Send Campaign Notification</h2>
+        <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5">Select Campaign</label>

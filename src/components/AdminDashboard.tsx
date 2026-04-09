@@ -159,7 +159,10 @@ export default function AdminDashboard() {
           <button onClick={() => setSidebarOpen(true)} style={{ color: 'var(--ink-60)' }}>
             <Menu size={22} />
           </button>
-          <Logo size={22} variant="wordmark" />
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            <Logo size={20} variant="icon" />
+            <span className="text-[15px] font-semibold text-[var(--ink)] truncate">{PAGE_TITLES[activeTab]}</span>
+          </div>
         </div>
 
         {/* Desktop topbar */}

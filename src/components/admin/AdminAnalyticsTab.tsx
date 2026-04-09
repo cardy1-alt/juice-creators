@@ -9,7 +9,7 @@ function Skeleton({ className }: { className?: string }) {
 
 function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
-    <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
+    <div className={`grid grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
       {Array.from({ length: count }).map((_, i) => (
         <div key={i} className="bg-white rounded-[12px] p-4">
           <Skeleton className="h-3 w-24 mb-3" />
@@ -154,9 +154,9 @@ export default function AdminAnalyticsTab() {
   return (
     <div className="tab-fade-in">
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white rounded-[12px]" style={{ padding: 16 }}>
+          <div key={s.label} className="bg-white rounded-[12px]" className="p-3 md:p-4">
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
