@@ -233,63 +233,66 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           </div>
 
-          {/* Title — Instrument Sans, not Hornbill (user-generated content may contain any character) */}
-          <h1 className="text-[22px] text-[var(--ink)] mb-4" style={{ fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.3px' }}>
+          {/* Title */}
+          <h1 className="text-[22px] text-[var(--ink)] mb-2" style={{ fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.3px' }}>
             {campaign.headline || campaign.title}
           </h1>
 
-          {/* Perk highlight */}
+          {/* Dates — inline under title */}
+          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-35)] mb-3">
+            {campaign.expression_deadline && <span>Apply by <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span>}
+            {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
+            {campaign.content_deadline && <span>Content due <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
+          </div>
+
+          {/* Perk — part of header area */}
           {campaign.perk_description && (
-            <div className="mb-5 px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
+            <div className="px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
               <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
               {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
             </div>
           )}
 
-          {/* Dates — clean inline text */}
-          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-35)] mb-6">
-            {campaign.expression_deadline && <><span>Apply by <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span></>}
-            {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
-            {campaign.content_deadline && <span>Content due <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
+          {/* ── Divider ── */}
+          <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
+            {/* About the brand */}
+            {campaign.about_brand && (
+              <div>
+                <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
+              </div>
+            )}
           </div>
 
-          {/* About the brand */}
-          {campaign.about_brand && (
-            <div className="mb-6">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">About</p>
-              <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
-            </div>
-          )}
-
-          {/* What to post */}
+          {/* ── Divider ── */}
           {campaign.content_requirements && (
-            <div className="mb-6 p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.025)' }}>
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">
-                What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
-              </p>
-              <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
+            <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
+              <div className="p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.025)' }}>
+                <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">
+                  What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
+                </p>
+                <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
+                {/* Tags inside the brief */}
+                {campaign.required_tags && campaign.required_tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-3">
+                    {campaign.required_tags.map((tag, i) => (
+                      <span key={i} className="px-2.5 py-1 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)]" style={{ fontWeight: 500 }}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {/* Required tags */}
-          {campaign.required_tags && campaign.required_tags.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 mb-6">
-              {campaign.required_tags.map((tag, i) => (
-                <span key={i} className="px-2.5 py-1 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-[13px] text-[var(--ink-60)]" style={{ fontWeight: 500 }}>
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-
-          {/* Talking points */}
+          {/* ── Divider ── */}
           {campaign.talking_points && campaign.talking_points.length > 0 && (
-            <div className="mb-6">
-              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">Key messages</p>
+            <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
+              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Key messages</p>
               <ol className="space-y-2">
                 {campaign.talking_points.map((tp, i) => (
                   <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.6]">
-                    <span className="text-[12px] font-semibold text-[var(--ink-35)] mt-0.5 flex-shrink-0 w-5 h-5 rounded-full bg-[rgba(42,32,24,0.04)] flex items-center justify-center">{i + 1}</span>
+                    <span className="text-[12px] font-medium text-[var(--ink-35)] mt-0.5 flex-shrink-0">{i + 1}.</span>
                     {tp}
                   </li>
                 ))}
