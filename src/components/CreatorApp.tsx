@@ -24,11 +24,9 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="rounded-[12px] bg-white" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
-      <div className="px-2.5 pt-2.5">
-        <div className="skeleton w-full rounded-[8px]" style={{ height: 150 }} />
-      </div>
-      <div className="px-3.5 pb-3.5 pt-3 space-y-2.5">
+    <div className="rounded-[12px] bg-white overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+      <div className="skeleton w-full" style={{ height: 170 }} />
+      <div className="p-3.5 space-y-2.5">
         <div className="skeleton h-3 w-20" />
         <div className="skeleton h-4 w-full" />
         <div className="skeleton h-3 w-28" />
@@ -38,7 +36,7 @@ function SkeletonCard() {
 }
 function SkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
       {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
     </div>
   );
@@ -256,94 +254,80 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         {/* Featured campaign — first result, horizontal layout */}
         {featured && (() => {
           const appStatus = applications[featured.id];
-          const perkShort = featured.perk_description?.split('—')[0]?.split(',')[0]?.trim();
           const catPalette = getCategoryPalette(featured.businesses?.category);
           return (
             <button onClick={() => onOpenCampaign(featured.id)}
-              className="w-full text-left rounded-[12px] bg-white mb-5 transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
-              style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
-              <div className="flex flex-col md:flex-row p-3 gap-3 md:gap-4">
-                {/* Image — inset with rounded corners */}
-                <div className="md:w-[45%] relative rounded-[8px] overflow-hidden" style={{ minHeight: 200 }}>
-                  {featured.campaign_image ? (
-                    <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 200 }} />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: 200, background: catPalette.tint }}>
-                      <CategoryIcon category={featured.businesses?.category} className="w-12 h-12 mb-3" style={{ color: catPalette.color, opacity: 0.6 }} />
-                      {featured.businesses?.name && (
-                        <span className="text-[14px] font-medium" style={{ color: catPalette.color, opacity: 0.7 }}>{featured.businesses.name}</span>
-                      )}
-                    </div>
-                  )}
-                  {appStatus && (
-                    <span className={`absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                    </span>
-                  )}
-                </div>
-                {/* Content */}
-                <div className="flex-1 py-1 md:py-3 md:pr-2 flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                    <span className="text-[13px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
-                  </div>
-                  <p className="text-[18px] md:text-[20px] text-[var(--ink)] leading-[1.3] mb-2" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
-                  {perkShort && <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">{perkShort}{featured.perk_value ? ` · £${featured.perk_value}` : ''}</p>}
-                  <div className="flex items-center justify-between">
-                    {featured.expression_deadline && (
-                      <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
+              className="w-full text-left rounded-[12px] bg-white mb-5 flex flex-col md:flex-row overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
+              style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              {/* Image — edge to edge, rounded by card overflow */}
+              <div className="md:w-[45%] relative" style={{ minHeight: 220 }}>
+                {featured.campaign_image ? (
+                  <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 220 }} />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: 220, background: catPalette.tint }}>
+                    <CategoryIcon category={featured.businesses?.category} className="w-12 h-12 mb-3" style={{ color: catPalette.color, opacity: 0.5 }} />
+                    {featured.businesses?.name && (
+                      <span className="text-[14px] font-medium" style={{ color: catPalette.color, opacity: 0.6 }}>{featured.businesses.name}</span>
                     )}
-                    <span className="inline-flex items-center px-4 py-2 rounded-full text-[13px] text-white" style={{ background: 'var(--terra)', fontWeight: 600 }}>View campaign</span>
                   </div>
+                )}
+                {appStatus && (
+                  <span className={`absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
+                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                  </span>
+                )}
+              </div>
+              {/* Content */}
+              <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                  <span className="text-[13px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
                 </div>
+                <p className="text-[20px] md:text-[22px] text-[var(--ink)] leading-[1.25] mb-3" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
+                {featured.expression_deadline && (
+                  <p className="text-[13px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
+                )}
               </div>
             </button>
           );
         })()}
 
         {/* Remaining campaigns — grid */}
-        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
           {rest.map(c => {
             const appStatus = applications[c.id];
-            const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
-                {/* Cover image — inset with rounded corners */}
-                <div className="px-2.5 pt-2.5">
-                  <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>
-                    {c.campaign_image ? (
-                      <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
-                        <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.5 }} />
-                        <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.6 }}>{c.businesses?.name}</span>
-                      </div>
-                    )}
+                className="w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                {/* Cover image — edge to edge */}
+                <div className="w-full relative" style={{ height: 170 }}>
+                  {c.campaign_image ? (
+                    <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
+                      <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.45 }} />
+                      <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.55 }}>{c.businesses?.name}</span>
+                    </div>
+                  )}
                   {appStatus && (
-                    <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                    <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
                       {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
                     </span>
                   )}
                   {c.campaign_type === 'community' && (
-                    <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                    <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
                   )}
-                  </div>
                 </div>
-                {/* Content */}
-                <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <span className="inline-flex px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                    <span className="text-[11px] text-[var(--ink-35)]">{c.businesses?.name}</span>
+                {/* Content — minimal */}
+                <div className="flex-1 p-3.5 flex flex-col">
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <span className="text-[11px]" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
                   </div>
-                  <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
-                  <div className="mt-auto space-y-1">
-                    {perkShort && <p className="text-[12px] font-medium text-[var(--ink-60)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
-                    {c.expression_deadline && (
-                      <p className="text-[11px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
-                    )}
-                  </div>
+                  <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
+                  {c.expression_deadline && (
+                    <p className="text-[11px] text-[var(--ink-35)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
+                  )}
                 </div>
               </button>
             );
