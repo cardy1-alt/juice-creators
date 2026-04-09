@@ -24,7 +24,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative transition-all duration-200 rounded-[12px] ${focused ? 'border-[1.5px] border-[var(--terra)]' : 'border border-[rgba(42,32,24,0.12)]'}`} style={{ background: '#ffffff' }}>
+    <div className={`relative transition-all duration-200 rounded-[10px] ${focused ? 'border-[1.5px] border-[var(--terra)]' : 'border border-[rgba(42,32,24,0.12)]'}`} style={{ background: '#ffffff' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -150,38 +150,72 @@ export default function Auth() {
   return (
     <div className="flex flex-col overscroll-none" style={{ minHeight: '100dvh', background: 'var(--chalk)' }}>
       {mode === 'signin' ? (
-        /* ─── SIGN IN: single centred column ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6 md:py-16" style={{ background: 'var(--chalk)' }}>
-          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
+        /* ─── SIGN IN: two-column on desktop ─── */
+        <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'var(--chalk)' }}>
+          {/* Left — branding */}
+          <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 md:px-12 md:py-16" style={{ background: 'var(--chalk)' }}>
+            <div className="w-full max-w-[420px]">
+              <div style={{ marginBottom: 32 }}>
+                <Logo size={28} variant="wordmark" />
+              </div>
 
-            {/* 1. Wordmark */}
-            <div style={{ marginBottom: 36 }}>
-              <Logo size={28} variant="wordmark" />
-            </div>
+              <h1 className="nayba-h1 text-[28px] md:text-[36px]" style={{ margin: '0 0 16px', color: 'var(--ink)' }}>
+                <span style={{ display: 'block' }}>Discover local brands.</span>
+                Get <span style={{ color: 'var(--terra)' }}>rewarded</span> for sharing.
+              </h1>
 
-            {/* 2. Location pill */}
-            <div className="mb-7">
-              <div className="inline-flex items-center gap-[8px] px-[16px] py-[8px]" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
-                <span className="relative flex h-[8px] w-[8px]">
-                  <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
+              <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, maxWidth: 360, margin: '0 0 28px' }}>
+                New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
+              </p>
+
+              {/* Location pill */}
+              <div className="mb-6">
+                <div className="inline-flex items-center gap-[8px] px-[14px] py-[6px]" style={{ background: 'var(--chalk)', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
+                  <span className="relative flex h-[7px] w-[7px]">
+                    <span className="relative inline-flex rounded-full h-[7px] w-[7px]" style={{ background: 'var(--terra)' }} />
+                  </span>
+                  <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 12, color: 'var(--ink-60)' }}>Now live in Suffolk</span>
+                </div>
+              </div>
+
+              {/* Social proof */}
+              <div className="hidden md:flex items-center gap-3">
+                <div className="flex -space-x-[8px]">
+                  {['S', 'M', 'J', 'R'].map((initial, i) => (
+                    <div
+                      key={initial}
+                      className="w-[28px] h-[28px] rounded-full flex items-center justify-center border-2"
+                      style={{
+                        borderColor: 'var(--chalk)',
+                        background: ['var(--terra)', 'var(--sage)', 'var(--violet)', 'var(--baltic)'][i],
+                        zIndex: 4 - i,
+                        fontFamily: "'Instrument Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: 11,
+                        color: 'white',
+                      }}
+                    >
+                      {initial}
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)' }}>
+                  Real creators · real local brands
                 </span>
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 600, fontSize: 13, color: 'var(--ink-60)' }}>Now live in Bury St Edmunds</span>
               </div>
             </div>
+          </div>
 
-            {/* 3. Headline — Hornbill Black, the hero moment */}
-            <h1 className="nayba-h1 text-[32px] md:text-[40px]" style={{ margin: '0 0 16px', color: 'var(--ink)', textAlign: 'center' }}>
-              <span style={{ display: 'block' }}>Discover local brands.</span>
-              Get <span style={{ color: 'var(--terra)' }}>rewarded</span> for sharing.
-            </h1>
+          {/* Right — form */}
+          <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-12 md:py-16" style={{ background: 'white' }}>
+            <div className="w-full max-w-[380px]">
+              {/* Mobile logo — only show on mobile since left panel is hidden */}
+              <div className="md:hidden mb-8 text-center">
+                <Logo size={28} variant="wordmark" />
+              </div>
 
-            {/* 4. Subheadline */}
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 16, fontWeight: 400, color: 'var(--ink-60)', lineHeight: 1.65, maxWidth: 380, margin: '0 0 28px' }}>
-              New campaigns drop in your county every week. Browse local brands, express your interest, and get rewarded with free experiences — no follower minimums, ever.
-            </p>
-
-            {/* 5. Form card */}
-            <div className="w-full bg-white rounded-[12px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+              <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
+              <p className="text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
@@ -303,34 +337,33 @@ export default function Auth() {
                 </form>
                 </>
               )}
-            </div>
 
-            {/* 6. Social proof */}
-            <div className="inline-flex items-center justify-center gap-3 mt-8">
-              <div className="flex -space-x-[9px]">
-                {['S', 'M', 'J', 'R'].map((initial, i) => (
-                  <div
-                    key={initial}
-                    className="w-[30px] h-[30px] rounded-full flex items-center justify-center border-2"
-                    style={{
-                      borderColor: 'var(--chalk)',
-                      background: ['var(--terra)', 'var(--stone)', '#FFFFFF', 'rgba(42,32,24,0.10)'][i],
-                      zIndex: 4 - i,
-                      fontFamily: "'Instrument Sans', sans-serif",
-                      fontWeight: 600,
-                      fontSize: 12,
-                      color: i === 0 ? 'white' : 'var(--ink-60)',
-                    }}
-                  >
-                    {initial}
-                  </div>
-                ))}
+              {/* Mobile social proof */}
+              <div className="flex md:hidden items-center justify-center gap-3 mt-8">
+                <div className="flex -space-x-[8px]">
+                  {['S', 'M', 'J', 'R'].map((initial, i) => (
+                    <div
+                      key={initial}
+                      className="w-[28px] h-[28px] rounded-full flex items-center justify-center border-2"
+                      style={{
+                        borderColor: 'white',
+                        background: ['var(--terra)', 'var(--sage)', 'var(--violet)', 'var(--baltic)'][i],
+                        zIndex: 4 - i,
+                        fontFamily: "'Instrument Sans', sans-serif",
+                        fontWeight: 600,
+                        fontSize: 11,
+                        color: 'white',
+                      }}
+                    >
+                      {initial}
+                    </div>
+                  ))}
+                </div>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)' }}>
+                  Real creators · real local brands
+                </span>
               </div>
-              <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 13, color: 'var(--ink-35)' }}>
-                Real creators · real local brands · no follower minimums
-              </span>
             </div>
-
           </div>
         </div>
       ) : mode === 'roleselect' ? (
@@ -431,7 +464,7 @@ export default function Auth() {
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
                     required
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -444,7 +477,7 @@ export default function Auth() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -458,7 +491,7 @@ export default function Auth() {
                     placeholder="At least 8 characters"
                     required
                     minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-35)' }}>
@@ -473,7 +506,7 @@ export default function Auth() {
                     value={instagramHandle}
                     onChange={e => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>Optional — you can add this later</p>
@@ -483,7 +516,7 @@ export default function Auth() {
                 <div>
                   <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
                   <select value={gender} onChange={e => setGender(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     <option value="">Prefer not to say</option>
                     <option value="female">Female</option>
@@ -500,7 +533,7 @@ export default function Auth() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>For WhatsApp campaign notifications</p>
@@ -511,7 +544,7 @@ export default function Auth() {
                   <select
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   >
                     <option value="">Select your county</option>
