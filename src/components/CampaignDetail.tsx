@@ -264,18 +264,9 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           {/* ── About ── */}
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
             {campaign.about_brand && (
-              <div className="flex gap-3">
-                {campaign.businesses?.logo_url ? (
-                  <img src={campaign.businesses.logo_url} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
-                ) : (
-                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
-                    <span className="text-[12px]" style={{ fontWeight: 700, color: catPalette.color }}>{(campaign.businesses?.name || '?')[0]}</span>
-                  </div>
-                )}
-                <div className="flex-1">
-                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">About {campaign.businesses?.name}</p>
-                  <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
-                </div>
+              <div>
+                <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">About {campaign.businesses?.name}</p>
+                <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
               </div>
             )}
           </div>
