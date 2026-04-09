@@ -238,35 +238,19 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             {campaign.headline || campaign.title}
           </h1>
 
-          {/* Quick info cards row */}
-          <div className="flex flex-wrap gap-3 mb-6">
-            {campaign.perk_description && (
-              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-[10px] bg-[var(--terra-light)]">
-                <Gift size={15} className="text-[var(--terra)] flex-shrink-0 mt-0.5" />
-                <div>
-                  <p className="text-[13px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-                  {campaign.perk_value && <p className="text-[11px] text-[var(--terra)]" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
-                </div>
-              </div>
-            )}
-            {campaign.expression_deadline && (
-              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.03)' }}>
-                <Clock size={14} className="text-[var(--ink-35)]" />
-                <div>
-                  <p className="text-[12px] text-[var(--ink-35)]">Apply by</p>
-                  <p className="text-[13px] font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</p>
-                </div>
-              </div>
-            )}
-            {campaign.content_deadline && (
-              <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.03)' }}>
-                <Clock size={14} className="text-[var(--ink-35)]" />
-                <div>
-                  <p className="text-[12px] text-[var(--ink-35)]">Content due</p>
-                  <p className="text-[13px] font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</p>
-                </div>
-              </div>
-            )}
+          {/* Perk highlight */}
+          {campaign.perk_description && (
+            <div className="mb-5 px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
+              <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
+              {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
+            </div>
+          )}
+
+          {/* Dates — clean inline text */}
+          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-35)] mb-6">
+            {campaign.expression_deadline && <><span>Apply by <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span></>}
+            {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
+            {campaign.content_deadline && <span>Content due <span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
           </div>
 
           {/* About the brand */}
@@ -279,14 +263,10 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
           {/* What to post */}
           {campaign.content_requirements && (
-            <div className="mb-6 p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.02)', border: '1px solid rgba(42,32,24,0.06)' }}>
-              <div className="flex items-center gap-2 mb-2">
-                <Film size={14} className="text-[var(--ink-35)]" />
-                <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">What to post</p>
-                {deliverablesList.length > 0 && (
-                  <span className="text-[11px] px-2 py-0.5 rounded-[999px] bg-white text-[var(--ink-35)]" style={{ fontWeight: 500 }}>{deliverablesList.join(' + ')}</span>
-                )}
-              </div>
+            <div className="mb-6 p-4 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.025)' }}>
+              <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2">
+                What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
+              </p>
               <p className="text-[14px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
             </div>
           )}
