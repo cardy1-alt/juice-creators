@@ -192,22 +192,19 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     <div className="bg-white">
       <div className="max-w-[720px] mx-auto">
         {/* Hero image */}
-        <div className="w-full relative" style={{ height: 280 }}>
+        <div className="w-full relative" style={{ height: 280, marginBottom: 32 }}>
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
             <CampaignFallbackImage category={campaign.businesses?.category} />
           )}
           {onBack && (
-            <button onClick={onBack} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors">
+            <button onClick={onBack} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors z-10">
               <X size={18} />
             </button>
           )}
-        </div>
-
-        <div className="px-6 pb-24 md:pb-8">
-          {/* Logo — overlapping the hero image */}
-          <div className="-mt-7 mb-3">
+          {/* Logo overlapping bottom edge */}
+          <div className="absolute -bottom-7 left-6">
             {campaign.businesses?.logo_url ? (
               <img src={campaign.businesses.logo_url} alt="" className="w-14 h-14 rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
             ) : (
@@ -216,7 +213,9 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               </div>
             )}
           </div>
+        </div>
 
+        <div className="px-6 pb-24 md:pb-8">
           {/* Brand info */}
           <div className="mb-2">
             <button onClick={() => setShowBrandInfo(true)} className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
