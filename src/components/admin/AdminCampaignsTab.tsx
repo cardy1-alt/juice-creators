@@ -707,17 +707,33 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
           {/* Admin controls */}
           <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)]">
           <div className="mb-4">
-            <p className={peekLabel}>Change Status</p>
-            <select value={campaign.status} onChange={async e => {
-              if (e.target.value === 'completed' && !window.confirm('Mark this campaign as completed?')) { e.target.value = campaign.status; return; }
-              const { error } = await supabase.from('campaigns').update({ status: e.target.value }).eq('id', campaign.id);
-              if (error) showToast('Failed to update status');
-              else { showToast(`Status → ${e.target.value}`); onEdit(); }
-            }} className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[13px] font-medium text-[var(--ink)] bg-white">
-              <option value="draft">Draft</option><option value="active">Active</option>
-              <option value="selecting">Selecting</option><option value="live">Live</option>
-              <option value="completed">Completed</option>
-            </select>
+            <p className={peekLabel}>Status</p>
+            <div className="flex flex-wrap gap-1.5">
+              {([
+                { value: 'draft', label: 'Draft', bg: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' },
+                { value: 'active', label: 'Active', bg: 'rgba(45,122,79,0.10)', color: '#2D7A4F' },
+                { value: 'selecting', label: 'Selecting', bg: 'rgba(59,130,246,0.10)', color: '#3B82F6' },
+                { value: 'live', label: 'Live', bg: 'rgba(45,122,79,0.10)', color: '#2D7A4F' },
+                { value: 'completed', label: 'Completed', bg: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' },
+              ] as const).map(s => (
+                <button key={s.value} onClick={async () => {
+                  if (s.value === campaign.status) return;
+                  if (s.value === 'completed' && !window.confirm('Mark this campaign as completed?')) return;
+                  const { error } = await supabase.from('campaigns').update({ status: s.value }).eq('id', campaign.id);
+                  if (error) showToast('Failed to update status');
+                  else { showToast(`Status → ${s.value}`); onEdit(); }
+                }}
+                  className="px-3 py-1.5 rounded-[999px] text-[12px] transition-all"
+                  style={{
+                    fontWeight: campaign.status === s.value ? 700 : 500,
+                    background: campaign.status === s.value ? s.bg : 'transparent',
+                    color: campaign.status === s.value ? s.color : 'var(--ink-35)',
+                    border: campaign.status === s.value ? 'none' : '1px solid rgba(42,32,24,0.08)',
+                  }}>
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {aiError && <p className="text-[12px] text-[var(--terra)] mb-3">{aiError}</p>}
