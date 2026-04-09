@@ -102,6 +102,7 @@ export default function BusinessPortal() {
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [toast, setToast] = useState<string | null>(null);
   const [campaignSearch, setCampaignSearch] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -278,13 +279,9 @@ export default function BusinessPortal() {
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-          {selectedCampaignId ? (
+          {selectedCampaignId && (
             <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
               <ArrowLeft size={20} />
-            </button>
-          ) : (
-            <button onClick={() => setSidebarOpen(true)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
-              <Menu size={22} />
             </button>
           )}
           <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -293,6 +290,10 @@ export default function BusinessPortal() {
               {selectedCampaignId ? campaign?.title || 'Campaign' : brand.name}
             </span>
           </div>
+          {/* Help icon */}
+          <a href="mailto:jacob@nayba.app" className="text-[var(--ink-35)] hover:text-[var(--ink)]" title="Get help">
+            <Mail size={18} />
+          </a>
         </div>
 
         <main className="flex-1 p-4 md:p-8 pb-20 md:pb-0 overflow-auto" key={selectedCampaignId ? activeTab : 'campaigns'}>
@@ -380,13 +381,56 @@ export default function BusinessPortal() {
               ))}
             </div>
 
-            {/* Campaign preview — what creators see (read-only) */}
-            <div className="mb-6">
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Your campaign — as creators see it</p>
-              <div className="bg-white rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <CampaignDetail campaignId={campaign.id} hideActions />
-              </div>
+            {/* Campaign brief — clean read-only sections */}
+            <div className="bg-white rounded-[12px] p-4 md:p-5 mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              {campaign.perk_description && (
+                <div className="mb-4 px-4 py-3 rounded-[10px]" style={{ background: 'var(--terra-light)' }}>
+                  <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
+                  {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
+                </div>
+              )}
+              {campaign.content_requirements && (
+                <div className="mb-4">
+                  <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1.5">Content requirements</p>
+                  <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{campaign.content_requirements}</p>
+                </div>
+              )}
+              {campaign.talking_points && campaign.talking_points.length > 0 && (
+                <div className="mb-4">
+                  <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1.5">Key messages</p>
+                  <ol className="space-y-1">
+                    {campaign.talking_points.map((tp, i) => <li key={i} className="text-[14px] text-[var(--ink)] leading-[1.5]">{i + 1}. {tp}</li>)}
+                  </ol>
+                </div>
+              )}
+              <button onClick={() => setShowPreview(true)}
+                className="text-[13px] font-medium text-[var(--terra)] hover:underline">
+                Preview as creator →
+              </button>
             </div>
+
+            {/* Help */}
+            <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
+              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
+              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                <Mail size={14} /> jacob@nayba.app
+              </a>
+            </div>
+
+            {/* Campaign preview modal */}
+            {showPreview && (
+              <div className="fixed inset-0 z-50 bg-white overflow-y-auto md:bg-[rgba(42,32,24,0.40)] md:flex md:items-center md:justify-center md:p-8">
+                <div className="md:bg-white md:rounded-[12px] md:max-w-[680px] md:w-full md:max-h-[90vh] md:overflow-y-auto relative" style={{ scrollbarWidth: 'none' as any }}>
+                  <button onClick={() => setShowPreview(false)}
+                    className="sticky top-3 right-3 float-right z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white mr-3 mt-3"
+                    style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
+                    <X size={18} />
+                  </button>
+                  <CampaignDetail campaignId={campaign.id} hideActions />
+                </div>
+              </div>
+            )}
 
             <div className="mt-4">
               <a href="mailto:jacob@nayba.app"
@@ -752,16 +796,16 @@ export default function BusinessPortal() {
       </main>
       </div>
 
-      {/* Mobile bottom nav — only when viewing a campaign */}
-      {selectedCampaignId && (
+      {/* Mobile bottom nav — always visible */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-30" style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-center justify-around py-2" style={{ height: 'var(--nav-height)' }}>
           {TABS.map(tab => {
-            const active = activeTab === tab.key;
+            const active = selectedCampaignId && activeTab === tab.key;
+            const disabled = !selectedCampaignId;
             return (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              <button key={tab.key} onClick={() => { if (!disabled) setActiveTab(tab.key); }}
                 className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px]"
-                style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }}>
+                style={{ color: active ? 'var(--terra)' : disabled ? 'var(--ink-15)' : 'var(--ink-35)', opacity: disabled ? 0.5 : 1 }}>
                 <tab.icon size={20} strokeWidth={active ? 2 : 1.5} />
                 <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
               </button>
@@ -769,7 +813,6 @@ export default function BusinessPortal() {
           })}
         </div>
       </div>
-      )}
     </div>
   );
 }
