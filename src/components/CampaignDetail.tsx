@@ -205,31 +205,33 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           )}
         </div>
 
-        <div className="px-6 pt-7 pb-24 md:pb-8">
-          {/* Brand row */}
-          <div className="flex items-center gap-3 mb-2">
+        <div className="px-6 pb-24 md:pb-8">
+          {/* Logo — overlapping the hero image */}
+          <div className="-mt-7 mb-3">
             {campaign.businesses?.logo_url ? (
-              <img src={campaign.businesses.logo_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+              <img src={campaign.businesses.logo_url} alt="" className="w-14 h-14 rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
             ) : (
-              <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
-                <CategoryIcon category={campaign.businesses?.category} className="w-5 h-5" style={{ color: catPalette.color, opacity: 0.6 }} />
+              <div className="w-14 h-14 rounded-full flex items-center justify-center border-[3px] border-white" style={{ background: catPalette.tint, boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
+                <CategoryIcon category={campaign.businesses?.category} className="w-6 h-6" style={{ color: catPalette.color, opacity: 0.6 }} />
               </div>
             )}
-            <div className="flex-1 min-w-0">
-              <button onClick={() => setShowBrandInfo(true)} className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
-                {campaign.businesses?.name}
-              </button>
-              <div className="flex items-center gap-2">
-                {campaign.businesses?.category && (
-                  <span className="text-[11px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
-                )}
-                {campaign.businesses?.instagram_handle && (
-                  <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                    className="text-[11px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
-                    <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
-                  </a>
-                )}
-              </div>
+          </div>
+
+          {/* Brand info */}
+          <div className="mb-2">
+            <button onClick={() => setShowBrandInfo(true)} className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
+              {campaign.businesses?.name}
+            </button>
+            <div className="flex items-center gap-2 mt-0.5">
+              {campaign.businesses?.category && (
+                <span className="text-[11px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
+              )}
+              {campaign.businesses?.instagram_handle && (
+                <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+                  className="text-[11px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
+                  <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
+                </a>
+              )}
             </div>
           </div>
           {/* Address */}
