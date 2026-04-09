@@ -36,7 +36,7 @@ function SkeletonCard() {
 }
 function SkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
     </div>
   );
@@ -292,7 +292,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </div>
       )}
       {!loading && !fetchError && <>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {filtered.map(c => {
             const appStatus = applications[c.id];
             const catPalette = getCategoryPalette(c.businesses?.category);
