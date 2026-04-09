@@ -226,10 +226,10 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[10px] text-[14px] font-medium">{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
+      <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead><tr>
             <th className={thCls}>Brand</th><th className={thCls}>Category</th><th className={thCls}>Region</th>

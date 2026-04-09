@@ -116,17 +116,14 @@ export default function AdminDashboard() {
                   <button
                     key={item.key}
                     onClick={() => handleTabClick(item.key)}
-                    className="w-full flex items-center gap-[9px] rounded-[10px] text-[14px] transition-colors"
+                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] mb-1 text-[14px] transition-colors"
                     style={{
                       fontWeight: active ? 700 : 500,
                       background: active ? 'var(--terra-10)' : 'transparent',
-                      borderLeft: active ? '3px solid var(--terra)' : '3px solid transparent',
                       color: active ? 'var(--terra)' : 'var(--ink-60)',
-                      padding: '8px 12px',
-                      margin: '1px 8px',
                     }}
                   >
-                    <item.icon size={15} strokeWidth={active ? 2 : 1.5} />
+                    <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {item.key === 'creators' && pendingCount > 0 && (
                       <span className="flex items-center justify-center text-[10px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>

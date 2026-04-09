@@ -472,7 +472,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
         {/* Toast */}
         {toast && (
-          <div className="absolute top-16 left-1/2 -translate-x-1/2 z-10 bg-[var(--ink)] text-white px-4 py-2 rounded-[10px] text-[13px] font-medium">
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>
             {toast}
           </div>
         )}
@@ -696,7 +696,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
         </div>
 
         {toast && (
-          <div className="mx-5 mt-3 px-3.5 py-2 rounded-[10px] bg-[var(--ink)] text-white text-[13px] font-medium">{toast}</div>
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
         )}
 
         {/* Scrollable body */}
@@ -922,7 +922,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px]" style={{ padding: 16 }}>
+          <div key={s.label} className="bg-white rounded-[12px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
@@ -931,7 +931,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
       {/* Campaign table */}
       {campaigns.length > 0 ? (
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
+        <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
@@ -985,7 +985,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         </div>
       ) : (
         /* Empty state */
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] p-12 text-center">
+        <div className="bg-white rounded-[12px] p-12 text-center">
           <div className="w-12 h-12 rounded-[10px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>
             <Megaphone size={22} className="text-[var(--terra)]" />
           </div>

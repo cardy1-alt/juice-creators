@@ -91,11 +91,11 @@ export default function AdminNotificationsTab() {
   return (
     <div>
       {toast && (
-        <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[10px] text-[14px] font-medium">{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Send notification card */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] p-6 mb-6">
+      <div className="bg-white rounded-[12px] p-6 mb-6">
         <h2 className="nayba-h2 text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
@@ -145,7 +145,7 @@ export default function AdminNotificationsTab() {
       </div>
 
       {/* Sent log */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden overflow-x-auto">
+      <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[500px]">
           <thead><tr>
             <th className={thCls}>Sent</th><th className={thCls}>Campaign</th><th className={thCls}>Recipients</th><th className={thCls}>Type</th>
