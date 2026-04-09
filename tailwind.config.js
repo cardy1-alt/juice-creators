@@ -4,23 +4,31 @@ export default {
   theme: {
     extend: {
       fontFamily: {
+        hornbill: ['Hornbill', 'Georgia', 'serif'],
         sans: ['Instrument Sans', 'sans-serif'],
-        serif: ['Instrument Serif', 'serif'],
       },
       colors: {
         nayba: {
-          shell:   '#F7F6F3',
-          card:    '#FFFFFF',
-          border:  'rgba(0,0,0,0.08)',
-          ink:     '#1C1917',
-          terra:   '#C4674A',
+          // New palette tokens
+          chalk:    'var(--chalk)',
+          stone:    'var(--stone)',
+          terra:    'var(--terra)',
+          sage:     'var(--sage)',
+          violet:   'var(--violet)',
+          baltic:   'var(--baltic)',
+          mist:     'var(--golden-mist)',
+          ink:      'var(--ink)',
+          'ink-60': 'var(--ink-60)',
+          'ink-35': 'var(--ink-35)',
+          'ink-08': 'var(--ink-08)',
+          // Aliases — keep so existing Tailwind classes don't break
+          shell:    'var(--chalk)',
+          card:     'var(--stone)',
+          border:   'rgba(0,0,0,0.08)',
           'terra-light': 'rgba(196,103,74,0.08)',
-          'ink-60': 'rgba(0,0,0,0.6)',
           'ink-45': 'rgba(0,0,0,0.45)',
-          'ink-35': 'rgba(0,0,0,0.35)',
-          'ink-08': 'rgba(0,0,0,0.08)',
-          success: '#0F6E56',
-          neutral: '#6B7280',
+          success:  '#0F6E56',
+          neutral:  '#6B7280',
         },
       },
       borderRadius: {
