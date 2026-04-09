@@ -275,9 +275,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                       {c.campaign_image ? (
                         <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
-                          <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.45 }} />
-                          <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.55 }}>{c.businesses?.name}</span>
+                        <div className="w-full h-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                          <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.45 }} />
                         </div>
                       )}
                       {appStatus && (
