@@ -158,8 +158,8 @@ export default function AdminAnalyticsTab() {
         {statCards.map(s => (
           <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
-                <s.icon size={17} style={{ color: s.color }} />
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
+                <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
                 <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
