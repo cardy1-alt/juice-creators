@@ -193,7 +193,16 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const rawAddress = profile.address || '';
   const knownCounties = ['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'];
   const county = knownCounties.find(c => rawAddress.includes(c)) || rawAddress.split(',')[0]?.trim() || 'your area';
-  const [featured, ...rest] = filtered;
+
+  // Profile completeness
+  const completenessChecks = [
+    !!profile.display_name,
+    !!profile.instagram_handle,
+    !!profile.address,
+    !!profile.bio,
+    profile.total_campaigns > 0,
+  ];
+  const completePct = Math.round((completenessChecks.filter(Boolean).length / completenessChecks.length) * 100);
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
@@ -212,142 +221,175 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </button>
       )}
 
-      {/* Search */}
-      <div className="relative mb-4">
-        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search campaigns..."
-          className="w-full pl-10 pr-4 h-[44px] rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
-      </div>
+      {/* Desktop layout: grid + right sidebar */}
+      <div className="flex gap-6">
+        {/* Main column */}
+        <div className="flex-1 min-w-0">
+          {/* Search */}
+          <div className="relative mb-4">
+            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Search campaigns..."
+              className="w-full pl-10 pr-4 h-[44px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+          </div>
 
-      {/* Category chips — active chip uses category-specific color */}
-      <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
-        {categories.map(c => {
-          const isActive = category === c;
-          const chipColor = c === 'All' ? null : getFilterChipColor(c);
-          return (
-            <button key={c} onClick={() => setCategory(c)}
-              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
-              style={{
-                fontWeight: isActive ? 700 : 600,
-                background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
-              }}>
-              {c}
-            </button>
-          );
-        })}
-      </div>
+          {/* Category chips */}
+          <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
+            {categories.map(c => {
+              const isActive = category === c;
+              const chipColor = c === 'All' ? null : getFilterChipColor(c);
+              return (
+                <button key={c} onClick={() => setCategory(c)}
+                  className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+                  style={{
+                    fontWeight: isActive ? 700 : 600,
+                    background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
+                  }}>
+                  {c}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Campaign cards */}
-      {loading && <SkeletonList count={6} />}
-      {!loading && fetchError && (
-        <div className="py-12 text-center">
-          <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
-          <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
-          <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
-          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
-            <RefreshCw size={14} /> Retry
-          </button>
-        </div>
-      )}
-      {!loading && !fetchError && <>
-        {/* Featured campaign — first result, horizontal layout */}
-        {featured && (() => {
-          const appStatus = applications[featured.id];
-          const catPalette = getCategoryPalette(featured.businesses?.category);
-          return (
-            <button onClick={() => onOpenCampaign(featured.id)}
-              className="w-full text-left rounded-[12px] bg-white mb-5 flex flex-col md:flex-row overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
-              style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              {/* Image — edge to edge, rounded by card overflow */}
-              <div className="md:w-[45%] relative" style={{ minHeight: 220 }}>
-                {featured.campaign_image ? (
-                  <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 220 }} />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: 220, background: catPalette.tint }}>
-                    <CategoryIcon category={featured.businesses?.category} className="w-12 h-12 mb-3" style={{ color: catPalette.color, opacity: 0.5 }} />
-                    {featured.businesses?.name && (
-                      <span className="text-[14px] font-medium" style={{ color: catPalette.color, opacity: 0.6 }}>{featured.businesses.name}</span>
-                    )}
-                  </div>
-                )}
-                {appStatus && (
-                  <span className={`absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
-                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                  </span>
-                )}
-              </div>
-              {/* Content */}
-              <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                  <span className="text-[13px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
-                </div>
-                <p className="text-[20px] md:text-[22px] text-[var(--ink)] leading-[1.25] mb-3" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
-                {featured.expression_deadline && (
-                  <p className="text-[13px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
-                )}
-              </div>
-            </button>
-          );
-        })()}
-
-        {/* Remaining campaigns — grid */}
-        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-5">
-          {rest.map(c => {
-            const appStatus = applications[c.id];
-            const catPalette = getCategoryPalette(c.businesses?.category);
-            return (
-              <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className="w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                {/* Cover image — edge to edge */}
-                <div className="w-full relative" style={{ height: 170 }}>
-                  {c.campaign_image ? (
-                    <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
-                      <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.45 }} />
-                      <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.55 }}>{c.businesses?.name}</span>
-                    </div>
-                  )}
-                  {appStatus && (
-                    <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
-                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                    </span>
-                  )}
-                  {c.campaign_type === 'community' && (
-                    <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
-                  )}
-                </div>
-                {/* Content — minimal */}
-                <div className="flex-1 p-3.5 flex flex-col">
-                  <div className="flex items-center gap-1.5 mb-1.5">
-                    <span className="text-[11px]" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
-                  </div>
-                  <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
-                  {c.expression_deadline && (
-                    <p className="text-[11px] text-[var(--ink-35)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
-                  )}
-                </div>
+          {/* Campaign grid — uniform */}
+          {loading && <SkeletonList count={6} />}
+          {!loading && fetchError && (
+            <div className="py-12 text-center">
+              <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
+              <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
+              <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
+              <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+                <RefreshCw size={14} /> Retry
               </button>
-            );
-          })}
-        </div>}
+            </div>
+          )}
+          {!loading && !fetchError && <>
+            <div className="grid grid-cols-2 gap-5">
+              {filtered.map(c => {
+                const appStatus = applications[c.id];
+                const catPalette = getCategoryPalette(c.businesses?.category);
+                return (
+                  <button key={c.id} onClick={() => onOpenCampaign(c.id)}
+                    className="w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                    <div className="w-full relative" style={{ height: 170 }}>
+                      {c.campaign_image ? (
+                        <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
+                          <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.45 }} />
+                          <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.55 }}>{c.businesses?.name}</span>
+                        </div>
+                      )}
+                      {appStatus && (
+                        <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
+                          {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                        </span>
+                      )}
+                      {c.campaign_type === 'community' && (
+                        <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
+                      )}
+                    </div>
+                    <div className="flex-1 p-3.5 flex flex-col">
+                      <span className="text-[11px] mb-1.5" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
+                      <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
+                      {c.expression_deadline && (
+                        <p className="text-[11px] text-[var(--ink-35)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
 
-        {filtered.length === 0 && (
-          <div className="py-12 text-center">
-            <Compass size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
-            <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
-            <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
+            {filtered.length === 0 && (
+              <div className="py-12 text-center">
+                <Compass size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
+                <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
+                <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
+              </div>
+            )}
+            {filtered.length > 0 && (
+              <div className="py-8 text-center">
+                <Check size={20} className="text-[var(--ink-15)] mx-auto mb-2" />
+                <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon</p>
+              </div>
+            )}
+          </>}
+        </div>
+
+        {/* Right sidebar — desktop only */}
+        <div className="hidden lg:block w-[260px] flex-shrink-0 space-y-4">
+          {/* Profile card */}
+          <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex items-center gap-3 mb-3">
+              {profile.avatar_url ? (
+                <img src={profile.avatar_url} alt="" className="w-10 h-10 rounded-full object-cover" />
+              ) : (
+                <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: 'var(--terra)' }}>
+                  <span className="text-[14px] text-white" style={{ fontWeight: 700 }}>{(profile.display_name || profile.name || '?')[0].toUpperCase()}</span>
+                </div>
+              )}
+              <div>
+                <p className="text-[14px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
+                <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2 mb-3">
+              <div className="text-center">
+                <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.total_campaigns}</p>
+                <p className="text-[10px] text-[var(--ink-35)]">Campaigns</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.total_reels}</p>
+                <p className="text-[10px] text-[var(--ink-35)]">Reels</p>
+              </div>
+              <div className="text-center">
+                <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
+                <p className="text-[10px] text-[var(--ink-35)]">Rate</p>
+              </div>
+            </div>
+            {profile.total_campaigns > 0 && (
+              <div className="h-1 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden">
+                <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
+              </div>
+            )}
           </div>
-        )}
-        {filtered.length > 0 && (
-          <div className="py-8 text-center">
-            <Check size={20} className="text-[var(--ink-15)] mx-auto mb-2" />
-            <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon for new campaigns</p>
+
+          {/* Profile completeness nudge */}
+          {completePct < 100 && (
+            <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <p className="text-[13px] font-medium text-[var(--ink)]">Complete your profile</p>
+                <span className="text-[12px] font-semibold text-[var(--terra)]">{completePct}%</span>
+              </div>
+              <div className="h-1 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden mb-2">
+                <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${completePct}%` }} />
+              </div>
+              <p className="text-[12px] text-[var(--ink-35)]">
+                {!profile.bio ? 'Add a bio' : !profile.address ? 'Add your county' : 'Complete your details'} to help brands find you
+              </p>
+            </div>
+          )}
+
+          {/* How it works */}
+          <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)] mb-2.5">How it works</p>
+            <div className="space-y-2.5">
+              {[
+                { icon: Compass, text: 'Browse campaigns near you' },
+                { icon: Megaphone, text: "Express interest in ones you like" },
+                { icon: Gift, text: 'Get selected, receive your perk' },
+                { icon: Film, text: 'Post a Reel about the experience' },
+              ].map((step, i) => (
+                <div key={i} className="flex items-start gap-2.5">
+                  <step.icon size={14} className="text-[var(--ink-35)] mt-0.5 flex-shrink-0" />
+                  <p className="text-[12px] text-[var(--ink-60)] leading-[1.4]">{step.text}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        )}
-      </>}
+        </div>
+      </div>
 
       {/* Brand info modal */}
       {brandModal && <BrandInfoModal brand={brandModal} onClose={() => setBrandModal(null)} />}
