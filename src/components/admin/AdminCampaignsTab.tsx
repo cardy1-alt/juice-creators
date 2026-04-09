@@ -930,8 +930,33 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       </div>
 
       {/* Campaign table */}
-      {campaigns.length > 0 ? (
-        <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
+      {campaigns.length > 0 ? (<>
+        {/* Mobile card list */}
+        <div className="md:hidden space-y-2">
+          {campaigns.map(c => {
+            const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+            return (
+              <div key={c.id} onClick={() => setPeekCampaign(peekCampaign?.id === c.id ? null : c)}
+                className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <div>
+                    <p className="text-[14px] font-semibold text-[var(--ink)]">{c.title}</p>
+                    <p className="text-[12px] text-[var(--ink-60)]">{c.businesses?.name}</p>
+                  </div>
+                  <StatusBadge status={c.status} />
+                </div>
+                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                  <span>{counts.applicants}/{c.creator_target} applicants</span>
+                  <span>{counts.selected} selected</span>
+                  <span>{counts.submitted} reels</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Desktop table */}
+        <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
@@ -983,7 +1008,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             </tbody>
           </table>
         </div>
-      ) : (
+      </>) : (
         /* Empty state */
         <div className="bg-white rounded-[12px] p-12 text-center">
           <div className="w-12 h-12 rounded-[10px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>

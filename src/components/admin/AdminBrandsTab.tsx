@@ -229,7 +229,38 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
         <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
-      <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
+      {/* Mobile card list */}
+      <div className="md:hidden space-y-2">
+        {brands.map(b => (
+          <div key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
+            className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex items-center justify-between mb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
+                  <span className="text-[12px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
+                </div>
+                <div>
+                  <p className="text-[14px] font-semibold text-[var(--ink)]">{b.name}</p>
+                  <p className="text-[12px] text-[var(--ink-60)]">{b.category}</p>
+                </div>
+              </div>
+              {b.approved
+                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                : <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
+              }
+            </div>
+            <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+              <span>{b.region}</span>
+              {b.instagram_handle && <span>@{b.instagram_handle.replace('@','')}</span>}
+              <span>{campaignCounts[b.id] || 0} campaigns</span>
+            </div>
+          </div>
+        ))}
+        {brands.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-35)]">No brands yet</p>}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead><tr>
             <th className={thCls}>Brand</th><th className={thCls}>Category</th><th className={thCls}>Region</th>

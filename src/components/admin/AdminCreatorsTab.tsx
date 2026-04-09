@@ -429,8 +429,39 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
       </div>
 
-      {/* Creators table */}
-      <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
+      {/* Mobile card list */}
+      <div className="md:hidden space-y-2">
+        {filteredCreators.map(c => {
+          const initial = (c.display_name || c.name || '?')[0].toUpperCase();
+          const colors = getAvatarColors(initial);
+          return (
+            <div key={c.id} onClick={() => setPeekCreator(peekCreator?.id === c.id ? null : c)}
+              className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: colors.bg }}>
+                    <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                  </div>
+                  <div>
+                    <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
+                    <p className="text-[12px] text-[var(--ink-60)]">{c.instagram_handle}</p>
+                  </div>
+                </div>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>L{c.level}</span>
+              </div>
+              <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                <span>{c.address || '—'}</span>
+                <span>{c.completion_rate}% rate</span>
+                <span>{c.completed_campaigns}/{c.total_campaigns} done</span>
+              </div>
+            </div>
+          );
+        })}
+        {filteredCreators.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</p>}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>

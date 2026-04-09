@@ -144,8 +144,24 @@ export default function AdminNotificationsTab() {
         )}
       </div>
 
-      {/* Sent log */}
-      <div className="bg-white rounded-[12px] overflow-hidden overflow-x-auto">
+      {/* Mobile card list */}
+      <div className="md:hidden space-y-2">
+        {logs.map(n => (
+          <div key={n.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex items-center justify-between mb-1.5">
+              <span className="text-[12px] text-[var(--ink-35)]">{fmtDate(n.created_at)}</span>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+                {n.email_type?.replace(/_/g, ' ') || 'notification'}
+              </span>
+            </div>
+            <p className="text-[13px] text-[var(--ink)] line-clamp-2">{n.message}</p>
+          </div>
+        ))}
+        {logs.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-35)]">No notifications sent yet</p>}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[500px]">
           <thead><tr>
             <th className={thCls}>Sent</th><th className={thCls}>Campaign</th><th className={thCls}>Recipients</th><th className={thCls}>Type</th>
