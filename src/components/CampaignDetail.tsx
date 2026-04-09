@@ -205,9 +205,9 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           )}
         </div>
 
-        <div className="px-6 pt-5 pb-24 md:pb-8">
+        <div className="px-6 pt-7 pb-24 md:pb-8">
           {/* Brand row */}
-          <div className="flex items-center gap-3 mb-4">
+          <div className="flex items-center gap-3 mb-2">
             {campaign.businesses?.logo_url ? (
               <img src={campaign.businesses.logo_url} alt="" className="w-10 h-10 rounded-full object-cover" />
             ) : (
@@ -232,6 +232,14 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
               </div>
             </div>
           </div>
+          {/* Address */}
+          {campaign.businesses?.address && (
+            <div className="flex items-center gap-1.5 mb-5 ml-[52px]">
+              <MapPin size={12} className="text-[var(--ink-35)]" />
+              <span className="text-[13px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
+            </div>
+          )}
+          {!campaign.businesses?.address && <div className="mb-5" />}
 
           {/* Title */}
           <h1 className="text-[22px] text-[var(--ink)] mb-2" style={{ fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.3px' }}>
@@ -265,10 +273,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
                   </div>
                 )}
                 <div className="flex-1">
-                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">
-                    About {campaign.businesses?.name}
-                    {campaign.businesses?.address && <span> · {campaign.businesses.address}</span>}
-                  </p>
+                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">About {campaign.businesses?.name}</p>
                   <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
                 </div>
               </div>
