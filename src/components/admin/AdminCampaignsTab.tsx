@@ -218,7 +218,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                   <button type="button" onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
                     className="inline-flex items-center gap-1 px-3.5 py-1 rounded-[10px] border border-[var(--terra)] text-[var(--terra)] bg-white text-[12px] font-semibold hover:bg-[rgba(196,103,74,0.04)] disabled:opacity-40 transition-colors">
                     {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
-                    {aiLoading ? 'Generating...' : 'Generate brief with AI'}
+                    {aiLoading ? 'Suggesting...' : 'Suggest ideas'}
                   </button>
                 </div>
                 <input value={form.headline} onChange={e => set('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
@@ -279,7 +279,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                     className={`${primaryBtn} inline-flex items-center gap-2 mb-3`}
                     style={{ fontWeight: 700 }}>
                     {aiLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✦'}{' '}
-                    {aiLoading ? 'Generating brief...' : 'Generate brief with AI'}
+                    {aiLoading ? 'Suggesting...' : 'Suggest ideas'}
                   </button>
                   <p className="text-[13px] text-[var(--ink-35)]">Fill in Step 1 first, then let AI write your brief.</p>
                   {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
@@ -598,9 +598,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
   campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [recommendations, setRecommendations] = useState<{ creator_id: string; name: string; reason: string; score: number }[] | null>(null);
-  const [aiError, setAiError] = useState('');
   const [showAddApplicant, setShowAddApplicant] = useState(false);
   const [allCreators, setAllCreators] = useState<{id:string;name:string;display_name:string|null;instagram_handle:string}[]>([]);
   const [addingCreator, setAddingCreator] = useState<string | null>(null);
@@ -625,35 +622,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
     showToast('Applicant added');
   };
 
-  const handleAiRecommend = async () => {
-    setAiLoading(true); setAiError(''); setRecommendations(null);
-    try {
-      const { data: apps } = await supabase.from('applications')
-        .select('creator_id, creators(id, name, display_name, instagram_handle, level, completion_rate, total_campaigns, address)')
-        .eq('campaign_id', campaign.id).eq('status', 'interested');
-      if (!apps || apps.length === 0) { setAiError('No applicants to recommend from'); setAiLoading(false); return; }
-      const applicants = apps.map((a: any) => ({
-        creator_id: a.creator_id, name: a.creators?.display_name || a.creators?.name,
-        instagram: a.creators?.instagram_handle, level: a.creators?.level,
-        completion_rate: a.creators?.completion_rate, campaigns: a.creators?.total_campaigns, city: a.creators?.address,
-      }));
-      const res = await fetch('/api/ai/generate', {
-        method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `You are helping select creators for a hyperlocal marketing campaign. Campaign: ${campaign.title}. Brand: ${campaign.businesses?.name}. City: ${campaign.target_city}. Perk: ${campaign.perk_description}. Here are the applicants: ${JSON.stringify(applicants)}. Rank the top applicants by fit. Consider: location match to target city, completion rate (higher is better), level (higher is better), campaign experience. Return a JSON array of the top applicants ordered by recommendation score, each with fields: creator_id, name, reason (one sentence explaining why they're a good fit), score (1-10). Return only valid JSON.`,
-          max_tokens: 1000,
-        }),
-      });
-      if (!res.ok) throw new Error('API error');
-      const { text } = await res.json();
-      setRecommendations(JSON.parse(text));
-    } catch {
-      setAiError('AI recommendation failed');
-      setTimeout(() => setAiError(''), 4000);
-    }
-    setAiLoading(false);
-  };
-
   const handleSelectCreator = async (creatorId: string) => {
     const { error: appErr } = await supabase.from('applications').update({
       status: 'confirmed', selected_at: new Date().toISOString(), confirmed_at: new Date().toISOString(),
@@ -675,7 +643,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
         campaign_id: campaign.id,
       });
     }
-    setRecommendations(prev => prev ? prev.filter(r => r.creator_id !== creatorId) : null);
     showToast('Creator selected and confirmed');
   };
 
@@ -736,34 +703,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
             </div>
           </div>
 
-          {aiError && <p className="text-[12px] text-[var(--terra)] mb-3">{aiError}</p>}
-
-          {recommendations && recommendations.length > 0 && (
-            <div className="mb-4 pt-3 border-t border-[rgba(42,32,24,0.08)]">
-              <p className={`${peekLabel} mb-3`}>AI Recommendations</p>
-              <div className="space-y-2">
-                {recommendations.map(r => (
-                  <div key={r.creator_id} className="flex items-center gap-3 bg-[rgba(42,32,24,0.02)] rounded-[10px] border border-[rgba(42,32,24,0.08)] px-3 py-2.5">
-                    <div className="w-7 h-7 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-semibold text-white">{r.name[0]}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] font-semibold text-[var(--ink)]">{r.name}</p>
-                      <p className="text-[12px] text-[var(--ink-35)] truncate">{r.reason}</p>
-                    </div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-[13px] font-semibold text-[var(--terra)]">{r.score}/10</span>
-                      <button onClick={() => handleSelectCreator(r.creator_id)}
-                        className="px-2.5 py-1 rounded-[10px] bg-[var(--terra)] text-white text-[11px] font-semibold hover:opacity-[0.85]">
-                        Select
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {showAddApplicant && (
             <div className="mb-4 pt-3 border-t border-[rgba(42,32,24,0.08)]">
               <div className="flex items-center justify-between mb-3">
@@ -793,11 +732,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
         <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] mb-3" style={{ fontWeight: 700 }}>Edit Campaign</button>
           <div className="flex items-center justify-center gap-1 flex-wrap">
-            <button onClick={handleAiRecommend} disabled={aiLoading}
-              className="text-[12px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] disabled:opacity-40 transition-colors px-1 py-0.5">
-              {aiLoading ? 'Analysing...' : 'AI Recommend'}
-            </button>
-            <span className="text-[var(--ink-15)]">·</span>
             <button onClick={onViewParticipation}
               className="text-[12px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors px-1 py-0.5">
               Participation
