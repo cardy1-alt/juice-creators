@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye } from 'lucide-react';
+import CampaignDetail from '../CampaignDetail';
 
 // ─── Types ───
 interface Brand { id: string; name: string; }
@@ -699,63 +700,12 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
           <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
         )}
 
-        {/* Scrollable body */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
-            <div>
-              <p className={peekLabel}>Status</p>
-              <StatusBadge status={campaign.status} />
-            </div>
-            <div>
-              <p className={peekLabel}>City</p>
-              <p className="text-[14px] text-[var(--ink)]">{campaign.target_city || '—'}</p>
-            </div>
-            <div>
-              <p className={peekLabel}>Target</p>
-              <p className="text-[14px] text-[var(--ink)]">{campaign.creator_target} creators</p>
-            </div>
-            <div>
-              <p className={peekLabel}>Deadline</p>
-              <p className="text-[14px] text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</p>
-            </div>
-            {campaign.perk_value && (
-              <div>
-                <p className={peekLabel}>Perk Value</p>
-                <p className="text-[14px] text-[var(--ink)]">£{campaign.perk_value}</p>
-              </div>
-            )}
-            {campaign.campaign_type === 'community' && (
-              <div>
-                <p className={peekLabel}>Type</p>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
-              </div>
-            )}
-          </div>
+        {/* Scrollable body — reuses CampaignDetail from creator app */}
+        <div className="flex-1 overflow-y-auto">
+          <CampaignDetail campaignId={campaign.id} />
 
-          {campaign.perk_description && (
-            <div className="mb-4">
-              <p className={peekLabel}>Perk</p>
-              <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{campaign.perk_description}</p>
-              {campaign.perk_type && <p className="text-[13px] text-[var(--ink-35)] mt-1">{campaign.perk_type.replace('_', ' ')}</p>}
-            </div>
-          )}
-
-          {campaign.content_requirements && (
-            <div className="mb-4">
-              <p className={peekLabel}>Content Required</p>
-              <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{campaign.content_requirements}</p>
-            </div>
-          )}
-
-          {campaign.talking_points && campaign.talking_points.length > 0 && (
-            <div className="mb-4">
-              <p className={peekLabel}>Talking Points</p>
-              <ol className="text-[14px] text-[var(--ink)] space-y-1 list-decimal list-inside">
-                {campaign.talking_points.map((tp, i) => <li key={i}>{tp}</li>)}
-              </ol>
-            </div>
-          )}
-
+          {/* Admin controls */}
+          <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)]">
           <div className="mb-4">
             <p className={peekLabel}>Change Status</p>
             <select value={campaign.status} onChange={async e => {
@@ -820,6 +770,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
               </div>
             </div>
           )}
+          </div>
         </div>
 
         {/* Actions */}
