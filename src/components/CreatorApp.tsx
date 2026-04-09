@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
-import { getCategoryPalette, getFilterChipColor } from '../lib/categories';
+import { getCategoryPalette, getFilterChipColor, CategoryIcon } from '../lib/categories';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -191,7 +191,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   });
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
-  const county = profile.address || 'your area';
+  // Extract county — address might be "Suffolk" or "29 Wood View, Haughley, Stowmarket, UK"
+  const rawAddress = profile.address || '';
+  const knownCounties = ['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'];
+  const county = knownCounties.find(c => rawAddress.includes(c)) || rawAddress.split(',')[0]?.trim() || 'your area';
   const [featured, ...rest] = filtered;
 
   return (
@@ -257,38 +260,42 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           const catPalette = getCategoryPalette(featured.businesses?.category);
           return (
             <button onClick={() => onOpenCampaign(featured.id)}
-              className="w-full text-left rounded-[12px] bg-white mb-5 flex flex-col md:flex-row overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
+              className="w-full text-left rounded-[12px] bg-white mb-5 transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
               style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
-              {/* Image — full width on mobile, left side on desktop */}
-              <div className="md:w-[45%] relative" style={{ minHeight: 200 }}>
-                {featured.campaign_image ? (
-                  <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 200 }} />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center" style={{ minHeight: 200 }}>
-                    {featured.businesses?.logo_url ? (
-                      <img src={featured.businesses.logo_url} alt={featured.businesses?.name} className="w-14 h-14 rounded-full object-cover border-2 border-white/30" />
-                    ) : (
-                      <span className="text-[32px] font-semibold text-white/60">{(featured.businesses?.name || '?')[0]}</span>
-                    )}
-                  </div>
-                )}
-                {appStatus && (
-                  <span className={`absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                  </span>
-                )}
-              </div>
-              {/* Content */}
-              <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                  <span className="text-[12px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
+              <div className="flex flex-col md:flex-row p-3 gap-3 md:gap-4">
+                {/* Image — inset with rounded corners */}
+                <div className="md:w-[45%] relative rounded-[8px] overflow-hidden" style={{ minHeight: 200 }}>
+                  {featured.campaign_image ? (
+                    <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 200 }} />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center" style={{ minHeight: 200, background: catPalette.tint }}>
+                      <CategoryIcon category={featured.businesses?.category} className="w-12 h-12 mb-3" style={{ color: catPalette.color, opacity: 0.6 }} />
+                      {featured.businesses?.name && (
+                        <span className="text-[14px] font-medium" style={{ color: catPalette.color, opacity: 0.7 }}>{featured.businesses.name}</span>
+                      )}
+                    </div>
+                  )}
+                  {appStatus && (
+                    <span className={`absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                    </span>
+                  )}
                 </div>
-                <p className="text-[18px] md:text-[20px] text-[var(--ink)] leading-[1.3] mb-3" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
-                {perkShort && <p className="text-[14px] text-[var(--ink-60)] mb-2">{perkShort}{featured.perk_value ? ` · £${featured.perk_value}` : ''}</p>}
-                {featured.expression_deadline && (
-                  <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
-                )}
+                {/* Content */}
+                <div className="flex-1 py-1 md:py-3 md:pr-2 flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                    <span className="text-[13px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
+                  </div>
+                  <p className="text-[18px] md:text-[20px] text-[var(--ink)] leading-[1.3] mb-2" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
+                  {perkShort && <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">{perkShort}{featured.perk_value ? ` · £${featured.perk_value}` : ''}</p>}
+                  <div className="flex items-center justify-between">
+                    {featured.expression_deadline && (
+                      <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
+                    )}
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-[13px] text-white" style={{ background: 'var(--terra)', fontWeight: 600 }}>View campaign</span>
+                  </div>
+                </div>
               </div>
             </button>
           );
@@ -309,12 +316,9 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     {c.campaign_image ? (
                       <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
-                        {c.businesses?.logo_url ? (
-                          <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
-                        ) : (
-                          <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
-                        )}
+                      <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
+                        <CategoryIcon category={c.businesses?.category} className="w-10 h-10 mb-2" style={{ color: catPalette.color, opacity: 0.5 }} />
+                        <span className="text-[12px] font-medium" style={{ color: catPalette.color, opacity: 0.6 }}>{c.businesses?.name}</span>
                       </div>
                     )}
                   {appStatus && (
@@ -638,7 +642,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
               ))}
             </div>
             <div className="relative z-10">
-              <div className="celebrate-bounce w-24 h-24 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-5">
+              <div className="celebrate-bounce w-24 h-24 rounded-full bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-5">
                 <Star size={40} className="text-white" />
               </div>
               <p className="nayba-h2 text-[var(--ink)] mb-2">You're in!</p>
@@ -660,7 +664,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
-        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
+        <div className="w-20 h-20 rounded-full bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
         <p className="nayba-h2 text-[var(--ink)] mb-2">Welcome to The Naybahood</p>

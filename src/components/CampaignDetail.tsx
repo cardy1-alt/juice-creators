@@ -3,6 +3,17 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail } from '../lib/notifications';
 import { ArrowLeft, Check, X, AtSign, ExternalLink } from 'lucide-react';
+import { getCategoryPalette, CategoryIcon } from '../lib/categories';
+
+function CampaignFallbackImage({ category, name }: { category?: string | null; name?: string | null }) {
+  const cp = getCategoryPalette(category);
+  return (
+    <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: cp.tint }}>
+      <CategoryIcon category={category} className="w-14 h-14 mb-2" style={{ color: cp.color, opacity: 0.5 }} />
+      {name && <span className="text-[14px] font-medium" style={{ color: cp.color, opacity: 0.6 }}>{name}</span>}
+    </div>
+  );
+}
 
 interface CampaignDetailProps {
   campaignId: string;
@@ -182,13 +193,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#A8573E] flex items-center justify-center">
-              {campaign.businesses?.logo_url ? (
-                <img src={campaign.businesses.logo_url} alt={campaign.businesses.name} className="w-14 h-14 rounded-full object-cover" />
-              ) : (
-                <span className="text-[32px] font-semibold text-white/40">{(campaign.businesses?.name || '?')[0]}</span>
-              )}
-            </div>
+            <CampaignFallbackImage category={campaign.businesses?.category} name={campaign.businesses?.name} />
           )}
           {onBack && (
             <button onClick={onBack} className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors">
