@@ -209,11 +209,6 @@ export default function Auth() {
           {/* Right — form */}
           <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-12 md:py-16" style={{ background: 'white' }}>
             <div className="w-full max-w-[380px]">
-              {/* Mobile logo — only show on mobile since left panel is hidden */}
-              <div className="md:hidden mb-8 text-center">
-                <Logo size={28} variant="wordmark" />
-              </div>
-
               <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
               <p className="text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
 
