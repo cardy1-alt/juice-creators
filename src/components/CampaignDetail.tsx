@@ -28,7 +28,7 @@ interface Campaign {
   required_tags: string[] | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
   status: string; campaign_image: string | null;
-  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null };
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null };
 }
 
 interface Application {
@@ -60,7 +60,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     setLoading(true);
     const { data: campData, error: campErr } = await supabase
       .from('campaigns')
-      .select('*, businesses(name, category, bio, instagram_handle, logo_url)')
+      .select('*, businesses(name, category, bio, instagram_handle, logo_url, address)')
       .eq('id', campaignId)
       .single();
     if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
@@ -257,11 +257,18 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
             {campaign.about_brand && (
               <div className="flex gap-3">
-                <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
-                  <MapPin size={15} style={{ color: catPalette.color }} />
-                </div>
+                {campaign.businesses?.logo_url ? (
+                  <img src={campaign.businesses.logo_url} alt="" className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
+                    <span className="text-[12px]" style={{ fontWeight: 700, color: catPalette.color }}>{(campaign.businesses?.name || '?')[0]}</span>
+                  </div>
+                )}
                 <div className="flex-1">
-                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">About {campaign.businesses?.name}</p>
+                  <p className="text-[13px] font-medium text-[var(--ink-35)] mb-1">
+                    About {campaign.businesses?.name}
+                    {campaign.businesses?.address && <span> · {campaign.businesses.address}</span>}
+                  </p>
                   <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
                 </div>
               </div>
