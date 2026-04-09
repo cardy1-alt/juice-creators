@@ -236,7 +236,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           </div>
           {/* Address */}
           {campaign.businesses?.address && (
-            <div className="flex items-center gap-1.5 mb-5 ml-[52px]">
+            <div className="flex items-center gap-1.5 mb-5">
               <MapPin size={12} className="text-[var(--ink-35)]" />
               <span className="text-[13px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
             </div>
