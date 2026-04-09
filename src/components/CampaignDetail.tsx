@@ -192,7 +192,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
     <div className="bg-white">
       <div className="max-w-[720px] mx-auto">
         {/* Hero image */}
-        <div className="w-full relative" style={{ height: 280, marginBottom: 32 }}>
+        <div className="w-full relative" style={{ height: 280, marginBottom: 44 }}>
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
@@ -204,12 +204,12 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </button>
           )}
           {/* Logo overlapping bottom edge */}
-          <div className="absolute -bottom-7 left-6">
+          <div className="absolute -bottom-9 left-6">
             {campaign.businesses?.logo_url ? (
-              <img src={campaign.businesses.logo_url} alt="" className="w-14 h-14 rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
+              <img src={campaign.businesses.logo_url} alt="" className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
             ) : (
-              <div className="w-14 h-14 rounded-full flex items-center justify-center border-[3px] border-white" style={{ background: catPalette.tint, boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
-                <CategoryIcon category={campaign.businesses?.category} className="w-6 h-6" style={{ color: catPalette.color, opacity: 0.6 }} />
+              <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white" style={{ background: catPalette.tint, boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
+                <CategoryIcon category={campaign.businesses?.category} className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.6 }} />
               </div>
             )}
           </div>
@@ -217,11 +217,11 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
 
         <div className="px-6 pb-24 md:pb-8">
           {/* Brand info */}
-          <div className="mb-2">
-            <button onClick={() => setShowBrandInfo(true)} className="text-[14px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
+          <div className="mb-5">
+            <button onClick={() => setShowBrandInfo(true)} className="text-[16px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
               {campaign.businesses?.name}
             </button>
-            <div className="flex items-center gap-2 mt-0.5">
+            <div className="flex items-center gap-2 mt-1.5">
               {campaign.businesses?.category && (
                 <span className="text-[11px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
               )}
@@ -232,15 +232,13 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
                 </a>
               )}
             </div>
+            {campaign.businesses?.address && (
+              <div className="flex items-center gap-1.5 mt-2">
+                <MapPin size={12} className="text-[var(--ink-35)]" />
+                <span className="text-[13px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
+              </div>
+            )}
           </div>
-          {/* Address */}
-          {campaign.businesses?.address && (
-            <div className="flex items-center gap-1.5 mb-5">
-              <MapPin size={12} className="text-[var(--ink-35)]" />
-              <span className="text-[13px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
-            </div>
-          )}
-          {!campaign.businesses?.address && <div className="mb-5" />}
 
           {/* Title */}
           <h1 className="text-[22px] text-[var(--ink)] mb-2" style={{ fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.3px' }}>
