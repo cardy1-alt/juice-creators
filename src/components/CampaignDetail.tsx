@@ -233,16 +233,16 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             </div>
           </div>
 
-          {/* Title */}
-          <h1 className="nayba-h2 text-[var(--ink)] mb-4" style={{ fontSize: 22 }}>
+          {/* Title — Instrument Sans, not Hornbill (user-generated content may contain any character) */}
+          <h1 className="text-[22px] text-[var(--ink)] mb-4" style={{ fontWeight: 600, lineHeight: 1.25, letterSpacing: '-0.3px' }}>
             {campaign.headline || campaign.title}
           </h1>
 
           {/* Quick info cards row */}
           <div className="flex flex-wrap gap-3 mb-6">
             {campaign.perk_description && (
-              <div className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-[10px] bg-[var(--terra-light)]">
-                <Gift size={15} className="text-[var(--terra)] flex-shrink-0" />
+              <div className="flex items-start gap-2.5 px-3.5 py-2.5 rounded-[10px] bg-[var(--terra-light)]">
+                <Gift size={15} className="text-[var(--terra)] flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-[13px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
                   {campaign.perk_value && <p className="text-[11px] text-[var(--terra)]" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
@@ -260,7 +260,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
             )}
             {campaign.content_deadline && (
               <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(42,32,24,0.03)' }}>
-                <Film size={14} className="text-[var(--ink-35)]" />
+                <Clock size={14} className="text-[var(--ink-35)]" />
                 <div>
                   <p className="text-[12px] text-[var(--ink-35)]">Content due</p>
                   <p className="text-[13px] font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</p>
