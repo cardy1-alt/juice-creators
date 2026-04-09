@@ -100,6 +100,7 @@ export default function BusinessPortal() {
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [toast, setToast] = useState<string | null>(null);
+  const [showBrief, setShowBrief] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -159,7 +160,7 @@ export default function BusinessPortal() {
   if (!brand) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+        <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
           <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
@@ -190,7 +191,7 @@ export default function BusinessPortal() {
           </div>
           <div className="flex-1" />
           <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
               <LogOut size={18} /> Sign out
             </button>
           </div>
@@ -239,7 +240,7 @@ export default function BusinessPortal() {
         {campaigns.length > 1 && (
           <div className="px-3 py-3" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <select value={selectedCampaignId || ''} onChange={e => setSelectedCampaignId(e.target.value)}
-              className="w-full px-3 py-2 rounded-[6px] bg-white text-[14px] text-[var(--ink)]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              className="w-full px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.title}</option>)}
             </select>
           </div>
@@ -260,7 +261,7 @@ export default function BusinessPortal() {
         </nav>
 
         <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[6px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <LogOut size={18} /> Sign out
           </button>
         </div>
@@ -281,37 +282,52 @@ export default function BusinessPortal() {
         {/* Summary Tab */}
         {activeTab === 'summary' && campaign && (
           <div>
-            <div className="flex items-center gap-3 mb-6">
-              <h1 className="nayba-h2 text-[var(--ink)]">{campaign.title}</h1>
-              <StatusBadge status={campaign.status} />
+            {/* Welcome */}
+            <div className="mb-6">
+              <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {brand.name}</h1>
+              <div className="flex items-center gap-2 mt-1">
+                <StatusBadge status={campaign.status} />
+                <span className="text-[14px] text-[var(--ink-60)]">{campaign.title}</span>
+              </div>
             </div>
 
-            {/* Dates */}
-            <div className="space-y-1.5 text-[13px] mb-6 max-w-[280px]">
-              {campaign.open_date && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Opens</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.open_date)}</span></div>}
-              {campaign.expression_deadline && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Apply by</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></div>}
-              {campaign.content_deadline && <div className="flex justify-between"><span className="text-[var(--ink-35)]">Content due</span><span className="font-medium text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></div>}
+            {/* Dates — inline */}
+            <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mb-5">
+              {campaign.expression_deadline && <span>Apply by <span className="font-semibold text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span>}
+              {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
+              {campaign.content_deadline && <span>Content due <span className="font-semibold text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
             </div>
 
             {/* Stats row */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
               {[
-                { label: 'Applicants', value: applications.length },
-                { label: 'Selected', value: selectedCount },
-                { label: 'Content Submitted', value: submittedCount },
-                { label: 'Completed', value: completedCount },
-                { label: 'Total Reach', value: totalReach.toLocaleString() },
+                { label: 'Applicants', value: applications.length, icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
+                { label: 'Selected', value: selectedCount, icon: Check, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+                { label: 'Content', value: submittedCount, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+                { label: 'Completed', value: completedCount, icon: Check, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+                { label: 'Reach', value: totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
               ].map(s => (
-                <div key={s.label} className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
-                  <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">{s.label}</p>
-                  <p className="text-[24px] font-semibold text-[var(--ink)]">{s.value}</p>
+                <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
+                      <s.icon size={15} style={{ color: s.color }} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
 
-            {/* Campaign brief */}
-            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
-              <h2 className="nayba-h3 text-[var(--ink)] mb-4">Campaign Brief</h2>
+            {/* Campaign brief — collapsible */}
+            <div className="bg-white rounded-[12px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <button onClick={() => setShowBrief(!showBrief)} className="w-full flex items-center justify-between p-4 text-left">
+                <span className="text-[14px] font-semibold text-[var(--ink)]">Campaign Brief</span>
+                <span className="text-[12px] text-[var(--ink-35)]">{showBrief ? 'Hide' : 'Show'}</span>
+              </button>
+              {showBrief && <div className="px-5 pb-5 pt-0">
               {campaign.perk_description && (
                 <div className="mb-4">
                   <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Perk</p>
@@ -333,11 +349,12 @@ export default function BusinessPortal() {
                   </ul>
                 </div>
               )}
+              </div>}
             </div>
 
             <div className="mt-4">
               <a href="mailto:jacob@nayba.app"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[6px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
                 <Mail size={15} /> Contact nayba
               </a>
             </div>
@@ -399,12 +416,12 @@ export default function BusinessPortal() {
             {/* Filters + bulk actions */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
-                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink)]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                className="px-3 py-2 rounded-[10px] bg-white text-[13px] text-[var(--ink)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <option value="all">All levels</option>
                 {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
               </select>
               <button onClick={toggleAll}
-                className="px-3 py-2 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
+                className="px-3 py-2 rounded-[10px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
                 {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
               </button>
               {selectedCreators.size > 0 && (
@@ -415,7 +432,7 @@ export default function BusinessPortal() {
                     Select {selectedCreators.size}
                   </button>
                   <button onClick={handleBulkDecline}
-                    className="min-h-[44px] px-3 py-2 rounded-[6px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.04)]">
+                    className="min-h-[44px] px-3 py-2 rounded-[10px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.04)]">
                     Decline
                   </button>
                 </>
@@ -470,7 +487,7 @@ export default function BusinessPortal() {
 
                     {/* Pitch */}
                     {a.pitch && (
-                      <div className="bg-[var(--shell)] rounded-[var(--r-sm)] px-3 py-2 mb-3">
+                      <div className="bg-[var(--shell)] rounded-[10px] px-3 py-2 mb-3">
                         <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
                       </div>
                     )}
@@ -481,7 +498,7 @@ export default function BusinessPortal() {
                       {a.status === 'interested' && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
-                            className="min-h-[44px] px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                            className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85]">
                             Select
                           </button>
                           <button onClick={() => handleDecline(a.id)}
@@ -528,7 +545,7 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                  <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
                       <div className="w-11 h-11 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
@@ -539,7 +556,7 @@ export default function BusinessPortal() {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center justify-between mb-1">
                           <div className="flex items-center gap-2">
-                            <p className="nayba-h2 text-[var(--ink)]">{name}</p>
+                            <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
                             <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
                               className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
                               @{handle} <ExternalLink size={11} />
@@ -561,7 +578,7 @@ export default function BusinessPortal() {
                         <div className="flex items-center gap-4">
                           {steps.map((s, i) => (
                             <div key={i} className="flex items-center gap-1.5">
-                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { border: '1px solid rgba(42,32,24,0.08)' }}>
+                              <div className={`w-4 h-4 rounded-full flex items-center justify-center ${s.done ? 'bg-[var(--terra)]' : ''}`} style={s.done ? {} : { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                                 {s.done && <Check size={10} className="text-white" />}
                               </div>
                               <span className={`text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
@@ -612,7 +629,7 @@ export default function BusinessPortal() {
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
@@ -655,15 +672,15 @@ export default function BusinessPortal() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Total Reach</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Content Pieces</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">{submittedCount}</p>
               </div>
-              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Avg Engagement</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">
                   {participations.filter(p => p.reach && p.reach > 0).length > 0
@@ -676,7 +693,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Reach by creator */}
-            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+            <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
@@ -686,8 +703,8 @@ export default function BusinessPortal() {
                     {withReach.map((p, i) => (
                       <div key={p.id} className="flex items-center gap-3">
                         <span className="text-[14px] text-[var(--ink)] w-32 truncate">{p.creators?.display_name || p.creators?.name}</span>
-                        <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[6px] overflow-hidden">
-                          <div className="h-full rounded-[6px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
+                        <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden">
+                          <div className="h-full rounded-[10px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
                             style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
                             <span className="text-[11px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
                           </div>
