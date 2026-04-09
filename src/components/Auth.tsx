@@ -408,169 +408,164 @@ export default function Auth() {
           </div>
         </div>
       ) : (
-        /* ─── SIGN UP: single page form ─── */
-        <div className="flex-1 flex flex-col items-center justify-center px-5 py-12 md:px-6" style={{ background: 'var(--chalk)', minHeight: '100dvh' }}>
-          <div className="w-full flex flex-col items-center text-center" style={{ maxWidth: 440 }}>
+        /* ─── SIGN UP: multi-step experience ─── */
+        <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 md:py-16" style={{ background: 'white', minHeight: '100dvh' }}>
+          <div className="w-full flex flex-col items-center" style={{ maxWidth: 380 }}>
 
-            {/* Wordmark */}
-            <div style={{ marginBottom: 12 }}>
+            {/* Logo */}
+            <div style={{ marginBottom: 24 }}>
               <Logo size={28} variant="wordmark" />
             </div>
 
-            {/* Back link */}
-            <button
-              type="button"
-              onClick={() => { setMode('roleselect'); setError(''); }}
-              className="flex items-center gap-1 text-[13px] mb-8 transition-colors"
-              style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}
-            >
-              <ChevronLeft size={14} /> Back
-            </button>
+            {/* Progress stepper */}
+            <div className="flex items-center gap-2 mb-8">
+              {[1, 2, 3].map(s => (
+                <div key={s} className="rounded-full transition-all duration-300" style={{
+                  width: signupStep === s ? 24 : 8,
+                  height: 8,
+                  background: signupStep >= s ? 'var(--terra)' : 'rgba(42,32,24,0.10)',
+                  borderRadius: 999,
+                }} />
+              ))}
+            </div>
 
-            {/* Heading — Hornbill for hero moment */}
-            <h1 className="nayba-h1" style={{ fontSize: 28, margin: '0 0 8px', color: 'var(--ink)' }}>Create your account</h1>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'var(--ink-60)', margin: '0 0 32px' }}>You'll be reviewed by our team before getting access.</p>
+            {/* Step 1: The basics */}
+            {signupStep === 1 && (
+              <div className="w-full tab-fade-in">
+                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Let's get you started</h2>
+                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">Takes less than a minute</p>
 
-            {/* Form card */}
-            <div className="w-full bg-white rounded-[12px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
-              <form onSubmit={handleSubmit} className="space-y-3.5">
-                {/* Full Name */}
-                <div>
+                <div className="space-y-3.5">
                   <input
                     type="text"
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
-                    required
                     className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
-                </div>
-
-                {/* Email */}
-                <div>
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    required
                     className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
-                </div>
-
-                {/* Password */}
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={e => setPassword(e.target.value)}
-                    placeholder="At least 8 characters"
-                    required
-                    minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                  />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-35)' }}>
-                    {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
-                  </button>
-                </div>
-
-                {/* Instagram handle */}
-                <div>
-                  <input
-                    type="text"
-                    value={instagramHandle}
-                    onChange={e => setInstagramHandle(e.target.value)}
-                    placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                  />
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>Optional — you can add this later</p>
-                </div>
-
-                {/* Gender */}
-                <div>
-                  <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
-                  <select value={gender} onChange={e => setGender(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
-                    <option value="">Prefer not to say</option>
-                    <option value="female">Female</option>
-                    <option value="male">Male</option>
-                    <option value="non-binary">Non-binary</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                {/* Phone number */}
-                <div>
-                  <input
-                    type="tel"
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                  />
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>For WhatsApp campaign notifications</p>
-                </div>
-
-                {/* County */}
-                <div>
-                  <select
-                    value={address}
-                    onChange={e => setAddress(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif" }}
-                  >
-                    <option value="">Select your county</option>
-                    <option value="Suffolk">Suffolk</option>
-                    <option value="Norfolk">Norfolk</option>
-                    <option value="Cambridgeshire">Cambridgeshire</option>
-                    <option value="Essex">Essex</option>
-                  </select>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>So we can show you local campaigns</p>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={e => setPassword(e.target.value)}
+                      placeholder="Create a password"
+                      minLength={8}
+                      className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    />
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-35)' }}>
+                      {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
+                    </button>
+                  </div>
+                  <p className="text-[12px] text-[var(--ink-35)]">At least 8 characters</p>
                 </div>
 
                 {error && (
-                  <div className="flex items-center gap-2.5 px-4 py-3 rounded-[12px] text-[14px] font-medium" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
+                  <div className="flex items-center gap-2.5 px-4 py-3 rounded-[10px] text-[14px] font-medium mt-3" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
                     <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: 'var(--terra)' }} />
                     {error}
                   </div>
                 )}
 
-                {/* Submit */}
                 <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full h-[48px] text-white rounded-[10px] transition-all disabled:opacity-50 active:scale-[0.98]"
-                  style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '14px', background: 'var(--terra)' }}
+                  type="button"
+                  onClick={() => {
+                    if (!name.trim() || !email.trim() || password.length < 8) {
+                      setError(!name.trim() ? 'Please enter your name' : !email.trim() ? 'Please enter your email' : 'Password must be at least 8 characters');
+                      return;
+                    }
+                    setError('');
+                    setSignupStep(2);
+                  }}
+                  className="w-full h-[48px] text-white rounded-[10px] transition-all active:scale-[0.98] mt-6"
+                  style={{ fontWeight: 700, fontSize: '14px', background: 'var(--terra)' }}
                 >
-                  {loading ? (
-                    <span className="inline-flex items-center gap-2">
-                      <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    </span>
-                  ) : 'Apply for access'}
+                  Continue
                 </button>
-              </form>
-            </div>
 
-            {/* Footer links */}
-            <p className="text-center mt-6" style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'var(--ink-35)', lineHeight: 1.5 }}>
-              Already have an account?{' '}
-              <button
-                type="button"
-                onClick={() => { setMode('signin'); setError(''); }}
-                style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}
-              >
-                Sign in
-              </button>
-            </p>
-            <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', textAlign: 'center', marginTop: 10, lineHeight: 1.5 }}>
-              By signing up you agree to our terms and privacy policy. Your account will be reviewed by our team.
-            </p>
+                <p className="text-center mt-6 text-[13px] text-[var(--ink-35)]">
+                  Already have an account?{' '}
+                  <button type="button" onClick={() => { setMode('signin'); setError(''); }}
+                    style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}>
+                    Sign in
+                  </button>
+                </p>
+              </div>
+            )}
+
+            {/* Step 2: Location + Instagram */}
+            {signupStep === 2 && (
+              <div className="w-full tab-fade-in">
+                <button type="button" onClick={() => { setSignupStep(1); setError(''); }}
+                  className="flex items-center gap-1 text-[13px] mb-6 transition-colors"
+                  style={{ color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                  <ChevronLeft size={14} /> Back
+                </button>
+
+                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Almost there</h2>
+                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">Help us match you with local brands</p>
+
+                <form onSubmit={handleSubmit} className="space-y-3.5">
+                  <div>
+                    <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Your county</label>
+                    <select
+                      value={address}
+                      onChange={e => setAddress(e.target.value)}
+                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    >
+                      <option value="">Select your county</option>
+                      <option value="Suffolk">Suffolk</option>
+                      <option value="Norfolk">Norfolk</option>
+                      <option value="Cambridgeshire">Cambridgeshire</option>
+                      <option value="Essex">Essex</option>
+                    </select>
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">So we can show you campaigns near you</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
+                    <input
+                      type="text"
+                      value={instagramHandle}
+                      onChange={e => setInstagramHandle(e.target.value)}
+                      placeholder="@yourhandle"
+                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    />
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">Optional — you can add this later</p>
+                  </div>
+
+                  {error && (
+                    <div className="flex items-center gap-2.5 px-4 py-3 rounded-[10px] text-[14px] font-medium" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
+                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full" style={{ background: 'var(--terra)' }} />
+                      {error}
+                    </div>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full h-[48px] text-white rounded-[10px] transition-all disabled:opacity-50 active:scale-[0.98] mt-4"
+                    style={{ fontWeight: 700, fontSize: '14px', background: 'var(--terra)' }}
+                  >
+                    {loading ? (
+                      <span className="inline-flex items-center gap-2">
+                        <span className="w-[18px] h-[18px] border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      </span>
+                    ) : 'Apply for access'}
+                  </button>
+                </form>
+
+                <p className="text-[12px] text-[var(--ink-35)] text-center mt-6 leading-[1.5]">
+                  By signing up you agree to our terms and privacy policy.
+                </p>
+              </div>
+            )}
 
           </div>
         </div>
