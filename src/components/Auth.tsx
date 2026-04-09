@@ -153,8 +153,28 @@ export default function Auth() {
         /* ─── SIGN IN: two-column on desktop ─── */
         <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'white' }}>
           {/* Left — branding (desktop only) */}
-          <div className="hidden md:flex flex-1 flex-col items-center justify-center px-12 py-16" style={{ background: 'var(--chalk)' }}>
-            <div className="w-full max-w-[420px]">
+          <div className="hidden md:flex flex-1 flex-col items-center justify-center px-12 py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
+            {/* Floating preview images */}
+            <div className="absolute inset-0 pointer-events-none">
+              {[
+                { src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop', top: '8%', right: '8%', size: 100, rotate: 3 },
+                { src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&h=200&fit=crop', top: '55%', right: '5%', size: 80, rotate: -4 },
+                { src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=200&h=200&fit=crop', bottom: '10%', right: '15%', size: 90, rotate: 5 },
+                { src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop', top: '18%', left: '75%', size: 70, rotate: -2 },
+              ].map((img, i) => (
+                <div key={i} className="absolute rounded-[12px] overflow-hidden" style={{
+                  width: img.size, height: img.size,
+                  top: img.top, right: img.right, bottom: img.bottom, left: img.left,
+                  transform: `rotate(${img.rotate}deg)`,
+                  opacity: 0.35,
+                  boxShadow: '0 2px 12px rgba(42,32,24,0.08)',
+                }}>
+                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                </div>
+              ))}
+            </div>
+
+            <div className="w-full max-w-[420px] relative z-10">
               <div style={{ marginBottom: 32 }}>
                 <Logo size={28} variant="wordmark" />
               </div>
