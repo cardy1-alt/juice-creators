@@ -23,7 +23,7 @@ export default {
           'ink-08': 'var(--ink-08)',
           // Aliases — keep so existing Tailwind classes don't break
           shell:    'var(--chalk)',
-          card:     'var(--stone)',
+          card:     '#FFFFFF',
           border:   'rgba(42,32,24,0.10)',
           'terra-light': 'rgba(217,95,59,0.08)',
           'ink-45': 'rgba(42,32,24,0.45)',
@@ -33,10 +33,10 @@ export default {
       },
       borderRadius: {
         'pill': '999px',
-        'card': '16px',
-        'sm': '12px',
-        'input': '12px',
-        'button': '999px',
+        'card': '12px',
+        'sm': '10px',
+        'input': '10px',
+        'button': '8px',
       },
       boxShadow: {
         'card': '0 2px 8px rgba(42,32,24,0.08)',

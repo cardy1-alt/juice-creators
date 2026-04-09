@@ -187,7 +187,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[12px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="nayba-h2 text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
@@ -303,7 +303,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 </div>
               </div>
               {/* Summary card */}
-              <div className="bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+              <div className="bg-[var(--chalk)] border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
                 <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
                   <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
@@ -461,7 +461,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[12px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="nayba-h2 text-[var(--ink)]">
@@ -922,7 +922,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px]" style={{ padding: 16 }}>
+          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
@@ -931,7 +931,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
       {/* Campaign table */}
       {campaigns.length > 0 ? (
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden overflow-x-auto">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
@@ -985,7 +985,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         </div>
       ) : (
         /* Empty state */
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-12 text-center">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-12 text-center">
           <div className="w-12 h-12 rounded-[12px] flex items-center justify-center mx-auto mb-4" style={{ background: 'rgba(196,103,74,0.08)' }}>
             <Megaphone size={22} className="text-[var(--terra)]" />
           </div>

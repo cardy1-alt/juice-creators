@@ -144,3 +144,37 @@ export function getCategoryPastelBg(category: string | undefined | null): string
 export function getCategoryPastelIcon(category: string | undefined | null): string {
   return CATEGORY_PASTEL_ICON[category || ''] || '#6E6A62';
 }
+
+/* ── Nayba palette mapping — maps business categories to design token colors ── */
+const CATEGORY_PALETTE: Record<string, { color: string; tint: string; border: string }> = {
+  'Food & Drink':         { color: 'var(--sage)',        tint: 'var(--sage-tint)',   border: 'var(--sage)' },
+  'Cafe & Coffee':        { color: 'var(--sage)',        tint: 'var(--sage-tint)',   border: 'var(--sage)' },
+  'Hair & Beauty':        { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
+  'Wellness & Spa':       { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
+  'Health & Fitness':     { color: 'var(--baltic)',      tint: 'var(--baltic-tint)', border: 'var(--baltic)' },
+  'Arts & Entertainment': { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
+  'Education':            { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
+  'Retail':               { color: 'var(--baltic)',      tint: 'var(--baltic-tint)', border: 'var(--baltic)' },
+  'Services':             { color: 'var(--ink-35)',      tint: 'var(--stone)',       border: 'var(--ink-35)' },
+  'Pets':                 { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
+};
+
+const DEFAULT_PALETTE = { color: 'var(--ink-35)', tint: 'var(--stone)', border: 'var(--ink-35)' };
+
+export function getCategoryPalette(category: string | undefined | null): { color: string; tint: string; border: string } {
+  return CATEGORY_PALETTE[category || ''] || DEFAULT_PALETTE;
+}
+
+/* Maps display filter categories to palette colors for filter chips */
+const FILTER_CHIP_COLORS: Record<string, { bg: string; text: string }> = {
+  'Food & Drink': { bg: 'var(--sage)',        text: '#FFFFFF' },
+  'Beauty':       { bg: 'var(--violet)',      text: '#FFFFFF' },
+  'Wellness':     { bg: 'var(--violet)',      text: '#FFFFFF' },
+  'Experience':   { bg: 'var(--golden-mist)', text: '#FFFFFF' },
+  'Retail':       { bg: 'var(--baltic)',      text: '#FFFFFF' },
+  'Fitness':      { bg: 'var(--baltic)',      text: '#FFFFFF' },
+};
+
+export function getFilterChipColor(displayCategory: string): { bg: string; text: string } | null {
+  return FILTER_CHIP_COLORS[displayCategory] || null;
+}

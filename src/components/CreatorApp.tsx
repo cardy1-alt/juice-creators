@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
+import { getCategoryPalette, getFilterChipColor } from '../lib/categories';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -23,7 +24,7 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden" style={{ background: 'var(--stone)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+    <div className="border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden" style={{ background: 'white', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
       <div className="skeleton w-full" style={{ height: 160 }} />
       <div className="p-4 space-y-2.5">
         <div className="skeleton h-3 w-20" />
@@ -96,7 +97,7 @@ function BrandInfoModal({ brand, onClose }: {
   const handle = brand.instagram_handle?.replace('@', '') || '';
   return (
     <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="bg-white rounded-[16px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             {brand.logo_url ? (
@@ -192,7 +193,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] bg-[rgba(45,122,79,0.08)] border border-[rgba(45,122,79,0.15)] mb-4 min-h-[44px]">
+          className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] bg-[rgba(45,122,79,0.08)] border border-[rgba(45,122,79,0.15)] mb-4 min-h-[44px]">
           <span className="text-[14px] font-medium text-[var(--success)]">You're in a campaign — view it</span>
           <ChevronRight size={16} className="text-[var(--success)]" />
         </button>
@@ -203,18 +204,25 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="w-full pl-10 pr-4 h-[44px] rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+          className="w-full pl-10 pr-4 h-[44px] rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
       </div>
 
-      {/* Category chips */}
+      {/* Category chips — active chip uses category-specific color */}
       <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
-        {categories.map(c => (
-          <button key={c} onClick={() => setCategory(c)}
-            className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${category === c ? 'bg-[var(--terra)] text-white border border-transparent' : 'border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
-            style={{ fontWeight: category === c ? 700 : 600, background: category !== c ? 'var(--stone)' : undefined }}>
-            {c}
-          </button>
-        ))}
+        {categories.map(c => {
+          const isActive = category === c;
+          const chipColor = c === 'All' ? null : getFilterChipColor(c);
+          return (
+            <button key={c} onClick={() => setCategory(c)}
+              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+              style={{
+                fontWeight: isActive ? 700 : 600,
+                background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
+              }}>
+              {c}
+            </button>
+          );
+        })}
       </div>
 
       {/* Campaign cards */}
@@ -233,9 +241,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         {filtered.map(c => {
           const appStatus = applications[c.id];
           const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
+          const catPalette = getCategoryPalette(c.businesses?.category);
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left rounded-[16px] overflow-hidden flex flex-col" style={{ background: 'var(--stone)', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+              className="card-press w-full text-left rounded-[12px] overflow-hidden flex flex-col" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)', borderLeft: `3px solid ${catPalette.border}` }}>
               {/* Cover image */}
               <div className="w-full relative" style={{ height: 160 }}>
                 {c.campaign_image ? (
@@ -260,7 +269,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
               </div>
               {/* Content */}
               <div className="flex-1 p-4 flex flex-col">
-                <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1">{c.businesses?.name}</p>
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="inline-flex px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                  <span className="text-[11px] text-[var(--ink-35)]">{c.businesses?.name}</span>
+                </div>
                 <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.headline || c.title}</p>
                 <div className="mt-auto space-y-1.5">
                   {perkShort && <p className="text-[13px] font-semibold text-[var(--terra)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
@@ -397,7 +409,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
@@ -457,7 +469,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
@@ -466,7 +478,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
@@ -485,7 +497,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {/* Reel submission modal */}
       {showReelModal && (
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
-          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[16px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[12px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="nayba-h3 text-[var(--ink)]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
@@ -524,7 +536,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-8 text-center">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
             <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
@@ -547,7 +559,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
-          <div className="bg-white rounded-[16px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
+          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
             {/* Confetti-like decorative dots */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               {[...Array(20)].map((_, i) => (
@@ -585,7 +597,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-8 text-center">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
@@ -638,7 +650,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       </div>
 
       {/* Completion rate */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mt-3 mb-3">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mt-3 mb-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
         <div className="flex items-center gap-3">
           <p className="text-[28px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
@@ -658,22 +670,22 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
           <p className="nayba-h2 text-[var(--ink)]">{profile.total_campaigns}</p>
           <p className="text-[11px] text-[var(--ink-35)]">Campaigns</p>
         </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
           <p className="nayba-h2 text-[var(--ink)]">{profile.total_reels}</p>
           <p className="text-[11px] text-[var(--ink-35)]">Reels</p>
         </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
           <p className="nayba-h2 text-[var(--ink)]">L{profile.level}</p>
           <p className="text-[11px] text-[var(--ink-35)]">{profile.level_name}</p>
         </div>
       </div>
 
       {/* Instagram connection */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
@@ -708,7 +720,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 mt-3">
+          <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 mt-3">
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
               <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
@@ -758,7 +770,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
@@ -776,7 +788,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
@@ -852,23 +864,23 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mb-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
         <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]">
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]">
               <option value="">Select county</option>
               <option value="Suffolk">Suffolk</option>
               <option value="Norfolk">Norfolk</option>
@@ -879,7 +891,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
             <input value={profile.email} disabled
-              className="w-full px-4 py-2.5 rounded-[16px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
             <p className="text-[12px] text-[var(--ink-35)] mt-1">Email can't be changed — contact support if needed</p>
           </div>
         </div>
@@ -890,7 +902,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Password */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mb-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
         <div className="flex items-center justify-between">
           <h2 className="nayba-h3 text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
@@ -905,7 +917,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
-                  className="w-full px-4 py-2.5 pr-10 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+                  className="w-full px-4 py-2.5 pr-10 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -916,12 +928,12 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+                className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
             </div>
             {passwordError && <p className="text-[13px] text-[var(--destructive)]">{passwordError}</p>}
             <div className="flex gap-3">
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
-                className="px-4 py-2 rounded-full border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
+                className="px-4 py-2 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={handleChangePassword} disabled={passwordSaving}
                 className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                 {passwordSaving ? 'Updating...' : 'Update password'}
@@ -932,7 +944,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
         <h2 className="nayba-h3 text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -969,7 +981,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
             className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
@@ -981,19 +993,19 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </div>
 
       <button onClick={() => setShowSignOutConfirm(true)}
-        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] hover:bg-[var(--shell)] min-h-[44px]">
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
         <LogOut size={18} className="text-[var(--terra)]" />
         <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
       </button>
 
       {showSignOutConfirm && (
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-[16px] p-6 max-w-sm w-full text-center">
+          <div className="bg-white rounded-[12px] p-6 max-w-sm w-full text-center">
             <p className="nayba-h3 text-[var(--ink)] mb-2">Sign out?</p>
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowSignOutConfirm(false)}
-                className="flex-1 py-2.5 rounded-full border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
+                className="flex-1 py-2.5 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={onSignOut}
                 className="flex-1 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
             </div>
@@ -1015,7 +1027,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
-      <div className="bg-white rounded-[16px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
+      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
         <Logo size={28} variant="wordmark" />
         <h2 className="nayba-h2 text-[var(--ink)] mt-4 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
@@ -1214,7 +1226,7 @@ export default function CreatorApp() {
         <>
           <div className="hidden md:block fixed inset-0 bg-[rgba(42,32,24,0.25)] z-30" onClick={() => closeCampaignDetail()} />
           <div className="hidden md:flex fixed inset-0 z-40 items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto bg-white rounded-[16px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto"
+            <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto"
               style={{ margin: '0 24px', scrollbarWidth: 'none', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
               <CampaignDetail campaignId={viewingCampaign} onBack={() => closeCampaignDetail()} />
             </div>

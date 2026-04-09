@@ -16,7 +16,7 @@ function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+        <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
           <Skeleton className="h-3 w-24 mb-3" />
           <Skeleton className="h-7 w-16" />
         </div>
@@ -150,7 +150,7 @@ export default function BusinessPortal() {
         </aside>
         <div className="flex-1 p-4 md:p-8">
           <StatCardsSkeleton count={4} />
-          <Skeleton className="h-[300px] rounded-[16px]" />
+          <Skeleton className="h-[300px] rounded-[12px]" />
         </div>
       </div>
     );
@@ -159,7 +159,7 @@ export default function BusinessPortal() {
   if (!brand) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-white rounded-[16px] p-8 max-w-md text-center" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+        <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
           <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
@@ -302,7 +302,7 @@ export default function BusinessPortal() {
                 { label: 'Completed', value: completedCount },
                 { label: 'Total Reach', value: totalReach.toLocaleString() },
               ].map(s => (
-                <div key={s.label} className="bg-white rounded-[16px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <div key={s.label} className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                   <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">{s.label}</p>
                   <p className="text-[24px] font-semibold text-[var(--ink)]">{s.value}</p>
                 </div>
@@ -310,7 +310,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Campaign brief */}
-            <div className="bg-white rounded-[16px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
               <h2 className="nayba-h3 text-[var(--ink)] mb-4">Campaign Brief</h2>
               {campaign.perk_description && (
                 <div className="mb-4">
@@ -430,7 +430,7 @@ export default function BusinessPortal() {
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
                 return (
-                  <div key={a.id} className={`bg-white rounded-[16px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.08)' }}>
+                  <div key={a.id} className={`bg-white rounded-[12px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.08)' }}>
                     {/* Header: checkbox + avatar + name + status */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
@@ -528,7 +528,7 @@ export default function BusinessPortal() {
                 const doneCount = steps.filter(s => s.done).length;
                 const progressPct = (doneCount / steps.length) * 100;
                 return (
-                  <div key={p.id} className="bg-white rounded-[16px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                  <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                     <div className="flex items-start gap-4">
                       {/* Avatar */}
                       <div className="w-11 h-11 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
@@ -612,7 +612,7 @@ export default function BusinessPortal() {
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-white rounded-[16px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+                <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                   <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
                   <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
                     className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
@@ -655,15 +655,15 @@ export default function BusinessPortal() {
 
             {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-              <div className="bg-white rounded-[16px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Total Reach</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">{totalReach.toLocaleString()}</p>
               </div>
-              <div className="bg-white rounded-[16px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Content Pieces</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">{submittedCount}</p>
               </div>
-              <div className="bg-white rounded-[16px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+              <div className="bg-white rounded-[12px] p-[16px]" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1">Avg Engagement</p>
                 <p className="text-[24px] font-semibold text-[var(--ink)]">
                   {participations.filter(p => p.reach && p.reach > 0).length > 0
@@ -676,7 +676,7 @@ export default function BusinessPortal() {
             </div>
 
             {/* Reach by creator */}
-            <div className="bg-white rounded-[16px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
+            <div className="bg-white rounded-[12px] p-5" style={{ border: '1px solid rgba(42,32,24,0.08)' }}>
               <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);

@@ -54,7 +54,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[12px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="nayba-h2 text-[var(--ink)]">Create Brand</h2>
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
@@ -229,7 +229,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
         <div className="fixed top-4 right-4 z-50 bg-[var(--ink)] text-white px-4 py-2.5 rounded-[12px] text-[14px] font-medium">{toast}</div>
       )}
 
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[700px]">
           <thead><tr>
             <th className={thCls}>Brand</th><th className={thCls}>Category</th><th className={thCls}>Region</th>

@@ -11,7 +11,7 @@ function StatCardsSkeleton({ count = 4 }: { count?: number }) {
   return (
     <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-${count} gap-4 mb-6`}>
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+        <div key={i} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
           <Skeleton className="h-3 w-24 mb-3" />
           <Skeleton className="h-7 w-16" />
         </div>
@@ -144,8 +144,8 @@ export default function AdminAnalyticsTab() {
       <div className="tab-fade-in">
         <StatCardsSkeleton count={4} />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Skeleton className="h-[200px] rounded-[16px]" />
-          <Skeleton className="h-[200px] rounded-[16px]" />
+          <Skeleton className="h-[200px] rounded-[12px]" />
+          <Skeleton className="h-[200px] rounded-[12px]" />
         </div>
       </div>
     );
@@ -156,7 +156,7 @@ export default function AdminAnalyticsTab() {
       {/* Stat cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px]" style={{ padding: 16 }}>
+          <div key={s.label} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px]" style={{ padding: 16 }}>
             <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
             <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
           </div>
@@ -165,11 +165,11 @@ export default function AdminAnalyticsTab() {
 
       {/* Charts: row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
           <p className={chartLabel}>Creators by County</p>
           <AnimatedBarChart items={stats.creatorsByCity.map(c => ({ label: c.city, value: c.count }))} color="var(--terra)" />
         </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
           <p className={chartLabel}>New Creators Over Time</p>
           <AnimatedBarChart items={stats.creatorsByMonth.map(m => ({
             label: new Date(m.month + '-01').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
@@ -180,11 +180,11 @@ export default function AdminAnalyticsTab() {
 
       {/* Charts: row 2 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
           <p className={chartLabel}>Campaign Performance</p>
           <AnimatedBarChart items={stats.campaignPerformance.map(c => ({ label: c.title.slice(0, 20), value: c.reach }))} color="var(--terra)" />
         </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
           <p className={chartLabel}>Platform Health</p>
           <ProgressMetric label="Avg Completion Rate" value={stats.completionRate} />
           <ProgressMetric label="Campaign Fill Rate" value={stats.avgFillRate} />

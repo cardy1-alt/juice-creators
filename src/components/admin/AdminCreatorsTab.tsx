@@ -95,7 +95,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
       <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[16px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[12px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="nayba-h2 text-[var(--ink)]">Create Creator</h2>
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
@@ -333,7 +333,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
       {pendingCreators.length > 0 && !showApprovalPane && (
         <button onClick={() => setShowApprovalPane(true)}
-          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[16px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
+          className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[12px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
           <AlertCircle size={18} className="text-[var(--terra)] flex-shrink-0" />
           <div className="flex-1">
             <p className="text-[14px] font-semibold text-[var(--terra)]">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} awaiting approval</p>
@@ -344,7 +344,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       )}
 
       {showApprovalPane && pendingCreators.length > 0 && (
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] mb-5 overflow-hidden">
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] mb-5 overflow-hidden">
           <div className="flex items-center justify-between px-5 py-3.5 border-b border-[rgba(42,32,24,0.08)] bg-[var(--chalk)]">
             <div className="flex items-center gap-3">
               <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending Approvals</h3>
@@ -430,7 +430,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       </div>
 
       {/* Creators table */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[900px]">
           <thead><tr>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>

@@ -4,7 +4,7 @@
   "description": "Hyperlocal creator-brand platform",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F5F0E8",
+  "background_color": "#FAFAF9",
   "theme_color": "#D95F3B",
   "icons": [
     {

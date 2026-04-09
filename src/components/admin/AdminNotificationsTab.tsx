@@ -95,7 +95,7 @@ export default function AdminNotificationsTab() {
       )}
 
       {/* Send notification card */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-6 mb-6">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-6 mb-6">
         <h2 className="nayba-h2 text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
@@ -145,7 +145,7 @@ export default function AdminNotificationsTab() {
       </div>
 
       {/* Sent log */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden overflow-x-auto">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
         <table className="w-full min-w-[500px]">
           <thead><tr>
             <th className={thCls}>Sent</th><th className={thCls}>Campaign</th><th className={thCls}>Recipients</th><th className={thCls}>Type</th>

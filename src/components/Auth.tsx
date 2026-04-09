@@ -24,7 +24,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
   const hasValue = value.length > 0;
 
   return (
-    <div className={`relative transition-all duration-200 rounded-[12px] ${focused ? 'border-[1.5px] border-[var(--terra)]' : 'border-[1.5px] border-[rgba(42,32,24,0.15)]'}`} style={{ background: '#ffffff' }}>
+    <div className={`relative transition-all duration-200 rounded-[12px] ${focused ? 'border-[1.5px] border-[var(--terra)]' : 'border border-[rgba(42,32,24,0.12)]'}`} style={{ background: '#ffffff' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
           focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
@@ -161,7 +161,7 @@ export default function Auth() {
 
             {/* 2. Location pill */}
             <div className="mb-7">
-              <div className="inline-flex items-center gap-[8px] px-[16px] py-[8px]" style={{ background: 'var(--stone)', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
+              <div className="inline-flex items-center gap-[8px] px-[16px] py-[8px]" style={{ background: 'white', border: '1px solid rgba(42,32,24,0.08)', borderRadius: '999px' }}>
                 <span className="relative flex h-[8px] w-[8px]">
                   <span className="relative inline-flex rounded-full h-[8px] w-[8px]" style={{ background: 'var(--terra)' }} />
                 </span>
@@ -181,7 +181,7 @@ export default function Auth() {
             </p>
 
             {/* 5. Form card */}
-            <div className="w-full bg-white rounded-[16px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+            <div className="w-full bg-white rounded-[12px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
 
               {/* ─── FORGOT PASSWORD ─── */}
               {forgotPassword ? (
@@ -350,7 +350,7 @@ export default function Auth() {
                 const selected = selectedRole === opt.key;
                 return (
                   <button key={opt.key} onClick={() => setSelectedRole(opt.key)}
-                    className="flex-1 text-left p-6 rounded-[16px] transition-all"
+                    className="flex-1 text-left p-6 rounded-[12px] transition-all"
                     style={{
                       background: selected ? 'var(--terra-5)' : 'white',
                       border: selected ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.10)',
@@ -421,7 +421,7 @@ export default function Auth() {
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'var(--ink-60)', margin: '0 0 32px' }}>You'll be reviewed by our team before getting access.</p>
 
             {/* Form card */}
-            <div className="w-full bg-white rounded-[16px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+            <div className="w-full bg-white rounded-[12px] p-6 md:p-8 text-left" style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
               <form onSubmit={handleSubmit} className="space-y-3.5">
                 {/* Full Name */}
                 <div>
@@ -431,7 +431,7 @@ export default function Auth() {
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
                     required
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -444,7 +444,7 @@ export default function Auth() {
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
                     required
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                 </div>
@@ -458,7 +458,7 @@ export default function Auth() {
                     placeholder="At least 8 characters"
                     required
                     minLength={8}
-                    className="w-full px-3.5 py-3 pr-11 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 pr-11 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-35)' }}>
@@ -473,7 +473,7 @@ export default function Auth() {
                     value={instagramHandle}
                     onChange={e => setInstagramHandle(e.target.value)}
                     placeholder="@yourhandle"
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>Optional — you can add this later</p>
@@ -483,7 +483,7 @@ export default function Auth() {
                 <div>
                   <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5" style={{ fontFamily: "'Instrument Sans', sans-serif" }}>Gender</label>
                   <select value={gender} onChange={e => setGender(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}>
                     <option value="">Prefer not to say</option>
                     <option value="female">Female</option>
@@ -500,7 +500,7 @@ export default function Auth() {
                     value={phone}
                     onChange={e => setPhone(e.target.value)}
                     placeholder="Phone number"
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   />
                   <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, color: 'var(--ink-35)', marginTop: 6 }}>For WhatsApp campaign notifications</p>
@@ -511,7 +511,7 @@ export default function Auth() {
                   <select
                     value={address}
                     onChange={e => setAddress(e.target.value)}
-                    className="w-full px-3.5 py-3 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[48px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif" }}
                   >
                     <option value="">Select your county</option>
@@ -570,7 +570,7 @@ export default function Auth() {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowTerms(false)}>
           <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" />
           <div
-            className="relative bg-white rounded-[16px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            className="relative bg-white rounded-[12px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
             style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -637,7 +637,7 @@ export default function Auth() {
         <div className="fixed inset-0 z-[9999] flex items-center justify-center px-4" onClick={() => setShowPrivacy(false)}>
           <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" />
           <div
-            className="relative bg-white rounded-[16px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
+            className="relative bg-white rounded-[12px] p-6 max-w-md w-full max-h-[80vh] overflow-y-auto"
             style={{ border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}
             onClick={(e) => e.stopPropagation()}
           >
