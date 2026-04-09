@@ -153,7 +153,7 @@ export default function Auth() {
         /* ─── SIGN IN: two-column on desktop ─── */
         <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'white' }}>
           {/* Left — branding */}
-          <div className="flex flex-1 flex-col items-center justify-center px-6 py-10 md:px-12 md:py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
+          <div className="flex flex-col items-center justify-center px-6 py-8 md:flex-1 md:px-12 md:py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
             {/* Floating preview images — desktop only */}
             <div className="hidden md:block absolute inset-0 pointer-events-none">
               {[
@@ -227,7 +227,7 @@ export default function Auth() {
           </div>
 
           {/* Right / main — form */}
-          <div className="flex-1 flex flex-col items-center justify-center px-5 py-10 md:px-12 md:py-16" style={{ background: 'white' }}>
+          <div className="flex-1 flex flex-col items-center justify-center px-5 py-6 md:px-12 md:py-16" style={{ background: 'white' }}>
             <div className="w-full max-w-[380px]">
               <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Sign in</h2>
               <p className="text-[14px] text-[var(--ink-60)] mb-6">Welcome back to Nayba</p>
