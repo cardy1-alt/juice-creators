@@ -255,7 +255,7 @@ export default function Auth() {
                       />
                       {resetError && (
                         <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                          <span className="flex-shrink-0 w-[6px] h-[6px] rounded-[10px] bg-[var(--terra)]" />
+                          <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                           {resetError}
                         </div>
                       )}
@@ -299,7 +299,7 @@ export default function Auth() {
 
                   {error && (
                     <div className="flex items-center gap-[10px] bg-[var(--terra-10)] text-[var(--terra)] px-[14px] py-[12px] rounded-[12px] text-[15px] font-medium">
-                      <span className="flex-shrink-0 w-[6px] h-[6px] rounded-[10px] bg-[var(--terra)]" />
+                      <span className="flex-shrink-0 w-[6px] h-[6px] rounded-full bg-[var(--terra)]" />
                       {error}
                     </div>
                   )}
@@ -307,7 +307,7 @@ export default function Auth() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full h-[48px] text-white rounded-full transition-all disabled:opacity-50 active:scale-[0.98]"
+                    className="w-full h-[48px] text-white rounded-[10px] transition-all disabled:opacity-50 active:scale-[0.98]"
                     style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '14px', background: 'var(--terra)' }}
                   >
                     {loading ? (
@@ -545,7 +545,7 @@ export default function Auth() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full h-[48px] text-white rounded-full transition-all disabled:opacity-50 active:scale-[0.98]"
+                  className="w-full h-[48px] text-white rounded-[10px] transition-all disabled:opacity-50 active:scale-[0.98]"
                   style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 700, fontSize: '14px', background: 'var(--terra)' }}
                 >
                   {loading ? (
