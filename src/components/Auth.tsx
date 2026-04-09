@@ -535,9 +535,10 @@ export default function Auth() {
                       value={instagramHandle}
                       onChange={e => setInstagramHandle(e.target.value)}
                       placeholder="@yourhandle"
+                      required
                       className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
                     />
-                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">Optional — you can add this later</p>
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">So we can check out your content</p>
                   </div>
 
                   {error && (
