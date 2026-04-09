@@ -77,24 +77,24 @@
   --destructive: #C0392B;
   --destructive-border: rgba(192,57,43,0.3);
 
-  /* ── Shadows ── */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-fab: 0 2px 8px rgba(0,0,0,0.15);
+  /* ── Shadows (warm ink, never pure black) ── */
+  --shadow-card: 0 2px 8px rgba(42,32,24,0.08);
+  --shadow-fab: 0 4px 16px rgba(42,32,24,0.12);
   --shadow-none: none;
 
-  /* ── Borders ── */
-  --border-default: 0.5px solid rgba(0,0,0,0.08);
-  --border-width: 0.5px;
-  --border-color: rgba(0,0,0,0.08);
-  --border-color-hover: rgba(0,0,0,0.18);
-  --border-color-input: rgba(0,0,0,0.18);
-  --border-color-subtle: rgba(0,0,0,0.06);
+  /* ── Borders (warm ink-based, subtle) ── */
+  --border-default: 1px solid rgba(42,32,24,0.10);
+  --border-width: 1px;
+  --border-color: rgba(42,32,24,0.10);
+  --border-color-hover: rgba(42,32,24,0.18);
+  --border-color-input: rgba(42,32,24,0.15);
+  --border-color-subtle: rgba(42,32,24,0.06);
 
   /* ── Radii ── */
-  --r-card: 10px;
-  --r-button: 6px;
+  --r-card: 16px;
+  --r-button: 999px;
   --r-pill: 999px;
-  --r-input: 8px;
+  --r-input: 12px;
   --r-avatar: 50%;
 
   /* ── Typography — Font families ── */
@@ -103,32 +103,35 @@
 
   /* ── Typography — Sizes ── */
   --text-wordmark: 22px;
-  --text-page-title: 16px;
-  --text-section-label: 10px;
+  --text-hero: 36px;
+  --text-page-title: 24px;
+  --text-section-title: 18px;
+  --text-section-label: 11px;
   --text-nav: 14px;
   --text-table-header: 11px;
   --text-table-primary: 14px;
   --text-table-secondary: 13px;
-  --text-body: 14px;
-  --text-label: 11px;
-  --text-meta: 12px;
-  --text-stat-value: 24px;
-  --text-button: 13px;
+  --text-body: 15px;
+  --text-label: 12px;
+  --text-meta: 13px;
+  --text-stat-value: 28px;
+  --text-button: 14px;
 
   /* ── Typography — Weights ── */
   --weight-regular: 400;
   --weight-medium: 500;
   --weight-semibold: 600;
+  --weight-bold: 700;
 
-  /* ── Typography — Colours ── */
-  --text-primary: #1C1917;
-  --text-secondary: rgba(0,0,0,0.5);
-  --text-muted: rgba(0,0,0,0.4);
-  --text-faint: rgba(0,0,0,0.15);
+  /* ── Typography — Colours (warm ink, never cold black) ── */
+  --text-primary: var(--ink);
+  --text-secondary: var(--ink-60);
+  --text-muted: var(--ink-35);
+  --text-faint: var(--ink-15);
 
   /* ── Spacing ── */
-  --space-section: 24px;
-  --space-card-padding: 16px;
+  --space-section: 32px;
+  --space-card-padding: 20px;
 
   /* ── Touch targets ── */
   --touch-min: 44px;
@@ -137,23 +140,23 @@
   --transition-fast: 0.12s ease;
 
   /* ── Focus ring ── */
-  --focus-ring: 0 0 0 3px rgba(196,103,74,0.12);
+  --focus-ring: 0 0 0 3px rgba(217,95,59,0.15);
 
   /* ── Skeleton ── */
-  --skeleton-bg: rgba(0,0,0,0.06);
+  --skeleton-bg: rgba(42,32,24,0.06);
 
   /* ── Progress ── */
-  --progress-track: rgba(0,0,0,0.08);
-  --progress-fill: #C4674A;
+  --progress-track: rgba(42,32,24,0.08);
+  --progress-fill: var(--terra);
 
   /* ── Completion rate bar ── */
   --bar-height: 4px;
 
   /* ── Bottom nav (creator) ── */
-  --nav-height: 56px;
-  --nav-bg: rgba(247,246,243,0.95);
-  --nav-active: #C4674A;
-  --nav-inactive: rgba(0,0,0,0.35);
+  --nav-height: 60px;
+  --nav-bg: rgba(245,240,232,0.95);
+  --nav-active: var(--terra);
+  --nav-inactive: var(--ink-35);
 }
 
 /* ── Skeleton pulse animation ── */
@@ -171,11 +174,23 @@
 .nayba-h1 {
   font-family: 'Hornbill', Georgia, serif;
   font-weight: 900;
+  font-size: var(--text-hero);
   letter-spacing: -0.03em;
+  line-height: 1.1;
 }
 
 .nayba-h2 {
   font-family: 'Hornbill', Georgia, serif;
   font-weight: 700;
+  font-size: var(--text-page-title);
   letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.nayba-h3 {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: var(--text-section-title);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
 }

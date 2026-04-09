@@ -7,32 +7,39 @@
   /* ── Compat aliases — legacy variable references resolve here ── */
   --border: var(--border-color);
   --success: var(--status-active-text);
-  --neutral: #6B7280;
+  --neutral: rgba(42,32,24,0.45);
   --r-sm: var(--r-input);
-  --terra-hover: #A8573E;
-  --terra-5: rgba(196,103,74,0.05);
-  --terra-10: rgba(196,103,74,0.10);
-  --terra-15: rgba(196,103,74,0.15);
-  --terra-20: rgba(196,103,74,0.20);
-  --terra-40: rgba(196,103,74,0.40);
-  --terra-ring: rgba(196,103,74,0.30);
+  --terra-hover: #C04E2E;
+  --terra-5: rgba(217,95,59,0.05);
+  --terra-10: rgba(217,95,59,0.10);
+  --terra-15: rgba(217,95,59,0.15);
+  --terra-20: rgba(217,95,59,0.20);
+  --terra-40: rgba(217,95,59,0.40);
+  --terra-ring: rgba(217,95,59,0.30);
   --shadow-sm: var(--shadow-card);
   --shadow-md: var(--shadow-card);
   --shadow-lg: var(--shadow-fab);
 }
 
 @layer base {
-  h1, h2, h3, h4, h5 {
+  h1, h2 {
+    font-family: var(--font-sans);
+    font-weight: var(--weight-bold);
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  h3, h4, h5 {
     font-family: var(--font-sans);
     font-weight: var(--weight-semibold);
     letter-spacing: -0.01em;
+    color: var(--ink);
   }
   body, p, button, input, label, select, textarea, a {
     font-family: var(--font-sans);
     font-size: var(--text-body);
     font-weight: var(--weight-regular);
     color: var(--ink);
-    line-height: 1.6;
+    line-height: 1.55;
   }
 }
 
