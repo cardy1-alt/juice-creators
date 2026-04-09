@@ -20,35 +20,41 @@
 }
 
 :root {
-  /* ── Backgrounds ── */
-  --shell: #F7F6F3;
-  --card: #FFFFFF;
-  --sidebar-bg: #F7F6F3;
-
-  /* ── Brand ── */
-  --terra: #C4674A;
-  --terra-light: rgba(196,103,74,0.08);
+  /* ── Core palette ── */
+  --chalk: #F5F0E8;
+  --stone: #EDE4D4;
+  --terra: #D95F3B;
+  --sage: #7A9478;
+  --violet: #8C7AAA;
+  --baltic: #7AA0B8;
+  --golden-mist: #C4A84A;
+  --ink: #2A2018;
 
   /* ── Ink scale ── */
-  --ink: #1C1917;
-  --ink-80: rgba(0,0,0,0.8);
-  --ink-60: rgba(0,0,0,0.6);
-  --ink-55: rgba(0,0,0,0.55);
-  --ink-50: rgba(0,0,0,0.5);
-  --ink-45: rgba(0,0,0,0.45);
-  --ink-40: rgba(0,0,0,0.4);
-  --ink-35: rgba(0,0,0,0.35);
-  --ink-18: rgba(0,0,0,0.18);
-  --ink-12: rgba(0,0,0,0.12);
-  --ink-10: rgba(0,0,0,0.10);
-  --ink-08: rgba(0,0,0,0.08);
-  --ink-06: rgba(0,0,0,0.06);
-  --ink-04: rgba(0,0,0,0.04);
-  --ink-03: rgba(0,0,0,0.03);
-  --ink-02: rgba(0,0,0,0.02);
-  --ink-15: rgba(0,0,0,0.15);
+  --ink-60: rgba(42, 32, 24, 0.60);
+  --ink-35: rgba(42, 32, 24, 0.35);
+  --ink-15: rgba(42, 32, 24, 0.15);
+  --ink-08: rgba(42, 32, 24, 0.08);
 
-  /* ── Status ── */
+  /* ── Category chip tints ── */
+  --sage-tint: #E8EEE8;
+  --violet-tint: #EAE6F4;
+  --baltic-tint: #E4EEF4;
+  --mist-tint: #F4EED4;
+
+  /* ── Semantic aliases — keep these so existing code does not break ── */
+  --shell: var(--chalk);
+  --card: var(--stone);
+  --border: rgba(42, 32, 24, 0.12);
+  --sidebar-bg: var(--chalk);
+  --terra-light: rgba(217,95,59,0.08);
+
+  /* ── Status colours — keep unchanged ── */
+  --status-active: #2A7A4A;
+  --status-pending: #C4A84A;
+  --status-error: #C4294A;
+
+  /* ── Status (extended — existing references) ── */
   --status-active-bg: #E1F5EE;
   --status-active-text: #0F6E56;
   --status-pending-bg: #FAEEDA;
