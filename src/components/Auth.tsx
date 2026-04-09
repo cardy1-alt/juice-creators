@@ -432,8 +432,8 @@ export default function Auth() {
             {/* Step 1: The basics */}
             {signupStep === 1 && (
               <div className="w-full tab-fade-in">
-                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Let's get you started</h2>
-                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">Takes less than a minute</p>
+                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Your first collab is a few taps away</h2>
+                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">Create your account to start browsing campaigns</p>
 
                 <div className="space-y-3.5">
                   <input
@@ -508,8 +508,8 @@ export default function Auth() {
                   <ChevronLeft size={14} /> Back
                 </button>
 
-                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Almost there</h2>
-                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">Help us match you with local brands</p>
+                <h2 className="text-[22px] font-semibold text-[var(--ink)] mb-1 text-center">Where should we look?</h2>
+                <p className="text-[14px] text-[var(--ink-60)] mb-8 text-center">We'll match you with brands in your area</p>
 
                 <form onSubmit={handleSubmit} className="space-y-3.5">
                   <div>
