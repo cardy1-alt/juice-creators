@@ -96,7 +96,7 @@ export default function AdminNotificationsTab() {
 
       {/* Send notification card */}
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-6 mb-6">
-        <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
+        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5">Select Campaign</label>
@@ -109,8 +109,8 @@ export default function AdminNotificationsTab() {
             {selectedCampaignId && (
               <button onClick={handleSend} disabled={sending}
                 disabled={sending || recipientCount === 0}
-                className="flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-50"
-               >
+                className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-50"
+                style={{ fontWeight: 700 }}>
                 <Send size={14} /> {sending ? 'Sending...' : `Send to ${recipientCount} creators`}
               </button>
             )}
@@ -134,7 +134,7 @@ export default function AdminNotificationsTab() {
                 {selectedCampaign.perk_description && <p className="text-[var(--ink-60)]">{selectedCampaign.perk_description.slice(0, 80)}{selectedCampaign.perk_value ? ` — worth £${selectedCampaign.perk_value}` : ''}</p>}
                 {selectedCampaign.expression_deadline && <p className="text-[var(--ink-60)]">Apply by {fmtShort(selectedCampaign.expression_deadline)}</p>}
                 <div className="pt-3">
-                  <span className="inline-block px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[14px] font-semibold">
+                  <span className="inline-block px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
                     See the campaign →
                   </span>
                 </div>

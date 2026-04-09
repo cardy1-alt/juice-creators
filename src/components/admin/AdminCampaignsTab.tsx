@@ -190,7 +190,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       <div className="relative bg-white rounded-[16px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.2px' }}>{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
+          <h2 className="nayba-h2 text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
             <span className="text-[13px] text-[var(--ink-35)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
@@ -464,7 +464,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
       <div className="relative bg-white rounded-[16px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.2px' }}>
+          <h2 className="nayba-h2 text-[var(--ink)]">
             Manage Participation — {campaign.title}
           </h2>
           <button onClick={onClose} className={modalClose}><X size={15} /></button>
@@ -824,7 +824,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
 
         {/* Actions */}
         <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
-          <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] mb-3">Edit Campaign</button>
+          <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] mb-3" style={{ fontWeight: 700 }}>Edit Campaign</button>
           <div className="flex items-center justify-center gap-1 flex-wrap">
             <button onClick={handleAiRecommend} disabled={aiLoading}
               className="text-[12px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] disabled:opacity-40 transition-colors px-1 py-0.5">
@@ -991,7 +991,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           </div>
           <p className="text-[17px] font-semibold text-[var(--ink)] mb-1">No campaigns yet</p>
           <p className="text-[14px] text-[var(--ink-60)] mb-5">Create your first campaign to get started</p>
-          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[13px] font-semibold">
+          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             + New Campaign
           </button>
         </div>

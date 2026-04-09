@@ -97,7 +97,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
       <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
       <div className="relative bg-white rounded-[16px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
-          <h2 style={{ fontSize: 16, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.2px' }}>Create Creator</h2>
+          <h2 className="nayba-h2 text-[var(--ink)]">Create Creator</h2>
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[var(--chalk)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
@@ -149,8 +149,8 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
           <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
             <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
             <button onClick={handleCreate as any} disabled={creating}
-              className="px-4 py-2 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-40"
-             >
+              className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-40"
+              style={{ fontWeight: 700 }}>
               {creating ? 'Creating...' : 'Create Account'}
             </button>
           </div>

@@ -62,7 +62,7 @@ export default function AdminSettingsTab() {
     <div className="max-w-[520px]">
       {/* Change Password */}
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-6 mb-4">
-        <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-4">Change Password</h2>
+        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Change Password</h2>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
             <label className={labelCls}>Current Password</label>
@@ -85,8 +85,8 @@ export default function AdminSettingsTab() {
             <p className={`text-[14px] ${passwordMessage.type === 'success' ? 'text-[#2D7A4F]' : 'text-[var(--terra)]'}`}>{passwordMessage.text}</p>
           )}
           <button type="submit" disabled={saving}
-            className="px-5 py-2.5 rounded-[6px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] disabled:opacity-50"
->
+            className="px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-50"
+            style={{ fontWeight: 700 }}>
             {saving ? 'Updating...' : 'Update Password'}
           </button>
         </form>
@@ -94,7 +94,7 @@ export default function AdminSettingsTab() {
 
       {/* Feature Flags */}
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-6">
-        <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-4">Feature Flags</h2>
+        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Feature Flags</h2>
         <div className="space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
