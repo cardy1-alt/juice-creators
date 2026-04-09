@@ -1051,7 +1051,7 @@ export default function CreatorApp() {
   const [profileError, setProfileError] = useState(false);
   const [viewingCampaign, setViewingCampaign] = useState<string | null>(null);
   const [discoverRefresh, setDiscoverRefresh] = useState(0);
-  const closeCampaignDetail = () => { closeCampaignDetail(); setDiscoverRefresh(r => r + 1); };
+  const closeCampaignDetail = () => { setViewingCampaign(null); setDiscoverRefresh(r => r + 1); };
   const [toast, setToast] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
