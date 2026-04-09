@@ -77,31 +77,28 @@ export default function AdminDashboard() {
   const cta = CTA_CONFIG[activeTab];
 
   return (
-    <div className="flex min-h-screen bg-[var(--shell)]">
+    <div className="flex min-h-screen" style={{ background: 'var(--chalk)' }}>
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ─── Sidebar ─── */}
       <aside className={`
-        w-[220px] bg-[#F7F6F3] border-r border-[rgba(0,0,0,0.08)] flex flex-col flex-shrink-0
+        w-[240px] flex flex-col flex-shrink-0
         fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+      `} style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
         {/* Wordmark */}
         <div className="px-5 pt-5 pb-4 flex items-center justify-between">
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <img src={NaybaLogo} alt="" width={28} height={28} />
-              <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
-            </div>
-            <div className="flex items-center gap-1.5 mt-1">
-              <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'rgba(0,0,0,0.25)' }} />
-              <span style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const }}>Admin</span>
+            <Logo size={28} variant="wordmark" />
+            <div className="flex items-center gap-1.5 mt-1.5">
+              <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--terra)' }} />
+              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Admin</span>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[rgba(0,0,0,0.35)] hover:text-[#1C1917]">
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden" style={{ color: 'var(--ink-35)' }}>
             <X size={20} />
           </button>
         </div>
@@ -110,7 +107,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-3 pb-3 overflow-y-auto">
           {NAV_SECTIONS.map(section => (
             <div key={section.label} className="mb-3">
-              <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.07em', color: 'rgba(0,0,0,0.4)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
+              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
                 {section.label}
               </p>
               {section.items.map(item => {
@@ -119,20 +116,20 @@ export default function AdminDashboard() {
                   <button
                     key={item.key}
                     onClick={() => handleTabClick(item.key)}
-                    className="w-full flex items-center gap-[9px] rounded-[6px] text-[14px] transition-colors"
+                    className="w-full flex items-center gap-[9px] rounded-[12px] text-[14px] transition-colors"
                     style={{
-                      fontWeight: active ? 600 : 400,
-                      background: active ? 'rgba(0,0,0,0.04)' : 'transparent',
-                      borderLeft: active ? '3px solid #C4674A' : '3px solid transparent',
-                      color: active ? '#1C1917' : 'rgba(0,0,0,0.55)',
-                      padding: '7px 12px',
+                      fontWeight: active ? 700 : 500,
+                      background: active ? 'var(--terra-10)' : 'transparent',
+                      borderLeft: active ? '3px solid var(--terra)' : '3px solid transparent',
+                      color: active ? 'var(--terra)' : 'var(--ink-60)',
+                      padding: '8px 12px',
                       margin: '1px 8px',
                     }}
                   >
                     <item.icon size={15} strokeWidth={active ? 2 : 1.5} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {item.key === 'creators' && pendingCount > 0 && (
-                      <span className="flex items-center justify-center text-[10px] font-bold rounded-[999px]" style={{ background: '#F6EDE9', color: '#993C1D', padding: '2px 6px', minWidth: 20 }}>
+                      <span className="flex items-center justify-center text-[10px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
                         {pendingCount}
                       </span>
                     )}
@@ -144,16 +141,16 @@ export default function AdminDashboard() {
         </nav>
 
         {/* User row */}
-        <div className="border-t border-[rgba(0,0,0,0.08)]" style={{ padding: '12px 8px 16px' }}>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-[8px] hover:bg-[rgba(0,0,0,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
-            <div className="w-8 h-8 rounded-full bg-[#E8E6E2] flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] font-medium text-[#1C1917]">{adminInitial}</span>
+        <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: '12px 8px 16px' }}>
+          <div className="flex items-center gap-3 px-2 py-2 rounded-[12px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
+              <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-[#1C1917] truncate">{adminName}</p>
-              <p className="text-[12px] text-[rgba(0,0,0,0.4)] truncate">{user?.email}</p>
+              <p className="text-[13px] font-medium text-[var(--ink)] truncate">{adminName}</p>
+              <p className="text-[12px] text-[var(--ink-35)] truncate">{user?.email}</p>
             </div>
-            <LogOut size={14} className="text-[rgba(0,0,0,0.35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            <LogOut size={14} className="text-[var(--ink-35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
           </div>
         </div>
       </aside>
@@ -161,27 +158,24 @@ export default function AdminDashboard() {
       {/* ─── Main area ─── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
-        <div className="md:hidden flex items-center gap-3 px-4 h-[56px] bg-white border-b border-[rgba(0,0,0,0.08)]">
-          <button onClick={() => setSidebarOpen(true)} className="text-[rgba(0,0,0,0.55)]">
+        <div className="md:hidden flex items-center gap-3 px-4 h-[56px] bg-white" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
+          <button onClick={() => setSidebarOpen(true)} style={{ color: 'var(--ink-60)' }}>
             <Menu size={22} />
           </button>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <img src={NaybaLogo} alt="" width={28} height={28} />
-            <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
-          </div>
+          <Logo size={22} variant="wordmark" />
         </div>
 
         {/* Desktop topbar */}
-        <div className="hidden md:flex items-center justify-between h-[52px] bg-white flex-shrink-0" style={{ borderBottom: '0.5px solid rgba(0,0,0,0.08)' }}>
-          <h1 style={{ fontSize: 16, fontWeight: 600, color: '#1C1917', letterSpacing: '-0.2px', margin: 0, paddingLeft: 24 }}>
+        <div className="hidden md:flex items-center justify-between h-[56px] bg-white flex-shrink-0" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
+          <h1 className="nayba-h2" style={{ fontSize: 20, margin: 0, paddingLeft: 24, color: 'var(--ink)' }}>
             {PAGE_TITLES[activeTab]}
           </h1>
           {cta.show && (
             <button
               onClick={() => setShowModal(true)}
-              className="flex items-center gap-1.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold transition-opacity mr-6"
-              style={{ padding: '8px 16px' }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = '0.85')}
+              className="flex items-center gap-1.5 rounded-full text-white text-[14px] transition-opacity mr-6"
+              style={{ padding: '8px 20px', background: 'var(--terra)', fontWeight: 700 }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '0.90')}
               onMouseLeave={e => (e.currentTarget.style.opacity = '1')}
             >
               <Plus size={15} strokeWidth={2} />
