@@ -18,6 +18,7 @@ function CampaignFallbackImage({ category, name }: { category?: string | null; n
 interface CampaignDetailProps {
   campaignId: string;
   onBack?: () => void;
+  hideActions?: boolean;
 }
 
 interface Campaign {
@@ -40,7 +41,7 @@ function fmtDate(d: string | null) {
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
-export default function CampaignDetail({ campaignId, onBack }: CampaignDetailProps) {
+export default function CampaignDetail({ campaignId, onBack, hideActions }: CampaignDetailProps) {
   const { user } = useAuth();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
@@ -332,16 +333,20 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
           )}
 
           {/* CTA — inline on desktop */}
-          <div className="hidden md:block mt-6 pt-6 border-t border-[rgba(42,32,24,0.06)]">
-            {ctaContent}
-          </div>
+          {!hideActions && (
+            <div className="hidden md:block mt-6 pt-6 border-t border-[rgba(42,32,24,0.06)]">
+              {ctaContent}
+            </div>
+          )}
         </div>
       </div>
 
       {/* CTA — fixed bottom bar on mobile */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white px-4 py-3 z-40 border-t border-[rgba(42,32,24,0.06)]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
-        {ctaContent}
-      </div>
+      {!hideActions && (
+        <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white px-4 py-3 z-40 border-t border-[rgba(42,32,24,0.06)]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
+          {ctaContent}
+        </div>
+      )}
 
       {/* Brand info modal */}
       {showBrandInfo && campaign.businesses && (
@@ -371,7 +376,7 @@ export default function CampaignDetail({ campaignId, onBack }: CampaignDetailPro
       )}
 
       {/* Pitch modal */}
-      {showPitchModal && (
+      {!hideActions && showPitchModal && (
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center">
           <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[12px] p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">

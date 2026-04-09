@@ -702,7 +702,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
 
         {/* Scrollable body — reuses CampaignDetail from creator app */}
         <div className="flex-1 overflow-y-auto">
-          <CampaignDetail campaignId={campaign.id} />
+          <CampaignDetail campaignId={campaign.id} hideActions />
 
           {/* Admin controls */}
           <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)]">
