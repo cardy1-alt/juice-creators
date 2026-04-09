@@ -878,10 +878,10 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   };
 
   const statCards = [
-    { label: 'Active Campaigns', value: totalStats.active, icon: Megaphone },
-    { label: 'Applicants', value: totalStats.applicants, icon: Users },
-    { label: 'Reels Submitted', value: totalStats.reels, icon: Film },
-    { label: 'Estimated Reach', value: totalStats.reach.toLocaleString(), icon: Eye },
+    { label: 'Active Campaigns', value: totalStats.active, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+    { label: 'Applicants', value: totalStats.applicants, icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
+    { label: 'Reels Submitted', value: totalStats.reels, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+    { label: 'Estimated Reach', value: totalStats.reach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
   ];
 
   return (
@@ -889,9 +889,16 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {statCards.map(s => (
-          <div key={s.label} className="bg-white rounded-[12px]" style={{ padding: 16 }}>
-            <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 4 }}>{s.label}</p>
-            <p style={{ fontSize: 24, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
+          <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
+                <s.icon size={17} style={{ color: s.color }} />
+              </div>
+              <div>
+                <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
+              </div>
+            </div>
           </div>
         ))}
       </div>
