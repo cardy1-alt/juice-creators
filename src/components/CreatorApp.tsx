@@ -13,6 +13,7 @@ import {
   AlertCircle, RefreshCw
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
+import { Logo } from './Logo';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -22,9 +23,9 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden">
-      <div className="skeleton w-full" style={{ height: 140 }} />
-      <div className="p-3.5 space-y-2.5">
+    <div className="border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden" style={{ background: 'var(--stone)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
+      <div className="skeleton w-full" style={{ height: 160 }} />
+      <div className="p-4 space-y-2.5">
         <div className="skeleton h-3 w-20" />
         <div className="skeleton h-4 w-full" />
         <div className="skeleton h-3 w-28" />
@@ -94,8 +95,8 @@ function BrandInfoModal({ brand, onClose }: {
 }) {
   const handle = brand.instagram_handle?.replace('@', '') || '';
   return (
-    <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div className="bg-white rounded-[16px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             {brand.logo_url ? (
@@ -191,25 +192,26 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       {/* Active campaign banner */}
       {activeParticipations > 0 && (
         <button onClick={onGoToCampaigns}
-          className="w-full flex items-center justify-between px-4 py-3 rounded-[10px] bg-[rgba(45,122,79,0.08)] border-[0.5px] border-[rgba(45,122,79,0.15)] mb-4 min-h-[44px]">
+          className="w-full flex items-center justify-between px-4 py-3 rounded-[16px] bg-[rgba(45,122,79,0.08)] border border-[rgba(45,122,79,0.15)] mb-4 min-h-[44px]">
           <span className="text-[14px] font-medium text-[var(--success)]">You're in a campaign — view it</span>
           <ChevronRight size={16} className="text-[var(--success)]" />
         </button>
       )}
 
       {/* Search */}
-      <div className="relative mb-3">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+      <div className="relative mb-4">
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search campaigns..."
-          className="w-full pl-9 pr-4 h-[40px] rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A]" />
+          className="w-full pl-10 pr-4 h-[44px] rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
       </div>
 
       {/* Category chips */}
-      <div className="flex gap-2 overflow-x-auto pb-3 hide-scrollbar">
+      <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
         {categories.map(c => (
           <button key={c} onClick={() => setCategory(c)}
-            className={`flex-shrink-0 px-[14px] py-[6px] rounded-[999px] text-[13px] font-medium transition-colors ${category === c ? 'bg-[#C4674A] text-white border-[0.5px] border-transparent' : 'bg-white border-[0.5px] border-[rgba(0,0,0,0.12)] text-[rgba(0,0,0,0.55)]'}`}>
+            className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${category === c ? 'bg-[var(--terra)] text-white border border-transparent' : 'border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+            style={{ fontWeight: category === c ? 700 : 600, background: category !== c ? 'var(--stone)' : undefined }}>
             {c}
           </button>
         ))}
@@ -219,10 +221,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       {loading && <SkeletonList count={6} />}
       {!loading && fetchError && (
         <div className="py-12 text-center">
-          <AlertCircle size={48} className="text-[rgba(0,0,0,0.15)] mx-auto mb-3" />
+          <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
-          <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-4">Check your connection and try again</p>
-          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold min-h-[44px]">
+          <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
+          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>
@@ -233,13 +235,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
           return (
             <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-              className="card-press w-full text-left bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden flex flex-col">
+              className="card-press w-full text-left rounded-[16px] overflow-hidden flex flex-col" style={{ background: 'var(--stone)', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 2px 8px rgba(42,32,24,0.06)' }}>
               {/* Cover image */}
-              <div className="w-full relative" style={{ height: 140 }}>
+              <div className="w-full relative" style={{ height: 160 }}>
                 {c.campaign_image ? (
                   <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                 ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[#C4674A] to-[#A8573E] flex items-center justify-center">
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
                     {c.businesses?.logo_url ? (
                       <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
                     ) : (
@@ -257,13 +259,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 )}
               </div>
               {/* Content */}
-              <div className="flex-1 p-3.5 flex flex-col">
-                <p className="text-[11px] font-medium text-[rgba(0,0,0,0.4)] mb-0.5">{c.businesses?.name}</p>
-                <p className="text-[14px] font-semibold text-[#1C1917] leading-[1.3] mb-2 line-clamp-2">{c.headline || c.title}</p>
-                <div className="mt-auto space-y-1">
-                  {perkShort && <p className="text-[12px] font-medium text-[#C4674A]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
+              <div className="flex-1 p-4 flex flex-col">
+                <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1">{c.businesses?.name}</p>
+                <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.headline || c.title}</p>
+                <div className="mt-auto space-y-1.5">
+                  {perkShort && <p className="text-[13px] font-semibold text-[var(--terra)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
                   {c.expression_deadline && (
-                    <p className="text-[11px] text-[rgba(0,0,0,0.35)]">Apply by {fmtDate(c.expression_deadline)}</p>
+                    <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
                   )}
                 </div>
               </div>
@@ -272,14 +274,14 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         })}
         {filtered.length === 0 && (
           <div className="py-12 text-center">
-            <Compass size={48} className="text-[rgba(0,0,0,0.15)] mx-auto mb-3" />
+            <Compass size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
             <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
-            <p className="text-[13px] text-[rgba(0,0,0,0.45)]">New campaigns drop every week — keep an eye out</p>
+            <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
         {filtered.length > 0 && (
           <div className="col-span-full py-8 text-center">
-            <Check size={20} className="text-[rgba(0,0,0,0.15)] mx-auto mb-2" />
+            <Check size={20} className="text-[var(--ink-15)] mx-auto mb-2" />
             <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon for new campaigns</p>
           </div>
         )}
@@ -373,9 +375,9 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-4">Campaigns</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
-      <div className="flex gap-1 mb-4 border-b border-[0.5px] border-[rgba(0,0,0,0.08)]">
+      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.08)]">
         {(['active', 'past'] as const).map(t => (
           <button key={t} onClick={() => setSubTab(t)}
             className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
@@ -395,9 +397,9 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
-                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[rgba(0,0,0,0.4)]">{p.campaigns?.businesses?.name}</p>
-                <p className="text-[15px] font-semibold text-[#1C1917] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
+              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
                   <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[999px] bg-[var(--terra-light)] mb-3">
                     <Gift size={12} className="text-[var(--terra)]" />
@@ -413,21 +415,21 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                     return (
                       <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
                         <div className="flex flex-col items-center">
-                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[#1D9E75]' : isCurrent ? 'bg-[#C4674A]' : 'bg-[rgba(0,0,0,0.15)]'}`} />
-                          <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[#1D9E75]' : isCurrent ? 'text-[#C4674A]' : 'text-[rgba(0,0,0,0.35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
+                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[var(--status-active-text)]' : isCurrent ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.12)]'}`} />
+                          <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
                         </div>
-                        {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[#1D9E75]' : 'bg-[rgba(0,0,0,0.12)]'}`} />}
+                        {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[var(--status-active-text)]' : 'bg-[rgba(42,32,24,0.10)]'}`} />}
                       </div>
                     );
                   })}
                 </div>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
-                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[6px] bg-[#C4674A] text-white text-[13px] font-semibold min-h-[44px]">
+                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
                     <Film size={12} /> Share Reel
                   </button>
                 )}
-                <div className="flex items-center justify-between pt-2 border-t border-[0.5px] border-[rgba(0,0,0,0.08)]">
+                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.08)]">
                   <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
                     {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[12px] font-medium">Content overdue</span>}
@@ -444,9 +446,9 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.length === 0 && (
             <div className="py-12 text-center">
-              <Megaphone size={48} className="text-[rgba(0,0,0,0.15)] mx-auto mb-3" />
+              <Megaphone size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
               <p className="text-[15px] font-medium text-[var(--ink)] mb-1">No active campaigns yet</p>
-              <p className="text-[13px] text-[rgba(0,0,0,0.45)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
+              <p className="text-[13px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>
           )}
         </div>
@@ -455,7 +457,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
@@ -464,7 +466,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
@@ -482,20 +484,20 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
       {/* Reel submission modal */}
       {showReelModal && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
-          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[10px] p-6" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[16px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[18px] font-semibold text-[#1C1917]">Share your experience</h3>
+              <h3 className="nayba-h3 text-[var(--ink)]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
             </div>
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
             <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
-              className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border-[0.5px] ${reelUrlError ? 'border-[#C0392B]' : 'border-[rgba(0,0,0,0.18)]'} bg-white text-[15px] focus:outline-none focus:border-[#C4674A] mb-1`} />
-            {reelUrlError && <p className="text-[13px] text-[#C0392B] mb-3">{reelUrlError}</p>}
+              className={`w-full px-4 py-3 min-h-[48px] rounded-[12px] border-[1.5px] ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
+            {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
-              className="w-full py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] disabled:opacity-50 min-h-[44px] hover:opacity-[0.85]">
+              className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
               {submittingReel ? 'Sharing...' : 'Share Reel'}
             </button>
           </div>
@@ -521,12 +523,12 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (!unlocked) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center">
-          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(0,0,0,0.08)]">
-            <Lock size={28} className="text-[rgba(0,0,0,0.35)]" />
+        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-8 text-center">
+          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
+            <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
-          <p className="text-[18px] font-semibold text-[#1C1917] mb-2">Almost there...</p>
+          <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Almost there...</p>
           <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-4">
             Complete your first campaign to unlock The Naybahood — our community of active local creators with exclusive events, brand connections, and the creator WhatsApp group.
           </p>
@@ -542,10 +544,10 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (unlocked && showCelebration) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
+        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
-          <div className="bg-white rounded-[10px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
+          <div className="bg-white rounded-[16px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
             {/* Confetti-like decorative dots */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               {[...Array(20)].map((_, i) => (
@@ -565,12 +567,12 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
               <div className="celebrate-bounce w-24 h-24 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-5">
                 <Star size={40} className="text-white" />
               </div>
-              <p className="text-[20px] font-semibold text-[#1C1917] mb-2">You're in!</p>
+              <p className="nayba-h2 text-[var(--ink)] mb-2">You're in!</p>
               <p className="text-[16px] text-[var(--ink-60)] leading-[1.65] max-w-xs mx-auto mb-6">
                 Welcome to The Naybahood — our community of active local creators. You've earned your place.
               </p>
               <button onClick={dismissCelebration}
-                className="w-full py-3.5 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
+                className="w-full py-3.5 rounded-[6px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
                 Let's go
               </button>
             </div>
@@ -582,12 +584,12 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">The Naybahood</h1>
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-8 text-center">
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-8 text-center">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
-        <p className="text-[20px] font-semibold text-[#1C1917] mb-2">Welcome to The Naybahood</p>
+        <p className="nayba-h2 text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
@@ -613,38 +615,38 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-4">Profile</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Profile</h1>
 
       {/* Avatar centered */}
       <div className="flex flex-col items-center mb-4">
         {profile.avatar_url ? (
           <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[60px] h-[60px] rounded-full object-cover mb-2" />
         ) : (
-          <div className="w-[60px] h-[60px] rounded-full bg-[#C4674A] flex items-center justify-center mb-2">
-            <span className="text-[22px] font-semibold text-white">{initial}</span>
+          <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-2" style={{ background: 'var(--terra)' }}>
+            <span className="text-[22px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
           </div>
         )}
-        <p className="text-[18px] font-semibold text-[#1C1917]">{profile.display_name || profile.name}</p>
+        <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-          className="text-[13px] text-[rgba(0,0,0,0.45)] hover:underline">{profile.instagram_handle}</a>
+          className="text-[13px] text-[var(--ink-35)] hover:underline">{profile.instagram_handle}</a>
         <div className="flex items-center gap-2 mt-1.5">
           <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
           {profile.address && (
-            <span className="text-[12px] text-[rgba(0,0,0,0.45)] flex items-center gap-1"><MapPin size={11} />{profile.address.split(',')[0].trim()}</span>
+            <span className="text-[12px] text-[var(--ink-35)] flex items-center gap-1"><MapPin size={11} />{profile.address.split(',')[0].trim()}</span>
           )}
         </div>
       </div>
 
       {/* Completion rate */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mt-3 mb-3">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mt-3 mb-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
         <div className="flex items-center gap-3">
-          <p className="text-[28px] font-semibold text-[#1C1917]">{profile.completion_rate}%</p>
+          <p className="text-[28px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
           <span className="text-[14px] text-[var(--ink-60)]">{profile.completed_campaigns} of {profile.total_campaigns} campaigns completed</span>
         </div>
         {profile.total_campaigns > 0 && (
-          <div className="h-1 bg-[rgba(0,0,0,0.08)] rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-[#C4674A] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
+          <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full mt-2 overflow-hidden">
+            <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
           </div>
         )}
         {profile.total_campaigns > 0 && profile.completion_rate < 60 && (
@@ -656,22 +658,22 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[#1C1917]">{profile.total_campaigns}</p>
-          <p className="text-[11px] text-[rgba(0,0,0,0.45)]">Campaigns</p>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+          <p className="nayba-h2 text-[var(--ink)]">{profile.total_campaigns}</p>
+          <p className="text-[11px] text-[var(--ink-35)]">Campaigns</p>
         </div>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[#1C1917]">{profile.total_reels}</p>
-          <p className="text-[11px] text-[rgba(0,0,0,0.45)]">Reels</p>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+          <p className="nayba-h2 text-[var(--ink)]">{profile.total_reels}</p>
+          <p className="text-[11px] text-[var(--ink-35)]">Reels</p>
         </div>
-        <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[#1C1917]">L{profile.level}</p>
-          <p className="text-[11px] text-[rgba(0,0,0,0.45)]">{profile.level_name}</p>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 text-center">
+          <p className="nayba-h2 text-[var(--ink)]">L{profile.level}</p>
+          <p className="text-[11px] text-[var(--ink-35)]">{profile.level_name}</p>
         </div>
       </div>
 
       {/* Instagram connection */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
@@ -685,7 +687,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
               <Check size={12} /> Connected
             </span>
           ) : (
-            <span className="px-3 py-1.5 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[rgba(0,0,0,0.35)]">
+            <span className="px-3 py-1.5 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)]">
               Coming soon
             </span>
           )}
@@ -706,13 +708,13 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4 mt-3">
+          <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4 mt-3">
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[13px] font-medium text-[#1C1917]">Profile completeness</p>
-              <span className="text-[13px] font-semibold text-[#C4674A]">{completePct}%</span>
+              <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
+              <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
             </div>
-            <div className="h-1 bg-[rgba(0,0,0,0.08)] rounded-full overflow-hidden">
-              <div className="h-full bg-[#C4674A] rounded-full transition-all" style={{ width: `${completePct}%` }} />
+            <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
+              <div className="h-full bg-[var(--terra)] rounded-full transition-all" style={{ width: `${completePct}%` }} />
             </div>
             <p className="text-[12px] text-[var(--ink-35)] mt-1.5">Add your {!profile.address ? 'city' : !profile.bio ? 'bio' : 'details'} to complete your profile</p>
           </div>
@@ -748,7 +750,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-4">Campaign History</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaign History</h1>
 
       {loading ? (
         <div className="py-12 flex justify-center"><div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /></div>
@@ -756,7 +758,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
@@ -774,7 +776,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
@@ -847,26 +849,26 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">Account Settings</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4">
-        <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-4">Profile</h2>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mb-4">
+        <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]">
+              className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]">
               <option value="">Select county</option>
               <option value="Suffolk">Suffolk</option>
               <option value="Norfolk">Norfolk</option>
@@ -877,20 +879,20 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
             <input value={profile.email} disabled
-              className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[16px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
             <p className="text-[12px] text-[var(--ink-35)] mt-1">Email can't be changed — contact support if needed</p>
           </div>
         </div>
         <button onClick={handleSaveProfile} disabled={saving}
-          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] disabled:opacity-50 min-h-[44px] hover:opacity-[0.85]">
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <Save size={15} /> {saving ? 'Saving...' : 'Save changes'}
         </button>
       </div>
 
       {/* Password */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5 mb-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5 mb-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-[16px] font-semibold text-[var(--ink)]">Password</h2>
+          <h2 className="nayba-h3 text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
             <button onClick={() => setShowPasswordChange(true)}
               className="text-[14px] text-[var(--terra)] font-medium hover:underline">Change password</button>
@@ -903,7 +905,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
-                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
+                  className="w-full px-4 py-2.5 pr-10 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -914,14 +916,14 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="w-full px-4 py-2.5 rounded-[10px] border-[0.5px] border-[rgba(0,0,0,0.18)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[#C4674A] min-h-[44px]" />
+                className="w-full px-4 py-2.5 rounded-[12px] border-[1.5px] border-[rgba(42,32,24,0.15)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
             </div>
-            {passwordError && <p className="text-[13px] text-[#C0392B]">{passwordError}</p>}
+            {passwordError && <p className="text-[13px] text-[var(--destructive)]">{passwordError}</p>}
             <div className="flex gap-3">
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
-                className="px-4 py-2 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.18)] text-[var(--ink)] font-medium text-[13px] min-h-[44px]">Cancel</button>
+                className="px-4 py-2 rounded-full border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={handleChangePassword} disabled={passwordSaving}
-                className="px-4 py-2 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] disabled:opacity-50 min-h-[44px] hover:opacity-[0.85]">
+                className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                 {passwordSaving ? 'Updating...' : 'Update password'}
               </button>
             </div>
@@ -930,8 +932,8 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] p-5">
-        <h2 className="text-[16px] font-semibold text-[var(--ink)] mb-2">Need help?</h2>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] p-5">
+        <h2 className="nayba-h3 text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
           <Mail size={15} /> {SUPPORT_EMAIL}
@@ -966,11 +968,11 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[16px] font-semibold text-[#1C1917] mb-6">More</h1>
-      <div className="bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] overflow-hidden">
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border-[0.5px] border-[rgba(0,0,0,0.08)] last:border-0 min-h-[44px]">
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
             <item.icon size={18} className="text-[var(--ink-35)]" />
             <span className="text-[15px] text-[var(--ink)] font-medium">{item.label}</span>
             <ChevronRight size={16} className="text-[var(--ink-35)] ml-auto" />
@@ -979,21 +981,21 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </div>
 
       <button onClick={() => setShowSignOutConfirm(true)}
-        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border-[0.5px] border-[rgba(0,0,0,0.08)] rounded-[10px] hover:bg-[var(--shell)] min-h-[44px]">
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[16px] hover:bg-[var(--shell)] min-h-[44px]">
         <LogOut size={18} className="text-[var(--terra)]" />
         <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
       </button>
 
       {showSignOutConfirm && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.4)] z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-[10px] p-6 max-w-sm w-full text-center">
-            <p className="text-[18px] font-semibold text-[#1C1917] mb-2">Sign out?</p>
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4">
+          <div className="bg-white rounded-[16px] p-6 max-w-sm w-full text-center">
+            <p className="nayba-h3 text-[var(--ink)] mb-2">Sign out?</p>
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowSignOutConfirm(false)}
-                className="flex-1 py-2.5 rounded-[6px] border-[0.5px] border-[rgba(0,0,0,0.18)] text-[var(--ink)] font-medium text-[13px] min-h-[44px]">Cancel</button>
+                className="flex-1 py-2.5 rounded-full border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={onSignOut}
-                className="flex-1 py-2.5 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] min-h-[44px] hover:opacity-[0.85]">Sign out</button>
+                className="flex-1 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
             </div>
           </div>
         </div>
@@ -1012,13 +1014,10 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-[rgba(0,0,0,0.5)] z-[60] flex items-center justify-center px-4">
-      <div className="bg-white rounded-[10px] max-w-[400px] w-full p-6 text-center">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <img src={NaybaLogo} alt="" width={28} height={28} />
-          <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
-        </div>
-        <h2 className="text-[20px] font-semibold text-[#1C1917] mt-3 mb-1">How it works</h2>
+    <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
+      <div className="bg-white rounded-[16px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
+        <Logo size={28} variant="wordmark" />
+        <h2 className="nayba-h2 text-[var(--ink)] mt-4 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
         <div className="space-y-3 mb-6 text-left">
           {steps.map((s, i) => (
@@ -1034,7 +1033,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
           ))}
         </div>
         <button onClick={onDismiss}
-          className="w-full py-3 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] min-h-[44px] hover:opacity-[0.85]">
+          className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           Start exploring
         </button>
       </div>
@@ -1104,20 +1103,20 @@ export default function CreatorApp() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#F7F6F3]">
-        <div className="w-10 h-10 border-[3px] border-[#C4674A] border-t-transparent rounded-full animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-[var(--chalk)]">
+        <div className="w-10 h-10 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
       </div>
     );
   }
 
   if (profileError || !profile) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F7F6F3] px-6 text-center">
-        <AlertCircle size={48} className="text-[rgba(0,0,0,0.15)] mb-4" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
+        <AlertCircle size={48} className="text-[var(--ink-15)] mb-4" />
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Something went wrong</p>
-        <p className="text-[13px] text-[rgba(0,0,0,0.45)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
+        <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
         <button onClick={() => { setProfileError(false); setLoading(true); fetchProfile(); }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[6px] bg-[#C4674A] text-white font-semibold text-[13px] min-h-[44px] hover:opacity-[0.85]">
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <RefreshCw size={14} /> Retry
         </button>
         <button onClick={signOut} className="mt-4 text-[14px] text-[var(--ink-35)]">Sign out</button>
@@ -1128,16 +1127,15 @@ export default function CreatorApp() {
   // Approval gate — unapproved creators see a pending screen
   if (!profile.approved) {
     return (
-      <div className="min-h-screen bg-[#F7F6F3] flex flex-col items-center justify-center px-6 text-center">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: 32 }}>
-          <img src={NaybaLogo} alt="" width={28} height={28} />
-          <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--chalk)' }}>
+        <div style={{ marginBottom: 36 }}>
+          <Logo size={28} variant="wordmark" />
         </div>
-        <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1C1917', marginBottom: 8 }}>You're on the list</h1>
-        <p style={{ fontSize: 14, color: 'rgba(0,0,0,0.5)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
+        <h1 className="nayba-h1" style={{ fontSize: 28, marginBottom: 10, color: 'var(--ink)' }}>You're on the list</h1>
+        <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
           We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
         </p>
-        <button onClick={signOut} style={{ fontSize: 13, color: 'rgba(0,0,0,0.4)', background: 'none', border: 'none', cursor: 'pointer' }}>
+        <button onClick={signOut} style={{ fontSize: 13, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
           Sign out
         </button>
       </div>
@@ -1151,15 +1149,12 @@ export default function CreatorApp() {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
 
   return (
-    <div className="min-h-screen bg-[#F7F6F3]">
+    <div className="min-h-screen bg-[var(--chalk)]">
       {/* ─── Sidebar (desktop only) ─── */}
-      <aside className="w-[220px] bg-[#F7F6F3] border-r border-[rgba(0,0,0,0.08)] flex-col flex-shrink-0 fixed inset-y-0 left-0 z-50 hidden md:flex">
+      <aside className="w-[240px] flex-col flex-shrink-0 fixed inset-y-0 left-0 z-50 hidden md:flex" style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
         {/* Wordmark */}
-        <div className="px-5 pt-6 pb-5 border-b border-[rgba(0,0,0,0.08)]">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <img src={NaybaLogo} alt="" width={28} height={28} />
-            <span style={{ fontFamily: 'Hornbill, Georgia, serif', fontWeight: 900, fontSize: '20px', letterSpacing: '-0.03em', color: 'var(--ink)' }}>Nayba</span>
-          </div>
+        <div className="px-5 pt-6 pb-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
+          <Logo size={28} variant="wordmark" />
         </div>
 
         {/* Nav */}
@@ -1170,14 +1165,14 @@ export default function CreatorApp() {
               <button
                 key={item.key}
                 onClick={() => handleNav(item.key)}
-                className="w-full flex items-center gap-3 px-2.5 py-2 rounded-[8px] mb-0.5 transition-colors"
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] mb-1 transition-colors"
                 style={{
                   fontSize: 14,
-                  fontWeight: active ? 600 : 400,
-                  background: active ? 'rgba(0,0,0,0.06)' : 'transparent',
-                  color: active ? '#1C1917' : 'rgba(0,0,0,0.55)',
+                  fontWeight: active ? 700 : 500,
+                  background: active ? 'var(--terra-10)' : 'transparent',
+                  color: active ? 'var(--terra)' : 'var(--ink-60)',
                 }}
-                onMouseEnter={e => { if (!active) (e.currentTarget.style.background = 'rgba(0,0,0,0.04)'); }}
+                onMouseEnter={e => { if (!active) (e.currentTarget.style.background = 'rgba(42,32,24,0.04)'); }}
                 onMouseLeave={e => { if (!active) (e.currentTarget.style.background = 'transparent'); }}
               >
                 <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
@@ -1188,21 +1183,21 @@ export default function CreatorApp() {
         </nav>
 
         {/* Creator info */}
-        <div className="px-3 py-4 border-t border-[rgba(0,0,0,0.08)]">
-          <div className="flex items-center gap-2.5 px-2">
-            <div className="w-[26px] h-[26px] rounded-full bg-[#E8E6E2] flex items-center justify-center flex-shrink-0">
-              <span className="text-[11px] font-medium text-[#1C1917]">{initial}</span>
+        <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
+          <div className="flex items-center gap-3 px-1">
+            <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
+              <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[13px] font-medium text-[#1C1917] truncate">{profile.display_name || profile.name}</p>
-              <p className="text-[11px] text-[rgba(0,0,0,0.4)] truncate">{profile.instagram_handle}</p>
+              <p className="text-[13px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
+              <p className="text-[11px] text-[var(--ink-35)] truncate">{profile.instagram_handle}</p>
             </div>
           </div>
         </div>
       </aside>
 
       {/* ─── Main content ─── */}
-      <div className="md:ml-[220px] min-h-screen">
+      <div className="md:ml-[240px] min-h-screen">
         <div className="p-4 lg:p-5 pb-20 md:pb-5" key={tab}>
           <div className="tab-fade-in">
             {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} refreshKey={discoverRefresh} />}
@@ -1217,10 +1212,10 @@ export default function CreatorApp() {
       {/* ─── Campaign detail — centered modal (desktop) ─── */}
       {viewingCampaign && !isMobile && tab === 'discover' && (
         <>
-          <div className="hidden md:block fixed inset-0 bg-[rgba(0,0,0,0.25)] z-30" onClick={() => closeCampaignDetail()} />
+          <div className="hidden md:block fixed inset-0 bg-[rgba(42,32,24,0.25)] z-30" onClick={() => closeCampaignDetail()} />
           <div className="hidden md:flex fixed inset-0 z-40 items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto border-[0.5px] border-[rgba(0,0,0,0.08)]"
-              style={{ margin: '0 24px', scrollbarWidth: 'none' }}>
+            <div className="pointer-events-auto bg-white rounded-[16px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto"
+              style={{ margin: '0 24px', scrollbarWidth: 'none', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
               <CampaignDetail campaignId={viewingCampaign} onBack={() => closeCampaignDetail()} />
             </div>
           </div>
@@ -1229,7 +1224,7 @@ export default function CreatorApp() {
 
       {/* ─── Mobile bottom tab bar ─── */}
       <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
-        style={{ height: '56px', background: 'rgba(247,246,243,0.95)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderTop: '0.5px solid rgba(0,0,0,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
+        style={{ height: 'var(--nav-height)', background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex h-full">
           {NAV_ITEMS.map(item => {
             const active = tab === item.key;
@@ -1237,9 +1232,9 @@ export default function CreatorApp() {
               <button key={item.key} onClick={() => handleNav(item.key)}
                 className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[44px]">
                 <item.icon size={22} strokeWidth={active ? 2 : 1.5}
-                  style={{ color: active ? '#C4674A' : 'rgba(0,0,0,0.35)' }} />
-                <span style={{ fontSize: 10, fontWeight: active ? 600 : 500,
-                  color: active ? '#C4674A' : 'rgba(0,0,0,0.35)' }}>{item.label}</span>
+                  style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }} />
+                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500,
+                  color: active ? 'var(--terra)' : 'var(--ink-35)' }}>{item.label}</span>
               </button>
             );
           })}
@@ -1256,7 +1251,7 @@ export default function CreatorApp() {
 
       {/* Toast */}
       {toast && (
-        <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-5 py-3 rounded-[999px] bg-[#C4674A] text-white text-[14px] font-medium"
+        <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}
          >
           {toast}
         </div>
