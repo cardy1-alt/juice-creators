@@ -274,14 +274,14 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                   </div>
                 </>
               ) : (
-                <div className="flex flex-col items-center justify-center py-12">
+                <div className="py-8 text-center">
+                  <p className="text-[14px] text-[var(--ink-35)] mb-3">Fill in the fields above, or</p>
                   <button onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                    className={`${primaryBtn} inline-flex items-center gap-2 mb-3`}
-                    style={{ fontWeight: 700 }}>
-                    {aiLoading ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : '✦'}{' '}
-                    {aiLoading ? 'Suggesting...' : 'Suggest ideas'}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.10)] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)] disabled:opacity-40 transition-colors"
+                    style={{ fontWeight: 600 }}>
+                    {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
+                    {aiLoading ? 'Suggesting...' : 'Suggest ideas from Step 1'}
                   </button>
-                  <p className="text-[13px] text-[var(--ink-35)]">Fill in Step 1 first, then let AI write your brief.</p>
                   {aiError && <p className="text-[12px] text-[var(--terra)] mt-2">{aiError}</p>}
                 </div>
               )}
