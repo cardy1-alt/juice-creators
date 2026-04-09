@@ -4,6 +4,21 @@
    Referenced by theme.css and all components.
    ────────────────────────────────────────────────────────── */
 
+/* ── Hornbill font-face ── */
+@font-face {
+  font-family: 'Hornbill';
+  src: url('../fonts/HornbillTrial-Black.woff2') format('woff2');
+  font-weight: 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hornbill';
+  src: url('../fonts/HornbillTrial-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-display: swap;
+}
+
 :root {
   /* ── Backgrounds ── */
   --shell: #F7F6F3;
@@ -144,4 +159,17 @@
 .skeleton-pulse {
   background: var(--skeleton-bg);
   animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+/* ── Hornbill heading utilities ── */
+.nayba-h1 {
+  font-family: 'Hornbill', Georgia, serif;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.nayba-h2 {
+  font-family: 'Hornbill', Georgia, serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
