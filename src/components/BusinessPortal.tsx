@@ -4,8 +4,9 @@ import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
   LayoutDashboard, Users, ClipboardList, Film, BarChart3,
-  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft
+  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search
 } from 'lucide-react';
+import CampaignDetail from './CampaignDetail';
 
 // ─── Skeleton Loaders ───
 function Skeleton({ className }: { className?: string }) {
@@ -100,7 +101,7 @@ export default function BusinessPortal() {
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [toast, setToast] = useState<string | null>(null);
-  const [showBrief, setShowBrief] = useState(false);
+  const [campaignSearch, setCampaignSearch] = useState('');
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -298,14 +299,29 @@ export default function BusinessPortal() {
         <div className="tab-fade-in">
 
         {/* Campaign list landing page — when no campaign selected */}
-        {!selectedCampaignId && campaigns.length > 0 && (
+        {!selectedCampaignId && campaigns.length > 0 && (() => {
+          const filteredCampaigns = campaignSearch
+            ? campaigns.filter(c => c.title.toLowerCase().includes(campaignSearch.toLowerCase()))
+            : campaigns;
+          return (
           <div>
             <div className="mb-6">
-              <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {brand.name}</h1>
-              <p className="text-[14px] text-[var(--ink-60)] mt-1">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+              <h1 className="nayba-h1 text-[var(--ink)] mb-2" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
+              <p className="text-[14px] text-[var(--ink-60)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
             </div>
+
+            {/* Search — only show if 3+ campaigns */}
+            {campaigns.length >= 3 && (
+              <div className="relative mb-4">
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+                <input value={campaignSearch} onChange={e => setCampaignSearch(e.target.value)}
+                  placeholder="Search campaigns..."
+                  className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {campaigns.map(c => (
+              {filteredCampaigns.map(c => (
                 <button key={c.id} onClick={() => setSelectedCampaignId(c.id)}
                   className="w-full text-left bg-white rounded-[12px] p-5 transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -322,35 +338,33 @@ export default function BusinessPortal() {
               ))}
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Summary Tab */}
         {selectedCampaignId && activeTab === 'summary' && campaign && (
           <div>
-            {/* Welcome */}
-            <div className="mb-6">
-              <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {brand.name}</h1>
-              <div className="flex items-center gap-2 mt-1">
+            {/* Welcome — more breathing room */}
+            <div className="mb-8">
+              <h1 className="nayba-h1 text-[var(--ink)] mb-2" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
+              <div className="flex items-center gap-2.5">
                 <StatusBadge status={campaign.status} />
-                <span className="text-[14px] text-[var(--ink-60)]">{campaign.title}</span>
+                <span className="text-[15px] text-[var(--ink-60)]">{campaign.title}</span>
+              </div>
+              <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mt-2">
+                {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
+                {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
+                {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
               </div>
             </div>
 
-            {/* Dates — inline */}
-            <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mb-5">
-              {campaign.expression_deadline && <span>Apply by <span className="font-semibold text-[var(--ink)]">{fmtDate(campaign.expression_deadline)}</span></span>}
-              {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
-              {campaign.content_deadline && <span>Content due <span className="font-semibold text-[var(--ink)]">{fmtDate(campaign.content_deadline)}</span></span>}
-            </div>
-
-            {/* Stats row */}
-            <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+            {/* Stats row — 4 cards for even 2x2 on mobile */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
               {[
                 { label: 'Applicants', value: applications.length, icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
                 { label: 'Selected', value: selectedCount, icon: Check, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
-                { label: 'Content', value: submittedCount, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
-                { label: 'Completed', value: completedCount, icon: Check, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
-                { label: 'Reach', value: totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+                { label: 'Reels', value: submittedCount, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+                { label: 'Reach', value: totalReach.toLocaleString(), icon: Eye, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
               ].map(s => (
                 <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                   <div className="flex items-center gap-3">
@@ -366,35 +380,12 @@ export default function BusinessPortal() {
               ))}
             </div>
 
-            {/* Campaign brief — collapsible */}
-            <div className="bg-white rounded-[12px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <button onClick={() => setShowBrief(!showBrief)} className="w-full flex items-center justify-between p-4 text-left">
-                <span className="text-[14px] font-semibold text-[var(--ink)]">Campaign Brief</span>
-                <span className="text-[12px] text-[var(--ink-35)]">{showBrief ? 'Hide' : 'Show'}</span>
-              </button>
-              {showBrief && <div className="px-5 pb-5 pt-0">
-              {campaign.perk_description && (
-                <div className="mb-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Perk</p>
-                  <p className="text-[15px] text-[var(--ink)]">{campaign.perk_description}</p>
-                  <p className="text-[13px] text-[var(--ink-35)] mt-1">£{campaign.perk_value} &middot; {campaign.perk_type?.replace('_', ' ')}</p>
-                </div>
-              )}
-              {campaign.content_requirements && (
-                <div className="mb-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Content Requirements</p>
-                  <p className="text-[15px] text-[var(--ink)] leading-[1.65]">{campaign.content_requirements}</p>
-                </div>
-              )}
-              {campaign.talking_points && campaign.talking_points.length > 0 && (
-                <div className="mb-4">
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-1">Talking Points</p>
-                  <ul className="space-y-1">
-                    {campaign.talking_points.map((tp, i) => <li key={i} className="text-[15px] text-[var(--ink)]">{i + 1}. {tp}</li>)}
-                  </ul>
-                </div>
-              )}
-              </div>}
+            {/* Campaign preview — what creators see (read-only) */}
+            <div className="mb-6">
+              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Your campaign — as creators see it</p>
+              <div className="bg-white rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <CampaignDetail campaignId={campaign.id} hideActions />
+              </div>
             </div>
 
             <div className="mt-4">
