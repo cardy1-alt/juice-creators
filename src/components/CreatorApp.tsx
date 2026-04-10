@@ -10,11 +10,11 @@ import {
   ChevronRight, Settings, History, Link2, HelpCircle,
   AtSign, ExternalLink, X, ArrowLeft,
   Eye, EyeOff, Mail, MapPin, Save, Star, Award,
-  AlertCircle, RefreshCw
+  AlertCircle, RefreshCw, CheckCircle
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
-import { getCategoryPalette, getFilterChipColor, CategoryIcon } from '../lib/categories';
+import { getCategoryPalette, getFilterChipColor } from '../lib/categories';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -24,9 +24,11 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="rounded-[12px] bg-white overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-      <div className="skeleton w-full" style={{ height: 170 }} />
-      <div className="p-3.5 space-y-2.5">
+    <div className="rounded-[12px] bg-white" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+      <div className="px-2.5 pt-2.5">
+        <div className="skeleton w-full rounded-[8px]" style={{ height: 150 }} />
+      </div>
+      <div className="px-3.5 pb-3.5 pt-3 space-y-2.5">
         <div className="skeleton h-3 w-20" />
         <div className="skeleton h-4 w-full" />
         <div className="skeleton h-3 w-28" />
@@ -36,7 +38,7 @@ function SkeletonCard() {
 }
 function SkeletonList({ count = 3 }: { count?: number }) {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
       {Array.from({ length: count }).map((_, i) => <SkeletonCard key={i} />)}
     </div>
   );
@@ -109,15 +111,15 @@ function BrandInfoModal({ brand, onClose }: {
             )}
             <h3 className="text-[18px] font-semibold text-[var(--ink)]">{brand.name}</h3>
           </div>
-          <button onClick={onClose} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
+          <button onClick={onClose} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
         </div>
         {brand.category && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium bg-[var(--terra-light)] text-[var(--terra)] mb-3">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[var(--terra-light)] text-[var(--terra)] mb-3">
             {brand.category}
           </span>
         )}
         {brand.bio && <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{brand.bio}</p>}
-        {!brand.bio && <p className="text-[14px] text-[var(--ink-50)] mb-4">No description available yet.</p>}
+        {!brand.bio && <p className="text-[14px] text-[var(--ink-35)] mb-4">No description available yet.</p>}
         {handle && (
           <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -138,7 +140,6 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
-  const [sortBy, setSortBy] = useState<'newest' | 'closing' | 'value' | 'new' | 'applied'>('newest');
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
@@ -186,32 +187,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       const allowedCats = categoryMap[category] || [];
       if (!allowedCats.some(cat => c.businesses?.category?.includes(cat))) return false;
     }
-    if (sortBy === 'new' && applications[c.id]) return false;
-    if (sortBy === 'applied' && !applications[c.id]) return false;
     return true;
-  }).sort((a, b) => {
-    if (sortBy === 'closing') {
-      if (!a.expression_deadline) return 1;
-      if (!b.expression_deadline) return -1;
-      return new Date(a.expression_deadline).getTime() - new Date(b.expression_deadline).getTime();
-    }
-    if (sortBy === 'value') {
-      return (b.perk_value || 0) - (a.perk_value || 0);
-    }
-    return 0;
   });
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
-  // County — the address field stores county directly (Suffolk, Norfolk, etc.)
-  const knownCounties = ['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'];
-  const county = knownCounties.find(c => (profile.address || '').includes(c)) || profile.address || 'your area';
+  const county = profile.address || 'your area';
+  const [featured, ...rest] = filtered;
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      {/* Welcome */}
-      <div className="mb-4">
-        <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {firstName}</h1>
-        <p className="text-[14px] text-[var(--ink-60)] mt-0.5">Campaigns in {county}</p>
+      {/* Welcome + county context */}
+      <div className="mb-5">
+        <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 28 }}>Hey {firstName}</h1>
+        <p className="text-[14px] text-[var(--ink-35)] mt-1">Campaigns in {county}</p>
       </div>
 
       {/* Active campaign banner */}
@@ -223,33 +211,22 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </button>
       )}
 
-      {/* Search row with inline sort */}
-      <div className="flex gap-2 mb-3">
-        <div className="relative flex-1">
-          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search..."
-            className="w-full pl-10 pr-3 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
-        </div>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="h-[40px] px-2.5 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
-          style={{ fontWeight: 500, minWidth: 100 }}>
-          <option value="newest">Newest</option>
-          <option value="closing">Closing soon</option>
-          <option value="value">Highest value</option>
-          <option value="new">Not applied</option>
-          <option value="applied">Applied</option>
-        </select>
+      {/* Search */}
+      <div className="relative mb-4">
+        <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+        <input value={search} onChange={e => setSearch(e.target.value)}
+          placeholder="Search campaigns..."
+          className="w-full pl-10 pr-4 h-[44px] rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
       </div>
 
-      {/* Category filter chips */}
-      <div className="flex gap-2 overflow-x-auto mb-4 hide-scrollbar">
+      {/* Category chips — active chip uses category-specific color */}
+      <div className="flex gap-2 overflow-x-auto pb-4 hide-scrollbar">
         {categories.map(c => {
           const isActive = category === c;
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
           return (
             <button key={c} onClick={() => setCategory(c)}
-              className={`flex-shrink-0 px-[16px] py-[8px] rounded-[999px] text-[14px] md:text-[12px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
               style={{
                 fontWeight: isActive ? 700 : 600,
                 background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
@@ -260,66 +237,126 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         })}
       </div>
 
-      {/* Campaign grid */}
+      {/* Campaign cards */}
       {loading && <SkeletonList count={6} />}
       {!loading && fetchError && (
         <div className="py-12 text-center">
-          <AlertCircle size={48} className="text-[var(--ink-50)] mx-auto mb-3" />
+          <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
-          <p className="text-[14px] text-[var(--ink-50)] mb-4">Check your connection and try again</p>
-          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+          <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
+          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>
       )}
       {!loading && !fetchError && <>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map(c => {
+        {/* Featured campaign — first result, horizontal layout */}
+        {featured && (() => {
+          const appStatus = applications[featured.id];
+          const perkShort = featured.perk_description?.split('—')[0]?.split(',')[0]?.trim();
+          const catPalette = getCategoryPalette(featured.businesses?.category);
+          return (
+            <button onClick={() => onOpenCampaign(featured.id)}
+              className="w-full text-left rounded-[12px] bg-white mb-5 flex flex-col md:flex-row overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
+              style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+              {/* Image — full width on mobile, left side on desktop */}
+              <div className="md:w-[45%] relative" style={{ minHeight: 200 }}>
+                {featured.campaign_image ? (
+                  <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 200 }} />
+                ) : (
+                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center" style={{ minHeight: 200 }}>
+                    {featured.businesses?.logo_url ? (
+                      <img src={featured.businesses.logo_url} alt={featured.businesses?.name} className="w-14 h-14 rounded-full object-cover border-2 border-white/30" />
+                    ) : (
+                      <span className="text-[32px] font-semibold text-white/60">{(featured.businesses?.name || '?')[0]}</span>
+                    )}
+                  </div>
+                )}
+                {appStatus && (
+                  <span className={`absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                  </span>
+                )}
+              </div>
+              {/* Content */}
+              <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                  <span className="text-[12px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
+                </div>
+                <p className="text-[18px] md:text-[20px] text-[var(--ink)] leading-[1.3] mb-3" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
+                {perkShort && <p className="text-[14px] text-[var(--ink-60)] mb-2">{perkShort}{featured.perk_value ? ` · £${featured.perk_value}` : ''}</p>}
+                {featured.expression_deadline && (
+                  <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
+                )}
+              </div>
+            </button>
+          );
+        })()}
+
+        {/* Remaining campaigns — grid */}
+        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          {rest.map(c => {
             const appStatus = applications[c.id];
+            const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className={`w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] active:scale-[0.98] ${appStatus ? 'ring-1 ring-[rgba(42,32,24,0.06)]' : ''}`} style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <div className="w-full relative" style={{ height: 180, opacity: appStatus ? 0.75 : 1 }}>
-                  {c.campaign_image ? (
-                    <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center" style={{ background: catPalette.tint }}>
-                      <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
-                    </div>
-                  )}
+                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+                {/* Cover image — inset with rounded corners */}
+                <div className="px-2.5 pt-2.5">
+                  <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>
+                    {c.campaign_image ? (
+                      <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
+                        {c.businesses?.logo_url ? (
+                          <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
+                        ) : (
+                          <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
+                        )}
+                      </div>
+                    )}
                   {appStatus && (
-                    <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2.5 py-1 md:px-2 md:py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
+                    <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
                       {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
                     </span>
                   )}
                   {c.campaign_type === 'community' && (
-                    <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 md:px-2 md:py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
+                    <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
                   )}
+                  </div>
                 </div>
-                <div className="flex-1 p-4 flex flex-col">
-                  <span className="text-[14px] md:text-[12px] mb-1 truncate block" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
-                  <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
-                  {c.expression_deadline && (
-                    <p className="text-[14px] md:text-[12px] text-[var(--ink-60)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
-                  )}
+                {/* Content */}
+                <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
+                  <div className="flex items-center gap-2 mb-1.5">
+                    <span className="inline-flex px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                    <span className="text-[11px] text-[var(--ink-35)]">{c.businesses?.name}</span>
+                  </div>
+                  <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
+                  <div className="mt-auto space-y-1">
+                    {perkShort && <p className="text-[12px] font-medium text-[var(--ink-60)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
+                    {c.expression_deadline && (
+                      <p className="text-[11px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
+                    )}
+                  </div>
                 </div>
               </button>
             );
           })}
-        </div>
+        </div>}
 
         {filtered.length === 0 && (
           <div className="py-12 text-center">
-            <Compass size={48} className="text-[var(--ink-50)] mx-auto mb-3" />
+            <Compass size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
             <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
-            <p className="text-[14px] text-[var(--ink-50)]">New campaigns drop every week — keep an eye out</p>
+            <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
         {filtered.length > 0 && (
           <div className="py-8 text-center">
-            <Check size={20} className="text-[var(--ink-50)] mx-auto mb-2" />
-            <p className="text-[14px] text-[var(--ink-50)]">You're all caught up — check back soon</p>
+            <Check size={20} className="text-[var(--ink-15)] mx-auto mb-2" />
+            <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon for new campaigns</p>
           </div>
         )}
       </>}
@@ -412,12 +449,12 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaigns</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
-      <div className="flex gap-1 mb-4 border-b border-[rgba(42,32,24,0.12)]">
+      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.08)]">
         {(['active', 'past'] as const).map(t => (
           <button key={t} onClick={() => setSubTab(t)}
-            className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-50)]'}`}>
+            className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
             {t === 'active' ? 'Active' : 'Past'}
           </button>
         ))}
@@ -434,39 +471,46 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white rounded-[12px] p-4">
-                <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
                   <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[999px] bg-[var(--terra-light)] mb-3">
                     <Gift size={12} className="text-[var(--terra)]" />
-                    <span className="text-[14px] md:text-[12px] font-medium text-[var(--terra)]">{perkText}{p.campaigns?.perk_value ? ` — £${p.campaigns.perk_value}` : ''}</span>
+                    <span className="text-[12px] font-medium text-[var(--terra)]">{perkText}{p.campaigns?.perk_value ? ` — £${p.campaigns.perk_value}` : ''}</span>
                   </div>
                 )}
                 {!perkText && <div className="mb-3" />}
                 {/* Stepper */}
-                {/* Progress bar */}
-                <div className="h-1.5 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden mb-2">
-                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(todos.filter(t => t.done).length / todos.length) * 100}%`, background: todos.every(t => t.done) ? 'var(--status-active-text)' : 'var(--terra)' }} />
+                <div className="flex items-center gap-0 mb-3">
+                  {todos.map((t, i) => {
+                    const isLast = i === todos.length - 1;
+                    const isCurrent = !t.done && (i === 0 || todos[i - 1].done);
+                    return (
+                      <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
+                        <div className="flex flex-col items-center">
+                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[var(--status-active-text)]' : isCurrent ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.12)]'}`} />
+                          <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
+                        </div>
+                        {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[var(--status-active-text)]' : 'bg-[rgba(42,32,24,0.10)]'}`} />}
+                      </div>
+                    );
+                  })}
                 </div>
-                {/* Current step label */}
-                <p className="text-[14px] text-[var(--ink-60)] mb-3">
-                  {todos.every(t => t.done) ? 'Complete — nice work!' : todos.find(t => !t.done)?.label || 'In progress'}
-                </p>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
-                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
                     <Film size={12} /> Share Reel
                   </button>
                 )}
-                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.12)]">
-                  <div className="flex gap-3 text-[14px] md:text-[12px] text-[var(--ink-50)]">
+                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.08)]">
+                  <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
-                    {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[14px] md:text-[12px] font-medium">Content overdue</span>}
+                    {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[12px] font-medium">Content overdue</span>}
                   </div>
                   {p.reel_url && (
                     <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium">
+                      className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
                       <Film size={14} /> View Reel <ExternalLink size={12} />
                     </a>
                   )}
@@ -476,9 +520,9 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.length === 0 && (
             <div className="py-12 text-center">
-              <Megaphone size={48} className="text-[var(--ink-50)] mx-auto mb-3" />
+              <Megaphone size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
               <p className="text-[15px] font-medium text-[var(--ink)] mb-1">No active campaigns yet</p>
-              <p className="text-[14px] text-[var(--ink-50)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
+              <p className="text-[13px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>
           )}
         </div>
@@ -487,26 +531,26 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
-                <p className="text-[14px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium bg-[#E1F5EE] text-[#0F6E56]">Completed</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#E1F5EE] text-[#0F6E56]">Completed</span>
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
-                <p className="text-[14px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
             </div>
           ))}
           {completedParts.length === 0 && pastApps.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-[14px] text-[var(--ink-50)]">No past campaigns</p>
+              <p className="text-[14px] text-[var(--ink-35)]">No past campaigns</p>
             </div>
           )}
         </div>
@@ -515,7 +559,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {/* Reel submission modal */}
       {showReelModal && (
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
-          <div className="bg-white w-full max-w-[480px] rounded-t-[12px] sm:rounded-[12px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[12px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="nayba-h3 text-[var(--ink)]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
@@ -523,11 +567,11 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
             <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
-              className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
-            {reelUrlError && <p className="text-[14px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
+              className={`w-full px-4 py-3 min-h-[48px] rounded-[12px] border-[1.5px] ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
+            {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
-              className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+              className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
               {submittingReel ? 'Sharing...' : 'Share Reel'}
             </button>
           </div>
@@ -553,10 +597,10 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (!unlocked) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
-        <div className="bg-white rounded-[12px] p-8 text-center">
-          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.12)]">
-            <Lock size={28} className="text-[var(--ink-50)]" />
+        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
+            <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
           <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Almost there...</p>
           <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-4">
@@ -564,7 +608,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[999px] bg-[var(--terra-light)]">
             <Megaphone size={14} className="text-[var(--terra)]" />
-            <span className="text-[14px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
+            <span className="text-[13px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
           </div>
         </div>
       </div>
@@ -574,7 +618,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (unlocked && showCelebration) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
+        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
           <div className="bg-white rounded-[12px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
@@ -594,15 +638,15 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
               ))}
             </div>
             <div className="relative z-10">
-              <div className="celebrate-bounce w-24 h-24 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-5">
+              <div className="celebrate-bounce w-24 h-24 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-5">
                 <Star size={40} className="text-white" />
               </div>
-              <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">You're in!</p>
+              <p className="nayba-h2 text-[var(--ink)] mb-2">You're in!</p>
               <p className="text-[16px] text-[var(--ink-60)] leading-[1.65] max-w-xs mx-auto mb-6">
                 Welcome to The Naybahood — our community of active local creators. You've earned your place.
               </p>
               <button onClick={dismissCelebration}
-                className="w-full py-3.5 rounded-[6px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
+                className="w-full py-3.5 rounded-[6px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
                 Let's go
               </button>
             </div>
@@ -614,21 +658,21 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
-      <div className="bg-white rounded-[12px] p-8 text-center">
-        <div className="w-20 h-20 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+        <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
-        <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
+        <p className="nayba-h2 text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
         <a href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-[6px] bg-[#25D366] text-white font-semibold text-[14px] min-h-[44px] hover:opacity-[0.85]">
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-[6px] bg-[#25D366] text-white font-semibold text-[13px] min-h-[44px] hover:opacity-[0.85]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Join the WhatsApp Community
         </a>
-        <p className="text-[14px] text-[var(--ink-50)] mt-3">Connect with other Suffolk creators, share tips, and hear about campaigns first</p>
+        <p className="text-[13px] text-[var(--ink-35)] mt-3">Connect with other Suffolk creators, share tips, and hear about campaigns first</p>
       </div>
     </div>
   );
@@ -637,98 +681,87 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 // ─── Profile Tab ───
 function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
-  const completionPct = profile.completion_rate;
-  // SVG ring progress
-  const ringR = 38;
-  const ringC = 2 * Math.PI * ringR;
-  const ringOffset = ringC - (completionPct / 100) * ringC;
-
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Profile</h1>
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-6">
 
-      {/* Avatar centered */}
-      <div className="flex flex-col items-center mb-4">
+      {/* Avatar + identity hero */}
+      <div className="flex flex-col items-center mb-6">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[60px] h-[60px] rounded-full object-cover mb-2" />
+          <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[80px] h-[80px] rounded-full object-cover mb-3" />
         ) : (
-          <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-2" style={{ background: 'var(--terra)' }}>
-            <span className="text-[22px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
+          <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center mb-3" style={{ background: 'var(--terra)' }}>
+            <span className="text-[28px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
           </div>
         )}
-        <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
+        <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-          className="text-[14px] text-[var(--ink-50)] hover:underline">@{profile.instagram_handle.replace('@', '')}</a>
-        <div className="flex items-center gap-2 mt-2">
+          className="text-[14px] text-[var(--ink-50)] hover:underline mt-0.5">@{profile.instagram_handle.replace('@', '')}</a>
+        <div className="mt-2">
           <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
-          {profile.address && (
-            <span className="text-[14px] text-[var(--ink-60)] flex items-center gap-1"><MapPin size={12} />{profile.address}</span>
-          )}
         </div>
-      </div>
-
-      {/* Completion rate */}
-      <div className="bg-white rounded-[12px] p-5 mt-3 mb-3">
-        <p className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
-        <div className="flex items-center gap-3">
-          <p className="text-[28px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
-          <span className="text-[14px] text-[var(--ink-60)]">{profile.completed_campaigns} of {profile.total_campaigns} campaigns completed</span>
-        </div>
-        {profile.total_campaigns > 0 && (
-          <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full mt-2 overflow-hidden">
-            <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
-          </div>
-        )}
-        {profile.total_campaigns > 0 && profile.completion_rate < 60 && (
-          <p className="text-[14px] md:text-[12px] text-[var(--terra)] mt-2 flex items-center gap-1">
-            <AlertCircle size={12} /> Brands can see your completion rate — completing campaigns helps you get selected
-          </p>
+        {profile.address && (
+          <span className="text-[14px] text-[var(--ink-50)] flex items-center gap-1 mt-1.5"><MapPin size={12} />{profile.address}</span>
         )}
       </div>
 
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3 mb-3">
+      {/* Stats row — 4 columns */}
+      <div className="grid grid-cols-4 gap-2 mb-4">
         {[
           { label: 'Campaigns', value: profile.total_campaigns, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
           { label: 'Reels', value: profile.total_reels, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
           { label: profile.level_name, value: `L${profile.level}`, icon: Star, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+          { label: 'Completion', value: `${profile.completion_rate}%`, icon: CheckCircle, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-[12px] p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-            <div className="flex flex-col items-center gap-2">
-              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center" style={{ background: s.tint }}>
-                <s.icon size={15} style={{ color: s.color }} />
+          <div key={s.label} className="bg-white rounded-[12px] p-2.5 md:p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-7 h-7 rounded-[8px] flex items-center justify-center" style={{ background: s.tint }}>
+                <s.icon size={14} style={{ color: s.color }} />
               </div>
               <div className="text-center">
-                <p className="text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
-                <p className="text-[14px] md:text-[12px] text-[var(--ink-60)]">{s.label}</p>
+                <p className="text-[16px] md:text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
+                <p className="text-[11px] text-[var(--ink-50)]">{s.label}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
+      {/* Completion progress bar + warning */}
+      {profile.total_campaigns > 0 && (
+        <div className="mb-4">
+          <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
+            <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
+          </div>
+          {profile.completion_rate < 60 && (
+            <p className="text-[12px] text-[var(--terra)] mt-2 flex items-center gap-1">
+              <AlertCircle size={12} /> Brands can see your completion rate — completing campaigns helps you get selected
+            </p>
+          )}
+        </div>
+      )}
+
       {/* Instagram connection */}
-      <div className="bg-white rounded-[12px] p-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
-            <div>
-              <p className="text-[15px] font-medium text-[var(--ink)]">Instagram</p>
-              <p className="text-[14px] text-[var(--ink-50)]">{profile.instagram_connected ? 'Connected' : 'Manual at pilot — auto-connect coming soon'}</p>
+      <div className="bg-white rounded-[12px] p-4 mb-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <AtSign size={18} className={`shrink-0 ${profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-50)]'}`} />
+            <div className="min-w-0">
+              <p className="text-[14px] font-medium text-[var(--ink)]">Instagram</p>
+              <p className="text-[12px] text-[var(--ink-35)] truncate">{profile.instagram_connected ? 'Connected' : 'Linked manually'}</p>
             </div>
           </div>
           {profile.instagram_connected ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[14px] md:text-[12px] font-medium text-[#0F6E56]">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56] whitespace-nowrap shrink-0">
               <Check size={12} /> Connected
             </span>
           ) : (
-            <span className="px-3 py-1.5 rounded-[999px] bg-[var(--shell)] text-[14px] md:text-[12px] font-medium text-[var(--ink-50)]">
+            <span className="px-2.5 py-1 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)] whitespace-nowrap shrink-0">
               Coming soon
             </span>
           )}
         </div>
         {!profile.instagram_connected && (
-          <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-2 ml-8">Right now your IG handle is linked manually. We're working on auto-connecting via the Instagram API so your stats update automatically.</p>
+          <p className="text-[12px] text-[var(--ink-35)] mt-2 ml-[42px]">Auto-connect via Instagram API coming soon — your handle is linked manually for now.</p>
         )}
       </div>
 
@@ -743,15 +776,15 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white rounded-[12px] p-4 mt-3">
+          <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[14px] font-medium text-[var(--ink)]">Profile completeness</p>
-              <span className="text-[14px] font-semibold text-[var(--terra)]">{completePct}%</span>
+              <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
+              <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
             </div>
             <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
               <div className="h-full bg-[var(--terra)] rounded-full transition-all" style={{ width: `${completePct}%` }} />
             </div>
-            <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">Add your {!profile.address ? 'city' : !profile.bio ? 'bio' : 'details'} to complete your profile</p>
+            <p className="text-[12px] text-[var(--ink-35)] mt-1.5">Add your {!profile.address ? 'city' : !profile.bio ? 'bio' : 'details'} to complete your profile</p>
           </div>
         ) : null;
       })()}
@@ -782,10 +815,10 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-50)] hover:text-[var(--terra)] mb-3">
+      <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaign History</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaign History</h1>
 
       {loading ? (
         <div className="py-12 flex justify-center"><div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /></div>
@@ -793,13 +826,13 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
-                <p className="text-[14px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
-                <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1">{fmtDate(p.created_at)}</p>
+                <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(p.created_at)}</p>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium ${
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
                 p.status === 'completed' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 p.status === 'content_submitted' ? 'bg-[#FAEEDA] text-[#854F0B]' :
                 p.status === 'overdue' ? 'bg-[#FCEBEB] text-[#A32D2D]' :
@@ -811,13 +844,13 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
               <div>
-                <p className="text-[14px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
-                <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1">{fmtDate(a.applied_at)}</p>
+                <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(a.applied_at)}</p>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium ${
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
                 a.status === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' :
                 a.status === 'selected' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 'bg-[#F1EFE8] text-[#5F5E5A]'
@@ -828,7 +861,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {participations.length === 0 && applications.length === 0 && (
             <div className="py-12 text-center">
-              <p className="text-[14px] text-[var(--ink-50)]">No campaign history yet</p>
+              <p className="text-[14px] text-[var(--ink-35)]">No campaign history yet</p>
             </div>
           )}
         </div>
@@ -881,29 +914,29 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-50)] hover:text-[var(--terra)] mb-3">
+      <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">Account Settings</h1>
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white rounded-[12px] p-5 mb-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
         <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
-            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
           </div>
           <div>
-            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]">
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]">
               <option value="">Select county</option>
               <option value="Suffolk">Suffolk</option>
               <option value="Norfolk">Norfolk</option>
@@ -912,20 +945,20 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
             </select>
           </div>
           <div>
-            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
             <input value={profile.email} disabled
-              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-50)] min-h-[44px]" />
-            <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1">Email can't be changed — contact support if needed</p>
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
+            <p className="text-[12px] text-[var(--ink-35)] mt-1">Email can't be changed — contact support if needed</p>
           </div>
         </div>
         <button onClick={handleSaveProfile} disabled={saving}
-          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <Save size={15} /> {saving ? 'Saving...' : 'Save changes'}
         </button>
       </div>
 
       {/* Password */}
-      <div className="bg-white rounded-[12px] p-5 mb-4">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
         <div className="flex items-center justify-between">
           <h2 className="nayba-h3 text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
@@ -936,29 +969,29 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
         {showPasswordChange && (
           <div className="mt-4 space-y-3">
             <div>
-              <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">New password</label>
+              <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">New password</label>
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
-                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
+                  className="w-full px-4 py-2.5 pr-10 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]">
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
             </div>
             <div>
-              <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
+              <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
+                className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
             </div>
-            {passwordError && <p className="text-[14px] text-[var(--destructive)]">{passwordError}</p>}
+            {passwordError && <p className="text-[13px] text-[var(--destructive)]">{passwordError}</p>}
             <div className="flex gap-3">
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
-                className="px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
+                className="px-4 py-2 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={handleChangePassword} disabled={passwordSaving}
-                className="px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                 {passwordSaving ? 'Updating...' : 'Update password'}
               </button>
             </div>
@@ -967,7 +1000,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white rounded-[12px] p-5">
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
         <h2 className="nayba-h3 text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -1003,20 +1036,20 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">More</h1>
-      <div className="bg-white rounded-[12px] overflow-hidden">
+      <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
+      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.12)] last:border-0 min-h-[44px]">
-            <item.icon size={18} className="text-[var(--ink-50)]" />
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
+            <item.icon size={18} className="text-[var(--ink-35)]" />
             <span className="text-[15px] text-[var(--ink)] font-medium">{item.label}</span>
-            <ChevronRight size={16} className="text-[var(--ink-50)] ml-auto" />
+            <ChevronRight size={16} className="text-[var(--ink-35)] ml-auto" />
           </button>
         ))}
       </div>
 
       <button onClick={() => setShowSignOutConfirm(true)}
-        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
         <LogOut size={18} className="text-[var(--terra)]" />
         <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
       </button>
@@ -1028,9 +1061,9 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowSignOutConfirm(false)}
-                className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
+                className="flex-1 py-2.5 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={onSignOut}
-                className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
+                className="flex-1 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
             </div>
           </div>
         </div>
@@ -1052,7 +1085,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
     <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
       <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
         <Logo size={28} variant="wordmark" />
-        <h2 className="text-[20px] font-semibold text-[var(--ink)] mt-4 mb-1">How it works</h2>
+        <h2 className="nayba-h2 text-[var(--ink)] mt-4 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
         <div className="space-y-3 mb-6 text-left">
           {steps.map((s, i) => (
@@ -1062,13 +1095,13 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
               </div>
               <div>
                 <p className="text-[15px] font-semibold text-[var(--ink)]">{s.title}</p>
-                <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">{s.desc}</p>
+                <p className="text-[13px] text-[var(--ink-60)] leading-[1.5]">{s.desc}</p>
               </div>
             </div>
           ))}
         </div>
         <button onClick={onDismiss}
-          className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           Start exploring
         </button>
       </div>
@@ -1149,12 +1182,12 @@ export default function CreatorApp() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
         <AlertCircle size={48} className="text-[var(--ink-15)] mb-4" />
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Something went wrong</p>
-        <p className="text-[14px] text-[var(--ink-50)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
+        <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
         <button onClick={() => { setProfileError(false); setLoading(true); fetchProfile(); }}
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <RefreshCw size={14} /> Retry
         </button>
-        <button onClick={signOut} className="mt-4 text-[14px] text-[var(--ink-50)]">Sign out</button>
+        <button onClick={signOut} className="mt-4 text-[14px] text-[var(--ink-35)]">Sign out</button>
       </div>
     );
   }
@@ -1170,7 +1203,7 @@ export default function CreatorApp() {
         <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
           We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
         </p>
-        <button onClick={signOut} style={{ fontSize: 14, color: 'var(--ink-50)', background: 'none', border: 'none', cursor: 'pointer' }}>
+        <button onClick={signOut} style={{ fontSize: 13, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
           Sign out
         </button>
       </div>
@@ -1221,11 +1254,11 @@ export default function CreatorApp() {
         <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
           <div className="flex items-center gap-3 px-1">
             <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
-              <span className="text-[14px] md:text-[12px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
+              <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[14px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
-              <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] truncate">{profile.instagram_handle}</p>
+              <p className="text-[13px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
+              <p className="text-[11px] text-[var(--ink-35)] truncate">{profile.instagram_handle}</p>
             </div>
           </div>
         </div>
@@ -1268,7 +1301,7 @@ export default function CreatorApp() {
                 className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[44px]">
                 <item.icon size={22} strokeWidth={active ? 2 : 1.5}
                   style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }} />
-                <span style={{ fontSize: 12, fontWeight: active ? 700 : 500,
+                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500,
                   color: active ? 'var(--terra)' : 'var(--ink-35)' }}>{item.label}</span>
               </button>
             );
