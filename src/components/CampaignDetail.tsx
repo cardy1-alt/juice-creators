@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { sendCreatorConfirmedEmail } from '../lib/notifications';
+import { sendCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
 import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
@@ -98,6 +98,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       pitch: withPitch || null,
       status: 'interested',
     });
+    // Notify admin
+    sendAdminInterestExpressedEmail({
+      creator_name: user?.email?.split('@')[0] || 'A creator',
+      campaign_title: campaign.title,
+      brand_name: campaign.businesses?.name || '',
+    }).catch(() => {});
     setShowPitchModal(false);
     setPitch('');
     setSubmitting(false);
@@ -124,6 +130,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         brand_name: campaign.businesses.name,
         perk_description: campaign.perk_description || '',
       });
+      // Notify admin
+      sendAdminCreatorConfirmedEmail({
+        creator_name: user?.email?.split('@')[0] || 'A creator',
+        campaign_title: campaign.title,
+        brand_name: campaign.businesses.name,
+      }).catch(() => {});
     }
     setSubmitting(false);
     fetchCampaign();

@@ -195,6 +195,51 @@ export async function sendCreatorContentReceivedEmail(creatorId: string, meta: {
   });
 }
 
+// ─── Admin Activity Notifications ──────────────────────────────────────
+
+export async function sendAdminContentSubmittedEmail(meta: {
+  creator_name: string;
+  campaign_title: string;
+  brand_name: string;
+  reel_url: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `${meta.creator_name} submitted a Reel for ${meta.brand_name} — ${meta.campaign_title}`,
+    emailType: 'admin_content_submitted',
+    emailMeta: meta,
+  });
+}
+
+export async function sendAdminInterestExpressedEmail(meta: {
+  creator_name: string;
+  campaign_title: string;
+  brand_name: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `${meta.creator_name} expressed interest in ${meta.brand_name} — ${meta.campaign_title}`,
+    emailType: 'admin_interest_expressed',
+    emailMeta: meta,
+  });
+}
+
+export async function sendAdminCreatorConfirmedEmail(meta: {
+  creator_name: string;
+  campaign_title: string;
+  brand_name: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `${meta.creator_name} confirmed their spot for ${meta.brand_name} — ${meta.campaign_title}`,
+    emailType: 'admin_creator_confirmed',
+    emailMeta: meta,
+  });
+}
+
 export async function sendCreatorCampaignCompleteEmail(creatorId: string, meta: {
   campaign_title: string;
   brand_name: string;
