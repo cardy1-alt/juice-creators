@@ -45,7 +45,7 @@ interface Application {
   creators?: { name: string; display_name: string | null; instagram_handle: string; completion_rate: number; level: number; follower_count: string | null; };
 }
 interface Participation {
-  id: string; campaign_id: string; creator_id: string; perk_sent: boolean;
+  id: string; campaign_id: string; creator_id: string; perk_redeemed: boolean;
   reel_url: string | null; reel_submitted_at: string | null;
   reach: number | null; likes: number | null; comments: number | null; views: number | null;
   status: string; completed_at: string | null;
@@ -766,14 +766,14 @@ export default function BusinessPortal() {
         {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'participation' && (() => {
           const columns = [
             { key: 'confirmed', label: 'Confirmed', items: participations.filter(p => !p.perk_sent) },
-            { key: 'perk_sent', label: 'Perk Sent', items: participations.filter(p => p.perk_sent && !p.reel_url) },
+            { key: 'perk_redeemed', label: 'Perk Redeemed', items: participations.filter(p => p.perk_sent && !p.reel_url) },
             { key: 'submitted', label: 'Content Submitted', items: participations.filter(p => p.reel_url && p.status !== 'completed') },
             { key: 'completed', label: 'Completed', items: participations.filter(p => p.status === 'completed') },
           ];
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[18px] font-semibold text-[var(--ink)]">Progress</h1>
+              <h1 className="nayba-h2 text-[var(--ink)]">Progress</h1>
               <span className="text-[13px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -785,7 +785,7 @@ export default function BusinessPortal() {
             ) : (
               <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none">
                 {columns.map(col => (
-                  <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink">
+                  <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink md:border-r md:border-[rgba(42,32,24,0.04)] md:last:border-0 md:pr-4">
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
                       <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">{col.label}</span>
@@ -834,7 +834,7 @@ export default function BusinessPortal() {
                                   await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                                   fetchCampaignData();
                                   showToast('Content approved');
-                                }} className="w-full py-1.5 rounded-[8px] text-[12px] text-white bg-[var(--status-active-text)] hover:opacity-[0.90]" style={{ fontWeight: 600 }}>
+                                }} className="w-full py-1.5 rounded-[8px] text-[12px] text-[#0F6E56] hover:bg-[rgba(15,110,86,0.06)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(15,110,86,0.2)' }}>
                                   Approve
                                 </button>
                               </div>
