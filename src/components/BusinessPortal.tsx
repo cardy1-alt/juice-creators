@@ -7,6 +7,7 @@ import {
   LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search, Megaphone, AlertCircle, ChevronRight
 } from 'lucide-react';
 import CampaignDetail from './CampaignDetail';
+import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
 // ─── Avatar colors by initial ───
 function getAvatarColors(letter: string): { bg: string; text: string } {
@@ -360,8 +361,8 @@ export default function BusinessPortal() {
                       {c.campaign_image ? (
                         <img src={c.campaign_image} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />
                       ) : (
-                        <div className="w-10 h-10 rounded-[8px] bg-[var(--chalk)] flex items-center justify-center flex-shrink-0">
-                          <Megaphone size={16} className="text-[var(--ink-15)]" />
+                        <div className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: getCategoryPalette(brand.category).tint }}>
+                          <CategoryIcon category={brand.category} className="w-5 h-5" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.4 }} />
                         </div>
                       )}
                       <div className="min-w-0">
@@ -427,12 +428,12 @@ export default function BusinessPortal() {
                   className="w-full text-left bg-white rounded-[12px] overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                   {/* Hero image */}
-                  <div className="w-full h-[120px] bg-[var(--chalk)]">
+                  <div className="w-full h-[120px]">
                     {c.campaign_image ? (
                       <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center">
-                        <Megaphone size={24} className="text-[var(--ink-15)]" />
+                      <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryPalette(brand.category).tint }}>
+                        <CategoryIcon category={brand.category} className="w-8 h-8" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.4 }} />
                       </div>
                     )}
                   </div>
