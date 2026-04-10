@@ -455,7 +455,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     onRefresh();
   };
 
-  const pThCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
+  const pThCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
   const pTdCls = "py-2 px-3 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)] align-middle";
   const numInput = "w-[72px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
 

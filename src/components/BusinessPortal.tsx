@@ -204,7 +204,7 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] py-[10px] px-4 bg-[var(--chalk)]';
+  const thCls = 'text-left text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[var(--chalk)]';
   const tdCls = 'py-0 px-4 text-[14px] text-[var(--ink)]' + " border-b border-[rgba(42,32,24,0.06)]";
 
   // Empty state
@@ -214,7 +214,7 @@ export default function BusinessPortal() {
         <aside className="hidden md:flex w-[240px] bg-[var(--stone)] flex-col flex-shrink-0" style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
           <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[14px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+            <p className="text-[14px] font-medium text-[var(--ink)] mt-1">{brand.name}</p>
           </div>
           <div className="flex-1" />
           <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
@@ -246,7 +246,7 @@ export default function BusinessPortal() {
       <aside className="hidden md:flex w-[240px] flex-col flex-shrink-0" style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
         <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
           <Logo size={28} variant="wordmark" />
-          <p className="text-[14px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+          <p className="text-[14px] font-medium text-[var(--ink)] mt-1">{brand.name}</p>
         </div>
 
         <nav className="flex-1 py-3 px-3">
@@ -321,7 +321,7 @@ export default function BusinessPortal() {
           <div>
             <div className="mb-6">
               <h1 className="nayba-h1 text-[var(--ink)] mb-1" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
-              <p className="text-[14px] text-[var(--ink-60)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+              <p className="text-[14px] text-[var(--ink)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
             </div>
 
             {/* Aggregate stats */}
@@ -338,7 +338,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -349,7 +349,7 @@ export default function BusinessPortal() {
             {/* Active campaigns quick view */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[14px] font-medium text-[var(--ink-50)]">Active campaigns</p>
+                <p className="text-[14px] font-medium text-[var(--ink-60)]">Active campaigns</p>
                 <button onClick={() => setActiveTab('campaigns')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
               </div>
               <div className="space-y-2">
@@ -526,7 +526,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -1003,7 +1003,7 @@ export default function BusinessPortal() {
                     <s.icon size={15} style={{ color: s.color }} />
                   </div>
                   <div>
-                    <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                    <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
                     <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                   </div>
                 </div>
@@ -1014,7 +1014,7 @@ export default function BusinessPortal() {
 
             {/* Reach by creator */}
             <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-4">Reach by Creator</p>
+              <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
