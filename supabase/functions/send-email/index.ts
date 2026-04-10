@@ -32,17 +32,16 @@ interface WebhookPayload {
   record: Record<string, unknown>;
 }
 
-// ─── Design system ────────────────────────────────────────────────────────
-const TERRA = '#C4674A';
-const TERRA_LIGHT = '#FFF5F0';
-const TERRA_BORDER = '#F5DDD5';
-const FOREST = '#1A3C34';
-const NEAR_BLACK = '#222222';
-const MID = '#666666';
-const SOFT = '#999999';
-const FAINT = '#F0F0F0';
-const LAVENDER = '#C8B8F0';
-const LAVENDER_LIGHT = '#F5F2FF';
+// ─── Design system (aligned with app tokens) ─────────────────────────────
+const TERRA = '#D95F3B';
+const TERRA_LIGHT = '#FDF5F2';
+const TERRA_BORDER = '#F2DDD5';
+const INK = '#2A2018';
+const INK_60 = '#7A7168';
+const INK_35 = '#B0AAA4';
+const INK_08 = '#F4F3F1';
+const VIOLET = '#8C7AAA';
+const VIOLET_LIGHT = '#EAE6F4';
 
 // ─── Branded email wrapper ────────────────────────────────────────────────
 function wrapEmail(body: string, accentColor = TERRA): string {
@@ -50,22 +49,22 @@ function wrapEmail(body: string, accentColor = TERRA): string {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin: 0; padding: 0; background-color: #F7F7F7; -webkit-font-smoothing: antialiased;">
+<body style="margin: 0; padding: 0; background-color: #FAFAF9; -webkit-font-smoothing: antialiased;">
   <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
     <!-- Logo -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 26px; font-weight: 800; color: ${FOREST}; letter-spacing: -1px;">nayba</span>
+      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.03em;">Nayba</span>
     </div>
     <!-- Card -->
-    <div style="background: #FFFFFF; border-radius: 20px; padding: 40px 32px; box-shadow: 0 2px 16px rgba(34,34,34,0.06);">
+    <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04);">
       ${body}
     </div>
     <!-- Footer -->
     <div style="text-align: center; padding: 28px 0 0;">
-      <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; color: ${SOFT};">
+      <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; color: ${INK_35};">
         The Nayba Team &middot; Connecting creators with local businesses
       </p>
-      <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; color: #BBBBBB;">
+      <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; color: ${INK_35};">
         You're receiving this because you signed up for Nayba.
       </p>
     </div>
@@ -76,28 +75,28 @@ function wrapEmail(body: string, accentColor = TERRA): string {
 
 function btn(text: string, href: string, bg = TERRA): string {
   return `<div style="text-align: center; margin: 28px 0 0;">
-    <a href="${href}" style="display: inline-block; background: ${bg}; color: #FFFFFF; padding: 15px 36px; border-radius: 50px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.2px;">${text}</a>
+    <a href="${href}" style="display: inline-block; background: ${bg}; color: #FFFFFF; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.2px;">${text}</a>
   </div>`;
 }
 
 function p(text: string): string {
-  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${NEAR_BLACK}; margin: 0 0 16px;">${text}</p>`;
+  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${INK}; margin: 0 0 16px;">${text}</p>`;
 }
 
 function heading(text: string): string {
-  return `<h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0 0 8px; letter-spacing: -0.5px;">${text}</h1>`;
+  return `<h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 22px; font-weight: 600; color: ${INK}; margin: 0 0 8px; letter-spacing: -0.3px;">${text}</h1>`;
 }
 
 function subtext(text: string): string {
-  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: ${MID}; margin: 0 0 24px;">${text}</p>`;
+  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: ${INK_60}; margin: 0 0 24px;">${text}</p>`;
 }
 
 function divider(): string {
-  return `<div style="height: 1px; background: ${FAINT}; margin: 24px 0;"></div>`;
+  return `<div style="height: 1px; background: ${INK_08}; margin: 24px 0;"></div>`;
 }
 
 function infoBox(content: string, bg = TERRA_LIGHT, border = TERRA_BORDER): string {
-  return `<div style="background: ${bg}; border-radius: 14px; padding: 18px 22px; margin: 20px 0; border: 1px solid ${border};">${content}</div>`;
+  return `<div style="background: ${bg}; border-radius: 10px; padding: 16px 20px; margin: 20px 0; border: 1px solid ${border};">${content}</div>`;
 }
 
 function stepList(steps: string[]): string {
@@ -108,7 +107,7 @@ function stepList(steps: string[]): string {
           <div style="width: 28px; height: 28px; border-radius: 50%; background: ${TERRA_LIGHT}; color: ${TERRA}; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 700; text-align: center; line-height: 28px;">${i + 1}</div>
         </td>
         <td style="vertical-align: top; padding: 0 0 ${i < steps.length - 1 ? '14px' : '0'} 0;">
-          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; color: ${NEAR_BLACK}; margin: 2px 0 0;">${step}</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.6; color: ${INK}; margin: 2px 0 0;">${step}</p>
         </td>
       </tr>
     `).join('')}
@@ -135,7 +134,7 @@ function creatorWelcomeEmail(name: string): { subject: string; html: string } {
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${TERRA}; font-weight: 600; margin: 0;">
           Your account is being reviewed
         </p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${MID}; margin: 6px 0 0;">
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${INK_60}; margin: 6px 0 0;">
           We'll email you once approved. In the meantime, make sure your profile is looking great!
         </p>
       `)}
@@ -154,8 +153,8 @@ function campaignNotificationEmail(name: string, meta: Record<string, string>): 
       ${heading('New Campaign!')}
       ${subtext(`Hey ${escapeHtml(name)}, there's a new opportunity for you.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 6px;">${escapeHtml(brandName)}</p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; color: ${MID}; margin: 0;">${escapeHtml(campaignTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 700; color: ${INK}; margin: 0 0 6px;">${escapeHtml(brandName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; color: ${INK_60}; margin: 0;">${escapeHtml(campaignTitle)}</p>
       `)}
       ${p("A brand in your area is looking for local creators. Check out the campaign, see what's on offer, and let them know you're interested.")}
       ${p("Spots are limited — express your interest early.")}
@@ -173,13 +172,13 @@ function creatorSelectedEmail(name: string, meta: Record<string, string>): { sub
     subject: `${brandName} wants you — you've been selected`,
     html: wrapEmail(`
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
       </div>
       ${heading("You've been selected!")}
       ${subtext(`Great news, ${escapeHtml(name)} — ${escapeHtml(brandName)} wants to work with you.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(campaignTitle)}</p>
-        ${perkDescription ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">${escapeHtml(perkDescription)}</p>` : ''}
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(campaignTitle)}</p>
+        ${perkDescription ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">${escapeHtml(perkDescription)}</p>` : ''}
       `)}
       ${p("<strong>What happens next:</strong>")}
       ${stepList([
@@ -203,7 +202,7 @@ function contentDeadlineReminderEmail(name: string, meta: Record<string, string>
       ${subtext(`Hey ${escapeHtml(name)}, just a friendly reminder.`)}
       ${infoBox(`
         <div style="text-align: center;">
-          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(brandName)}</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(brandName)}</p>
           <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 600; color: ${TERRA}; margin: 0;">Due in 48 hours</p>
         </div>
       `)}
@@ -232,7 +231,7 @@ function businessWelcomeEmail(name: string): { subject: string; html: string } {
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${TERRA}; font-weight: 600; margin: 0;">
           Your account is being reviewed
         </p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${MID}; margin: 6px 0 0;">
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; color: ${INK_60}; margin: 6px 0 0;">
           We'll email you once approved. Complete your profile while you wait!
         </p>
       `)}
@@ -250,8 +249,8 @@ function offerClaimedCreatorEmail(name: string, meta: Record<string, string>): {
       ${heading('Collab Claimed!')}
       ${subtext(`Nice one, ${escapeHtml(name)}.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">from ${escapeHtml(businessName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">from ${escapeHtml(businessName)}</p>
       `)}
       ${p("<strong>What happens next:</strong>")}
       ${stepList([
@@ -282,7 +281,7 @@ function visitConfirmedCreatorEmail(name: string, meta: Record<string, string>):
       ${infoBox(`
         <div style="text-align: center;">
           <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: ${TERRA}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">48-Hour Reel Clock Started</p>
-          ${deadlineStr ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0;">${escapeHtml(deadlineStr)}</p>` : ''}
+          ${deadlineStr ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${INK}; margin: 0;">${escapeHtml(deadlineStr)}</p>` : ''}
         </div>
       `)}
       ${p('Post your Instagram Reel and submit the link in the app before the deadline.')}
@@ -309,7 +308,7 @@ function reelDueReminderEmail(name: string, meta: Record<string, string>): { sub
       ${subtext(`Don't forget, ${escapeHtml(name)} — less than 24 hours left.`)}
       ${infoBox(`
         <div style="text-align: center;">
-          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(businessName)}</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(businessName)}</p>
           ${deadlineStr ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; font-weight: 600; color: ${TERRA}; margin: 0;">Due by ${escapeHtml(deadlineStr)}</p>` : ''}
         </div>
       `)}
@@ -329,8 +328,8 @@ function newClaimBusinessEmail(name: string, meta: Record<string, string>): { su
       ${heading('New Claim!')}
       ${subtext(`Good news, ${escapeHtml(name)}.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(creatorName)}</p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">claimed ${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(creatorName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">claimed ${escapeHtml(offerTitle)}</p>
       `)}
       ${p("<strong>What happens next:</strong>")}
       ${stepList([
@@ -348,7 +347,7 @@ function creatorApprovedEmail(name: string): { subject: string; html: string } {
     subject: "You're approved — welcome to Nayba!",
     html: wrapEmail(`
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
       </div>
       ${heading("You're Approved!")}
       ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're all set.`)}
@@ -370,7 +369,7 @@ function businessApprovedEmail(name: string): { subject: string; html: string } 
     subject: "You're approved — welcome to Nayba!",
     html: wrapEmail(`
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
       </div>
       ${heading("You're Approved!")}
       ${subtext(`Welcome to Nayba, ${escapeHtml(name)}. You're live on the platform.`)}
@@ -390,10 +389,10 @@ function creatorDeniedEmail(name: string): { subject: string; html: string } {
       ${p("After reviewing your application, we're unable to approve your creator account at this time.")}
       ${p('This could be for a number of reasons — incomplete profile, follower count, or content fit.')}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">
           Think this was a mistake? Just reply to this email and we'll take another look.
         </p>
-      `, FAINT, '#E0E0E0')}
+      `, INK_08, ${INK_08})}
       ${p('We appreciate your time and hope to welcome you in the future.')}
     `),
   };
@@ -407,10 +406,10 @@ function businessDeniedEmail(name: string): { subject: string; html: string } {
       ${subtext(`Hi ${escapeHtml(name)}, thanks for your interest in Nayba.`)}
       ${p("After reviewing your application, we're unable to approve your business account at this time.")}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">
           If you believe this was a mistake, just reply to this email and we'll be happy to help.
         </p>
-      `, FAINT, '#E0E0E0')}
+      `, INK_08, ${INK_08})}
       ${p('We appreciate your interest and hope to work with you in the future.')}
     `),
   };
@@ -427,13 +426,13 @@ function adminApprovalRequestEmail(meta: Record<string, string>): { subject: str
       ${heading(`New ${escapeHtml(userType)} signup`)}
       ${subtext('Awaiting your review.')}
       <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse;">
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Type</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Name</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Email</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userEmail)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0; white-space: nowrap;">Time</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0; white-space: nowrap;">Type</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0; white-space: nowrap;">Name</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0; white-space: nowrap;">Email</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(userEmail)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0; white-space: nowrap;">Time</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
       </table>
-      ${btn('Review in Dashboard', `${APP_URL}?demo=admin`, FOREST)}
-    `, FOREST),
+      ${btn('Review in Dashboard', `${APP_URL}?demo=admin`, INK)}
+    `, INK),
   };
 }
 
@@ -447,12 +446,12 @@ function adminSignupEmail(meta: Record<string, string>): { subject: string; html
     html: wrapEmail(`
       ${heading(`New ${escapeHtml(userType)} signup`)}
       <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse;">
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Type</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Name</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Email</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(email)}</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Time</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">Type</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(userType)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">Name</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(displayName)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">Email</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(email)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">Time</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(timestamp)}</td></tr>
       </table>
-    `, FOREST),
+    `, INK),
   };
 }
 
@@ -466,13 +465,13 @@ function feedbackEmail(meta: Record<string, string>): { subject: string; html: s
     html: wrapEmail(`
       ${heading('New Feedback')}
       <table style="width: 100%; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 2; border-collapse: collapse; margin-bottom: 16px;">
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">From</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(meta.display_name || userId)} (${escapeHtml(userType)})</td></tr>
-        <tr><td style="color: ${SOFT}; padding: 0 16px 0 0;">Page</td><td style="color: ${NEAR_BLACK}; font-weight: 600;">${escapeHtml(page)}</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">From</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(meta.display_name || userId)} (${escapeHtml(userType)})</td></tr>
+        <tr><td style="color: ${INK_35}; padding: 0 16px 0 0;">Page</td><td style="color: ${INK}; font-weight: 600;">${escapeHtml(page)}</td></tr>
       </table>
-      <div style="background: ${FAINT}; border-radius: 14px; padding: 20px 22px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${NEAR_BLACK};">
+      <div style="background: ${INK_08}; border-radius: 14px; padding: 20px 22px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${INK};">
         ${escapeHtml(feedbackText)}
       </div>
-    `, FOREST),
+    `, INK),
   };
 }
 
@@ -483,13 +482,13 @@ function reelSubmittedCreatorEmail(name: string, meta: Record<string, string>): 
     subject: 'Your Nayba collab is complete \u{1F389}',
     html: wrapEmail(`
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#127881;</div>
       </div>
       ${heading('Collab Complete!')}
       ${subtext(`Amazing work, ${escapeHtml(name)}.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">with ${escapeHtml(businessName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">with ${escapeHtml(businessName)}</p>
       `)}
       ${p("Your Reel has been submitted and the collab is now complete. Thanks for supporting a local business \u2014 that's what Nayba is all about.")}
       ${p('Ready for your next one? There are more collabs waiting for you.')}
@@ -513,19 +512,19 @@ function slotReadyEmail(name: string, meta: Record<string, string>): { subject: 
     subject: `A spot just opened — ${offerTitle} at ${businessName}`,
     html: wrapEmail(`
       <div style="text-align: center; margin-bottom: 24px;">
-        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${LAVENDER_LIGHT}); line-height: 56px; font-size: 28px;">&#128276;</div>
+        <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#128276;</div>
       </div>
       ${heading('Your spot is ready!')}
       ${subtext(`Great news, ${escapeHtml(name)} — a slot just opened up.`)}
       ${infoBox(`
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${NEAR_BLACK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
-        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${MID}; margin: 0;">at ${escapeHtml(businessName)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 700; color: ${INK}; margin: 0 0 4px;">${escapeHtml(offerTitle)}</p>
+        <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">at ${escapeHtml(businessName)}</p>
       `)}
       ${p('You were next on the waitlist and this spot is yours — but you need to claim it before it moves to the next person.')}
       ${deadlineStr ? infoBox(`
         <div style="text-align: center;">
           <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 13px; font-weight: 600; color: ${TERRA}; margin: 0 0 4px; text-transform: uppercase; letter-spacing: 0.5px;">Claim by</p>
-          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${NEAR_BLACK}; margin: 0;">${escapeHtml(deadlineStr)}</p>
+          <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 18px; font-weight: 800; color: ${INK}; margin: 0;">${escapeHtml(deadlineStr)}</p>
         </div>
       `) : ''}
       ${btn('Claim Now', APP_URL)}
