@@ -8,6 +8,18 @@ import {
 } from 'lucide-react';
 import CampaignDetail from './CampaignDetail';
 
+// ─── Avatar colors by initial ───
+function getAvatarColors(letter: string): { bg: string; text: string } {
+  const ch = letter.toUpperCase();
+  if ('AGMSY'.includes(ch)) return { bg: '#E8EDF2', text: '#3D5A7A' };
+  if ('BHNTZ'.includes(ch)) return { bg: '#EDF2E8', text: '#3A6B3A' };
+  if ('CIOU'.includes(ch))  return { bg: '#F2EDE8', text: '#7A5A3D' };
+  if ('DJPV'.includes(ch))  return { bg: '#EDE8F2', text: '#5A3D7A' };
+  if ('EKQW'.includes(ch))  return { bg: '#F2E8ED', text: '#7A3D5A' };
+  if ('FLRX'.includes(ch))  return { bg: '#E8F2EF', text: '#2D6B5A' };
+  return { bg: '#E8EDF2', text: '#3D5A7A' };
+}
+
 // ─── Skeleton Loaders ───
 function Skeleton({ className }: { className?: string }) {
   return <div className={`animate-pulse bg-[rgba(42,32,24,0.06)] rounded-[8px] ${className || ''}`} />;
@@ -574,7 +586,7 @@ export default function BusinessPortal() {
                   {recentApps.map(a => (
                     <div key={a.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-7 h-7 rounded-full bg-[var(--sage-tint)] flex items-center justify-center flex-shrink-0">
                           <span className="text-[10px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
                         </div>
                         <div>
@@ -693,7 +705,7 @@ export default function BusinessPortal() {
                       <div className="flex items-center gap-3">
                         <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
                           className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
-                        <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "var(--sage-tint)" }}>
                           <span className="text-[15px] font-semibold text-white">{initial}</span>
                         </div>
                         <div>
@@ -784,7 +796,46 @@ export default function BusinessPortal() {
                 <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, they'll appear here</p>
               </div>
             ) : (
-              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none">
+              {/* Mobile: vertical grouped list */}
+              <div className="md:hidden space-y-5">
+                {columns.filter(col => col.items.length > 0).map(col => (
+                  <div key={col.key}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">{col.label}</span>
+                      <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
+                    </div>
+                    <div className="space-y-2">
+                      {col.items.map(p => {
+                        const name = p.creators?.display_name || p.creators?.name || 'Creator';
+                        const initial = name[0].toUpperCase();
+                        const handle = p.creators?.instagram_handle?.replace('@', '') || '';
+                        const avatarColors = getAvatarColors(initial);
+                        return (
+                          <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: avatarColors.bg }}>
+                                <span className="text-[11px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                                <p className="text-[11px] text-[var(--ink-35)]">@{handle}</p>
+                              </div>
+                              {col.key === 'submitted' && p.reel_url && (
+                                <a href={p.reel_url} target="_blank" rel="noopener noreferrer" onClick={(e: any) => e.stopPropagation()}
+                                  className="text-[11px] text-[var(--terra)] font-medium">View Reel</a>
+                              )}
+                              {col.key === 'completed' && <span className="text-[11px] text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Desktop: 4-column kanban grid */}
+              <div className="hidden md:grid md:grid-cols-4 gap-4">
                 {columns.map(col => (
                   <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink md:border-r md:border-[rgba(42,32,24,0.04)] md:last:border-0 md:pr-4">
                     {/* Column header */}
@@ -804,8 +855,8 @@ export default function BusinessPortal() {
                         return (
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5 mb-2">
-                              <div className="w-8 h-8 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                                <span className="text-[11px] font-semibold text-white">{initial}</span>
+                              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(initial).bg }}>
+                                <span className="text-[11px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
                               </div>
                               <div className="min-w-0">
                                 <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
@@ -881,7 +932,7 @@ export default function BusinessPortal() {
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-[var(--terra)] flex items-center justify-center">
+                    <div className="w-12 h-12 rounded-full  flex items-center justify-center">
                       <span className="text-[18px] font-semibold text-white">{name[0].toUpperCase()}</span>
                     </div>
                     <div>
