@@ -431,7 +431,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaigns</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
       <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.08)]">
         {(['active', 'past'] as const).map(t => (
@@ -579,7 +579,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (!unlocked) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+        <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
         <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
             <Lock size={28} className="text-[var(--ink-35)]" />
@@ -600,7 +600,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   if (unlocked && showCelebration) {
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-        <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+        <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
           <div className="bg-white rounded-[12px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
@@ -623,7 +623,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
               <div className="celebrate-bounce w-24 h-24 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-5">
                 <Star size={40} className="text-white" />
               </div>
-              <p className="nayba-h2 text-[var(--ink)] mb-2">You're in!</p>
+              <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">You're in!</p>
               <p className="text-[16px] text-[var(--ink-60)] leading-[1.65] max-w-xs mx-auto mb-6">
                 Welcome to The Naybahood — our community of active local creators. You've earned your place.
               </p>
@@ -640,12 +640,12 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
         <div className="w-20 h-20 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
-        <p className="nayba-h2 text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
+        <p className="text-[20px] font-semibold text-[var(--ink)] mb-2">Welcome to The Naybahood</p>
         <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-6">
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
@@ -671,7 +671,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Profile</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Profile</h1>
 
       {/* Avatar centered */}
       <div className="flex flex-col items-center mb-4">
@@ -715,15 +715,15 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
         <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">{profile.total_campaigns}</p>
+          <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.total_campaigns}</p>
           <p className="text-[11px] text-[var(--ink-35)]">Campaigns</p>
         </div>
         <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">{profile.total_reels}</p>
+          <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.total_reels}</p>
           <p className="text-[11px] text-[var(--ink-35)]">Reels</p>
         </div>
         <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">L{profile.level}</p>
+          <p className="text-[20px] font-semibold text-[var(--ink)]">L{profile.level}</p>
           <p className="text-[11px] text-[var(--ink-35)]">{profile.level_name}</p>
         </div>
       </div>
@@ -806,7 +806,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaign History</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaign History</h1>
 
       {loading ? (
         <div className="py-12 flex justify-center"><div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /></div>
@@ -905,7 +905,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <button onClick={onBack} className="flex items-center gap-1 text-[14px] text-[var(--ink-35)] hover:text-[var(--terra)] mb-3">
         <ArrowLeft size={16} /> Back
       </button>
-      <h1 className="nayba-h2 text-[var(--ink)] mb-6">Account Settings</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
@@ -1024,7 +1024,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
+      <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">More</h1>
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
@@ -1073,7 +1073,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
     <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
       <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
         <Logo size={28} variant="wordmark" />
-        <h2 className="nayba-h2 text-[var(--ink)] mt-4 mb-1">How it works</h2>
+        <h2 className="text-[20px] font-semibold text-[var(--ink)] mt-4 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
         <div className="space-y-3 mb-6 text-left">
           {steps.map((s, i) => (

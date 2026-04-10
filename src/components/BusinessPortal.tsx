@@ -662,7 +662,7 @@ export default function BusinessPortal() {
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="nayba-h2 text-[var(--ink)]">Selection</h1>
+              <h1 className="text-[20px] font-semibold text-[var(--ink)]">Selection</h1>
               <span className="text-[14px] text-[var(--ink-35)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -766,7 +766,7 @@ export default function BusinessPortal() {
               })}
               {filteredApps.length === 0 && (
                 <div className="col-span-3 py-12 text-center">
-                  <p className="nayba-h2 text-[var(--ink)] mb-1">No applicants yet</p>
+                  <p className="text-[20px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
                   <p className="text-[14px] text-[var(--ink-35)]">Creators will appear here once they express interest</p>
                 </div>
               )}
@@ -787,7 +787,7 @@ export default function BusinessPortal() {
           return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="nayba-h2 text-[var(--ink)]">Progress</h1>
+              <h1 className="text-[20px] font-semibold text-[var(--ink)]">Progress</h1>
               <span className="text-[13px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
@@ -988,7 +988,7 @@ export default function BusinessPortal() {
         {/* Analytics Tab */}
         {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'analytics' && (
           <div>
-            <h1 className="nayba-h2 text-[var(--ink)] mb-5">Analytics</h1>
+            <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-5">Analytics</h1>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-6">

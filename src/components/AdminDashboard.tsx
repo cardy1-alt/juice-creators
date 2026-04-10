@@ -167,7 +167,7 @@ export default function AdminDashboard() {
 
         {/* Desktop topbar */}
         <div className="hidden md:flex items-center justify-between h-[56px] bg-white flex-shrink-0" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-          <h1 className="nayba-h2" style={{ fontSize: 20, margin: 0, paddingLeft: 24, color: 'var(--ink)' }}>
+          <h1 className="text-[20px] font-semibold text-[var(--ink)]" style={{ fontSize: 20, margin: 0, paddingLeft: 24, color: 'var(--ink)' }}>
             {PAGE_TITLES[activeTab]}
           </h1>
           {cta.show && (

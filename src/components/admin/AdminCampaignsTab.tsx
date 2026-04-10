@@ -191,7 +191,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 className="nayba-h2 text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
+          <h2 className="text-[20px] font-semibold text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
             <span className="text-[13px] text-[var(--ink-35)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
@@ -465,7 +465,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
       <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
-          <h2 className="nayba-h2 text-[var(--ink)]">
+          <h2 className="text-[20px] font-semibold text-[var(--ink)]">
             Manage Participation — {campaign.title}
           </h2>
           <button onClick={onClose} className={modalClose}><X size={15} /></button>

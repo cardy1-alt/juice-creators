@@ -351,7 +351,7 @@ export default function Auth() {
             <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium mb-8 mx-auto transition-colors" style={{ color: 'var(--ink-60)' }}>
               <ChevronLeft size={14} /> Back to sign in
             </button>
-            <h2 className="nayba-h2" style={{ margin: '0 0 8px', color: 'var(--ink)' }}>Join Nayba</h2>
+            <h2 className="text-[20px] font-semibold text-[var(--ink)]" style={{ margin: '0 0 8px', color: 'var(--ink)' }}>Join Nayba</h2>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'var(--ink-60)', margin: '0 0 32px' }}>Which best describes you?</p>
             <div className="flex gap-4">
               {([
@@ -396,7 +396,7 @@ export default function Auth() {
             <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'var(--terra-10)' }}>
               <Building2 size={24} style={{ color: 'var(--terra)' }} />
             </div>
-            <h2 className="nayba-h2" style={{ margin: '0 0 10px', color: 'var(--ink)' }}>Get your brand on Nayba</h2>
+            <h2 className="text-[20px] font-semibold text-[var(--ink)]" style={{ margin: '0 0 10px', color: 'var(--ink)' }}>Get your brand on Nayba</h2>
             <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.65, margin: '0 0 32px' }}>
               Get in touch at hello@nayba.app to get your brand set up. We'll have you live within 24 hours.
             </p>

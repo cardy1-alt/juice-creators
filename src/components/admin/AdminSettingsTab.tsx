@@ -62,7 +62,7 @@ export default function AdminSettingsTab() {
     <div className="max-w-[520px]">
       {/* Change Password */}
       <div className="bg-white rounded-[12px] p-6 mb-4">
-        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Change Password</h2>
+        <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Change Password</h2>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
             <label className={labelCls}>Current Password</label>
@@ -94,7 +94,7 @@ export default function AdminSettingsTab() {
 
       {/* Feature Flags */}
       <div className="bg-white rounded-[12px] p-6">
-        <h2 className="nayba-h2 text-[var(--ink)] mb-4">Feature Flags</h2>
+        <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Feature Flags</h2>
         <div className="space-y-5">
           <div className="flex items-start justify-between gap-4">
             <div>
