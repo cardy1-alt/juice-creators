@@ -451,7 +451,7 @@ export default function BusinessPortal() {
                 </button>
               ))}
               {filteredCampaigns.length === 0 && (
-                <p className="py-8 text-center text-[14px] text-[var(--ink-35)]">No campaigns match your search</p>
+                <p className="py-8 text-center text-[14px] text-[var(--ink-60)]">No campaigns match your search</p>
               )}
             </div>
 

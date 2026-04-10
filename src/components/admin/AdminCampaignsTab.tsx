@@ -32,8 +32,8 @@ interface Creator { id: string; name: string; display_name: string | null; insta
 
 // ─── Shared styling (using CSS variables from theme.css) ───
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
+const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)]";
@@ -254,7 +254,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       <p className="text-[12px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
                     </div>
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(42,32,24,0.08)]">
-                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Talking Points</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Talking Points</p>
                     </div>
                     {[form.tp1, form.tp2, form.tp3].map((tp, i) => (
                       <div key={i} className="md:col-span-2 flex items-center gap-3">
@@ -263,7 +263,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       </div>
                     ))}
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(42,32,24,0.08)]">
-                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Inspiration</p>
+                      <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Inspiration</p>
                     </div>
                     {form.insp.map((item: any, i: number) => (
                       <div key={i} className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -305,13 +305,13 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               </div>
               {/* Summary card */}
               <div className="bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] p-5">
-                <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
+                <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
-                  <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
-                  <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Title</span><span className="text-[var(--ink)] font-medium">{form.title || '—'}</span></div>
-                  {form.perk_description && <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Perk</span><span className="text-[var(--ink)]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
-                  {form.target_city && <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">City</span><span className="text-[var(--ink)]">{form.target_city}</span></div>}
-                  <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Creators</span><span className="text-[var(--ink)]">{form.creator_target}</span></div>
+                  <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
+                  <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Title</span><span className="text-[var(--ink)] font-medium">{form.title || '—'}</span></div>
+                  {form.perk_description && <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Perk</span><span className="text-[var(--ink)]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
+                  {form.target_city && <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">City</span><span className="text-[var(--ink)]">{form.target_city}</span></div>}
+                  <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Creators</span><span className="text-[var(--ink)]">{form.creator_target}</span></div>
                 </div>
               </div>
             </div>
@@ -646,7 +646,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
     showToast('Creator selected and confirmed');
   };
 
-  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
+  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
 
   return (
     <>
@@ -829,7 +829,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
                 <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
               </div>
             </div>

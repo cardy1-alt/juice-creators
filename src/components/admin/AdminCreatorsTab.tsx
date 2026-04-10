@@ -15,8 +15,8 @@ interface Creator {
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
 
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
+const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function getAvatarColors(letter: string): { bg: string; text: string } {
@@ -166,7 +166,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
   const handle = creator.instagram_handle?.replace('@', '') || '';
-  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
+  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
 
   return (
     <>
@@ -454,7 +454,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
             </div>
           );
         })}
-        {filteredCreators.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</p>}
+        {filteredCreators.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-60)]">{search ? 'No creators match your search' : 'No approved creators yet'}</p>}
       </div>
 
       {/* Desktop table */}
@@ -514,7 +514,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               </tr>
             ))}
             {filteredCreators.length === 0 && (
-              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
+              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[var(--ink-60)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
             )}
           </tbody>
         </table>

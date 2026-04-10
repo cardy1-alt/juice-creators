@@ -137,7 +137,7 @@ export default function AdminAnalyticsTab() {
     { label: 'Estimated Reach', value: stats.totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
   ];
 
-  const chartLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4";
+  const chartLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-4";
 
   if (loading) {
     return (
@@ -162,7 +162,7 @@ export default function AdminAnalyticsTab() {
                 <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
                 <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
               </div>
             </div>
