@@ -352,6 +352,21 @@ export default function BusinessPortal() {
                   </div>
                 </button>
               ))}
+              {filteredCampaigns.length === 0 && (
+                <p className="py-8 text-center text-[14px] text-[var(--ink-35)]">No campaigns match your search</p>
+              )}
+            </div>
+
+            {/* Profile / help / sign out */}
+            <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
+              <div className="flex items-center justify-between">
+                <a href="mailto:jacob@nayba.app" className="text-[13px] text-[var(--ink-60)] hover:text-[var(--terra)]">
+                  <Mail size={15} className="inline mr-1" style={{ verticalAlign: '-2px' }} />Need help?
+                </a>
+                <button onClick={signOut} className="text-[13px] text-[var(--ink-35)] hover:text-[var(--ink)]">
+                  <LogOut size={14} className="inline mr-1" style={{ verticalAlign: '-2px' }} />Sign out
+                </button>
+              </div>
             </div>
           </div>
           );
