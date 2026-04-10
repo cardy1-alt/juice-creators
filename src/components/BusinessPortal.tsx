@@ -53,7 +53,7 @@ interface Participation {
 }
 
 type TopTab = 'dashboard' | 'campaigns';
-type CampaignSubTab = 'summary' | 'selection' | 'participation' | 'content' | 'analytics';
+type CampaignSubTab = 'summary' | 'selection' | 'participation' | 'analytics';
 
 function fmtDate(d: string | null) {
   if (!d) return '—';
@@ -91,7 +91,6 @@ const CAMPAIGN_SUB_TABS: { key: CampaignSubTab; label: string }[] = [
   { key: 'summary', label: 'Summary' },
   { key: 'selection', label: 'Selection' },
   { key: 'participation', label: 'Progress' },
-  { key: 'content', label: 'Content' },
   { key: 'analytics', label: 'Analytics' },
 ];
 
@@ -763,141 +762,107 @@ export default function BusinessPortal() {
         })()}
 
         {/* Participation Tab — renamed to "Creator Progress" */}
-        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'participation' && (
+        {/* ─── Progress — Kanban board ─── */}
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'participation' && (() => {
+          const columns = [
+            { key: 'confirmed', label: 'Confirmed', items: participations.filter(p => !p.perk_sent) },
+            { key: 'perk_sent', label: 'Perk Sent', items: participations.filter(p => p.perk_sent && !p.reel_url) },
+            { key: 'submitted', label: 'Content Submitted', items: participations.filter(p => p.reel_url && p.status !== 'completed') },
+            { key: 'completed', label: 'Completed', items: participations.filter(p => p.status === 'completed') },
+          ];
+          return (
           <div>
             <div className="flex items-center justify-between mb-5">
-              <h1 className="nayba-h2 text-[var(--ink)]">Creator Progress</h1>
-              <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
+              <h1 className="text-[18px] font-semibold text-[var(--ink)]">Progress</h1>
+              <span className="text-[13px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
-            <div className="space-y-3">
-              {participations.map(p => {
-                const name = p.creators?.display_name || p.creators?.name || 'Creator';
-                const initial = name[0].toUpperCase();
-                const handle = p.creators?.instagram_handle?.replace('@', '') || '';
-                // Progress steps
-                const steps = [
-                  { label: 'Confirmed', done: true },
-                  { label: 'Perk sent', done: p.perk_sent },
-                  { label: 'Reel shared', done: !!p.reel_url },
-                  { label: 'Complete', done: p.status === 'completed' },
-                ];
-                const doneCount = steps.filter(s => s.done).length;
-                const progressPct = (doneCount / steps.length) * 100;
-                return (
-                  <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                    {/* Header: avatar + name + status */}
-                    <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                        <span className="text-[14px] font-semibold text-white">{initial}</span>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
-                        <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                          className="text-[12px] text-[var(--terra)] hover:underline flex items-center gap-1">
-                          @{handle} <ExternalLink size={10} />
-                        </a>
-                      </div>
-                      <StatusBadge status={p.status} />
-                    </div>
-
-                    {/* Progress bar */}
-                    <div className="h-[4px] bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden mb-3">
-                      <div className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${progressPct}%`,
-                          background: p.status === 'completed' ? 'var(--success)' : p.status === 'overdue' ? '#DC2626' : 'var(--terra)',
-                        }} />
-                    </div>
-
-                    {/* Steps — circles only on mobile, full labels on desktop */}
-                    <div className="flex items-center gap-2 md:gap-4 mb-3">
-                      {steps.map((s, i) => (
-                        <div key={i} className="flex items-center gap-1 md:gap-1.5">
-                          <div className={`w-3.5 h-3.5 md:w-4 md:h-4 rounded-full flex items-center justify-center flex-shrink-0 ${s.done ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.06)]'}`}>
-                            {s.done && <Check size={8} className="text-white" />}
-                          </div>
-                          <span className={`hidden md:inline text-[12px] ${s.done ? 'text-[var(--ink-60)] font-medium' : 'text-[var(--ink-35)]'}`}>{s.label}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Actions + data */}
-                    <div className="flex items-center gap-3 pt-3 flex-wrap" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
-                          {!p.perk_sent && (
-                            <button onClick={async () => {
-                              await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
-                              fetchCampaignData();
-                              showToast('Perk marked as sent');
-                            }} className="min-h-[36px] px-4 py-1.5 rounded-[10px] bg-[var(--terra)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
-                              Mark perk sent
-                            </button>
-                          )}
-                          {p.reel_url && (
-                            <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                              className="flex items-center gap-1.5 text-[13px] text-[var(--terra)] font-medium hover:underline">
-                              <Film size={14} /> View Reel <ExternalLink size={11} />
-                            </a>
-                          )}
-                          {p.reach != null && <span className="text-[13px] text-[var(--ink-60)]"><Eye size={13} className="inline mr-1" />{p.reach.toLocaleString()} reach</span>}
-                          {(p.likes != null || p.comments != null) && (
-                            <span className="text-[13px] text-[var(--ink-60)]">{p.likes || 0} likes &middot; {p.comments || 0} comments</span>
-                          )}
-                    </div>
-                  </div>
-                );
-              })}
-              {participations.length === 0 && (
-                <div className="py-12 text-center">
-                  <p className="nayba-h2 text-[var(--ink)] mb-1">No creators confirmed yet</p>
-                  <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, their progress will appear here</p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Content Tab */}
-        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'content' && (
-          <div>
-            <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {participations.filter(p => p.reel_url).map(p => (
-                <div key={p.id} className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                  <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">{p.creators?.display_name || p.creators?.name}</p>
-                  <a href={p.reel_url!} target="_blank" rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] hover:underline mb-3">
-                    <Film size={15} /> View Reel <ExternalLink size={13} />
-                  </a>
-                  <div className="space-y-1 text-[13px] text-[var(--ink-60)]">
-                    {p.reach != null && <p>Reach: {p.reach.toLocaleString()}</p>}
-                    {p.likes != null && <p>Likes: {p.likes.toLocaleString()}</p>}
-                    {p.reel_submitted_at && <p>Posted: {fmtDate(p.reel_submitted_at)}</p>}
-                  </div>
-                  <div className="flex items-center gap-2 mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
-                    {p.status !== 'completed' && (
-                      <button onClick={async () => {
-                        await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
-                        fetchCampaignData();
-                        showToast('Content approved');
-                      }} className="min-h-[36px] px-4 py-1.5 rounded-[10px] bg-[var(--status-active-text)] text-white text-[12px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
-                        Approve
-                      </button>
-                    )}
-                    {p.status === 'completed' && (
-                      <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#0F6E56]">
-                        <Check size={13} /> Approved
+            {participations.length === 0 ? (
+              <div className="py-12 text-center">
+                <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No creators confirmed yet</p>
+                <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, they'll appear here</p>
+              </div>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto pb-4 snap-x snap-mandatory hide-scrollbar md:grid md:grid-cols-4 md:overflow-visible md:snap-none">
+                {columns.map(col => (
+                  <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink">
+                    {/* Column header */}
+                    <div className="flex items-center gap-2 mb-3 px-1">
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">{col.label}</span>
+                      <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
+                        {col.items.length}
                       </span>
-                    )}
+                    </div>
+
+                    {/* Cards */}
+                    <div className="space-y-2">
+                      {col.items.map(p => {
+                        const name = p.creators?.display_name || p.creators?.name || 'Creator';
+                        const initial = name[0].toUpperCase();
+                        const handle = p.creators?.instagram_handle?.replace('@', '') || '';
+                        return (
+                          <div key={p.id} className="bg-white rounded-[10px] p-3.5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                            <div className="flex items-center gap-2.5 mb-2">
+                              <div className="w-8 h-8 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                                <span className="text-[11px] font-semibold text-white">{initial}</span>
+                              </div>
+                              <div className="min-w-0">
+                                <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                                <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                                  className="text-[11px] text-[var(--terra)] hover:underline">@{handle}</a>
+                              </div>
+                            </div>
+
+                            {/* Context-dependent actions */}
+                            {col.key === 'confirmed' && !p.perk_sent && (
+                              <button onClick={async () => {
+                                await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
+                                fetchCampaignData();
+                                showToast('Perk marked as sent');
+                              }} className="w-full mt-2 py-1.5 rounded-[8px] text-[12px] text-[var(--terra)] hover:bg-[var(--terra-10)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(217,95,59,0.15)' }}>
+                                Mark perk sent
+                              </button>
+                            )}
+
+                            {col.key === 'submitted' && p.reel_url && (
+                              <div className="mt-2 space-y-1.5">
+                                <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                                  className="flex items-center gap-1 text-[12px] text-[var(--terra)] font-medium hover:underline">
+                                  <Film size={12} /> View Reel <ExternalLink size={10} />
+                                </a>
+                                <button onClick={async () => {
+                                  await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
+                                  fetchCampaignData();
+                                  showToast('Content approved');
+                                }} className="w-full py-1.5 rounded-[8px] text-[12px] text-white bg-[var(--status-active-text)] hover:opacity-[0.90]" style={{ fontWeight: 600 }}>
+                                  Approve
+                                </button>
+                              </div>
+                            )}
+
+                            {col.key === 'completed' && (
+                              <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--ink-60)]">
+                                <span className="text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>
+                                {p.reach != null && <span>{p.reach.toLocaleString()} reach</span>}
+                                {p.likes != null && <span>{p.likes} likes</span>}
+                              </div>
+                            )}
+                          </div>
+                        );
+                      })}
+                      {col.items.length === 0 && (
+                        <div className="rounded-[10px] border border-dashed border-[rgba(42,32,24,0.08)] py-6 text-center">
+                          <p className="text-[12px] text-[var(--ink-15)]">No creators</p>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
-              {participations.filter(p => p.reel_url).length === 0 && (
-                <div className="col-span-3 py-12 text-center text-[14px] text-[var(--ink-35)]">No content submitted yet</div>
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
-        )}
+          );
+        })()}
 
         {/* Analytics Tab */}
         {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'analytics' && (
