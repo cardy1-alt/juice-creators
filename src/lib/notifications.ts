@@ -281,28 +281,6 @@ export async function sendWeeklyDigestEmail(creatorId: string, meta: {
   });
 }
 
-// ─── Admin: Content Submitted ───────────────────────────────────────────
-
-export async function sendAdminContentSubmittedEmail(meta: {
-  creator_name: string;
-  campaign_title: string;
-  brand_name: string;
-  reel_url: string;
-}): Promise<void> {
-  await insertNotification({
-    userId: '00000000-0000-0000-0000-000000000000',
-    userType: 'admin',
-    message: `${meta.creator_name} submitted a Reel for ${meta.brand_name}: ${meta.campaign_title}`,
-    emailType: 'admin_content_submitted',
-    emailMeta: {
-      creator_name: meta.creator_name,
-      campaign_title: meta.campaign_title,
-      brand_name: meta.brand_name,
-      reel_url: meta.reel_url,
-    },
-  });
-}
-
 // ─── Feedback ───────────────────────────────────────────────────────────
 
 export async function sendFeedbackEmail(params: {
