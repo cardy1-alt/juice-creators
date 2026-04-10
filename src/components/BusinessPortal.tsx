@@ -338,7 +338,7 @@ export default function BusinessPortal() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCampaigns.map(c => (
-                <button key={c.id} onClick={() => setSelectedCampaignId(c.id)}
+                <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('summary'); }}
                   className="w-full text-left bg-white rounded-[12px] p-5 transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                   <div className="flex items-center justify-between mb-3">
