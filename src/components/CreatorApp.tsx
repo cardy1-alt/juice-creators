@@ -317,7 +317,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                   )}
                 </div>
                 <div className="flex-1 p-3.5 flex flex-col">
-                  <span className="text-[14px] md:text-[12px] mb-1" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
+                  <span className="text-[14px] md:text-[12px] mb-1 truncate block" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
                   <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                   {c.expression_deadline && (
                     <p className="text-[14px] md:text-[12px] text-[var(--ink-60)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
@@ -684,11 +684,11 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         )}
         <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-          className="text-[14px] text-[var(--ink-50)] hover:underline">{profile.instagram_handle}</a>
-        <div className="flex items-center gap-2 mt-1.5">
+          className="text-[14px] text-[var(--ink-50)] hover:underline">@{profile.instagram_handle.replace('@', '')}</a>
+        <div className="flex items-center gap-2 mt-2">
           <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
           {profile.address && (
-            <span className="text-[14px] md:text-[12px] text-[var(--ink-60)] flex items-center gap-1"><MapPin size={11} />{profile.address.split(',')[0].trim()}</span>
+            <span className="text-[14px] text-[var(--ink-60)] flex items-center gap-1"><MapPin size={12} />{profile.address}</span>
           )}
         </div>
       </div>

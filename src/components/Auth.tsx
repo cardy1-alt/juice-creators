@@ -412,10 +412,10 @@ export default function Auth() {
         <div className="flex-1 flex flex-col items-center justify-center px-5 py-8 md:py-16" style={{ background: 'white', minHeight: '100dvh' }}>
           <div className="w-full flex flex-col items-center" style={{ maxWidth: 380 }}>
 
-            {/* Logo */}
-            <div style={{ marginBottom: 24 }}>
+            {/* Logo — links back to sign in */}
+            <button onClick={() => { setMode('signin'); setError(''); setSignupStep(1); }} style={{ marginBottom: 24, background: 'none', border: 'none', cursor: 'pointer' }}>
               <Logo size={28} variant="wordmark" />
-            </div>
+            </button>
 
             {/* Progress stepper */}
             <div className="flex items-center gap-2 mb-8">
