@@ -138,8 +138,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
-  const [sortBy, setSortBy] = useState<'newest' | 'closing' | 'value'>('newest');
-  const [statusFilter, setStatusFilter] = useState<'all' | 'new' | 'applied'>('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'closing' | 'value' | 'new' | 'applied'>('newest');
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
@@ -187,8 +186,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       const allowedCats = categoryMap[category] || [];
       if (!allowedCats.some(cat => c.businesses?.category?.includes(cat))) return false;
     }
-    if (statusFilter === 'new' && applications[c.id]) return false;
-    if (statusFilter === 'applied' && !applications[c.id]) return false;
+    if (sortBy === 'new' && applications[c.id]) return false;
+    if (sortBy === 'applied' && !applications[c.id]) return false;
     return true;
   }).sort((a, b) => {
     if (sortBy === 'closing') {
@@ -199,7 +198,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
     if (sortBy === 'value') {
       return (b.perk_value || 0) - (a.perk_value || 0);
     }
-    return 0; // newest is already the default order from supabase
+    return 0;
   });
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
@@ -238,29 +237,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           <option value="newest">Newest</option>
           <option value="closing">Closing soon</option>
           <option value="value">Highest value</option>
+          <option value="new">Not applied</option>
+          <option value="applied">Applied</option>
         </select>
       </div>
 
-      {/* Filters — single scrollable row */}
+      {/* Category filter chips */}
       <div className="flex gap-2 overflow-x-auto mb-4 hide-scrollbar">
-        {/* Status pills */}
-        {([['all', 'All'], ['new', 'New'], ['applied', 'Applied']] as const).map(([key, label]) => (
-          <button key={key} onClick={() => setStatusFilter(key)}
-            className="flex-shrink-0 px-[14px] py-[7px] rounded-[999px] text-[14px] md:text-[12px] transition-colors"
-            style={{
-              fontWeight: statusFilter === key ? 700 : 500,
-              background: statusFilter === key ? 'var(--ink)' : 'white',
-              color: statusFilter === key ? 'white' : 'var(--ink-60)',
-              border: statusFilter === key ? 'none' : '1px solid rgba(42,32,24,0.10)',
-            }}>
-            {label}
-          </button>
-        ))}
-
-        <div className="w-px h-6 bg-[rgba(42,32,24,0.12)] flex-shrink-0 my-auto" />
-
-        {/* Category chips */}
-      <div className="flex gap-2 hide-scrollbar flex-1">
         {categories.map(c => {
           const isActive = category === c;
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
@@ -275,7 +258,6 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             </button>
           );
         })}
-      </div>
       </div>
 
       {/* Campaign grid */}
