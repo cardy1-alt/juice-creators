@@ -549,7 +549,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Paste the link to your Instagram Reel below and we'll take it from there</p>
             <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
-              className={`w-full px-4 py-3 min-h-[48px] rounded-[12px] border ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
+              className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
             {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
@@ -919,17 +919,17 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
-              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]">
+              className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]">
               <option value="">Select county</option>
               <option value="Suffolk">Suffolk</option>
               <option value="Norfolk">Norfolk</option>
@@ -966,7 +966,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
-                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+                  className="w-full px-4 py-2.5 pr-10 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
                 <button type="button" onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -977,7 +977,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
-                className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+                className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
             </div>
             {passwordError && <p className="text-[13px] text-[var(--destructive)]">{passwordError}</p>}
             <div className="flex gap-3">

@@ -723,16 +723,16 @@ export default function BusinessPortal() {
                     {/* Stats row */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Level</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
                         <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Rate</span>
+                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
                         <span className={`text-[13px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
                       </div>
                       {a.creators?.follower_count && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-35)]">Followers</span>
+                          <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
                           <span className="text-[13px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
                         </div>
                       )}
@@ -802,7 +802,7 @@ export default function BusinessPortal() {
                 {columns.filter(col => col.items.length > 0).map(col => (
                   <div key={col.key}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">{col.label}</span>
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
                       <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
                     </div>
                     <div className="space-y-2">
@@ -841,7 +841,7 @@ export default function BusinessPortal() {
                   <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink md:border-r md:border-[rgba(42,32,24,0.04)] md:last:border-0 md:pr-4">
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-35)]">{col.label}</span>
+                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
                       <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
                         {col.items.length}
                       </span>
