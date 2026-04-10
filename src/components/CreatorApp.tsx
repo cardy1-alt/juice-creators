@@ -209,10 +209,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      {/* Welcome + county context */}
-      <div className="mb-5">
-        <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 28 }}>Hey {firstName}</h1>
-        <p className="text-[14px] text-[var(--ink-60)] mt-1">Campaigns in {county}</p>
+      {/* Welcome */}
+      <div className="mb-4">
+        <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 26 }}>Hey {firstName}</h1>
+        <p className="text-[14px] text-[var(--ink-60)] mt-0.5">Campaigns in {county}</p>
       </div>
 
       {/* Active campaign banner */}
@@ -224,45 +224,43 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </button>
       )}
 
-      {/* Search + sort row — stacks on mobile */}
-      <div className="flex flex-col sm:flex-row gap-3 mb-4">
+      {/* Search row with inline sort */}
+      <div className="flex gap-2 mb-3">
         <div className="relative flex-1">
-          <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search campaigns..."
-            className="w-full pl-10 pr-4 h-[44px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
+            placeholder="Search..."
+            className="w-full pl-10 pr-3 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
         </div>
         <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="h-[44px] px-3 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)] sm:w-auto"
-          style={{ fontWeight: 500 }}>
+          className="h-[40px] px-2.5 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
+          style={{ fontWeight: 500, minWidth: 100 }}>
           <option value="newest">Newest</option>
           <option value="closing">Closing soon</option>
           <option value="value">Highest value</option>
         </select>
       </div>
 
-      {/* Status + category filters */}
-      <div className="flex items-center gap-3 mb-4">
-        {/* Status tabs */}
-        <div className="flex gap-1 bg-[rgba(42,32,24,0.04)] rounded-[10px] p-1">
-          {([['all', 'All'], ['new', 'New'], ['applied', 'Applied']] as const).map(([key, label]) => (
-            <button key={key} onClick={() => setStatusFilter(key)}
-              className="px-3 py-2 rounded-[8px] text-[14px] md:text-[12px] transition-colors"
-              style={{
-                fontWeight: statusFilter === key ? 600 : 500,
-                background: statusFilter === key ? 'white' : 'transparent',
-                color: statusFilter === key ? 'var(--ink)' : 'var(--ink-35)',
-                boxShadow: statusFilter === key ? '0 1px 2px rgba(42,32,24,0.06)' : 'none',
-              }}>
-              {label}
-            </button>
-          ))}
-        </div>
+      {/* Filters — single scrollable row */}
+      <div className="flex gap-2 overflow-x-auto mb-4 hide-scrollbar">
+        {/* Status pills */}
+        {([['all', 'All'], ['new', 'New'], ['applied', 'Applied']] as const).map(([key, label]) => (
+          <button key={key} onClick={() => setStatusFilter(key)}
+            className="flex-shrink-0 px-[14px] py-[7px] rounded-[999px] text-[14px] md:text-[12px] transition-colors"
+            style={{
+              fontWeight: statusFilter === key ? 700 : 500,
+              background: statusFilter === key ? 'var(--ink)' : 'white',
+              color: statusFilter === key ? 'white' : 'var(--ink-60)',
+              border: statusFilter === key ? 'none' : '1px solid rgba(42,32,24,0.10)',
+            }}>
+            {label}
+          </button>
+        ))}
 
-        <div className="w-px h-5 bg-[rgba(42,32,24,0.08)]" />
+        <div className="w-px h-6 bg-[rgba(42,32,24,0.12)] flex-shrink-0 my-auto" />
 
         {/* Category chips */}
-      <div className="flex gap-2 overflow-x-auto hide-scrollbar flex-1">
+      <div className="flex gap-2 hide-scrollbar flex-1">
         {categories.map(c => {
           const isActive = category === c;
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
