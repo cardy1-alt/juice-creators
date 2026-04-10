@@ -181,7 +181,7 @@
 /* ── Hornbill heading utilities (Regular 400 — light, refined) ── */
 .nayba-h1 {
   font-family: 'Hornbill', Georgia, serif;
-  font-weight: 400;
+  font-weight: 700;
   font-size: var(--text-hero);
   letter-spacing: -0.035em;
   line-height: 1.15;
