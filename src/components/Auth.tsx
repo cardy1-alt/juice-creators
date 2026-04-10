@@ -463,7 +463,7 @@ export default function Auth() {
                       {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                     </button>
                   </div>
-                  <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">At least 8 characters</p>
+                  <p className="text-[14px] text-[var(--ink-50)]">At least 8 characters</p>
                 </div>
 
                 {error && (

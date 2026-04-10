@@ -157,7 +157,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
           </button>
-          <p className="text-[14px] md:text-[12px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
+          <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
         </div>
       )}
       {application?.status === 'interested' && (

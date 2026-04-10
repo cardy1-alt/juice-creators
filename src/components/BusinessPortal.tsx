@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
+    <span className={`inline-flex items-center rounded-[999px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '4px 10px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -439,7 +439,7 @@ export default function BusinessPortal() {
                   </div>
                   <div className="p-4">
                     <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-[15px] font-semibold text-[var(--ink)]">{c.title}</h3>
+                      <h3 className="text-[16px] font-semibold text-[var(--ink)]">{c.title}</h3>
                       <StatusBadge status={c.status} />
                     </div>
                     {c.headline && <p className="text-[14px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
@@ -724,7 +724,7 @@ export default function BusinessPortal() {
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[14px] md:text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[14px] md:text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
