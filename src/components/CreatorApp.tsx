@@ -414,7 +414,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
-      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.12)]">
+      <div className="flex gap-1 mb-4 border-b border-[rgba(42,32,24,0.12)]">
         {(['active', 'past'] as const).map(t => (
           <button key={t} onClick={() => setSubTab(t)}
             className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-50)]'}`}>
