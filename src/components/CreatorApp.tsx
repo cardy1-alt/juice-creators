@@ -453,7 +453,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+              <div key={p.id} className="bg-white rounded-[12px] p-4">
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
@@ -513,7 +513,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
@@ -522,7 +522,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
@@ -580,7 +580,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+        <div className="bg-white rounded-[12px] p-8 text-center">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
             <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
@@ -641,7 +641,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+      <div className="bg-white rounded-[12px] p-8 text-center">
         <div className="w-20 h-20 rounded-[10px] bg-[var(--status-active-text)] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
@@ -694,7 +694,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       </div>
 
       {/* Completion rate */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mt-3 mb-3">
+      <div className="bg-white rounded-[12px] p-5 mt-3 mb-3">
         <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
         <div className="flex items-center gap-3">
           <p className="text-[28px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
@@ -714,22 +714,27 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Stats row */}
       <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.total_campaigns}</p>
-          <p className="text-[11px] text-[var(--ink-60)]">Campaigns</p>
-        </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.total_reels}</p>
-          <p className="text-[11px] text-[var(--ink-60)]">Reels</p>
-        </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="text-[20px] font-semibold text-[var(--ink)]">L{profile.level}</p>
-          <p className="text-[11px] text-[var(--ink-35)]">{profile.level_name}</p>
-        </div>
+        {[
+          { label: 'Campaigns', value: profile.total_campaigns, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+          { label: 'Reels', value: profile.total_reels, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+          { label: profile.level_name, value: `L${profile.level}`, icon: Star, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-[12px] p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center" style={{ background: s.tint }}>
+                <s.icon size={15} style={{ color: s.color }} />
+              </div>
+              <div className="text-center">
+                <p className="text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
+                <p className="text-[10px] text-[var(--ink-60)]">{s.label}</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Instagram connection */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+      <div className="bg-white rounded-[12px] p-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
@@ -764,7 +769,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 mt-3">
+          <div className="bg-white rounded-[12px] p-4 mt-3">
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
               <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
@@ -814,7 +819,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
@@ -832,7 +837,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
@@ -908,7 +913,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
+      <div className="bg-white rounded-[12px] p-5 mb-4">
         <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
@@ -946,7 +951,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Password */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
+      <div className="bg-white rounded-[12px] p-5 mb-4">
         <div className="flex items-center justify-between">
           <h2 className="nayba-h3 text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
@@ -988,7 +993,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
+      <div className="bg-white rounded-[12px] p-5">
         <h2 className="nayba-h3 text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -1025,7 +1030,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">More</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden">
+      <div className="bg-white rounded-[12px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
             className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
@@ -1037,7 +1042,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </div>
 
       <button onClick={() => setShowSignOutConfirm(true)}
-        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
         <LogOut size={18} className="text-[var(--terra)]" />
         <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
       </button>
