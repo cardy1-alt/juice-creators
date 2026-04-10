@@ -392,7 +392,7 @@ function creatorDeniedEmail(name: string): { subject: string; html: string } {
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">
           Think this was a mistake? Just reply to this email and we'll take another look.
         </p>
-      `, INK_08, ${INK_08})}
+      `, INK_08, INK_08)}
       ${p('We appreciate your time and hope to welcome you in the future.')}
     `),
   };
@@ -409,7 +409,7 @@ function businessDeniedEmail(name: string): { subject: string; html: string } {
         <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; color: ${INK_60}; margin: 0;">
           If you believe this was a mistake, just reply to this email and we'll be happy to help.
         </p>
-      `, INK_08, ${INK_08})}
+      `, INK_08, INK_08)}
       ${p('We appreciate your interest and hope to work with you in the future.')}
     `),
   };
