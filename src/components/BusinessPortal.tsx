@@ -52,7 +52,8 @@ interface Participation {
   creators?: { name: string; display_name: string | null; instagram_handle: string; };
 }
 
-type Tab = 'summary' | 'selection' | 'participation' | 'content' | 'analytics';
+type TopTab = 'dashboard' | 'campaigns';
+type CampaignSubTab = 'summary' | 'selection' | 'participation' | 'content' | 'analytics';
 
 function fmtDate(d: string | null) {
   if (!d) return '—';
@@ -81,12 +82,17 @@ function StatusBadge({ status }: { status: string }) {
   );
 }
 
-const TABS: { key: Tab; label: string; icon: typeof LayoutDashboard }[] = [
-  { key: 'summary', label: 'Summary', icon: LayoutDashboard },
-  { key: 'selection', label: 'Selection', icon: Users },
-  { key: 'participation', label: 'Participation', icon: ClipboardList },
-  { key: 'content', label: 'Content', icon: Film },
-  { key: 'analytics', label: 'Analytics', icon: BarChart3 },
+const TOP_TABS: { key: TopTab; label: string; icon: typeof LayoutDashboard }[] = [
+  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { key: 'campaigns', label: 'Campaigns', icon: Megaphone },
+];
+
+const CAMPAIGN_SUB_TABS: { key: CampaignSubTab; label: string }[] = [
+  { key: 'summary', label: 'Summary' },
+  { key: 'selection', label: 'Selection' },
+  { key: 'participation', label: 'Progress' },
+  { key: 'content', label: 'Content' },
+  { key: 'analytics', label: 'Analytics' },
 ];
 
 export default function BusinessPortal() {
@@ -96,7 +102,8 @@ export default function BusinessPortal() {
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   const [participations, setParticipations] = useState<Participation[]>([]);
-  const [activeTab, setActiveTab] = useState<Tab>('summary');
+  const [activeTab, setActiveTab] = useState<TopTab>('dashboard');
+  const [campaignSubTab, setCampaignSubTab] = useState<CampaignSubTab>('summary');
   const [loading, setLoading] = useState(true);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedCreators, setSelectedCreators] = useState<Set<string>>(new Set());
@@ -108,8 +115,9 @@ export default function BusinessPortal() {
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
-  const handleTabClick = (tab: Tab) => {
+  const handleTabClick = (tab: TopTab) => {
     setActiveTab(tab);
+    if (tab === 'dashboard') setSelectedCampaignId(null);
     setSidebarOpen(false);
   };
 
@@ -221,68 +229,43 @@ export default function BusinessPortal() {
         <div className="fixed top-4 right-4 z-50 text-white px-5 py-3 rounded-[999px] text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
-
-      {/* Sidebar — hidden on mobile by default, overlay when open */}
-      <aside className={`
-        w-[240px] bg-[var(--stone)] flex flex-col flex-shrink-0
-        fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `} style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
-        <div className="px-5 py-5 flex items-center justify-between" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-          <div>
-            <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden text-[var(--ink-60)] hover:text-[var(--ink)]">
-            <X size={20} />
-          </button>
+      {/* ─── Desktop sidebar ─── */}
+      <aside className="hidden md:flex w-[240px] flex-col flex-shrink-0" style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
+        <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
+          <Logo size={28} variant="wordmark" />
+          <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
         </div>
 
-        {/* Back to campaigns */}
-        {selectedCampaignId && (
-          <div className="px-3 py-3" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-            <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }}
-              className="flex items-center gap-2 text-[13px] text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors">
-              <ArrowLeft size={14} /> All campaigns
-            </button>
-          </div>
-        )}
-
         <nav className="flex-1 py-3 px-3">
-          {selectedCampaignId ? TABS.map(tab => {
+          {TOP_TABS.map(tab => {
             const active = activeTab === tab.key;
             return (
               <button key={tab.key} onClick={() => handleTabClick(tab.key)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] mb-1 transition-colors ${active ? 'text-[var(--terra)]' : 'text-[var(--ink-60)] font-medium hover:bg-[rgba(42,32,24,0.04)]'}`}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] text-[14px] mb-1 transition-colors ${active ? 'text-[var(--terra)]' : 'text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.04)]'}`}
                 style={{ fontWeight: active ? 700 : 500, background: active ? 'var(--terra-10)' : 'transparent' }}>
                 <tab.icon size={18} strokeWidth={active ? 2 : 1.5} />
                 {tab.label}
               </button>
             );
-          }) : (
-            <div className="px-3 py-2">
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]">Your campaigns</p>
-            </div>
-          )}
+          })}
         </nav>
 
-        <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
-            <LogOut size={18} /> Sign out
+        <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
+          <a href="mailto:jacob@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+            <Mail size={16} /> Need help?
+          </a>
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+            <LogOut size={16} /> Sign out
           </button>
         </div>
       </aside>
 
-      {/* Main content */}
+      {/* ─── Main content ─── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Mobile header */}
         <div className="md:hidden flex items-center gap-3 px-4 py-3 bg-white" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
           {selectedCampaignId && (
-            <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
+            <button onClick={() => setSelectedCampaignId(null)} className="text-[var(--ink-60)] hover:text-[var(--ink)]">
               <ArrowLeft size={20} />
             </button>
           )}
@@ -292,25 +275,114 @@ export default function BusinessPortal() {
               {selectedCampaignId ? campaign?.title || 'Campaign' : brand.name}
             </span>
           </div>
-          {/* Help icon */}
           <a href="mailto:jacob@nayba.app" className="text-[var(--ink-35)] hover:text-[var(--ink)]" title="Get help">
             <Mail size={18} />
           </a>
         </div>
 
+        {/* Campaign sub-tabs — horizontal, shown when inside a campaign */}
+        {selectedCampaignId && (
+          <div className="flex gap-1 px-4 md:px-8 py-2 bg-white overflow-x-auto hide-scrollbar" style={{ borderBottom: '1px solid rgba(42,32,24,0.06)' }}>
+            {CAMPAIGN_SUB_TABS.map(tab => {
+              const active = campaignSubTab === tab.key;
+              return (
+                <button key={tab.key} onClick={() => setCampaignSubTab(tab.key)}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-[999px] text-[13px] transition-colors"
+                  style={{
+                    fontWeight: active ? 600 : 500,
+                    background: active ? 'var(--terra-10)' : 'transparent',
+                    color: active ? 'var(--terra)' : 'var(--ink-35)',
+                  }}>
+                  {tab.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         <main className="flex-1 p-4 md:p-8 pb-20 md:pb-0 overflow-auto" key={selectedCampaignId ? activeTab : 'campaigns'}>
         <div className="tab-fade-in">
 
-        {/* Campaign list landing page — when no campaign selected */}
-        {!selectedCampaignId && campaigns.length > 0 && (() => {
+        {/* ─── Dashboard page ─── */}
+        {activeTab === 'dashboard' && (
+          <div>
+            <div className="mb-6">
+              <h1 className="nayba-h1 text-[var(--ink)] mb-1" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
+              <p className="text-[14px] text-[var(--ink-60)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+            </div>
+
+            {/* Aggregate stats */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              {[
+                { label: 'Campaigns', value: campaigns.filter(c => c.status === 'active' || c.status === 'live').length, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+                { label: 'Creators', value: campaigns.reduce((s, c) => s + c.creator_target, 0), icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
+                { label: 'Reels', value: submittedCount, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+                { label: 'Reach', value: totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+              ].map(s => (
+                <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-[10px] flex items-center justify-center flex-shrink-0" style={{ background: s.tint }}>
+                      <s.icon size={15} style={{ color: s.color }} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Active campaigns quick view */}
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-[13px] font-medium text-[var(--ink-35)]">Active campaigns</p>
+                <button onClick={() => setActiveTab('campaigns')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
+              </div>
+              <div className="space-y-2">
+                {campaigns.filter(c => c.status === 'active' || c.status === 'live' || c.status === 'selecting').slice(0, 3).map(c => (
+                  <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('campaigns'); setCampaignSubTab('summary'); }}
+                    className="w-full flex items-center justify-between bg-white rounded-[12px] p-4 text-left transition-shadow hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
+                    style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      {c.campaign_image ? (
+                        <img src={c.campaign_image} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-[8px] bg-[var(--chalk)] flex items-center justify-center flex-shrink-0">
+                          <Megaphone size={16} className="text-[var(--ink-15)]" />
+                        </div>
+                      )}
+                      <div className="min-w-0">
+                        <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{c.title}</p>
+                        <p className="text-[12px] text-[var(--ink-35)]">{c.creator_target} creators</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={c.status} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Need help */}
+            <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
+              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
+              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                <Mail size={14} /> jacob@nayba.app
+              </a>
+            </div>
+          </div>
+        )}
+
+        {/* ─── Campaigns page — list ─── */}
+        {activeTab === 'campaigns' && !selectedCampaignId && campaigns.length > 0 && (() => {
           const filteredCampaigns = campaigns
             .filter(c => campaignFilter === 'all' || c.status === campaignFilter || (campaignFilter === 'active' && (c.status === 'active' || c.status === 'live' || c.status === 'selecting')))
             .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()));
           return (
           <div>
-            <div className="mb-6">
-              <h1 className="nayba-h1 text-[var(--ink)] mb-1" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
-              <p className="text-[14px] text-[var(--ink-60)]">Your campaigns</p>
+            <div className="mb-5">
+              <h1 className="text-[20px] font-semibold text-[var(--ink)]">Campaigns</h1>
             </div>
 
             {/* Search + filter */}
@@ -339,7 +411,7 @@ export default function BusinessPortal() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCampaigns.map(c => (
-                <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('summary'); }}
+                <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setCampaignSubTab('summary'); }}
                   className="w-full text-left bg-white rounded-[12px] overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                   {/* Hero image */}
@@ -370,23 +442,12 @@ export default function BusinessPortal() {
               )}
             </div>
 
-            {/* Profile / help / sign out */}
-            <div className="mt-8 pt-6" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
-              <div className="flex items-center justify-between">
-                <a href="mailto:jacob@nayba.app" className="text-[13px] text-[var(--ink-60)] hover:text-[var(--terra)]">
-                  <Mail size={15} className="inline mr-1" style={{ verticalAlign: '-2px' }} />Need help?
-                </a>
-                <button onClick={signOut} className="text-[13px] text-[var(--ink-35)] hover:text-[var(--ink)]">
-                  <LogOut size={14} className="inline mr-1" style={{ verticalAlign: '-2px' }} />Sign out
-                </button>
-              </div>
-            </div>
           </div>
           );
         })()}
 
         {/* Summary Tab */}
-        {selectedCampaignId && activeTab === 'summary' && campaign && (() => {
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'summary' && campaign && (() => {
           const pendingApplicants = applications.filter(a => a.status === 'interested').length;
           const awaitingContent = participations.filter(p => !p.reel_url && p.status !== 'completed').length;
           const recentApps = applications.slice(0, 3);
@@ -541,7 +602,7 @@ export default function BusinessPortal() {
         })()}
 
         {/* Selection Tab */}
-        {selectedCampaignId && activeTab === 'selection' && (() => {
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'selection' && (() => {
           const filteredApps = applications.filter(a => {
             if (filterLevel !== 'all' && a.creators?.level && a.creators.level < parseInt(filterLevel)) return false;
             return true;
@@ -702,7 +763,7 @@ export default function BusinessPortal() {
         })()}
 
         {/* Participation Tab — renamed to "Creator Progress" */}
-        {selectedCampaignId && activeTab === 'participation' && (
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'participation' && (
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="nayba-h2 text-[var(--ink)]">Creator Progress</h1>
@@ -797,7 +858,7 @@ export default function BusinessPortal() {
         )}
 
         {/* Content Tab */}
-        {selectedCampaignId && activeTab === 'content' && (
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'content' && (
           <div>
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Content</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -839,7 +900,7 @@ export default function BusinessPortal() {
         )}
 
         {/* Analytics Tab */}
-        {selectedCampaignId && activeTab === 'analytics' && (
+        {selectedCampaignId && activeTab === 'campaigns' && campaignSubTab === 'analytics' && (
           <div>
             <h1 className="nayba-h2 text-[var(--ink)] mb-5">Analytics</h1>
 
@@ -896,24 +957,22 @@ export default function BusinessPortal() {
       </main>
       </div>
 
-      {/* Mobile bottom nav — only inside a campaign */}
-      {selectedCampaignId && (
+      {/* Mobile bottom nav — always visible, 2 tabs */}
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-30" style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-center justify-around py-2" style={{ height: 'var(--nav-height)' }}>
-          {TABS.map(tab => {
+          {TOP_TABS.map(tab => {
             const active = activeTab === tab.key;
             return (
-              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              <button key={tab.key} onClick={() => handleTabClick(tab.key)}
                 className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px]"
                 style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }}>
-                <tab.icon size={20} strokeWidth={active ? 2 : 1.5} />
+                <tab.icon size={22} strokeWidth={active ? 2 : 1.5} />
                 <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
               </button>
             );
           })}
         </div>
       </div>
-      )}
     </div>
   );
 }
