@@ -4,7 +4,7 @@ import { friendlyError } from '../../lib/errors';
 import { Eye, EyeOff } from 'lucide-react';
 
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
+const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
 
 function Toggle({ enabled, onToggle }: { enabled: boolean; onToggle: () => void }) {
   return (
@@ -99,7 +99,7 @@ export default function AdminSettingsTab() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[15px] font-medium text-[var(--ink)]">Instagram API</p>
-              <p className="text-[13px] text-[var(--ink-60)] leading-[1.5]">Enable Instagram OAuth and automatic reach/engagement data</p>
+              <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">Enable Instagram OAuth and automatic reach/engagement data</p>
             </div>
             <Toggle enabled={instagramEnabled} onToggle={() => toggleFlag('instagram_api', !instagramEnabled, setInstagramEnabled)} />
           </div>
@@ -107,7 +107,7 @@ export default function AdminSettingsTab() {
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[15px] font-medium text-[var(--ink)]">The Naybahood</p>
-              <p className="text-[13px] text-[var(--ink-60)] leading-[1.5]">Show the Naybahood tab in the creator app</p>
+              <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">Show the Naybahood tab in the creator app</p>
             </div>
             <Toggle enabled={naybahoodEnabled} onToggle={() => toggleFlag('naybahood', !naybahoodEnabled, setNaybahoodEnabled)} />
           </div>

@@ -32,8 +32,8 @@ interface Creator { id: string; name: string; display_name: string | null; insta
 
 // ─── Shared styling (using CSS variables from theme.css) ───
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
+const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)]";
@@ -43,7 +43,7 @@ const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
 const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0";
 const ghostBtn = "text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors";
 const primaryBtn = "px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] disabled:opacity-40 transition-opacity";
-const secondaryBtn = "px-5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[rgba(42,32,24,0.02)]";
+const secondaryBtn = "px-5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]";
 // shadows removed — border alone;
 
 function StatusBadge({ status }: { status: string }) {
@@ -61,7 +61,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[11px] font-medium ${cls[status] || cls.draft}`} style={{ padding: '3px 9px' }}>
+    <span className={`inline-flex items-center rounded-[999px] text-[12px] font-medium ${cls[status] || cls.draft}`} style={{ padding: '3px 9px' }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -193,7 +193,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         <div className={modalHeader}>
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
-            <span className="text-[13px] text-[var(--ink-35)]">Step {step} of 3</span>
+            <span className="text-[14px] text-[var(--ink-35)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
           </div>
         </div>
@@ -204,7 +204,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         <div className={modalBody}>
           {(formError || saveError) && (
             <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
-              <span className="text-[13px] font-medium">{formError || saveError}</span>
+              <span className="text-[14px] font-medium">{formError || saveError}</span>
             </div>
           )}
           {/* STEP 1 — Basics */}
@@ -251,7 +251,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
                         className={inputCls} placeholder="#brandname, @brand, #campaign" />
-                      <p className="text-[11px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
+                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
                     </div>
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(42,32,24,0.08)]">
                       <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Talking Points</p>
@@ -277,7 +277,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 <div className="py-8 text-center">
                   <p className="text-[14px] text-[var(--ink-35)] mb-3">Fill in the fields above, or</p>
                   <button onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.10)] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)] disabled:opacity-40 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.10)] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)] disabled:opacity-40 transition-colors"
                     style={{ fontWeight: 600 }}>
                     {aiLoading ? <span className="w-3 h-3 border-[1.5px] border-[var(--ink-35)] border-t-transparent rounded-full animate-spin" /> : '✦'}{' '}
                     {aiLoading ? 'Suggesting...' : 'Suggest ideas from Step 1'}
@@ -455,9 +455,9 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     onRefresh();
   };
 
-  const pThCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
-  const pTdCls = "py-2 px-3 text-[13px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)] align-middle";
-  const numInput = "w-[72px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[13px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
+  const pThCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
+  const pTdCls = "py-2 px-3 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)] align-middle";
+  const numInput = "w-[72px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
 
   return (
     <div className={modalOverlay}>
@@ -500,7 +500,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                       <td className={`${pTdCls} font-medium whitespace-nowrap`}>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 rounded-[10px] bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
-                            <span className="text-[10px] font-semibold text-white">{(p.creators?.display_name || p.creators?.name || '?')[0].toUpperCase()}</span>
+                            <span className="text-[12px] font-semibold text-white">{(p.creators?.display_name || p.creators?.name || '?')[0].toUpperCase()}</span>
                           </div>
                           {p.creators?.display_name || p.creators?.name}
                         </div>
@@ -532,7 +532,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                           />
                           {p.reel_url && (
                             <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                              className="text-[11px] text-[var(--terra)] font-medium whitespace-nowrap hover:underline">
+                              className="text-[12px] text-[var(--terra)] font-medium whitespace-nowrap hover:underline">
                               View →
                             </a>
                           )}
@@ -562,7 +562,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                         <button
                           onClick={() => markComplete(p.id)}
                           disabled={p.status === 'completed'}
-                          className="px-3 py-1.5 rounded-[10px] text-[11px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
+                          className="px-3 py-1.5 rounded-[10px] text-[12px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{
                             background: p.status === 'completed' ? 'rgba(42,32,24,0.06)' : 'rgba(45,122,79,0.08)',
                             color: p.status === 'completed' ? 'var(--ink-35)' : '#2D7A4F',
@@ -646,7 +646,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
     showToast('Creator selected and confirmed');
   };
 
-  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
+  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
 
   return (
     <>
@@ -656,7 +656,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">
             <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{campaign.title}</p>
-            <p className="text-[13px] text-[var(--ink-35)] mt-0.5">{campaign.businesses?.name || '—'}</p>
+            <p className="text-[14px] text-[var(--ink-35)] mt-0.5">{campaign.businesses?.name || '—'}</p>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
@@ -713,11 +713,11 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
                 {allCreators.map(cr => (
                   <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.02)]">
                     <div className="min-w-0">
-                      <span className="text-[13px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
-                      <span className="text-[11px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
+                      <span className="text-[14px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
+                      <span className="text-[12px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
                     </div>
                     <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
-                      className="px-2.5 py-1 rounded-[10px] bg-[var(--terra)] text-white text-[11px] font-semibold disabled:opacity-40">
+                      className="px-2.5 py-1 rounded-[10px] bg-[var(--terra)] text-white text-[12px] font-semibold disabled:opacity-40">
                       {addingCreator === cr.id ? '...' : 'Add'}
                     </button>
                   </div>
@@ -882,7 +882,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       <td className={tdCls}>
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-                            <span className="text-[11px] font-semibold text-[var(--terra)]">{(c.businesses?.name || '?')[0]}</span>
+                            <span className="text-[12px] font-semibold text-[var(--terra)]">{(c.businesses?.name || '?')[0]}</span>
                           </div>
                           <span className="font-medium text-[14px]">{c.businesses?.name || '—'}</span>
                         </div>
@@ -892,7 +892,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         <div className="flex items-center gap-1.5">
                           <StatusBadge status={c.status} />
                           {c.campaign_type === 'community' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[10px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
                           )}
                         </div>
                       </td>
@@ -903,7 +903,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           <div className="w-16 h-1.5 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden">
                             <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
                           </div>
-                          <span className="text-[13px] text-[var(--ink-60)]">{counts.applicants}/{c.creator_target}</span>
+                          <span className="text-[14px] text-[var(--ink-60)]">{counts.applicants}/{c.creator_target}</span>
                         </div>
                       </td>
                       <td className={tdCls}>{counts.selected}</td>

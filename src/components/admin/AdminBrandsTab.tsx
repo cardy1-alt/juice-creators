@@ -12,8 +12,8 @@ interface Brand {
 
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
-const labelCls = "block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5";
+const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
@@ -63,7 +63,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
           {error && (
             <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
               <AlertCircle size={14} />
-              <span className="text-[13px] font-medium">{error}</span>
+              <span className="text-[14px] font-medium">{error}</span>
             </div>
           )}
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -94,7 +94,7 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
   onViewAs: (brand: Brand) => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const peekLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
+  const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1";
 
   return (
     <>
@@ -107,7 +107,7 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
             </div>
             <div className="min-w-0">
               <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{brand.name}</p>
-              <p className="text-[13px] text-[var(--ink-35)]">{brand.category}</p>
+              <p className="text-[14px] text-[var(--ink-35)]">{brand.category}</p>
             </div>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
@@ -120,8 +120,8 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
             <div>
               <p className={peekLabel}>Status</p>
               {brand.approved
-                ? <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
-                : <span className="inline-flex items-center rounded-[999px] text-[11px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
+                ? <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
+                : <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
               }
             </div>
             <div>
@@ -172,17 +172,17 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
           {!brand.approved && (
             <div className="flex gap-2">
               <button onClick={() => { onApprove(brand.id, true); onClose(); }}
-                className="flex-1 px-4 py-2.5 rounded-[10px] bg-[#2D7A4F] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                className="flex-1 px-4 py-2.5 rounded-[10px] bg-[#2D7A4F] text-white text-[14px] font-semibold hover:opacity-[0.85]">
                 Approve
               </button>
               <button onClick={() => { onApprove(brand.id, false); onClose(); }}
-                className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
+                className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
                 Deny
               </button>
             </div>
           )}
           <button onClick={() => { onViewAs(brand); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[13px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
+            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
             <Eye size={14} /> View as Brand
           </button>
         </div>
@@ -245,8 +245,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 </div>
               </div>
               {b.approved
-                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
-                : <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
+                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                : <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
               }
             </div>
             <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
@@ -274,7 +274,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[11px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
+                      <span className="text-[12px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
                     </div>
                     <span className="font-medium">{b.name}</span>
                   </div>
@@ -285,8 +285,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 <td className={tdCls}>{campaignCounts[b.id] || 0}</td>
                 <td className={tdCls}>
                   {b.approved
-                    ? <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
-                    : <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
+                    ? <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                    : <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
                   }
                 </td>
                 <td className={tdCls}>

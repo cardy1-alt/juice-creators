@@ -232,7 +232,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
         </div>
         <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="h-[40px] px-3 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[13px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
+          className="h-[40px] px-3 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
           style={{ fontWeight: 500 }}>
           <option value="newest">Newest</option>
           <option value="closing">Closing soon</option>
@@ -285,7 +285,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         <div className="py-12 text-center">
           <AlertCircle size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
-          <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
+          <p className="text-[14px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
           <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
             <RefreshCw size={14} /> Retry
           </button>
@@ -308,19 +308,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     </div>
                   )}
                   {appStatus && (
-                    <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
+                    <span className={`absolute top-2.5 left-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-medium backdrop-blur-sm ${appStatus === 'interested' ? 'bg-[#FAEEDA]/90 text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE]/90 text-[#0F6E56]' : 'bg-white/80 text-[#5F5E5A]'}`}>
                       {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
                     </span>
                   )}
                   {c.campaign_type === 'community' && (
-                    <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
+                    <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
                   )}
                 </div>
                 <div className="flex-1 p-3.5 flex flex-col">
-                  <span className="text-[11px] mb-1" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
+                  <span className="text-[12px] mb-1" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
                   <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                   {c.expression_deadline && (
-                    <p className="text-[11px] text-[var(--ink-60)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
+                    <p className="text-[12px] text-[var(--ink-60)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
                   )}
                 </div>
               </button>
@@ -332,13 +332,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           <div className="py-12 text-center">
             <Compass size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
             <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
-            <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
+            <p className="text-[14px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
         {filtered.length > 0 && (
           <div className="py-8 text-center">
             <Check size={20} className="text-[var(--ink-35)] mx-auto mb-2" />
-            <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon</p>
+            <p className="text-[14px] text-[var(--ink-35)]">You're all caught up — check back soon</p>
           </div>
         )}
       </>}
@@ -454,7 +454,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
               <div key={p.id} className="bg-white rounded-[12px] p-4">
-                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[12px] font-medium uppercase tracking-[0.04em] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
                   <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[999px] bg-[var(--terra-light)] mb-3">
@@ -472,7 +472,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                       <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
                         <div className="flex flex-col items-center">
                           <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[var(--status-active-text)]' : isCurrent ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.12)]'}`} />
-                          <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
+                          <span className={`text-[12px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
                         </div>
                         {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[var(--status-active-text)]' : 'bg-[rgba(42,32,24,0.10)]'}`} />}
                       </div>
@@ -492,7 +492,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                   </div>
                   {p.reel_url && (
                     <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
+                      className="flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium">
                       <Film size={14} /> View Reel <ExternalLink size={12} />
                     </a>
                   )}
@@ -504,7 +504,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             <div className="py-12 text-center">
               <Megaphone size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
               <p className="text-[15px] font-medium text-[var(--ink)] mb-1">No active campaigns yet</p>
-              <p className="text-[13px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
+              <p className="text-[14px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>
           )}
         </div>
@@ -515,7 +515,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           {completedParts.map(p => (
             <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[14px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
               </div>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#E1F5EE] text-[#0F6E56]">Completed</span>
@@ -524,7 +524,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           {pastApps.map(a => (
             <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[14px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
               </div>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
@@ -550,7 +550,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             <input value={reelUrl} onChange={e => { setReelUrl(e.target.value); setReelUrlError(''); }}
               placeholder="https://www.instagram.com/reel/..."
               className={`w-full px-4 py-3 min-h-[44px] rounded-[10px] border ${reelUrlError ? 'border-[var(--destructive)]' : 'border-[rgba(42,32,24,0.15)]'} bg-white text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)] mb-1`} />
-            {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
+            {reelUrlError && <p className="text-[14px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
               className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
@@ -590,7 +590,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
           </p>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[999px] bg-[var(--terra-light)]">
             <Megaphone size={14} className="text-[var(--terra)]" />
-            <span className="text-[13px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
+            <span className="text-[14px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
           </div>
         </div>
       </div>
@@ -628,7 +628,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
                 Welcome to The Naybahood — our community of active local creators. You've earned your place.
               </p>
               <button onClick={dismissCelebration}
-                className="w-full py-3.5 rounded-[6px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
+                className="w-full py-3.5 rounded-[6px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-[0.85] transition-opacity min-h-[44px]">
                 Let's go
               </button>
             </div>
@@ -650,11 +650,11 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
           You're part of the crew. Connect with other local creators, get early access to campaigns, and grow together.
         </p>
         <a href={WHATSAPP_COMMUNITY_URL} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-[6px] bg-[#25D366] text-white font-semibold text-[13px] min-h-[44px] hover:opacity-[0.85]">
+          className="inline-flex items-center gap-2 px-5 py-3 rounded-[6px] bg-[#25D366] text-white font-semibold text-[14px] min-h-[44px] hover:opacity-[0.85]">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
           Join the WhatsApp Community
         </a>
-        <p className="text-[13px] text-[var(--ink-35)] mt-3">Connect with other Suffolk creators, share tips, and hear about campaigns first</p>
+        <p className="text-[14px] text-[var(--ink-35)] mt-3">Connect with other Suffolk creators, share tips, and hear about campaigns first</p>
       </div>
     </div>
   );
@@ -684,7 +684,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         )}
         <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-          className="text-[13px] text-[var(--ink-35)] hover:underline">{profile.instagram_handle}</a>
+          className="text-[14px] text-[var(--ink-35)] hover:underline">{profile.instagram_handle}</a>
         <div className="flex items-center gap-2 mt-1.5">
           <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
           {profile.address && (
@@ -726,7 +726,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
               </div>
               <div className="text-center">
                 <p className="text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
-                <p className="text-[10px] text-[var(--ink-60)]">{s.label}</p>
+                <p className="text-[12px] text-[var(--ink-60)]">{s.label}</p>
               </div>
             </div>
           </div>
@@ -740,7 +740,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
             <div>
               <p className="text-[15px] font-medium text-[var(--ink)]">Instagram</p>
-              <p className="text-[13px] text-[var(--ink-35)]">{profile.instagram_connected ? 'Connected' : 'Manual at pilot — auto-connect coming soon'}</p>
+              <p className="text-[14px] text-[var(--ink-35)]">{profile.instagram_connected ? 'Connected' : 'Manual at pilot — auto-connect coming soon'}</p>
             </div>
           </div>
           {profile.instagram_connected ? (
@@ -771,8 +771,8 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         return completePct < 100 ? (
           <div className="bg-white rounded-[12px] p-4 mt-3">
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
-              <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
+              <p className="text-[14px] font-medium text-[var(--ink)]">Profile completeness</p>
+              <span className="text-[14px] font-semibold text-[var(--terra)]">{completePct}%</span>
             </div>
             <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
               <div className="h-full bg-[var(--terra)] rounded-full transition-all" style={{ width: `${completePct}%` }} />
@@ -821,7 +821,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           {participations.map(p => (
             <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[14px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
                 <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(p.created_at)}</p>
               </div>
@@ -839,7 +839,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
             <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4">
               <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[14px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
                 <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(a.applied_at)}</p>
               </div>
@@ -917,17 +917,17 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
         <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
-            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
+            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Display name</label>
             <input value={displayName} onChange={e => setDisplayName(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
+            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
+            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
             <select value={city} onChange={e => setCity(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]">
               <option value="">Select county</option>
@@ -938,7 +938,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
             </select>
           </div>
           <div>
-            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
+            <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Email</label>
             <input value={profile.email} disabled
               className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-[var(--shell)] text-[15px] text-[var(--ink-35)] min-h-[44px]" />
             <p className="text-[12px] text-[var(--ink-35)] mt-1">Email can't be changed — contact support if needed</p>
@@ -962,7 +962,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
         {showPasswordChange && (
           <div className="mt-4 space-y-3">
             <div>
-              <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">New password</label>
+              <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">New password</label>
               <div className="relative">
                 <input type={showPassword ? 'text' : 'password'} value={newPassword} onChange={e => setNewPassword(e.target.value)}
                   placeholder="At least 8 characters"
@@ -974,12 +974,12 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               </div>
             </div>
             <div>
-              <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
+              <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Confirm new password</label>
               <input type={showPassword ? 'text' : 'password'} value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)}
                 placeholder="Re-enter your password"
                 className="w-full px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[44px]" />
             </div>
-            {passwordError && <p className="text-[13px] text-[var(--destructive)]">{passwordError}</p>}
+            {passwordError && <p className="text-[14px] text-[var(--destructive)]">{passwordError}</p>}
             <div className="flex gap-3">
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
                 className="px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
@@ -1088,7 +1088,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
               </div>
               <div>
                 <p className="text-[15px] font-semibold text-[var(--ink)]">{s.title}</p>
-                <p className="text-[13px] text-[var(--ink-60)] leading-[1.5]">{s.desc}</p>
+                <p className="text-[14px] text-[var(--ink-60)] leading-[1.5]">{s.desc}</p>
               </div>
             </div>
           ))}
@@ -1175,7 +1175,7 @@ export default function CreatorApp() {
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
         <AlertCircle size={48} className="text-[var(--ink-15)] mb-4" />
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Something went wrong</p>
-        <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
+        <p className="text-[14px] text-[var(--ink-35)] mb-5 max-w-xs">We couldn't load your profile. Check your connection and try again.</p>
         <button onClick={() => { setProfileError(false); setLoading(true); fetchProfile(); }}
           className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <RefreshCw size={14} /> Retry
@@ -1247,11 +1247,11 @@ export default function CreatorApp() {
         <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
           <div className="flex items-center gap-3 px-1">
             <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
-              <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
+              <span className="text-[12px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
             </div>
             <div className="min-w-0">
-              <p className="text-[13px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
-              <p className="text-[11px] text-[var(--ink-35)] truncate">{profile.instagram_handle}</p>
+              <p className="text-[14px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
+              <p className="text-[12px] text-[var(--ink-35)] truncate">{profile.instagram_handle}</p>
             </div>
           </div>
         </div>

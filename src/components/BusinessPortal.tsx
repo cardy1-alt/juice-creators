@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[11px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
+    <span className={`inline-flex items-center rounded-[999px] text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -189,7 +189,7 @@ export default function BusinessPortal() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
         <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
-          <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
+          <p className="text-[14px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
           <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             <Mail size={16} /> Contact nayba
           </a>
@@ -204,7 +204,7 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]';
+  const thCls = 'text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]';
   const tdCls = 'py-0 px-4 text-[14px] text-[var(--ink)]' + " border-b border-[rgba(42,32,24,0.06)]";
 
   // Empty state
@@ -214,7 +214,7 @@ export default function BusinessPortal() {
         <aside className="hidden md:flex w-[240px] bg-[var(--stone)] flex-col flex-shrink-0" style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
           <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <Logo size={28} variant="wordmark" />
-            <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+            <p className="text-[14px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
           </div>
           <div className="flex-1" />
           <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
@@ -226,7 +226,7 @@ export default function BusinessPortal() {
         <main className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
-            <p className="text-[13px] text-[var(--ink-35)] mb-4">Contact nayba to get started with your first campaign.</p>
+            <p className="text-[14px] text-[var(--ink-35)] mb-4">Contact nayba to get started with your first campaign.</p>
             <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
               <Mail size={16} /> Contact nayba
             </a>
@@ -246,7 +246,7 @@ export default function BusinessPortal() {
       <aside className="hidden md:flex w-[240px] flex-col flex-shrink-0" style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
         <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
           <Logo size={28} variant="wordmark" />
-          <p className="text-[13px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
+          <p className="text-[14px] font-medium text-[var(--ink-60)] mt-1">{brand.name}</p>
         </div>
 
         <nav className="flex-1 py-3 px-3">
@@ -264,10 +264,10 @@ export default function BusinessPortal() {
         </nav>
 
         <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-          <a href="mailto:jacob@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+          <a href="mailto:jacob@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <Mail size={16} /> Need help?
           </a>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[13px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <LogOut size={16} /> Sign out
           </button>
         </div>
@@ -300,7 +300,7 @@ export default function BusinessPortal() {
               const active = campaignSubTab === tab.key;
               return (
                 <button key={tab.key} onClick={() => setCampaignSubTab(tab.key)}
-                  className="flex-shrink-0 px-3 py-1.5 rounded-[999px] text-[13px] transition-colors"
+                  className="flex-shrink-0 px-3 py-1.5 rounded-[999px] text-[14px] transition-colors"
                   style={{
                     fontWeight: active ? 600 : 500,
                     background: active ? 'var(--terra-10)' : 'transparent',
@@ -338,7 +338,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -349,7 +349,7 @@ export default function BusinessPortal() {
             {/* Active campaigns quick view */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[13px] font-medium text-[var(--ink-35)]">Active campaigns</p>
+                <p className="text-[14px] font-medium text-[var(--ink-35)]">Active campaigns</p>
                 <button onClick={() => setActiveTab('campaigns')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
               </div>
               <div className="space-y-2">
@@ -379,8 +379,8 @@ export default function BusinessPortal() {
             {/* Need help */}
             <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
-              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
-              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
+              <p className="text-[14px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
+              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
                 <Mail size={14} /> jacob@nayba.app
               </a>
             </div>
@@ -442,7 +442,7 @@ export default function BusinessPortal() {
                       <h3 className="text-[15px] font-semibold text-[var(--ink)]">{c.title}</h3>
                       <StatusBadge status={c.status} />
                     </div>
-                    {c.headline && <p className="text-[13px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
+                    {c.headline && <p className="text-[14px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
                     <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
                       {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
                       <span>{c.creator_target} creators</span>
@@ -477,7 +477,7 @@ export default function BusinessPortal() {
                 <h1 className="text-[20px] font-semibold text-[var(--ink)]">{campaign.title}</h1>
                 <StatusBadge status={campaign.status} />
               </div>
-              <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)]">
+              <div className="flex items-center gap-1.5 text-[14px] text-[var(--ink-60)]">
                 {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
                 {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
                 {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
@@ -526,7 +526,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -557,7 +557,7 @@ export default function BusinessPortal() {
                 </div>
               )}
               <button onClick={() => setShowPreview(true)}
-                className="text-[13px] font-medium text-[var(--terra)] hover:underline">
+                className="text-[14px] font-medium text-[var(--terra)] hover:underline">
                 Preview as creator →
               </button>
             </div>
@@ -580,7 +580,7 @@ export default function BusinessPortal() {
             {recentApps.length > 0 && (
               <div className="bg-white rounded-[12px] p-4 md:p-5 mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[13px] font-medium text-[var(--ink-35)]">Recent applicants</p>
+                  <p className="text-[14px] font-medium text-[var(--ink-35)]">Recent applicants</p>
                   <button onClick={() => setActiveTab('selection')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
                 </div>
                 <div className="space-y-2.5">
@@ -588,11 +588,11 @@ export default function BusinessPortal() {
                     <div key={a.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-full bg-[var(--sage-tint)] flex items-center justify-center flex-shrink-0">
-                          <span className="text-[10px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
+                          <span className="text-[12px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
                         </div>
                         <div>
-                          <p className="text-[13px] font-medium text-[var(--ink)]">{a.creators?.display_name || a.creators?.name}</p>
-                          <p className="text-[11px] text-[var(--ink-35)]">{a.creators?.instagram_handle}</p>
+                          <p className="text-[14px] font-medium text-[var(--ink)]">{a.creators?.display_name || a.creators?.name}</p>
+                          <p className="text-[12px] text-[var(--ink-35)]">{a.creators?.instagram_handle}</p>
                         </div>
                       </div>
                       <StatusBadge status={a.status} />
@@ -605,8 +605,8 @@ export default function BusinessPortal() {
             {/* Help */}
             <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
-              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
-              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
+              <p className="text-[14px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
+              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
                 <Mail size={14} /> jacob@nayba.app
               </a>
             </div>
@@ -669,23 +669,23 @@ export default function BusinessPortal() {
             {/* Filters + bulk actions */}
             <div className="flex items-center gap-3 mb-4 flex-wrap">
               <select value={filterLevel} onChange={e => setFilterLevel(e.target.value)}
-                className="px-3 py-2 rounded-[10px] bg-white text-[13px] text-[var(--ink)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                className="px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <option value="all">All levels</option>
                 {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
               </select>
               <button onClick={toggleAll}
-                className="px-3 py-2 rounded-[10px] bg-white text-[13px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
+                className="px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
                 {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
               </button>
               {selectedCreators.size > 0 && (
                 <>
-                  <span className="text-[13px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
+                  <span className="text-[14px] text-[var(--ink-60)] font-medium">{selectedCreators.size} selected</span>
                   <button onClick={handleBulkSelect}
-                    className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[13px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                    className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                     Select {selectedCreators.size}
                   </button>
                   <button onClick={handleBulkDecline}
-                    className="min-h-[44px] px-3 py-2 rounded-[10px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.04)]">
+                    className="min-h-[44px] px-3 py-2 rounded-[10px] text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.04)]">
                     Decline
                   </button>
                 </>
@@ -712,7 +712,7 @@ export default function BusinessPortal() {
                         <div>
                           <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
                           <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                            className="text-[13px] text-[var(--terra)] hover:underline flex items-center gap-1">
+                            className="text-[14px] text-[var(--terra)] hover:underline flex items-center gap-1">
                             @{handle} <ExternalLink size={11} />
                           </a>
                         </div>
@@ -723,17 +723,17 @@ export default function BusinessPortal() {
                     {/* Stats row */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[11px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
-                        <span className={`text-[13px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
+                        <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
+                        <span className={`text-[14px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
                       </div>
                       {a.creators?.follower_count && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[11px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
-                          <span className="text-[13px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
+                          <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
+                          <span className="text-[14px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
                         </div>
                       )}
                     </div>
@@ -741,7 +741,7 @@ export default function BusinessPortal() {
                     {/* Pitch */}
                     {a.pitch && (
                       <div className="bg-[var(--shell)] rounded-[10px] px-3 py-2 mb-3">
-                        <p className="text-[13px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
+                        <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
                       </div>
                     )}
 
@@ -751,7 +751,7 @@ export default function BusinessPortal() {
                       {a.status === 'interested' && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
-                            className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85]">
+                            className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85]">
                             Select
                           </button>
                           <button onClick={() => handleDecline(a.id)}
@@ -788,7 +788,7 @@ export default function BusinessPortal() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-[20px] font-semibold text-[var(--ink)]">Progress</h1>
-              <span className="text-[13px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
+              <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
             {participations.length === 0 ? (
@@ -803,7 +803,7 @@ export default function BusinessPortal() {
                   <div key={col.key}>
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
-                      <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
+                      <span className="text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
                     </div>
                     <div className="space-y-2">
                       {col.items.map(p => {
@@ -815,17 +815,17 @@ export default function BusinessPortal() {
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: avatarColors.bg }}>
-                                <span className="text-[11px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
+                                <span className="text-[12px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
-                                <p className="text-[11px] text-[var(--ink-35)]">@{handle}</p>
+                                <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                                <p className="text-[12px] text-[var(--ink-35)]">@{handle}</p>
                               </div>
                               {col.key === 'submitted' && p.reel_url && (
                                 <a href={p.reel_url} target="_blank" rel="noopener noreferrer" onClick={(e: any) => e.stopPropagation()}
-                                  className="text-[11px] text-[var(--terra)] font-medium">View Reel</a>
+                                  className="text-[12px] text-[var(--terra)] font-medium">View Reel</a>
                               )}
-                              {col.key === 'completed' && <span className="text-[11px] text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>}
+                              {col.key === 'completed' && <span className="text-[12px] text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>}
                             </div>
                           </div>
                         );
@@ -842,7 +842,7 @@ export default function BusinessPortal() {
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
                       <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
-                      <span className="text-[11px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
+                      <span className="text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
                         {col.items.length}
                       </span>
                     </div>
@@ -857,12 +857,12 @@ export default function BusinessPortal() {
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5 mb-2">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(initial).bg }}>
-                                <span className="text-[11px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
+                                <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
                               </div>
                               <div className="min-w-0">
-                                <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                                <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
                                 <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                                  className="text-[11px] text-[var(--terra)] hover:underline">@{handle}</a>
+                                  className="text-[12px] text-[var(--terra)] hover:underline">@{handle}</a>
                               </div>
                             </div>
 
@@ -895,7 +895,7 @@ export default function BusinessPortal() {
                             )}
 
                             {col.key === 'completed' && (
-                              <div className="mt-2 flex items-center gap-2 text-[11px] text-[var(--ink-60)]">
+                              <div className="mt-2 flex items-center gap-2 text-[12px] text-[var(--ink-60)]">
                                 <span className="text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>
                                 {p.reach != null && <span>{p.reach.toLocaleString()} reach</span>}
                                 {p.likes != null && <span>{p.likes} likes</span>}
@@ -945,7 +945,7 @@ export default function BusinessPortal() {
                     </div>
                   </div>
 
-                  <div className="space-y-3 text-[13px]">
+                  <div className="space-y-3 text-[14px]">
                     <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
                       <span className="text-[var(--ink-35)]">Perk</span>
                       <span className="text-[var(--ink)] font-medium">{p.perk_sent ? 'Redeemed' : 'Pending'}</span>
@@ -1003,7 +1003,7 @@ export default function BusinessPortal() {
                     <s.icon size={15} style={{ color: s.color }} />
                   </div>
                   <div>
-                    <p className="text-[10px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                    <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
                     <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                   </div>
                 </div>
@@ -1014,7 +1014,7 @@ export default function BusinessPortal() {
 
             {/* Reach by creator */}
             <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
+              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
@@ -1026,14 +1026,14 @@ export default function BusinessPortal() {
                         <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden">
                           <div className="h-full rounded-[10px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
                             style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
-                            <span className="text-[11px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
+                            <span className="text-[12px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[13px] text-[var(--ink-35)]">No reach data yet — admin will enter this after content is reviewed</p>
+                  <p className="text-[14px] text-[var(--ink-35)]">No reach data yet — admin will enter this after content is reviewed</p>
                 );
               })()}
             </div>

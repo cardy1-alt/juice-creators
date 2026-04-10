@@ -108,19 +108,19 @@
   --font-sans: 'Instrument Sans', sans-serif;
   --font-serif: 'Instrument Serif', serif;
 
-  /* ── Typography — Sizes ── */
+  /* ── Typography — Sizes (6-step scale) ── */
   --text-wordmark: 22px;
   --text-hero: 36px;
-  --text-page-title: 24px;
+  --text-page-title: 20px;
   --text-section-title: 18px;
-  --text-section-label: 11px;
+  --text-section-label: 12px;
   --text-nav: 14px;
-  --text-table-header: 11px;
+  --text-table-header: 12px;
   --text-table-primary: 14px;
-  --text-table-secondary: 13px;
+  --text-table-secondary: 14px;
   --text-body: 15px;
   --text-label: 12px;
-  --text-meta: 13px;
+  --text-meta: 14px;
   --text-stat-value: 28px;
   --text-button: 14px;
 

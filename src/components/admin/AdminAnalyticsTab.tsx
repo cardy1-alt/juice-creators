@@ -31,13 +31,13 @@ interface Stats {
 // Animated SVG bar chart
 function AnimatedBarChart({ items, color }: { items: { label: string; value: number }[]; color: string }) {
   const max = Math.max(...items.map(i => i.value), 1);
-  if (items.length === 0) return <p className="text-[13px] text-[var(--ink-35)]">No data yet</p>;
+  if (items.length === 0) return <p className="text-[14px] text-[var(--ink-35)]">No data yet</p>;
 
   return (
     <div className="space-y-3">
       {items.map((item, i) => (
         <div key={item.label} className="flex items-center gap-3">
-          <span className="text-[13px] text-[var(--ink)] truncate" style={{ width: 90, flexShrink: 0 }}>{item.label}</span>
+          <span className="text-[14px] text-[var(--ink)] truncate" style={{ width: 90, flexShrink: 0 }}>{item.label}</span>
           <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden">
             <div className="h-full rounded-[10px] flex items-center justify-end pr-2 chart-bar-enter"
               style={{
@@ -47,7 +47,7 @@ function AnimatedBarChart({ items, color }: { items: { label: string; value: num
                 animationDelay: `${i * 0.08}s`,
                 animationFillMode: 'both',
               }}>
-              <span className="text-[11px] font-semibold text-white">{item.value.toLocaleString()}</span>
+              <span className="text-[12px] font-semibold text-white">{item.value.toLocaleString()}</span>
             </div>
           </div>
         </div>
@@ -60,8 +60,8 @@ function ProgressMetric({ label, value }: { label: string; value: number }) {
   return (
     <div className="mb-4 last:mb-0">
       <div className="flex items-center justify-between mb-1.5">
-        <span className="text-[13px] text-[var(--ink)] font-medium">{label}</span>
-        <span className="text-[13px] font-semibold text-[var(--ink)]">{value}%</span>
+        <span className="text-[14px] text-[var(--ink)] font-medium">{label}</span>
+        <span className="text-[14px] font-semibold text-[var(--ink)]">{value}%</span>
       </div>
       <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
         <div className="h-full rounded-[10px] bg-[var(--terra)] transition-all duration-700" style={{ width: `${value}%` }} />
@@ -137,7 +137,7 @@ export default function AdminAnalyticsTab() {
     { label: 'Estimated Reach', value: stats.totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
   ];
 
-  const chartLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4";
+  const chartLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4";
 
   if (loading) {
     return (

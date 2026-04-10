@@ -126,7 +126,7 @@ export default function AdminDashboard() {
                     <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
                     <span className="flex-1 text-left">{item.label}</span>
                     {item.key === 'creators' && pendingCount > 0 && (
-                      <span className="flex items-center justify-center text-[10px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
+                      <span className="flex items-center justify-center text-[12px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
                         {pendingCount}
                       </span>
                     )}
@@ -141,10 +141,10 @@ export default function AdminDashboard() {
         <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: '12px 8px 16px' }}>
           <div className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
             <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
-              <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
+              <span className="text-[12px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[13px] font-medium text-[var(--ink)] truncate">{adminName}</p>
+              <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
               <p className="text-[12px] text-[var(--ink-35)] truncate">{user?.email}</p>
             </div>
             <LogOut size={14} className="text-[var(--ink-35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />

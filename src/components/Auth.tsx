@@ -226,7 +226,7 @@ export default function Auth() {
                   <button
                     type="button"
                     onClick={() => setForgotPassword(false)}
-                    className="flex items-center gap-[6px] text-[13px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
+                    className="flex items-center gap-[6px] text-[14px] font-medium text-[var(--ink-60)] mb-[20px] hover:text-[var(--ink)] transition-colors"
                   >
                     <ChevronLeft size={14} strokeWidth={1.5} /> Back to sign in
                   </button>
@@ -348,7 +348,7 @@ export default function Auth() {
         /* ─── ROLE SELECTION ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12" style={{ background: 'var(--chalk)' }}>
           <div className="max-w-[440px] w-full text-center">
-            <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[13px] font-medium mb-8 mx-auto transition-colors" style={{ color: 'var(--ink-60)' }}>
+            <button onClick={() => setMode('signin')} className="flex items-center gap-1 text-[14px] font-medium mb-8 mx-auto transition-colors" style={{ color: 'var(--ink-60)' }}>
               <ChevronLeft size={14} /> Back to sign in
             </button>
             <h2 className="text-[20px] font-semibold text-[var(--ink)]" style={{ margin: '0 0 8px', color: 'var(--ink)' }}>Join Nayba</h2>
@@ -390,7 +390,7 @@ export default function Auth() {
         /* ─── BRAND CONTACT ─── */
         <div className="flex-1 flex flex-col items-center justify-center px-6 py-12" style={{ background: 'var(--chalk)' }}>
           <div className="max-w-[400px] w-full text-center">
-            <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[13px] font-medium mb-8 mx-auto transition-colors" style={{ color: 'var(--ink-60)' }}>
+            <button onClick={() => setMode('roleselect')} className="flex items-center gap-1 text-[14px] font-medium mb-8 mx-auto transition-colors" style={{ color: 'var(--ink-60)' }}>
               <ChevronLeft size={14} /> Back
             </button>
             <div className="w-14 h-14 rounded-full flex items-center justify-center mx-auto mb-5" style={{ background: 'var(--terra-10)' }}>
@@ -489,7 +489,7 @@ export default function Auth() {
                   Continue
                 </button>
 
-                <p className="text-center mt-6 text-[13px] text-[var(--ink-35)]">
+                <p className="text-center mt-6 text-[14px] text-[var(--ink-35)]">
                   Already have an account?{' '}
                   <button type="button" onClick={() => { setMode('signin'); setError(''); }}
                     style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}>
@@ -503,7 +503,7 @@ export default function Auth() {
             {signupStep === 2 && (
               <div className="w-full tab-fade-in">
                 <button type="button" onClick={() => { setSignupStep(1); setError(''); }}
-                  className="flex items-center gap-1 text-[13px] mb-6 transition-colors"
+                  className="flex items-center gap-1 text-[14px] mb-6 transition-colors"
                   style={{ color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
                   <ChevronLeft size={14} /> Back
                 </button>
@@ -513,7 +513,7 @@ export default function Auth() {
 
                 <form onSubmit={handleSubmit} className="space-y-3.5">
                   <div>
-                    <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Your county</label>
+                    <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Your county</label>
                     <select
                       value={address}
                       onChange={e => setAddress(e.target.value)}
@@ -529,7 +529,7 @@ export default function Auth() {
                   </div>
 
                   <div>
-                    <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
+                    <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
                     <input
                       type="text"
                       value={instagramHandle}

@@ -12,7 +12,7 @@ interface NotificationLog {
   created_at: string; user_type: string;
 }
 
-const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
@@ -99,7 +99,7 @@ export default function AdminNotificationsTab() {
         <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5">Select Campaign</label>
+            <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-1.5">Select Campaign</label>
             <select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)} className={inputCls}>
               <option value="">Choose a campaign...</option>
               {campaigns.map(c => <option key={c.id} value={c.id}>{c.businesses?.name} — {c.title}</option>)}
@@ -117,7 +117,7 @@ export default function AdminNotificationsTab() {
           </div>
         </div>
         {selectedCampaignId && recipientCount > 0 && (
-          <p className="text-[13px] text-[var(--ink-60)] mb-4">{recipientCount} approved creator{recipientCount !== 1 ? 's' : ''} in {selectedCampaign?.target_city || 'all locations'}</p>
+          <p className="text-[14px] text-[var(--ink-60)] mb-4">{recipientCount} approved creator{recipientCount !== 1 ? 's' : ''} in {selectedCampaign?.target_city || 'all locations'}</p>
         )}
 
         {/* Email preview */}
@@ -150,11 +150,11 @@ export default function AdminNotificationsTab() {
           <div key={n.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[12px] text-[var(--ink-35)]">{fmtDate(n.created_at)}</span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                 {n.email_type?.replace(/_/g, ' ') || 'notification'}
               </span>
             </div>
-            <p className="text-[13px] text-[var(--ink)] line-clamp-2">{n.message}</p>
+            <p className="text-[14px] text-[var(--ink)] line-clamp-2">{n.message}</p>
           </div>
         ))}
         {logs.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-35)]">No notifications sent yet</p>}
@@ -173,7 +173,7 @@ export default function AdminNotificationsTab() {
                 <td className={`${tdCls} text-[var(--ink-60)] max-w-[300px] truncate`}>{n.message}</td>
                 <td className={tdCls}>1</td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-[10px] text-[11px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+                  <span className="inline-flex items-center px-2.5 py-1 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                     {n.email_type?.replace(/_/g, ' ') || 'notification'}
                   </span>
                 </td>

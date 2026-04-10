@@ -141,8 +141,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Campaign not available</p>
-        <p className="text-[13px] text-[var(--ink-60)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
-        {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
+        <p className="text-[14px] text-[var(--ink-60)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
+        {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">Go back</button>}
       </div>
     );
   }
@@ -161,7 +161,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         </div>
       )}
       {application?.status === 'interested' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
           <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
           Interest registered — we'll be in touch
         </div>
@@ -173,13 +173,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         </button>
       )}
       {application?.status === 'confirmed' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[13px]">
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
           <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
           You're confirmed
         </div>
       )}
       {application?.status === 'declined' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-35)] font-medium text-[13px]">
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-35)] font-medium text-[14px]">
           Not selected for this campaign
         </div>
       )}
@@ -224,11 +224,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             </button>
             <div className="flex items-center gap-2 mt-1.5">
               {campaign.businesses?.category && (
-                <span className="text-[11px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
+                <span className="text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
               )}
               {campaign.businesses?.instagram_handle && (
                 <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                  className="text-[11px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
+                  className="text-[12px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
                   <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
                 </a>
               )}
@@ -236,7 +236,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             {campaign.businesses?.address && (
               <div className="flex items-center gap-1.5 mt-2">
                 <MapPin size={12} className="text-[var(--ink-35)]" />
-                <span className="text-[13px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
+                <span className="text-[14px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
               </div>
             )}
           </div>
@@ -247,7 +247,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           </h1>
 
           {/* Dates — inline under title */}
-          <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mb-3">
+          <div className="flex items-center gap-1.5 text-[14px] text-[var(--ink-60)] mb-3">
             {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
             {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
             {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
@@ -265,7 +265,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
             {campaign.about_brand && (
               <div>
-                <p className="text-[13px] font-medium text-[var(--ink-60)] mb-2">About {campaign.businesses?.name}</p>
+                <p className="text-[14px] font-medium text-[var(--ink-60)] mb-2">About {campaign.businesses?.name}</p>
                 <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
               </div>
             )}
@@ -279,7 +279,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
                   <div className="w-7 h-7 rounded-full flex items-center justify-center" style={{ background: catPalette.tint }}>
                     <Film size={14} style={{ color: catPalette.color }} />
                   </div>
-                  <p className="text-[13px] font-semibold text-[var(--ink)]">
+                  <p className="text-[14px] font-semibold text-[var(--ink)]">
                     What to post{deliverablesList.length > 0 ? ` · ${deliverablesList.join(' + ')}` : ''}
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
                 {campaign.required_tags && campaign.required_tags.length > 0 && (
                   <div className="flex flex-wrap gap-1.5 mt-3">
                     {campaign.required_tags.map((tag, i) => (
-                      <span key={i} className="px-2.5 py-1 rounded-[6px] bg-white text-[13px] text-[var(--ink-60)]" style={{ fontWeight: 500 }}>
+                      <span key={i} className="px-2.5 py-1 rounded-[6px] bg-white text-[14px] text-[var(--ink-60)]" style={{ fontWeight: 500 }}>
                         {tag}
                       </span>
                     ))}
@@ -300,11 +300,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* ── Key messages ── */}
           {campaign.talking_points && campaign.talking_points.length > 0 && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
-              <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">Key messages</p>
+              <p className="text-[14px] font-medium text-[var(--ink-60)] mb-3">Key messages</p>
               <ol className="space-y-2.5">
                 {campaign.talking_points.map((tp, i) => (
                   <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.5]">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[11px]" style={{ fontWeight: 700, background: catPalette.tint, color: catPalette.color }}>{i + 1}</span>
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[12px]" style={{ fontWeight: 700, background: catPalette.tint, color: catPalette.color }}>{i + 1}</span>
                     {tp}
                   </li>
                 ))}
@@ -315,7 +315,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* ── Inspiration ── */}
           {campaign.inspiration && campaign.inspiration.length > 0 && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
-              <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">Inspiration</p>
+              <p className="text-[14px] font-medium text-[var(--ink-60)] mb-3">Inspiration</p>
               <div className="space-y-3">
                 {campaign.inspiration.map((item: any, i: number) => (
                   <div key={i} className="flex gap-3">
@@ -324,7 +324,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-[14px] font-semibold text-[var(--ink)] mb-0.5">{item.title}</p>
-                      <p className="text-[13px] text-[var(--ink-60)] leading-[1.55]">{item.description}</p>
+                      <p className="text-[14px] text-[var(--ink-60)] leading-[1.55]">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -357,7 +357,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
             </div>
             {campaign.businesses.category && (
-              <p className="text-[13px] text-[var(--ink-35)] mb-3">{campaign.businesses.category}</p>
+              <p className="text-[14px] text-[var(--ink-35)] mb-3">{campaign.businesses.category}</p>
             )}
             {(campaign.about_brand || campaign.businesses.bio) && (
               <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
@@ -394,14 +394,14 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             <div className="flex gap-3">
               <button
                 onClick={() => handleApply()}
-                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[13px] hover:bg-[rgba(42,32,24,0.04)]"
+                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-[rgba(42,32,24,0.04)]"
               >
                 Skip
               </button>
               <button
                 onClick={() => handleApply(pitch)}
                 disabled={submitting}
-                className="flex-1 min-h-[44px] py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 disabled:opacity-50"
+                className="flex-1 min-h-[44px] py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
               >
                 {submitting ? 'Submitting...' : 'Submit'}
               </button>
