@@ -18,7 +18,7 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
       style={{
         fontFamily: "'Instrument Sans', sans-serif",
         fontSize: size,
-        fontWeight: 700,
+        fontWeight: 600,
         color,
         lineHeight: 1.1,
         letterSpacing: '-0.04em',
@@ -40,7 +40,7 @@ export function Logo({ size = 28, color = "var(--ink)", variant = 'icon-word' }:
         <img src={NaybaLogo} alt="" width={size} height={size} />
         <span style={{
           fontFamily: "'Instrument Sans', sans-serif",
-          fontWeight: 700,
+          fontWeight: 600,
           fontSize: size * 0.78,
           letterSpacing: '-0.04em',
           color: 'var(--ink)'
