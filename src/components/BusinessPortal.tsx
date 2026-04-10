@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
   LayoutDashboard, Users, ClipboardList, Film, BarChart3,
-  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search
+  LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search, Megaphone, AlertCircle, ChevronRight
 } from 'lucide-react';
 import CampaignDetail from './CampaignDetail';
 
@@ -36,6 +36,7 @@ interface Campaign {
   perk_description: string | null; perk_value: number | null; perk_type: string | null;
   content_requirements: string | null; talking_points: string[] | null;
   inspiration: any[] | null; deliverables: any; creator_target: number;
+  campaign_image: string | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
 }
 interface Application {
@@ -339,16 +340,28 @@ export default function BusinessPortal() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCampaigns.map(c => (
                 <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('summary'); }}
-                  className="w-full text-left bg-white rounded-[12px] p-5 transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
+                  className="w-full text-left bg-white rounded-[12px] overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-[16px] font-semibold text-[var(--ink)]">{c.title}</h3>
-                    <StatusBadge status={c.status} />
+                  {/* Hero image */}
+                  <div className="w-full h-[120px] bg-[var(--chalk)]">
+                    {c.campaign_image ? (
+                      <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <Megaphone size={24} className="text-[var(--ink-15)]" />
+                      </div>
+                    )}
                   </div>
-                  {c.headline && <p className="text-[13px] text-[var(--ink-60)] mb-3 line-clamp-2">{c.headline}</p>}
-                  <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
-                    {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
-                    <span>{c.creator_target} creators</span>
+                  <div className="p-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <h3 className="text-[15px] font-semibold text-[var(--ink)]">{c.title}</h3>
+                      <StatusBadge status={c.status} />
+                    </div>
+                    {c.headline && <p className="text-[13px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
+                    <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                      {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
+                      <span>{c.creator_target} creators</span>
+                    </div>
                   </div>
                 </button>
               ))}
@@ -373,9 +386,18 @@ export default function BusinessPortal() {
         })()}
 
         {/* Summary Tab */}
-        {selectedCampaignId && activeTab === 'summary' && campaign && (
+        {selectedCampaignId && activeTab === 'summary' && campaign && (() => {
+          const pendingApplicants = applications.filter(a => a.status === 'interested').length;
+          const awaitingContent = participations.filter(p => !p.reel_url && p.status !== 'completed').length;
+          const recentApps = applications.slice(0, 3);
+          return (
           <div>
-            {/* Campaign header — no greeting, just the campaign */}
+            {/* Campaign hero header */}
+            {campaign.campaign_image && (
+              <div className="w-full h-[140px] md:h-[180px] rounded-[12px] overflow-hidden mb-5 -mt-2">
+                <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
+              </div>
+            )}
             <div className="mb-6">
               <div className="flex items-center gap-2.5 mb-1">
                 <h1 className="text-[20px] font-semibold text-[var(--ink)]">{campaign.title}</h1>
@@ -388,8 +410,36 @@ export default function BusinessPortal() {
               </div>
             </div>
 
+            {/* Action prompts — what needs attention */}
+            {(pendingApplicants > 0 || awaitingContent > 0) && (
+              <div className="space-y-2 mb-6">
+                {pendingApplicants > 0 && (
+                  <button onClick={() => setActiveTab('selection')}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-left transition-colors hover:bg-[rgba(42,32,24,0.02)]"
+                    style={{ background: 'rgba(122,160,184,0.08)', border: '1px solid rgba(122,160,184,0.12)' }}>
+                    <div className="flex items-center gap-3">
+                      <Users size={16} style={{ color: 'var(--baltic)' }} />
+                      <span className="text-[14px] font-medium" style={{ color: 'var(--baltic)' }}>{pendingApplicants} creator{pendingApplicants !== 1 ? 's' : ''} awaiting selection</span>
+                    </div>
+                    <ChevronRight size={16} style={{ color: 'var(--baltic)' }} />
+                  </button>
+                )}
+                {awaitingContent > 0 && (
+                  <button onClick={() => setActiveTab('participation')}
+                    className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-left transition-colors hover:bg-[rgba(42,32,24,0.02)]"
+                    style={{ background: 'rgba(140,122,170,0.08)', border: '1px solid rgba(140,122,170,0.12)' }}>
+                    <div className="flex items-center gap-3">
+                      <Film size={16} style={{ color: 'var(--violet)' }} />
+                      <span className="text-[14px] font-medium" style={{ color: 'var(--violet)' }}>{awaitingContent} creator{awaitingContent !== 1 ? 's' : ''} haven't shared yet</span>
+                    </div>
+                    <ChevronRight size={16} style={{ color: 'var(--violet)' }} />
+                  </button>
+                )}
+              </div>
+            )}
+
             {/* Stats row — 4 cards for even 2x2 on mobile */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
               {[
                 { label: 'Applicants', value: applications.length, icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
                 { label: 'Selected', value: selectedCount, icon: Check, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
@@ -461,14 +511,43 @@ export default function BusinessPortal() {
               </div>
             )}
 
-            <div className="mt-4">
-              <a href="mailto:jacob@nayba.app"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-[10px] text-[var(--ink)] font-medium text-[13px] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
-                <Mail size={15} /> Contact nayba
+            {/* Recent applicants */}
+            {recentApps.length > 0 && (
+              <div className="bg-white rounded-[12px] p-4 md:p-5 mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div className="flex items-center justify-between mb-3">
+                  <p className="text-[13px] font-medium text-[var(--ink-35)]">Recent applicants</p>
+                  <button onClick={() => setActiveTab('selection')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
+                </div>
+                <div className="space-y-2.5">
+                  {recentApps.map(a => (
+                    <div key={a.id} className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-7 h-7 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
+                          <span className="text-[10px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
+                        </div>
+                        <div>
+                          <p className="text-[13px] font-medium text-[var(--ink)]">{a.creators?.display_name || a.creators?.name}</p>
+                          <p className="text-[11px] text-[var(--ink-35)]">{a.creators?.instagram_handle}</p>
+                        </div>
+                      </div>
+                      <StatusBadge status={a.status} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Help */}
+            <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
+              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
+              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                <Mail size={14} /> jacob@nayba.app
               </a>
             </div>
           </div>
-        )}
+          );
+        })()}
 
         {/* Selection Tab */}
         {selectedCampaignId && activeTab === 'selection' && (() => {
