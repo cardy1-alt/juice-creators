@@ -705,21 +705,21 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
       </div>
 
       {/* Stats row — 4 columns */}
-      <div className="grid grid-cols-4 gap-2.5 mb-4">
+      <div className="grid grid-cols-4 gap-2 mb-4">
         {[
           { label: 'Campaigns', value: profile.total_campaigns, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
           { label: 'Reels', value: profile.total_reels, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
           { label: profile.level_name, value: `L${profile.level}`, icon: Star, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
           { label: 'Completion', value: `${profile.completion_rate}%`, icon: CheckCircle, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
         ].map(s => (
-          <div key={s.label} className="bg-white rounded-[12px] p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center" style={{ background: s.tint }}>
-                <s.icon size={15} style={{ color: s.color }} />
+          <div key={s.label} className="bg-white rounded-[12px] p-2.5 md:p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex flex-col items-center gap-1">
+              <div className="w-7 h-7 rounded-[8px] flex items-center justify-center" style={{ background: s.tint }}>
+                <s.icon size={14} style={{ color: s.color }} />
               </div>
               <div className="text-center">
-                <p className="text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
-                <p className="text-[12px] text-[var(--ink-50)]">{s.label}</p>
+                <p className="text-[16px] md:text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
+                <p className="text-[11px] text-[var(--ink-50)]">{s.label}</p>
               </div>
             </div>
           </div>
@@ -742,26 +742,26 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Instagram connection */}
       <div className="bg-white rounded-[12px] p-4 mb-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
-            <div>
-              <p className="text-[15px] font-medium text-[var(--ink)]">Instagram</p>
-              <p className="text-[13px] text-[var(--ink-35)]">{profile.instagram_connected ? 'Connected' : 'Manual at pilot — auto-connect coming soon'}</p>
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <AtSign size={18} className={`shrink-0 ${profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-50)]'}`} />
+            <div className="min-w-0">
+              <p className="text-[14px] font-medium text-[var(--ink)]">Instagram</p>
+              <p className="text-[12px] text-[var(--ink-35)] truncate">{profile.instagram_connected ? 'Connected' : 'Linked manually'}</p>
             </div>
           </div>
           {profile.instagram_connected ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56]">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56] whitespace-nowrap shrink-0">
               <Check size={12} /> Connected
             </span>
           ) : (
-            <span className="px-3 py-1.5 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)]">
+            <span className="px-2.5 py-1 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)] whitespace-nowrap shrink-0">
               Coming soon
             </span>
           )}
         </div>
         {!profile.instagram_connected && (
-          <p className="text-[12px] text-[var(--ink-35)] mt-2 ml-8">Right now your IG handle is linked manually. We're working on auto-connecting via the Instagram API so your stats update automatically.</p>
+          <p className="text-[12px] text-[var(--ink-35)] mt-2 ml-[42px]">Auto-connect via Instagram API coming soon — your handle is linked manually for now.</p>
         )}
       </div>
 
