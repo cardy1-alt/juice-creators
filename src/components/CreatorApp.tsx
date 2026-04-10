@@ -10,7 +10,7 @@ import {
   ChevronRight, Settings, History, Link2, HelpCircle,
   AtSign, ExternalLink, X, ArrowLeft,
   Eye, EyeOff, Mail, MapPin, Save, Star, Award,
-  AlertCircle, RefreshCw
+  AlertCircle, RefreshCw, CheckCircle
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
@@ -681,73 +681,67 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 // ─── Profile Tab ───
 function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
-  const completionPct = profile.completion_rate;
-  // SVG ring progress
-  const ringR = 38;
-  const ringC = 2 * Math.PI * ringR;
-  const ringOffset = ringC - (completionPct / 100) * ringC;
-
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
-      <h1 className="nayba-h2 text-[var(--ink)] mb-4">Profile</h1>
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-6">
 
-      {/* Avatar centered */}
-      <div className="flex flex-col items-center mb-4">
+      {/* Avatar + identity hero */}
+      <div className="flex flex-col items-center mb-6">
         {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[60px] h-[60px] rounded-full object-cover mb-2" />
+          <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[80px] h-[80px] rounded-full object-cover mb-3" />
         ) : (
-          <div className="w-[64px] h-[64px] rounded-full flex items-center justify-center mb-2" style={{ background: 'var(--terra)' }}>
-            <span className="text-[22px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
+          <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center mb-3" style={{ background: 'var(--terra)' }}>
+            <span className="text-[28px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
           </div>
         )}
-        <p className="text-[18px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
+        <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-          className="text-[13px] text-[var(--ink-35)] hover:underline">{profile.instagram_handle}</a>
-        <div className="flex items-center gap-2 mt-1.5">
+          className="text-[14px] text-[var(--ink-50)] hover:underline mt-0.5">@{profile.instagram_handle.replace('@', '')}</a>
+        <div className="mt-2">
           <LevelBadge level={profile.level} levelName={profile.level_name} size="sm" />
-          {profile.address && (
-            <span className="text-[12px] text-[var(--ink-35)] flex items-center gap-1"><MapPin size={11} />{profile.address.split(',')[0].trim()}</span>
-          )}
         </div>
+        {profile.address && (
+          <span className="text-[14px] text-[var(--ink-50)] flex items-center gap-1 mt-1.5"><MapPin size={12} />{profile.address}</span>
+        )}
       </div>
 
-      {/* Completion rate */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mt-3 mb-3">
-        <p className="text-[12px] font-semibold uppercase tracking-[0.6px] text-[var(--ink-60)] mb-2">Completion Rate</p>
-        <div className="flex items-center gap-3">
-          <p className="text-[28px] font-semibold text-[var(--ink)]">{profile.completion_rate}%</p>
-          <span className="text-[14px] text-[var(--ink-60)]">{profile.completed_campaigns} of {profile.total_campaigns} campaigns completed</span>
-        </div>
-        {profile.total_campaigns > 0 && (
-          <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full mt-2 overflow-hidden">
+      {/* Stats row — 4 columns */}
+      <div className="grid grid-cols-4 gap-2.5 mb-4">
+        {[
+          { label: 'Campaigns', value: profile.total_campaigns, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+          { label: 'Reels', value: profile.total_reels, icon: Film, tint: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
+          { label: profile.level_name, value: `L${profile.level}`, icon: Star, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+          { label: 'Completion', value: `${profile.completion_rate}%`, icon: CheckCircle, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
+        ].map(s => (
+          <div key={s.label} className="bg-white rounded-[12px] p-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-8 h-8 rounded-[10px] flex items-center justify-center" style={{ background: s.tint }}>
+                <s.icon size={15} style={{ color: s.color }} />
+              </div>
+              <div className="text-center">
+                <p className="text-[18px] font-semibold text-[var(--ink)]">{s.value}</p>
+                <p className="text-[12px] text-[var(--ink-50)]">{s.label}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Completion progress bar + warning */}
+      {profile.total_campaigns > 0 && (
+        <div className="mb-4">
+          <div className="h-1 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
             <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500" style={{ width: `${profile.completion_rate}%` }} />
           </div>
-        )}
-        {profile.total_campaigns > 0 && profile.completion_rate < 60 && (
-          <p className="text-[12px] text-[var(--terra)] mt-2 flex items-center gap-1">
-            <AlertCircle size={12} /> Brands can see your completion rate — completing campaigns helps you get selected
-          </p>
-        )}
-      </div>
-
-      {/* Stats row */}
-      <div className="grid grid-cols-3 gap-3 mb-3">
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">{profile.total_campaigns}</p>
-          <p className="text-[11px] text-[var(--ink-35)]">Campaigns</p>
+          {profile.completion_rate < 60 && (
+            <p className="text-[12px] text-[var(--terra)] mt-2 flex items-center gap-1">
+              <AlertCircle size={12} /> Brands can see your completion rate — completing campaigns helps you get selected
+            </p>
+          )}
         </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">{profile.total_reels}</p>
-          <p className="text-[11px] text-[var(--ink-35)]">Reels</p>
-        </div>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 text-center">
-          <p className="nayba-h2 text-[var(--ink)]">L{profile.level}</p>
-          <p className="text-[11px] text-[var(--ink-35)]">{profile.level_name}</p>
-        </div>
-      </div>
+      )}
 
       {/* Instagram connection */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+      <div className="bg-white rounded-[12px] p-4 mb-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <AtSign size={20} className={profile.instagram_connected ? 'text-[var(--success)]' : 'text-[var(--ink-60)]'} />
@@ -782,7 +776,7 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         ].filter(Boolean).length;
         const completePct = Math.round((completeness / 5) * 100);
         return completePct < 100 ? (
-          <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4 mt-3">
+          <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-[13px] font-medium text-[var(--ink)]">Profile completeness</p>
               <span className="text-[13px] font-semibold text-[var(--terra)]">{completePct}%</span>
