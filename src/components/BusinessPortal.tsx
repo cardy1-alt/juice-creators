@@ -110,6 +110,7 @@ export default function BusinessPortal() {
   const [toast, setToast] = useState<string | null>(null);
   const [campaignSearch, setCampaignSearch] = useState('');
   const [campaignFilter, setCampaignFilter] = useState<'all' | 'active' | 'draft' | 'completed'>('all');
+  const [peekCreator, setPeekCreator] = useState<Participation | null>(null);
   const [showPreview, setShowPreview] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -290,7 +291,7 @@ export default function BusinessPortal() {
                   style={{
                     fontWeight: active ? 600 : 500,
                     background: active ? 'var(--terra-10)' : 'transparent',
-                    color: active ? 'var(--terra)' : 'var(--ink-35)',
+                    color: active ? 'var(--terra)' : 'var(--ink-60)',
                   }}>
                   {tab.label}
                 </button>
@@ -801,7 +802,7 @@ export default function BusinessPortal() {
                         const initial = name[0].toUpperCase();
                         const handle = p.creators?.instagram_handle?.replace('@', '') || '';
                         return (
-                          <div key={p.id} className="bg-white rounded-[10px] p-3.5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                          <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5 mb-2">
                               <div className="w-8 h-8 rounded-full bg-[var(--terra)] flex items-center justify-center flex-shrink-0">
                                 <span className="text-[11px] font-semibold text-white">{initial}</span>
@@ -815,7 +816,7 @@ export default function BusinessPortal() {
 
                             {/* Context-dependent actions */}
                             {col.key === 'confirmed' && !p.perk_sent && (
-                              <button onClick={async () => {
+                              <button onClick={async (e: any) => { e.stopPropagation();
                                 await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
                                 fetchCampaignData();
                                 showToast('Perk marked as sent');
@@ -830,7 +831,8 @@ export default function BusinessPortal() {
                                   className="flex items-center gap-1 text-[12px] text-[var(--terra)] font-medium hover:underline">
                                   <Film size={12} /> View Reel <ExternalLink size={10} />
                                 </a>
-                                <button onClick={async () => {
+                                <button onClick={async (e: any) => { e.stopPropagation();
+                                  if (!window.confirm(`Approve ${name}'s content?`)) return;
                                   await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                                   fetchCampaignData();
                                   showToast('Content approved');
@@ -861,6 +863,73 @@ export default function BusinessPortal() {
               </div>
             )}
           </div>
+          );
+        })()}
+
+        {/* Creator peek panel */}
+        {peekCreator && (() => {
+          const p = peekCreator;
+          const name = p.creators?.display_name || p.creators?.name || 'Creator';
+          const handle = p.creators?.instagram_handle?.replace('@', '') || '';
+          return (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setPeekCreator(null)} />
+              <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[360px] bg-white flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
+                <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(42,32,24,0.06)' }}>
+                  <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
+                  <button onClick={() => setPeekCreator(null)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={18} /></button>
+                </div>
+                <div className="flex-1 overflow-y-auto px-5 py-5">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-[var(--terra)] flex items-center justify-center">
+                      <span className="text-[18px] font-semibold text-white">{name[0].toUpperCase()}</span>
+                    </div>
+                    <div>
+                      <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                        className="text-[14px] text-[var(--terra)] font-medium hover:underline flex items-center gap-1">
+                        @{handle} <ExternalLink size={12} />
+                      </a>
+                      <StatusBadge status={p.status} />
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 text-[13px]">
+                    <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+                      <span className="text-[var(--ink-35)]">Perk</span>
+                      <span className="text-[var(--ink)] font-medium">{p.perk_sent ? 'Redeemed' : 'Pending'}</span>
+                    </div>
+                    <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+                      <span className="text-[var(--ink-35)]">Content</span>
+                      <span className="text-[var(--ink)] font-medium">{p.reel_url ? 'Submitted' : 'Awaiting'}</span>
+                    </div>
+                    {p.reel_url && (
+                      <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline py-2">
+                        <Film size={14} /> View Reel <ExternalLink size={12} />
+                      </a>
+                    )}
+                    {p.reach != null && (
+                      <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+                        <span className="text-[var(--ink-35)]">Reach</span>
+                        <span className="text-[var(--ink)] font-medium">{p.reach.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {p.likes != null && (
+                      <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+                        <span className="text-[var(--ink-35)]">Likes</span>
+                        <span className="text-[var(--ink)] font-medium">{p.likes.toLocaleString()}</span>
+                      </div>
+                    )}
+                    {p.comments != null && (
+                      <div className="flex justify-between py-2">
+                        <span className="text-[var(--ink-35)]">Comments</span>
+                        <span className="text-[var(--ink)] font-medium">{p.comments}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </>
           );
         })()}
 
