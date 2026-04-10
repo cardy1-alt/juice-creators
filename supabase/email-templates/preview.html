@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nayba Email Template Preview</title>
+<style>
+  body { margin: 0; padding: 0; background: #E8E8E8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .preview-nav { position: sticky; top: 0; z-index: 10; background: #2A2018; padding: 12px 20px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .preview-nav button { background: rgba(255,255,255,0.1); border: none; color: #fff; padding: 8px 16px; border-radius: 999px; font-size: 13px; cursor: pointer; font-weight: 500; }
+  .preview-nav button:hover { background: rgba(255,255,255,0.2); }
+  .preview-nav button.active { background: #D95F3B; }
+  .preview-container { max-width: 700px; margin: 0 auto; padding: 20px; }
+  .preview-label { font-size: 12px; font-weight: 600; color: #7A7168; text-transform: uppercase; letter-spacing: 0.05em; margin: 32px 0 12px; }
+  .email-frame { border: none; width: 100%; border-radius: 8px; box-shadow: 0 4px 24px rgba(42,32,24,0.12); }
+  iframe { border: none; width: 100%; min-height: 700px; border-radius: 8px; background: white; }
+</style>
+</head>
+<body>
+
+<div class="preview-nav">
+  <button class="active" onclick="show('welcome')">Welcome</button>
+  <button onclick="show('campaign')">New Campaign</button>
+  <button onclick="show('selected')">Selected</button>
+  <button onclick="show('deadline')">Deadline Reminder</button>
+  <button onclick="show('approved')">Approved</button>
+  <button onclick="show('denied')">Denied</button>
+  <button onclick="show('business')">Business Welcome</button>
+</div>
+
+<div class="preview-container">
+  <p class="preview-label" id="label">Creator Welcome Email</p>
+  <iframe id="frame"></iframe>
+</div>
+
+<script>
+const TERRA = '#D95F3B';
+const TERRA_LIGHT = '#FDF5F2';
+const TERRA_BORDER = '#F2DDD5';
+const INK = '#2A2018';
+const INK_60 = '#7A7168';
+const INK_35 = '#B0AAA4';
+const INK_08 = '#F4F3F1';
+const VIOLET = '#8C7AAA';
+const VIOLET_LIGHT = '#EAE6F4';
+const APP_URL = 'https://app.nayba.app';
+
+function wrap(body) {
+  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+<body style="margin:0;padding:0;background-color:#FAFAF9;-webkit-font-smoothing:antialiased;">
+<div style="max-width:560px;margin:0 auto;padding:40px 20px;">
+<div style="text-align:center;margin-bottom:32px;">
+<span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:24px;font-weight:700;color:${INK};letter-spacing:-0.03em;">Nayba</span>
+</div>
+<div style="background:#FFFFFF;border-radius:12px;padding:36px 28px;box-shadow:0 1px 4px rgba(42,32,24,0.04);">
+${body}
+</div>
+<div style="text-align:center;padding:28px 0 0;">
+<p style="margin:0 0 8px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:${INK_35};">The Nayba Team &middot; Connecting creators with local businesses</p>
+<p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:${INK_35};">You're receiving this because you signed up for Nayba.</p>
+</div>
+</div>
+</body></html>`;
+}
+
+function btn(text, href, bg) {
+  bg = bg || TERRA;
+  return `<div style="text-align:center;margin:28px 0 0;"><a href="${href}" style="display:inline-block;background:${bg};color:#FFFFFF;padding:14px 32px;border-radius:10px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.2px;">${text}</a></div>`;
+}
+function p(t) { return `<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.7;color:${INK};margin:0 0 16px;">${t}</p>`; }
+function heading(t) { return `<h1 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:22px;font-weight:600;color:${INK};margin:0 0 8px;letter-spacing:-0.3px;">${t}</h1>`; }
+function subtext(t) { return `<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;color:${INK_60};margin:0 0 24px;">${t}</p>`; }
+function divider() { return `<div style="height:1px;background:${INK_08};margin:24px 0;"></div>`; }
+function infoBox(c, bg, border) { bg=bg||TERRA_LIGHT; border=border||TERRA_BORDER; return `<div style="background:${bg};border-radius:10px;padding:16px 20px;margin:20px 0;border:1px solid ${border};">${c}</div>`; }
+function stepList(steps) {
+  return `<table role="presentation" style="width:100%;border-collapse:collapse;margin:20px 0;">${steps.map((s,i) => `<tr><td style="width:28px;vertical-align:top;padding:0 14px ${i<steps.length-1?'14px':'0'} 0;"><div style="width:28px;height:28px;border-radius:50%;background:${TERRA_LIGHT};color:${TERRA};font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;font-weight:700;text-align:center;line-height:28px;">${i+1}</div></td><td style="vertical-align:top;padding:0 0 ${i<steps.length-1?'14px':'0'} 0;"><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:${INK};margin:2px 0 0;">${s}</p></td></tr>`).join('')}</table>`;
+}
+
+const templates = {
+  welcome: {
+    label: 'Creator Welcome Email',
+    html: wrap(`
+      ${heading('Welcome, Sophie!')}
+      ${subtext("We're really glad you're here.")}
+      ${p('Nayba connects you with local brands who want to work with creators like you. Browse campaigns from cafes, wellness studios, food brands, and more in your area.')}
+      ${p("<strong>Here's how it works:</strong>")}
+      ${stepList(['Browse campaigns and express interest','Get selected and receive your perk','Post an Instagram Reel about your experience'])}
+      ${divider()}
+      ${infoBox(`<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:${TERRA};font-weight:600;margin:0;">Your account is being reviewed</p><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:${INK_60};margin:6px 0 0;">We'll email you once approved. In the meantime, make sure your profile is looking great!</p>`)}
+      ${btn('Complete Your Profile', APP_URL)}
+    `)
+  },
+  campaign: {
+    label: 'New Campaign Notification',
+    html: wrap(`
+      ${heading('New Campaign!')}
+      ${subtext("Hey Sophie, there's a new opportunity for you.")}
+      ${infoBox(`<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:18px;font-weight:700;color:${INK};margin:0 0 6px;">The Buttermarket Brew Co.</p><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;color:${INK_60};margin:0;">Try our new iced coffee range and share your experience</p>`)}
+      ${p("A brand in your area is looking for local creators. Check out the campaign, see what's on offer, and let them know you're interested.")}
+      ${p("Spots are limited — express your interest early.")}
+      ${btn('View Campaign', APP_URL)}
+    `)
+  },
+  selected: {
+    label: 'Creator Selected',
+    html: wrap(`
+      <div style="text-align:center;margin-bottom:24px;"><div style="display:inline-block;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,${TERRA_LIGHT},${VIOLET_LIGHT});line-height:56px;font-size:28px;">&#127881;</div></div>
+      ${heading("You've been selected!")}
+      ${subtext("Great news, Sophie — Glow Wellness Studio wants to work with you.")}
+      ${infoBox(`<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:700;color:${INK};margin:0 0 4px;">Glow-Up Facial Experience</p><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:${INK_60};margin:0;">One complimentary Signature Glow Facial (60 minutes, usually £65)</p>`)}
+      ${p("<strong>What happens next:</strong>")}
+      ${stepList(["Confirm your spot in the app","You'll receive your perk from the brand",'Post an Instagram Reel about your experience'])}
+      ${p("Don't keep them waiting — confirm now!")}
+      ${btn('Confirm Your Spot', APP_URL)}
+    `)
+  },
+  deadline: {
+    label: 'Content Deadline Reminder',
+    html: wrap(`
+      ${heading('Your Reel is due soon')}
+      ${subtext("Hey Sophie, just a friendly reminder.")}
+      ${infoBox(`<div style="text-align:center;"><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:16px;font-weight:700;color:${INK};margin:0 0 4px;">Revamp Gym</p><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;font-weight:600;color:${TERRA};margin:0;">Due in 48 hours</p></div>`)}
+      ${p("Post your Instagram Reel and submit the link in the nayba app. It doesn't need to be perfect — just authentic.")}
+      ${p("Missing the deadline affects your completion rate, which brands can see when choosing creators for future campaigns.")}
+      ${btn('Submit Your Reel', APP_URL)}
+    `)
+  },
+  approved: {
+    label: 'Creator Approved',
+    html: wrap(`
+      <div style="text-align:center;margin-bottom:24px;"><div style="display:inline-block;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,${TERRA_LIGHT},${VIOLET_LIGHT});line-height:56px;font-size:28px;">&#127881;</div></div>
+      ${heading("You're approved!")}
+      ${subtext("Welcome to the nayba community, Sophie.")}
+      ${p("Your profile has been reviewed and approved. You can now browse campaigns from local brands, express your interest, and start collaborating.")}
+      ${p("Head to the app to see what's available near you.")}
+      ${btn('Browse Campaigns', APP_URL)}
+    `)
+  },
+  denied: {
+    label: 'Creator Denied',
+    html: wrap(`
+      ${heading("Thanks for applying")}
+      ${subtext("Hey Sophie, thanks for your interest in Nayba.")}
+      ${p("Unfortunately we're not able to approve your account at this time. This might be because we're not yet active in your area, or because your profile didn't quite match what we're looking for right now.")}
+      ${p("If you think this was a mistake, feel free to reply to this email and we'll take another look.")}
+    `)
+  },
+  business: {
+    label: 'Business Welcome Email',
+    html: wrap(`
+      ${heading('Welcome, Revamp Gym!')}
+      ${subtext('Great to have you on board.')}
+      ${p("Nayba turns local creators into your marketing team — no budget required. Create a collab, local creators claim it, visit your business, and post an authentic Instagram Reel about the experience.")}
+      ${p("<strong>Getting started is simple:</strong>")}
+      ${stepList(['Create your first collab (a free coffee, a discount — whatever feels right)','Creators discover and claim it','They visit, you scan their QR code, and they post a Reel'])}
+      ${divider()}
+      ${infoBox(`<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;color:${TERRA};font-weight:600;margin:0;">Your account is being reviewed</p><p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;color:${INK_60};margin:6px 0 0;">We'll email you once approved. Complete your profile while you wait!</p>`)}
+      ${btn('Set Up Your Profile', APP_URL)}
+    `)
+  }
+};
+
+function show(key) {
+  const t = templates[key];
+  document.getElementById('label').textContent = t.label;
+  document.getElementById('frame').srcdoc = t.html;
+  document.querySelectorAll('.preview-nav button').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+}
+
+// Load first template
+window.onload = () => show('welcome');
+</script>
+</body>
+</html>
