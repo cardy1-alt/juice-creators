@@ -204,7 +204,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
   // County — the address field stores county directly (Suffolk, Norfolk, etc.)
-  const county = profile.address || 'your area';
+  const knownCounties = ['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'];
+  const county = knownCounties.find(c => (profile.address || '').includes(c)) || profile.address || 'your area';
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
