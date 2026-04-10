@@ -293,8 +293,8 @@ export default function BusinessPortal() {
           </a>
         </div>
 
-        {/* Campaign sub-tabs — horizontal, shown when inside a campaign */}
-        {selectedCampaignId && (
+        {/* Campaign sub-tabs — only when viewing a campaign inside Campaigns tab */}
+        {selectedCampaignId && activeTab === 'campaigns' && (
           <div className="flex gap-1 px-4 md:px-8 py-2 bg-white overflow-x-auto hide-scrollbar" style={{ borderBottom: '1px solid rgba(42,32,24,0.06)' }}>
             {CAMPAIGN_SUB_TABS.map(tab => {
               const active = campaignSubTab === tab.key;
