@@ -9,7 +9,7 @@ function CampaignFallbackImage({ category, name }: { category?: string | null; n
   const cp = getCategoryPalette(category);
   return (
     <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: cp.tint }}>
-      <CategoryIcon category={category} className="w-14 h-14 mb-2" style={{ color: cp.color, opacity: 0.5 }} />
+      <CategoryIcon category={category} className="w-14 h-14 mb-2" style={{ color: cp.color, opacity: 0.7 }} />
       {name && <span className="text-[14px] font-medium" style={{ color: cp.color, opacity: 0.6 }}>{name}</span>}
     </div>
   );

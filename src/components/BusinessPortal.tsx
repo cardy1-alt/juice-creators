@@ -362,7 +362,7 @@ export default function BusinessPortal() {
                         <img src={c.campaign_image} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />
                       ) : (
                         <div className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: getCategoryPalette(brand.category).tint }}>
-                          <CategoryIcon category={brand.category} className="w-5 h-5" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.4 }} />
+                          <CategoryIcon category={brand.category} className="w-5 h-5" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.7 }} />
                         </div>
                       )}
                       <div className="min-w-0">
@@ -433,7 +433,7 @@ export default function BusinessPortal() {
                       <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center" style={{ background: getCategoryPalette(brand.category).tint }}>
-                        <CategoryIcon category={brand.category} className="w-8 h-8" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.4 }} />
+                        <CategoryIcon category={brand.category} className="w-8 h-8" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.7 }} />
                       </div>
                     )}
                   </div>
