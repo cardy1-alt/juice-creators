@@ -242,8 +242,8 @@ export default function BusinessPortal() {
           </button>
         </div>
 
-        {/* Back to campaigns (when viewing one) */}
-        {selectedCampaignId && campaigns.length > 1 && (
+        {/* Back to campaigns */}
+        {selectedCampaignId && (
           <div className="px-3 py-3" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
             <button onClick={() => { setSelectedCampaignId(null); setActiveTab('summary'); }}
               className="flex items-center gap-2 text-[13px] text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors">
@@ -486,15 +486,6 @@ export default function BusinessPortal() {
                 className="text-[13px] font-medium text-[var(--terra)] hover:underline">
                 Preview as creator →
               </button>
-            </div>
-
-            {/* Help */}
-            <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
-              <p className="text-[13px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
-              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[13px] text-[var(--terra)] font-medium hover:underline">
-                <Mail size={14} /> jacob@nayba.app
-              </a>
             </div>
 
             {/* Campaign preview modal */}
