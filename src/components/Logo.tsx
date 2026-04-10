@@ -16,12 +16,12 @@ function LogoWordmark({ size, color }: { size: number; color: string }) {
   return (
     <span
       style={{
-        fontFamily: 'Hornbill, Georgia, serif',
+        fontFamily: "'Instrument Sans', sans-serif",
         fontSize: size,
         fontWeight: 700,
         color,
         lineHeight: 1.1,
-        letterSpacing: '-0.03em',
+        letterSpacing: '-0.04em',
       }}
     >
       Nayba
@@ -39,10 +39,10 @@ export function Logo({ size = 28, color = "var(--ink)", variant = 'icon-word' }:
       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <img src={NaybaLogo} alt="" width={size} height={size} />
         <span style={{
-          fontFamily: 'Hornbill, Georgia, serif',
+          fontFamily: "'Instrument Sans', sans-serif",
           fontWeight: 700,
           fontSize: size * 0.78,
-          letterSpacing: '-0.03em',
+          letterSpacing: '-0.04em',
           color: 'var(--ink)'
         }}>Nayba</span>
       </div>

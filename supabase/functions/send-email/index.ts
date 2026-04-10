@@ -53,7 +53,7 @@ function wrapEmail(body: string, accentColor = TERRA): string {
   <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
     <!-- Logo -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.03em;">Nayba</span>
+      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
     </div>
     <!-- Card -->
     <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04);">
