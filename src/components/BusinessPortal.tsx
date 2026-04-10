@@ -102,6 +102,7 @@ export default function BusinessPortal() {
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [toast, setToast] = useState<string | null>(null);
   const [campaignSearch, setCampaignSearch] = useState('');
+  const [campaignFilter, setCampaignFilter] = useState<'all' | 'active' | 'draft' | 'completed'>('all');
   const [showPreview, setShowPreview] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -301,25 +302,39 @@ export default function BusinessPortal() {
 
         {/* Campaign list landing page — when no campaign selected */}
         {!selectedCampaignId && campaigns.length > 0 && (() => {
-          const filteredCampaigns = campaignSearch
-            ? campaigns.filter(c => c.title.toLowerCase().includes(campaignSearch.toLowerCase()))
-            : campaigns;
+          const filteredCampaigns = campaigns
+            .filter(c => campaignFilter === 'all' || c.status === campaignFilter || (campaignFilter === 'active' && (c.status === 'active' || c.status === 'live' || c.status === 'selecting')))
+            .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()));
           return (
           <div>
             <div className="mb-6">
-              <h1 className="nayba-h1 text-[var(--ink)] mb-2" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
-              <p className="text-[14px] text-[var(--ink-60)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
+              <h1 className="nayba-h1 text-[var(--ink)] mb-1" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
+              <p className="text-[14px] text-[var(--ink-60)]">Your campaigns</p>
             </div>
 
-            {/* Search — only show if 3+ campaigns */}
-            {campaigns.length >= 3 && (
-              <div className="relative mb-4">
+            {/* Search + filter */}
+            <div className="flex gap-3 mb-4">
+              <div className="relative flex-1">
                 <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
                 <input value={campaignSearch} onChange={e => setCampaignSearch(e.target.value)}
                   placeholder="Search campaigns..."
                   className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
               </div>
-            )}
+            </div>
+            <div className="flex gap-1.5 mb-5">
+              {(['all', 'active', 'draft', 'completed'] as const).map(f => (
+                <button key={f} onClick={() => setCampaignFilter(f)}
+                  className="px-3 py-1.5 rounded-[999px] text-[12px] transition-colors"
+                  style={{
+                    fontWeight: campaignFilter === f ? 600 : 500,
+                    background: campaignFilter === f ? 'var(--terra)' : 'white',
+                    color: campaignFilter === f ? 'white' : 'var(--ink-60)',
+                    border: campaignFilter === f ? 'none' : '1px solid rgba(42,32,24,0.10)',
+                  }}>
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {filteredCampaigns.map(c => (
@@ -345,14 +360,13 @@ export default function BusinessPortal() {
         {/* Summary Tab */}
         {selectedCampaignId && activeTab === 'summary' && campaign && (
           <div>
-            {/* Welcome — more breathing room */}
-            <div className="mb-8">
-              <h1 className="nayba-h1 text-[var(--ink)] mb-2" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
-              <div className="flex items-center gap-2.5">
+            {/* Campaign header — no greeting, just the campaign */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2.5 mb-1">
+                <h1 className="text-[20px] font-semibold text-[var(--ink)]">{campaign.title}</h1>
                 <StatusBadge status={campaign.status} />
-                <span className="text-[15px] text-[var(--ink-60)]">{campaign.title}</span>
               </div>
-              <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)] mt-2">
+              <div className="flex items-center gap-1.5 text-[13px] text-[var(--ink-60)]">
                 {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
                 {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
                 {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
@@ -764,6 +778,7 @@ export default function BusinessPortal() {
               </div>
               ))}
             </div>
+            <p className="text-[12px] text-[var(--ink-35)] -mt-3 mb-6">Industry average engagement: 0.7%. Nayba benchmark: 3-4%.</p>
 
             {/* Reach by creator */}
             <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -796,16 +811,16 @@ export default function BusinessPortal() {
       </main>
       </div>
 
-      {/* Mobile bottom nav — always visible */}
+      {/* Mobile bottom nav — only inside a campaign */}
+      {selectedCampaignId && (
       <div className="md:hidden fixed bottom-0 left-0 right-0 z-30" style={{ background: 'var(--nav-bg)', backdropFilter: 'blur(12px)', borderTop: '1px solid rgba(42,32,24,0.08)', paddingBottom: 'env(safe-area-inset-bottom)' }}>
         <div className="flex items-center justify-around py-2" style={{ height: 'var(--nav-height)' }}>
           {TABS.map(tab => {
-            const active = selectedCampaignId && activeTab === tab.key;
-            const disabled = !selectedCampaignId;
+            const active = activeTab === tab.key;
             return (
-              <button key={tab.key} onClick={() => { if (!disabled) setActiveTab(tab.key); }}
+              <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                 className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px]"
-                style={{ color: active ? 'var(--terra)' : disabled ? 'var(--ink-15)' : 'var(--ink-35)', opacity: disabled ? 0.5 : 1 }}>
+                style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }}>
                 <tab.icon size={20} strokeWidth={active ? 2 : 1.5} />
                 <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
               </button>
@@ -813,6 +828,7 @@ export default function BusinessPortal() {
           })}
         </div>
       </div>
+      )}
     </div>
   );
 }
