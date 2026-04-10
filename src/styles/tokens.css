@@ -178,20 +178,20 @@
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
-/* ── Hornbill heading utilities (Regular 400 — light, refined) ── */
+/* ── Heading utilities (Instrument Sans) ── */
 .nayba-h1 {
-  font-family: 'Hornbill', Georgia, serif;
+  font-family: var(--font-sans);
   font-weight: 700;
   font-size: var(--text-hero);
-  letter-spacing: -0.035em;
+  letter-spacing: -0.025em;
   line-height: 1.15;
 }
 
 .nayba-h2 {
-  font-family: 'Hornbill', Georgia, serif;
-  font-weight: 400;
+  font-family: var(--font-sans);
+  font-weight: 600;
   font-size: var(--text-page-title);
-  letter-spacing: -0.02em;
+  letter-spacing: -0.015em;
   line-height: 1.2;
 }
 

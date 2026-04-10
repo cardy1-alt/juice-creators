@@ -192,7 +192,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
   const county = profile.address || 'your area';
-  const [featured, ...rest] = filtered;
+  const rest = filtered;
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
@@ -250,51 +250,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </div>
       )}
       {!loading && !fetchError && <>
-        {/* Featured campaign — first result, horizontal layout */}
-        {featured && (() => {
-          const appStatus = applications[featured.id];
-          const perkShort = featured.perk_description?.split('—')[0]?.split(',')[0]?.trim();
-          const catPalette = getCategoryPalette(featured.businesses?.category);
-          return (
-            <button onClick={() => onOpenCampaign(featured.id)}
-              className="w-full text-left rounded-[12px] bg-white mb-5 flex flex-col md:flex-row overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_16px_rgba(42,32,24,0.10)]"
-              style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
-              {/* Image — full width on mobile, left side on desktop */}
-              <div className="md:w-[45%] relative" style={{ minHeight: 200 }}>
-                {featured.campaign_image ? (
-                  <img src={featured.campaign_image} alt={featured.title} className="w-full h-full object-cover" style={{ minHeight: 200 }} />
-                ) : (
-                  <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center" style={{ minHeight: 200 }}>
-                    {featured.businesses?.logo_url ? (
-                      <img src={featured.businesses.logo_url} alt={featured.businesses?.name} className="w-14 h-14 rounded-full object-cover border-2 border-white/30" />
-                    ) : (
-                      <span className="text-[32px] font-semibold text-white/60">{(featured.businesses?.name || '?')[0]}</span>
-                    )}
-                  </div>
-                )}
-                {appStatus && (
-                  <span className={`absolute top-3 right-3 inline-flex items-center px-2.5 py-1 rounded-[999px] text-[11px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                    {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
-                  </span>
-                )}
-              </div>
-              {/* Content */}
-              <div className="flex-1 p-5 md:p-6 flex flex-col justify-center">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="inline-flex px-2.5 py-0.5 rounded-[999px] text-[11px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{featured.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                  <span className="text-[12px] text-[var(--ink-35)]">{featured.businesses?.name}</span>
-                </div>
-                <p className="text-[18px] md:text-[20px] text-[var(--ink)] leading-[1.3] mb-3" style={{ fontWeight: 600 }}>{featured.headline || featured.title}</p>
-                {perkShort && <p className="text-[14px] text-[var(--ink-60)] mb-2">{perkShort}{featured.perk_value ? ` · £${featured.perk_value}` : ''}</p>}
-                {featured.expression_deadline && (
-                  <p className="text-[12px] text-[var(--ink-35)]">Apply by {fmtDate(featured.expression_deadline)}</p>
-                )}
-              </div>
-            </button>
-          );
-        })()}
-
-        {/* Remaining campaigns — grid */}
+        {/* Campaign grid */}
         {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
           {rest.map(c => {
             const appStatus = applications[c.id];
