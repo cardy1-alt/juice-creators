@@ -291,6 +291,9 @@ export default function BusinessPortal() {
           <a href="mailto:jacob@nayba.app" className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Get help">
             <Mail size={18} />
           </a>
+          <button onClick={signOut} className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Sign out">
+            <LogOut size={18} />
+          </button>
         </div>
 
         {/* Campaign sub-tabs — only when viewing a campaign inside Campaigns tab */}
