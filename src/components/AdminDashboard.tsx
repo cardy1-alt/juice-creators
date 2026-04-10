@@ -95,7 +95,7 @@ export default function AdminDashboard() {
             <Logo size={28} variant="wordmark" />
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--terra)' }} />
-              <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Admin</span>
+              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const }}>Admin</span>
             </div>
           </div>
           <button onClick={() => setSidebarOpen(false)} className="md:hidden" style={{ color: 'var(--ink-35)' }}>
@@ -107,7 +107,7 @@ export default function AdminDashboard() {
         <nav className="flex-1 px-3 pb-3 overflow-y-auto">
           {NAV_SECTIONS.map(section => (
             <div key={section.label} className="mb-3">
-              <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
+              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
                 {section.label}
               </p>
               {section.items.map(item => {

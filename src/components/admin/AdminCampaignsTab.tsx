@@ -305,7 +305,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               </div>
               {/* Summary card */}
               <div className="bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] p-5">
-                <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
+                <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
                   <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
                   <div className="flex gap-2"><span className="text-[var(--ink-35)] w-24 flex-shrink-0">Title</span><span className="text-[var(--ink)] font-medium">{form.title || '—'}</span></div>
@@ -829,7 +829,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
                 <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
               </div>
             </div>

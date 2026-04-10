@@ -1053,7 +1053,7 @@ export default function BusinessPortal() {
                 className="flex flex-col items-center gap-0.5 px-3 py-1 min-w-[56px]"
                 style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }}>
                 <tab.icon size={22} strokeWidth={active ? 2 : 1.5} />
-                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
+                <span style={{ fontSize: 12, fontWeight: active ? 700 : 500 }}>{tab.label}</span>
               </button>
             );
           })}

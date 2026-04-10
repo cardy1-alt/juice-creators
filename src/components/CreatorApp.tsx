@@ -1196,7 +1196,7 @@ export default function CreatorApp() {
         <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
           We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
         </p>
-        <button onClick={signOut} style={{ fontSize: 13, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
+        <button onClick={signOut} style={{ fontSize: 14, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
           Sign out
         </button>
       </div>
@@ -1294,7 +1294,7 @@ export default function CreatorApp() {
                 className="flex-1 flex flex-col items-center justify-center gap-0.5 min-h-[44px]">
                 <item.icon size={22} strokeWidth={active ? 2 : 1.5}
                   style={{ color: active ? 'var(--terra)' : 'var(--ink-35)' }} />
-                <span style={{ fontSize: 10, fontWeight: active ? 700 : 500,
+                <span style={{ fontSize: 12, fontWeight: active ? 700 : 500,
                   color: active ? 'var(--terra)' : 'var(--ink-35)' }}>{item.label}</span>
               </button>
             );

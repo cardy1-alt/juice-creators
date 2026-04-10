@@ -369,7 +369,7 @@ export default function Auth() {
                     }}>
                     <opt.icon size={24} style={{ color: selected ? 'var(--terra)' : 'var(--ink-35)', marginBottom: 12 }} />
                     <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 15, fontWeight: 700, color: 'var(--ink)', margin: '0 0 4px' }}>{opt.label}</p>
-                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, color: 'var(--ink-60)', margin: 0, lineHeight: 1.45 }}>{opt.sub}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 14, color: 'var(--ink-60)', margin: 0, lineHeight: 1.45 }}>{opt.sub}</p>
                   </button>
                 );
               })}

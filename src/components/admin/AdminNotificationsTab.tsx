@@ -123,7 +123,7 @@ export default function AdminNotificationsTab() {
         {/* Email preview */}
         {selectedCampaign && (
           <div className="border border-[rgba(42,32,24,0.08)] rounded-[10px] bg-[rgba(42,32,24,0.02)] p-5">
-            <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
+            <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
             <div className="bg-white rounded-[10px] border border-[rgba(42,32,24,0.08)] p-5 max-w-lg">
               <p className="text-[12px] text-[var(--ink-35)] mb-1">Subject</p>
               <p className="text-[15px] font-semibold text-[var(--ink)] mb-4">New campaign just dropped — {selectedCampaign.businesses?.name}</p>

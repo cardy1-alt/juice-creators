@@ -162,7 +162,7 @@ export default function AdminAnalyticsTab() {
                 <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
-                <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-35)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
                 <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
               </div>
             </div>
