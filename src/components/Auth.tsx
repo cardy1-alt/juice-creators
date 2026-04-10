@@ -27,7 +27,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
     <div className={`relative transition-all duration-200 rounded-[10px] ${focused ? 'border-[1.5px] border-[var(--terra)]' : 'border border-[rgba(42,32,24,0.12)]'}`} style={{ background: '#ffffff' }}>
       {iconName && (
         <span className={`absolute left-[14px] top-1/2 -translate-y-1/2 transition-colors ${
-          focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'
+          focused ? 'text-[var(--ink-60)]' : 'text-[var(--ink-50)]'
         }`}>
           {iconName === 'user' && <User size={16} strokeWidth={1.5} />}
           {iconName === 'instagram' && <AtSign size={16} strokeWidth={1.5} />}
@@ -43,7 +43,7 @@ function FloatingInput({ label, icon: iconName, type = 'text', value, onChange, 
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         placeholder={focused ? placeholder : label}
-        className={`w-full min-h-[44px] ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[10px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none`}
+        className={`w-full min-h-[44px] ${iconName ? 'pl-[40px]' : 'pl-[16px]'} ${rightElement ? 'pr-[44px]' : 'pr-[16px]'} py-[10px] bg-transparent text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none`}
         style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 400 }}
         required={required}
         minLength={minLength}
@@ -207,7 +207,7 @@ export default function Auth() {
                     />
                   ))}
                 </div>
-                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-35)' }}>
+                <span style={{ fontFamily: "'Instrument Sans', sans-serif", fontWeight: 500, fontSize: 12, color: 'var(--ink-50)' }}>
                   Join 50+ Suffolk creators
                 </span>
               </div>
@@ -291,7 +291,7 @@ export default function Auth() {
                     required
                     minLength={8}
                     rightElement={
-                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors p-1">
+                      <button type="button" onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-50)] hover:text-[var(--ink-60)] transition-colors p-1">
                         {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                       </button>
                     }
@@ -333,7 +333,7 @@ export default function Auth() {
                     type="button"
                     onClick={() => { setForgotPassword(true); setResetEmail(email); setResetSent(false); setResetError(''); }}
                     className="block text-sm text-center mt-[4px] transition-colors mx-auto"
-                    style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-35)' }}
+                    style={{ fontFamily: "'Instrument Sans', sans-serif", color: 'var(--ink-50)' }}
                   >
                     Forgot password?
                   </button>
@@ -441,14 +441,14 @@ export default function Auth() {
                     value={name}
                     onChange={e => setName(e.target.value)}
                     placeholder="Your full name"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
                   />
                   <input
                     type="email"
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="your@email.com"
-                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                    className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
                   />
                   <div className="relative">
                     <input
@@ -457,13 +457,13 @@ export default function Auth() {
                       onChange={e => setPassword(e.target.value)}
                       placeholder="Create a password"
                       minLength={8}
-                      className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                      className="w-full px-3.5 py-3 pr-11 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
                     />
-                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-35)' }}>
+                    <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 transition-colors" style={{ color: 'var(--ink-50)' }}>
                       {showPassword ? <EyeOff size={16} strokeWidth={1.5} /> : <Eye size={16} strokeWidth={1.5} />}
                     </button>
                   </div>
-                  <p className="text-[12px] text-[var(--ink-35)]">At least 8 characters</p>
+                  <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">At least 8 characters</p>
                 </div>
 
                 {error && (
@@ -489,7 +489,7 @@ export default function Auth() {
                   Continue
                 </button>
 
-                <p className="text-center mt-6 text-[14px] text-[var(--ink-35)]">
+                <p className="text-center mt-6 text-[14px] text-[var(--ink-50)]">
                   Already have an account?{' '}
                   <button type="button" onClick={() => { setMode('signin'); setError(''); }}
                     style={{ color: 'var(--terra)', fontWeight: 600, background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 13 }}>
@@ -504,7 +504,7 @@ export default function Auth() {
               <div className="w-full tab-fade-in">
                 <button type="button" onClick={() => { setSignupStep(1); setError(''); }}
                   className="flex items-center gap-1 text-[14px] mb-6 transition-colors"
-                  style={{ color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
+                  style={{ color: 'var(--ink-50)', background: 'none', border: 'none', cursor: 'pointer' }}>
                   <ChevronLeft size={14} /> Back
                 </button>
 
@@ -525,7 +525,7 @@ export default function Auth() {
                       <option value="Cambridgeshire">Cambridgeshire</option>
                       <option value="Essex">Essex</option>
                     </select>
-                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">So we can show you campaigns near you</p>
+                    <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">So we can show you campaigns near you</p>
                   </div>
 
                   <div>
@@ -536,9 +536,9 @@ export default function Auth() {
                       onChange={e => setInstagramHandle(e.target.value)}
                       placeholder="@yourhandle"
                       required
-                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-35)] focus:outline-none focus:border-[var(--terra)]"
+                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
                     />
-                    <p className="text-[12px] text-[var(--ink-35)] mt-1.5">So we can check out your content</p>
+                    <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">So we can check out your content</p>
                   </div>
 
                   {error && (
@@ -562,7 +562,7 @@ export default function Auth() {
                   </button>
                 </form>
 
-                <p className="text-[12px] text-[var(--ink-35)] text-center mt-6 leading-[1.5]">
+                <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] text-center mt-6 leading-[1.5]">
                   By signing up you agree to our terms and privacy policy.
                 </p>
               </div>

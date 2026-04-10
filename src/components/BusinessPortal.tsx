@@ -89,7 +89,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
+    <span className={`inline-flex items-center rounded-[999px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '3px 9px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -189,7 +189,7 @@ export default function BusinessPortal() {
       <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
         <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
-          <p className="text-[14px] text-[var(--ink-35)] mb-4">Contact nayba to get set up.</p>
+          <p className="text-[14px] text-[var(--ink-50)] mb-4">Contact nayba to get set up.</p>
           <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             <Mail size={16} /> Contact nayba
           </a>
@@ -204,7 +204,7 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-[10px] px-4 bg-[var(--chalk)]';
+  const thCls = 'text-left text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] py-[10px] px-4 bg-[var(--chalk)]';
   const tdCls = 'py-0 px-4 text-[14px] text-[var(--ink)]' + " border-b border-[rgba(42,32,24,0.06)]";
 
   // Empty state
@@ -226,7 +226,7 @@ export default function BusinessPortal() {
         <main className="flex-1 flex items-center justify-center p-4 md:p-8">
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
-            <p className="text-[14px] text-[var(--ink-35)] mb-4">Contact nayba to get started with your first campaign.</p>
+            <p className="text-[14px] text-[var(--ink-50)] mb-4">Contact nayba to get started with your first campaign.</p>
             <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
               <Mail size={16} /> Contact nayba
             </a>
@@ -288,7 +288,7 @@ export default function BusinessPortal() {
               {selectedCampaignId ? campaign?.title || 'Campaign' : brand.name}
             </span>
           </div>
-          <a href="mailto:jacob@nayba.app" className="text-[var(--ink-35)] hover:text-[var(--ink)]" title="Get help">
+          <a href="mailto:jacob@nayba.app" className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Get help">
             <Mail size={18} />
           </a>
         </div>
@@ -338,7 +338,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -349,8 +349,8 @@ export default function BusinessPortal() {
             {/* Active campaigns quick view */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-[14px] font-medium text-[var(--ink-35)]">Active campaigns</p>
-                <button onClick={() => setActiveTab('campaigns')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
+                <p className="text-[14px] font-medium text-[var(--ink-50)]">Active campaigns</p>
+                <button onClick={() => setActiveTab('campaigns')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
               </div>
               <div className="space-y-2">
                 {campaigns.filter(c => c.status === 'active' || c.status === 'live' || c.status === 'selecting').slice(0, 3).map(c => (
@@ -367,7 +367,7 @@ export default function BusinessPortal() {
                       )}
                       <div className="min-w-0">
                         <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{c.title}</p>
-                        <p className="text-[12px] text-[var(--ink-35)]">{c.creator_target} creators</p>
+                        <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">{c.creator_target} creators</p>
                       </div>
                     </div>
                     <StatusBadge status={c.status} />
@@ -401,16 +401,16 @@ export default function BusinessPortal() {
             {/* Search + filter */}
             <div className="flex gap-3 mb-4">
               <div className="relative flex-1">
-                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+                <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
                 <input value={campaignSearch} onChange={e => setCampaignSearch(e.target.value)}
                   placeholder="Search campaigns..."
-                  className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+                  className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
               </div>
             </div>
             <div className="flex gap-1.5 mb-5">
               {(['all', 'active', 'draft', 'completed'] as const).map(f => (
                 <button key={f} onClick={() => setCampaignFilter(f)}
-                  className="px-3 py-1.5 rounded-[999px] text-[12px] transition-colors"
+                  className="px-3 py-1.5 rounded-[999px] text-[14px] md:text-[12px] transition-colors"
                   style={{
                     fontWeight: campaignFilter === f ? 600 : 500,
                     background: campaignFilter === f ? 'var(--terra)' : 'white',
@@ -443,7 +443,7 @@ export default function BusinessPortal() {
                       <StatusBadge status={c.status} />
                     </div>
                     {c.headline && <p className="text-[14px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
-                    <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                    <div className="flex items-center gap-3 text-[14px] md:text-[12px] text-[var(--ink-50)]">
                       {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
                       <span>{c.creator_target} creators</span>
                     </div>
@@ -526,7 +526,7 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
                       <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
@@ -539,18 +539,18 @@ export default function BusinessPortal() {
               {campaign.perk_description && (
                 <div className="mb-4 px-4 py-3 rounded-[10px]" style={{ background: 'var(--terra-light)' }}>
                   <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-                  {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
+                  {campaign.perk_value && <p className="text-[14px] md:text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
                 </div>
               )}
               {campaign.content_requirements && (
                 <div className="mb-4">
-                  <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1.5">Content requirements</p>
+                  <p className="text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] mb-1.5">Content requirements</p>
                   <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{campaign.content_requirements}</p>
                 </div>
               )}
               {campaign.talking_points && campaign.talking_points.length > 0 && (
                 <div className="mb-4">
-                  <p className="text-[12px] font-medium text-[var(--ink-35)] mb-1.5">Key messages</p>
+                  <p className="text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] mb-1.5">Key messages</p>
                   <ol className="space-y-1">
                     {campaign.talking_points.map((tp, i) => <li key={i} className="text-[14px] text-[var(--ink)] leading-[1.5]">{i + 1}. {tp}</li>)}
                   </ol>
@@ -580,19 +580,19 @@ export default function BusinessPortal() {
             {recentApps.length > 0 && (
               <div className="bg-white rounded-[12px] p-4 md:p-5 mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <div className="flex items-center justify-between mb-3">
-                  <p className="text-[14px] font-medium text-[var(--ink-35)]">Recent applicants</p>
-                  <button onClick={() => setActiveTab('selection')} className="text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
+                  <p className="text-[14px] font-medium text-[var(--ink-50)]">Recent applicants</p>
+                  <button onClick={() => setActiveTab('selection')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
                 </div>
                 <div className="space-y-2.5">
                   {recentApps.map(a => (
                     <div key={a.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
                         <div className="w-7 h-7 rounded-full bg-[var(--sage-tint)] flex items-center justify-center flex-shrink-0">
-                          <span className="text-[12px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
+                          <span className="text-[14px] md:text-[12px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
                         </div>
                         <div>
                           <p className="text-[14px] font-medium text-[var(--ink)]">{a.creators?.display_name || a.creators?.name}</p>
-                          <p className="text-[12px] text-[var(--ink-35)]">{a.creators?.instagram_handle}</p>
+                          <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">{a.creators?.instagram_handle}</p>
                         </div>
                       </div>
                       <StatusBadge status={a.status} />
@@ -663,7 +663,7 @@ export default function BusinessPortal() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-[20px] font-semibold text-[var(--ink)]">Selection</h1>
-              <span className="text-[14px] text-[var(--ink-35)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
+              <span className="text-[14px] text-[var(--ink-50)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
             </div>
 
             {/* Filters + bulk actions */}
@@ -723,16 +723,16 @@ export default function BusinessPortal() {
                     {/* Stats row */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
+                        <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[14px] md:text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
+                        <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
                         <span className={`text-[14px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
                       </div>
                       {a.creators?.follower_count && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
+                          <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
                           <span className="text-[14px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
                         </div>
                       )}
@@ -747,7 +747,7 @@ export default function BusinessPortal() {
 
                     {/* Actions */}
                     <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
-                      <p className="text-[12px] text-[var(--ink-35)]">Applied {fmtDate(a.applied_at)}</p>
+                      <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">Applied {fmtDate(a.applied_at)}</p>
                       {a.status === 'interested' && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
@@ -755,7 +755,7 @@ export default function BusinessPortal() {
                             Select
                           </button>
                           <button onClick={() => handleDecline(a.id)}
-                            className="min-h-[44px] flex items-center text-[12px] font-medium text-[var(--ink-35)] hover:text-[var(--ink)]">
+                            className="min-h-[44px] flex items-center text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
                             Decline
                           </button>
                         </div>
@@ -767,7 +767,7 @@ export default function BusinessPortal() {
               {filteredApps.length === 0 && (
                 <div className="col-span-3 py-12 text-center">
                   <p className="text-[20px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
-                  <p className="text-[14px] text-[var(--ink-35)]">Creators will appear here once they express interest</p>
+                  <p className="text-[14px] text-[var(--ink-50)]">Creators will appear here once they express interest</p>
                 </div>
               )}
             </div>
@@ -788,13 +788,13 @@ export default function BusinessPortal() {
           <div>
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-[20px] font-semibold text-[var(--ink)]">Progress</h1>
-              <span className="text-[14px] text-[var(--ink-35)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
+              <span className="text-[14px] text-[var(--ink-50)]">{participations.length} creator{participations.length !== 1 ? 's' : ''}</span>
             </div>
 
             {participations.length === 0 ? (
               <div className="py-12 text-center">
                 <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No creators confirmed yet</p>
-                <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, they'll appear here</p>
+                <p className="text-[14px] text-[var(--ink-50)]">Once creators confirm their spot, they'll appear here</p>
               </div>
             ) : (<>
               {/* Mobile: vertical grouped list */}
@@ -802,8 +802,8 @@ export default function BusinessPortal() {
                 {columns.filter(col => col.items.length > 0).map(col => (
                   <div key={col.key}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
-                      <span className="text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
+                      <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
+                      <span className="text-[14px] md:text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
                     </div>
                     <div className="space-y-2">
                       {col.items.map(p => {
@@ -815,17 +815,17 @@ export default function BusinessPortal() {
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: avatarColors.bg }}>
-                                <span className="text-[12px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
+                                <span className="text-[14px] md:text-[12px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
-                                <p className="text-[12px] text-[var(--ink-35)]">@{handle}</p>
+                                <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">@{handle}</p>
                               </div>
                               {col.key === 'submitted' && p.reel_url && (
                                 <a href={p.reel_url} target="_blank" rel="noopener noreferrer" onClick={(e: any) => e.stopPropagation()}
-                                  className="text-[12px] text-[var(--terra)] font-medium">View Reel</a>
+                                  className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium">View Reel</a>
                               )}
-                              {col.key === 'completed' && <span className="text-[12px] text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>}
+                              {col.key === 'completed' && <span className="text-[14px] md:text-[12px] text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>}
                             </div>
                           </div>
                         );
@@ -841,8 +841,8 @@ export default function BusinessPortal() {
                   <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink md:border-r md:border-[rgba(42,32,24,0.04)] md:last:border-0 md:pr-4">
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
-                      <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
-                      <span className="text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
+                      <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
+                      <span className="text-[14px] md:text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
                         {col.items.length}
                       </span>
                     </div>
@@ -857,12 +857,12 @@ export default function BusinessPortal() {
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5 mb-2">
                               <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(initial).bg }}>
-                                <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
+                                <span className="text-[14px] md:text-[12px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
                               </div>
                               <div className="min-w-0">
                                 <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
                                 <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                                  className="text-[12px] text-[var(--terra)] hover:underline">@{handle}</a>
+                                  className="text-[14px] md:text-[12px] text-[var(--terra)] hover:underline">@{handle}</a>
                               </div>
                             </div>
 
@@ -872,7 +872,7 @@ export default function BusinessPortal() {
                                 await supabase.from('participations').update({ perk_sent: true, perk_sent_at: new Date().toISOString() }).eq('id', p.id);
                                 fetchCampaignData();
                                 showToast('Perk marked as sent');
-                              }} className="w-full mt-2 py-1.5 rounded-[8px] text-[12px] text-[var(--terra)] hover:bg-[var(--terra-10)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(217,95,59,0.15)' }}>
+                              }} className="w-full mt-2 py-1.5 rounded-[8px] text-[14px] md:text-[12px] text-[var(--terra)] hover:bg-[var(--terra-10)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(217,95,59,0.15)' }}>
                                 Mark perk sent
                               </button>
                             )}
@@ -880,7 +880,7 @@ export default function BusinessPortal() {
                             {col.key === 'submitted' && p.reel_url && (
                               <div className="mt-2 space-y-1.5">
                                 <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                                  className="flex items-center gap-1 text-[12px] text-[var(--terra)] font-medium hover:underline">
+                                  className="flex items-center gap-1 text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">
                                   <Film size={12} /> View Reel <ExternalLink size={10} />
                                 </a>
                                 <button onClick={async (e: any) => { e.stopPropagation();
@@ -888,14 +888,14 @@ export default function BusinessPortal() {
                                   await supabase.from('participations').update({ status: 'completed', completed_at: new Date().toISOString() }).eq('id', p.id);
                                   fetchCampaignData();
                                   showToast('Content approved');
-                                }} className="w-full py-1.5 rounded-[8px] text-[12px] text-[#0F6E56] hover:bg-[rgba(15,110,86,0.06)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(15,110,86,0.2)' }}>
+                                }} className="w-full py-1.5 rounded-[8px] text-[14px] md:text-[12px] text-[#0F6E56] hover:bg-[rgba(15,110,86,0.06)] transition-colors" style={{ fontWeight: 600, border: '1px solid rgba(15,110,86,0.2)' }}>
                                   Approve
                                 </button>
                               </div>
                             )}
 
                             {col.key === 'completed' && (
-                              <div className="mt-2 flex items-center gap-2 text-[12px] text-[var(--ink-60)]">
+                              <div className="mt-2 flex items-center gap-2 text-[14px] md:text-[12px] text-[var(--ink-60)]">
                                 <span className="text-[#0F6E56] font-medium"><Check size={11} className="inline" /> Done</span>
                                 {p.reach != null && <span>{p.reach.toLocaleString()} reach</span>}
                                 {p.likes != null && <span>{p.likes} likes</span>}
@@ -906,7 +906,7 @@ export default function BusinessPortal() {
                       })}
                       {col.items.length === 0 && (
                         <div className="rounded-[10px] border border-dashed border-[rgba(42,32,24,0.08)] py-6 text-center">
-                          <p className="text-[12px] text-[var(--ink-15)]">No creators</p>
+                          <p className="text-[14px] md:text-[12px] text-[var(--ink-15)]">No creators</p>
                         </div>
                       )}
                     </div>
@@ -929,7 +929,7 @@ export default function BusinessPortal() {
               <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[360px] bg-white flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(42,32,24,0.06)' }}>
                   <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
-                  <button onClick={() => setPeekCreator(null)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={18} /></button>
+                  <button onClick={() => setPeekCreator(null)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={18} /></button>
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                   <div className="flex items-center gap-3 mb-4">
@@ -947,11 +947,11 @@ export default function BusinessPortal() {
 
                   <div className="space-y-3 text-[14px]">
                     <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
-                      <span className="text-[var(--ink-35)]">Perk</span>
+                      <span className="text-[var(--ink-50)]">Perk</span>
                       <span className="text-[var(--ink)] font-medium">{p.perk_sent ? 'Redeemed' : 'Pending'}</span>
                     </div>
                     <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
-                      <span className="text-[var(--ink-35)]">Content</span>
+                      <span className="text-[var(--ink-50)]">Content</span>
                       <span className="text-[var(--ink)] font-medium">{p.reel_url ? 'Submitted' : 'Awaiting'}</span>
                     </div>
                     {p.reel_url && (
@@ -962,19 +962,19 @@ export default function BusinessPortal() {
                     )}
                     {p.reach != null && (
                       <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
-                        <span className="text-[var(--ink-35)]">Reach</span>
+                        <span className="text-[var(--ink-50)]">Reach</span>
                         <span className="text-[var(--ink)] font-medium">{p.reach.toLocaleString()}</span>
                       </div>
                     )}
                     {p.likes != null && (
                       <div className="flex justify-between py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
-                        <span className="text-[var(--ink-35)]">Likes</span>
+                        <span className="text-[var(--ink-50)]">Likes</span>
                         <span className="text-[var(--ink)] font-medium">{p.likes.toLocaleString()}</span>
                       </div>
                     )}
                     {p.comments != null && (
                       <div className="flex justify-between py-2">
-                        <span className="text-[var(--ink-35)]">Comments</span>
+                        <span className="text-[var(--ink-50)]">Comments</span>
                         <span className="text-[var(--ink)] font-medium">{p.comments}</span>
                       </div>
                     )}
@@ -1003,18 +1003,18 @@ export default function BusinessPortal() {
                     <s.icon size={15} style={{ color: s.color }} />
                   </div>
                   <div>
-                    <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)]" style={{ marginBottom: 1 }}>{s.label}</p>
+                    <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 1 }}>{s.label}</p>
                     <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                   </div>
                 </div>
               </div>
               ))}
             </div>
-            <p className="text-[12px] text-[var(--ink-35)] -mt-3 mb-6">Industry average engagement: 0.7%. Nayba benchmark: 3-4%.</p>
+            <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] -mt-3 mb-6">Industry average engagement: 0.7%. Nayba benchmark: 3-4%.</p>
 
             {/* Reach by creator */}
             <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] mb-4">Reach by Creator</p>
+              <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);
@@ -1026,14 +1026,14 @@ export default function BusinessPortal() {
                         <div className="flex-1 h-6 bg-[rgba(42,32,24,0.08)] rounded-[10px] overflow-hidden">
                           <div className="h-full rounded-[10px] bg-[var(--terra)] flex items-center justify-end pr-2 chart-bar-enter"
                             style={{ width: `${(p.reach! / maxReach) * 100}%`, minWidth: 32, animationDelay: `${i * 0.08}s`, animationFillMode: 'both' }}>
-                            <span className="text-[12px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
+                            <span className="text-[14px] md:text-[12px] font-semibold text-white">{p.reach!.toLocaleString()}</span>
                           </div>
                         </div>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-[14px] text-[var(--ink-35)]">No reach data yet — admin will enter this after content is reviewed</p>
+                  <p className="text-[14px] text-[var(--ink-50)]">No reach data yet — admin will enter this after content is reviewed</p>
                 );
               })()}
             </div>

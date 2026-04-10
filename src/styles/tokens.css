@@ -39,15 +39,16 @@
 
   /* ── Ink scale ── */
   --ink-60: rgba(42, 32, 24, 0.60);
+  --ink-50: rgba(42, 32, 24, 0.50);
   --ink-35: rgba(42, 32, 24, 0.35);
   --ink-15: rgba(42, 32, 24, 0.15);
   --ink-08: rgba(42, 32, 24, 0.08);
 
-  /* ── Category chip tints ── */
-  --sage-tint: #E8EEE8;
-  --violet-tint: #EAE6F4;
-  --baltic-tint: #E4EEF4;
-  --mist-tint: #F4EED4;
+  /* ── Category chip tints (saturated enough to see on white) ── */
+  --sage-tint: #DDEADD;
+  --violet-tint: #DDD6EE;
+  --baltic-tint: #D6E6F0;
+  --mist-tint: #EDE5C0;
 
   /* ── Semantic aliases ── */
   --shell: var(--chalk);

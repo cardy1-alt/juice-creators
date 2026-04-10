@@ -11,7 +11,7 @@ interface Brand {
 }
 
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
 const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
@@ -57,7 +57,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
       <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">Create Brand</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
           {error && (
@@ -107,10 +107,10 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
             </div>
             <div className="min-w-0">
               <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{brand.name}</p>
-              <p className="text-[14px] text-[var(--ink-35)]">{brand.category}</p>
+              <p className="text-[14px] text-[var(--ink-50)]">{brand.category}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -249,7 +249,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 : <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
               }
             </div>
-            <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+            <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
               <span>{b.region}</span>
               {b.instagram_handle && <span>@{b.instagram_handle.replace('@','')}</span>}
               <span>{campaignCounts[b.id] || 0} campaigns</span>

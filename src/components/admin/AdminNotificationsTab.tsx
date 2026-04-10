@@ -86,7 +86,7 @@ export default function AdminNotificationsTab() {
     fetchData();
   };
 
-  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+  const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 
   return (
     <div>
@@ -125,7 +125,7 @@ export default function AdminNotificationsTab() {
           <div className="border border-[rgba(42,32,24,0.08)] rounded-[10px] bg-[rgba(42,32,24,0.02)] p-5">
             <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Email Preview</p>
             <div className="bg-white rounded-[10px] border border-[rgba(42,32,24,0.08)] p-5 max-w-lg">
-              <p className="text-[12px] text-[var(--ink-35)] mb-1">Subject</p>
+              <p className="text-[12px] text-[var(--ink-50)] mb-1">Subject</p>
               <p className="text-[15px] font-semibold text-[var(--ink)] mb-4">New campaign just dropped — {selectedCampaign.businesses?.name}</p>
               <div className="text-[14px] text-[var(--ink)] space-y-2 leading-[1.65]">
                 <p>Hey [creator name]!</p>
@@ -149,7 +149,7 @@ export default function AdminNotificationsTab() {
         {logs.map(n => (
           <div key={n.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
-              <span className="text-[12px] text-[var(--ink-35)]">{fmtDate(n.created_at)}</span>
+              <span className="text-[12px] text-[var(--ink-50)]">{fmtDate(n.created_at)}</span>
               <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                 {n.email_type?.replace(/_/g, ' ') || 'notification'}
               </span>
@@ -169,7 +169,7 @@ export default function AdminNotificationsTab() {
           <tbody>
             {logs.map(n => (
               <tr key={n.id} className="hover:bg-[rgba(42,32,24,0.03)] transition-colors" style={{ height: 44 }}>
-                <td className={`${tdCls} text-[var(--ink-35)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
+                <td className={`${tdCls} text-[var(--ink-50)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
                 <td className={`${tdCls} text-[var(--ink-60)] max-w-[300px] truncate`}>{n.message}</td>
                 <td className={tdCls}>1</td>
                 <td className={tdCls}>

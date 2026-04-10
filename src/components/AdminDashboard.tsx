@@ -98,7 +98,7 @@ export default function AdminDashboard() {
               <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Admin</span>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden" style={{ color: 'var(--ink-35)' }}>
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden" style={{ color: 'var(--ink-50)' }}>
             <X size={20} />
           </button>
         </div>
@@ -145,9 +145,9 @@ export default function AdminDashboard() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
-              <p className="text-[12px] text-[var(--ink-35)] truncate">{user?.email}</p>
+              <p className="text-[12px] text-[var(--ink-50)] truncate">{user?.email}</p>
             </div>
-            <LogOut size={14} className="text-[var(--ink-35)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            <LogOut size={14} className="text-[var(--ink-50)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
           </div>
         </div>
       </aside>

@@ -31,7 +31,7 @@ interface Stats {
 // Animated SVG bar chart
 function AnimatedBarChart({ items, color }: { items: { label: string; value: number }[]; color: string }) {
   const max = Math.max(...items.map(i => i.value), 1);
-  if (items.length === 0) return <p className="text-[14px] text-[var(--ink-35)]">No data yet</p>;
+  if (items.length === 0) return <p className="text-[14px] text-[var(--ink-50)]">No data yet</p>;
 
   return (
     <div className="space-y-3">

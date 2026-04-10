@@ -157,7 +157,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
           </button>
-          <p className="text-[12px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
+          <p className="text-[14px] md:text-[12px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
         </div>
       )}
       {application?.status === 'interested' && (
@@ -179,7 +179,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         </div>
       )}
       {application?.status === 'declined' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-35)] font-medium text-[14px]">
+        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
           Not selected for this campaign
         </div>
       )}
@@ -224,18 +224,18 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             </button>
             <div className="flex items-center gap-2 mt-1.5">
               {campaign.businesses?.category && (
-                <span className="text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
+                <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
               )}
               {campaign.businesses?.instagram_handle && (
                 <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                  className="text-[12px] text-[var(--ink-35)] hover:text-[var(--terra)] flex items-center gap-0.5">
+                  className="text-[14px] md:text-[12px] text-[var(--ink-50)] hover:text-[var(--terra)] flex items-center gap-0.5">
                   <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
                 </a>
               )}
             </div>
             {campaign.businesses?.address && (
               <div className="flex items-center gap-1.5 mt-2">
-                <MapPin size={12} className="text-[var(--ink-35)]" />
+                <MapPin size={12} className="text-[var(--ink-50)]" />
                 <span className="text-[14px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
               </div>
             )}
@@ -257,7 +257,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {campaign.perk_description && (
             <div className="px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
               <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-              {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
+              {campaign.perk_value && <p className="text-[14px] md:text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
             </div>
           )}
 
@@ -304,7 +304,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               <ol className="space-y-2.5">
                 {campaign.talking_points.map((tp, i) => (
                   <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.5]">
-                    <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[12px]" style={{ fontWeight: 700, background: catPalette.tint, color: catPalette.color }}>{i + 1}</span>
+                    <span className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-[14px] md:text-[12px]" style={{ fontWeight: 700, background: catPalette.tint, color: catPalette.color }}>{i + 1}</span>
                     {tp}
                   </li>
                 ))}
@@ -354,16 +354,16 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[var(--ink)]">{campaign.businesses.name}</h3>
-              <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+              <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
             </div>
             {campaign.businesses.category && (
-              <p className="text-[14px] text-[var(--ink-35)] mb-3">{campaign.businesses.category}</p>
+              <p className="text-[14px] text-[var(--ink-50)] mb-3">{campaign.businesses.category}</p>
             )}
             {(campaign.about_brand || campaign.businesses.bio) && (
               <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
             )}
             {!campaign.about_brand && !campaign.businesses.bio && (
-              <p className="text-[14px] text-[var(--ink-35)] mb-4">No description available yet.</p>
+              <p className="text-[14px] text-[var(--ink-50)] mb-4">No description available yet.</p>
             )}
             {campaign.businesses.instagram_handle && (
               <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
@@ -381,7 +381,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[12px] p-4 sm:p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[var(--ink)]">Tell them why you</h3>
-              <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+              <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
             </div>
             <p className="text-[14px] text-[var(--ink-60)] mb-4">Write a short pitch to stand out — totally optional but helps your chances</p>
             <textarea
@@ -390,7 +390,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               placeholder="I'd love to be part of this because..."
               className="w-full px-4 py-3 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-24 resize-none focus:outline-none focus:border-[var(--terra)] mb-1"
             />
-            <p className="text-[12px] text-[var(--ink-35)] text-right mb-3">{pitch.length}/500</p>
+            <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] text-right mb-3">{pitch.length}/500</p>
             <div className="flex gap-3">
               <button
                 onClick={() => handleApply()}

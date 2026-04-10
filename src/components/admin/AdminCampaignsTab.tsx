@@ -31,13 +31,13 @@ interface Participation {
 interface Creator { id: string; name: string; display_name: string | null; instagram_handle: string; level: number; completion_rate: number; }
 
 // ─── Shared styling (using CSS variables from theme.css) ───
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
 const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
 const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)]";
-const modalClose = "w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3] transition-colors";
+const modalClose = "w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3] transition-colors";
 const modalHeader = "flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
 const modalFooterCls = "flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0";
@@ -193,7 +193,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         <div className={modalHeader}>
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
           <div className="flex items-center gap-4">
-            <span className="text-[14px] text-[var(--ink-35)]">Step {step} of 3</span>
+            <span className="text-[14px] text-[var(--ink-50)]">Step {step} of 3</span>
             <button onClick={onClose} className={modalClose}><X size={15} /></button>
           </div>
         </div>
@@ -251,7 +251,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
                         className={inputCls} placeholder="#brandname, @brand, #campaign" />
-                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Comma-separated tags creators must include</p>
+                      <p className="text-[12px] text-[var(--ink-50)] mt-1">Comma-separated tags creators must include</p>
                     </div>
                     <div className="md:col-span-2 pt-3 pb-1 border-t border-[rgba(42,32,24,0.08)]">
                       <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.6px', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Talking Points</p>
@@ -275,7 +275,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                 </>
               ) : (
                 <div className="py-8 text-center">
-                  <p className="text-[14px] text-[var(--ink-35)] mb-3">Fill in the fields above, or</p>
+                  <p className="text-[14px] text-[var(--ink-50)] mb-3">Fill in the fields above, or</p>
                   <button onClick={handleAiGenerate} disabled={aiLoading || (!form.brand_id && !form.title)}
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.10)] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)] disabled:opacity-40 transition-colors"
                     style={{ fontWeight: 600 }}>
@@ -455,7 +455,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     onRefresh();
   };
 
-  const pThCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-35)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
+  const pThCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] py-2.5 px-3 bg-[rgba(42,32,24,0.02)] whitespace-nowrap";
   const pTdCls = "py-2 px-3 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)] align-middle";
   const numInput = "w-[72px] px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]";
 
@@ -578,7 +578,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
             </div>
           ) : (
             <div className="py-12 text-center">
-              <p className="text-[14px] text-[var(--ink-35)]">No confirmed participations yet</p>
+              <p className="text-[14px] text-[var(--ink-50)]">No confirmed participations yet</p>
             </div>
           )}
         </div>
@@ -656,9 +656,9 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">
             <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{campaign.title}</p>
-            <p className="text-[14px] text-[var(--ink-35)] mt-0.5">{campaign.businesses?.name || '—'}</p>
+            <p className="text-[14px] text-[var(--ink-50)] mt-0.5">{campaign.businesses?.name || '—'}</p>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -707,14 +707,14 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit }: {
             <div className="mb-4 pt-3 border-t border-[rgba(42,32,24,0.08)]">
               <div className="flex items-center justify-between mb-3">
                 <p className={peekLabel}>Add Creator as Applicant</p>
-                <button onClick={() => setShowAddApplicant(false)} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={14} /></button>
+                <button onClick={() => setShowAddApplicant(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={14} /></button>
               </div>
               <div className="max-h-[200px] overflow-y-auto space-y-1">
                 {allCreators.map(cr => (
                   <div key={cr.id} className="flex items-center justify-between px-3 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.02)]">
                     <div className="min-w-0">
                       <span className="text-[14px] font-medium text-[var(--ink)]">{cr.display_name || cr.name}</span>
-                      <span className="text-[12px] text-[var(--ink-35)] ml-2">{cr.instagram_handle}</span>
+                      <span className="text-[12px] text-[var(--ink-50)] ml-2">{cr.instagram_handle}</span>
                     </div>
                     <button onClick={() => handleAddApplicant(cr.id)} disabled={addingCreator === cr.id}
                       className="px-2.5 py-1 rounded-[10px] bg-[var(--terra)] text-white text-[12px] font-semibold disabled:opacity-40">
@@ -853,7 +853,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                   </div>
                   <StatusBadge status={c.status} />
                 </div>
-                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
                   <span>{counts.applicants}/{c.creator_target} applicants</span>
                   <span>{counts.selected} selected</span>
                   <span>{counts.submitted} reels</span>
@@ -909,7 +909,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       <td className={tdCls}>{counts.selected}</td>
                       <td className={tdCls}>{counts.submitted}</td>
                       <td className={tdCls}>{counts.completed}</td>
-                      <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtShortDate(c.expression_deadline)}</td>
+                      <td className={`${tdCls} text-[var(--ink-50)]`}>{fmtShortDate(c.expression_deadline)}</td>
                     </tr>
                 );
               })}

@@ -14,7 +14,7 @@ interface Creator {
 
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
 
-const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)] font-['Instrument_Sans']";
+const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
 const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
@@ -98,7 +98,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
       <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">Create Creator</h2>
-          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[#EDE9E3]"><X size={15} /></button>
+          <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
           {createdPassword ? (
@@ -110,7 +110,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
               <p className="text-[14px] text-[var(--ink-60)] mb-3">Share this temporary password with the creator:</p>
               <div className="inline-flex items-center gap-2 bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] px-4 py-2.5">
                 <code className="text-[15px] font-mono text-[var(--terra)]">{showPassword ? createdPassword : '••••••••••••'}</code>
-                <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-35)]">
+                <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-50)]">
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
@@ -179,10 +179,10 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
             </div>
             <div className="min-w-0">
               <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{creator.display_name || creator.name}</p>
-              {handle && <p className="text-[14px] text-[var(--ink-35)]">@{handle}</p>}
+              {handle && <p className="text-[14px] text-[var(--ink-50)]">@{handle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
+          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
           </button>
         </div>
@@ -224,11 +224,11 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
                 @{handle} <ExternalLink size={12} />
               </a>
               <div className="flex items-center gap-2 mt-1">
-                <span className="text-[14px] text-[var(--ink-35)]">
+                <span className="text-[14px] text-[var(--ink-50)]">
                   {creator.instagram_connected ? 'Connected' : 'Not connected'}
                 </span>
                 {creator.follower_count && (
-                  <span className="text-[14px] text-[var(--ink-35)]">· {creator.follower_count} followers</span>
+                  <span className="text-[14px] text-[var(--ink-50)]">· {creator.follower_count} followers</span>
                 )}
               </div>
             </div>
@@ -239,11 +239,11 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
             <div className="grid grid-cols-2 gap-3">
               <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
                 <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
-                <p className="text-[12px] text-[var(--ink-35)] font-medium">Campaigns</p>
+                <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
               </div>
               <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
                 <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
-                <p className="text-[12px] text-[var(--ink-35)] font-medium">Completion</p>
+                <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
               </div>
             </div>
           </div>
@@ -348,7 +348,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)]">
             <div className="flex items-center gap-2">
               <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending</h3>
-              <span className="text-[12px] text-[var(--ink-35)]">{pendingCreators.length}</span>
+              <span className="text-[12px] text-[var(--ink-50)]">{pendingCreators.length}</span>
             </div>
             <div className="flex items-center gap-1.5">
               <button onClick={selectAllPending}
@@ -368,7 +368,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 </>
               )}
               <button onClick={() => { setShowApprovalPane(false); setSelectedPending(new Set()); }}
-                className="ml-2 w-7 h-7 rounded-full bg-[rgba(42,32,24,0.06)] flex items-center justify-center text-[var(--ink-35)] hover:bg-[rgba(42,32,24,0.10)]">
+                className="ml-2 w-7 h-7 rounded-full bg-[rgba(42,32,24,0.06)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.10)]">
                 <X size={14} />
               </button>
             </div>
@@ -396,7 +396,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                         @{handle} <ExternalLink size={11} />
                       </a>
                     )}
-                    <div className="flex items-center gap-2 mt-1 text-[12px] text-[var(--ink-35)]">
+                    <div className="flex items-center gap-2 mt-1 text-[12px] text-[var(--ink-50)]">
                       {c.address && <span>{c.address}</span>}
                       <span>Joined {fmtDate(c.created_at)}</span>
                     </div>
@@ -420,7 +420,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
       {/* Search bar */}
       <div className="relative mb-4">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search creators by name, email, Instagram, or county..."
           className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
@@ -446,7 +446,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 </div>
                 <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>L{c.level}</span>
               </div>
-              <div className="flex items-center gap-3 text-[12px] text-[var(--ink-35)]">
+              <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
                 <span>{c.address || '—'}</span>
                 <span>{c.completion_rate}% rate</span>
                 <span>{c.completed_campaigns}/{c.total_campaigns} done</span>
@@ -495,7 +495,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                       <span className="text-[14px] text-[var(--ink-60)]">{c.completion_rate}%</span>
                     </div>
                   ) : (
-                    <span className="text-[14px] text-[var(--ink-35)]">—</span>
+                    <span className="text-[14px] text-[var(--ink-50)]">—</span>
                   )}
                 </td>
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
@@ -510,7 +510,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                     Approved
                   </span>
                 </td>
-                <td className={`${tdCls} text-[var(--ink-35)]`}>{fmtDate(c.created_at)}</td>
+                <td className={`${tdCls} text-[var(--ink-50)]`}>{fmtDate(c.created_at)}</td>
               </tr>
             ))}
             {filteredCreators.length === 0 && (
