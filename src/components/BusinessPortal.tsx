@@ -795,7 +795,7 @@ export default function BusinessPortal() {
                 <p className="text-[16px] font-semibold text-[var(--ink)] mb-1">No creators confirmed yet</p>
                 <p className="text-[14px] text-[var(--ink-35)]">Once creators confirm their spot, they'll appear here</p>
               </div>
-            ) : (
+            ) : (<>
               {/* Mobile: vertical grouped list */}
               <div className="md:hidden space-y-5">
                 {columns.filter(col => col.items.length > 0).map(col => (
@@ -912,7 +912,7 @@ export default function BusinessPortal() {
                   </div>
                 ))}
               </div>
-            )}
+            </>)}
           </div>
           );
         })()}
