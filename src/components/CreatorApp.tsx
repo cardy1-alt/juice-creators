@@ -223,16 +223,16 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         </button>
       )}
 
-      {/* Search + sort row */}
-      <div className="flex gap-3 mb-4">
+      {/* Search + sort row — stacks on mobile */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
           <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search campaigns..."
-            className="w-full pl-10 pr-4 h-[40px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
+            className="w-full pl-10 pr-4 h-[44px] rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)]" />
         </div>
         <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="h-[40px] px-3 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)]"
+          className="h-[44px] px-3 rounded-[10px] border border-[rgba(42,32,24,0.10)] bg-white text-[14px] text-[var(--ink-60)] focus:outline-none focus:border-[var(--terra)] sm:w-auto"
           style={{ fontWeight: 500 }}>
           <option value="newest">Newest</option>
           <option value="closing">Closing soon</option>
@@ -241,12 +241,12 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       </div>
 
       {/* Status + category filters */}
-      <div className="flex items-center gap-4 mb-4">
+      <div className="flex items-center gap-3 mb-4">
         {/* Status tabs */}
-        <div className="flex gap-0.5 bg-[rgba(42,32,24,0.04)] rounded-[8px] p-0.5">
+        <div className="flex gap-1 bg-[rgba(42,32,24,0.04)] rounded-[10px] p-1">
           {([['all', 'All'], ['new', 'New'], ['applied', 'Applied']] as const).map(([key, label]) => (
             <button key={key} onClick={() => setStatusFilter(key)}
-              className="px-3 py-1.5 rounded-[6px] text-[14px] md:text-[12px] transition-colors"
+              className="px-3 py-2 rounded-[8px] text-[14px] md:text-[12px] transition-colors"
               style={{
                 fontWeight: statusFilter === key ? 600 : 500,
                 background: statusFilter === key ? 'white' : 'transparent',
@@ -267,7 +267,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
           return (
             <button key={c} onClick={() => setCategory(c)}
-              className={`flex-shrink-0 px-[14px] py-[5px] rounded-[999px] text-[14px] md:text-[12px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+              className={`flex-shrink-0 px-[16px] py-[8px] rounded-[999px] text-[14px] md:text-[12px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
               style={{
                 fontWeight: isActive ? 700 : 600,
                 background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
@@ -298,7 +298,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className={`w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] ${appStatus ? 'ring-1 ring-[rgba(42,32,24,0.06)]' : ''}`} style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                className={`w-full text-left rounded-[12px] flex flex-col bg-white overflow-hidden transition-all duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] active:scale-[0.98] ${appStatus ? 'ring-1 ring-[rgba(42,32,24,0.06)]' : ''}`} style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <div className="w-full relative" style={{ height: 180, opacity: appStatus ? 0.75 : 1 }}>
                   {c.campaign_image ? (
                     <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
@@ -316,7 +316,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     <span className="absolute top-2.5 right-2.5 inline-flex items-center px-2.5 py-1 md:px-2 md:py-0.5 rounded-[999px] text-[14px] md:text-[12px] font-medium bg-white/80 backdrop-blur-sm text-[var(--ink-60)]">Community</span>
                   )}
                 </div>
-                <div className="flex-1 p-3.5 flex flex-col">
+                <div className="flex-1 p-4 flex flex-col">
                   <span className="text-[14px] md:text-[12px] mb-1 truncate block" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
                   <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                   {c.expression_deadline && (
@@ -433,7 +433,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
-      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.08)]">
+      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.12)]">
         {(['active', 'past'] as const).map(t => (
           <button key={t} onClick={() => setSubTab(t)}
             className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-50)]'}`}>
@@ -464,28 +464,21 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 )}
                 {!perkText && <div className="mb-3" />}
                 {/* Stepper */}
-                <div className="flex items-center gap-0 mb-3">
-                  {todos.map((t, i) => {
-                    const isLast = i === todos.length - 1;
-                    const isCurrent = !t.done && (i === 0 || todos[i - 1].done);
-                    return (
-                      <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
-                        <div className="flex flex-col items-center">
-                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[var(--status-active-text)]' : isCurrent ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.12)]'}`} />
-                          <span className={`text-[14px] md:text-[12px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-50)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
-                        </div>
-                        {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[var(--status-active-text)]' : 'bg-[rgba(42,32,24,0.10)]'}`} />}
-                      </div>
-                    );
-                  })}
+                {/* Progress bar */}
+                <div className="h-1.5 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden mb-2">
+                  <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(todos.filter(t => t.done).length / todos.length) * 100}%`, background: todos.every(t => t.done) ? 'var(--status-active-text)' : 'var(--terra)' }} />
                 </div>
+                {/* Current step label */}
+                <p className="text-[14px] text-[var(--ink-60)] mb-3">
+                  {todos.every(t => t.done) ? 'Complete — nice work!' : todos.find(t => !t.done)?.label || 'In progress'}
+                </p>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
                     className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
                     <Film size={12} /> Share Reel
                   </button>
                 )}
-                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.08)]">
+                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.12)]">
                   <div className="flex gap-3 text-[14px] md:text-[12px] text-[var(--ink-50)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
                     {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[14px] md:text-[12px] font-medium">Content overdue</span>}
@@ -581,7 +574,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-6">The Naybahood</h1>
         <div className="bg-white rounded-[12px] p-8 text-center">
-          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
+          <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.12)]">
             <Lock size={28} className="text-[var(--ink-50)]" />
           </div>
           <p className="text-[18px] font-semibold text-[var(--ink)] mb-2">Almost there...</p>
@@ -1033,7 +1026,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       <div className="bg-white rounded-[12px] overflow-hidden">
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.12)] last:border-0 min-h-[44px]">
             <item.icon size={18} className="text-[var(--ink-50)]" />
             <span className="text-[15px] text-[var(--ink)] font-medium">{item.label}</span>
             <ChevronRight size={16} className="text-[var(--ink-50)] ml-auto" />
