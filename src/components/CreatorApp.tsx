@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
-import { getCategoryPalette, getFilterChipColor } from '../lib/categories';
+import { getCategoryPalette, getFilterChipColor, CategoryIcon } from '../lib/categories';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'jacob@nayba.app';
@@ -265,12 +265,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     {c.campaign_image ? (
                       <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                     ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[var(--terra)] to-[#C04E2E] flex items-center justify-center">
-                        {c.businesses?.logo_url ? (
-                          <img src={c.businesses.logo_url} alt={c.businesses?.name} className="w-12 h-12 rounded-full object-cover border-2 border-white/30" />
-                        ) : (
-                          <span className="text-[28px] font-semibold text-white/60">{(c.businesses?.name || '?')[0]}</span>
-                        )}
+                      <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
+                        <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
                       </div>
                     )}
                   {appStatus && (
