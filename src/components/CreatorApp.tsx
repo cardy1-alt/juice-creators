@@ -211,7 +211,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       {/* Welcome + county context */}
       <div className="mb-5">
         <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 28 }}>Hey {firstName}</h1>
-        <p className="text-[14px] text-[var(--ink-35)] mt-1">Campaigns in {county}</p>
+        <p className="text-[14px] text-[var(--ink-60)] mt-1">Campaigns in {county}</p>
       </div>
 
       {/* Active campaign banner */}
@@ -283,7 +283,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       {loading && <SkeletonList count={6} />}
       {!loading && fetchError && (
         <div className="py-12 text-center">
-          <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
+          <AlertCircle size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
           <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
@@ -320,7 +320,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                   <span className="text-[11px] mb-1" style={{ fontWeight: 600, color: catPalette.color }}>{c.businesses?.name}</span>
                   <p className="text-[14px] text-[var(--ink)] leading-[1.35] line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                   {c.expression_deadline && (
-                    <p className="text-[11px] text-[var(--ink-35)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
+                    <p className="text-[11px] text-[var(--ink-60)] mt-auto pt-2">Apply by {fmtDate(c.expression_deadline)}</p>
                   )}
                 </div>
               </button>
@@ -330,14 +330,14 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
         {filtered.length === 0 && (
           <div className="py-12 text-center">
-            <Compass size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
+            <Compass size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
             <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Nothing here yet</p>
             <p className="text-[13px] text-[var(--ink-35)]">New campaigns drop every week — keep an eye out</p>
           </div>
         )}
         {filtered.length > 0 && (
           <div className="py-8 text-center">
-            <Check size={20} className="text-[var(--ink-15)] mx-auto mb-2" />
+            <Check size={20} className="text-[var(--ink-35)] mx-auto mb-2" />
             <p className="text-[13px] text-[var(--ink-35)]">You're all caught up — check back soon</p>
           </div>
         )}
@@ -502,7 +502,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.length === 0 && (
             <div className="py-12 text-center">
-              <Megaphone size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
+              <Megaphone size={48} className="text-[var(--ink-35)] mx-auto mb-3" />
               <p className="text-[15px] font-medium text-[var(--ink)] mb-1">No active campaigns yet</p>
               <p className="text-[13px] text-[var(--ink-35)]">Browse the Discover tab and tap "I'm Interested" on a campaign you like</p>
             </div>

@@ -539,7 +539,7 @@ export default function BusinessPortal() {
               {campaign.perk_description && (
                 <div className="mb-4 px-4 py-3 rounded-[10px]" style={{ background: 'var(--terra-light)' }}>
                   <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-                  {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
+                  {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
                 </div>
               )}
               {campaign.content_requirements && (

@@ -141,7 +141,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[var(--chalk)] px-6 text-center">
         <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Campaign not available</p>
-        <p className="text-[13px] text-[var(--ink-35)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
+        <p className="text-[13px] text-[var(--ink-60)] mb-5 max-w-xs">This campaign may have ended or been removed.</p>
         {onBack && <button onClick={onBack} className="px-4 py-2 min-h-[44px] rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[13px] hover:opacity-85 transition-opacity">Go back</button>}
       </div>
     );
@@ -157,7 +157,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
           </button>
-          <p className="text-[12px] text-[var(--ink-35)] text-center mt-2">This won't commit you — the brand will review and select</p>
+          <p className="text-[12px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
         </div>
       )}
       {application?.status === 'interested' && (
@@ -257,7 +257,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {campaign.perk_description && (
             <div className="px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
               <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-              {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{ opacity: 0.7 }}>Worth £{campaign.perk_value}</p>}
+              {campaign.perk_value && <p className="text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
             </div>
           )}
 
@@ -265,7 +265,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
             {campaign.about_brand && (
               <div>
-                <p className="text-[13px] font-medium text-[var(--ink-35)] mb-2">About {campaign.businesses?.name}</p>
+                <p className="text-[13px] font-medium text-[var(--ink-60)] mb-2">About {campaign.businesses?.name}</p>
                 <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
               </div>
             )}
@@ -300,7 +300,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* ── Key messages ── */}
           {campaign.talking_points && campaign.talking_points.length > 0 && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Key messages</p>
+              <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">Key messages</p>
               <ol className="space-y-2.5">
                 {campaign.talking_points.map((tp, i) => (
                   <li key={i} className="flex gap-3 text-[14px] text-[var(--ink)] leading-[1.5]">
@@ -315,7 +315,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* ── Inspiration ── */}
           {campaign.inspiration && campaign.inspiration.length > 0 && (
             <div className="border-t border-[rgba(42,32,24,0.06)] mt-5 pt-5">
-              <p className="text-[13px] font-medium text-[var(--ink-35)] mb-3">Inspiration</p>
+              <p className="text-[13px] font-medium text-[var(--ink-60)] mb-3">Inspiration</p>
               <div className="space-y-3">
                 {campaign.inspiration.map((item: any, i: number) => (
                   <div key={i} className="flex gap-3">
