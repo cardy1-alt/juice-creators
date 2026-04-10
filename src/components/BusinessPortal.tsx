@@ -323,7 +323,7 @@ export default function BusinessPortal() {
         {activeTab === 'dashboard' && (
           <div>
             <div className="mb-6">
-              <h1 className="nayba-h1 text-[var(--ink)] mb-1" style={{ fontSize: 28 }}>Hey {brand.name}</h1>
+              <h1 className="text-[28px] text-[var(--ink)] mb-1" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15 }}>Hey {brand.name}</h1>
               <p className="text-[14px] text-[var(--ink)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
             </div>
 

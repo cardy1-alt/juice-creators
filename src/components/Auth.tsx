@@ -179,7 +179,7 @@ export default function Auth() {
                 <Logo size={28} variant="wordmark" />
               </div>
 
-              <h1 className="nayba-h1 text-[36px]" style={{ margin: '0 0 16px', color: 'var(--ink)' }}>
+              <h1 className="text-[36px]" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15, margin: '0 0 16px', color: 'var(--ink)' }}>
                 <span style={{ display: 'block' }}>Discover local brands.</span>
                 Get <span style={{ color: 'var(--terra)' }}>rewarded</span> for sharing.
               </h1>

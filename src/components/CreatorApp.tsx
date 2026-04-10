@@ -198,7 +198,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       {/* Welcome + county context */}
       <div className="mb-5">
-        <h1 className="nayba-h1 text-[var(--ink)]" style={{ fontSize: 28 }}>Hey {firstName}</h1>
+        <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15 }}>Hey {firstName}</h1>
         <p className="text-[14px] text-[var(--ink-35)] mt-1">Campaigns in {county}</p>
       </div>
 
@@ -1155,7 +1155,7 @@ export default function CreatorApp() {
         <div style={{ marginBottom: 36 }}>
           <Logo size={28} variant="wordmark" />
         </div>
-        <h1 className="nayba-h1" style={{ fontSize: 28, marginBottom: 10, color: 'var(--ink)' }}>You're on the list</h1>
+        <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15, marginBottom: 10 }}>You're on the list</h1>
         <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
           We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
         </p>
