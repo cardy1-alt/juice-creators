@@ -195,7 +195,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const rest = filtered;
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
       {/* Welcome + county context */}
       <div className="mb-5">
         <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15 }}>Hey {firstName}</h1>
@@ -251,7 +251,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
       )}
       {!loading && !fetchError && <>
         {/* Campaign grid */}
-        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        {rest.length > 0 && <div className="grid grid-cols-2 md:grid-cols-3 gap-4 animate-stagger">
           {rest.map(c => {
             const appStatus = applications[c.id];
             const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
@@ -400,7 +400,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   };
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
       <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
       <div className="flex gap-1 mb-4 border-b border-[rgba(42,32,24,0.08)]">
@@ -548,7 +548,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   if (!unlocked) {
     return (
-      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         <div className="bg-white rounded-[12px] p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
@@ -569,7 +569,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 
   if (unlocked && showCelebration) {
     return (
-      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+      <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">

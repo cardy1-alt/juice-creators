@@ -178,6 +178,82 @@
   animation: skeleton-pulse 1.5s ease-in-out infinite;
 }
 
+/* ── Micro-animations ── */
+
+/* Fade-in for page/tab content */
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fade-in {
+  animation: fade-in 0.25s ease-out both;
+}
+
+/* Stagger children — apply to parent, each child fades in sequence */
+.animate-stagger > * {
+  animation: fade-in 0.3s ease-out both;
+}
+.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.animate-stagger > *:nth-child(2) { animation-delay: 40ms; }
+.animate-stagger > *:nth-child(3) { animation-delay: 80ms; }
+.animate-stagger > *:nth-child(4) { animation-delay: 120ms; }
+.animate-stagger > *:nth-child(5) { animation-delay: 160ms; }
+.animate-stagger > *:nth-child(6) { animation-delay: 200ms; }
+.animate-stagger > *:nth-child(7) { animation-delay: 240ms; }
+.animate-stagger > *:nth-child(8) { animation-delay: 280ms; }
+
+/* Modal / peek panel slide-in */
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(16px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.animate-slide-up {
+  animation: slide-up 0.2s ease-out both;
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+.animate-slide-in-right {
+  animation: slide-in-right 0.25s ease-out both;
+}
+
+/* Overlay fade */
+@keyframes overlay-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+.animate-overlay {
+  animation: overlay-fade 0.2s ease-out both;
+}
+
+/* Toast enter from bottom */
+@keyframes toast-enter {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.toast-enter {
+  animation: toast-enter 0.3s ease-out both;
+}
+
+/* Stat value count-up shimmer */
+@keyframes shimmer-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+.animate-shimmer {
+  animation: shimmer-in 0.4s ease-out both;
+}
+
+/* Press feedback for interactive cards */
+.press-card {
+  transition: transform 0.12s ease, box-shadow 0.2s ease;
+}
+.press-card:active {
+  transform: scale(0.98);
+}
+
 /* ── Heading utilities (Instrument Sans) ── */
 .nayba-h1 {
   font-family: var(--font-sans);
