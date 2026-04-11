@@ -58,6 +58,58 @@ export default function AdminSettingsTab() {
     setter(value);
   };
 
+  const NOTIFICATION_GROUPS = [
+    {
+      label: 'Creator Emails',
+      items: [
+        { key: 'creator_welcome', name: 'Welcome email', desc: 'Sent when a creator signs up' },
+        { key: 'creator_approved', name: 'Account approved', desc: 'Sent when admin approves a creator' },
+        { key: 'creator_denied', name: 'Account denied', desc: 'Sent when admin denies a creator' },
+        { key: 'creator_selected', name: 'Selected for campaign', desc: 'Sent when a creator is selected by admin' },
+        { key: 'creator_confirmed', name: 'Spot confirmed', desc: 'Sent when creator confirms — includes perk details and brand address' },
+        { key: 'creator_deadline_reminder', name: 'Deadline reminder', desc: 'Sent 48 hours before content deadline' },
+        { key: 'creator_content_received', name: 'Content received', desc: 'Sent when creator submits their Reel' },
+        { key: 'creator_campaign_complete', name: 'Campaign complete', desc: 'Sent when campaign is marked complete' },
+        { key: 'weekly_digest', name: 'Weekly digest', desc: 'Weekly roundup of new campaigns in their area' },
+      ],
+    },
+    {
+      label: 'Brand Emails',
+      items: [
+        { key: 'business_welcome', name: 'Welcome email', desc: 'Sent when a brand account is created' },
+        { key: 'business_approved', name: 'Account approved', desc: 'Sent when admin approves a brand' },
+        { key: 'business_campaign_live', name: 'Campaign live', desc: 'Sent when a campaign is published' },
+        { key: 'business_creator_confirmed', name: 'Creator confirmed', desc: 'Sent when a creator confirms — includes creator name and Instagram' },
+      ],
+    },
+    {
+      label: 'Admin Emails',
+      items: [
+        { key: 'admin_signup', name: 'New signup', desc: 'Notified when a new creator or brand signs up' },
+        { key: 'admin_approval_request', name: 'Approval request', desc: 'Notified when a creator needs approval' },
+        { key: 'admin_interest_expressed', name: 'Interest expressed', desc: 'Notified when a creator applies to a campaign' },
+        { key: 'admin_creator_confirmed', name: 'Creator confirmed', desc: 'Notified when a creator confirms their spot' },
+        { key: 'admin_content_submitted', name: 'Content submitted', desc: 'Notified when a creator submits a Reel' },
+        { key: 'feedback', name: 'Feedback received', desc: 'Notified when a user submits feedback' },
+      ],
+    },
+  ];
+
+  const [notifSettings, setNotifSettings] = useState<Record<string, boolean>>(() => {
+    try {
+      const stored = localStorage.getItem('nayba_notification_settings');
+      return stored ? JSON.parse(stored) : {};
+    } catch { return {}; }
+  });
+
+  const isNotifEnabled = (key: string) => notifSettings[key] !== false; // default on
+
+  const toggleNotif = (key: string) => {
+    const updated = { ...notifSettings, [key]: !isNotifEnabled(key) };
+    setNotifSettings(updated);
+    try { localStorage.setItem('nayba_notification_settings', JSON.stringify(updated)); } catch {}
+  };
+
   return (
     <div className="max-w-[520px]">
       {/* Change Password */}
@@ -112,6 +164,32 @@ export default function AdminSettingsTab() {
             <Toggle enabled={naybahoodEnabled} onToggle={() => toggleFlag('naybahood', !naybahoodEnabled, setNaybahoodEnabled)} />
           </div>
         </div>
+      </div>
+
+      {/* Notification Settings */}
+      <div className="bg-white rounded-[12px] p-6 mt-4">
+        <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Email Notifications</h2>
+        <p className="text-[13px] text-[var(--ink-50)] mb-5">Control which emails are sent across the platform</p>
+
+        {NOTIFICATION_GROUPS.map((group, gi) => (
+          <div key={group.label} className={gi > 0 ? 'mt-6' : ''}>
+            <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-3">{group.label}</p>
+            <div className="space-y-0">
+              {group.items.map((item, i) => (
+                <div key={item.key}>
+                  {i > 0 && <div className="border-t border-[rgba(42,32,24,0.06)]" />}
+                  <div className="flex items-center justify-between gap-4 py-3">
+                    <div className="min-w-0">
+                      <p className="text-[14px] font-medium text-[var(--ink)]">{item.name}</p>
+                      <p className="text-[12px] text-[var(--ink-50)] leading-[1.5]">{item.desc}</p>
+                    </div>
+                    <Toggle enabled={isNotifEnabled(item.key)} onToggle={() => toggleNotif(item.key)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
