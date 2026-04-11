@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import type { UserRole } from '../types/database';
 import { friendlyError } from '../lib/errors';
-import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X, Camera, Building2 } from 'lucide-react';
+import { Eye, EyeOff, ArrowLeft, ChevronLeft, ChevronRight, Mail, Store, Check, Cake, User, AtSign, Lock, X, Camera, Building2, Megaphone, Gift, Star, Film } from 'lucide-react';
 import { CATEGORY_LIST, CategoryIcon } from '../lib/categories';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
@@ -157,20 +157,25 @@ export default function Auth() {
             {/* Floating product cards — desktop only */}
             <div className="hidden md:block absolute inset-0 pointer-events-none">
               {[
-                { text: '🎟️ Free festival tickets just went live', sub: 'Suffolk Music Fest · 2 spots left', top: '6%', right: '4%', rotate: 3 },
-                { text: '☕ You redeemed a free coffee & pastry', sub: 'The Buttermarket Brew Co.', top: '52%', right: '2%', rotate: -3 },
-                { text: '💆‍♀️ Glow Wellness selected you', sub: 'Confirm your free facial', bottom: '12%', right: '10%', rotate: 4 },
-                { text: '🏋️ Reel submitted — nice work!', sub: 'Revamp Gym · Summer Challenge', top: '28%', left: '72%', rotate: -2 },
+                { icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: '#D95F3B', text: 'New campaign just went live', sub: 'Suffolk Music Fest · 2 spots left', top: '6%', right: '4%', rotate: 3 },
+                { icon: Gift, tint: 'rgba(122,148,120,0.12)', color: '#5A8A58', text: 'You redeemed a free coffee & pastry', sub: 'The Buttermarket Brew Co.', top: '52%', right: '2%', rotate: -3 },
+                { icon: Star, tint: 'rgba(140,122,170,0.12)', color: '#7A6A9A', text: 'Glow Wellness selected you', sub: 'Confirm your free facial', bottom: '12%', right: '10%', rotate: 4 },
+                { icon: Film, tint: 'rgba(122,160,184,0.12)', color: '#5A8AA8', text: 'Reel submitted — nice work!', sub: 'Revamp Gym · Summer Challenge', top: '28%', left: '72%', rotate: -2 },
               ].map((card, i) => (
-                <div key={i} className="absolute rounded-[12px] px-3.5 py-3 bg-white" style={{
-                  width: 220,
+                <div key={i} className="absolute rounded-[12px] px-3.5 py-3 bg-white flex items-start gap-2.5" style={{
+                  width: 230,
                   top: card.top, right: card.right, bottom: card.bottom, left: card.left,
                   transform: `rotate(${card.rotate}deg)`,
                   opacity: 0.55,
                   boxShadow: '0 2px 12px rgba(42,32,24,0.08)',
                 }}>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 600, color: '#2A2018', margin: 0, lineHeight: 1.4 }}>{card.text}</p>
-                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, color: '#7A7168', margin: '4px 0 0', lineHeight: 1.3 }}>{card.sub}</p>
+                  <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: card.tint }}>
+                    <card.icon size={15} style={{ color: card.color }} />
+                  </div>
+                  <div style={{ minWidth: 0 }}>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 600, color: '#2A2018', margin: 0, lineHeight: 1.4 }}>{card.text}</p>
+                    <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, color: '#7A7168', margin: '3px 0 0', lineHeight: 1.3 }}>{card.sub}</p>
+                  </div>
                 </div>
               ))}
             </div>
