@@ -650,13 +650,13 @@ Deno.serve(async (req: Request) => {
         email = adminApprovalRequestEmail(meta);
         break;
       case 'admin_interest_expressed':
-        email = { subject: `${meta.creator_name} interested in ${meta.brand_name}`, html: wrapEmail(`${heading('New Interest')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> expressed interest in <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
+        email = { subject: `${meta.creator_name} interested in ${meta.brand_name}`, html: wrapEmail(`${heading('New Interest')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> expressed interest in <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
         break;
       case 'admin_creator_confirmed':
-        email = { subject: `${meta.creator_name} confirmed for ${meta.brand_name}`, html: wrapEmail(`${heading('Creator Confirmed')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> confirmed their spot for <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
+        email = { subject: `${meta.creator_name} confirmed for ${meta.brand_name}`, html: wrapEmail(`${heading('Creator Confirmed')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> confirmed their spot for <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
         break;
       case 'admin_content_submitted':
-        email = { subject: `${meta.creator_name} submitted a Reel for ${meta.brand_name}`, html: wrapEmail(`${heading('Reel Submitted')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> submitted a Reel for <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}}${meta.reel_url ? `${p(`<a href="${meta.reel_url}" style="color:${TERRA};font-weight:600;">View Reel →</a>`)}` : ''}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
+        email = { subject: `${meta.creator_name} submitted a Reel for ${meta.brand_name}`, html: wrapEmail(`${heading('Reel Submitted')}${p(`<strong>${escapeHtml(meta.creator_name || '')}</strong> submitted a Reel for <strong>${escapeHtml(meta.brand_name || '')}</strong>'s campaign: ${escapeHtml(meta.campaign_title || '')}`)}${meta.reel_url ? p(`<a href="${meta.reel_url}" style="color:${TERRA};font-weight:600;">View Reel →</a>`) : ''}${btn('View in Dashboard', APP_URL, INK)}`, INK) };
         break;
       case 'feedback':
         email = feedbackEmail(meta);

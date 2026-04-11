@@ -46,6 +46,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
   const [creatorId, setCreatorId] = useState<string | null>(null);
+  const [creatorName, setCreatorName] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
@@ -71,11 +72,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     if (user?.email) {
       const { data: creatorData } = await supabase
         .from('creators')
-        .select('id')
+        .select('id, display_name, instagram_handle')
         .eq('email', user.email)
         .single();
       if (creatorData) {
         setCreatorId(creatorData.id);
+        setCreatorName(creatorData.display_name || creatorData.instagram_handle || user.email?.split('@')[0] || 'A creator');
         // Check if creator already applied
         const { data: appData } = await supabase
           .from('applications')
@@ -107,7 +109,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     if (data) setApplication(data as Application);
     // Notify admin
     sendAdminInterestExpressedEmail({
-      creator_name: user?.email?.split('@')[0] || 'A creator',
+      creator_name: creatorName,
       campaign_title: campaign.title,
       brand_name: campaign.businesses?.name || '',
     }).catch(() => {});
@@ -145,7 +147,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       });
       // Notify admin
       sendAdminCreatorConfirmedEmail({
-        creator_name: user?.email?.split('@')[0] || 'A creator',
+        creator_name: creatorName,
         campaign_title: campaign.title,
         brand_name: campaign.businesses.name,
       }).catch(() => {});
