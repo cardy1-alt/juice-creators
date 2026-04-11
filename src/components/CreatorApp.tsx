@@ -434,20 +434,20 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 )}
                 {!perkText && <div className="mb-3" />}
                 {/* Stepper */}
-                <div className="flex items-center gap-0 mb-3">
-                  {todos.map((t, i) => {
-                    const isLast = i === todos.length - 1;
-                    const isCurrent = !t.done && (i === 0 || todos[i - 1].done);
-                    return (
-                      <div key={i} className="flex items-center" style={{ flex: isLast ? '0 0 auto' : '1 1 0' }}>
-                        <div className="flex flex-col items-center">
-                          <div className={`w-3.5 h-3.5 rounded-full flex-shrink-0 ${t.done ? 'bg-[var(--status-active-text)]' : isCurrent ? 'bg-[var(--terra)]' : 'bg-[rgba(42,32,24,0.12)]'}`} />
-                          <span className={`text-[10px] font-medium mt-1 text-center whitespace-nowrap ${t.done ? 'text-[var(--status-active-text)]' : isCurrent ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{t.label.length > 12 ? t.label.slice(0, 12) + '…' : t.label}</span>
-                        </div>
-                        {!isLast && <div className={`flex-1 h-[1px] mx-1 mt-[-14px] ${todos[i + 1]?.done || (isCurrent && t.done) ? 'bg-[var(--status-active-text)]' : 'bg-[rgba(42,32,24,0.10)]'}`} />}
-                      </div>
-                    );
-                  })}
+                {/* Progress bar + current step */}
+                <div className="mb-3">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[12px] font-medium text-[var(--terra)]">
+                      {todos.find((t, i) => !t.done && (i === 0 || todos[i-1].done))?.label || 'Complete'}
+                    </span>
+                    <span className="text-[12px] text-[var(--ink-35)]">
+                      {todos.filter(t => t.done).length}/{todos.length}
+                    </span>
+                  </div>
+                  <div className="h-1.5 bg-[rgba(42,32,24,0.08)] rounded-full overflow-hidden">
+                    <div className="h-full bg-[var(--terra)] rounded-full transition-all duration-500"
+                      style={{ width: `${(todos.filter(t => t.done).length / todos.length) * 100}%` }} />
+                  </div>
                 </div>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
@@ -523,7 +523,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             {reelUrlError && <p className="text-[13px] text-[var(--destructive)] mb-3">{reelUrlError}</p>}
             {!reelUrlError && <div className="mb-3" />}
             <button onClick={handleSubmitReel} disabled={!reelUrl || submittingReel}
-              className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+              className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
               {submittingReel ? 'Sharing...' : 'Share Reel'}
             </button>
           </div>
@@ -904,7 +904,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           </div>
         </div>
         <button onClick={handleSaveProfile} disabled={saving}
-          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="mt-4 inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           <Save size={15} /> {saving ? 'Saving...' : 'Save changes'}
         </button>
       </div>
@@ -943,7 +943,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
               <button onClick={() => { setShowPasswordChange(false); setPasswordError(''); }}
                 className="px-4 py-2 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={handleChangePassword} disabled={passwordSaving}
-                className="px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+                className="px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] disabled:opacity-50 min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
                 {passwordSaving ? 'Updating...' : 'Update password'}
               </button>
             </div>

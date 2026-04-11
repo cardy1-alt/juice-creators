@@ -67,13 +67,6 @@ export default function Auth() {
   const [name, setName] = useState('');
   const [instagramHandle, setInstagramHandle] = useState('');
   const [followerCount, setFollowerCount] = useState('Under 1k');
-  const [dobDay, setDobDay] = useState('');
-  const [dobMonth, setDobMonth] = useState('');
-  const [dobYear, setDobYear] = useState('');
-  const dateOfBirth = dobDay && dobMonth && dobYear
-    ? `${dobYear}-${dobMonth.padStart(2, '0')}-${dobDay.padStart(2, '0')}`
-    : '';
-  const [gender, setGender] = useState('');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
@@ -128,7 +121,7 @@ export default function Auth() {
       if (mode === 'signin') {
         await signIn(email, password);
       } else {
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), dateOfBirth: dateOfBirth || null, gender: gender || null, address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
