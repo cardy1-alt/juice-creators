@@ -44,9 +44,9 @@ export default function ImageUpload({ value, onChange, folder, label, shape = 's
   const isCircle = shape === 'circle';
 
   return (
-    <div>
+    <div className={isCircle ? 'flex flex-col items-center' : ''}>
       {label && (
-        <p className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">{label}</p>
+        <p className={`block text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-1.5 ${isCircle ? 'text-center' : ''}`}>{label}</p>
       )}
       <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
 
@@ -88,7 +88,7 @@ export default function ImageUpload({ value, onChange, folder, label, shape = 's
           ) : (
             <>
               <Upload size={18} className="text-[var(--ink-35)] mb-1" />
-              <span className="text-[12px] text-[var(--ink-35)]">{isCircle ? 'Logo' : 'Upload image'}</span>
+              <span className="text-[11px] text-[var(--ink-35)]">{isCircle ? 'Photo' : 'Upload image'}</span>
             </>
           )}
         </button>
