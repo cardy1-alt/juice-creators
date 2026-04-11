@@ -643,6 +643,25 @@ Deno.serve(async (req: Request) => {
       case 'business_denied':
         email = businessDeniedEmail(recipientName);
         break;
+      case 'business_campaign_live':
+        email = {
+          subject: `Your campaign is live — ${meta.campaign_title}`,
+          html: wrapEmail(`
+            ${heading('Your Campaign is Live!')}
+            ${subtext(`Great news, ${escapeHtml(recipientName)}. Your campaign is now visible to creators in your area.`)}
+            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
+              <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              ${meta.headline ? `<p style="margin:0 0 12px;font-size:14px;color:${INK_60};">${escapeHtml(meta.headline)}</p>` : ''}
+              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || 'Not specified')}</p>
+              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Looking for: ${escapeHtml(meta.creator_target || '5')} creators</p>
+              ${meta.expression_deadline ? `<p style="margin:0;font-size:13px;color:${INK_60};">Apply by: ${escapeHtml(meta.expression_deadline)}</p>` : ''}
+            </div>
+            ${p('Creators can now express interest. We\'ll handle the selection process and keep you updated as things progress.')}
+            ${p('Log in anytime to see how your campaign is doing.')}
+            ${btn('View Campaign', APP_URL)}
+          `),
+        };
+        break;
       case 'admin_signup':
         email = adminSignupEmail(meta);
         break;

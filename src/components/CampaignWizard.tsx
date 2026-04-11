@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { sendBusinessCampaignLiveEmail } from '../lib/notifications';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 
@@ -40,6 +41,7 @@ export default function CampaignWizard({ brands, fixedBrandId, onSave, onClose }
   const [brandId, setBrandId] = useState(fixedBrandId || '');
   const [perk, setPerk] = useState('');
   const [instructions, setInstructions] = useState('');
+  const [mode, setMode] = useState<'ai' | 'manual'>('ai');
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -149,6 +151,16 @@ Return only valid JSON, no markdown, no code fences.`,
     const { error } = await supabase.from('campaigns').insert(payload);
     setSaving(false);
     if (error) { setSaveError('Failed to save: ' + error.message); return; }
+    // Send campaign live email to brand when publishing
+    if (status === 'active' && brandId) {
+      sendBusinessCampaignLiveEmail(brandId, {
+        campaign_title: gen.title,
+        headline: gen.headline || '',
+        perk_description: perk || '',
+        creator_target: parseInt(gen.creator_target) || 5,
+        expression_deadline: gen.expression_deadline || '',
+      }).catch(() => {});
+    }
     onSave();
   };
 
@@ -163,7 +175,7 @@ Return only valid JSON, no markdown, no code fences.`,
             <h2 className="text-[20px] font-semibold text-[var(--ink)]">
               {step === 1 ? 'New Campaign' : gen.title || 'Campaign Preview'}
             </h2>
-            {step === 1 && <p className="text-[13px] text-[var(--ink-50)] mt-0.5">AI will generate the full brief from a few inputs</p>}
+            {step === 1 && <p className="text-[13px] text-[var(--ink-50)] mt-0.5">{mode === 'ai' ? 'AI will generate the full brief from a few inputs' : 'Fill in campaign details manually'}</p>}
           </div>
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
@@ -181,9 +193,23 @@ Return only valid JSON, no markdown, no code fences.`,
             </div>
           )}
 
-          {/* ─── STEP 1: Quick inputs ─── */}
+          {/* ─── STEP 1 ─── */}
           {step === 1 && (
             <div className="space-y-4">
+              {/* Mode toggle */}
+              <div className="flex gap-1 p-1 rounded-[10px] bg-[rgba(42,32,24,0.04)]">
+                <button type="button" onClick={() => setMode('ai')}
+                  className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'ai' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
+                  style={mode === 'ai' ? { boxShadow: '0 1px 3px rgba(42,32,24,0.08)' } : undefined}>
+                  ✦ AI Assist
+                </button>
+                <button type="button" onClick={() => setMode('manual')}
+                  className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'manual' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
+                  style={mode === 'manual' ? { boxShadow: '0 1px 3px rgba(42,32,24,0.08)' } : undefined}>
+                  Create manually
+                </button>
+              </div>
+
               {!fixedBrandId && (
                 <div>
                   <label className={labelCls}>Brand *</label>
@@ -193,20 +219,62 @@ Return only valid JSON, no markdown, no code fences.`,
                   </select>
                 </div>
               )}
-              <div>
-                <label className={labelCls}>What's the perk? *</label>
-                <textarea value={perk} onChange={e => setPerk(e.target.value)}
-                  className={`${inputCls} min-h-[72px] resize-y`}
-                  placeholder="e.g. Free week pass including unlimited classes + 1 PT session worth £45" />
-              </div>
-              <div>
-                <label className={labelCls}>Any specific instructions? <span className="text-[var(--ink-35)]">(optional)</span></label>
-                <textarea value={instructions} onChange={e => setInstructions(e.target.value)}
-                  className={`${inputCls} min-h-[60px] resize-y`}
-                  placeholder="e.g. Film a Reel showing the gym, mention the free pass, tag @revampgym" />
-              </div>
 
-              {aiError && <p className="text-[13px] text-[var(--terra)]">{aiError}</p>}
+              {mode === 'ai' ? (
+                <>
+                  <div>
+                    <label className={labelCls}>What's the perk? *</label>
+                    <textarea value={perk} onChange={e => setPerk(e.target.value)}
+                      className={`${inputCls} min-h-[72px] resize-y`}
+                      placeholder="e.g. Free week pass including unlimited classes + 1 PT session worth £45" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Any specific instructions? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                    <textarea value={instructions} onChange={e => setInstructions(e.target.value)}
+                      className={`${inputCls} min-h-[60px] resize-y`}
+                      placeholder="e.g. Film a Reel showing the gym, mention the free pass, tag @revampgym" />
+                  </div>
+                  {aiError && <p className="text-[13px] text-[var(--terra)]">{aiError}</p>}
+                </>
+              ) : (
+                <>
+                  <div>
+                    <label className={labelCls}>Title *</label>
+                    <input value={gen.title} onChange={e => setG('title', e.target.value)} className={inputCls} placeholder="Campaign title" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Headline</label>
+                    <input value={gen.headline} onChange={e => setG('headline', e.target.value)} className={inputCls} placeholder="Short punchy description" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Perk Description *</label>
+                    <textarea value={perk} onChange={e => setPerk(e.target.value)}
+                      className={`${inputCls} min-h-[72px] resize-y`}
+                      placeholder="What the creator receives" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={gen.perk_value} onChange={e => setG('perk_value', e.target.value)} className={inputCls} /></div>
+                    <div><label className={labelCls}>Creator Target</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className={labelCls}>Target City</label><input value={gen.target_city} onChange={e => setG('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
+                    <div><label className={labelCls}>County</label>
+                      <select value={gen.target_county} onChange={e => setG('target_county', e.target.value)} className={inputCls}>
+                        <option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className={labelCls}>About the Brand</label>
+                    <textarea value={gen.about_brand} onChange={e => setG('about_brand', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder="2-3 sentences about the brand" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Content Requirements</label>
+                    <textarea value={gen.content_requirements} onChange={e => setG('content_requirements', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder="What should the Reel include?" />
+                  </div>
+                  <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="Campaign Image" />
+                </>
+              )}
             </div>
           )}
 
@@ -278,11 +346,18 @@ Return only valid JSON, no markdown, no code fences.`,
           {step === 1 ? (
             <>
               <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">Cancel</button>
-              <button onClick={handleGenerate} disabled={aiLoading || !brandId || !perk}
-                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
-                {aiLoading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <span>✦</span>}
-                <span>{aiLoading ? 'Generating...' : 'Generate campaign'}</span>
-              </button>
+              {mode === 'ai' ? (
+                <button onClick={handleGenerate} disabled={aiLoading || !brandId || !perk}
+                  className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
+                  {aiLoading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <span>✦</span>}
+                  <span>{aiLoading ? 'Generating...' : 'Generate campaign'}</span>
+                </button>
+              ) : (
+                <button onClick={() => setStep(2)} disabled={!brandId || !gen.title || !perk}
+                  className="px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
+                  Next →
+                </button>
+              )}
             </>
           ) : (
             <>

@@ -99,6 +99,28 @@ export async function sendBusinessDeniedEmail(businessId: string): Promise<void>
   });
 }
 
+export async function sendBusinessCampaignLiveEmail(businessId: string, meta: {
+  campaign_title: string;
+  headline: string;
+  perk_description: string;
+  creator_target: number;
+  expression_deadline: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: businessId,
+    userType: 'business',
+    message: `Your campaign "${meta.campaign_title}" is now live!`,
+    emailType: 'business_campaign_live',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      headline: meta.headline,
+      perk_description: meta.perk_description,
+      creator_target: meta.creator_target.toString(),
+      expression_deadline: meta.expression_deadline,
+    },
+  });
+}
+
 export async function sendAdminApprovalRequest(params: {
   userType: 'creator' | 'business';
   userId: string;
