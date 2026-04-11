@@ -5,6 +5,7 @@ import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import ImageUpload from '../ImageUpload';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
@@ -34,7 +35,7 @@ function fmtDate(d: string) {
 // ─── Create Creator Modal ───
 function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => void; onCreated: () => void; showToast: (msg: string) => void }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1', followers: '' });
+  const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1', followers: '', avatar_url: '' });
   const [creating, setCreating] = useState(false);
   const [created, setCreated] = useState(false);
   const [error, setError] = useState('');
@@ -70,6 +71,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
       address: form.city || null, level,
       level_name: LEVEL_NAMES[level] || 'Newcomer',
       follower_count: form.followers || null,
+      avatar_url: form.avatar_url || null,
       approved: true, onboarding_complete: true, profile_complete: true,
     });
     if (insertErr) { setError('Account created but profile save failed — ' + insertErr.message); setCreating(false); return; }
@@ -112,6 +114,9 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 </div>
               )}
               <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="md:col-span-2 flex justify-center">
+                  <ImageUpload value={form.avatar_url} onChange={url => setForm(p => ({ ...p, avatar_url: url }))} folder="logos" label="Profile Photo" shape="circle" />
+                </div>
                 <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => { setForm(p => ({ ...p, displayName: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
