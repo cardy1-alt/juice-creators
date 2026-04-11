@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
+import { getCategoryPalette } from '../../lib/categories';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
@@ -18,7 +19,7 @@ interface Campaign {
   creator_target: number; open_date: string | null; expression_deadline: string | null;
   content_deadline: string | null; campaign_type: 'brand' | 'community'; campaign_image: string | null;
   status: string; min_level: number; required_tags: string[] | null; created_at: string;
-  businesses?: { name: string };
+  businesses?: { name: string; category?: string };
 }
 interface Application {
   id: string; campaign_id: string; creator_id: string; pitch: string | null;
@@ -177,7 +178,6 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       target_city: form.target_city || null, target_county: form.target_county || null,
       creator_target: creatorTarget, min_level: parseInt(form.min_level as any) || 1,
       content_requirements: form.content_requirements || null,
-      required_tags: form.required_tags ? form.required_tags.split(',').map((t: string) => t.trim()).filter(Boolean) : null,
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
       deliverables: { reel: form.reel, story: form.story },
@@ -186,8 +186,11 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       open_date: form.open_date ? new Date(form.open_date).toISOString() : null,
       expression_deadline: form.expression_deadline ? new Date(form.expression_deadline).toISOString() : null,
       content_deadline: form.content_deadline ? new Date(form.content_deadline).toISOString() : null,
-      status: asStatus,
     };
+    // When editing, preserve the existing status; when creating, use the chosen status
+    if (!campaign) {
+      payload.status = asStatus;
+    }
     const { error } = campaign
       ? await supabase.from('campaigns').update(payload).eq('id', campaign.id)
       : await supabase.from('campaigns').insert(payload);
@@ -806,7 +809,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
   const fetchCampaigns = async () => {
     const [campRes, brandRes] = await Promise.all([
-      supabase.from('campaigns').select('*, businesses(name)').order('created_at', { ascending: false }),
+      supabase.from('campaigns').select('*, businesses(name, category)').order('created_at', { ascending: false }),
       supabase.from('businesses').select('id, name').eq('approved', true).order('name'),
     ]);
     if (campRes.data) {
@@ -1100,11 +1103,16 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       {c.campaign_image ? (
                         <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                       ) : (
-                        <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--stone)]">
-                          <Megaphone size={32} className="text-[var(--ink-15)]" />
-                        </div>
+                        {(() => {
+                          const palette = getCategoryPalette(c.businesses?.category);
+                          return (
+                            <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: palette.tint }}>
+                              <Megaphone size={32} style={{ color: palette.color, opacity: 0.5 }} />
+                            </div>
+                          );
+                        })()}
                       )}
-                      <span className="absolute top-2 right-2"><StatusBadge status={c.status} /></span>
+                      <span className="absolute top-2 right-2 bg-white rounded-[999px] shadow-sm"><StatusBadge status={c.status} /></span>
                     </div>
                   </div>
                   <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
