@@ -95,8 +95,8 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between" style={{ padding: collapsed ? '20px 12px 16px' : '20px 20px 16px' }}>
           {collapsed ? (
             <button onClick={() => setCollapsed(false)} title="Expand sidebar"
-              className="flex justify-center w-full text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors">
-              <PanelLeftOpen size={18} />
+              className="flex justify-center w-full hover:opacity-70 transition-opacity">
+              <Logo size={22} variant="icon" />
             </button>
           ) : (
             <>
@@ -129,7 +129,7 @@ export default function AdminDashboard() {
                     key={item.key}
                     onClick={() => handleTabClick(item.key)}
                     title={collapsed ? item.label : undefined}
-                    className={`w-full flex items-center rounded-[12px] mb-1 text-[14px] transition-colors ${collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2.5'}`}
+                    className={`w-full flex items-center rounded-[12px] mb-1 text-[14px] transition-colors relative ${collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2.5'}`}
                     style={{
                       fontWeight: active ? 700 : 500,
                       background: active ? 'var(--terra-10)' : 'transparent',
