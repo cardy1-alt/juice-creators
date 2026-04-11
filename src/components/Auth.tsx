@@ -166,7 +166,7 @@ export default function Auth() {
                   width: 230,
                   top: card.top, right: card.right, bottom: card.bottom, left: card.left,
                   transform: `rotate(${card.rotate}deg)`,
-                  opacity: 0.55,
+                  opacity: 0.85,
                   boxShadow: '0 2px 12px rgba(42,32,24,0.08)',
                 }}>
                   <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: card.tint }}>
