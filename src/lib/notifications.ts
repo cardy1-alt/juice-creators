@@ -166,6 +166,7 @@ export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
   campaign_title: string;
   brand_name: string;
   perk_description: string;
+  brand_address?: string;
 }): Promise<void> {
   await insertNotification({
     userId: creatorId,
@@ -175,6 +176,27 @@ export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
     emailMeta: {
       campaign_title: meta.campaign_title,
       brand_name: meta.brand_name,
+      perk_description: meta.perk_description,
+      brand_address: meta.brand_address || '',
+    },
+  });
+}
+
+export async function sendBusinessCreatorConfirmedEmail(businessId: string, meta: {
+  creator_name: string;
+  creator_instagram: string;
+  campaign_title: string;
+  perk_description: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: businessId,
+    userType: 'business',
+    message: `${meta.creator_name} is confirmed for your campaign — they'll visit soon`,
+    emailType: 'business_creator_confirmed',
+    emailMeta: {
+      creator_name: meta.creator_name,
+      creator_instagram: meta.creator_instagram,
+      campaign_title: meta.campaign_title,
       perk_description: meta.perk_description,
     },
   });

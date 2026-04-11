@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { sendCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
+import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
 import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
@@ -47,6 +47,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [application, setApplication] = useState<Application | null>(null);
   const [creatorId, setCreatorId] = useState<string | null>(null);
   const [creatorName, setCreatorName] = useState<string>('');
+  const [creatorInstagram, setCreatorInstagram] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
@@ -78,6 +79,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       if (creatorData) {
         setCreatorId(creatorData.id);
         setCreatorName(creatorData.display_name || creatorData.instagram_handle || user.email?.split('@')[0] || 'A creator');
+        setCreatorInstagram(creatorData.instagram_handle || '');
         // Check if creator already applied
         const { data: appData } = await supabase
           .from('applications')
@@ -132,17 +134,27 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     }
     // Optimistically update
     setApplication({ ...application, status: 'confirmed' });
-    // Create participation
+    // Create participation — perk is ready immediately
     await supabase.from('participations').insert({
       application_id: application.id,
       campaign_id: campaign.id,
       creator_id: creatorId,
+      perk_sent: true,
+      perk_sent_at: new Date().toISOString(),
     });
-    // Send confirmation email
+    // Send confirmation email to creator (with brand address for visit)
     if (campaign.businesses?.name) {
       sendCreatorConfirmedEmail(creatorId, {
         campaign_title: campaign.title,
         brand_name: campaign.businesses.name,
+        perk_description: campaign.perk_description || '',
+        brand_address: campaign.businesses.address || '',
+      });
+      // Notify brand — creator is coming
+      sendBusinessCreatorConfirmedEmail(campaign.brand_id, {
+        creator_name: creatorName,
+        creator_instagram: creatorInstagram,
+        campaign_title: campaign.title,
         perk_description: campaign.perk_description || '',
       });
       // Notify admin

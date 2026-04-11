@@ -662,6 +662,41 @@ Deno.serve(async (req: Request) => {
           `),
         };
         break;
+      case 'creator_confirmed':
+        email = {
+          subject: `You're confirmed for ${meta.brand_name} — here's what happens next`,
+          html: wrapEmail(`
+            ${heading("You're In!")}
+            ${subtext(`Nice one, ${escapeHtml(recipientName)}. You're confirmed for ${escapeHtml(meta.brand_name || '')}'s campaign.`)}
+            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
+              <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
+              ${meta.brand_address ? `<p style="margin:0;font-size:13px;color:${INK_60};">📍 ${escapeHtml(meta.brand_address)}</p>` : ''}
+            </div>
+            ${p('Your perk is ready — visit the brand whenever suits you. When you arrive, just mention you\'re with Nayba or show your Instagram.')}
+            ${p('After your visit, film a short Reel sharing your experience and submit the link in the app.')}
+            ${btn('View Campaign', APP_URL)}
+          `),
+        };
+        break;
+      case 'business_creator_confirmed':
+        email = {
+          subject: `${meta.creator_name} is confirmed for your campaign`,
+          html: wrapEmail(`
+            ${heading('Creator Confirmed')}
+            ${subtext(`A creator has confirmed their spot on your campaign and will visit soon.`)}
+            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
+              <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.creator_name || '')}</p>
+              ${meta.creator_instagram ? `<p style="margin:0 0 12px;font-size:14px;color:${TERRA};font-weight:500;">@${escapeHtml(meta.creator_instagram.replace('@', ''))}</p>` : ''}
+              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Campaign: ${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="margin:0;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
+            </div>
+            ${p('They\'ll visit your venue to redeem their perk and create content. They may show their Instagram profile or mention Nayba when they arrive.')}
+            ${p('You don\'t need to do anything — just welcome them when they visit.')}
+            ${btn('View in Dashboard', APP_URL)}
+          `),
+        };
+        break;
       case 'admin_signup':
         email = adminSignupEmail(meta);
         break;
