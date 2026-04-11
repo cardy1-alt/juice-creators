@@ -81,7 +81,7 @@ export default function AdminDashboard() {
     <div className="flex min-h-screen" style={{ background: 'var(--chalk)' }}>
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-40 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-40 md:hidden animate-overlay" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ─── Sidebar ─── */}
@@ -205,8 +205,8 @@ export default function AdminDashboard() {
 
       {/* Sign-out confirmation modal */}
       {showSignOutModal && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
-          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center animate-slide-up">
             <h3 className="nayba-h3">Sign out?</h3>
             <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">You'll need to sign in again to access your account.</p>
             <div className="flex gap-3">

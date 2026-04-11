@@ -98,8 +98,8 @@ function BrandInfoModal({ brand, onClose }: {
 }) {
   const handle = brand.instagram_handle?.replace('@', '') || '';
   return (
-    <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4 animate-overlay" onClick={onClose}>
+      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 animate-slide-up" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             {brand.logo_url ? (
@@ -510,8 +510,8 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
       {/* Reel submission modal */}
       {showReelModal && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
-          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[12px] p-6" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center animate-overlay" onClick={() => { setShowReelModal(null); setReelUrl(''); setReelUrlError(''); }}>
+          <div className="bg-white w-full max-w-[480px] rounded-t-[16px] sm:rounded-[12px] p-6 animate-slide-up" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="nayba-h3 text-[var(--ink)]">Share your experience</h3>
               <button onClick={() => { setShowReelModal(null); setReelUrl(''); }} className="text-[var(--ink-35)]"><X size={20} /></button>
@@ -572,8 +572,8 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
         {/* Celebration overlay */}
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
-          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-8 text-center relative overflow-hidden">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4 animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-8 text-center relative overflow-hidden animate-slide-up">
             {/* Confetti-like decorative dots */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
               {[...Array(20)].map((_, i) => (
@@ -609,7 +609,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   }
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
       <div className="bg-white rounded-[12px] p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
@@ -634,7 +634,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-6">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-6 animate-fade-in">
 
       {/* Avatar + identity hero */}
       <div className="flex flex-col items-center mb-6">
@@ -987,7 +987,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   ];
 
   return (
-    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
+    <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
       <div className="bg-white rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         {items.map((item, i) => (
@@ -1007,8 +1007,8 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </button>
 
       {showSignOutConfirm && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4">
-          <div className="bg-white rounded-[12px] p-6 max-w-sm w-full text-center">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4 animate-overlay">
+          <div className="bg-white rounded-[12px] p-6 max-w-sm w-full text-center animate-slide-up">
             <p className="nayba-h3 text-[var(--ink)] mb-2">Sign out?</p>
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
@@ -1034,8 +1034,8 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
   ];
 
   return (
-    <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4">
-      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 text-center" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
+    <div className="fixed inset-0 bg-[rgba(42,32,24,0.50)] z-[60] flex items-center justify-center px-4 animate-overlay">
+      <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 text-center animate-slide-up" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
         <Logo size={28} variant="wordmark" />
         <h2 className="nayba-h2 text-[var(--ink)] mt-4 mb-1">How it works</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-5">Four simple steps — no follower minimums, ever</p>
@@ -1232,9 +1232,9 @@ export default function CreatorApp() {
       {/* ─── Campaign detail — centered modal (desktop) ─── */}
       {viewingCampaign && !isMobile && tab === 'discover' && (
         <>
-          <div className="hidden md:block fixed inset-0 bg-[rgba(42,32,24,0.25)] z-30" onClick={() => closeCampaignDetail()} />
+          <div className="hidden md:block fixed inset-0 bg-[rgba(42,32,24,0.25)] z-30 animate-overlay" onClick={() => closeCampaignDetail()} />
           <div className="hidden md:flex fixed inset-0 z-40 items-center justify-center pointer-events-none">
-            <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto"
+            <div className="pointer-events-auto bg-white rounded-[12px] w-full max-w-[680px] max-h-[90vh] overflow-y-auto animate-slide-up"
               style={{ margin: '0 24px', scrollbarWidth: 'none', border: '1px solid rgba(42,32,24,0.10)', boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }}>
               <CampaignDetail campaignId={viewingCampaign} onBack={() => closeCampaignDetail()} />
             </div>

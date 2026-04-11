@@ -324,14 +324,14 @@ export default function BusinessPortal() {
 
         {/* ─── Dashboard page ─── */}
         {activeTab === 'dashboard' && (
-          <div>
+          <div className="animate-fade-in">
             <div className="mb-6">
               <h1 className="text-[28px] text-[var(--ink)] mb-1" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15 }}>Hey {brand.name}</h1>
               <p className="text-[14px] text-[var(--ink)]">{campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''}</p>
             </div>
 
             {/* Aggregate stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-stagger">
               {[
                 { label: 'Campaigns', value: campaigns.filter(c => c.status === 'active' || c.status === 'live').length, icon: Megaphone, tint: 'rgba(217,95,59,0.08)', color: 'var(--terra)' },
                 { label: 'Creators', value: campaigns.reduce((s, c) => s + c.creator_target, 0), icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
@@ -399,7 +399,7 @@ export default function BusinessPortal() {
             .filter(c => campaignFilter === 'all' || c.status === campaignFilter || (campaignFilter === 'active' && (c.status === 'active' || c.status === 'live' || c.status === 'selecting')))
             .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()));
           return (
-          <div>
+          <div className="animate-fade-in">
             <div className="flex items-center justify-between mb-5">
               <h1 className="text-[20px] font-semibold text-[var(--ink)]">Campaigns</h1>
               <button onClick={() => setShowCampaignWizard(true)}
@@ -523,7 +523,7 @@ export default function BusinessPortal() {
             )}
 
             {/* Stats row — 4 cards for even 2x2 on mobile */}
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-stagger">
               {[
                 { label: 'Applicants', value: applications.length, icon: Users, tint: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
                 { label: 'Selected', value: selectedCount, icon: Check, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
@@ -574,8 +574,8 @@ export default function BusinessPortal() {
 
             {/* Campaign preview modal */}
             {showPreview && (
-              <div className="fixed inset-0 z-50 bg-white overflow-y-auto md:bg-[rgba(42,32,24,0.40)] md:flex md:items-center md:justify-center md:p-8">
-                <div className="md:bg-white md:rounded-[12px] md:max-w-[680px] md:w-full md:max-h-[90vh] md:overflow-y-auto relative" style={{ scrollbarWidth: 'none' as any }}>
+              <div className="fixed inset-0 z-50 bg-white overflow-y-auto md:bg-[rgba(42,32,24,0.40)] md:flex md:items-center md:justify-center md:p-8 animate-overlay">
+                <div className="md:bg-white md:rounded-[12px] md:max-w-[680px] md:w-full md:max-h-[90vh] md:overflow-y-auto relative animate-slide-up" style={{ scrollbarWidth: 'none' as any }}>
                   <button onClick={() => setShowPreview(false)}
                     className="sticky top-3 right-3 float-right z-10 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white mr-3 mt-3"
                     style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
@@ -935,8 +935,8 @@ export default function BusinessPortal() {
           const handle = p.creators?.instagram_handle?.replace('@', '') || '';
           return (
             <>
-              <div className="fixed inset-0 z-40" onClick={() => setPeekCreator(null)} />
-              <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[360px] bg-white flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
+              <div className="fixed inset-0 z-40 animate-overlay" onClick={() => setPeekCreator(null)} />
+              <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[360px] bg-white flex flex-col animate-slide-in-right" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
                 <div className="flex items-center justify-between px-5 py-4" style={{ borderBottom: '1px solid rgba(42,32,24,0.06)' }}>
                   <p className="text-[16px] font-semibold text-[var(--ink)]">{name}</p>
                   <button onClick={() => setPeekCreator(null)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={18} /></button>
@@ -1082,8 +1082,8 @@ export default function BusinessPortal() {
 
       {/* Sign-out confirmation modal */}
       {showSignOutModal && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
-          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center animate-slide-up">
             <h3 className="nayba-h3">Sign out?</h3>
             <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
