@@ -336,7 +336,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </button>
       )}
 
-      {/* Approval modal */}
+      {/* Approval peek panel */}
       {showApprovalModal && (() => {
         const filtered = pendingCreators.filter(c => {
           if (!approvalSearch) return true;
@@ -347,46 +347,28 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
             || (c.address || '').toLowerCase().includes(q);
         });
         return (
-        <div className="fixed inset-0 z-[60] flex items-center justify-center">
-          <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={() => { setShowApprovalModal(false); setSelectedPending(new Set()); }} />
-          <div className="relative bg-white rounded-[12px] w-full max-w-[560px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '80vh' }}>
+        <>
+          <div className="fixed inset-0 z-40" onClick={() => { setShowApprovalModal(false); setSelectedPending(new Set()); }} />
+          <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
               <div>
-                <h2 className="text-[20px] font-semibold text-[var(--ink)]">Pending Approval</h2>
+                <h2 className="text-[18px] font-semibold text-[var(--ink)]">Pending Approval</h2>
                 <p className="text-[13px] text-[var(--ink-50)] mt-0.5">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} waiting</p>
               </div>
               <button onClick={() => { setShowApprovalModal(false); setSelectedPending(new Set()); }}
-                className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]">
-                <X size={15} />
+                className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0">
+                <X size={16} />
               </button>
             </div>
 
-            {/* Search + bulk actions */}
-            <div className="px-5 py-3 border-b border-[rgba(42,32,24,0.06)] flex-shrink-0">
-              <div className="relative mb-2">
+            {/* Search */}
+            <div className="px-5 py-3 flex-shrink-0">
+              <div className="relative">
                 <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
                 <input value={approvalSearch} onChange={e => setApprovalSearch(e.target.value)}
-                  placeholder="Search by name, Instagram, or location..."
+                  placeholder="Search creators..."
                   className="w-full pl-9 pr-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
-              </div>
-              <div className="flex items-center gap-2">
-                <button onClick={selectAllPending}
-                  className="px-2.5 py-1 rounded-[8px] text-[12px] font-medium text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.04)]">
-                  {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
-                </button>
-                {selectedPending.size > 0 && (
-                  <>
-                    <button onClick={() => bulkApprove(true)}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-[8px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
-                      <Check size={12} /> Approve {selectedPending.size}
-                    </button>
-                    <button onClick={() => bulkApprove(false)}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-[8px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
-                      <X size={12} /> Deny {selectedPending.size}
-                    </button>
-                  </>
-                )}
               </div>
             </div>
 
@@ -401,43 +383,68 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 const initial = (c.display_name || c.name || '?')[0].toUpperCase();
                 const colors = getAvatarColors(initial);
                 return (
-                  <div key={c.id} className={`flex items-center gap-3 px-5 py-3.5 border-b border-[rgba(42,32,24,0.06)] transition-colors ${selected ? 'bg-[rgba(196,103,74,0.03)]' : 'hover:bg-[rgba(42,32,24,0.02)]'}`}>
-                    <button onClick={() => toggleSelectPending(c.id)}
-                      className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
-                      {selected && <Check size={10} className="text-white" />}
-                    </button>
-                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
-                      <span className="text-[13px] font-semibold" style={{ color: colors.text }}>{initial}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
-                      <div className="flex items-center gap-2 text-[12px] text-[var(--ink-50)]">
+                  <div key={c.id} className={`px-5 py-4 border-b border-[rgba(42,32,24,0.06)] transition-colors ${selected ? 'bg-[rgba(196,103,74,0.03)]' : 'hover:bg-[rgba(42,32,24,0.02)]'}`}>
+                    <div className="flex items-center gap-3">
+                      <button onClick={() => toggleSelectPending(c.id)}
+                        className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
+                        {selected && <Check size={10} className="text-white" />}
+                      </button>
+                      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                        <span className="text-[14px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[15px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
                         {handle && (
                           <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                            className="text-[var(--terra)] font-medium hover:underline" onClick={e => e.stopPropagation()}>
+                            className="text-[13px] text-[var(--terra)] font-medium hover:underline" onClick={e => e.stopPropagation()}>
                             @{handle}
                           </a>
                         )}
-                        {c.address && <span>{c.address}</span>}
-                        <span>Joined {fmtDate(c.created_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <button onClick={() => handleApprove(c.id, true)}
+                          className="w-9 h-9 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
+                          <Check size={16} />
+                        </button>
+                        <button onClick={() => handleApprove(c.id, false)}
+                          className="w-9 h-9 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors" title="Deny">
+                          <X size={16} />
+                        </button>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <button onClick={() => handleApprove(c.id, true)}
-                        className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
-                        <Check size={14} />
-                      </button>
-                      <button onClick={() => handleApprove(c.id, false)}
-                        className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors" title="Deny">
-                        <X size={14} />
-                      </button>
+                    <div className="flex items-center gap-2 mt-1.5 ml-[62px] text-[12px] text-[var(--ink-50)]">
+                      {c.address && <span>{c.address}</span>}
+                      {c.address && <span>·</span>}
+                      <span>Joined {fmtDate(c.created_at)}</span>
                     </div>
                   </div>
                 );
               })}
             </div>
+
+            {/* Footer — bulk actions */}
+            {selectedPending.size > 0 && (
+              <div className="px-5 py-3 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 flex items-center gap-2">
+                <button onClick={() => bulkApprove(true)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] bg-[#2D7A4F] text-white text-[14px] font-semibold hover:opacity-[0.85]">
+                  <Check size={14} /> Approve {selectedPending.size}
+                </button>
+                <button onClick={() => bulkApprove(false)}
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] text-[var(--ink)] text-[14px] font-medium hover:bg-[rgba(42,32,24,0.03)]">
+                  <X size={14} /> Deny {selectedPending.size}
+                </button>
+              </div>
+            )}
+            {selectedPending.size === 0 && pendingCreators.length > 1 && (
+              <div className="px-5 py-3 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
+                <button onClick={selectAllPending}
+                  className="w-full py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.12)] text-[var(--ink-60)] text-[14px] font-medium hover:bg-[rgba(42,32,24,0.03)]">
+                  Select all to bulk approve
+                </button>
+              </div>
+            )}
           </div>
-        </div>
+        </>
         );
       })()}
 

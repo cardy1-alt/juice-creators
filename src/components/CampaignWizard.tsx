@@ -200,12 +200,12 @@ Return only valid JSON, no markdown, no code fences.`,
               <div className="flex gap-1 p-1 rounded-[10px] bg-[rgba(42,32,24,0.04)]">
                 <button type="button" onClick={() => setMode('ai')}
                   className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'ai' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
-                  style={mode === 'ai' ? { boxShadow: '0 1px 3px rgba(42,32,24,0.08)' } : undefined}>
+                  style={mode === 'ai' ? { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' } : undefined}>
                   ✦ AI Assist
                 </button>
                 <button type="button" onClick={() => setMode('manual')}
                   className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'manual' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
-                  style={mode === 'manual' ? { boxShadow: '0 1px 3px rgba(42,32,24,0.08)' } : undefined}>
+                  style={mode === 'manual' ? { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' } : undefined}>
                   Create manually
                 </button>
               </div>
