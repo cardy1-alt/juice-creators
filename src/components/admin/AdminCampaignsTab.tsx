@@ -610,8 +610,6 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
     setShowAddApplicant(true);
   };
 
-  const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
-
   const [toast, setToast] = useState('');
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
@@ -966,6 +964,25 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           onClose={() => setParticipationCampaign(null)}
           onRefresh={fetchCampaigns}
         />
+      )}
+
+      {/* Delete campaign confirmation modal */}
+      {deletingCampaign && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+            <h3 className="nayba-h3">Delete campaign?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this campaign and all its applications. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeletingCampaign(null)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={async () => {
+                await supabase.from('campaigns').delete().eq('id', deletingCampaign);
+                setDeletingCampaign(null);
+                setPeekCampaign(null);
+                fetchCampaigns();
+              }} className="flex-1 py-2.5 rounded-[10px] bg-[var(--destructive)] text-white font-semibold text-[14px]">Delete</button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
