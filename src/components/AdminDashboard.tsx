@@ -91,7 +91,7 @@ export default function AdminDashboard() {
         fixed inset-y-0 left-0 z-50 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `} style={{ width: collapsed ? 64 : 240, background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
-        {/* Wordmark + Admin badge + collapse toggle */}
+        {/* Wordmark + collapse toggle */}
         <div className="flex items-center justify-between" style={{ padding: collapsed ? '20px 12px 16px' : '20px 20px 16px' }}>
           {collapsed ? (
             <button onClick={() => setCollapsed(false)} title="Expand sidebar"
@@ -100,13 +100,7 @@ export default function AdminDashboard() {
             </button>
           ) : (
             <>
-              <div className="flex items-center gap-3">
-                <Logo size={24} variant="wordmark" />
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px]" style={{ background: 'var(--terra-10)' }}>
-                  <span className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--terra)' }} />
-                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--terra)', textTransform: 'uppercase' as const }}>Admin</span>
-                </span>
-              </div>
+              <Logo size={24} variant="wordmark" />
               <button onClick={() => setCollapsed(true)} title="Collapse sidebar"
                 className="hidden md:flex items-center justify-center w-7 h-7 rounded-[8px] text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.04)] transition-colors flex-shrink-0">
                 <PanelLeftClose size={16} />
@@ -172,7 +166,13 @@ export default function AdminDashboard() {
             {!collapsed && (
               <>
                 <div className="flex-1 min-w-0">
-                  <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
+                    <span className="inline-flex items-center gap-1 px-1.5 py-px rounded-[5px] flex-shrink-0" style={{ background: 'var(--terra-10)' }}>
+                      <span className="w-[4px] h-[4px] rounded-full" style={{ background: 'var(--terra)' }} />
+                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--terra)', textTransform: 'uppercase' as const }}>Admin</span>
+                    </span>
+                  </div>
                   <p className="text-[12px] text-[var(--ink-50)] truncate">{user?.email}</p>
                 </div>
                 <LogOut size={14} className="text-[var(--ink-35)] group-hover:text-[var(--ink-60)] transition-colors flex-shrink-0" />
