@@ -165,9 +165,10 @@ export default function Auth() {
                 <div key={i} className="absolute rounded-[12px] px-3.5 py-3 bg-white flex items-start gap-2.5" style={{
                   width: 230,
                   top: card.top, right: card.right, bottom: card.bottom, left: card.left,
-                  transform: `rotate(${card.rotate}deg)`,
+                  rotate: `${card.rotate}deg`,
                   opacity: 0.85,
                   boxShadow: '0 2px 12px rgba(42,32,24,0.08)',
+                  animation: `card-float 7s ease-in-out ${i * 1.5}s infinite`,
                 }}>
                   <div className="w-8 h-8 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: card.tint }}>
                     <card.icon size={15} style={{ color: card.color }} />
