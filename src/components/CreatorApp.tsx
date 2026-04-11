@@ -17,7 +17,7 @@ import { Logo } from './Logo';
 import { getCategoryPalette, getFilterChipColor, CategoryIcon } from '../lib/categories';
 
 // ─── Constants ───
-const SUPPORT_EMAIL = 'jacob@nayba.app';
+const SUPPORT_EMAIL = 'hello@nayba.app';
 // TODO(jacob): Replace with real WhatsApp Community invite link before launch
 const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 

@@ -193,7 +193,7 @@ export default function BusinessPortal() {
         <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
           <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
           <p className="text-[14px] text-[var(--ink-50)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+          <a href="mailto:hello@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
             <Mail size={16} /> Contact nayba
           </a>
         </div>
@@ -230,7 +230,7 @@ export default function BusinessPortal() {
           <div className="text-center max-w-md">
             <p className="text-[15px] font-medium text-[var(--ink)] mb-2">Your campaigns will appear here</p>
             <p className="text-[14px] text-[var(--ink-50)] mb-4">Contact nayba to get started with your first campaign.</p>
-            <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+            <a href="mailto:hello@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
               <Mail size={16} /> Contact nayba
             </a>
           </div>
@@ -267,7 +267,7 @@ export default function BusinessPortal() {
         </nav>
 
         <div className="px-3 py-3" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-          <a href="mailto:jacob@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+          <a href="mailto:hello@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <Mail size={16} /> Need help?
           </a>
           <button onClick={() => setShowSignOutModal(true)} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
@@ -291,7 +291,7 @@ export default function BusinessPortal() {
               {selectedCampaignId ? campaign?.title || 'Campaign' : brand.name}
             </span>
           </div>
-          <a href="mailto:jacob@nayba.app" className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Get help">
+          <a href="mailto:hello@nayba.app" className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Get help">
             <Mail size={18} />
           </a>
           <button onClick={() => setShowSignOutModal(true)} className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Sign out">
@@ -386,8 +386,8 @@ export default function BusinessPortal() {
             <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
               <p className="text-[14px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
-              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                <Mail size={14} /> jacob@nayba.app
+              <a href="mailto:hello@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                <Mail size={14} /> hello@nayba.app
               </a>
             </div>
           </div>
@@ -616,8 +616,8 @@ export default function BusinessPortal() {
             <div className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <p className="text-[14px] font-semibold text-[var(--ink)] mb-1">Need help?</p>
               <p className="text-[14px] text-[var(--ink-60)] mb-3">Request changes, ask questions, or get support.</p>
-              <a href="mailto:jacob@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                <Mail size={14} /> jacob@nayba.app
+              <a href="mailto:hello@nayba.app" className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                <Mail size={14} /> hello@nayba.app
               </a>
             </div>
           </div>

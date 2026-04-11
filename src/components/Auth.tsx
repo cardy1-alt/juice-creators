@@ -154,22 +154,23 @@ export default function Auth() {
         <div className="flex-1 flex flex-col md:flex-row" style={{ background: 'white' }}>
           {/* Left — branding */}
           <div className="flex flex-col items-center justify-center px-6 py-8 md:flex-1 md:px-12 md:py-16 relative overflow-hidden" style={{ background: 'var(--chalk)' }}>
-            {/* Floating preview images — desktop only */}
+            {/* Floating product cards — desktop only */}
             <div className="hidden md:block absolute inset-0 pointer-events-none">
               {[
-                { src: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=200&h=200&fit=crop', top: '8%', right: '8%', size: 100, rotate: 3 },
-                { src: 'https://images.unsplash.com/photo-1560066984-138dadb4c035?w=200&h=200&fit=crop', top: '55%', right: '5%', size: 80, rotate: -4 },
-                { src: 'https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=200&h=200&fit=crop', bottom: '10%', right: '15%', size: 90, rotate: 5 },
-                { src: 'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=200&h=200&fit=crop', top: '18%', left: '75%', size: 70, rotate: -2 },
-              ].map((img, i) => (
-                <div key={i} className="absolute rounded-[12px] overflow-hidden" style={{
-                  width: img.size, height: img.size,
-                  top: img.top, right: img.right, bottom: img.bottom, left: img.left,
-                  transform: `rotate(${img.rotate}deg)`,
-                  opacity: 0.35,
+                { text: '🎟️ Free festival tickets just went live', sub: 'Suffolk Music Fest · 2 spots left', top: '6%', right: '4%', rotate: 3 },
+                { text: '☕ You redeemed a free coffee & pastry', sub: 'The Buttermarket Brew Co.', top: '52%', right: '2%', rotate: -3 },
+                { text: '💆‍♀️ Glow Wellness selected you', sub: 'Confirm your free facial', bottom: '12%', right: '10%', rotate: 4 },
+                { text: '🏋️ Reel submitted — nice work!', sub: 'Revamp Gym · Summer Challenge', top: '28%', left: '72%', rotate: -2 },
+              ].map((card, i) => (
+                <div key={i} className="absolute rounded-[12px] px-3.5 py-3 bg-white" style={{
+                  width: 220,
+                  top: card.top, right: card.right, bottom: card.bottom, left: card.left,
+                  transform: `rotate(${card.rotate}deg)`,
+                  opacity: 0.55,
                   boxShadow: '0 2px 12px rgba(42,32,24,0.08)',
                 }}>
-                  <img src={img.src} alt="" className="w-full h-full object-cover" loading="lazy" />
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 13, fontWeight: 600, color: '#2A2018', margin: 0, lineHeight: 1.4 }}>{card.text}</p>
+                  <p style={{ fontFamily: "'Instrument Sans', sans-serif", fontSize: 11, color: '#7A7168', margin: '4px 0 0', lineHeight: 1.3 }}>{card.sub}</p>
                 </div>
               ))}
             </div>
