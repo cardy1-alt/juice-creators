@@ -13,14 +13,16 @@ export default function LevelBadge({ level, levelName, size = 'sm' }: LevelBadge
     lg: { fontSize: '16px', padding: '7px 18px' },
   };
 
+  const colors = getLevelColour(level);
+
   return (
     <span
       className="inline-block rounded-full whitespace-nowrap"
       style={{
         fontFamily: "'Instrument Sans', sans-serif",
         fontWeight: 600,
-        background: level === 1 ? 'var(--stone)' : getLevelColour(level),
-        color: level === 1 ? 'var(--ink-60)' : '#ffffff',
+        background: colors.bg,
+        color: colors.text,
         ...sizeStyles[size],
       }}
     >

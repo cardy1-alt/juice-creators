@@ -61,6 +61,7 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   useEffect(() => {
     supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
@@ -139,7 +140,7 @@ export default function AdminDashboard() {
 
         {/* User row */}
         <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: '12px 8px 16px' }}>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={signOut}>
+          <div className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={() => setShowSignOutModal(true)}>
             <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
               <span className="text-[12px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
             </div>
@@ -194,6 +195,20 @@ export default function AdminDashboard() {
           {activeTab === 'settings' && <AdminSettingsTab />}
         </main>
       </div>
+
+      {/* Sign-out confirmation modal */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+            <h3 className="nayba-h3">Sign out?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">You'll need to sign in again to access your account.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowSignOutModal(false)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={signOut} className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px]">Sign out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

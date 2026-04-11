@@ -9,15 +9,15 @@ export const LEVEL_THRESHOLDS = [
   { level: 6, name: 'Nayba', minReels: 21, minRating: 4.8 },
 ] as const;
 
-export const getLevelColour = (level: number): string => {
+export const getLevelColour = (level: number): { bg: string; text: string } => {
   switch (level) {
-    case 1: return '#9E9E9E';                  // Newcomer – neutral grey
-    case 2: return '#8FAF8F';                  // Explorer – soft sage
-    case 3: return '#4CAF7D';                  // Regular  – green
-    case 4: return '#1A4A2E';                  // Local    – forest (brand)
-    case 5: return '#D4470C';                  // Trusted  – terra  (brand)
-    case 6: return '#2C2420';                  // Nayba    – near-black
-    default: return '#9E9E9E';
+    case 1: return { bg: 'var(--stone)', text: 'var(--ink-50)' };       // Newcomer
+    case 2: return { bg: '#D6E6F0', text: '#5A8AA8' };                  // Explorer – baltic tint
+    case 3: return { bg: '#DDEADD', text: '#5A8A58' };                  // Regular  – sage tint
+    case 4: return { bg: '#DDD6EE', text: '#7A6A9A' };                  // Local    – violet tint
+    case 5: return { bg: '#F2DDD5', text: '#C4674A' };                  // Trusted  – terra tint
+    case 6: return { bg: '#2A2018', text: '#FFFFFF' };                  // Nayba    – ink
+    default: return { bg: 'var(--stone)', text: 'var(--ink-50)' };
   }
 };
 

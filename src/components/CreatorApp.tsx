@@ -244,7 +244,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           <AlertCircle size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
           <p className="text-[15px] font-medium text-[var(--ink)] mb-1">Couldn't load campaigns</p>
           <p className="text-[13px] text-[var(--ink-35)] mb-4">Check your connection and try again</p>
-          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+          <button onClick={fetchDiscover} className="inline-flex items-center gap-2 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
             <RefreshCw size={14} /> Retry
           </button>
         </div>
@@ -451,7 +451,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 </div>
                 {todos.find(t => t.action) && (
                   <button onClick={todos.find(t => t.action)!.action}
-                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
+                    className="mb-3 flex items-center gap-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px]" style={{ fontWeight: 700 }}>
                     <Film size={12} /> Share Reel
                   </button>
                 )}
@@ -1013,9 +1013,9 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
             <p className="text-[14px] text-[var(--ink-60)] mb-5">You'll need to sign in again to access your campaigns.</p>
             <div className="flex gap-3">
               <button onClick={() => setShowSignOutConfirm(false)}
-                className="flex-1 py-2.5 rounded-[8px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
+                className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] min-h-[48px]">Cancel</button>
               <button onClick={onSignOut}
-                className="flex-1 py-2.5 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
+                className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>Sign out</button>
             </div>
           </div>
         </div>
@@ -1053,7 +1053,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
           ))}
         </div>
         <button onClick={onDismiss}
-          className="w-full py-3 rounded-full bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
+          className="w-full py-3 rounded-[10px] bg-[var(--terra)] text-white text-[14px] min-h-[48px] hover:opacity-[0.90]" style={{ fontWeight: 700 }}>
           Start exploring
         </button>
       </div>

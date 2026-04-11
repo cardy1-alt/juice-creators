@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
+import { getAvatarColors } from '../../lib/avatarColors';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -16,19 +17,9 @@ const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: '
 
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
-const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
-function getAvatarColors(letter: string): { bg: string; text: string } {
-  const ch = letter.toUpperCase();
-  if ('AGMSY'.includes(ch)) return { bg: '#E8EDF2', text: '#3D5A7A' };
-  if ('BHNTZ'.includes(ch)) return { bg: '#EDF2E8', text: '#3A6B3A' };
-  if ('CIOU'.includes(ch))  return { bg: '#F2EDE8', text: '#7A5A3D' };
-  if ('DJPV'.includes(ch))  return { bg: '#EDE8F2', text: '#5A3D7A' };
-  if ('EKQW'.includes(ch))  return { bg: '#F2E8ED', text: '#7A3D5A' };
-  if ('FLRX'.includes(ch))  return { bg: '#E8F2EF', text: '#2D6B5A' };
-  return { bg: '#E8EDF2', text: '#3D5A7A' };
-}
 
 function normalizeInstagram(raw: string): string {
   if (!raw) return '';

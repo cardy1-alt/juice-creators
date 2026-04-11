@@ -137,7 +137,7 @@ export default function AdminAnalyticsTab() {
     { label: 'Estimated Reach', value: stats.totalReach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
   ];
 
-  const chartLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-4";
+  const chartLabel = "text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-4";
 
   if (loading) {
     return (
@@ -162,8 +162,8 @@ export default function AdminAnalyticsTab() {
                 <s.icon size={15} style={{ color: s.color }} />
               </div>
               <div>
-                <p style={{ fontSize: 12, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
-                <p style={{ fontSize: 22, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
+                <p style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.05em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 2 }}>{s.label}</p>
+                <p style={{ fontSize: 20, fontWeight: 600, color: 'var(--ink)', letterSpacing: '-0.4px' }}>{s.value}</p>
               </div>
             </div>
           </div>
@@ -173,7 +173,7 @@ export default function AdminAnalyticsTab() {
       {/* Charts: row 1 */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="bg-white rounded-[12px] p-5">
-          <p className={chartLabel}>Creators by County</p>
+          <p className={chartLabel}>Creators by Location</p>
           <AnimatedBarChart items={stats.creatorsByCity.map(c => ({ label: c.city, value: c.count }))} color="var(--terra)" />
         </div>
         <div className="bg-white rounded-[12px] p-5">

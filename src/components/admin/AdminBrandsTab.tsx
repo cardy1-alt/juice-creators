@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
+import { getAvatarColors } from '../../lib/avatarColors';
 import { Check, X, AlertCircle, ExternalLink, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
@@ -14,7 +15,7 @@ interface Brand {
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
 const inputCls = "w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[14px] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-50)] font-['Instrument_Sans']";
 const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5";
-const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
@@ -111,8 +112,8 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
       <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-              <span className="text-[15px] font-semibold text-[var(--terra)]">{brand.name[0]}</span>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(brand.name[0]).bg }}>
+              <span className="text-[15px] font-semibold" style={{ color: getAvatarColors(brand.name[0]).text }}>{brand.name[0]}</span>
             </div>
             <div className="min-w-0">
               <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{brand.name}</p>
@@ -245,8 +246,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
             className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center">
-                  <span className="text-[12px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
+                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: getAvatarColors(b.name[0]).bg }}>
+                  <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
                 </div>
                 <div>
                   <p className="text-[14px] font-semibold text-[var(--ink)]">{b.name}</p>
@@ -282,8 +283,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
                 className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full bg-[rgba(196,103,74,0.08)] flex items-center justify-center flex-shrink-0">
-                      <span className="text-[12px] font-semibold text-[var(--terra)]">{b.name[0]}</span>
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(b.name[0]).bg }}>
+                      <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
                     </div>
                     <span className="font-medium">{b.name}</span>
                   </div>

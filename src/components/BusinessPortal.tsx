@@ -125,6 +125,7 @@ export default function BusinessPortal() {
   const [campaignFilter, setCampaignFilter] = useState<'all' | 'active' | 'draft' | 'completed'>('all');
   const [peekCreator, setPeekCreator] = useState<Participation | null>(null);
   const [showPreview, setShowPreview] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -218,7 +219,7 @@ export default function BusinessPortal() {
           </div>
           <div className="flex-1" />
           <div className="px-3 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-            <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+            <button onClick={() => setShowSignOutModal(true)} className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
               <LogOut size={18} /> Sign out
             </button>
           </div>
@@ -267,7 +268,7 @@ export default function BusinessPortal() {
           <a href="mailto:jacob@nayba.app" className="flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <Mail size={16} /> Need help?
           </a>
-          <button onClick={signOut} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
+          <button onClick={() => setShowSignOutModal(true)} className="w-full flex items-center gap-3 px-3 py-2 rounded-[10px] text-[14px] text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.03)]">
             <LogOut size={16} /> Sign out
           </button>
         </div>
@@ -291,7 +292,7 @@ export default function BusinessPortal() {
           <a href="mailto:jacob@nayba.app" className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Get help">
             <Mail size={18} />
           </a>
-          <button onClick={signOut} className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Sign out">
+          <button onClick={() => setShowSignOutModal(true)} className="text-[var(--ink-50)] hover:text-[var(--ink)]" title="Sign out">
             <LogOut size={18} />
           </button>
         </div>
@@ -1062,6 +1063,20 @@ export default function BusinessPortal() {
           })}
         </div>
       </div>
+
+      {/* Sign-out confirmation modal */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+            <h3 className="nayba-h3">Sign out?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">You'll need to sign in again to access your campaigns.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowSignOutModal(false)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={signOut} className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px]">Sign out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

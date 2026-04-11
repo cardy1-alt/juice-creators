@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Send } from 'lucide-react';
 
@@ -12,7 +12,7 @@ interface NotificationLog {
   created_at: string; user_type: string;
 }
 
-const thCls = "text-left text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
+const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 
 function fmtDate(d: string) {
@@ -41,6 +41,19 @@ export default function AdminNotificationsTab() {
     if (campRes.data) setCampaigns(campRes.data as Campaign[]);
     if (logRes.data) setLogs(logRes.data as NotificationLog[]);
   };
+
+  // Group notification logs by campaign_id to show recipient counts
+  const groupedLogs = useMemo(() => {
+    const groups: Record<string, { id: string; message: string; email_type: string | null; campaign_id: string | null; created_at: string; count: number }> = {};
+    for (const n of logs) {
+      const key = n.campaign_id || n.id;
+      if (!groups[key]) {
+        groups[key] = { id: n.id, message: n.message, email_type: n.email_type, campaign_id: n.campaign_id, created_at: n.created_at, count: 0 };
+      }
+      groups[key].count++;
+    }
+    return Object.values(groups).sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }, [logs]);
 
   const selectedCampaign = campaigns.find(c => c.id === selectedCampaignId);
 
@@ -96,7 +109,7 @@ export default function AdminNotificationsTab() {
 
       {/* Send notification card */}
       <div className="bg-white rounded-[12px] p-6 mb-6">
-        <h2 className="text-[18px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
+        <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Send Campaign Notification</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Select Campaign</label>
@@ -146,7 +159,7 @@ export default function AdminNotificationsTab() {
 
       {/* Mobile card list */}
       <div className="md:hidden space-y-2">
-        {logs.map(n => (
+        {groupedLogs.map(n => (
           <div key={n.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[12px] text-[var(--ink-50)]">{fmtDate(n.created_at)}</span>
@@ -155,9 +168,10 @@ export default function AdminNotificationsTab() {
               </span>
             </div>
             <p className="text-[14px] text-[var(--ink)] line-clamp-2">{n.message}</p>
+            <p className="text-[12px] text-[var(--ink-50)] mt-1">{n.count} recipient{n.count !== 1 ? 's' : ''}</p>
           </div>
         ))}
-        {logs.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-60)]">No notifications sent yet</p>}
+        {groupedLogs.length === 0 && <p className="py-12 text-center text-[14px] text-[var(--ink-60)]">No notifications sent yet</p>}
       </div>
 
       {/* Desktop table */}
@@ -167,11 +181,11 @@ export default function AdminNotificationsTab() {
             <th className={thCls}>Sent</th><th className={thCls}>Campaign</th><th className={thCls}>Recipients</th><th className={thCls}>Type</th>
           </tr></thead>
           <tbody>
-            {logs.map(n => (
+            {groupedLogs.map(n => (
               <tr key={n.id} className="hover:bg-[rgba(42,32,24,0.03)] transition-colors" style={{ height: 44 }}>
                 <td className={`${tdCls} text-[var(--ink-50)] whitespace-nowrap`}>{fmtDate(n.created_at)}</td>
                 <td className={`${tdCls} text-[var(--ink-60)] max-w-[300px] truncate`}>{n.message}</td>
-                <td className={tdCls}>1</td>
+                <td className={tdCls}>{n.count}</td>
                 <td className={tdCls}>
                   <span className="inline-flex items-center px-2.5 py-1 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                     {n.email_type?.replace(/_/g, ' ') || 'notification'}
@@ -179,7 +193,7 @@ export default function AdminNotificationsTab() {
                 </td>
               </tr>
             ))}
-            {logs.length === 0 && (
+            {groupedLogs.length === 0 && (
               <tr><td colSpan={4} className="py-12 text-center text-[14px] text-[var(--ink-60)]">No notifications sent yet</td></tr>
             )}
           </tbody>
