@@ -376,8 +376,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
       {/* Brand info modal */}
       {showBrandInfo && campaign.businesses && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4" onClick={() => setShowBrandInfo(false)}>
-          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4 animate-overlay" onClick={() => setShowBrandInfo(false)}>
+          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[var(--ink)]">{campaign.businesses.name}</h3>
               <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
@@ -403,8 +403,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
       {/* Pitch modal */}
       {!hideActions && showPitchModal && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center">
-          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[12px] p-4 sm:p-6">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center animate-overlay">
+          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[12px] p-4 sm:p-6 animate-slide-up">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[16px] font-semibold text-[var(--ink)]">Tell them why you</h3>
               <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>

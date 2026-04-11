@@ -154,7 +154,7 @@ export default function AdminAnalyticsTab() {
   return (
     <div className="tab-fade-in">
       {/* Stat cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-stagger">
         {statCards.map(s => (
           <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center gap-3">

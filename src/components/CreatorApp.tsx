@@ -258,7 +258,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] press-card" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 {/* Cover image — inset with rounded corners */}
                 <div className="px-2.5 pt-2.5">
                   <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>

@@ -39,7 +39,7 @@ const labelCls = "block text-[12px] font-medium uppercase tracking-[0.05em] text
 const thCls = "text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[rgba(42,32,24,0.02)]";
 const tdCls = "py-0 px-4 text-[14px] text-[var(--ink)] border-b border-[rgba(42,32,24,0.06)]";
 const modalOverlay = "fixed inset-0 z-[60] flex items-center justify-center";
-const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)]";
+const modalBackdrop = "absolute inset-0 bg-[rgba(42,32,24,0.40)] animate-overlay";
 const modalClose = "w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3] transition-colors";
 const modalHeader = "flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0";
 const modalBody = "flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6";
@@ -191,7 +191,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[720px] mx-4 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">{campaign ? 'Edit Campaign' : 'New Campaign'}</h2>
@@ -465,7 +465,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
   return (
     <div className={modalOverlay}>
       <div className={modalBackdrop} onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="relative bg-white rounded-[10px] w-full max-w-[960px] mx-4 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className={modalHeader}>
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">
@@ -653,8 +653,8 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 
   return (
     <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
+      <div className="fixed inset-0 z-40 animate-overlay" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[420px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col animate-slide-in-right" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">
@@ -829,7 +829,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   return (
     <div>
       {/* Stats row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-stagger">
         {statCards.map(s => (
           <div key={s.label} className="bg-white rounded-[12px] p-3 md:p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center gap-3">
@@ -979,8 +979,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
       {/* Delete campaign confirmation modal */}
       {deletingCampaign && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center">
-          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center">
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center animate-slide-up">
             <h3 className="nayba-h3">Delete campaign?</h3>
             <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this campaign and all its applications. This cannot be undone.</p>
             <div className="flex gap-3">

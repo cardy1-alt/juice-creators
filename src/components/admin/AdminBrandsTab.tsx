@@ -62,8 +62,8 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)] animate-overlay" onClick={onClose} />
+      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '88vh' }}>
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <h2 className="text-[20px] font-semibold text-[var(--ink)]">Create Brand</h2>
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]"><X size={15} /></button>
@@ -108,8 +108,8 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
 
   return (
     <>
-      <div className="fixed inset-0 z-40" onClick={onClose} />
-      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
+      <div className="fixed inset-0 z-40 animate-overlay" onClick={onClose} />
+      <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col animate-slide-in-right" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
             <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(brand.name[0]).bg }}>

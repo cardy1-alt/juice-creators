@@ -167,8 +167,8 @@ Return only valid JSON, no markdown, no code fences.`,
   // ─── Render ────────────────────────────────────────────
   return (
     <div className="fixed inset-0 z-[60] flex items-center justify-center">
-      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={onClose} />
-      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '88vh' }}>
+      <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)] animate-overlay" onClick={onClose} />
+      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '88vh' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 md:px-6 py-5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div>
