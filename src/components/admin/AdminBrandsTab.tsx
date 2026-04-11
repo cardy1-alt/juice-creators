@@ -47,6 +47,13 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
       approved: true, onboarding_complete: true,
     });
     if (insertErr) { setError('Failed to create brand — ' + insertErr.message); setCreating(false); return; }
+
+    // Invite brand owner — creates auth user and sends "set your password" email
+    const { data: fnData, error: fnErr } = await supabase.functions.invoke('invite-brand', {
+      body: { email: form.email, brandName: form.name },
+    });
+    if (fnErr) console.error('[CreateBrand] invite-brand failed:', fnErr.message);
+
     setCreating(false);
     onCreated();
   };
