@@ -215,13 +215,7 @@ Return only valid JSON, no markdown, no code fences.`,
             <div className="space-y-4">
               {/* Preview card */}
               <div className="rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.06)' }}>
-                {gen.campaign_image ? (
-                  <img src={gen.campaign_image} alt="" className="w-full h-[160px] object-cover" />
-                ) : (
-                  <div className="w-full h-[100px] bg-[rgba(42,32,24,0.03)] flex items-center justify-center">
-                    <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="" />
-                  </div>
-                )}
+                <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="" shape="square" />
                 <div className="p-4">
                   <p className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{brandName}</p>
                   <input value={gen.title} onChange={e => setG('title', e.target.value)}
@@ -285,9 +279,9 @@ Return only valid JSON, no markdown, no code fences.`,
             <>
               <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">Cancel</button>
               <button onClick={handleGenerate} disabled={aiLoading || !brandId || !perk}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
-                {aiLoading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : '✦'}
-                {aiLoading ? 'Generating...' : 'Generate campaign'}
+                className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
+                {aiLoading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <span>✦</span>}
+                <span>{aiLoading ? 'Generating...' : 'Generate campaign'}</span>
               </button>
             </>
           ) : (

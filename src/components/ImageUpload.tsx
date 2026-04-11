@@ -51,11 +51,11 @@ export default function ImageUpload({ value, onChange, folder, label, shape = 's
       <input ref={inputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
 
       {value ? (
-        <div className="relative inline-block">
+        <div className={`relative ${isCircle ? 'inline-block' : 'w-full'}`}>
           <img
             src={value}
             alt="Upload preview"
-            className={`object-cover ${isCircle ? 'w-[80px] h-[80px] rounded-full' : 'w-full h-[140px] rounded-[10px]'}`}
+            className={`object-cover ${isCircle ? 'w-[80px] h-[80px] rounded-full' : 'w-full h-[160px] rounded-[10px]'}`}
           />
           <button
             type="button"
@@ -80,7 +80,7 @@ export default function ImageUpload({ value, onChange, folder, label, shape = 's
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
           className={`flex flex-col items-center justify-center border border-dashed border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)] transition-colors bg-[rgba(42,32,24,0.02)] ${
-            isCircle ? 'w-[80px] h-[80px] rounded-full' : 'w-full h-[140px] rounded-[10px]'
+            isCircle ? 'w-[80px] h-[80px] rounded-full' : 'w-full h-[160px] rounded-[10px]'
           }`}
         >
           {uploading ? (
