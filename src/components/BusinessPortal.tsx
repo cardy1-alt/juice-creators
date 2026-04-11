@@ -204,7 +204,7 @@ export default function BusinessPortal() {
   const completedCount = participations.filter(p => p.status === 'completed').length;
   const totalReach = participations.reduce((s, p) => s + (p.reach || 0), 0);
 
-  const thCls = 'text-left text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] py-[10px] px-4 bg-[var(--chalk)]';
+  const thCls = 'text-left text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] py-[10px] px-4 bg-[var(--chalk)]';
   const tdCls = 'py-0 px-4 text-[14px] text-[var(--ink)]' + " border-b border-[rgba(42,32,24,0.06)]";
 
   // Empty state
@@ -341,8 +341,8 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
-                      <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 2 }}>{s.label}</p>
+                      <p className="text-[18px] md:text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
                 </div>
@@ -529,8 +529,8 @@ export default function BusinessPortal() {
                       <s.icon size={15} style={{ color: s.color }} />
                     </div>
                     <div>
-                      <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
-                      <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                      <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 2 }}>{s.label}</p>
+                      <p className="text-[18px] md:text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                     </div>
                   </div>
                 </div>
@@ -726,16 +726,16 @@ export default function BusinessPortal() {
                     {/* Stats row */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Level</span>
+                        <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">Level</span>
                         <span className="inline-flex items-center px-2 py-0.5 rounded-[4px] text-[14px] md:text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">L{a.creators?.level}</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Rate</span>
+                        <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">Rate</span>
                         <span className={`text-[14px] font-semibold ${isLowCompletion ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{a.creators?.completion_rate ?? 0}%</span>
                       </div>
                       {a.creators?.follower_count && (
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.4px] text-[var(--ink-60)]">Followers</span>
+                          <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">Followers</span>
                           <span className="text-[14px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
                         </div>
                       )}
@@ -805,7 +805,7 @@ export default function BusinessPortal() {
                 {columns.filter(col => col.items.length > 0).map(col => (
                   <div key={col.key}>
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
+                      <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">{col.label}</span>
                       <span className="text-[14px] md:text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{col.items.length}</span>
                     </div>
                     <div className="space-y-2">
@@ -844,7 +844,7 @@ export default function BusinessPortal() {
                   <div key={col.key} className="min-w-[280px] md:min-w-0 snap-start flex-shrink-0 md:flex-shrink md:border-r md:border-[rgba(42,32,24,0.04)] md:last:border-0 md:pr-4">
                     {/* Column header */}
                     <div className="flex items-center gap-2 mb-3 px-1">
-                      <span className="text-[14px] md:text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{col.label}</span>
+                      <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">{col.label}</span>
                       <span className="text-[14px] md:text-[12px] font-semibold rounded-full w-5 h-5 flex items-center justify-center" style={{ background: col.items.length > 0 ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)', color: col.items.length > 0 ? 'var(--terra)' : 'var(--ink-35)' }}>
                         {col.items.length}
                       </span>
@@ -1006,8 +1006,8 @@ export default function BusinessPortal() {
                     <s.icon size={15} style={{ color: s.color }} />
                   </div>
                   <div>
-                    <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)]" style={{ marginBottom: 1 }}>{s.label}</p>
-                    <p className="text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
+                    <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]" style={{ marginBottom: 2 }}>{s.label}</p>
+                    <p className="text-[18px] md:text-[20px] font-semibold text-[var(--ink)]">{s.value}</p>
                   </div>
                 </div>
               </div>
@@ -1017,7 +1017,7 @@ export default function BusinessPortal() {
 
             {/* Reach by creator */}
             <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <p className="text-[14px] md:text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-4">Reach by Creator</p>
+              <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-4">Reach by Creator</p>
               {(() => {
                 const withReach = participations.filter(p => p.reach && p.reach > 0);
                 const maxReach = Math.max(...withReach.map(p => p.reach!), 1);

@@ -24,7 +24,7 @@ const WHATSAPP_COMMUNITY_URL = 'https://chat.whatsapp.com/nayba-suffolk';
 // ─── Skeleton Loader ───
 function SkeletonCard() {
   return (
-    <div className="rounded-[12px] bg-white" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+    <div className="rounded-[12px] bg-white" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
       <div className="px-2.5 pt-2.5">
         <div className="skeleton w-full rounded-[8px]" style={{ height: 150 }} />
       </div>
@@ -258,7 +258,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const catPalette = getCategoryPalette(c.businesses?.category);
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
-                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ border: '1px solid rgba(42,32,24,0.08)', boxShadow: '0 1px 4px rgba(42,32,24,0.05)' }}>
+                className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 {/* Cover image — inset with rounded corners */}
                 <div className="px-2.5 pt-2.5">
                   <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>
@@ -403,7 +403,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-4">Campaigns</h1>
       {/* Sub tabs */}
-      <div className="flex gap-1 mb-4 border-b border border-[rgba(42,32,24,0.08)]">
+      <div className="flex gap-1 mb-4 border-b border-[rgba(42,32,24,0.08)]">
         {(['active', 'past'] as const).map(t => (
           <button key={t} onClick={() => setSubTab(t)}
             className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors min-h-[44px] ${subTab === t ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
@@ -423,7 +423,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const days = daysUntil(p.campaigns?.content_deadline || null);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
-              <div key={p.id} className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+              <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
@@ -455,7 +455,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                     <Film size={12} /> Share Reel
                   </button>
                 )}
-                <div className="flex items-center justify-between pt-2 border-t border border-[rgba(42,32,24,0.08)]">
+                <div className="flex items-center justify-between pt-2 border-t border-[rgba(42,32,24,0.08)]">
                   <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
                     {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[12px] font-medium">Content overdue</span>}
@@ -483,7 +483,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
           {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
@@ -492,7 +492,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             </div>
           ))}
           {pastApps.map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
@@ -550,7 +550,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
     return (
       <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
         <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
-        <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+        <div className="bg-white rounded-[12px] p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
           <div className="w-20 h-20 rounded-full bg-[var(--shell)] flex items-center justify-center mx-auto mb-4 border-2 border-dashed border-[rgba(42,32,24,0.08)]">
             <Lock size={28} className="text-[var(--ink-35)]" />
           </div>
@@ -611,7 +611,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">The Naybahood</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-8 text-center">
+      <div className="bg-white rounded-[12px] p-8 text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
         <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[var(--success)] to-[#1A5A3A] flex items-center justify-center mx-auto mb-4">
           <Star size={32} className="text-white" />
         </div>
@@ -778,7 +778,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
         <div className="space-y-2">
           {/* Participations (confirmed/completed campaigns) */}
           {participations.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
@@ -796,7 +796,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
           ))}
           {/* Applications that didn't become participations */}
           {applications.filter(a => !partCampaignIds.has(a.campaign_id)).map(a => (
-            <div key={a.id} className="flex items-center justify-between bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-4">
+            <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
               <div>
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
@@ -872,7 +872,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">Account Settings</h1>
 
       {/* Profile fields */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
+      <div className="bg-white rounded-[12px] p-5 mb-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
         <h2 className="nayba-h3 text-[var(--ink)] mb-4">Profile</h2>
         <div className="space-y-4">
           <div>
@@ -910,7 +910,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Password */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5 mb-4">
+      <div className="bg-white rounded-[12px] p-5 mb-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}">
         <div className="flex items-center justify-between">
           <h2 className="nayba-h3 text-[var(--ink)]">Password</h2>
           {!showPasswordChange && (
@@ -952,7 +952,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       </div>
 
       {/* Danger zone */}
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] p-5">
+      <div className="bg-white rounded-[12px] p-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         <h2 className="nayba-h3 text-[var(--ink)] mb-2">Need help?</h2>
         <p className="text-[14px] text-[var(--ink-60)] mb-3">If you need to delete your account or have any issues, get in touch.</p>
         <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex items-center gap-2 text-[14px] text-[var(--terra)] font-medium hover:underline">
@@ -989,10 +989,10 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4">
       <h1 className="nayba-h2 text-[var(--ink)] mb-6">More</h1>
-      <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden">
+      <div className="bg-white rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         {items.map((item, i) => (
           <button key={i} onClick={item.action}
-            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border border-[rgba(42,32,24,0.08)] last:border-0 min-h-[44px]">
+            className="w-full flex items-center gap-3 px-4 py-3.5 text-left hover:bg-[var(--shell)] transition-colors border-b border-[rgba(42,32,24,0.06)] last:border-0 min-h-[44px]">
             <item.icon size={18} className="text-[var(--ink-35)]" />
             <span className="text-[15px] text-[var(--ink)] font-medium">{item.label}</span>
             <ChevronRight size={16} className="text-[var(--ink-35)] ml-auto" />
@@ -1001,7 +1001,7 @@ function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () =
       </div>
 
       <button onClick={() => setShowSignOutConfirm(true)}
-        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]">
+        className="w-full mt-4 flex items-center gap-3 px-4 py-3.5 bg-white rounded-[12px] hover:bg-[var(--shell)] min-h-[44px]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         <LogOut size={18} className="text-[var(--terra)]" />
         <span className="text-[15px] text-[var(--terra)] font-medium">Sign out</span>
       </button>
