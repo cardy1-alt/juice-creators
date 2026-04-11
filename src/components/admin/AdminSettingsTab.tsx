@@ -115,9 +115,10 @@ export default function AdminSettingsTab() {
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);
 
   return (
-    <div className="max-w-[520px]">
+    <div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
       {/* Change Password */}
-      <div className="bg-white rounded-[12px] p-6 mb-4">
+      <div className="bg-white rounded-[12px] p-6 self-start">
         <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Change Password</h2>
         <form onSubmit={handleChangePassword} className="space-y-4">
           <div>
@@ -149,7 +150,7 @@ export default function AdminSettingsTab() {
       </div>
 
       {/* Feature Flags */}
-      <div className="bg-white rounded-[12px] p-6">
+      <div className="bg-white rounded-[12px] p-6 self-start">
         <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-4">Feature Flags</h2>
         <div className="space-y-5">
           <div className="flex items-start justify-between gap-4">
@@ -169,14 +170,16 @@ export default function AdminSettingsTab() {
           </div>
         </div>
       </div>
+      </div>
 
       {/* Notification Settings */}
-      <div className="bg-white rounded-[12px] p-6 mt-4">
+      <div className="bg-white rounded-[12px] p-6">
         <h2 className="text-[20px] font-semibold text-[var(--ink)] mb-1">Email Notifications</h2>
         <p className="text-[13px] text-[var(--ink-50)] mb-5">Control which emails are sent across the platform</p>
 
-        {NOTIFICATION_GROUPS.map((group, gi) => (
-          <div key={group.label} className={gi > 0 ? 'mt-6' : ''}>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {NOTIFICATION_GROUPS.map((group) => (
+          <div key={group.label}>
             <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-3">{group.label}</p>
             <div className="space-y-0">
               {group.items.map((item, i) => (
@@ -200,6 +203,7 @@ export default function AdminSettingsTab() {
             </div>
           </div>
         ))}
+        </div>
       </div>
 
       {/* Email template editor peek panel */}
