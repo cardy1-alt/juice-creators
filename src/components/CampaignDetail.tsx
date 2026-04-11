@@ -92,12 +92,19 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const handleApply = async (withPitch?: string) => {
     if (!creatorId || !campaign) return;
     setSubmitting(true);
-    await supabase.from('applications').insert({
+    const { data, error } = await supabase.from('applications').insert({
       campaign_id: campaign.id,
       creator_id: creatorId,
       pitch: withPitch || null,
       status: 'interested',
-    });
+    }).select('id, status').single();
+    if (error) {
+      console.error('[CampaignDetail] Failed to apply:', error.message);
+      setSubmitting(false);
+      return;
+    }
+    // Optimistically update application state so CTA changes immediately
+    if (data) setApplication(data as Application);
     // Notify admin
     sendAdminInterestExpressedEmail({
       creator_name: user?.email?.split('@')[0] || 'A creator',
@@ -107,16 +114,22 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     setShowPitchModal(false);
     setPitch('');
     setSubmitting(false);
-    fetchCampaign();
   };
 
   const handleConfirm = async () => {
     if (!application || !creatorId || !campaign) return;
     setSubmitting(true);
-    await supabase.from('applications').update({
+    const { error: updateErr } = await supabase.from('applications').update({
       status: 'confirmed',
       confirmed_at: new Date().toISOString(),
     }).eq('id', application.id);
+    if (updateErr) {
+      console.error('[CampaignDetail] Failed to confirm:', updateErr.message);
+      setSubmitting(false);
+      return;
+    }
+    // Optimistically update
+    setApplication({ ...application, status: 'confirmed' });
     // Create participation
     await supabase.from('participations').insert({
       application_id: application.id,
@@ -138,7 +151,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       }).catch(() => {});
     }
     setSubmitting(false);
-    fetchCampaign();
   };
 
   if (loading) {
