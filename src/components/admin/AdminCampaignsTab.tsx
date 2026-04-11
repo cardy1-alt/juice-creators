@@ -82,11 +82,11 @@ function fmtShortDate(d: string | null) {
 
 // ─── Kanban column config ───
 const kanbanColumns = [
-  { key: 'draft', label: 'Draft', dot: '#9A9590' },
-  { key: 'active', label: 'Active', dot: '#2D7A4F' },
-  { key: 'selecting', label: 'Selecting', dot: '#3B82F6' },
+  { key: 'draft', label: 'Draft', dot: 'rgba(42,32,24,0.45)' },
+  { key: 'active', label: 'Active', dot: '#7A9478' },
+  { key: 'selecting', label: 'Selecting', dot: '#7AA0B8' },
   { key: 'live', label: 'Live', dot: '#8C7AAA' },
-  { key: 'completed', label: 'Completed', dot: '#7A9478' },
+  { key: 'completed', label: 'Completed', dot: '#C4A84A' },
 ] as const;
 
 // ─── 3-Step Campaign Modal ───
@@ -576,8 +576,8 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                           disabled={p.status === 'completed'}
                           className="px-3 py-1.5 rounded-[10px] text-[12px] font-semibold disabled:opacity-30 disabled:cursor-not-allowed"
                           style={{
-                            background: p.status === 'completed' ? 'rgba(42,32,24,0.06)' : 'rgba(45,122,79,0.08)',
-                            color: p.status === 'completed' ? 'var(--ink-35)' : '#2D7A4F',
+                            background: p.status === 'completed' ? 'rgba(42,32,24,0.06)' : 'rgba(122,148,120,0.12)',
+                            color: p.status === 'completed' ? 'var(--ink-35)' : 'var(--sage)',
                           }}
                         >
                           {p.status === 'completed' ? 'Completed' : 'Mark Complete'}
@@ -690,9 +690,9 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
             <div className="flex flex-wrap gap-1.5">
               {([
                 { value: 'draft', label: 'Draft', bg: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' },
-                { value: 'active', label: 'Active', bg: 'rgba(45,122,79,0.10)', color: '#2D7A4F' },
-                { value: 'selecting', label: 'Selecting', bg: 'rgba(59,130,246,0.10)', color: '#3B82F6' },
-                { value: 'live', label: 'Live', bg: 'rgba(45,122,79,0.10)', color: '#2D7A4F' },
+                { value: 'active', label: 'Active', bg: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
+                { value: 'selecting', label: 'Selecting', bg: 'rgba(122,160,184,0.12)', color: 'var(--baltic)' },
+                { value: 'live', label: 'Live', bg: 'rgba(140,122,170,0.12)', color: 'var(--violet)' },
                 { value: 'completed', label: 'Completed', bg: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' },
               ] as const).map(s => (
                 <button key={s.value} onClick={async () => {

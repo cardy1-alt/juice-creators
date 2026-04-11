@@ -181,7 +181,7 @@ export default function AdminAnalyticsTab() {
           <AnimatedBarChart items={stats.creatorsByMonth.map(m => ({
             label: new Date(m.month + '-01').toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }),
             value: m.count,
-          }))} color="#2D7A4F" />
+          }))} color="var(--sage)" />
         </div>
       </div>
 
