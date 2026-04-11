@@ -164,6 +164,13 @@ export default function AdminDashboard() {
             <Logo size={20} variant="icon" />
             <span className="text-[15px] font-semibold text-[var(--ink)] truncate">{PAGE_TITLES[activeTab]}</span>
           </div>
+          {cta.show && (
+            <button onClick={() => setShowModal(true)}
+              className="flex items-center gap-1 px-3 py-1.5 rounded-[10px] bg-[var(--terra)] text-white text-[13px] font-semibold flex-shrink-0">
+              <Plus size={14} strokeWidth={2.5} />
+              <span className="hidden sm:inline">{cta.label}</span>
+            </button>
+          )}
         </div>
 
         {/* Desktop topbar */}
