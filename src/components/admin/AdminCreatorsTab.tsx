@@ -282,8 +282,9 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
   const pendingCreators = creators.filter(c => !c.approved);
   const approvedCreators = creators.filter(c => c.approved);
-  const [showApprovalPane, setShowApprovalPane] = useState(false);
+  const [showApprovalModal, setShowApprovalModal] = useState(false);
   const [selectedPending, setSelectedPending] = useState<Set<string>>(new Set());
+  const [approvalSearch, setApprovalSearch] = useState('');
 
   const filteredCreators = approvedCreators.filter(c => {
     if (!search) return true;
@@ -323,8 +324,8 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </div>
       )}
 
-      {pendingCreators.length > 0 && !showApprovalPane && (
-        <button onClick={() => setShowApprovalPane(true)}
+      {pendingCreators.length > 0 && (
+        <button onClick={() => { setShowApprovalModal(true); setApprovalSearch(''); setSelectedPending(new Set()); }}
           className="w-full flex items-center gap-3 px-5 py-4 mb-5 rounded-[10px] transition-colors text-left" style={{ background: 'rgba(42,32,24,0.04)', border: '1px solid rgba(42,32,24,0.08)' }}>
           <AlertCircle size={18} className="text-[var(--terra)] flex-shrink-0" />
           <div className="flex-1">
@@ -335,80 +336,110 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </button>
       )}
 
-      {showApprovalPane && pendingCreators.length > 0 && (
-        <div className="bg-white rounded-[12px] mb-5 overflow-hidden">
-          <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)]">
-            <div className="flex items-center gap-2">
-              <h3 className="text-[14px] font-semibold text-[var(--ink)]">Pending</h3>
-              <span className="text-[12px] text-[var(--ink-50)]">{pendingCreators.length}</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <button onClick={selectAllPending}
-                className="px-2.5 py-1.5 rounded-[10px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
-                {selectedPending.size === pendingCreators.length ? 'Deselect' : 'Select all'}
+      {/* Approval modal */}
+      {showApprovalModal && (() => {
+        const filtered = pendingCreators.filter(c => {
+          if (!approvalSearch) return true;
+          const q = approvalSearch.toLowerCase();
+          return (c.display_name || c.name || '').toLowerCase().includes(q)
+            || (c.instagram_handle || '').toLowerCase().includes(q)
+            || (c.email || '').toLowerCase().includes(q)
+            || (c.address || '').toLowerCase().includes(q);
+        });
+        return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <div className="absolute inset-0 bg-[rgba(42,32,24,0.40)]" onClick={() => { setShowApprovalModal(false); setSelectedPending(new Set()); }} />
+          <div className="relative bg-white rounded-[12px] w-full max-w-[560px] mx-4 flex flex-col overflow-hidden" style={{ maxHeight: '80vh' }}>
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
+              <div>
+                <h2 className="text-[20px] font-semibold text-[var(--ink)]">Pending Approval</h2>
+                <p className="text-[13px] text-[var(--ink-50)] mt-0.5">{pendingCreators.length} creator{pendingCreators.length > 1 ? 's' : ''} waiting</p>
+              </div>
+              <button onClick={() => { setShowApprovalModal(false); setSelectedPending(new Set()); }}
+                className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]">
+                <X size={15} />
               </button>
-              {selectedPending.size > 0 && (
-                <>
-                  <button onClick={() => bulkApprove(true)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
-                    <CheckCircle2 size={13} /> Approve {selectedPending.size}
-                  </button>
-                  <button onClick={() => bulkApprove(false)}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[10px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
-                    <XCircle size={13} /> Deny {selectedPending.size}
-                  </button>
-                </>
+            </div>
+
+            {/* Search + bulk actions */}
+            <div className="px-5 py-3 border-b border-[rgba(42,32,24,0.06)] flex-shrink-0">
+              <div className="relative mb-2">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-35)]" />
+                <input value={approvalSearch} onChange={e => setApprovalSearch(e.target.value)}
+                  placeholder="Search by name, Instagram, or location..."
+                  className="w-full pl-9 pr-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] placeholder:text-[var(--ink-35)]" />
+              </div>
+              <div className="flex items-center gap-2">
+                <button onClick={selectAllPending}
+                  className="px-2.5 py-1 rounded-[8px] text-[12px] font-medium text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.04)]">
+                  {selectedPending.size === pendingCreators.length ? 'Deselect all' : 'Select all'}
+                </button>
+                {selectedPending.size > 0 && (
+                  <>
+                    <button onClick={() => bulkApprove(true)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-[8px] bg-[rgba(45,122,79,0.08)] text-[#2D7A4F] text-[12px] font-semibold hover:bg-[rgba(45,122,79,0.15)]">
+                      <Check size={12} /> Approve {selectedPending.size}
+                    </button>
+                    <button onClick={() => bulkApprove(false)}
+                      className="inline-flex items-center gap-1 px-3 py-1 rounded-[8px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+                      <X size={12} /> Deny {selectedPending.size}
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {/* Creator list */}
+            <div className="flex-1 overflow-y-auto">
+              {filtered.length === 0 && (
+                <p className="text-center text-[14px] text-[var(--ink-50)] py-8">No creators match your search</p>
               )}
-              <button onClick={() => { setShowApprovalPane(false); setSelectedPending(new Set()); }}
-                className="ml-2 w-7 h-7 rounded-full bg-[rgba(42,32,24,0.06)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.10)]">
-                <X size={14} />
-              </button>
-            </div>
-          </div>
-          <div className="max-h-[400px] overflow-y-auto divide-y divide-[rgba(42,32,24,0.08)]">
-            {pendingCreators.map(c => {
-              const handle = c.instagram_handle?.replace('@', '') || '';
-              const selected = selectedPending.has(c.id);
-              return (
-                <div key={c.id} className={`flex items-start gap-3 px-4 py-4 transition-colors ${selected ? 'bg-[rgba(196,103,74,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`}>
-                  <button onClick={() => toggleSelectPending(c.id)}
-                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 mt-1 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.15)] hover:border-[var(--terra)]'}`}>
-                    {selected && <Check size={12} className="text-white" />}
-                  </button>
-                  {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
-                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
-                    <span className="text-[14px] font-semibold" style={{ color: colors.text }}>{initial}</span>
-                  </div>
-                  ); })()}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
-                    {handle && (
-                      <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                        @{handle} <ExternalLink size={11} />
-                      </a>
-                    )}
-                    <div className="flex items-center gap-2 mt-1 text-[12px] text-[var(--ink-50)]">
-                      {c.address && <span>{c.address}</span>}
-                      <span>Joined {fmtDate(c.created_at)}</span>
+              {filtered.map(c => {
+                const handle = c.instagram_handle?.replace('@', '') || '';
+                const selected = selectedPending.has(c.id);
+                const initial = (c.display_name || c.name || '?')[0].toUpperCase();
+                const colors = getAvatarColors(initial);
+                return (
+                  <div key={c.id} className={`flex items-center gap-3 px-5 py-3.5 border-b border-[rgba(42,32,24,0.06)] transition-colors ${selected ? 'bg-[rgba(196,103,74,0.03)]' : 'hover:bg-[rgba(42,32,24,0.02)]'}`}>
+                    <button onClick={() => toggleSelectPending(c.id)}
+                      className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
+                      {selected && <Check size={10} className="text-white" />}
+                    </button>
+                    <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                      <span className="text-[13px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
+                      <div className="flex items-center gap-2 text-[12px] text-[var(--ink-50)]">
+                        {handle && (
+                          <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                            className="text-[var(--terra)] font-medium hover:underline" onClick={e => e.stopPropagation()}>
+                            @{handle}
+                          </a>
+                        )}
+                        {c.address && <span>{c.address}</span>}
+                        <span>Joined {fmtDate(c.created_at)}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5 flex-shrink-0">
+                      <button onClick={() => handleApprove(c.id, true)}
+                        className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
+                        <Check size={14} />
+                      </button>
+                      <button onClick={() => handleApprove(c.id, false)}
+                        className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors" title="Deny">
+                        <X size={14} />
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center gap-1.5 flex-shrink-0">
-                    <button onClick={() => handleApprove(c.id, true)}
-                      className="w-8 h-8 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center text-[#2D7A4F] hover:bg-[rgba(45,122,79,0.15)] transition-colors" title="Approve">
-                      <Check size={15} />
-                    </button>
-                    <button onClick={() => handleApprove(c.id, false)}
-                      className="w-8 h-8 rounded-full bg-[rgba(220,38,38,0.06)] flex items-center justify-center text-[#DC2626] hover:bg-[rgba(220,38,38,0.12)] transition-colors" title="Deny">
-                      <X size={15} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* Search bar */}
       <div className="relative mb-4">
