@@ -91,20 +91,27 @@ export default function AdminDashboard() {
         fixed inset-y-0 left-0 z-50 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `} style={{ width: collapsed ? 64 : 240, background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
-        {/* Wordmark + Admin badge */}
-        <div className="flex items-center justify-between" style={{ padding: collapsed ? '20px 0 16px' : '20px 20px 16px' }}>
+        {/* Wordmark + Admin badge + collapse toggle */}
+        <div className="flex items-center justify-between" style={{ padding: collapsed ? '20px 12px 16px' : '20px 20px 16px' }}>
           {collapsed ? (
-            <div className="flex justify-center w-full">
-              <Logo size={22} variant="icon" />
-            </div>
+            <button onClick={() => setCollapsed(false)} title="Expand sidebar"
+              className="flex justify-center w-full text-[var(--ink-35)] hover:text-[var(--ink-60)] transition-colors">
+              <PanelLeftOpen size={18} />
+            </button>
           ) : (
-            <div className="flex items-center gap-3">
-              <Logo size={24} variant="wordmark" />
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px]" style={{ background: 'var(--terra-10)' }}>
-                <span className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--terra)' }} />
-                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--terra)', textTransform: 'uppercase' as const }}>Admin</span>
-              </span>
-            </div>
+            <>
+              <div className="flex items-center gap-3">
+                <Logo size={24} variant="wordmark" />
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px]" style={{ background: 'var(--terra-10)' }}>
+                  <span className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--terra)' }} />
+                  <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--terra)', textTransform: 'uppercase' as const }}>Admin</span>
+                </span>
+              </div>
+              <button onClick={() => setCollapsed(true)} title="Collapse sidebar"
+                className="hidden md:flex items-center justify-center w-7 h-7 rounded-[8px] text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.04)] transition-colors flex-shrink-0">
+                <PanelLeftClose size={16} />
+              </button>
+            </>
           )}
           <button onClick={() => setSidebarOpen(false)} className="md:hidden flex-shrink-0" style={{ color: 'var(--ink-50)' }}>
             <X size={20} />
@@ -151,15 +158,6 @@ export default function AdminDashboard() {
             </div>
           ))}
         </nav>
-
-        {/* Collapse toggle — desktop only */}
-        <div className="hidden md:flex px-3 pb-2">
-          <button onClick={() => setCollapsed(!collapsed)}
-            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="w-full flex items-center justify-center py-2 rounded-[10px] text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.04)] transition-colors">
-            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
-          </button>
-        </div>
 
         {/* User row */}
         <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: collapsed ? '12px 8px 16px' : '12px 8px 16px' }}>
