@@ -75,6 +75,9 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
               <span className="text-[14px] font-medium">{error}</span>
             </div>
           )}
+          <div className="flex justify-center mb-5">
+            <ImageUpload value={form.logo_url} onChange={url => setForm(p => ({ ...p, logo_url: url }))} folder="logos" label="Logo" shape="circle" />
+          </div>
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={labelCls}>Brand Name *</label><input value={form.name} onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setError(''); }} className={inputCls} required /></div>
             <div><label className={labelCls}>Owner Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
@@ -83,7 +86,6 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
             <div><label className={labelCls}>Address</label><input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className={inputCls} /></div>
             <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} min-h-[72px] resize-y`} /></div>
-            <div><ImageUpload value={form.logo_url} onChange={url => setForm(p => ({ ...p, logo_url: url }))} folder="logos" label="Logo" shape="circle" /></div>
           </form>
         </div>
         <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">

@@ -69,6 +69,7 @@ export default function Auth() {
   const [followerCount, setFollowerCount] = useState('Under 1k');
   const [phone, setPhone] = useState('');
   const [address, setAddress] = useState('');
+  const [dob, setDob] = useState('');
   const [latitude, setLatitude] = useState<number | null>(null);
   const [longitude, setLongitude] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -121,7 +122,13 @@ export default function Auth() {
       if (mode === 'signin') {
         await signIn(email, password);
       } else {
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null };
+        // Age check — must be 18+
+        if (dob) {
+          const birthDate = new Date(dob);
+          const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
+          if (age < 18) { setError('You must be 18 or over to use Nayba'); setLoading(false); return; }
+        }
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null, date_of_birth: dob || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
@@ -532,6 +539,18 @@ export default function Auth() {
                       className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
                     />
                     <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">So we can check out your content</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Date of birth</label>
+                    <input
+                      type="date"
+                      value={dob}
+                      onChange={e => setDob(e.target.value)}
+                      required
+                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]"
+                    />
+                    <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">You must be 18 or over to use Nayba</p>
                   </div>
 
                   {error && (
