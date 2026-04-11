@@ -71,6 +71,7 @@ export default function CampaignWizard({ brands, fixedBrandId, onSave, onClose }
     if (!brandId || !perk) return;
     setAiLoading(true);
     setAiError('');
+    setStep(2); // Show skeleton immediately
     const county = brand?.region || 'Suffolk';
     try {
       const res = await fetch('/api/ai/generate', {
@@ -114,9 +115,9 @@ Return only valid JSON, no markdown, no code fences.`,
         target_county: county,
         perk_value: data.perk_value?.toString() || '',
       }));
-      setStep(2);
     } catch {
       setAiError('AI generation failed — try again or create manually');
+      setStep(1); // Go back to inputs on failure
     }
     setAiLoading(false);
   };
@@ -277,8 +278,35 @@ Return only valid JSON, no markdown, no code fences.`,
           )}
 
           {/* ─── STEP 2: AI Preview ─── */}
-          {step === 2 && (
-            <div className="space-y-4">
+          {step === 2 && aiLoading && (
+            <div className="animate-fade-in">
+              {/* Generating label */}
+              <div className="flex items-center justify-center gap-2 mb-5">
+                <span className="w-4 h-4 border-2 border-[var(--terra)] border-t-transparent rounded-full animate-spin" />
+                <span className="text-[14px] font-medium text-[var(--terra)]">✦ Generating your campaign...</span>
+              </div>
+              {/* Skeleton preview card */}
+              <div className="rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.06)' }}>
+                <div className="w-full h-[140px] skeleton-pulse rounded-t-[12px]" />
+                <div className="p-4 space-y-3">
+                  <div className="h-3 w-[80px] skeleton-pulse rounded-[4px]" />
+                  <div className="h-5 w-[260px] skeleton-pulse rounded-[4px]" />
+                  <div className="h-4 w-[200px] skeleton-pulse rounded-[4px]" />
+                  <div className="h-3 w-[140px] skeleton-pulse rounded-[4px]" />
+                </div>
+              </div>
+              {/* Skeleton details */}
+              <div className="mt-5 space-y-3">
+                <div className="h-3 w-[100px] skeleton-pulse rounded-[4px]" />
+                <div className="h-[60px] w-full skeleton-pulse rounded-[10px]" />
+                <div className="h-3 w-[120px] skeleton-pulse rounded-[4px]" />
+                <div className="h-[60px] w-full skeleton-pulse rounded-[10px]" />
+              </div>
+            </div>
+          )}
+
+          {step === 2 && !aiLoading && (
+            <div className="space-y-4 animate-fade-in">
               {/* Preview card */}
               <div className="rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.06)' }}>
                 <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="" shape="square" />
@@ -356,6 +384,11 @@ Return only valid JSON, no markdown, no code fences.`,
                   Next →
                 </button>
               )}
+            </>
+          ) : aiLoading ? (
+            <>
+              <button onClick={() => { setStep(1); setAiLoading(false); }} className="text-[14px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">← Cancel</button>
+              <span className="text-[13px] text-[var(--ink-35)]">Building your campaign...</span>
             </>
           ) : (
             <>
