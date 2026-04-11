@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
-import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
+import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search, Pencil, KeyRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
 
@@ -12,7 +12,7 @@ interface Creator {
   email: string; approved: boolean; level: number; level_name: string;
   completion_rate: number; total_campaigns: number; completed_campaigns: number;
   instagram_connected: boolean; address: string | null; created_at: string;
-  follower_count: string | null;
+  follower_count: string | null; avatar_url: string | null;
 }
 
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
@@ -158,12 +158,53 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
 }
 
 // ─── Creator Peek Panel ───
-function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void }) {
+function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void; onRefresh: () => void }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
   const handle = creator.instagram_handle?.replace('@', '') || '';
   const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
+
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState('');
+  const [form, setForm] = useState({
+    display_name: creator.display_name || creator.name || '',
+    email: creator.email,
+    instagram_handle: creator.instagram_handle || '',
+    address: creator.address || '',
+    follower_count: creator.follower_count || '',
+    level: creator.level.toString(),
+    avatar_url: creator.avatar_url || '',
+  });
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase.from('creators').update({
+      display_name: form.display_name || null,
+      instagram_handle: normalizeInstagram(form.instagram_handle),
+      address: form.address || null,
+      follower_count: form.follower_count || null,
+      level: parseInt(form.level),
+      level_name: LEVEL_NAMES[parseInt(form.level)] || 'Newcomer',
+      avatar_url: form.avatar_url || null,
+    }).eq('id', creator.id);
+    setSaving(false);
+    if (error) { showToast('Failed to save'); return; }
+    showToast('Creator updated');
+    setEditing(false);
+    onRefresh();
+  };
+
+  const handlePasswordReset = async () => {
+    const { error } = await supabase.auth.resetPasswordForEmail(creator.email, {
+      redirectTo: `${window.location.origin}/`,
+    });
+    if (error) showToast('Failed to send reset email');
+    else showToast('Password reset email sent');
+  };
 
   return (
     <>
@@ -179,79 +220,155 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
               {handle && <p className="text-[14px] text-[var(--ink-50)]">@{handle}</p>}
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0 ml-3">
+            {!editing && (
+              <button onClick={() => setEditing(true)} title="Edit creator"
+                className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)] transition-colors">
+                <Pencil size={14} />
+              </button>
+            )}
+            <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors">
+              <X size={16} />
+            </button>
+          </div>
         </div>
+
+        {toast && (
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        )}
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
-            <div>
-              <p className={peekLabel}>Level</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: getLevelColour(creator.level).bg, color: getLevelColour(creator.level).text }}>
-                L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
-              </span>
-            </div>
-            <div>
-              <p className={peekLabel}>Status</p>
-              <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: creator.approved ? '#E1F5EE' : '#FAEEDA', color: creator.approved ? '#0F6E56' : '#854F0B' }}>
-                {creator.approved ? 'Approved' : 'Pending'}
-              </span>
-            </div>
-            <div>
-              <p className={peekLabel}>County</p>
-              <p className="text-[14px] text-[var(--ink)]">{creator.address || '—'}</p>
-            </div>
-            <div>
-              <p className={peekLabel}>Joined</p>
-              <p className="text-[14px] text-[var(--ink)]">{fmtDate(creator.created_at)}</p>
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <p className={peekLabel}>Email</p>
-            <p className="text-[14px] text-[var(--ink)]">{creator.email}</p>
-          </div>
-
-          {handle && (
-            <div className="mb-4">
-              <p className={peekLabel}>Instagram</p>
-              <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                @{handle} <ExternalLink size={12} />
-              </a>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[14px] text-[var(--ink-50)]">
-                  {creator.instagram_connected ? 'Connected' : 'Not connected'}
-                </span>
-                {creator.follower_count && (
-                  <span className="text-[14px] text-[var(--ink-50)]">· {creator.follower_count} followers</span>
-                )}
+          {editing ? (
+            /* ── Edit mode ── */
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Profile Photo</label>
+                <ImageUpload value={form.avatar_url} onChange={url => setForm({ ...form, avatar_url: url })} folder="logos" shape="circle" />
+              </div>
+              <div>
+                <label className={labelCls}>Display Name</label>
+                <input value={form.display_name} onChange={e => setForm({ ...form, display_name: e.target.value })} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Email</label>
+                <input value={form.email} disabled className={`${inputCls} opacity-60 cursor-not-allowed`} />
+                <p className="text-[11px] text-[var(--ink-35)] mt-1">Email cannot be changed from here</p>
+              </div>
+              <div>
+                <label className={labelCls}>Instagram Handle</label>
+                <input value={form.instagram_handle} onChange={e => setForm({ ...form, instagram_handle: e.target.value })} className={inputCls} placeholder="@handle" />
+              </div>
+              <div>
+                <label className={labelCls}>County</label>
+                <select value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className={inputCls}>
+                  <option value="">Not set</option>
+                  {['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Follower Count</label>
+                <select value={form.follower_count} onChange={e => setForm({ ...form, follower_count: e.target.value })} className={inputCls}>
+                  <option value="">Not set</option>
+                  {['0-500', '500-1k', '1k-5k', '5k-10k', '10k-50k', '50k+'].map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Level</label>
+                <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })} className={inputCls}>
+                  {Object.entries(LEVEL_NAMES).map(([k, v]) => <option key={k} value={k}>L{k} — {v}</option>)}
+                </select>
               </div>
             </div>
+          ) : (
+            /* ── View mode ── */
+            <>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+                <div>
+                  <p className={peekLabel}>Level</p>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: getLevelColour(creator.level).bg, color: getLevelColour(creator.level).text }}>
+                    L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
+                  </span>
+                </div>
+                <div>
+                  <p className={peekLabel}>Status</p>
+                  <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: creator.approved ? '#E1F5EE' : '#FAEEDA', color: creator.approved ? '#0F6E56' : '#854F0B' }}>
+                    {creator.approved ? 'Approved' : 'Pending'}
+                  </span>
+                </div>
+                <div>
+                  <p className={peekLabel}>County</p>
+                  <p className="text-[14px] text-[var(--ink)]">{creator.address || '—'}</p>
+                </div>
+                <div>
+                  <p className={peekLabel}>Joined</p>
+                  <p className="text-[14px] text-[var(--ink)]">{fmtDate(creator.created_at)}</p>
+                </div>
+              </div>
+
+              <div className="mb-4">
+                <p className={peekLabel}>Email</p>
+                <p className="text-[14px] text-[var(--ink)]">{creator.email}</p>
+              </div>
+
+              {handle && (
+                <div className="mb-4">
+                  <p className={peekLabel}>Instagram</p>
+                  <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                    @{handle} <ExternalLink size={12} />
+                  </a>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span className="text-[14px] text-[var(--ink-50)]">
+                      {creator.instagram_connected ? 'Connected' : 'Not connected'}
+                    </span>
+                    {creator.follower_count && (
+                      <span className="text-[14px] text-[var(--ink-50)]">· {creator.follower_count} followers</span>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-4">
+                <p className={`${peekLabel} mb-3`}>Performance</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+                    <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
+                    <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
+                  </div>
+                  <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+                    <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
+                    <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
+                  </div>
+                </div>
+              </div>
+            </>
           )}
-
-          <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-4">
-            <p className={`${peekLabel} mb-3`}>Performance</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.completed_campaigns}/{creator.total_campaigns}</p>
-                <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
-              </div>
-              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[var(--ink)]">{creator.total_campaigns > 0 ? `${creator.completion_rate}%` : '—'}</p>
-                <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
-              </div>
-            </div>
-          </div>
         </div>
 
-        {/* View as */}
-        <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
-          <button onClick={() => { onViewAs(creator); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
-            <Eye size={14} /> View as Creator
-          </button>
+        {/* Footer actions */}
+        <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 space-y-2">
+          {editing ? (
+            <div className="flex gap-2">
+              <button onClick={() => setEditing(false)} className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
+                Cancel
+              </button>
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+                {saving ? 'Saving...' : 'Save'}
+              </button>
+            </div>
+          ) : (
+            <>
+              <button onClick={() => { onViewAs(creator); onClose(); }}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
+                <Eye size={14} /> View as Creator
+              </button>
+              <button onClick={handlePasswordReset}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-[10px] text-[var(--ink-50)] text-[13px] font-medium hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.02)] transition-colors">
+                <KeyRound size={13} /> Send password reset
+              </button>
+            </>
+          )}
         </div>
       </div>
     </>
@@ -555,7 +672,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </table>
       </div>
 
-      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} onViewAs={(c) => {
+      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} onRefresh={() => { fetchCreators(); }} onViewAs={(c) => {
         const { setViewAs } = authCtx;
         setViewAs('creator', { ...c, display_name: c.display_name || c.name });
       }} />}

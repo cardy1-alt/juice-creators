@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { Check, X, AlertCircle, ExternalLink, Eye } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink, Eye, Pencil } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
 
@@ -10,6 +10,7 @@ interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
   region: string; approved: boolean; instagram_handle: string | null;
   address: string | null; bio: string | null; created_at: string;
+  logo_url: string | null;
 }
 
 const CATEGORIES = ['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
@@ -100,13 +101,47 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 }
 
 // ─── Brand Peek Panel ───
-function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: {
+function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, onRefresh }: {
   brand: Brand; campaignCount: number; onClose: () => void;
   onApprove: (id: string, approved: boolean) => void;
-  onViewAs: (brand: Brand) => void;
+  onViewAs: (brand: Brand) => void; onRefresh: () => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
+
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState('');
+  const [form, setForm] = useState({
+    name: brand.name,
+    owner_email: brand.owner_email,
+    category: brand.category,
+    region: brand.region,
+    instagram_handle: brand.instagram_handle || '',
+    address: brand.address || '',
+    bio: brand.bio || '',
+    logo_url: brand.logo_url || '',
+  });
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
+
+  const handleSave = async () => {
+    setSaving(true);
+    const { error } = await supabase.from('businesses').update({
+      name: form.name,
+      category: form.category,
+      region: form.region,
+      instagram_handle: form.instagram_handle || null,
+      address: form.address || null,
+      bio: form.bio || null,
+      logo_url: form.logo_url || null,
+    }).eq('id', brand.id);
+    setSaving(false);
+    if (error) { showToast('Failed to save'); return; }
+    showToast('Brand updated');
+    setEditing(false);
+    onRefresh();
+  };
 
   return (
     <>
@@ -122,81 +157,153 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs }: 
               <p className="text-[14px] text-[var(--ink-50)]">{brand.category}</p>
             </div>
           </div>
-          <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
-            <X size={16} />
-          </button>
+          <div className="flex items-center gap-1 flex-shrink-0 ml-3">
+            {!editing && (
+              <button onClick={() => setEditing(true)} title="Edit brand"
+                className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)] transition-colors">
+                <Pencil size={14} />
+              </button>
+            )}
+            <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
+        {toast && (
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        )}
+
         <div className="flex-1 overflow-y-auto px-5 py-4">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
-            <div>
-              <p className={peekLabel}>Status</p>
-              {brand.approved
-                ? <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
-                : <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
-              }
+          {editing ? (
+            /* ── Edit mode ── */
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Logo</label>
+                <ImageUpload value={form.logo_url} onChange={url => setForm({ ...form, logo_url: url })} folder="logos" shape="circle" />
+              </div>
+              <div>
+                <label className={labelCls}>Name</label>
+                <input value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Owner Email</label>
+                <input value={form.owner_email} disabled className={`${inputCls} opacity-60 cursor-not-allowed`} />
+                <p className="text-[11px] text-[var(--ink-35)] mt-1">Email cannot be changed from here</p>
+              </div>
+              <div>
+                <label className={labelCls}>Category</label>
+                <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className={inputCls}>
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Region</label>
+                <select value={form.region} onChange={e => setForm({ ...form, region: e.target.value })} className={inputCls}>
+                  {['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(r => <option key={r} value={r}>{r}</option>)}
+                </select>
+              </div>
+              <div>
+                <label className={labelCls}>Instagram Handle</label>
+                <input value={form.instagram_handle} onChange={e => setForm({ ...form, instagram_handle: e.target.value })} className={inputCls} placeholder="@handle" />
+              </div>
+              <div>
+                <label className={labelCls}>Address</label>
+                <input value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className={inputCls} placeholder="Full address" />
+              </div>
+              <div>
+                <label className={labelCls}>Bio</label>
+                <textarea value={form.bio} onChange={e => setForm({ ...form, bio: e.target.value })} className={inputCls} rows={3} placeholder="Short description" />
+              </div>
             </div>
-            <div>
-              <p className={peekLabel}>Region</p>
-              <p className="text-[14px] text-[var(--ink)]">{brand.region}</p>
-            </div>
-            <div>
-              <p className={peekLabel}>Campaigns</p>
-              <p className="text-[14px] text-[var(--ink)]">{campaignCount}</p>
-            </div>
-            <div>
-              <p className={peekLabel}>Added</p>
-              <p className="text-[14px] text-[var(--ink)]">{fmtDate(brand.created_at)}</p>
-            </div>
-          </div>
+          ) : (
+            /* ── View mode ── */
+            <>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
+                <div>
+                  <p className={peekLabel}>Status</p>
+                  {brand.approved
+                    ? <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
+                    : <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
+                  }
+                </div>
+                <div>
+                  <p className={peekLabel}>Region</p>
+                  <p className="text-[14px] text-[var(--ink)]">{brand.region}</p>
+                </div>
+                <div>
+                  <p className={peekLabel}>Campaigns</p>
+                  <p className="text-[14px] text-[var(--ink)]">{campaignCount}</p>
+                </div>
+                <div>
+                  <p className={peekLabel}>Added</p>
+                  <p className="text-[14px] text-[var(--ink)]">{fmtDate(brand.created_at)}</p>
+                </div>
+              </div>
 
-          <div className="mb-4">
-            <p className={peekLabel}>Owner Email</p>
-            <p className="text-[14px] text-[var(--ink)]">{brand.owner_email}</p>
-          </div>
+              <div className="mb-4">
+                <p className={peekLabel}>Owner Email</p>
+                <p className="text-[14px] text-[var(--ink)]">{brand.owner_email}</p>
+              </div>
 
-          {brand.instagram_handle && (
-            <div className="mb-4">
-              <p className={peekLabel}>Instagram</p>
-              <a href={`https://instagram.com/${brand.instagram_handle}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                @{brand.instagram_handle} <ExternalLink size={12} />
-              </a>
-            </div>
-          )}
+              {brand.instagram_handle && (
+                <div className="mb-4">
+                  <p className={peekLabel}>Instagram</p>
+                  <a href={`https://instagram.com/${brand.instagram_handle}`} target="_blank" rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
+                    @{brand.instagram_handle} <ExternalLink size={12} />
+                  </a>
+                </div>
+              )}
 
-          {brand.address && (
-            <div className="mb-4">
-              <p className={peekLabel}>Address</p>
-              <p className="text-[14px] text-[var(--ink)]">{brand.address}</p>
-            </div>
-          )}
+              {brand.address && (
+                <div className="mb-4">
+                  <p className={peekLabel}>Address</p>
+                  <p className="text-[14px] text-[var(--ink)]">{brand.address}</p>
+                </div>
+              )}
 
-          {brand.bio && (
-            <div className="mb-4">
-              <p className={peekLabel}>Bio</p>
-              <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{brand.bio}</p>
-            </div>
+              {brand.bio && (
+                <div className="mb-4">
+                  <p className={peekLabel}>Bio</p>
+                  <p className="text-[14px] text-[var(--ink)] leading-[1.6]">{brand.bio}</p>
+                </div>
+              )}
+            </>
           )}
         </div>
 
         <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 space-y-2">
-          {!brand.approved && (
+          {editing ? (
             <div className="flex gap-2">
-              <button onClick={() => { onApprove(brand.id, true); onClose(); }}
-                className="flex-1 px-4 py-2.5 rounded-[10px] bg-[#2D7A4F] text-white text-[14px] font-semibold hover:opacity-[0.85]">
-                Approve
+              <button onClick={() => setEditing(false)} className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
+                Cancel
               </button>
-              <button onClick={() => { onApprove(brand.id, false); onClose(); }}
-                className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
-                Deny
+              <button onClick={handleSave} disabled={saving}
+                className="flex-1 px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+                {saving ? 'Saving...' : 'Save'}
               </button>
             </div>
+          ) : (
+            <>
+              {!brand.approved && (
+                <div className="flex gap-2">
+                  <button onClick={() => { onApprove(brand.id, true); onClose(); }}
+                    className="flex-1 px-4 py-2.5 rounded-[10px] bg-[#2D7A4F] text-white text-[14px] font-semibold hover:opacity-[0.85]">
+                    Approve
+                  </button>
+                  <button onClick={() => { onApprove(brand.id, false); onClose(); }}
+                    className="flex-1 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)]">
+                    Deny
+                  </button>
+                </div>
+              )}
+              <button onClick={() => { onViewAs(brand); onClose(); }}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
+                <Eye size={14} /> View as Brand
+              </button>
+            </>
           )}
-          <button onClick={() => { onViewAs(brand); onClose(); }}
-            className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
-            <Eye size={14} /> View as Brand
-          </button>
         </div>
       </div>
     </>
@@ -325,6 +432,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           onClose={() => setPeekBrand(null)}
           onApprove={handleApprove}
           onViewAs={(b) => authCtx.setViewAs('business', b)}
+          onRefresh={() => fetchBrands()}
         />
       )}
       {showModal && <CreateBrandModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchBrands(); }} />}
