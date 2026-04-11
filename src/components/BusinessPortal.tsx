@@ -7,6 +7,7 @@ import {
   LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search, Megaphone, AlertCircle, ChevronRight
 } from 'lucide-react';
 import CampaignDetail from './CampaignDetail';
+import CampaignWizard from './CampaignWizard';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
 // ─── Avatar colors by initial ───
@@ -126,6 +127,7 @@ export default function BusinessPortal() {
   const [peekCreator, setPeekCreator] = useState<Participation | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [showCampaignWizard, setShowCampaignWizard] = useState(false);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -398,8 +400,12 @@ export default function BusinessPortal() {
             .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()));
           return (
           <div>
-            <div className="mb-5">
+            <div className="flex items-center justify-between mb-5">
               <h1 className="text-[20px] font-semibold text-[var(--ink)]">Campaigns</h1>
+              <button onClick={() => setShowCampaignWizard(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85]">
+                ✦ New Campaign
+              </button>
             </div>
 
             {/* Search + filter */}
@@ -1063,6 +1069,16 @@ export default function BusinessPortal() {
           })}
         </div>
       </div>
+
+      {/* Campaign Wizard */}
+      {showCampaignWizard && brand && (
+        <CampaignWizard
+          brands={[{ id: brand.id, name: brand.name, category: brand.category, region: undefined }]}
+          fixedBrandId={brand.id}
+          onSave={() => { setShowCampaignWizard(false); fetchBrand(); }}
+          onClose={() => setShowCampaignWizard(false)}
+        />
+      )}
 
       {/* Sign-out confirmation modal */}
       {showSignOutModal && (

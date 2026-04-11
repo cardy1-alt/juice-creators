@@ -4,6 +4,7 @@ import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../.
 import { getAvatarColors } from '../../lib/avatarColors';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
+import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
 
 // ─── Types ───
@@ -775,6 +776,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [peekCampaign, setPeekCampaign] = useState<Campaign | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
+  const [showWizard, setShowWizard] = useState(false);
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
   const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
@@ -930,8 +932,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           </div>
           <p className="text-[17px] font-semibold text-[var(--ink)] mb-1">No campaigns yet</p>
           <p className="text-[14px] text-[var(--ink-60)] mb-5">Create your first campaign to get started</p>
-          <button onClick={onOpenModal} className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
-            + New Campaign
+          <button onClick={onOpenModal} className="inline-flex items-center gap-2 px-5 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
+            ✦ New Campaign
           </button>
         </div>
       )}
@@ -947,8 +949,17 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         />
       )}
 
-      {/* Campaign Modal */}
-      {(showModal || editingCampaign) && (
+      {/* AI Campaign Wizard (new campaigns) */}
+      {(showModal && !editingCampaign) && (
+        <CampaignWizard
+          brands={brands}
+          onSave={() => { onCloseModal(); fetchCampaigns(); }}
+          onClose={onCloseModal}
+        />
+      )}
+
+      {/* Legacy Campaign Modal (editing existing campaigns) */}
+      {editingCampaign && (
         <CampaignModal
           brands={brands}
           campaign={editingCampaign}
