@@ -777,8 +777,9 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 }
 
 // ─── Main Export ───
-export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal }: {
+export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal, initialPeekId, onPeekHandled }: {
   showModal: boolean; onCloseModal: () => void; onOpenModal: () => void;
+  initialPeekId?: string; onPeekHandled?: () => void;
 }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -792,6 +793,14 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
 
   useEffect(() => { fetchCampaigns(); }, []);
+
+  // Cmd-K deep link
+  useEffect(() => {
+    if (initialPeekId && campaigns.length > 0) {
+      const c = campaigns.find(x => x.id === initialPeekId);
+      if (c) { setPeekCampaign(c); onPeekHandled?.(); }
+    }
+  }, [initialPeekId, campaigns]);
 
   const fetchCampaigns = async () => {
     const [campRes, brandRes] = await Promise.all([

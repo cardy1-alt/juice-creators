@@ -158,7 +158,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
 }
 
 // ─── Creator Peek Panel ───
-function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void; onRefresh: () => void }) {
+function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh, onDelete }: { creator: Creator; onClose: () => void; onViewAs: (creator: Creator) => void; onRefresh: () => void; onDelete: () => void }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const initial = (creator.display_name || creator.name || '?')[0].toUpperCase();
   const colors = getAvatarColors(initial);
@@ -367,6 +367,9 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh }: { creator: 
                 className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-[10px] text-[var(--ink-50)] text-[13px] font-medium hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.02)] transition-colors">
                 <KeyRound size={13} /> Send password reset
               </button>
+              <div className="flex justify-center mt-2">
+                <button onClick={onDelete} className="text-[14px] text-[var(--destructive)] font-medium hover:underline">Delete creator</button>
+              </div>
             </>
           )}
         </div>
@@ -376,16 +379,25 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh }: { creator: 
 }
 
 // ─── Main Export ───
-export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
+export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekId, onPeekHandled }: { showModal: boolean; onCloseModal: () => void; initialPeekId?: string; onPeekHandled?: () => void }) {
   const authCtx = useAuth();
   const [creators, setCreators] = useState<Creator[]>([]);
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [peekCreator, setPeekCreator] = useState<Creator | null>(null);
+  const [deletingCreator, setDeletingCreator] = useState<string | null>(null);
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
   useEffect(() => { fetchCreators(); }, []);
+
+  // Cmd-K deep link
+  useEffect(() => {
+    if (initialPeekId && creators.length > 0) {
+      const c = creators.find(x => x.id === initialPeekId);
+      if (c) { setPeekCreator(c); onPeekHandled?.(); }
+    }
+  }, [initialPeekId, creators]);
 
   const fetchCreators = async () => {
     const { data } = await supabase.from('creators').select('*').order('created_at', { ascending: false });
@@ -672,10 +684,29 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
         </table>
       </div>
 
-      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} onRefresh={() => { fetchCreators(); }} onViewAs={(c) => {
+      {peekCreator && <CreatorPeekPanel creator={peekCreator} onClose={() => setPeekCreator(null)} onRefresh={() => { fetchCreators(); }} onDelete={() => setDeletingCreator(peekCreator.id)} onViewAs={(c) => {
         const { setViewAs } = authCtx;
         setViewAs('creator', { ...c, display_name: c.display_name || c.name });
       }} />}
+      {deletingCreator && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[380px] w-full mx-4 p-6 text-center animate-slide-up">
+            <h3 className="nayba-h3">Delete creator?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this creator and all their applications and campaign participations. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeletingCreator(null)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={async () => {
+                await supabase.from('participations').delete().eq('creator_id', deletingCreator);
+                await supabase.from('applications').delete().eq('creator_id', deletingCreator);
+                await supabase.from('creators').delete().eq('id', deletingCreator);
+                setDeletingCreator(null);
+                setPeekCreator(null);
+                fetchCreators();
+              }} className="flex-1 py-2.5 rounded-[10px] bg-[var(--destructive)] text-white font-semibold text-[14px]">Delete</button>
+            </div>
+          </div>
+        </div>
+      )}
       {showModal && <CreateCreatorModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchCreators(); }} showToast={showToast} />}
     </div>
   );

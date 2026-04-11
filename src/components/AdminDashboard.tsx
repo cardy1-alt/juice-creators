@@ -10,6 +10,7 @@ import AdminBrandsTab from './admin/AdminBrandsTab';
 import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
 import AdminNotificationsTab from './admin/AdminNotificationsTab';
 import AdminSettingsTab from './admin/AdminSettingsTab';
+import CommandPalette from './admin/CommandPalette';
 
 type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
 
@@ -63,11 +64,31 @@ export default function AdminDashboard() {
   const [pendingCount, setPendingCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
+  const [cmdkOpen, setCmdkOpen] = useState(false);
+  const [peekTarget, setPeekTarget] = useState<{ tab: Tab; entityId: string } | null>(null);
 
   useEffect(() => {
     supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
       .then(({ count }) => setPendingCount(count || 0));
   }, []);
+
+  // Cmd+K listener
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setCmdkOpen(prev => !prev);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, []);
+
+  const handleCmdKNavigate = (tab: Tab, entityId?: string) => {
+    setActiveTab(tab);
+    setCmdkOpen(false);
+    if (entityId) setPeekTarget({ tab, entityId });
+  };
 
   const handleTabClick = (tab: Tab) => {
     setActiveTab(tab);
@@ -223,14 +244,17 @@ export default function AdminDashboard() {
 
         {/* Content */}
         <main className="flex-1 p-4 md:p-6 lg:px-6 lg:pt-6 lg:pb-8 overflow-auto">
-          {activeTab === 'campaigns' && <AdminCampaignsTab showModal={showModal} onCloseModal={() => setShowModal(false)} onOpenModal={() => setShowModal(true)} />}
-          {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
-          {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
+          {activeTab === 'campaigns' && <AdminCampaignsTab showModal={showModal} onCloseModal={() => setShowModal(false)} onOpenModal={() => setShowModal(true)} initialPeekId={peekTarget?.tab === 'campaigns' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
+          {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'creators' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
+          {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'brands' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
           {activeTab === 'notifications' && <AdminNotificationsTab />}
           {activeTab === 'settings' && <AdminSettingsTab />}
         </main>
       </div>
+
+      {/* Cmd-K command palette */}
+      <CommandPalette open={cmdkOpen} onClose={() => setCmdkOpen(false)} onNavigate={handleCmdKNavigate} />
 
       {/* Sign-out confirmation modal */}
       {showSignOutModal && (

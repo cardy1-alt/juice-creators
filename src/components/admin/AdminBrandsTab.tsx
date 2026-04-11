@@ -101,10 +101,11 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
 }
 
 // ─── Brand Peek Panel ───
-function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, onRefresh }: {
+function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, onRefresh, onDelete }: {
   brand: Brand; campaignCount: number; onClose: () => void;
   onApprove: (id: string, approved: boolean) => void;
   onViewAs: (brand: Brand) => void; onRefresh: () => void;
+  onDelete: () => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
@@ -302,6 +303,9 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
                 className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
                 <Eye size={14} /> View as Brand
               </button>
+              <div className="flex justify-center mt-2">
+                <button onClick={onDelete} className="text-[14px] text-[var(--destructive)] font-medium hover:underline">Delete brand</button>
+              </div>
             </>
           )}
         </div>
@@ -310,14 +314,23 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
   );
 }
 
-export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal: boolean; onCloseModal: () => void }) {
+export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId, onPeekHandled }: { showModal: boolean; onCloseModal: () => void; initialPeekId?: string; onPeekHandled?: () => void }) {
   const authCtx = useAuth();
   const [brands, setBrands] = useState<Brand[]>([]);
   const [campaignCounts, setCampaignCounts] = useState<Record<string, number>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [peekBrand, setPeekBrand] = useState<Brand | null>(null);
+  const [deletingBrand, setDeletingBrand] = useState<string | null>(null);
 
   useEffect(() => { fetchBrands(); }, []);
+
+  // Cmd-K deep link
+  useEffect(() => {
+    if (initialPeekId && brands.length > 0) {
+      const b = brands.find(x => x.id === initialPeekId);
+      if (b) { setPeekBrand(b); onPeekHandled?.(); }
+    }
+  }, [initialPeekId, brands]);
 
   const fetchBrands = async () => {
     const { data } = await supabase.from('businesses').select('*').order('created_at', { ascending: false });
@@ -433,7 +446,32 @@ export default function AdminBrandsTab({ showModal, onCloseModal }: { showModal:
           onApprove={handleApprove}
           onViewAs={(b) => authCtx.setViewAs('business', b)}
           onRefresh={() => fetchBrands()}
+          onDelete={() => setDeletingBrand(peekBrand.id)}
         />
+      )}
+      {deletingBrand && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
+          <div className="bg-white rounded-[12px] max-w-[380px] w-full mx-4 p-6 text-center animate-slide-up">
+            <h3 className="nayba-h3">Delete brand?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this brand and all its campaigns, applications, and participations. This cannot be undone.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setDeletingBrand(null)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={async () => {
+                const { data: brandCampaigns } = await supabase.from('campaigns').select('id').eq('brand_id', deletingBrand);
+                const campaignIds = (brandCampaigns || []).map((c: any) => c.id);
+                if (campaignIds.length > 0) {
+                  await supabase.from('participations').delete().in('campaign_id', campaignIds);
+                  await supabase.from('applications').delete().in('campaign_id', campaignIds);
+                }
+                await supabase.from('campaigns').delete().eq('brand_id', deletingBrand);
+                await supabase.from('businesses').delete().eq('id', deletingBrand);
+                setDeletingBrand(null);
+                setPeekBrand(null);
+                fetchBrands();
+              }} className="flex-1 py-2.5 rounded-[10px] bg-[var(--destructive)] text-white font-semibold text-[14px]">Delete</button>
+            </div>
+          </div>
+        </div>
       )}
       {showModal && <CreateBrandModal onClose={onCloseModal} onCreated={() => { onCloseModal(); fetchBrands(); }} />}
     </div>
