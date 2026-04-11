@@ -20,7 +20,7 @@ export default function EmailTemplateEditor({ template, onClose }: Props) {
   const [subject, setSubject] = useState(template.defaultSubject);
   const iframeRef = useRef<HTMLIFrameElement>(null);
 
-  // Write preview HTML to iframe
+  // Write preview HTML to iframe and auto-resize
   useEffect(() => {
     if (iframeRef.current) {
       const doc = iframeRef.current.contentDocument;
@@ -28,6 +28,14 @@ export default function EmailTemplateEditor({ template, onClose }: Props) {
         doc.open();
         doc.write(renderPreview(template));
         doc.close();
+        // Auto-resize iframe to content height
+        const resize = () => {
+          if (iframeRef.current && doc.body) {
+            iframeRef.current.style.height = doc.body.scrollHeight + 20 + 'px';
+          }
+        };
+        setTimeout(resize, 50);
+        setTimeout(resize, 200);
       }
     }
   }, [template]);
@@ -88,7 +96,7 @@ export default function EmailTemplateEditor({ template, onClose }: Props) {
                 ref={iframeRef}
                 title="Email preview"
                 className="w-full border-0"
-                style={{ height: 500, pointerEvents: 'none' }}
+                style={{ minHeight: 300, pointerEvents: 'none' }}
                 sandbox="allow-same-origin"
               />
             </div>
