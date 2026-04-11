@@ -351,12 +351,18 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           {step === 3 && (
             <>
               <button onClick={() => setStep(2)} className={ghostBtn}>← Back</button>
-              <div className="flex gap-3">
-                <button onClick={() => handleSave('draft')} disabled={saving} className={secondaryBtn}>Save as Draft</button>
-                <button onClick={() => handleSave('active')} disabled={saving} className={primaryBtn} style={{ fontWeight: 700 }}>
-                  {saving ? 'Publishing...' : 'Publish Campaign'}
+              {campaign ? (
+                <button onClick={() => handleSave(campaign.status)} disabled={saving} className={primaryBtn} style={{ fontWeight: 700 }}>
+                  {saving ? 'Saving...' : 'Save Changes'}
                 </button>
-              </div>
+              ) : (
+                <div className="flex gap-3">
+                  <button onClick={() => handleSave('draft')} disabled={saving} className={secondaryBtn}>Save as Draft</button>
+                  <button onClick={() => handleSave('active')} disabled={saving} className={primaryBtn} style={{ fontWeight: 700 }}>
+                    {saving ? 'Publishing...' : 'Publish Campaign'}
+                  </button>
+                </div>
+              )}
             </>
           )}
         </div>
@@ -757,10 +763,10 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
             </button>
             <span className="text-[var(--ink-15)]">·</span>
             <button onClick={async () => {
-              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, required_tags, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
+              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
               const { error } = await supabase.from('campaigns').insert({
                 brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
-                target_city, target_county, creator_target, min_level, content_requirements, required_tags,
+                target_city, target_county, creator_target, min_level, content_requirements,
                 talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
               });
               if (error) showToast('Failed to duplicate');
