@@ -1,6 +1,6 @@
 // Supabase Edge Function: invite-brand
-// Called from admin dashboard when creating a brand.
-// Creates an auth user and sends an invite email so the brand owner
+// Called from admin dashboard when creating a brand or creator.
+// Creates an auth user and sends an invite email so the user
 // can set their own password and sign in.
 
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
@@ -16,11 +16,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const { email, brandName } = await req.json();
+    const { email, brandName, role } = await req.json();
 
-    if (!email || !brandName) {
+    if (!email) {
       return new Response(
-        JSON.stringify({ error: 'email and brandName are required' }),
+        JSON.stringify({ error: 'email is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -38,14 +38,14 @@ Deno.serve(async (req) => {
 
     if (existing) {
       return new Response(
-        JSON.stringify({ success: true, message: 'User already exists — they can sign in with their existing password' }),
+        JSON.stringify({ success: true, userId: existing.id, message: 'User already exists' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
     // Invite user — sends a "Set your password" email
     const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
-      data: { role: 'business', brand_name: brandName },
+      data: { role: role || 'business', brand_name: brandName || undefined },
       redirectTo: Deno.env.get('APP_URL') || 'https://nayba.vercel.app',
     });
 

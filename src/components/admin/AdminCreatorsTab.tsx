@@ -34,10 +34,9 @@ function fmtDate(d: string) {
 // ─── Create Creator Modal ───
 function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => void; onCreated: () => void; showToast: (msg: string) => void }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1' });
+  const [form, setForm] = useState({ displayName: '', email: '', instagram: '', city: '', level: '1', followers: '' });
   const [creating, setCreating] = useState(false);
-  const [createdPassword, setCreatedPassword] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
+  const [created, setCreated] = useState(false);
   const [error, setError] = useState('');
 
   const handleCreate = async (e: React.FormEvent) => {
@@ -49,37 +48,33 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
     if (!emailRegex.test(form.email)) { setError('Please enter a valid email address'); return; }
 
     setCreating(true);
-    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789';
-    const tempPassword = Array.from({ length: 12 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email: form.email, password: tempPassword });
-    if (authError) {
-      setError(authError.message === 'User already registered' ? 'This email is already registered' : authError.message);
+    // Invite user via edge function — sends "set your password" email
+    const { data: inviteData, error: inviteErr } = await supabase.functions.invoke('invite-brand', {
+      body: { email: form.email, role: 'creator' },
+    });
+    if (inviteErr) {
+      setError('Failed to create account — ' + inviteErr.message);
       setCreating(false);
       return;
     }
-    if (!authData.user) { setError('Failed to create account — try again'); setCreating(false); return; }
+    const userId = inviteData?.userId;
+    if (!userId) { setError('Failed to create account — no user ID returned'); setCreating(false); return; }
 
     const level = parseInt(form.level) || 1;
     const handle = normalizeInstagram(form.instagram);
 
     const { error: insertErr } = await supabase.from('creators').insert({
-      id: authData.user.id, name: form.displayName, display_name: form.displayName,
+      id: userId, name: form.displayName, display_name: form.displayName,
       email: form.email, instagram_handle: handle || '',
       address: form.city || null, level,
       level_name: LEVEL_NAMES[level] || 'Newcomer',
+      follower_count: form.followers || null,
       approved: true, onboarding_complete: true, profile_complete: true,
     });
-    if (insertErr) { setError('Account created but profile save failed — contact support'); setCreating(false); return; }
+    if (insertErr) { setError('Account created but profile save failed — ' + insertErr.message); setCreating(false); return; }
 
-    const { error: notifErr } = await supabase.from('notifications').insert({
-      user_id: authData.user.id, user_type: 'creator',
-      message: 'Welcome to nayba! Your account has been created. Check your email for login details.',
-      email_type: 'creator_welcome', email_meta: {},
-    });
-    if (notifErr) showToast('Account created but welcome notification failed');
-
-    setCreatedPassword(tempPassword);
+    setCreated(true);
     setCreating(false);
     onCreated();
   };
@@ -93,27 +88,22 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
           <button onClick={onClose} className="w-[30px] h-[30px] rounded-full bg-[rgba(42,32,24,0.02)] flex items-center justify-center text-[var(--ink-50)] hover:bg-[#EDE9E3]"><X size={15} /></button>
         </div>
         <div className="flex-1 overflow-y-auto px-4 py-5 md:px-6 md:py-6">
-          {createdPassword ? (
+          {created ? (
             <div className="text-center py-4">
               <div className="w-12 h-12 rounded-full bg-[rgba(45,122,79,0.08)] flex items-center justify-center mx-auto mb-3">
                 <Check size={22} className="text-[#2D7A4F]" />
               </div>
               <p className="text-[16px] font-semibold text-[var(--ink)] mb-2">Account created</p>
-              <p className="text-[14px] text-[var(--ink-60)] mb-3">Share this temporary password with the creator:</p>
-              <div className="inline-flex items-center gap-2 bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] px-4 py-2.5">
-                <code className="text-[15px] font-mono text-[var(--terra)]">{showPassword ? createdPassword : '••••••••••••'}</code>
-                <button onClick={() => setShowPassword(!showPassword)} className="text-[var(--ink-50)]">
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
+              <p className="text-[14px] text-[var(--ink-60)] mb-1">{form.displayName} will receive an email to set their password.</p>
+              <p className="text-[13px] text-[var(--ink-35)]">{form.email}</p>
               <div className="mt-5">
                 <button onClick={onClose} className="px-5 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold">Done</button>
               </div>
             </div>
           ) : (
             <>
-              <p className="text-[12px] text-[var(--ink-60)] mb-5 leading-[1.6]">
-                A Supabase auth account will be created automatically. Share the temporary password with the creator directly.
+              <p className="text-[13px] text-[var(--ink-50)] mb-5 leading-[1.6]">
+                The creator will receive an email to set their own password and sign in.
               </p>
               {error && (
                 <div className="flex items-center gap-2 px-3.5 py-2.5 rounded-[10px] mb-4" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
@@ -126,7 +116,17 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
                 <div><label className={labelCls}>County</label><select value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls}><option value="">Select county</option><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
-                <div className="md:col-span-2">
+                <div>
+                  <label className={labelCls}>Follower Count</label>
+                  <select value={form.followers} onChange={e => setForm(p => ({ ...p, followers: e.target.value }))} className={inputCls}>
+                    <option value="">Select range</option>
+                    <option value="0-1k">0 – 1,000</option>
+                    <option value="1k-5k">1,000 – 5,000</option>
+                    <option value="5k-10k">5,000 – 10,000</option>
+                    <option value="10k+">10,000+</option>
+                  </select>
+                </div>
+                <div>
                   <label className={labelCls}>Starting Level</label>
                   <select value={form.level} onChange={e => setForm(p => ({ ...p, level: e.target.value }))} className={inputCls}>
                     <option value="1">1 — Newcomer</option><option value="2">2 — Explorer</option>
@@ -137,7 +137,7 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
             </>
           )}
         </div>
-        {!createdPassword && (
+        {!created && (
           <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
             <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
             <button onClick={handleCreate as any} disabled={creating}
