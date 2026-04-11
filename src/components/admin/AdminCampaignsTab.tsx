@@ -759,6 +759,9 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
               Duplicate
             </button>
           </div>
+          <div className="flex justify-center mt-3">
+            <button onClick={onDelete} className="text-[14px] text-[var(--destructive)] font-medium hover:underline">Delete campaign</button>
+          </div>
         </div>
       </div>
     </>
@@ -776,6 +779,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
+  const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
 
   useEffect(() => { fetchCampaigns(); }, []);
 
@@ -941,6 +945,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           onClose={() => setPeekCampaign(null)}
           onViewParticipation={() => { setParticipationCampaign(peekCampaign); setPeekCampaign(null); }}
           onEdit={() => { setEditingCampaign(peekCampaign); onOpenModal(); setPeekCampaign(null); }}
+          onDelete={() => setDeletingCampaign(peekCampaign.id)}
         />
       )}
 
