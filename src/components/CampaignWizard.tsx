@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase';
 import { sendBusinessCampaignLiveEmail } from '../lib/notifications';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import ImageUpload from './ImageUpload';
+import Select from './ui/Select';
 
 interface Brand {
   id: string;
@@ -212,10 +213,7 @@ Return only valid JSON, no markdown, no code fences.`,
               {!fixedBrandId && (
                 <div>
                   <label className={labelCls}>Brand *</label>
-                  <select value={brandId} onChange={e => setBrandId(e.target.value)} className={inputCls}>
-                    <option value="">Select brand...</option>
-                    {brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}
-                  </select>
+                  <Select value={brandId} onChange={setBrandId} placeholder="Select brand..." options={[{ value: '', label: 'Select brand...' }, ...brands.map(b => ({ value: b.id, label: b.name }))]} />
                 </div>
               )}
 
@@ -258,9 +256,7 @@ Return only valid JSON, no markdown, no code fences.`,
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={labelCls}>Target City</label><input value={gen.target_city} onChange={e => setG('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
                     <div><label className={labelCls}>County</label>
-                      <select value={gen.target_county} onChange={e => setG('target_county', e.target.value)} className={inputCls}>
-                        <option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option>
-                      </select>
+                      <Select value={gen.target_county} onChange={val => setG('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} />
                     </div>
                   </div>
                   <div>
@@ -351,9 +347,7 @@ Return only valid JSON, no markdown, no code fences.`,
                     <div><label className={labelCls}>Creator Target</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
                     <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={gen.perk_value} onChange={e => setG('perk_value', e.target.value)} className={inputCls} /></div>
                     <div><label className={labelCls}>County</label>
-                      <select value={gen.target_county} onChange={e => setG('target_county', e.target.value)} className={inputCls}>
-                        <option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option>
-                      </select>
+                      <Select value={gen.target_county} onChange={val => setG('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} />
                     </div>
                   </div>
                   <div className="grid grid-cols-3 gap-3">

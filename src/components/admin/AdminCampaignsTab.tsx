@@ -6,6 +6,7 @@ import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye,
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
+import Select from '../ui/Select';
 
 // ─── Types ───
 interface Brand { id: string; name: string; }
@@ -222,7 +223,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           {/* STEP 1 — Basics */}
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className={labelCls}>Brand *</label><select value={form.brand_id} onChange={e => set('brand_id', e.target.value)} className={inputCls}><option value="">Select brand...</option>{brands.map(b => <option key={b.id} value={b.id}>{b.name}</option>)}</select></div>
+              <div><label className={labelCls}>Brand *</label><Select value={form.brand_id} onChange={val => set('brand_id', val)} placeholder="Select brand..." options={[{ value: '', label: 'Select brand...' }, ...brands.map(b => ({ value: b.id, label: b.name }))]} /></div>
               <div><label className={labelCls}>Title *</label><input value={form.title} onChange={e => set('title', e.target.value)} className={inputCls} placeholder="Campaign title" /></div>
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between mb-1.5">
@@ -238,12 +239,12 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               </div>
               <div className="md:col-span-2"><label className={labelCls}>Perk Description</label><textarea value={form.perk_description} onChange={e => set('perk_description', e.target.value)} className={taCls} placeholder="What the creator receives" /></div>
               <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={form.perk_value} onChange={e => set('perk_value', e.target.value)} className={inputCls} /></div>
-              <div><label className={labelCls}>Perk Type</label><select value={form.perk_type} onChange={e => set('perk_type', e.target.value)} className={inputCls}><option value="experience">Experience</option><option value="product">Product</option><option value="gift_card">Gift Card</option></select></div>
+              <div><label className={labelCls}>Perk Type</label><Select value={form.perk_type} onChange={val => set('perk_type', val)} options={[{ value: 'experience', label: 'Experience' }, { value: 'product', label: 'Product' }, { value: 'gift_card', label: 'Gift Card' }]} /></div>
               <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
-              <div><label className={labelCls}>Target County</label><select value={form.target_county} onChange={e => set('target_county', e.target.value)} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
+              <div><label className={labelCls}>Target County</label><Select value={form.target_county} onChange={val => set('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} /></div>
               <div><label className={labelCls}>Creator Target</label><input type="number" min="1" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
-              <div><label className={labelCls}>Min Creator Level</label><select value={form.min_level} onChange={e => set('min_level', e.target.value)} className={inputCls}><option value="1">Any (Level 1+)</option><option value="3">Regular+ (Level 3+)</option><option value="5">Trusted+ (Level 5+)</option></select></div>
-              <div><label className={labelCls}>Campaign Type</label><select value={form.campaign_type} onChange={e => set('campaign_type', e.target.value)} className={inputCls}><option value="brand">Brand Campaign</option><option value="community">Community Campaign</option></select></div>
+              <div><label className={labelCls}>Min Creator Level</label><Select value={form.min_level} onChange={val => set('min_level', val)} options={[{ value: '1', label: 'Any (Level 1+)' }, { value: '3', label: 'Regular+ (Level 3+)' }, { value: '5', label: 'Trusted+ (Level 5+)' }]} /></div>
+              <div><label className={labelCls}>Campaign Type</label><Select value={form.campaign_type} onChange={val => set('campaign_type', val)} options={[{ value: 'brand', label: 'Brand Campaign' }, { value: 'community', label: 'Community Campaign' }]} /></div>
               <div className="md:col-span-2"><ImageUpload value={form.campaign_image} onChange={url => set('campaign_image', url)} folder="campaigns" label="Campaign Image" /></div>
             </div>
           )}
@@ -518,15 +519,13 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                         </div>
                       </td>
                       <td className={pTdCls}>
-                        <select value={p.status}
-                          onChange={e => updateField(p.id, 'status', e.target.value)}
-                          className="text-[12px] px-2 py-1.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] bg-[rgba(42,32,24,0.02)] focus:outline-none focus:border-[var(--terra)]">
-                          <option value="confirmed">Confirmed</option>
-                          <option value="visited">Visited</option>
-                          <option value="content_submitted">Content Submitted</option>
-                          <option value="completed">Completed</option>
-                          <option value="overdue">Overdue</option>
-                        </select>
+                        <Select value={p.status} onChange={val => updateField(p.id, 'status', val)} options={[
+                          { value: 'confirmed', label: 'Confirmed' },
+                          { value: 'visited', label: 'Visited' },
+                          { value: 'content_submitted', label: 'Content Submitted' },
+                          { value: 'completed', label: 'Completed' },
+                          { value: 'overdue', label: 'Overdue' },
+                        ]} />
                       </td>
                       <td className={pTdCls}>
                         <input type="checkbox" checked={p.perk_sent}
@@ -895,21 +894,19 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
               placeholder="Search by title or brand..."
               className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
           </div>
-          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-            className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-            <option value="all">All statuses</option>
-            <option value="draft">Draft</option>
-            <option value="active">Active</option>
-            <option value="selecting">Selecting</option>
-            <option value="live">Live</option>
-            <option value="completed">Completed</option>
-          </select>
-          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-            className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="deadline">By deadline</option>
-          </select>
+          <Select value={statusFilter} onChange={setStatusFilter} options={[
+            { value: 'all', label: 'All statuses' },
+            { value: 'draft', label: 'Draft' },
+            { value: 'active', label: 'Active' },
+            { value: 'selecting', label: 'Selecting' },
+            { value: 'live', label: 'Live' },
+            { value: 'completed', label: 'Completed' },
+          ]} />
+          <Select value={sortBy} onChange={val => setSortBy(val as any)} options={[
+            { value: 'newest', label: 'Newest first' },
+            { value: 'oldest', label: 'Oldest first' },
+            { value: 'deadline', label: 'By deadline' },
+          ]} />
         </div>
       )}
 

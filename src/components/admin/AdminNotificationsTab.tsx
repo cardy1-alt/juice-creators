@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Send } from 'lucide-react';
+import Select from '../ui/Select';
 
 interface Campaign {
   id: string; title: string; target_city: string | null; target_county: string | null;
@@ -113,10 +114,7 @@ export default function AdminNotificationsTab() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Select Campaign</label>
-            <select value={selectedCampaignId} onChange={e => setSelectedCampaignId(e.target.value)} className={inputCls}>
-              <option value="">Choose a campaign...</option>
-              {campaigns.map(c => <option key={c.id} value={c.id}>{c.businesses?.name} — {c.title}</option>)}
-            </select>
+            <Select value={selectedCampaignId} onChange={setSelectedCampaignId} placeholder="Choose a campaign..." options={[{ value: '', label: 'Choose a campaign...' }, ...campaigns.map(c => ({ value: c.id, label: `${c.businesses?.name} — ${c.title}` }))]} />
           </div>
           <div className="flex items-end">
             {selectedCampaignId && (

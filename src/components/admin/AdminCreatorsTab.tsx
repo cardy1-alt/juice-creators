@@ -6,6 +6,7 @@ import { getLevelColour } from '../../lib/levels';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search, Pencil, KeyRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
+import Select from '../ui/Select';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
@@ -120,23 +121,23 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
                 <div><label className={labelCls}>Display Name *</label><input value={form.displayName} onChange={e => { setForm(p => ({ ...p, displayName: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
                 <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
-                <div><label className={labelCls}>County</label><select value={form.city} onChange={e => setForm(p => ({ ...p, city: e.target.value }))} className={inputCls}><option value="">Select county</option><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
+                <div><label className={labelCls}>County</label><Select value={form.city} onChange={val => setForm(p => ({ ...p, city: val }))} placeholder="Select county" options={[{ value: '', label: 'Select county' }, { value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} /></div>
                 <div>
                   <label className={labelCls}>Follower Count</label>
-                  <select value={form.followers} onChange={e => setForm(p => ({ ...p, followers: e.target.value }))} className={inputCls}>
-                    <option value="">Select range</option>
-                    <option value="0-1k">0 – 1,000</option>
-                    <option value="1k-5k">1,000 – 5,000</option>
-                    <option value="5k-10k">5,000 – 10,000</option>
-                    <option value="10k+">10,000+</option>
-                  </select>
+                  <Select value={form.followers} onChange={val => setForm(p => ({ ...p, followers: val }))} placeholder="Select range" options={[
+                    { value: '', label: 'Select range' },
+                    { value: '0-1k', label: '0 – 1,000' },
+                    { value: '1k-5k', label: '1,000 – 5,000' },
+                    { value: '5k-10k', label: '5,000 – 10,000' },
+                    { value: '10k+', label: '10,000+' },
+                  ]} />
                 </div>
                 <div>
                   <label className={labelCls}>Starting Level</label>
-                  <select value={form.level} onChange={e => setForm(p => ({ ...p, level: e.target.value }))} className={inputCls}>
-                    <option value="1">1 — Newcomer</option><option value="2">2 — Explorer</option>
-                    <option value="3">3 — Regular</option><option value="4">4 — Local</option><option value="5">5 — Trusted</option>
-                  </select>
+                  <Select value={form.level} onChange={val => setForm(p => ({ ...p, level: val }))} options={[
+                    { value: '1', label: '1 — Newcomer' }, { value: '2', label: '2 — Explorer' },
+                    { value: '3', label: '3 — Regular' }, { value: '4', label: '4 — Local' }, { value: '5', label: '5 — Trusted' },
+                  ]} />
                 </div>
               </form>
             </>
@@ -260,23 +261,24 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh, onDelete }: {
               </div>
               <div>
                 <label className={labelCls}>County</label>
-                <select value={form.address} onChange={e => setForm({ ...form, address: e.target.value })} className={inputCls}>
-                  <option value="">Not set</option>
-                  {['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <Select value={form.address} onChange={val => setForm({ ...form, address: val })} placeholder="Not set" options={[
+                  { value: '', label: 'Not set' },
+                  { value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' },
+                  { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' },
+                ]} />
               </div>
               <div>
                 <label className={labelCls}>Follower Count</label>
-                <select value={form.follower_count} onChange={e => setForm({ ...form, follower_count: e.target.value })} className={inputCls}>
-                  <option value="">Not set</option>
-                  {['0-500', '500-1k', '1k-5k', '5k-10k', '10k-50k', '50k+'].map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
+                <Select value={form.follower_count} onChange={val => setForm({ ...form, follower_count: val })} placeholder="Not set" options={[
+                  { value: '', label: 'Not set' },
+                  ...['0-500', '500-1k', '1k-5k', '5k-10k', '10k-50k', '50k+'].map(r => ({ value: r, label: r })),
+                ]} />
               </div>
               <div>
                 <label className={labelCls}>Level</label>
-                <select value={form.level} onChange={e => setForm({ ...form, level: e.target.value })} className={inputCls}>
-                  {Object.entries(LEVEL_NAMES).map(([k, v]) => <option key={k} value={k}>L{k} — {v}</option>)}
-                </select>
+                <Select value={form.level} onChange={val => setForm({ ...form, level: val })} options={
+                  Object.entries(LEVEL_NAMES).map(([k, v]) => ({ value: k, label: `L${k} — ${v}` }))
+                } />
               </div>
             </div>
           ) : (
@@ -600,18 +602,16 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
             placeholder="Search by name, email, Instagram, or county..."
             className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-          <option value="all">All statuses</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-          <option value="newest">Newest first</option>
-          <option value="alphabetical">A — Z</option>
-          <option value="level">Highest level</option>
-        </select>
+        <Select value={statusFilter} onChange={setStatusFilter} options={[
+          { value: 'all', label: 'All statuses' },
+          { value: 'approved', label: 'Approved' },
+          { value: 'pending', label: 'Pending' },
+        ]} />
+        <Select value={sortBy} onChange={val => setSortBy(val as any)} options={[
+          { value: 'newest', label: 'Newest first' },
+          { value: 'alphabetical', label: 'A — Z' },
+          { value: 'level', label: 'Highest level' },
+        ]} />
       </div>
 
       {/* Mobile card list */}

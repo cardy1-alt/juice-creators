@@ -5,6 +5,7 @@ import { getAvatarColors } from '../../lib/avatarColors';
 import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
+import Select from '../ui/Select';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
@@ -82,8 +83,8 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
           <form onSubmit={handleCreate} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div><label className={labelCls}>Brand Name *</label><input value={form.name} onChange={e => { setForm(p => ({ ...p, name: e.target.value })); setError(''); }} className={inputCls} required /></div>
             <div><label className={labelCls}>Owner Email *</label><input type="email" value={form.email} onChange={e => { setForm(p => ({ ...p, email: e.target.value })); setError(''); }} className={inputCls} required /></div>
-            <div><label className={labelCls}>Category *</label><select value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} className={inputCls} required><option value="">Select...</option>{CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}</select></div>
-            <div><label className={labelCls}>Region</label><select value={form.region} onChange={e => setForm(p => ({ ...p, region: e.target.value }))} className={inputCls}><option value="Suffolk">Suffolk</option><option value="Norfolk">Norfolk</option><option value="Cambridgeshire">Cambridgeshire</option><option value="Essex">Essex</option></select></div>
+            <div><label className={labelCls}>Category *</label><Select value={form.category} onChange={val => setForm(p => ({ ...p, category: val }))} placeholder="Select..." options={[{ value: '', label: 'Select...' }, ...CATEGORIES.map(c => ({ value: c, label: c }))]} /></div>
+            <div><label className={labelCls}>Region</label><Select value={form.region} onChange={val => setForm(p => ({ ...p, region: val }))} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} /></div>
             <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
             <div><label className={labelCls}>Address</label><input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className={inputCls} /></div>
             <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} min-h-[72px] resize-y`} /></div>
@@ -194,15 +195,11 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
               </div>
               <div>
                 <label className={labelCls}>Category</label>
-                <select value={form.category} onChange={e => setForm({ ...form, category: e.target.value })} className={inputCls}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                </select>
+                <Select value={form.category} onChange={val => setForm({ ...form, category: val })} options={CATEGORIES.map(c => ({ value: c, label: c }))} />
               </div>
               <div>
                 <label className={labelCls}>Region</label>
-                <select value={form.region} onChange={e => setForm({ ...form, region: e.target.value })} className={inputCls}>
-                  {['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(r => <option key={r} value={r}>{r}</option>)}
-                </select>
+                <Select value={form.region} onChange={val => setForm({ ...form, region: val })} options={['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(r => ({ value: r, label: r }))} />
               </div>
               <div>
                 <label className={labelCls}>Instagram Handle</label>
@@ -387,17 +384,15 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
             placeholder="Search by name, email, or category..."
             className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
         </div>
-        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
-          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-          <option value="all">All statuses</option>
-          <option value="approved">Approved</option>
-          <option value="pending">Pending</option>
-        </select>
-        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
-          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
-          <option value="newest">Newest first</option>
-          <option value="alphabetical">A — Z</option>
-        </select>
+        <Select value={statusFilter} onChange={setStatusFilter} options={[
+          { value: 'all', label: 'All statuses' },
+          { value: 'approved', label: 'Approved' },
+          { value: 'pending', label: 'Pending' },
+        ]} />
+        <Select value={sortBy} onChange={val => setSortBy(val as any)} options={[
+          { value: 'newest', label: 'Newest first' },
+          { value: 'alphabetical', label: 'A — Z' },
+        ]} />
       </div>
 
       {/* Mobile card list */}
