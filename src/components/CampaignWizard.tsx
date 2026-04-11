@@ -197,15 +197,13 @@ Return only valid JSON, no markdown, no code fences.`,
           {step === 1 && (
             <div className="space-y-4">
               {/* Mode toggle */}
-              <div className="flex gap-1 p-1 rounded-[10px] bg-[rgba(42,32,24,0.04)]">
+              <div className="flex gap-1 border-b border-[rgba(42,32,24,0.08)]">
                 <button type="button" onClick={() => setMode('ai')}
-                  className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'ai' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
-                  style={mode === 'ai' ? { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' } : undefined}>
+                  className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'ai' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
                   ✦ AI Assist
                 </button>
                 <button type="button" onClick={() => setMode('manual')}
-                  className={`flex-1 py-2 rounded-[8px] text-[13px] font-medium transition-colors ${mode === 'manual' ? 'bg-white text-[var(--ink)]' : 'text-[var(--ink-50)]'}`}
-                  style={mode === 'manual' ? { boxShadow: '0 1px 4px rgba(42,32,24,0.04)' } : undefined}>
+                  className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'manual' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
                   Create manually
                 </button>
               </div>
