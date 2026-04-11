@@ -7,7 +7,7 @@ const CreatorApp = React.lazy(() => import('./components/CreatorApp'));
 const BusinessPortal = React.lazy(() => import('./components/BusinessPortal'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 const CampaignDetail = React.lazy(() => import('./components/CampaignDetail'));
-import { AlertCircle, RefreshCw, LogOut, Eye, EyeOff, Lock, CheckCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw, LogOut, Eye, EyeOff, Lock, CheckCircle, Clock } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
 class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; errorMessage: string }> {
@@ -296,7 +296,7 @@ function ViewAsBanner() {
 }
 
 function App() {
-  const { user, userRole, loading, signOut, viewAsRole, viewAsProfile } = useAuth();
+  const { user, userRole, userProfile, loading, signOut, viewAsRole, viewAsProfile } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
   const campaignId = getCampaignIdFromUrl();
 
@@ -399,6 +399,22 @@ function App() {
   }
 
   if (userRole === 'business') {
+    if (userProfile && !userProfile.approved) {
+      return (
+        <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--chalk)' }}>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-[var(--terra-light)] mb-4">
+            <Clock size={28} strokeWidth={1.5} className="text-[var(--terra)]" />
+          </div>
+          <h2 className="text-xl font-sans font-semibold mb-2 text-[var(--ink)]">You're on the list</h2>
+          <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
+            We're reviewing your business profile and will email you at {userProfile.owner_email} once you're approved. Usually within 24 hours.
+          </p>
+          <button onClick={signOut} style={{ fontSize: 13, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
+            Sign out
+          </button>
+        </div>
+      );
+    }
     return <React.Suspense fallback={suspenseFallback}>{isDemo && <DemoBanner />}<div className={isDemo ? 'pt-10' : ''}><BusinessPortal /></div></React.Suspense>;
   }
 

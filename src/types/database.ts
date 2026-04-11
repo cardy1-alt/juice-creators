@@ -263,6 +263,7 @@ export type Database = {
           instagram_access_token: string | null;
           phone: string | null;
           referred_by: string | null;
+          date_of_birth: string | null;
         };
         Insert: {
           id?: string;
@@ -295,6 +296,7 @@ export type Database = {
           instagram_access_token?: string | null;
           phone?: string | null;
           referred_by?: string | null;
+          date_of_birth?: string | null;
         };
         Update: {
           id?: string;
@@ -327,6 +329,7 @@ export type Database = {
           instagram_access_token?: string | null;
           phone?: string | null;
           referred_by?: string | null;
+          date_of_birth?: string | null;
         };
       };
       notifications: {

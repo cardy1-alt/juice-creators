@@ -128,7 +128,7 @@ export default function Auth() {
           const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
           if (age < 18) { setError('You must be 18 or over to use Nayba'); setLoading(false); return; }
         }
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null, date_of_birth: dob || null };
+        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null, dateOfBirth: dob || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {

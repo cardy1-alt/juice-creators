@@ -24,3 +24,4 @@ jobs:
           supabase link --project-ref $SUPABASE_PROJECT_ID
           supabase functions deploy send-email --no-verify-jwt
           supabase functions deploy invite-brand --no-verify-jwt
+          supabase functions deploy check-overdue-reels --no-verify-jwt
