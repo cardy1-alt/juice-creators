@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
+import { getLevelColour } from '../../lib/levels';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -182,7 +183,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs }: { creator: Creator; on
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 mb-5">
             <div>
               <p className={peekLabel}>Level</p>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: getLevelColour(creator.level).bg, color: getLevelColour(creator.level).text }}>
                 L{creator.level} — {creator.level_name || LEVEL_NAMES[creator.level] || 'Newcomer'}
               </span>
             </div>
@@ -435,7 +436,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                     <p className="text-[12px] text-[var(--ink-60)]">{c.instagram_handle}</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>L{c.level}</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: getLevelColour(c.level).bg, color: getLevelColour(c.level).text }}>L{c.level}</span>
               </div>
               <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
                 <span>{c.address || '—'}</span>
@@ -473,7 +474,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.instagram_handle}</td>
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.address || '—'}</td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: getLevelColour(c.level).bg, color: getLevelColour(c.level).text }}>
                     L{c.level}
                   </span>
                 </td>
