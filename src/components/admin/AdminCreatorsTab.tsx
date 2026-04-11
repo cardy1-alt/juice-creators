@@ -386,6 +386,8 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
   const [search, setSearch] = useState('');
   const [peekCreator, setPeekCreator] = useState<Creator | null>(null);
   const [deletingCreator, setDeletingCreator] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'alphabetical' | 'level'>('newest');
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -420,13 +422,21 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
   const [selectedPending, setSelectedPending] = useState<Set<string>>(new Set());
   const [approvalSearch, setApprovalSearch] = useState('');
 
-  const filteredCreators = approvedCreators.filter(c => {
-    if (!search) return true;
-    const q = search.toLowerCase();
-    return (c.display_name || '').toLowerCase().includes(q) || c.name.toLowerCase().includes(q) ||
-      c.email.toLowerCase().includes(q) || (c.instagram_handle || '').toLowerCase().includes(q) ||
-      (c.address || '').toLowerCase().includes(q);
-  });
+  const baseCreators = statusFilter === 'pending' ? pendingCreators : statusFilter === 'approved' ? approvedCreators : creators;
+
+  const filteredCreators = baseCreators
+    .filter(c => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (c.display_name || '').toLowerCase().includes(q) || c.name.toLowerCase().includes(q) ||
+        c.email.toLowerCase().includes(q) || (c.instagram_handle || '').toLowerCase().includes(q) ||
+        (c.address || '').toLowerCase().includes(q);
+    })
+    .sort((a, b) => {
+      if (sortBy === 'alphabetical') return (a.display_name || a.name).localeCompare(b.display_name || b.name);
+      if (sortBy === 'level') return b.level - a.level;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
 
   const toggleSelectPending = (id: string) => {
     setSelectedPending(prev => {
@@ -582,12 +592,26 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
         );
       })()}
 
-      {/* Search bar */}
-      <div className="relative mb-4">
-        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
-        <input value={search} onChange={e => setSearch(e.target.value)}
-          placeholder="Search creators by name, email, Instagram, or county..."
-          className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+      {/* Search & filter toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name, email, Instagram, or county..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+        </div>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+          <option value="all">All statuses</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+          <option value="newest">Newest first</option>
+          <option value="alphabetical">A — Z</option>
+          <option value="level">Highest level</option>
+        </select>
       </div>
 
       {/* Mobile card list */}

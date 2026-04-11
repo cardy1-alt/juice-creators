@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { Check, X, AlertCircle, ExternalLink, Eye, Pencil } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
 
@@ -321,6 +321,9 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
   const [toast, setToast] = useState<string | null>(null);
   const [peekBrand, setPeekBrand] = useState<Brand | null>(null);
   const [deletingBrand, setDeletingBrand] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'alphabetical'>('newest');
 
   useEffect(() => { fetchBrands(); }, []);
 
@@ -355,15 +358,51 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
     fetchBrands();
   };
 
+  const filteredBrands = brands
+    .filter(b => {
+      if (statusFilter === 'approved' && !b.approved) return false;
+      if (statusFilter === 'pending' && b.approved) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return b.name.toLowerCase().includes(q) || b.owner_email.toLowerCase().includes(q) || b.category.toLowerCase().includes(q);
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
   return (
     <div>
       {toast && (
         <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
+      {/* Search & filter toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-[200px]">
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name, email, or category..."
+            className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+        </div>
+        <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+          <option value="all">All statuses</option>
+          <option value="approved">Approved</option>
+          <option value="pending">Pending</option>
+        </select>
+        <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+          className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+          <option value="newest">Newest first</option>
+          <option value="alphabetical">A — Z</option>
+        </select>
+      </div>
+
       {/* Mobile card list */}
       <div className="md:hidden space-y-2">
-        {brands.map(b => (
+        {filteredBrands.map(b => (
           <div key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
             className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-2">
@@ -400,7 +439,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
             <th className={thCls}>Actions</th>
           </tr></thead>
           <tbody>
-            {brands.map(b => (
+            {filteredBrands.map(b => (
               <tr key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
                 className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
                 <td className={tdCls}>

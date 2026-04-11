@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar } from 'lucide-react';
+import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
@@ -790,7 +790,10 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
   const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
+  const [viewMode, setViewMode] = useState<'table' | 'kanban' | 'gallery'>('table');
+  const [search, setSearch] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'deadline'>('newest');
 
   useEffect(() => { fetchCampaigns(); }, []);
 
@@ -845,6 +848,25 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
     { label: 'Estimated Reach', value: totalStats.reach.toLocaleString(), icon: Eye, tint: 'rgba(122,148,120,0.12)', color: 'var(--sage)' },
   ];
 
+  const filteredCampaigns = campaigns
+    .filter(c => {
+      if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+      if (search) {
+        const q = search.toLowerCase();
+        return c.title.toLowerCase().includes(q) || (c.businesses?.name || '').toLowerCase().includes(q);
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'oldest') return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+      if (sortBy === 'deadline') {
+        const da = a.expression_deadline ? new Date(a.expression_deadline).getTime() : Infinity;
+        const db = b.expression_deadline ? new Date(b.expression_deadline).getTime() : Infinity;
+        return da - db;
+      }
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+
   return (
     <div>
       {/* Stats row */}
@@ -864,12 +886,40 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         ))}
       </div>
 
+      {/* Search & filter toolbar */}
+      {campaigns.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 mb-4">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--ink-50)]" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Search by title or brand..."
+              className="w-full pl-9 pr-4 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
+          </div>
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}
+            className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+            <option value="all">All statuses</option>
+            <option value="draft">Draft</option>
+            <option value="active">Active</option>
+            <option value="selecting">Selecting</option>
+            <option value="live">Live</option>
+            <option value="completed">Completed</option>
+          </select>
+          <select value={sortBy} onChange={e => setSortBy(e.target.value as any)}
+            className="px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]">
+            <option value="newest">Newest first</option>
+            <option value="oldest">Oldest first</option>
+            <option value="deadline">By deadline</option>
+          </select>
+        </div>
+      )}
+
       {/* View toggle — desktop only */}
       {campaigns.length > 0 && (
         <div className="hidden md:flex items-center gap-1 mb-4">
           {([
             { mode: 'table' as const, icon: LayoutList, label: 'Table' },
             { mode: 'kanban' as const, icon: Kanban, label: 'Board' },
+            { mode: 'gallery' as const, icon: LayoutGrid, label: 'Gallery' },
           ]).map(v => (
             <button key={v.mode} onClick={() => setViewMode(v.mode)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-[13px] font-medium transition-colors"
@@ -888,7 +938,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       {campaigns.length > 0 ? (<>
         {/* Mobile card list (always list view on mobile) */}
         <div className="md:hidden space-y-2">
-          {campaigns.map(c => {
+          {filteredCampaigns.map(c => {
             const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
             return (
               <div key={c.id} onClick={() => setPeekCampaign(peekCampaign?.id === c.id ? null : c)}
@@ -921,7 +971,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
               <th className={thCls}>Deadline</th>
             </tr></thead>
             <tbody>
-              {campaigns.map(c => {
+              {filteredCampaigns.map(c => {
                 const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
                 const selected = peekCampaign?.id === c.id;
                 return (
@@ -970,7 +1020,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         {viewMode === 'kanban' && (
         <div className="hidden md:grid gap-3 animate-fade-in" style={{ gridTemplateColumns: `repeat(${kanbanColumns.length}, minmax(200px, 1fr))` }}>
           {kanbanColumns.map(col => {
-            const colCampaigns = campaigns.filter(c => c.status === col.key);
+            const colCampaigns = filteredCampaigns.filter(c => c.status === col.key);
             return (
               <div key={col.key} className="min-h-[200px]">
                 {/* Column header */}
@@ -1036,6 +1086,47 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             );
           })}
         </div>
+        )}
+
+        {/* Desktop: Gallery view */}
+        {viewMode === 'gallery' && (
+          <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
+            {filteredCampaigns.map(c => {
+              const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+              const selected = peekCampaign?.id === c.id;
+              return (
+                <button key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
+                  className={`w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] press-card ${selected ? 'ring-2 ring-[var(--terra)]' : ''}`}
+                  style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                  <div className="px-2.5 pt-2.5">
+                    <div className="w-full relative rounded-[8px] overflow-hidden" style={{ height: 150 }}>
+                      {c.campaign_image ? (
+                        <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex flex-col items-center justify-center bg-[var(--stone)]">
+                          <Megaphone size={32} className="text-[var(--ink-15)]" />
+                        </div>
+                      )}
+                      <span className="absolute top-2 right-2"><StatusBadge status={c.status} /></span>
+                    </div>
+                  </div>
+                  <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
+                    <span className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{c.businesses?.name}</span>
+                    <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
+                    <div className="mt-auto space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <div className="flex-1 h-1.5 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden">
+                          <div className="h-full bg-[var(--terra)] rounded-full" style={{ width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
+                        </div>
+                        <span className="text-[11px] text-[var(--ink-50)]">{counts.applicants}/{c.creator_target}</span>
+                      </div>
+                      {c.expression_deadline && <p className="text-[11px] text-[var(--ink-35)]">Deadline: {fmtShortDate(c.expression_deadline)}</p>}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
         )}
       </>) : (
         /* Empty state */
