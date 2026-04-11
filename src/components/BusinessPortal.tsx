@@ -216,7 +216,7 @@ export default function BusinessPortal() {
       <div className="flex min-h-screen bg-[var(--shell)]">
         <aside className="hidden md:flex w-[240px] bg-[var(--stone)] flex-col flex-shrink-0" style={{ borderRight: '1px solid rgba(42,32,24,0.08)' }}>
           <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-            <Logo size={28} variant="wordmark" />
+            <Logo size={24} variant="wordmark" />
             <p className="text-[14px] font-medium text-[var(--ink)] mt-1">{brand.name}</p>
           </div>
           <div className="flex-1" />
@@ -248,7 +248,7 @@ export default function BusinessPortal() {
       {/* ─── Desktop sidebar ─── */}
       <aside className="hidden md:flex w-[240px] flex-col flex-shrink-0" style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
         <div className="px-5 py-5" style={{ borderBottom: '1px solid rgba(42,32,24,0.08)' }}>
-          <Logo size={28} variant="wordmark" />
+          <Logo size={24} variant="wordmark" />
           <p className="text-[14px] font-medium text-[var(--ink)] mt-1">{brand.name}</p>
         </div>
 

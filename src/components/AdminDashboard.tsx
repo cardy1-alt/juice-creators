@@ -93,7 +93,7 @@ export default function AdminDashboard() {
         {/* Wordmark */}
         <div className="px-5 pt-5 pb-4 flex items-center justify-between">
           <div>
-            <Logo size={28} variant="wordmark" />
+            <Logo size={24} variant="wordmark" />
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--terra)' }} />
               <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Admin</span>

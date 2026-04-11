@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye } from 'lucide-react';
+import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
@@ -79,6 +79,15 @@ function fmtShortDate(d: string | null) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
+
+// ─── Kanban column config ───
+const kanbanColumns = [
+  { key: 'draft', label: 'Draft', dot: '#9A9590' },
+  { key: 'active', label: 'Active', dot: '#2D7A4F' },
+  { key: 'selecting', label: 'Selecting', dot: '#3B82F6' },
+  { key: 'live', label: 'Live', dot: '#8C7AAA' },
+  { key: 'completed', label: 'Completed', dot: '#7A9478' },
+] as const;
 
 // ─── 3-Step Campaign Modal ───
 function CampaignModal({ brands, campaign, onSave, onClose }: {
@@ -780,6 +789,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
   const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<'table' | 'kanban'>('table');
 
   useEffect(() => { fetchCampaigns(); }, []);
 
@@ -845,9 +855,29 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         ))}
       </div>
 
-      {/* Campaign table */}
+      {/* View toggle — desktop only */}
+      {campaigns.length > 0 && (
+        <div className="hidden md:flex items-center gap-1 mb-4">
+          {([
+            { mode: 'table' as const, icon: LayoutList, label: 'Table' },
+            { mode: 'kanban' as const, icon: Kanban, label: 'Board' },
+          ]).map(v => (
+            <button key={v.mode} onClick={() => setViewMode(v.mode)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-[10px] text-[13px] font-medium transition-colors"
+              style={{
+                background: viewMode === v.mode ? 'rgba(42,32,24,0.06)' : 'transparent',
+                color: viewMode === v.mode ? 'var(--ink)' : 'var(--ink-35)',
+              }}>
+              <v.icon size={14} />
+              {v.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Campaign views */}
       {campaigns.length > 0 ? (<>
-        {/* Mobile card list */}
+        {/* Mobile card list (always list view on mobile) */}
         <div className="md:hidden space-y-2">
           {campaigns.map(c => {
             const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
@@ -871,7 +901,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           })}
         </div>
 
-        {/* Desktop table */}
+        {/* Desktop: Table view */}
+        {viewMode === 'table' && (
         <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
           <table className="w-full min-w-[900px]">
             <thead><tr>
@@ -924,6 +955,79 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             </tbody>
           </table>
         </div>
+        )}
+
+        {/* Desktop: Kanban view */}
+        {viewMode === 'kanban' && (
+        <div className="hidden md:grid gap-3 animate-fade-in" style={{ gridTemplateColumns: `repeat(${kanbanColumns.length}, minmax(200px, 1fr))` }}>
+          {kanbanColumns.map(col => {
+            const colCampaigns = campaigns.filter(c => c.status === col.key);
+            return (
+              <div key={col.key} className="min-h-[200px]">
+                {/* Column header */}
+                <div className="flex items-center gap-2 px-2 mb-3">
+                  <span className="w-[7px] h-[7px] rounded-full flex-shrink-0" style={{ background: col.dot }} />
+                  <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.04em', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>{col.label}</span>
+                  <span className="text-[12px] font-medium text-[var(--ink-35)]">{colCampaigns.length}</span>
+                </div>
+
+                {/* Cards */}
+                <div className="space-y-2.5">
+                  {colCampaigns.map(c => {
+                    const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+                    const selected = peekCampaign?.id === c.id;
+                    return (
+                      <div key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
+                        className={`bg-white rounded-[12px] p-3.5 cursor-pointer transition-all ${selected ? 'ring-2 ring-[var(--terra)]' : 'hover:shadow-md'}`}
+                        style={{ boxShadow: selected ? undefined : '0 1px 4px rgba(42,32,24,0.04)' }}>
+                        {/* Brand row */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors((c.businesses?.name || '?')[0]).bg }}>
+                            <span className="text-[9px] font-bold" style={{ color: getAvatarColors((c.businesses?.name || '?')[0]).text }}>{(c.businesses?.name || '?')[0]}</span>
+                          </div>
+                          <span className="text-[12px] text-[var(--ink-50)] truncate">{c.businesses?.name || '—'}</span>
+                        </div>
+
+                        {/* Title */}
+                        <p className="text-[13px] font-semibold text-[var(--ink)] leading-snug mb-2.5">{c.title}</p>
+
+                        {/* Progress bar */}
+                        <div className="flex items-center gap-2 mb-2">
+                          <div className="flex-1 h-1 bg-[rgba(42,32,24,0.06)] rounded-full overflow-hidden">
+                            <div className="h-full rounded-full" style={{ background: col.dot, width: `${Math.min((counts.applicants / Math.max(c.creator_target, 1)) * 100, 100)}%` }} />
+                          </div>
+                          <span className="text-[11px] text-[var(--ink-50)] flex-shrink-0">{counts.applicants}/{c.creator_target}</span>
+                        </div>
+
+                        {/* Footer meta */}
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2 text-[11px] text-[var(--ink-35)]">
+                            {counts.selected > 0 && <span>{counts.selected} selected</span>}
+                            {counts.submitted > 0 && <span>{counts.submitted} reels</span>}
+                          </div>
+                          {c.expression_deadline && (
+                            <div className="flex items-center gap-1 text-[11px] text-[var(--ink-35)]">
+                              <Calendar size={10} />
+                              <span>{fmtShortDate(c.expression_deadline)}</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  {/* Empty column */}
+                  {colCampaigns.length === 0 && (
+                    <div className="rounded-[12px] border border-dashed border-[rgba(42,32,24,0.10)] p-6 text-center">
+                      <p className="text-[12px] text-[var(--ink-35)]">No campaigns</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        )}
       </>) : (
         /* Empty state */
         <div className="bg-white rounded-[12px] p-12 text-center">
