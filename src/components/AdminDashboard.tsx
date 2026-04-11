@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
@@ -59,6 +59,7 @@ export default function AdminDashboard() {
   const { user, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState<Tab>('campaigns');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
@@ -86,38 +87,48 @@ export default function AdminDashboard() {
 
       {/* ─── Sidebar ─── */}
       <aside className={`
-        w-[240px] flex flex-col flex-shrink-0
-        fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:relative md:translate-x-0
+        flex flex-col flex-shrink-0 transition-all duration-200
+        fixed inset-y-0 left-0 z-50 md:relative md:translate-x-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `} style={{ background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
-        {/* Wordmark */}
-        <div className="px-5 pt-5 pb-4 flex items-center justify-between">
-          <div>
-            <Logo size={24} variant="wordmark" />
-            <div className="flex items-center gap-1.5 mt-1.5">
-              <span className="w-[6px] h-[6px] rounded-full" style={{ background: 'var(--terra)' }} />
-              <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' as const }}>Admin</span>
+      `} style={{ width: collapsed ? 64 : 240, background: 'var(--stone)', borderRight: '1px solid rgba(42,32,24,0.08)' }}>
+        {/* Wordmark + Admin badge */}
+        <div className="flex items-center justify-between" style={{ padding: collapsed ? '20px 0 16px' : '20px 20px 16px' }}>
+          {collapsed ? (
+            <div className="flex justify-center w-full">
+              <Logo size={22} variant="icon" />
             </div>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} className="md:hidden" style={{ color: 'var(--ink-50)' }}>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Logo size={24} variant="wordmark" />
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px]" style={{ background: 'var(--terra-10)' }}>
+                <span className="w-[5px] h-[5px] rounded-full" style={{ background: 'var(--terra)' }} />
+                <span style={{ fontSize: 10, fontWeight: 700, letterSpacing: '0.06em', color: 'var(--terra)', textTransform: 'uppercase' as const }}>Admin</span>
+              </span>
+            </div>
+          )}
+          <button onClick={() => setSidebarOpen(false)} className="md:hidden flex-shrink-0" style={{ color: 'var(--ink-50)' }}>
             <X size={20} />
           </button>
         </div>
 
         {/* Nav sections */}
-        <nav className="flex-1 px-3 pb-3 overflow-y-auto">
+        <nav className="flex-1 overflow-y-auto" style={{ padding: collapsed ? '0 8px 12px' : '0 12px 12px' }}>
           {NAV_SECTIONS.map(section => (
             <div key={section.label} className="mb-3">
-              <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
-                {section.label}
-              </p>
+              {!collapsed && (
+                <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' as const, padding: '8px 12px 4px' }}>
+                  {section.label}
+                </p>
+              )}
+              {collapsed && <div className="h-2" />}
               {section.items.map(item => {
                 const active = activeTab === item.key;
                 return (
                   <button
                     key={item.key}
                     onClick={() => handleTabClick(item.key)}
-                    className="w-full flex items-center gap-3 px-3 py-2.5 rounded-[12px] mb-1 text-[14px] transition-colors"
+                    title={collapsed ? item.label : undefined}
+                    className={`w-full flex items-center rounded-[12px] mb-1 text-[14px] transition-colors ${collapsed ? 'justify-center py-2.5' : 'gap-3 px-3 py-2.5'}`}
                     style={{
                       fontWeight: active ? 700 : 500,
                       background: active ? 'var(--terra-10)' : 'transparent',
@@ -125,11 +136,14 @@ export default function AdminDashboard() {
                     }}
                   >
                     <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
-                    <span className="flex-1 text-left">{item.label}</span>
-                    {item.key === 'creators' && pendingCount > 0 && (
+                    {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
+                    {!collapsed && item.key === 'creators' && pendingCount > 0 && (
                       <span className="flex items-center justify-center text-[12px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
                         {pendingCount}
                       </span>
+                    )}
+                    {collapsed && item.key === 'creators' && pendingCount > 0 && (
+                      <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: 'var(--terra)' }} />
                     )}
                   </button>
                 );
@@ -138,17 +152,34 @@ export default function AdminDashboard() {
           ))}
         </nav>
 
+        {/* Collapse toggle — desktop only */}
+        <div className="hidden md:flex px-3 pb-2">
+          <button onClick={() => setCollapsed(!collapsed)}
+            title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            className="w-full flex items-center justify-center py-2 rounded-[10px] text-[var(--ink-35)] hover:text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.04)] transition-colors">
+            {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+          </button>
+        </div>
+
         {/* User row */}
-        <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: '12px 8px 16px' }}>
-          <div className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer" onClick={() => setShowSignOutModal(true)}>
+        <div style={{ borderTop: '1px solid rgba(42,32,24,0.08)', padding: collapsed ? '12px 8px 16px' : '12px 8px 16px' }}>
+          <div
+            className={`flex items-center rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer ${collapsed ? 'justify-center py-2' : 'gap-3 px-2 py-2'}`}
+            onClick={() => setShowSignOutModal(true)}
+            title={collapsed ? `${adminName} — Sign out` : undefined}
+          >
             <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
               <span className="text-[12px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{adminInitial}</span>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
-              <p className="text-[12px] text-[var(--ink-50)] truncate">{user?.email}</p>
-            </div>
-            <LogOut size={14} className="text-[var(--ink-50)] opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" />
+            {!collapsed && (
+              <>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[14px] font-medium text-[var(--ink)] truncate">{adminName}</p>
+                  <p className="text-[12px] text-[var(--ink-50)] truncate">{user?.email}</p>
+                </div>
+                <LogOut size={14} className="text-[var(--ink-35)] group-hover:text-[var(--ink-60)] transition-colors flex-shrink-0" />
+              </>
+            )}
           </div>
         </div>
       </aside>
