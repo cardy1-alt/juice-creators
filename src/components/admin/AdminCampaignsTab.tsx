@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
+import ImageUpload from '../ImageUpload';
 
 // ─── Types ───
 interface Brand { id: string; name: string; }
@@ -232,7 +233,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div><label className={labelCls}>Creator Target</label><input type="number" min="1" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
               <div><label className={labelCls}>Min Creator Level</label><select value={form.min_level} onChange={e => set('min_level', e.target.value)} className={inputCls}><option value="1">Any (Level 1+)</option><option value="3">Regular+ (Level 3+)</option><option value="5">Trusted+ (Level 5+)</option></select></div>
               <div><label className={labelCls}>Campaign Type</label><select value={form.campaign_type} onChange={e => set('campaign_type', e.target.value)} className={inputCls}><option value="brand">Brand Campaign</option><option value="community">Community Campaign</option></select></div>
-              <div className="md:col-span-2"><label className={labelCls}>Campaign Image URL</label><input value={form.campaign_image} onChange={e => set('campaign_image', e.target.value)} className={inputCls} placeholder="https://... (hero image for campaign card)" /></div>
+              <div className="md:col-span-2"><ImageUpload value={form.campaign_image} onChange={url => set('campaign_image', url)} folder="campaigns" label="Campaign Image" /></div>
             </div>
           )}
 

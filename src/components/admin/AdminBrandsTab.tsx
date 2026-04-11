@@ -3,6 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
 import { Check, X, AlertCircle, ExternalLink, Eye } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
+import ImageUpload from '../ImageUpload';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
@@ -22,7 +23,7 @@ function fmtDate(d: string) {
 
 function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreated: () => void }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
-  const [form, setForm] = useState({ name: '', email: '', category: '', region: 'Suffolk', instagram: '', address: '', bio: '' });
+  const [form, setForm] = useState({ name: '', email: '', category: '', region: 'Suffolk', instagram: '', address: '', bio: '', logo_url: '' });
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState('');
   const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -43,7 +44,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
     const { error: insertErr } = await supabase.from('businesses').insert({
       name: form.name, slug, owner_email: form.email, category: form.category, region: form.region,
       instagram_handle: form.instagram ? form.instagram.replace(/^@/, '') : null,
-      address: form.address || null, bio: form.bio || null,
+      address: form.address || null, bio: form.bio || null, logo_url: form.logo_url || null,
       approved: true, onboarding_complete: true,
     });
     if (insertErr) { setError('Failed to create brand — ' + insertErr.message); setCreating(false); return; }
@@ -81,6 +82,7 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
             <div><label className={labelCls}>Instagram Handle</label><input value={form.instagram} onChange={e => setForm(p => ({ ...p, instagram: e.target.value }))} className={inputCls} placeholder="@handle" /></div>
             <div><label className={labelCls}>Address</label><input value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} className={inputCls} /></div>
             <div className="md:col-span-2"><label className={labelCls}>Bio</label><textarea value={form.bio} onChange={e => setForm(p => ({ ...p, bio: e.target.value }))} className={`${inputCls} min-h-[72px] resize-y`} /></div>
+            <div><ImageUpload value={form.logo_url} onChange={url => setForm(p => ({ ...p, logo_url: url }))} folder="logos" label="Logo" shape="circle" /></div>
           </form>
         </div>
         <div className="flex items-center justify-between px-4 md:px-6 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
