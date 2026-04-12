@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { friendlyError } from '../../lib/errors';
 import { Eye, EyeOff } from 'lucide-react';
@@ -97,19 +97,34 @@ export default function AdminSettingsTab() {
     },
   ];
 
-  const [notifSettings, setNotifSettings] = useState<Record<string, boolean>>(() => {
-    try {
-      const stored = localStorage.getItem('nayba_notification_settings');
-      return stored ? JSON.parse(stored) : {};
-    } catch { return {}; }
-  });
+  const [notifSettings, setNotifSettings] = useState<Record<string, boolean>>({});
+  const [notifSettingsLoading, setNotifSettingsLoading] = useState(true);
+
+  useEffect(() => {
+    supabase.from('notification_settings').select('email_type, enabled').then(({ data }) => {
+      if (data) {
+        const map: Record<string, boolean> = {};
+        data.forEach((row: { email_type: string; enabled: boolean }) => { map[row.email_type] = row.enabled; });
+        setNotifSettings(map);
+      }
+      setNotifSettingsLoading(false);
+    });
+  }, []);
 
   const isNotifEnabled = (key: string) => notifSettings[key] !== false; // default on
 
-  const toggleNotif = (key: string) => {
-    const updated = { ...notifSettings, [key]: !isNotifEnabled(key) };
-    setNotifSettings(updated);
-    try { localStorage.setItem('nayba_notification_settings', JSON.stringify(updated)); } catch {}
+  const toggleNotif = async (key: string) => {
+    const next = !isNotifEnabled(key);
+    // Optimistic update
+    setNotifSettings(prev => ({ ...prev, [key]: next }));
+    // Upsert so if the row doesn't exist yet it gets created
+    const { error } = await supabase.from('notification_settings')
+      .upsert({ email_type: key, enabled: next }, { onConflict: 'email_type' });
+    if (error) {
+      // Revert on failure
+      setNotifSettings(prev => ({ ...prev, [key]: !next }));
+      console.error('[notifications] Failed to save toggle:', error.message);
+    }
   };
 
   const [editingTemplate, setEditingTemplate] = useState<EmailTemplate | null>(null);

@@ -1,20 +1,11 @@
 import { supabase } from './supabase';
 
-function isNotificationEnabled(emailType: string): boolean {
-  try {
-    const stored = localStorage.getItem('nayba_notification_settings');
-    if (!stored) return true; // default: all enabled
-    const settings = JSON.parse(stored);
-    return settings[emailType] !== false;
-  } catch {
-    return true;
-  }
-}
-
 /**
  * Insert a notification that triggers the send-email edge function via webhook.
  * The edge function reads email_type to pick the right template and email_meta
- * for template variables.
+ * for template variables. Enabled/disabled state is checked server-side in the
+ * edge function via the notification_settings table, so toggles work regardless
+ * of which browser triggered the notification.
  */
 async function insertNotification(params: {
   userId: string;
@@ -23,11 +14,6 @@ async function insertNotification(params: {
   emailType: string;
   emailMeta?: Record<string, string>;
 }): Promise<void> {
-  if (!isNotificationEnabled(params.emailType)) {
-    console.log(`[notifications] ${params.emailType} is disabled — skipping`);
-    return;
-  }
-
   const { error } = await supabase.from('notifications').insert({
     user_id: params.userId,
     user_type: params.userType,

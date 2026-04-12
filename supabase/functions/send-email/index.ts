@@ -589,6 +589,23 @@ Deno.serve(async (req: Request) => {
     const emailType = notification.email_type || '';
     const meta = (notification.email_meta || {}) as Record<string, string>;
 
+    // Check if this email type is enabled via notification_settings table.
+    // Default to true if no row exists (fail-open, better than silent drop).
+    if (emailType) {
+      const { data: setting } = await supabase
+        .from('notification_settings')
+        .select('enabled')
+        .eq('email_type', emailType)
+        .maybeSingle();
+      if (setting && setting.enabled === false) {
+        console.log(`[send-email] Skipping ${emailType} — disabled in notification_settings`);
+        return new Response(JSON.stringify({ skipped: true, reason: 'disabled' }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+    }
+
     let recipientEmail: string | null = null;
     let recipientName = '';
 
