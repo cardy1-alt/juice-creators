@@ -53,47 +53,73 @@ const LOGOMARK_URL = 'https://app.nayba.app/logomark.png';
 
 // ─── Branded email wrapper ────────────────────────────────────────────────
 function wrapEmail(body: string, _accentColor = TERRA): string {
-  return `
-<!DOCTYPE html>
-<html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin: 0; padding: 0; background-color: ${CHALK}; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
-  <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
-    <!-- Logo -->
-    <div style="text-align: center; margin-bottom: 32px;">
-      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
-        <tr>
-          <td style="vertical-align: middle; padding-right: 10px;">
-            <img src="${LOGOMARK_URL}" width="36" height="36" alt="Nayba" style="display: block; width: 36px; height: 36px;" />
-          </td>
-          <td style="vertical-align: middle;">
-            <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
-          </td>
-        </tr>
-      </table>
-    </div>
-    <!-- Card -->
-    <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: ${INK};">
-      ${body}
-    </div>
-    <!-- Footer -->
-    <div style="text-align: center; padding: 28px 0 0;">
-      <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; color: ${INK_35};">
-        The Nayba Team &middot; Connecting creators with local businesses
-      </p>
-      <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; color: ${INK_35};">
-        You're receiving this because you signed up for Nayba.
-      </p>
-    </div>
-  </div>
+  // Built with nested tables + bgcolor attrs for maximum email-client
+  // compatibility. Divs with background/border-radius/box-shadow are
+  // stripped or rendered inconsistently by Spark, Outlook, and some
+  // Android clients — tables render identically everywhere.
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
+  <title>Nayba</title>
+</head>
+<body style="margin:0;padding:0;background-color:${CHALK};-webkit-font-smoothing:antialiased;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${CHALK}" style="background-color:${CHALK};">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;width:100%;">
+          <!-- Logo -->
+          <tr>
+            <td align="center" style="padding:0 0 32px 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:10px;">
+                    <img src="${LOGOMARK_URL}" width="36" height="36" alt="Nayba" style="display:block;width:36px;height:36px;border:0;" />
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:24px;font-weight:700;color:${INK};letter-spacing:-0.04em;">Nayba</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <!-- Card -->
+          <tr>
+            <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;border-radius:12px;padding:36px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:${INK};">
+              ${body}
+            </td>
+          </tr>
+          <!-- Footer -->
+          <tr>
+            <td align="center" style="padding:28px 0 0 0;">
+              <p style="margin:0 0 8px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:${INK_35};">
+                The Nayba Team &middot; Connecting creators with local businesses
+              </p>
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:${INK_35};">
+                You're receiving this because you signed up for Nayba.
+              </p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body>
 </html>`;
 }
 
 function btn(text: string, href: string, bg = TERRA): string {
-  return `<div style="text-align: center; margin: 28px 0 0;">
-    <a href="${href}" style="display: inline-block; background: ${bg}; color: #FFFFFF; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.2px;">${text}</a>
-  </div>`;
+  // Table + bgcolor for button so Spark/Outlook render the background fill.
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px auto 0 auto;">
+    <tr>
+      <td align="center" bgcolor="${bg}" style="background-color:${bg};border-radius:10px;">
+        <a href="${href}" style="display:inline-block;background-color:${bg};color:#FFFFFF;padding:14px 32px;border-radius:10px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.2px;mso-padding-alt:0;">${text}</a>
+      </td>
+    </tr>
+  </table>`;
 }
 
 function p(text: string): string {
@@ -113,7 +139,12 @@ function divider(): string {
 }
 
 function infoBox(content: string, bg = TERRA_LIGHT, border = TERRA_BORDER): string {
-  return `<div style="background: ${bg}; border-radius: 10px; padding: 16px 20px; margin: 20px 0; border: 1px solid ${border};">${content}</div>`;
+  // Table-based card so Spark/Outlook keep the background fill + border.
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:20px 0;border-collapse:separate;">
+    <tr>
+      <td bgcolor="${bg}" style="background-color:${bg};border:1px solid ${border};border-radius:10px;padding:16px 20px;">${content}</td>
+    </tr>
+  </table>`;
 }
 
 function stepList(steps: string[]): string {
