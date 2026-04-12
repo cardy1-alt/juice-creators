@@ -34,26 +34,43 @@ interface WebhookPayload {
 
 // ─── Design system (aligned with app tokens) ─────────────────────────────
 const TERRA = '#D95F3B';
-const TERRA_LIGHT = '#FDF5F2';
+const TERRA_LIGHT = '#F9E8E1';
 const TERRA_BORDER = '#F2DDD5';
 const INK = '#2A2018';
 const INK_60 = '#7A7168';
 const INK_35 = '#B0AAA4';
 const INK_08 = '#F4F3F1';
 const VIOLET = '#8C7AAA';
-const VIOLET_LIGHT = '#EAE6F4';
+const VIOLET_LIGHT = '#DDD6EE';
+const SAGE = '#7A9478';
+const SAGE_LIGHT = '#DDEADD';
+const BALTIC = '#7AA0B8';
+const BALTIC_LIGHT = '#D6E6F0';
+const GOLDEN_MIST = '#C4A84A';
+const GOLDEN_MIST_LIGHT = '#EDE5C0';
+const CHALK = '#F6F3EE';
+const LOGOMARK_URL = 'https://app.nayba.app/logomark.png';
 
 // ─── Branded email wrapper ────────────────────────────────────────────────
-function wrapEmail(body: string, accentColor = TERRA): string {
+function wrapEmail(body: string, _accentColor = TERRA): string {
   return `
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin: 0; padding: 0; background-color: #FAFAF9; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+<body style="margin: 0; padding: 0; background-color: ${CHALK}; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
   <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
     <!-- Logo -->
     <div style="text-align: center; margin-bottom: 32px;">
-      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
+      <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+        <tr>
+          <td style="vertical-align: middle; padding-right: 10px;">
+            <img src="${LOGOMARK_URL}" width="36" height="36" alt="Nayba" style="display: block; width: 36px; height: 36px;" />
+          </td>
+          <td style="vertical-align: middle;">
+            <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
+          </td>
+        </tr>
+      </table>
     </div>
     <!-- Card -->
     <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: ${INK};">
