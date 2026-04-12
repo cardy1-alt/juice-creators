@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, Search, ArrowRight } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Settings, Search, ArrowRight, UserCheck } from 'lucide-react';
 
-type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
+type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
 
 interface SearchResult {
   id: string;
@@ -14,6 +14,7 @@ interface SearchResult {
 
 const PAGES: SearchResult[] = [
   { id: 'campaigns', type: 'page', tab: 'campaigns', title: 'Campaigns', subtitle: 'View all campaigns' },
+  { id: 'applicants', type: 'page', tab: 'applicants', title: 'Applicants', subtitle: 'Review creator interest' },
   { id: 'creators', type: 'page', tab: 'creators', title: 'Creators', subtitle: 'View all creators' },
   { id: 'brands', type: 'page', tab: 'brands', title: 'Brands', subtitle: 'View all brands' },
   { id: 'analytics', type: 'page', tab: 'analytics', title: 'Analytics', subtitle: 'Platform analytics' },
@@ -23,6 +24,7 @@ const PAGES: SearchResult[] = [
 
 const ICONS: Record<string, React.ReactNode> = {
   campaigns: <Megaphone size={16} />,
+  applicants: <UserCheck size={16} />,
   creators: <Users size={16} />,
   brands: <Store size={16} />,
   analytics: <BarChart3 size={16} />,

@@ -3,22 +3,24 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen, UserCheck } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
+import AdminApplicantsTab from './admin/AdminApplicantsTab';
 import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
 import AdminNotificationsTab from './admin/AdminNotificationsTab';
 import AdminSettingsTab from './admin/AdminSettingsTab';
 import CommandPalette from './admin/CommandPalette';
 
-type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
+type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
 
 const NAV_SECTIONS = [
   {
     label: 'Platform',
     items: [
       { key: 'campaigns' as Tab, label: 'Campaigns', icon: Megaphone },
+      { key: 'applicants' as Tab, label: 'Applicants', icon: UserCheck },
       { key: 'creators' as Tab, label: 'Creators', icon: Users },
       { key: 'brands' as Tab, label: 'Brands', icon: Store },
     ],
@@ -40,6 +42,7 @@ const NAV_SECTIONS = [
 
 const PAGE_TITLES: Record<Tab, string> = {
   campaigns: 'Campaigns',
+  applicants: 'Applicants',
   creators: 'Creators',
   brands: 'Brands',
   analytics: 'Analytics',
@@ -49,6 +52,7 @@ const PAGE_TITLES: Record<Tab, string> = {
 
 const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
   campaigns: { label: 'New Campaign', show: true },
+  applicants: { label: '', show: false },
   creators: { label: 'Create Creator', show: true },
   brands: { label: 'Create Brand', show: true },
   analytics: { label: '', show: false },
@@ -62,15 +66,27 @@ export default function AdminDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingApplicantCount, setPendingApplicantCount] = useState(0);
   const [showModal, setShowModal] = useState(false);
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [cmdkOpen, setCmdkOpen] = useState(false);
   const [peekTarget, setPeekTarget] = useState<{ tab: Tab; entityId: string } | null>(null);
 
-  useEffect(() => {
+  const refreshPendingCounts = () => {
     supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
       .then(({ count }) => setPendingCount(count || 0));
+    supabase.from('applications').select('id', { count: 'exact', head: true }).eq('status', 'interested')
+      .then(({ count }) => setPendingApplicantCount(count || 0));
+  };
+
+  useEffect(() => {
+    refreshPendingCounts();
   }, []);
+
+  // Refresh counts when leaving applicants tab (after decisions made)
+  useEffect(() => {
+    if (activeTab !== 'applicants') refreshPendingCounts();
+  }, [activeTab]);
 
   // Cmd+K listener
   useEffect(() => {
@@ -159,14 +175,16 @@ export default function AdminDashboard() {
                   >
                     <item.icon size={18} strokeWidth={active ? 2 : 1.5} />
                     {!collapsed && <span className="flex-1 text-left">{item.label}</span>}
-                    {!collapsed && item.key === 'creators' && pendingCount > 0 && (
-                      <span className="flex items-center justify-center text-[12px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
-                        {pendingCount}
-                      </span>
-                    )}
-                    {collapsed && item.key === 'creators' && pendingCount > 0 && (
-                      <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: 'var(--terra)' }} />
-                    )}
+                    {(() => {
+                      const badgeCount = item.key === 'creators' ? pendingCount : item.key === 'applicants' ? pendingApplicantCount : 0;
+                      if (badgeCount === 0) return null;
+                      if (collapsed) return <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: 'var(--terra)' }} />;
+                      return (
+                        <span className="flex items-center justify-center text-[12px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
+                          {badgeCount}
+                        </span>
+                      );
+                    })()}
                   </button>
                 );
               })}
@@ -245,6 +263,7 @@ export default function AdminDashboard() {
         {/* Content */}
         <main className="flex-1 p-4 md:p-6 lg:px-6 lg:pt-6 lg:pb-8 overflow-auto">
           {activeTab === 'campaigns' && <AdminCampaignsTab showModal={showModal} onCloseModal={() => setShowModal(false)} onOpenModal={() => setShowModal(true)} initialPeekId={peekTarget?.tab === 'campaigns' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
+          {activeTab === 'applicants' && <AdminApplicantsTab />}
           {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'creators' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'brands' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
