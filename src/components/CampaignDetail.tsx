@@ -54,6 +54,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [pitch, setPitch] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [showBrandInfo, setShowBrandInfo] = useState(false);
+  const [applyError, setApplyError] = useState<string>('');
 
   useEffect(() => {
     fetchCampaign();
@@ -80,13 +81,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         setCreatorId(creatorData.id);
         setCreatorName(creatorData.display_name || creatorData.instagram_handle || user.email?.split('@')[0] || 'A creator');
         setCreatorInstagram(creatorData.instagram_handle || '');
-        // Check if creator already applied
+        // Check if creator already applied (0 or 1 row expected)
         const { data: appData } = await supabase
           .from('applications')
           .select('id, status')
           .eq('campaign_id', campaignId)
           .eq('creator_id', creatorData.id)
-        .single();
+          .maybeSingle();
         if (appData) setApplication(appData as Application);
       }
     }
@@ -94,7 +95,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   };
 
   const handleApply = async (withPitch?: string) => {
-    if (!creatorId || !campaign) return;
+    if (!creatorId || !campaign || submitting) return;
+    setApplyError('');
     setSubmitting(true);
     const { data, error } = await supabase.from('applications').insert({
       campaign_id: campaign.id,
@@ -104,6 +106,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     }).select('id, status').single();
     if (error) {
       console.error('[CampaignDetail] Failed to apply:', error.message);
+      setApplyError(
+        error.message.includes('duplicate')
+          ? "You've already registered interest for this campaign."
+          : "Couldn't register your interest — please try again."
+      );
       setSubmitting(false);
       return;
     }
@@ -429,10 +436,14 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               className="w-full px-4 py-3 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-24 resize-none focus:outline-none focus:border-[var(--terra)] mb-1"
             />
             <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] text-right mb-3">{pitch.length}/500</p>
+            {applyError && (
+              <p className="text-[13px] text-[var(--terra)] mb-3">{applyError}</p>
+            )}
             <div className="flex gap-3">
               <button
                 onClick={() => handleApply()}
-                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-[rgba(42,32,24,0.04)]"
+                disabled={submitting}
+                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-[rgba(42,32,24,0.04)] disabled:opacity-50"
               >
                 Skip
               </button>

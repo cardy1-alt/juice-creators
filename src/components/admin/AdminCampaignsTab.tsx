@@ -643,18 +643,13 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
   };
 
   const handleSelectCreator = async (creatorId: string) => {
+    // Transition to 'selected' — the creator still needs to confirm their spot
+    // before a participation is created. This triggers the selection email
+    // and unlocks the "Confirm your spot" CTA in the creator app.
     const { error: appErr } = await supabase.from('applications').update({
-      status: 'confirmed', selected_at: new Date().toISOString(), confirmed_at: new Date().toISOString(),
+      status: 'selected', selected_at: new Date().toISOString(),
     }).eq('campaign_id', campaign.id).eq('creator_id', creatorId);
     if (appErr) { showToast('Failed to select creator'); return; }
-    const { data: appData } = await supabase.from('applications').select('id')
-      .eq('campaign_id', campaign.id).eq('creator_id', creatorId).single();
-    if (appData) {
-      await supabase.from('participations').insert({
-        campaign_id: campaign.id, creator_id: creatorId,
-        application_id: appData.id, status: 'confirmed', perk_sent: false,
-      });
-    }
     const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).single();
     if (campData) {
       sendCreatorSelectedEmail(creatorId, {
@@ -663,7 +658,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
         campaign_id: campaign.id,
       });
     }
-    showToast('Creator selected and confirmed');
+    showToast('Creator selected — waiting for them to confirm');
   };
 
   const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
