@@ -668,6 +668,15 @@ Deno.serve(async (req: Request) => {
       recipientName = 'Admin';
     }
 
+    // Test-send override: if email_meta contains test_to_email, route the
+    // email there regardless of who user_id points to. Used by the admin's
+    // "Send test email" button in the email template editor.
+    if (meta.test_to_email) {
+      recipientEmail = meta.test_to_email;
+      recipientName = meta.test_to_name || recipientName || 'Test User';
+      console.log(`[send-email] Test-send override: routing to ${recipientEmail}`);
+    }
+
     if (!recipientEmail) {
       console.log('[send-email] No recipient found. emailType:', emailType, 'user_type:', notification.user_type, 'user_id:', notification.user_id);
       return new Response(JSON.stringify({ error: 'No recipient found', emailType, user_type: notification.user_type }), { status: 200 });
