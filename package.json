@@ -11,7 +11,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.app.json"
   },
   "dependencies": {
+    "@sentry/react": "^10.48.0",
     "@supabase/supabase-js": "^2.57.4",
+    "@vercel/analytics": "^2.0.1",
     "doodle-icons": "^1.1.0",
     "leaflet": "^1.9.4",
     "lucide-react": "^1.7.0",

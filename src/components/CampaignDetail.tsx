@@ -131,43 +131,58 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   };
 
   const handleConfirm = async () => {
-    if (!application || !creatorId || !campaign) return;
+    if (!application || !creatorId || !campaign || submitting) return;
     setSubmitting(true);
+    setApplyError('');
+
+    // Step 1: mark application confirmed
     const { error: updateErr } = await supabase.from('applications').update({
       status: 'confirmed',
       confirmed_at: new Date().toISOString(),
     }).eq('id', application.id);
     if (updateErr) {
-      console.error('[CampaignDetail] Failed to confirm:', updateErr.message);
+      console.error('[CampaignDetail] Failed to confirm application:', updateErr);
+      setApplyError("Couldn't confirm — please try again.");
       setSubmitting(false);
       return;
     }
-    // Optimistically update
-    setApplication({ ...application, status: 'confirmed' });
-    // Create participation — perk is ready immediately
-    await supabase.from('participations').insert({
+
+    // Step 2: create participation (perk is ready immediately)
+    const { error: partErr } = await supabase.from('participations').insert({
       application_id: application.id,
       campaign_id: campaign.id,
       creator_id: creatorId,
       perk_sent: true,
       perk_sent_at: new Date().toISOString(),
     });
-    // Send confirmation email to creator (with brand address for visit)
+    if (partErr) {
+      console.error('[CampaignDetail] Failed to create participation:', partErr);
+      // Roll back: revert the application status so user isn't stuck in
+      // a half-confirmed state.
+      await supabase.from('applications').update({
+        status: 'selected',
+        confirmed_at: null,
+      }).eq('id', application.id);
+      setApplyError("Couldn't reserve your spot — please try again.");
+      setSubmitting(false);
+      return;
+    }
+
+    // Only now — both DB writes succeeded — update UI and fire emails.
+    setApplication({ ...application, status: 'confirmed' });
     if (campaign.businesses?.name) {
       sendCreatorConfirmedEmail(creatorId, {
         campaign_title: campaign.title,
         brand_name: campaign.businesses.name,
         perk_description: campaign.perk_description || '',
         brand_address: campaign.businesses.address || '',
-      });
-      // Notify brand — creator is coming
+      }).catch(() => {});
       sendBusinessCreatorConfirmedEmail(campaign.brand_id, {
         creator_name: creatorName,
         creator_instagram: creatorInstagram,
         campaign_title: campaign.title,
         perk_description: campaign.perk_description || '',
-      });
-      // Notify admin
+      }).catch(() => {});
       sendAdminCreatorConfirmedEmail({
         creator_name: creatorName,
         campaign_title: campaign.title,

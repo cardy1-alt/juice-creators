@@ -1155,12 +1155,35 @@ export default function CreatorApp() {
   if (!profile.approved) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center" style={{ background: 'var(--chalk)' }}>
-        <div style={{ marginBottom: 36 }}>
+        <div style={{ marginBottom: 32 }}>
           <Logo size={28} variant="wordmark" />
         </div>
-        <h1 className="text-[28px] text-[var(--ink)]" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15, marginBottom: 10 }}>You're on the list</h1>
-        <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 360, marginBottom: 40 }}>
-          We're reviewing your profile and will email you at {profile.email} once you're approved. Usually within 24 hours.
+        <div className="w-14 h-14 rounded-full flex items-center justify-center mb-5" style={{ background: 'var(--terra-10)' }}>
+          <Clock size={24} className="text-[var(--terra)]" />
+        </div>
+        <h1 className="text-[26px] text-[var(--ink)] mb-3" style={{ fontFamily: "'Hornbill', Georgia, serif", fontWeight: 700, letterSpacing: '-0.025em', lineHeight: 1.15 }}>
+          You're on the list
+        </h1>
+        <p style={{ fontSize: 15, color: 'var(--ink-60)', lineHeight: 1.6, maxWidth: 380, marginBottom: 24 }}>
+          We're reviewing your profile and will email <span className="font-medium text-[var(--ink)]">{profile.email}</span> once you're approved. Usually within 24 hours.
+        </p>
+        <div className="bg-white rounded-[12px] p-5 max-w-[380px] w-full text-left mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--ink-50)] mb-3">What happens next</p>
+          <div className="space-y-2.5">
+            {[
+              { n: 1, text: 'We check your Instagram to make sure it fits our community' },
+              { n: 2, text: "You'll get an approval email with a link back to the app" },
+              { n: 3, text: 'Browse local campaigns and register your interest' },
+            ].map(s => (
+              <div key={s.n} className="flex items-start gap-3">
+                <span className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 text-[12px] font-semibold" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>{s.n}</span>
+                <span className="text-[14px] text-[var(--ink)] leading-[1.5]">{s.text}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <p className="text-[13px] text-[var(--ink-50)] mb-3">
+          Questions? <a href="mailto:hello@nayba.app" className="text-[var(--terra)] hover:underline font-medium">hello@nayba.app</a>
         </p>
         <button onClick={signOut} style={{ fontSize: 13, color: 'var(--ink-35)', background: 'none', border: 'none', cursor: 'pointer' }}>
           Sign out

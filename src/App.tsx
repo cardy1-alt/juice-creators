@@ -26,6 +26,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boole
   }
   componentDidCatch(error: unknown, info: React.ErrorInfo) {
     console.error('[ErrorBoundary]', error, info.componentStack);
+    // Report to Sentry if configured (lazy-loaded, no-op otherwise)
+    import('./lib/observability').then(({ captureException }) => {
+      captureException(error, { componentStack: info.componentStack });
+    }).catch(() => {});
   }
   render() {
     if (this.state.hasError) {
@@ -123,9 +127,12 @@ function ResetPassword() {
       if (session) setSessionReady(true);
     });
 
+    // 60s timeout — 5s was too aggressive for slow mail clients /
+    // email-link redirects on mobile. Only show session error if session
+    // truly hasn't established in a reasonable window.
     const timeout = setTimeout(() => {
       setSessionError(true);
-    }, 5000);
+    }, 60000);
 
     return () => {
       subscription.unsubscribe();
