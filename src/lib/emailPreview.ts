@@ -4,51 +4,92 @@
  * so admin can preview emails without calling the edge function.
  */
 
+// Mirrors the helpers in supabase/functions/send-email/index.ts so admin
+// preview matches what creators actually receive. Tokens and layout must
+// stay in sync — if you change one, change the other.
 const TERRA = '#D95F3B';
+const TERRA_LIGHT = '#F9E8E1';
+const TERRA_BORDER = '#F2DDD5';
 const INK = '#2A2018';
 const INK_60 = '#7A7168';
 const INK_35 = '#B0AAA4';
-const INK_08 = '#F4F3F1';
-const TERRA_LIGHT = '#FDF5F2';
-const TERRA_BORDER = '#F2DDD5';
+const CHALK = '#F6F3EE';
+const LOGOMARK_URL = '/logomark.png';
 
 export function heading(text: string) {
-  return `<h1 style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 22px; font-weight: 600; color: ${INK}; margin: 0 0 8px; letter-spacing: -0.3px;">${text}</h1>`;
+  return `<h1 style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:22px;font-weight:600;color:${INK};margin:0 0 8px;letter-spacing:-0.3px;">${text}</h1>`;
 }
 
 export function subtext(text: string) {
-  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; line-height: 1.6; color: ${INK_60}; margin: 0 0 24px;">${text}</p>`;
+  return `<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:14px;line-height:1.6;color:${INK_60};margin:0 0 24px;">${text}</p>`;
 }
 
 export function p(text: string) {
-  return `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.7; color: ${INK}; margin: 0 0 16px;">${text}</p>`;
+  return `<p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.7;color:${INK};margin:0 0 16px;">${text}</p>`;
 }
 
 export function btn(text: string, bg = TERRA) {
-  return `<div style="text-align: center; margin: 28px 0 0;">
-    <a href="#" style="display: inline-block; background: ${bg}; color: #FFFFFF; padding: 14px 32px; border-radius: 10px; text-decoration: none; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: -0.2px;">${text}</a>
-  </div>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:28px auto 0 auto;">
+    <tr>
+      <td align="center" bgcolor="${bg}" style="background-color:${bg};border-radius:10px;">
+        <a href="#" style="display:inline-block;background-color:${bg};color:#FFFFFF;padding:14px 32px;border-radius:10px;text-decoration:none;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-weight:700;font-size:15px;letter-spacing:-0.2px;">${text}</a>
+      </td>
+    </tr>
+  </table>`;
 }
 
-export function infoBox(content: string) {
-  return `<div style="background: ${INK_08}; border-radius: 10px; padding: 20px; margin: 20px 0;">${content}</div>`;
+export function infoBox(content: string, bg = TERRA_LIGHT, border = TERRA_BORDER) {
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:20px 0;border-collapse:separate;">
+    <tr>
+      <td bgcolor="${bg}" style="background-color:${bg};border:1px solid ${border};border-radius:10px;padding:16px 20px;">${content}</td>
+    </tr>
+  </table>`;
 }
 
 export function wrapEmail(body: string) {
-  return `<!DOCTYPE html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin: 0; padding: 0; background-color: #FAFAF9; -webkit-font-smoothing: antialiased;">
-  <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
-    <div style="text-align: center; margin-bottom: 32px;">
-      <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
-    </div>
-    <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04);">
-      ${body}
-    </div>
-    <div style="text-align: center; padding: 28px 0 0;">
-      <p style="margin: 0 0 8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 12px; color: ${INK_35};">The Nayba Team &middot; Connecting creators with local businesses</p>
-      <p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 11px; color: ${INK_35};">You're receiving this because you signed up for Nayba.</p>
-    </div>
-  </div>
+  return `<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="color-scheme" content="light" />
+  <meta name="supported-color-schemes" content="light" />
+  <title>Nayba</title>
+</head>
+<body style="margin:0;padding:0;background-color:${CHALK};-webkit-font-smoothing:antialiased;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+  <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" bgcolor="${CHALK}" style="background-color:${CHALK};">
+    <tr>
+      <td align="center" style="padding:40px 20px;">
+        <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="560" style="max-width:560px;width:100%;">
+          <tr>
+            <td align="center" style="padding:0 0 32px 0;">
+              <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:10px;">
+                    <img src="${LOGOMARK_URL}" width="36" height="36" alt="Nayba" style="display:block;width:36px;height:36px;border:0;" />
+                  </td>
+                  <td style="vertical-align:middle;">
+                    <span style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:24px;font-weight:700;color:${INK};letter-spacing:-0.04em;">Nayba</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td bgcolor="#FFFFFF" style="background-color:#FFFFFF;border-radius:12px;padding:36px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:${INK};">
+              ${body}
+            </td>
+          </tr>
+          <tr>
+            <td align="center" style="padding:28px 0 0 0;">
+              <p style="margin:0 0 8px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:12px;color:${INK_35};">The Nayba Team &middot; Connecting creators with local businesses</p>
+              <p style="margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:11px;color:${INK_35};">You're receiving this because you signed up for Nayba.</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
 </body></html>`;
 }
 
