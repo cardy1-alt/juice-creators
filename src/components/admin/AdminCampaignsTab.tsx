@@ -1104,14 +1104,9 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                       {c.campaign_image ? (
                         <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                       ) : (
-                        {(() => {
-                          const palette = getCategoryPalette(c.businesses?.category);
-                          return (
-                            <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: palette.tint }}>
-                              <Megaphone size={32} style={{ color: palette.color, opacity: 0.5 }} />
-                            </div>
-                          );
-                        })()}
+                        <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: getCategoryPalette(c.businesses?.category).tint }}>
+                          <Megaphone size={32} style={{ color: getCategoryPalette(c.businesses?.category).color, opacity: 0.5 }} />
+                        </div>
                       )}
                       <span className="absolute top-2 right-2 bg-white rounded-[999px] shadow-sm"><StatusBadge status={c.status} /></span>
                     </div>
