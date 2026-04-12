@@ -49,14 +49,14 @@ function wrapEmail(body: string, accentColor = TERRA): string {
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin: 0; padding: 0; background-color: #FAFAF9; -webkit-font-smoothing: antialiased;">
+<body style="margin: 0; padding: 0; background-color: #FAFAF9; -webkit-font-smoothing: antialiased; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
   <div style="max-width: 560px; margin: 0 auto; padding: 40px 20px;">
     <!-- Logo -->
     <div style="text-align: center; margin-bottom: 32px;">
       <span style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 24px; font-weight: 700; color: ${INK}; letter-spacing: -0.04em;">Nayba</span>
     </div>
     <!-- Card -->
-    <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04);">
+    <div style="background: #FFFFFF; border-radius: 12px; padding: 36px 28px; box-shadow: 0 1px 4px rgba(42,32,24,0.04); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: ${INK};">
       ${body}
     </div>
     <!-- Footer -->
@@ -649,13 +649,13 @@ Deno.serve(async (req: Request) => {
           html: wrapEmail(`
             ${heading('Your Campaign is Live!')}
             ${subtext(`Great news, ${escapeHtml(recipientName)}. Your campaign is now visible to creators in your area.`)}
-            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
-              <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
-              ${meta.headline ? `<p style="margin:0 0 12px;font-size:14px;color:${INK_60};">${escapeHtml(meta.headline)}</p>` : ''}
-              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || 'Not specified')}</p>
-              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Looking for: ${escapeHtml(meta.creator_target || '5')} creators</p>
-              ${meta.expression_deadline ? `<p style="margin:0;font-size:13px;color:${INK_60};">Apply by: ${escapeHtml(meta.expression_deadline)}</p>` : ''}
-            </div>
+            ${infoBox(`
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 6px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              ${meta.headline ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 12px;font-size:14px;color:${INK_60};">${escapeHtml(meta.headline)}</p>` : ''}
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || 'Not specified')}</p>
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 4px;font-size:13px;color:${INK_60};">Looking for: ${escapeHtml(meta.creator_target || '5')} creators</p>
+              ${meta.expression_deadline ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0;font-size:13px;color:${INK_60};">Apply by: ${escapeHtml(meta.expression_deadline)}</p>` : ''}
+            `)}
             ${p('Creators can now express interest. We\'ll handle the selection process and keep you updated as things progress.')}
             ${p('Log in anytime to see how your campaign is doing.')}
             ${btn('View Campaign', APP_URL)}
@@ -666,15 +666,22 @@ Deno.serve(async (req: Request) => {
         email = {
           subject: `You're confirmed for ${meta.brand_name} — here's what happens next`,
           html: wrapEmail(`
+            <div style="text-align: center; margin-bottom: 24px;">
+              <div style="display: inline-block; width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, ${TERRA_LIGHT}, ${VIOLET_LIGHT}); line-height: 56px; font-size: 28px;">&#10004;</div>
+            </div>
             ${heading("You're In!")}
             ${subtext(`Nice one, ${escapeHtml(recipientName)}. You're confirmed for ${escapeHtml(meta.brand_name || '')}'s campaign.`)}
-            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
-              <p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
-              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
-              ${meta.brand_address ? `<p style="margin:0;font-size:13px;color:${INK_60};">📍 ${escapeHtml(meta.brand_address)}</p>` : ''}
-            </div>
-            ${p('Your perk is ready — visit the brand whenever suits you. When you arrive, just mention you\'re with Nayba or show your Instagram.')}
-            ${p('After your visit, film a short Reel sharing your experience and submit the link in the app.')}
+            ${infoBox(`
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 6px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
+              ${meta.brand_address ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0;font-size:13px;color:${INK_60};">&#128205; ${escapeHtml(meta.brand_address)}</p>` : ''}
+            `)}
+            ${p('<strong>What happens next:</strong>')}
+            ${stepList([
+              'Visit the brand whenever suits you',
+              'When you arrive, mention you\'re with Nayba or show your Instagram',
+              'After your visit, film a short Reel and submit the link in the app',
+            ])}
             ${btn('View Campaign', APP_URL)}
           `),
         };
@@ -685,12 +692,12 @@ Deno.serve(async (req: Request) => {
           html: wrapEmail(`
             ${heading('Creator Confirmed')}
             ${subtext(`A creator has confirmed their spot on your campaign and will visit soon.`)}
-            <div style="background:${INK_08};border-radius:10px;padding:20px;margin:20px 0;">
-              <p style="margin:0 0 8px;font-size:16px;font-weight:600;color:${INK};">${escapeHtml(meta.creator_name || '')}</p>
-              ${meta.creator_instagram ? `<p style="margin:0 0 12px;font-size:14px;color:${TERRA};font-weight:500;">@${escapeHtml(meta.creator_instagram.replace('@', ''))}</p>` : ''}
-              <p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Campaign: ${escapeHtml(meta.campaign_title || '')}</p>
-              <p style="margin:0;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
-            </div>
+            ${infoBox(`
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 8px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.creator_name || '')}</p>
+              ${meta.creator_instagram ? `<p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 12px;font-size:14px;color:${TERRA};font-weight:500;">@${escapeHtml(meta.creator_instagram.replace('@', ''))}</p>` : ''}
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0 0 4px;font-size:13px;color:${INK_60};">Campaign: ${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin:0;font-size:13px;color:${INK_60};">Perk: ${escapeHtml(meta.perk_description || '')}</p>
+            `)}
             ${p('They\'ll visit your venue to redeem their perk and create content. They may show their Instagram profile or mention Nayba when they arrive.')}
             ${p('You don\'t need to do anything — just welcome them when they visit.')}
             ${btn('View in Dashboard', APP_URL)}
