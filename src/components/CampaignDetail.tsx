@@ -66,7 +66,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       .from('campaigns')
       .select('*, businesses(name, category, bio, instagram_handle, logo_url, address)')
       .eq('id', campaignId)
-      .single();
+      .maybeSingle();
     if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
     setCampaign(campData as Campaign);
 
@@ -76,7 +76,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         .from('creators')
         .select('id, display_name, instagram_handle')
         .eq('email', user.email)
-        .single();
+        .maybeSingle();
       if (creatorData) {
         setCreatorId(creatorData.id);
         setCreatorName(creatorData.display_name || creatorData.instagram_handle || user.email?.split('@')[0] || 'A creator');

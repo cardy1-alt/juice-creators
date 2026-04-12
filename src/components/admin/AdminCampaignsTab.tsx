@@ -442,7 +442,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
     // Update creator stats
     const { data: creator } = await supabase.from('creators')
       .select('total_campaigns, completed_campaigns')
-      .eq('id', part.creator_id).single();
+      .eq('id', part.creator_id).maybeSingle();
     if (creator) {
       const newCompleted = (creator.completed_campaigns || 0) + 1;
       const total = creator.total_campaigns || 1;
@@ -462,7 +462,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
       }).eq('id', part.creator_id);
       if (levelErr) { showToast('Completed but failed to update creator stats'); onRefresh(); return; }
       // Send completion email
-      const { data: campInfo } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', part.campaign_id).single();
+      const { data: campInfo } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', part.campaign_id).maybeSingle();
       if (campInfo) {
         sendCreatorCampaignCompleteEmail(part.creator_id, {
           campaign_title: campInfo.title,
@@ -650,7 +650,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
       status: 'selected', selected_at: new Date().toISOString(),
     }).eq('campaign_id', campaign.id).eq('creator_id', creatorId);
     if (appErr) { showToast('Failed to select creator'); return; }
-    const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).single();
+    const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).maybeSingle();
     if (campData) {
       sendCreatorSelectedEmail(creatorId, {
         campaign_title: campData.title,

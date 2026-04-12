@@ -108,6 +108,101 @@ const CAMPAIGN_SUB_TABS: { key: CampaignSubTab; label: string }[] = [
   { key: 'analytics', label: 'Analytics' },
 ];
 
+// Recovery / onboarding form shown when a signed-in user has no brand row.
+// This happens if signup INSERT failed (RLS, network) or they were invited but
+// haven't completed setup. Rather than a dead-end "contact us", let them
+// complete their own profile.
+function BrandProfileSetup({ email, onCreated }: { email: string; onCreated: () => void }) {
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('Food & Drink');
+  const [region, setRegion] = useState('Suffolk');
+  const [address, setAddress] = useState('');
+  const [bio, setBio] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const slugify = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!name.trim()) { setError('Business name is required'); return; }
+    setSaving(true);
+    setError('');
+    const { error: insertErr } = await supabase.from('businesses').insert({
+      owner_email: email,
+      name: name.trim(),
+      slug: slugify(name),
+      category,
+      region,
+      address: address.trim() || null,
+      bio: bio.trim() || null,
+      approved: false,
+    });
+    setSaving(false);
+    if (insertErr) {
+      setError(insertErr.message.includes('duplicate')
+        ? 'A business with that name already exists — contact nayba to resolve.'
+        : "Couldn't create your brand profile. Please try again or contact nayba.");
+      return;
+    }
+    onCreated();
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4 py-10">
+      <div className="bg-white rounded-[12px] p-6 md:p-8 max-w-[480px] w-full" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+        <Logo size={24} variant="wordmark" />
+        <h1 className="text-[22px] font-semibold text-[var(--ink)] mt-4 mb-1">Finish setting up your brand</h1>
+        <p className="text-[14px] text-[var(--ink-60)] mb-5">Tell us a bit about your business. Once approved by nayba, you'll be able to create campaigns.</p>
+        <form onSubmit={handleCreate} className="space-y-4">
+          <div>
+            <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Business name *</label>
+            <input value={name} onChange={e => setName(e.target.value)} required
+              placeholder="e.g. Revamp Gym"
+              className="w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] focus:outline-none focus:border-[var(--terra)]" />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Category</label>
+              <select value={category} onChange={e => setCategory(e.target.value)}
+                className="w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] focus:outline-none focus:border-[var(--terra)]">
+                {['Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'].map(c => <option key={c} value={c}>{c}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Region</label>
+              <select value={region} onChange={e => setRegion(e.target.value)}
+                className="w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] focus:outline-none focus:border-[var(--terra)]">
+                {['Suffolk', 'Norfolk', 'Cambridgeshire', 'Essex'].map(r => <option key={r} value={r}>{r}</option>)}
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Address</label>
+            <input value={address} onChange={e => setAddress(e.target.value)}
+              placeholder="e.g. 12 High Street, Bury St Edmunds"
+              className="w-full px-3 py-2.5 min-h-[40px] rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] focus:outline-none focus:border-[var(--terra)]" />
+          </div>
+          <div>
+            <label className="block text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">Short bio (optional)</label>
+            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
+              placeholder="A sentence or two about what makes your brand special"
+              className="w-full px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] focus:outline-none focus:border-[var(--terra)] resize-none" />
+          </div>
+          {error && <p className="text-[13px] text-[var(--terra)]">{error}</p>}
+          <button type="submit" disabled={saving || !name.trim()}
+            className="w-full min-h-[44px] py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-[0.85] disabled:opacity-40">
+            {saving ? 'Creating...' : 'Create brand profile'}
+          </button>
+          <p className="text-[12px] text-[var(--ink-35)] text-center">
+            Or <a href="mailto:hello@nayba.app" className="text-[var(--terra)] hover:underline">contact nayba</a> if you need help.
+          </p>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 export default function BusinessPortal() {
   const { user, signOut } = useEffectiveAuth();
   const [brand, setBrand] = useState<Brand | null>(null);
@@ -140,7 +235,7 @@ export default function BusinessPortal() {
   useEffect(() => { if (user) fetchBrand(); }, [user]);
 
   const fetchBrand = async () => {
-    const { data: bData } = await supabase.from('businesses').select('*').eq('owner_email', user!.email).single();
+    const { data: bData } = await supabase.from('businesses').select('*').eq('owner_email', user!.email).maybeSingle();
     if (bData) {
       setBrand(bData as Brand);
       const { data: cData } = await supabase.from('campaigns').select('*').eq('brand_id', bData.id).order('created_at', { ascending: false });
@@ -188,17 +283,7 @@ export default function BusinessPortal() {
   }
 
   if (!brand) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[var(--shell)] px-4">
-        <div className="bg-white rounded-[12px] p-8 max-w-md text-center" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-          <p className="text-[15px] font-medium text-[var(--ink)] mb-2">No brand account found</p>
-          <p className="text-[14px] text-[var(--ink-50)] mb-4">Contact nayba to get set up.</p>
-          <a href="mailto:hello@nayba.app" className="inline-flex items-center gap-2 px-4 py-2 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[14px]" style={{ fontWeight: 700 }}>
-            <Mail size={16} /> Contact nayba
-          </a>
-        </div>
-      </div>
-    );
+    return <BrandProfileSetup email={user!.email!} onCreated={fetchBrand} />;
   }
 
   const campaign = campaigns.find(c => c.id === selectedCampaignId) || null;
@@ -653,21 +738,35 @@ export default function BusinessPortal() {
             showToast('Creator declined');
           };
           const handleBulkSelect = async () => {
-            for (const id of selectedCreators) {
-              await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() }).eq('id', id);
+            const ids = Array.from(selectedCreators);
+            if (ids.length === 0) return;
+            const { error } = await supabase.from('applications')
+              .update({ status: 'selected', selected_at: new Date().toISOString() })
+              .in('id', ids);
+            if (error) {
+              console.error('[BusinessPortal] Bulk select failed:', error);
+              showToast("Couldn't select creators — please try again");
+              return;
             }
             setSelectedCreators(new Set());
             fetchCampaignData();
-            showToast(`${selectedCreators.size} creator${selectedCreators.size !== 1 ? 's' : ''} selected`);
+            showToast(`${ids.length} creator${ids.length !== 1 ? 's' : ''} selected`);
           };
           const handleBulkDecline = async () => {
-            if (!window.confirm(`Decline ${selectedCreators.size} creator${selectedCreators.size > 1 ? 's' : ''}?`)) return;
-            for (const id of selectedCreators) {
-              await supabase.from('applications').update({ status: 'declined' }).eq('id', id);
+            const ids = Array.from(selectedCreators);
+            if (ids.length === 0) return;
+            if (!window.confirm(`Decline ${ids.length} creator${ids.length > 1 ? 's' : ''}?`)) return;
+            const { error } = await supabase.from('applications')
+              .update({ status: 'declined' })
+              .in('id', ids);
+            if (error) {
+              console.error('[BusinessPortal] Bulk decline failed:', error);
+              showToast("Couldn't decline creators — please try again");
+              return;
             }
             setSelectedCreators(new Set());
             fetchCampaignData();
-            showToast(`${selectedCreators.size} creator${selectedCreators.size !== 1 ? 's' : ''} declined`);
+            showToast(`${ids.length} creator${ids.length !== 1 ? 's' : ''} declined`);
           };
           return (
           <div>

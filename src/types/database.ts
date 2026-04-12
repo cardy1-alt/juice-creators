@@ -260,7 +260,6 @@ export type Database = {
           total_campaigns: number;
           completed_campaigns: number;
           instagram_connected: boolean;
-          instagram_access_token: string | null;
           phone: string | null;
           referred_by: string | null;
           date_of_birth: string | null;
@@ -293,7 +292,6 @@ export type Database = {
           total_campaigns?: number;
           completed_campaigns?: number;
           instagram_connected?: boolean;
-          instagram_access_token?: string | null;
           phone?: string | null;
           referred_by?: string | null;
           date_of_birth?: string | null;
@@ -326,7 +324,6 @@ export type Database = {
           total_campaigns?: number;
           completed_campaigns?: number;
           instagram_connected?: boolean;
-          instagram_access_token?: string | null;
           phone?: string | null;
           referred_by?: string | null;
           date_of_birth?: string | null;

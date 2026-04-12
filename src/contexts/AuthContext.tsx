@@ -438,7 +438,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider value={{ user, userRole, userProfile, loading, signIn, signUp, signOut, viewAsRole, viewAsProfile, setViewAs, exitViewAs }}>
-      {children}
+      {demoKey && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, zIndex: 9999,
+          background: '#C4A84A', color: '#2A2018', padding: '6px 12px',
+          fontFamily: "'Instrument Sans', sans-serif", fontSize: 12, fontWeight: 600,
+          textAlign: 'center', letterSpacing: '0.02em',
+        }}>
+          DEMO MODE ACTIVE · This is a demo session viewing as {demoKey}. No real authentication — do not enter real data.
+        </div>
+      )}
+      <div style={{ paddingTop: demoKey ? 28 : 0 }}>
+        {children}
+      </div>
     </AuthContext.Provider>
   );
 }

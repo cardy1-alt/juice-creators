@@ -809,7 +809,66 @@ Deno.serve(async (req: Request) => {
         email = creatorSelectedEmail(recipientName, meta);
         break;
       case 'content_deadline_reminder':
+      case 'creator_deadline_reminder':
         email = contentDeadlineReminderEmail(recipientName, meta);
+        break;
+      case 'creator_content_received':
+        email = {
+          subject: `We got your Reel — thanks for sharing!`,
+          html: wrapEmail(`
+            ${heading('Reel received!')}
+            ${subtext(`Thanks for sharing your ${escapeHtml(meta.brand_name || 'campaign')} experience, ${escapeHtml(recipientName)}.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${escapeHtml(meta.brand_name || '')}</p>
+            `)}
+            ${p("We'll review your Reel and mark the campaign complete once everything looks good.")}
+            ${p('Keep creating — more local collabs land in your feed every week.')}
+            ${btn('Explore more campaigns', APP_URL)}
+          `),
+        };
+        break;
+      case 'creator_campaign_complete':
+        email = {
+          subject: `Campaign complete — nice work on ${meta.brand_name || 'your campaign'}!`,
+          html: wrapEmail(`
+            ${heading('Campaign complete!')}
+            ${subtext(`Great work, ${escapeHtml(recipientName)}. Your ${escapeHtml(meta.brand_name || 'campaign')} campaign is wrapped.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${escapeHtml(meta.brand_name || '')}</p>
+            `)}
+            ${meta.total_campaigns ? p(`You've completed <strong>${escapeHtml(meta.completed_campaigns || meta.total_campaigns)}</strong> ${(parseInt(meta.total_campaigns) === 1) ? 'campaign' : 'campaigns'} so far${meta.completion_rate ? ` — ${escapeHtml(meta.completion_rate)}% completion rate` : ''}.`) : ''}
+            ${p('Keep going — more collabs are waiting in your area.')}
+            ${btn('Browse campaigns', APP_URL)}
+          `),
+        };
+        break;
+      case 'content_overdue':
+        email = {
+          subject: `Your Reel is overdue — ${meta.brand_name || 'a campaign'}`,
+          html: wrapEmail(`
+            ${heading('Reel is overdue')}
+            ${subtext(`Hey ${escapeHtml(recipientName)}, your ${escapeHtml(meta.brand_name || 'campaign')} Reel${meta.content_deadline ? ` was due on ${escapeHtml(meta.content_deadline)}` : ' is overdue'}.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${escapeHtml(meta.brand_name || '')}</p>
+            `)}
+            ${p('Still planning to post? Submit your Reel in the app. If your plans changed, let us know — no hard feelings.')}
+            ${btn('Submit your Reel', `${APP_URL}${meta.campaign_id ? `?campaign=${meta.campaign_id}` : ''}`)}
+          `),
+        };
+        break;
+      case 'weekly_digest':
+        email = {
+          subject: `This week's local collabs — ${meta.campaign_count || '0'} new`,
+          html: wrapEmail(`
+            ${heading("This week's opportunities")}
+            ${subtext(`${escapeHtml(meta.campaign_count || '0')} new ${parseInt(meta.campaign_count || '0') === 1 ? 'collab' : 'collabs'} in ${escapeHtml(meta.city || 'your area')} this week.`)}
+            ${p('Log in to see the full list and register your interest.')}
+            ${btn('Browse campaigns', APP_URL)}
+          `),
+        };
         break;
       default:
         email = genericNotificationEmail(recipientName, notification.message);

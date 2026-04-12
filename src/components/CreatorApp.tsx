@@ -369,7 +369,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     }
     // Notify admin of content submission
     const { data: partData } = await supabase.from('participations')
-      .select('campaigns(title, businesses(name))').eq('id', showReelModal).single();
+      .select('campaigns(title, businesses(name))').eq('id', showReelModal).maybeSingle();
     if (partData) {
       const campaignTitle = (partData as any).campaigns?.title || '';
       const brandName = (partData as any).campaigns?.businesses?.name || '';
@@ -1107,7 +1107,7 @@ export default function CreatorApp() {
       setLoading(false);
       return;
     }
-    const { data, error } = await supabase.from('creators').select('*').eq('email', user.email).single();
+    const { data, error } = await supabase.from('creators').select('*').eq('email', user.email).maybeSingle();
     if (data) {
       setProfile(data as CreatorProfile);
       // Show onboarding overlay for new creators who haven't seen it
