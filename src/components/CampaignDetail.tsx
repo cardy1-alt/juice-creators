@@ -105,10 +105,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       status: 'interested',
     }).select('id, status').single();
     if (error) {
-      console.error('[CampaignDetail] Failed to apply:', error.message);
+      console.error('[CampaignDetail] Failed to apply:', error);
+      const msg = error.message.toLowerCase();
       setApplyError(
-        error.message.includes('duplicate')
+        msg.includes('duplicate')
           ? "You've already registered interest for this campaign."
+          : msg.includes('row-level security') || msg.includes('policy')
+          ? "Permission denied — please make sure your account is approved."
           : "Couldn't register your interest — please try again."
       );
       setSubmitting(false);
