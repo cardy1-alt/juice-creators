@@ -196,13 +196,52 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
   const ctaContent = (
     <>
-      {!application && (
+      {!application && !showPitchModal && (
         <div>
           <button onClick={() => setShowPitchModal(true)}
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
           </button>
           <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
+        </div>
+      )}
+      {!application && showPitchModal && (
+        <div className="bg-[var(--stone)] rounded-[12px] p-4 animate-fade-in">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[15px] font-semibold text-[var(--ink)]">Tell them why you</p>
+              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">Optional — a short pitch helps you stand out</p>
+            </div>
+            <button onClick={() => { setShowPitchModal(false); setPitch(''); setApplyError(''); }}
+              className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
+          </div>
+          <textarea
+            value={pitch}
+            onChange={e => setPitch(e.target.value)}
+            placeholder="I'd love to be part of this because..."
+            maxLength={500}
+            className="w-full px-3 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-20 resize-none focus:outline-none focus:border-[var(--terra)]"
+          />
+          <p className="text-[12px] text-[var(--ink-50)] text-right mt-1 mb-2">{pitch.length}/500</p>
+          {applyError && (
+            <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>
+          )}
+          <div className="flex gap-2">
+            <button
+              onClick={() => handleApply()}
+              disabled={submitting}
+              className="flex-1 min-h-[40px] py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-white disabled:opacity-50"
+            >
+              Skip pitch
+            </button>
+            <button
+              onClick={() => handleApply(pitch)}
+              disabled={submitting}
+              className="flex-1 min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
+            >
+              {submitting ? 'Submitting...' : 'Submit interest'}
+            </button>
+          </div>
         </div>
       )}
       {application?.status === 'interested' && (
@@ -421,43 +460,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       )}
 
       {/* Pitch modal */}
-      {!hideActions && showPitchModal && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-end sm:items-center justify-center animate-overlay">
-          <div className="bg-white w-full max-w-[480px] rounded-t-[10px] sm:rounded-[12px] p-4 sm:p-6 animate-slide-up">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[16px] font-semibold text-[var(--ink)]">Tell them why you</h3>
-              <button onClick={() => setShowPitchModal(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
-            </div>
-            <p className="text-[14px] text-[var(--ink-60)] mb-4">Write a short pitch to stand out — totally optional but helps your chances</p>
-            <textarea
-              value={pitch}
-              onChange={e => setPitch(e.target.value)}
-              placeholder="I'd love to be part of this because..."
-              className="w-full px-4 py-3 rounded-[12px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-24 resize-none focus:outline-none focus:border-[var(--terra)] mb-1"
-            />
-            <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] text-right mb-3">{pitch.length}/500</p>
-            {applyError && (
-              <p className="text-[13px] text-[var(--terra)] mb-3">{applyError}</p>
-            )}
-            <div className="flex gap-3">
-              <button
-                onClick={() => handleApply()}
-                disabled={submitting}
-                className="flex-1 min-h-[44px] py-2.5 rounded-[6px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-[rgba(42,32,24,0.04)] disabled:opacity-50"
-              >
-                Skip
-              </button>
-              <button
-                onClick={() => handleApply(pitch)}
-                disabled={submitting}
-                className="flex-1 min-h-[44px] py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
-              >
-                {submitting ? 'Submitting...' : 'Submit'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
