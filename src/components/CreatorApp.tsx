@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useEffectiveAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
-import { sendAdminContentSubmittedEmail } from '../lib/notifications';
+import { sendAdminContentSubmittedEmail, sendCreatorContentReceivedEmail } from '../lib/notifications';
 import CampaignDetail from './CampaignDetail';
 import LevelBadge from './LevelBadge';
 import {
@@ -371,12 +371,19 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     const { data: partData } = await supabase.from('participations')
       .select('campaigns(title, businesses(name))').eq('id', showReelModal).single();
     if (partData) {
+      const campaignTitle = (partData as any).campaigns?.title || '';
+      const brandName = (partData as any).campaigns?.businesses?.name || '';
       sendAdminContentSubmittedEmail({
         creator_name: profile.display_name || profile.name,
-        campaign_title: (partData as any).campaigns?.title || '',
-        brand_name: (partData as any).campaigns?.businesses?.name || '',
+        campaign_title: campaignTitle,
+        brand_name: brandName,
         reel_url: reelUrl,
       });
+      // Confirmation email to the creator
+      sendCreatorContentReceivedEmail(profile.id, {
+        campaign_title: campaignTitle,
+        brand_name: brandName,
+      }).catch(() => {});
     }
     setShowReelModal(null);
     setReelUrl('');
