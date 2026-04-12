@@ -71,6 +71,17 @@ export default function AdminApplicantsTab() {
   const [actingOn, setActingOn] = useState<string | null>(null);
   const [peekApplicant, setPeekApplicant] = useState<Applicant | null>(null);
   const [peekHistory, setPeekHistory] = useState<CampaignHistoryItem[]>([]);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkActing, setBulkActing] = useState(false);
+
+  const toggleSelected = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+  const clearSelection = () => setSelectedIds(new Set());
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
@@ -113,6 +124,48 @@ export default function AdminApplicantsTab() {
     showToast('Creator declined');
     setActingOn(null);
     if (peekApplicant?.id === applicant.id) setPeekApplicant(null);
+    fetchApplicants();
+  };
+
+  const handleBulkSelect = async () => {
+    const ids = Array.from(selectedIds);
+    const targets = applicants.filter(a => ids.includes(a.id) && a.status === 'interested');
+    if (targets.length === 0) return;
+    setBulkActing(true);
+    const now = new Date().toISOString();
+    const { error } = await supabase.from('applications')
+      .update({ status: 'selected', selected_at: now })
+      .in('id', targets.map(t => t.id));
+    if (error) { showToast('Bulk select failed'); setBulkActing(false); return; }
+    // Fire selection emails in parallel
+    await Promise.all(targets.map(t => {
+      if (t.creators && t.campaigns) {
+        return sendCreatorSelectedEmail(t.creators.id, {
+          campaign_title: t.campaigns.title,
+          brand_name: t.campaigns.businesses?.name || '',
+          campaign_id: t.campaigns.id,
+        }).catch(() => {});
+      }
+      return Promise.resolve();
+    }));
+    showToast(`Selected ${targets.length} ${targets.length === 1 ? 'creator' : 'creators'}`);
+    clearSelection();
+    setBulkActing(false);
+    fetchApplicants();
+  };
+
+  const handleBulkDecline = async () => {
+    const ids = Array.from(selectedIds);
+    const targets = applicants.filter(a => ids.includes(a.id) && a.status === 'interested');
+    if (targets.length === 0) return;
+    setBulkActing(true);
+    const { error } = await supabase.from('applications')
+      .update({ status: 'declined' })
+      .in('id', targets.map(t => t.id));
+    if (error) { showToast('Bulk decline failed'); setBulkActing(false); return; }
+    showToast(`Declined ${targets.length} ${targets.length === 1 ? 'creator' : 'creators'}`);
+    clearSelection();
+    setBulkActing(false);
     fetchApplicants();
   };
 
@@ -170,6 +223,18 @@ export default function AdminApplicantsTab() {
     const isPending = a.status === 'interested';
     const isActing = actingOn === a.id;
     const isSelected = peekApplicant?.id === a.id;
+    const isChecked = selectedIds.has(a.id);
+
+    const Checkbox = isPending ? (
+      <span
+        onClick={(e) => { e.stopPropagation(); toggleSelected(a.id); }}
+        role="checkbox"
+        aria-checked={isChecked}
+        className={`w-5 h-5 rounded-[5px] border flex items-center justify-center flex-shrink-0 cursor-pointer transition-colors ${isChecked ? 'bg-[var(--terra)] border-[var(--terra)]' : 'bg-white border-[rgba(42,32,24,0.25)] hover:border-[var(--ink-50)]'}`}
+      >
+        {isChecked && <Check size={13} className="text-white" strokeWidth={3} />}
+      </span>
+    ) : null;
 
     const statusPill = a.status === 'selected' ? (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
@@ -189,9 +254,10 @@ export default function AdminApplicantsTab() {
       return (
         <button
           onClick={() => openPeek(a)}
-          className={`group text-left bg-white rounded-[12px] p-4 transition-all hover:shadow-[0_4px_12px_rgba(42,32,24,0.08)] ${isSelected ? 'ring-2 ring-[var(--terra)]' : ''} ${!isPending ? 'opacity-70' : ''}`}
-          style={{ boxShadow: isSelected ? undefined : '0 1px 4px rgba(42,32,24,0.04)' }}
+          className={`group relative text-left bg-white rounded-[12px] p-4 transition-all hover:shadow-[0_4px_12px_rgba(42,32,24,0.08)] ${isSelected ? 'ring-2 ring-[var(--terra)]' : isChecked ? 'ring-2 ring-[var(--terra)] ring-opacity-50' : ''} ${!isPending ? 'opacity-70' : ''}`}
+          style={{ boxShadow: isSelected || isChecked ? undefined : '0 1px 4px rgba(42,32,24,0.04)' }}
         >
+          {Checkbox && <div className="absolute top-3 right-3">{Checkbox}</div>}
           <div className="flex items-start gap-3 mb-3">
             <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
               {a.creators?.avatar_url ? (
@@ -200,7 +266,7 @@ export default function AdminApplicantsTab() {
                 <span className="text-[15px] font-semibold" style={{ color: colors.text }}>{initial}</span>
               )}
             </div>
-            <div className="flex-1 min-w-0">
+            <div className="flex-1 min-w-0 pr-6">
               <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
               <p className="text-[12px] text-[var(--ink-50)] truncate">@{handle || '—'}</p>
             </div>
@@ -241,10 +307,11 @@ export default function AdminApplicantsTab() {
     return (
       <button
         onClick={() => openPeek(a)}
-        className={`w-full text-left bg-white transition-colors hover:bg-[rgba(42,32,24,0.02)] ${isSelected ? 'bg-[rgba(196,103,74,0.04)]' : ''} ${!isPending ? 'opacity-70' : ''}`}
+        className={`w-full text-left bg-white transition-colors hover:bg-[rgba(42,32,24,0.02)] ${isSelected ? 'bg-[rgba(196,103,74,0.04)]' : isChecked ? 'bg-[rgba(196,103,74,0.03)]' : ''} ${!isPending ? 'opacity-70' : ''}`}
       >
         <div className="px-4 py-4">
-          <div className="flex items-start gap-4">
+          <div className="flex items-start gap-3">
+            {Checkbox && <div className="mt-1">{Checkbox}</div>}
             <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
               {a.creators?.avatar_url ? (
                 <img src={a.creators.avatar_url} alt={name} className="w-full h-full object-cover" />
@@ -377,7 +444,19 @@ export default function AdminApplicantsTab() {
 
           {/* Main pane: active campaign's applicants */}
           <section className="min-w-0">
-            {activeCampaign && currentCampaignId && (
+            {activeCampaign && currentCampaignId && (() => {
+              const pendingInCampaign = activeCampaign.items.filter(i => i.status === 'interested');
+              const selectedInCampaign = pendingInCampaign.filter(i => selectedIds.has(i.id));
+              const allPendingSelected = pendingInCampaign.length > 0 && selectedInCampaign.length === pendingInCampaign.length;
+              const anySelected = selectedInCampaign.length > 0;
+              const toggleSelectAll = () => {
+                if (allPendingSelected) {
+                  setSelectedIds(prev => { const n = new Set(prev); pendingInCampaign.forEach(p => n.delete(p.id)); return n; });
+                } else {
+                  setSelectedIds(prev => { const n = new Set(prev); pendingInCampaign.forEach(p => n.add(p.id)); return n; });
+                }
+              };
+              return (
               <div>
                 {/* Campaign header */}
                 <div className="bg-white rounded-[12px] px-5 py-4 mb-3 flex items-center justify-between" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -410,6 +489,34 @@ export default function AdminApplicantsTab() {
                   </div>
                 </div>
 
+                {/* Bulk action bar — appears when any pending applicant selected */}
+                {anySelected && (
+                  <div className="bg-[var(--ink)] rounded-[12px] px-4 py-3 mb-3 flex items-center justify-between flex-wrap gap-3 animate-slide-up">
+                    <div className="flex items-center gap-3 text-white">
+                      <span className="inline-flex items-center justify-center w-6 h-6 rounded-[6px] bg-white/10 text-[13px] font-semibold">{selectedInCampaign.length}</span>
+                      <span className="text-[14px] font-medium">selected</span>
+                      <button onClick={toggleSelectAll}
+                        className="text-[13px] text-white/70 hover:text-white transition-colors underline-offset-2 hover:underline">
+                        {allPendingSelected ? 'Deselect all' : `Select all ${pendingInCampaign.length}`}
+                      </button>
+                      <button onClick={clearSelection}
+                        className="text-[13px] text-white/70 hover:text-white transition-colors">
+                        Clear
+                      </button>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button onClick={handleBulkDecline} disabled={bulkActing}
+                        className="px-3 py-1.5 rounded-[8px] bg-white/10 text-white text-[13px] font-medium hover:bg-white/15 disabled:opacity-40 transition-colors">
+                        Decline {selectedInCampaign.length}
+                      </button>
+                      <button onClick={handleBulkSelect} disabled={bulkActing}
+                        className="px-3 py-1.5 rounded-[8px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.90] disabled:opacity-40 transition-opacity">
+                        {bulkActing ? 'Saving...' : `Select ${selectedInCampaign.length}`}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Applicants */}
                 {activeCampaign.items.length === 0 ? (
                   <div className="bg-white rounded-[12px] p-8 text-center">
@@ -425,7 +532,8 @@ export default function AdminApplicantsTab() {
                   </div>
                 )}
               </div>
-            )}
+              );
+            })()}
           </section>
         </div>
       )}
