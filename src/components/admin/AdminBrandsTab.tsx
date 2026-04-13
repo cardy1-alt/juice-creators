@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { sendBusinessApprovedEmail, sendBusinessDeniedEmail } from '../../lib/notifications';
+import { sendBusinessApprovedEmail, sendBusinessDeniedEmail, sendBusinessWelcomeEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -44,19 +44,26 @@ function CreateBrandModal({ onClose, onCreated }: { onClose: () => void; onCreat
     const { data: existing } = await supabase.from('businesses').select('id').eq('slug', slug).limit(1);
     if (existing && existing.length > 0) { setError('A brand with this name already exists'); setCreating(false); return; }
 
-    const { error: insertErr } = await supabase.from('businesses').insert({
+    const { data: inserted, error: insertErr } = await supabase.from('businesses').insert({
       name: form.name, slug, owner_email: form.email, category: form.category, region: form.region,
       instagram_handle: form.instagram ? form.instagram.replace(/^@/, '') : null,
       address: form.address || null, bio: form.bio || null, logo_url: form.logo_url || null,
       approved: true, onboarding_complete: true,
-    });
+    }).select('id').single();
     if (insertErr) { setError('Failed to create brand — ' + insertErr.message); setCreating(false); return; }
 
-    // Invite brand owner — creates auth user and sends "set your password" email
-    const { data: fnData, error: fnErr } = await supabase.functions.invoke('invite-brand', {
+    // Invite brand owner — creates auth user and sends Supabase "set password" email
+    const { error: fnErr } = await supabase.functions.invoke('invite-brand', {
       body: { email: form.email, brandName: form.name },
     });
     if (fnErr) console.error('[CreateBrand] invite-brand failed:', fnErr.message);
+
+    // Fire the Nayba-branded welcome email so admin-created brands get the
+    // same polished onboarding as self-signups (in addition to the Supabase
+    // transactional set-password email).
+    if (inserted?.id) {
+      sendBusinessWelcomeEmail(inserted.id).catch(() => {});
+    }
 
     setCreating(false);
     onCreated();

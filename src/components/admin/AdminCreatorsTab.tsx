@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
+import { sendCreatorApprovedEmail, sendCreatorDeniedEmail, sendCreatorWelcomeEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
 import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search, Pencil, KeyRound } from 'lucide-react';
@@ -76,6 +76,11 @@ function CreateCreatorModal({ onClose, onCreated, showToast }: { onClose: () => 
       approved: true, onboarding_complete: true, profile_complete: true,
     });
     if (insertErr) { setError('Account created but profile save failed — ' + insertErr.message); setCreating(false); return; }
+
+    // Fire the Nayba-branded welcome email so admin-created creators get the
+    // same polished onboarding as self-signups (in addition to the Supabase
+    // transactional set-password email).
+    sendCreatorWelcomeEmail(userId).catch(() => {});
 
     setCreated(true);
     setCreating(false);
