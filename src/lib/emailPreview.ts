@@ -151,11 +151,19 @@ export const EMAIL_TEMPLATES: EmailTemplate[] = [
   },
   {
     key: 'creator_confirmed', name: 'Spot confirmed', group: 'creator',
-    description: 'Sent when creator confirms — includes perk and brand address',
-    variables: ['name', 'brand_name', 'campaign_title', 'perk_description', 'brand_address'],
+    description: 'Sent when creator confirms — includes perk, brand address, and any brand-specific instructions',
+    variables: ['name', 'brand_name', 'campaign_title', 'perk_description', 'brand_address', 'brand_instructions', 'brand_instagram'],
     defaultSubject: "You're confirmed for {{brand_name}} — here's what happens next",
-    defaultBody: `${heading("You're In!")}${subtext("Nice one, {{name}}. You're confirmed for {{brand_name}}'s campaign.")}${infoBox(`<p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">{{campaign_title}}</p><p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: {{perk_description}}</p><p style="margin:0;font-size:13px;color:${INK_60};">📍 {{brand_address}}</p>`)}${p("Your perk is ready — visit the brand whenever suits you. When you arrive, just mention you're with Nayba or show your Instagram.")}${p("After your visit, film a short Reel sharing your experience and submit the link in the app.")}${btn("View Campaign")}`,
-    sampleData: { name: 'Sophie Turner', brand_name: 'Revamp Gym', campaign_title: 'Summer Fitness Challenge', perk_description: 'Free week pass + PT session worth £45', brand_address: '12 High Street, Bury St Edmunds' },
+    defaultBody: `${heading("You're In!")}${subtext("Nice one, {{name}}. You're confirmed for {{brand_name}}'s campaign.")}${infoBox(`<p style="margin:0 0 6px;font-size:16px;font-weight:600;color:${INK};">{{campaign_title}}</p><p style="margin:0 0 4px;font-size:13px;color:${INK_60};">Perk: {{perk_description}}</p><p style="margin:0;font-size:13px;color:${INK_60};">📍 {{brand_address}}</p>`)}${p("<strong>What happens next:</strong>")}${p("1. <strong>{{brand_instructions}}</strong> (DM @{{brand_instagram}})")}${p("2. When you arrive, mention you're with Nayba or show your Instagram")}${p("3. After your visit, film a short Reel and submit the link in the app")}${btn("View Campaign")}`,
+    sampleData: {
+      name: 'Sophie Turner',
+      brand_name: 'Revamp Gym',
+      campaign_title: 'Summer Fitness Challenge',
+      perk_description: 'Free week pass + PT session worth £45',
+      brand_address: '12 High Street, Bury St Edmunds',
+      brand_instructions: "Please book your visit at least 24h ahead by DMing us on Instagram. We'll meet you at reception.",
+      brand_instagram: 'revampgym',
+    },
   },
   {
     key: 'creator_campaign_complete', name: 'Campaign complete', group: 'creator',
