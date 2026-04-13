@@ -3,17 +3,18 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen, UserCheck } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Activity, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen, UserCheck } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
 import AdminApplicantsTab from './admin/AdminApplicantsTab';
 import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
+import AdminActivityTab from './admin/AdminActivityTab';
 import AdminNotificationsTab from './admin/AdminNotificationsTab';
 import AdminSettingsTab from './admin/AdminSettingsTab';
 import CommandPalette from './admin/CommandPalette';
 
-type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
+type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'activity' | 'broadcasts' | 'settings';
 
 const NAV_SECTIONS = [
   {
@@ -29,12 +30,13 @@ const NAV_SECTIONS = [
     label: 'Insights',
     items: [
       { key: 'analytics' as Tab, label: 'Analytics', icon: BarChart3 },
+      { key: 'activity' as Tab, label: 'Activity', icon: Activity },
     ],
   },
   {
     label: 'Tools',
     items: [
-      { key: 'notifications' as Tab, label: 'Notifications', icon: Bell },
+      { key: 'broadcasts' as Tab, label: 'Broadcasts', icon: Bell },
       { key: 'settings' as Tab, label: 'Settings', icon: Settings },
     ],
   },
@@ -46,7 +48,8 @@ const PAGE_TITLES: Record<Tab, string> = {
   creators: 'Creators',
   brands: 'Brands',
   analytics: 'Analytics',
-  notifications: 'Notifications',
+  activity: 'Activity',
+  broadcasts: 'Broadcasts',
   settings: 'Settings',
 };
 
@@ -56,7 +59,8 @@ const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
   creators: { label: 'Create Creator', show: true },
   brands: { label: 'Create Brand', show: true },
   analytics: { label: '', show: false },
-  notifications: { label: '', show: false },
+  activity: { label: '', show: false },
+  broadcasts: { label: '', show: false },
   settings: { label: '', show: false },
 };
 
@@ -73,7 +77,10 @@ export default function AdminDashboard() {
   const [peekTarget, setPeekTarget] = useState<{ tab: Tab; entityId: string } | null>(null);
 
   const refreshPendingCounts = () => {
-    supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
+    // Pending = awaiting review. Denied rows have denied_at set and should
+    // not be counted here, otherwise the sidebar badge sticks after denial.
+    supabase.from('creators').select('id', { count: 'exact', head: true })
+      .eq('approved', false).is('denied_at', null)
       .then(({ count }) => setPendingCount(count || 0));
     supabase.from('applications').select('id', { count: 'exact', head: true }).eq('status', 'interested')
       .then(({ count }) => setPendingApplicantCount(count || 0));
@@ -267,7 +274,8 @@ export default function AdminDashboard() {
           {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'creators' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'brands' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
-          {activeTab === 'notifications' && <AdminNotificationsTab />}
+          {activeTab === 'activity' && <AdminActivityTab />}
+          {activeTab === 'broadcasts' && <AdminNotificationsTab />}
           {activeTab === 'settings' && <AdminSettingsTab />}
         </main>
       </div>

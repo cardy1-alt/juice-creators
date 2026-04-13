@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, Search, ArrowRight, UserCheck } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Activity, Settings, Search, ArrowRight, UserCheck } from 'lucide-react';
 
-type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
+type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'activity' | 'broadcasts' | 'settings';
 
 interface SearchResult {
   id: string;
@@ -18,7 +18,8 @@ const PAGES: SearchResult[] = [
   { id: 'creators', type: 'page', tab: 'creators', title: 'Creators', subtitle: 'View all creators' },
   { id: 'brands', type: 'page', tab: 'brands', title: 'Brands', subtitle: 'View all brands' },
   { id: 'analytics', type: 'page', tab: 'analytics', title: 'Analytics', subtitle: 'Platform analytics' },
-  { id: 'notifications', type: 'page', tab: 'notifications', title: 'Notifications', subtitle: 'Email notifications' },
+  { id: 'activity', type: 'page', tab: 'activity', title: 'Activity', subtitle: 'Audit log of every change' },
+  { id: 'broadcasts', type: 'page', tab: 'broadcasts', title: 'Broadcasts', subtitle: 'Send campaign broadcasts' },
   { id: 'settings', type: 'page', tab: 'settings', title: 'Settings', subtitle: 'Platform settings' },
 ];
 
@@ -28,7 +29,8 @@ const ICONS: Record<string, React.ReactNode> = {
   creators: <Users size={16} />,
   brands: <Store size={16} />,
   analytics: <BarChart3 size={16} />,
-  notifications: <Bell size={16} />,
+  activity: <Activity size={16} />,
+  broadcasts: <Bell size={16} />,
   settings: <Settings size={16} />,
 };
 

@@ -2,14 +2,14 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail, sendBusinessWelcomeEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
 import Select from '../ui/Select';
 
 interface Brand {
   id: string; name: string; slug: string; owner_email: string; category: string;
-  region: string; approved: boolean; instagram_handle: string | null;
+  region: string; approved: boolean; denied_at: string | null; instagram_handle: string | null;
   address: string | null; bio: string | null; created_at: string;
   logo_url: string | null;
 }
@@ -325,6 +325,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
   const [toast, setToast] = useState<string | null>(null);
   const [peekBrand, setPeekBrand] = useState<Brand | null>(null);
   const [deletingBrand, setDeletingBrand] = useState<string | null>(null);
+  const [selectedBrands, setSelectedBrands] = useState<Set<string>>(new Set());
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'newest' | 'alphabetical'>('newest');
@@ -353,16 +354,44 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
 
   const handleApprove = async (id: string, approved: boolean) => {
     if (!approved && !window.confirm('Deny this brand?')) return;
-    const { error } = await supabase.from('businesses').update({ approved }).eq('id', id);
+    // denied_at distinguishes denied rows from fresh-pending ones so the
+    // Pending filter and sidebar counts don't keep surfacing denied brands.
+    const patch = approved
+      ? { approved: true, denied_at: null }
+      : { approved: false, denied_at: new Date().toISOString() };
+    const { error } = await supabase.from('businesses').update(patch).eq('id', id);
     if (error) { setToast('Update failed'); setTimeout(() => setToast(null), 3000); return; }
-    if (approved) sendBusinessApprovedEmail(id).catch(() => {});
-    else sendBusinessDeniedEmail(id).catch(() => {});
+    if (approved) sendBusinessApprovedEmail(id).catch(e => console.warn('[admin] business approved email enqueue failed', e));
+    else sendBusinessDeniedEmail(id).catch(e => console.warn('[admin] business denied email enqueue failed', e));
     setToast(`Brand ${approved ? 'approved' : 'denied'}`);
     setTimeout(() => setToast(null), 3000);
     fetchBrands();
   };
 
+  const bulkDelete = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const msg = ids.length === 1
+      ? 'Permanently delete this brand, its campaigns, applications, and participations? This cannot be undone.'
+      : `Permanently delete ${ids.length} brands and all their campaigns, applications, and participations? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    const { data: brandCampaigns } = await supabase.from('campaigns').select('id').in('brand_id', ids);
+    const campaignIds = (brandCampaigns || []).map((c: any) => c.id);
+    if (campaignIds.length > 0) {
+      await supabase.from('participations').delete().in('campaign_id', campaignIds);
+      await supabase.from('applications').delete().in('campaign_id', campaignIds);
+    }
+    await supabase.from('campaigns').delete().in('brand_id', ids);
+    const { error } = await supabase.from('businesses').delete().in('id', ids);
+    if (error) { setToast('Delete failed — try again'); setTimeout(() => setToast(null), 3000); return; }
+    setToast(`Deleted ${ids.length} brand${ids.length > 1 ? 's' : ''}`);
+    setTimeout(() => setToast(null), 3000);
+    setSelectedBrands(new Set());
+    fetchBrands();
+  };
+
   const filteredBrands = brands
+    // Denied brands stay in the DB for audit but are hidden from admin tables.
+    .filter(b => !b.denied_at)
     .filter(b => {
       if (statusFilter === 'approved' && !b.approved) return false;
       if (statusFilter === 'pending' && b.approved) return false;
@@ -376,6 +405,21 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
       if (sortBy === 'alphabetical') return a.name.localeCompare(b.name);
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
+
+  const toggleSelectBrand = (id: string) => {
+    setSelectedBrands(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllBrands = () => {
+    if (filteredBrands.length === 0) return;
+    if (selectedBrands.size === filteredBrands.length) setSelectedBrands(new Set());
+    else setSelectedBrands(new Set(filteredBrands.map(b => b.id)));
+  };
 
   return (
     <div>
@@ -401,6 +445,25 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
           { value: 'alphabetical', label: 'A — Z' },
         ]} />
       </div>
+
+      {/* Bulk action toolbar (desktop) */}
+      {selectedBrands.size > 0 && (
+        <div className="hidden md:flex items-center justify-between px-4 py-2.5 mb-2 rounded-[10px] border border-[rgba(42,32,24,0.08)] bg-white">
+          <div className="text-[13px] text-[var(--ink-60)]">
+            <span className="font-semibold text-[var(--ink)]">{selectedBrands.size}</span> brand{selectedBrands.size > 1 ? 's' : ''} selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setSelectedBrands(new Set())}
+              className="px-3 py-1.5 rounded-[8px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
+              Clear
+            </button>
+            <button onClick={() => bulkDelete(Array.from(selectedBrands))}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[8px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+              <Trash2 size={13} /> Delete {selectedBrands.size}
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Mobile card list */}
       <div className="md:hidden space-y-2">
@@ -434,8 +497,15 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
 
       {/* Desktop table */}
       <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[700px]">
+        <table className="w-full min-w-[740px]">
           <thead><tr>
+            <th className={thCls} style={{ width: 40 }}>
+              <button onClick={selectAllBrands}
+                className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors ${filteredBrands.length > 0 && selectedBrands.size === filteredBrands.length ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.25)] hover:border-[var(--terra)]'}`}
+                title={selectedBrands.size === filteredBrands.length ? 'Deselect all' : 'Select all'}>
+                {filteredBrands.length > 0 && selectedBrands.size === filteredBrands.length && <Check size={10} className="text-white" />}
+              </button>
+            </th>
             <th className={thCls}>Brand</th><th className={thCls}>Category</th><th className={thCls}>Region</th>
             <th className={thCls}>Instagram</th><th className={thCls}>Campaigns</th><th className={thCls}>Status</th>
             <th className={thCls}>Actions</th>
@@ -443,7 +513,13 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
           <tbody>
             {filteredBrands.map(b => (
               <tr key={b.id} onClick={() => setPeekBrand(peekBrand?.id === b.id ? null : b)}
-                className={`cursor-pointer transition-colors ${peekBrand?.id === b.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                className={`cursor-pointer transition-colors ${selectedBrands.has(b.id) ? 'bg-[rgba(196,103,74,0.04)]' : peekBrand?.id === b.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                <td className={tdCls} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => toggleSelectBrand(b.id)}
+                    className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors ${selectedBrands.has(b.id) ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
+                    {selectedBrands.has(b.id) && <Check size={10} className="text-white" />}
+                  </button>
+                </td>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
                     <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(b.name[0]).bg }}>
@@ -472,8 +548,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
                 </td>
               </tr>
             ))}
-            {brands.length === 0 && (
-              <tr><td colSpan={7} className="py-12 text-center text-[14px] text-[var(--ink-60)]">No brands yet</td></tr>
+            {filteredBrands.length === 0 && (
+              <tr><td colSpan={8} className="py-12 text-center text-[14px] text-[var(--ink-60)]">No brands yet</td></tr>
             )}
           </tbody>
         </table>
