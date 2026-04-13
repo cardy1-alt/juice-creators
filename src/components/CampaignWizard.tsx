@@ -101,10 +101,27 @@ Generate a complete campaign as JSON with these exact keys:
 Return only valid JSON, no markdown, no code fences.`,
         }),
       });
-      if (!res.ok) throw new Error('API error');
-      const { text } = await res.json();
-      let data;
-      try { data = JSON.parse(text); } catch { throw new Error('Invalid AI response'); }
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        const msg = body?.detail ? `${body.error}: ${body.detail}` : (body?.error || `Request failed (${res.status})`);
+        throw new Error(msg);
+      }
+      const text: string = body?.text || '';
+      if (!text) throw new Error('AI returned empty response');
+      // Models sometimes wrap JSON in ```json ... ``` fences despite the prompt.
+      // Strip them before parsing so we don't silently fail on valid output.
+      const cleaned = text
+        .trim()
+        .replace(/^```(?:json)?\s*/i, '')
+        .replace(/\s*```$/i, '')
+        .trim();
+      let data: any;
+      try {
+        data = JSON.parse(cleaned);
+      } catch (parseErr) {
+        console.error('[CampaignWizard] AI returned non-JSON:', cleaned.slice(0, 500));
+        throw new Error('AI response was not valid JSON — try again');
+      }
       setGen(p => ({
         ...p,
         title: data.title || `${brandName} Campaign`,
@@ -117,8 +134,10 @@ Return only valid JSON, no markdown, no code fences.`,
         target_county: county,
         perk_value: data.perk_value?.toString() || '',
       }));
-    } catch {
-      setAiError('AI generation failed — try again or create manually');
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error('[CampaignWizard] AI generation failed:', err);
+      setAiError(`AI generation failed: ${msg}`);
       setStep(1); // Go back to inputs on failure
     }
     setAiLoading(false);
