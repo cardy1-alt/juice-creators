@@ -101,10 +101,19 @@ Generate a complete campaign as JSON with these exact keys:
 Return only valid JSON, no markdown, no code fences.`,
         }),
       });
-      if (!res.ok) throw new Error('API error');
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('[CampaignWizard] /api/ai/generate failed', res.status, errBody);
+        throw new Error(errBody?.detail || errBody?.error || `API error ${res.status}`);
+      }
       const { text } = await res.json();
       let data;
-      try { data = JSON.parse(text); } catch { throw new Error('Invalid AI response'); }
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('[CampaignWizard] Failed to parse AI JSON', e, text);
+        throw new Error('Invalid AI response');
+      }
       setGen(p => ({
         ...p,
         title: data.title || `${brandName} Campaign`,
@@ -117,7 +126,8 @@ Return only valid JSON, no markdown, no code fences.`,
         target_county: county,
         perk_value: data.perk_value?.toString() || '',
       }));
-    } catch {
+    } catch (err) {
+      console.error('[CampaignWizard] AI generation failed', err);
       setAiError('AI generation failed — try again or create manually');
       setStep(1); // Go back to inputs on failure
     }

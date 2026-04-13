@@ -136,10 +136,19 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           prompt: `You are creating a campaign brief for nayba, a hyperlocal creator marketing platform in the UK. Brand: ${brandName}. Brand region: ${form.target_county || 'Suffolk'}. Campaign title: ${form.title}. Headline: ${form.headline || 'not provided'}. Perk: ${form.perk_description || 'not provided'}. Generate a complete campaign brief as JSON with these exact keys: - headline: suggested headline, short and punchy, max 10 words. Only suggest if the provided headline is empty or 'not provided'. - target_city: the city where this campaign should run, inferred from brand region. UK city name only. - about_brand: 2-3 sentence description of the brand and what makes it special, 50-80 words. - content_requirements: specific Reel instructions including required tags, what to show, tone, must-mention details, 40-60 words. - talking_points: array of exactly 3 strings, each a key message for creators to weave in naturally, max 15 words each. - inspiration: array of exactly 2 objects each with title (4-6 words) and description (one sentence, max 20 words). Return only valid JSON, no markdown, no preamble.`,
         }),
       });
-      if (!res.ok) throw new Error('API error');
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({}));
+        console.error('[AdminCampaigns] /api/ai/generate failed', res.status, errBody);
+        throw new Error(errBody?.detail || errBody?.error || `API error ${res.status}`);
+      }
       const { text } = await res.json();
       let data;
-      try { data = JSON.parse(text); } catch { throw new Error('Invalid AI response'); }
+      try {
+        data = JSON.parse(text);
+      } catch (e) {
+        console.error('[AdminCampaigns] Failed to parse AI JSON', e, text);
+        throw new Error('Invalid AI response');
+      }
       setForm(p => ({
         ...p,
         headline: p.headline || data.headline || p.headline,
@@ -152,7 +161,8 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
         insp: data.inspiration ? data.inspiration.slice(0, 2).map((i: any) => ({ title: i.title || '', description: i.description || '' })) : p.insp,
       }));
       setAiRan(true);
-    } catch {
+    } catch (err) {
+      console.error('[AdminCampaigns] AI generation failed', err);
       setAiError('AI generation failed — fill in manually');
       setTimeout(() => setAiError(''), 4000);
     }
