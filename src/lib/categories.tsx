@@ -145,16 +145,27 @@ export function getCategoryPastelIcon(category: string | undefined | null): stri
   return CATEGORY_PASTEL_ICON[category || ''] || '#6E6A62';
 }
 
-/* ── Nayba palette mapping — maps business categories to design token colors ── */
+/* ── Nayba palette mapping — maps business categories to design token colors ──
+ *
+ * Keys cover both the short canonical names used by AdminBrandsTab (Food &
+ * Drink / Beauty / Wellness / Experience / Retail) and legacy long-form
+ * variants, so admin-created brands pick up the right colour regardless of
+ * which vocabulary produced the row.
+ */
 const CATEGORY_PALETTE: Record<string, { color: string; tint: string; border: string }> = {
+  // Short canonical names (what AdminBrandsTab saves)
   'Food & Drink':         { color: 'var(--sage)',        tint: 'var(--sage-tint)',   border: 'var(--sage)' },
+  'Beauty':               { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
+  'Wellness':             { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
+  'Experience':           { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
+  'Retail':               { color: 'var(--baltic)',      tint: 'var(--baltic-tint)', border: 'var(--baltic)' },
+  // Legacy long-form variants (kept for any older rows)
   'Cafe & Coffee':        { color: 'var(--sage)',        tint: 'var(--sage-tint)',   border: 'var(--sage)' },
   'Hair & Beauty':        { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
   'Wellness & Spa':       { color: 'var(--violet)',      tint: 'var(--violet-tint)', border: 'var(--violet)' },
   'Health & Fitness':     { color: 'var(--baltic)',      tint: 'var(--baltic-tint)', border: 'var(--baltic)' },
   'Arts & Entertainment': { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
   'Education':            { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
-  'Retail':               { color: 'var(--baltic)',      tint: 'var(--baltic-tint)', border: 'var(--baltic)' },
   'Services':             { color: 'var(--ink-35)',      tint: 'var(--stone)',       border: 'var(--ink-35)' },
   'Pets':                 { color: 'var(--golden-mist)', tint: 'var(--mist-tint)',   border: 'var(--golden-mist)' },
 };
