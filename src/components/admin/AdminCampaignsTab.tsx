@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getCategoryPalette } from '../../lib/categories';
-import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid } from 'lucide-react';
+import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid, Trash2 } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
@@ -801,10 +801,59 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
   const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
+  const [selectedCampaigns, setSelectedCampaigns] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'kanban' | 'gallery'>('table');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'deadline'>('newest');
+
+  const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+
+  // Delete a campaign plus every row that references it. Child FKs don't all
+  // have ON DELETE CASCADE (participations.campaign_id doesn't, neither does
+  // notifications.campaign_id), so we clean up manually before deleting the
+  // campaign itself. Returns true on success.
+  const cascadeDeleteCampaigns = async (ids: string[]): Promise<boolean> => {
+    if (ids.length === 0) return true;
+    // Notifications keep campaign_id for audit — null it rather than delete.
+    await supabase.from('notifications').update({ campaign_id: null }).in('campaign_id', ids);
+    await supabase.from('participations').delete().in('campaign_id', ids);
+    await supabase.from('applications').delete().in('campaign_id', ids);
+    const { error } = await supabase.from('campaigns').delete().in('id', ids);
+    if (error) {
+      console.error('[admin] campaign delete failed:', error);
+      showToast(`Delete failed — ${error.message}`);
+      return false;
+    }
+    return true;
+  };
+
+  const bulkDelete = async () => {
+    const ids = Array.from(selectedCampaigns);
+    if (ids.length === 0) return;
+    const msg = ids.length === 1
+      ? 'Permanently delete this campaign, its applications, and participations? This cannot be undone.'
+      : `Permanently delete ${ids.length} campaigns and all their applications and participations? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    setBulkDeleting(true);
+    const ok = await cascadeDeleteCampaigns(ids);
+    setBulkDeleting(false);
+    if (!ok) return;
+    showToast(`Deleted ${ids.length} campaign${ids.length > 1 ? 's' : ''}`);
+    setSelectedCampaigns(new Set());
+    fetchCampaigns();
+  };
+
+  const toggleSelectCampaign = (id: string) => {
+    setSelectedCampaigns(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
 
   useEffect(() => { fetchCampaigns(); }, []);
 
@@ -878,8 +927,37 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
     });
 
+  const selectAllCampaigns = () => {
+    if (filteredCampaigns.length === 0) return;
+    if (selectedCampaigns.size === filteredCampaigns.length) setSelectedCampaigns(new Set());
+    else setSelectedCampaigns(new Set(filteredCampaigns.map(c => c.id)));
+  };
+
   return (
     <div>
+      {toast && (
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+      )}
+
+      {/* Bulk action toolbar (desktop) */}
+      {selectedCampaigns.size > 0 && (
+        <div className="hidden md:flex items-center justify-between px-4 py-2.5 mb-4 rounded-[10px] border border-[rgba(42,32,24,0.08)] bg-white">
+          <div className="text-[13px] text-[var(--ink-60)]">
+            <span className="font-semibold text-[var(--ink)]">{selectedCampaigns.size}</span> campaign{selectedCampaigns.size > 1 ? 's' : ''} selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setSelectedCampaigns(new Set())}
+              className="px-3 py-1.5 rounded-[8px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
+              Clear
+            </button>
+            <button onClick={bulkDelete} disabled={bulkDeleting}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[8px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)] disabled:opacity-50">
+              <Trash2 size={13} /> {bulkDeleting ? 'Deleting…' : `Delete ${selectedCampaigns.size}`}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Stats row */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6 animate-stagger">
         {statCards.map(s => (
@@ -972,8 +1050,15 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         {/* Desktop: Table view */}
         {viewMode === 'table' && (
         <div className="hidden md:block bg-white rounded-[12px] overflow-hidden overflow-x-auto">
-          <table className="w-full min-w-[900px]">
+          <table className="w-full min-w-[940px]">
             <thead><tr>
+              <th className={thCls} style={{ width: 40 }}>
+                <button onClick={selectAllCampaigns}
+                  className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors ${filteredCampaigns.length > 0 && selectedCampaigns.size === filteredCampaigns.length ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.25)] hover:border-[var(--terra)]'}`}
+                  title={selectedCampaigns.size === filteredCampaigns.length ? 'Deselect all' : 'Select all'}>
+                  {filteredCampaigns.length > 0 && selectedCampaigns.size === filteredCampaigns.length && <Check size={10} className="text-white" />}
+                </button>
+              </th>
               <th className={thCls}>Brand</th><th className={thCls}>Campaign</th><th className={thCls}>Status</th>
               <th className={thCls}>City</th><th className={thCls}>Target</th><th className={thCls}>Applicants</th>
               <th className={thCls}>Selected</th><th className={thCls}>Submitted</th><th className={thCls}>Completed</th>
@@ -983,9 +1068,16 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
               {filteredCampaigns.map(c => {
                 const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
                 const selected = peekCampaign?.id === c.id;
+                const isChecked = selectedCampaigns.has(c.id);
                 return (
                     <tr key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
-                      className={`cursor-pointer transition-colors ${selected ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                      className={`cursor-pointer transition-colors ${isChecked ? 'bg-[rgba(196,103,74,0.04)]' : selected ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                      <td className={tdCls} onClick={e => e.stopPropagation()}>
+                        <button onClick={() => toggleSelectCampaign(c.id)}
+                          className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center transition-colors ${isChecked ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
+                          {isChecked && <Check size={10} className="text-white" />}
+                        </button>
+                      </td>
                       <td className={tdCls}>
                         <div className="flex items-center gap-2.5">
                           <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors((c.businesses?.name || '?')[0]).bg }}>
@@ -1195,14 +1287,17 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center animate-overlay">
           <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center animate-slide-up">
             <h3 className="nayba-h3">Delete campaign?</h3>
-            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this campaign and all its applications. This cannot be undone.</p>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">This will permanently remove this campaign and all its applications and participations. This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => setDeletingCampaign(null)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
               <button onClick={async () => {
-                await supabase.from('campaigns').delete().eq('id', deletingCampaign);
+                const id = deletingCampaign;
+                const ok = await cascadeDeleteCampaigns([id]);
+                if (!ok) return; // toast already shown
                 setDeletingCampaign(null);
                 setPeekCampaign(null);
                 fetchCampaigns();
+                showToast('Campaign deleted');
               }} className="flex-1 py-2.5 rounded-[10px] bg-[var(--destructive)] text-white font-semibold text-[14px]">Delete</button>
             </div>
           </div>
