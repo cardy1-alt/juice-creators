@@ -46,8 +46,8 @@ WHERE brand_id IN (SELECT id FROM businesses WHERE name ILIKE 'The Space');
 UPDATE campaigns SET title = 'Free day pass'
 WHERE brand_id IN (SELECT id FROM businesses WHERE name ILIKE 'David Lloyd%');
 
--- Midgar Coffee (free drink / coffee)
-UPDATE campaigns SET title = 'Free drink'
+-- Midgar Coffee (free drink, sandwich and cake — full lunch perk)
+UPDATE campaigns SET title = 'Free drink, sandwich and cake'
 WHERE brand_id IN (SELECT id FROM businesses WHERE name ILIKE 'Midgar Coffee');
 
 -- Sugartown Toys (£20 gift voucher)
