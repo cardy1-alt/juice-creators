@@ -260,7 +260,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     <>
       {!application && !showPitchModal && (
         <div>
-          {PreApplyCallout}
           <button onClick={() => setShowPitchModal(true)}
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
@@ -315,7 +314,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       )}
       {application?.status === 'selected' && (
         <div>
-          {PreConfirmCallout}
           <button onClick={handleConfirm} disabled={submitting}
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
             {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
@@ -331,7 +329,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
             You're confirmed
           </div>
-          {PostConfirmCallout}
         </div>
       )}
       {application?.status === 'declined' && (
@@ -341,6 +338,18 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       )}
     </>
   );
+
+  // The brand-instructions callout is rendered inline in the scrollable
+  // content (below) rather than inside the mobile fixed bottom bar — when
+  // instructions are long, stuffing them into the fixed bar blocked creators
+  // from scrolling to see the rest of the page.
+  const currentCallout = !application && !showPitchModal
+    ? PreApplyCallout
+    : application?.status === 'selected'
+      ? PreConfirmCallout
+      : application?.status === 'confirmed'
+        ? PostConfirmCallout
+        : null;
 
   const catPalette = getCategoryPalette(campaign.businesses?.category);
   const deliverablesList = [campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean);
@@ -485,6 +494,15 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
                   </div>
                 ))}
               </div>
+            </div>
+          )}
+
+          {/* Brand-instructions callout — rendered inline in the main
+              scroll content so the mobile fixed bottom bar stays compact
+              even when instructions are long. */}
+          {!hideActions && currentCallout && (
+            <div className="mt-6">
+              {currentCallout}
             </div>
           )}
 
