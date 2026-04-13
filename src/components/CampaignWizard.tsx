@@ -89,8 +89,8 @@ Perk offered: ${perk}
 ${instructions ? `Additional instructions: ${instructions}` : ''}
 
 Generate a complete campaign as JSON with these exact keys:
-- title: campaign title, 3-6 words, catchy and action-oriented (e.g. "Free Week Pass at Revamp Gym")
-- headline: one-liner for creators, max 12 words, punchy
+- title: THE PERK itself in 3–5 words. Action-focused. NEVER start with "Experience", "Discover", "Try", "Enjoy", or "Unlock". Do NOT include the brand name (brand is shown separately). Good: "Free reformer class", "£20 gift voucher", "Free day pass", "Free coffee and pastry". Bad: "Experience wellness at The Space", "Discover the magic of...", "Try our premium..."
+- headline: short context line for the detail page, max 10 words, no cliché openers. Good: "45-minute opening-week taster — Saturday 24 May". Bad: "Experience the ultimate..."
 - about_brand: 2-3 sentences about the brand, 50-80 words, warm and inviting
 - content_requirements: specific Reel instructions — what to show, tone, must-mention details, 40-60 words
 - talking_points: array of exactly 3 strings, each a key message for creators, max 15 words each
