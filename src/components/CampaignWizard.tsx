@@ -58,6 +58,7 @@ export default function CampaignWizard({ brands, fixedBrandId, onSave, onClose }
     campaign_image: '',
     perk_value: '',
     creator_target: '5',
+    brand_instructions: '',
     open_date: addDays(new Date(), 1),
     expression_deadline: addDays(new Date(), 15),
     content_deadline: addDays(new Date(), 29),
@@ -140,6 +141,7 @@ Return only valid JSON, no markdown, no code fences.`,
       creator_target: parseInt(gen.creator_target) || 5,
       min_level: 1,
       content_requirements: gen.content_requirements || null,
+      brand_instructions: gen.brand_instructions || null,
       talking_points: gen.talking_points.filter(Boolean),
       inspiration: gen.inspiration.filter((i: any) => i.title),
       deliverables: { reel: true, story: false },
@@ -226,10 +228,17 @@ Return only valid JSON, no markdown, no code fences.`,
                       placeholder="e.g. Free week pass including unlimited classes + 1 PT session worth £45" />
                   </div>
                   <div>
-                    <label className={labelCls}>Any specific instructions? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                    <label className={labelCls}>Reel content notes for AI <span className="text-[var(--ink-35)]">(optional)</span></label>
                     <textarea value={instructions} onChange={e => setInstructions(e.target.value)}
                       className={`${inputCls} min-h-[60px] resize-y`}
                       placeholder="e.g. Film a Reel showing the gym, mention the free pass, tag @revampgym" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                    <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)}
+                      className={`${inputCls} min-h-[60px] resize-y`}
+                      placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram. We'll meet you at reception." />
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email. Be specific and actionable.</p>
                   </div>
                   {aiError && <p className="text-[13px] text-[var(--terra)]">{aiError}</p>}
                 </>
@@ -266,6 +275,11 @@ Return only valid JSON, no markdown, no code fences.`,
                   <div>
                     <label className={labelCls}>Content Requirements</label>
                     <textarea value={gen.content_requirements} onChange={e => setG('content_requirements', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder="What should the Reel include?" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                    <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)} className={`${inputCls} min-h-[60px] resize-y`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram." />
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email.</p>
                   </div>
                   <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="Campaign Image" />
                 </>

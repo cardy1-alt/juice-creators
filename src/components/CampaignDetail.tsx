@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
-import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin } from 'lucide-react';
+import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, AlertCircle, Sparkles } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 
 function CampaignFallbackImage({ category, name }: { category?: string | null; name?: string | null }) {
@@ -25,6 +25,7 @@ interface Campaign {
   id: string; brand_id: string; title: string; headline: string | null;
   about_brand: string | null; perk_description: string | null; perk_value: number | null;
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
+  brand_instructions: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   required_tags: string[] | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
@@ -176,6 +177,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         brand_name: campaign.businesses.name,
         perk_description: campaign.perk_description || '',
         brand_address: campaign.businesses.address || '',
+        brand_instructions: campaign.brand_instructions || '',
+        brand_instagram: campaign.businesses.instagram_handle || '',
       }).catch(() => {});
       sendBusinessCreatorConfirmedEmail(campaign.brand_id, {
         creator_name: creatorName,
@@ -212,10 +215,52 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
   const sectionGap = 'mt-6';
 
+  const brandInstructions = campaign?.brand_instructions?.trim() || '';
+  const brandHandle = (campaign?.businesses?.instagram_handle || '').replace('@', '');
+
+  // Brand requirements callout shown before applying.
+  const PreApplyCallout = brandInstructions ? (
+    <div className="mb-3 rounded-[12px] border border-[rgba(217,95,59,0.20)] bg-[rgba(249,232,225,0.50)] px-4 py-3">
+      <div className="flex items-start gap-2.5">
+        <AlertCircle size={16} className="text-[var(--terra)] mt-0.5 flex-shrink-0" />
+        <div className="min-w-0">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--terra)] mb-1">Brand requirements</p>
+          <p className="text-[14px] text-[var(--ink)] leading-[1.5]">{brandInstructions}</p>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  // Acceptance callout shown before confirming.
+  const PreConfirmCallout = brandInstructions ? (
+    <div className="mb-3 rounded-[12px] border border-[rgba(42,32,24,0.10)] bg-[var(--stone)] px-4 py-3">
+      <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">By confirming, you agree to:</p>
+      <p className="text-[14px] text-[var(--ink)] leading-[1.5]">{brandInstructions}</p>
+    </div>
+  ) : null;
+
+  // Next-step callout shown after confirming.
+  const PostConfirmCallout = brandInstructions ? (
+    <div className="mb-3 rounded-[12px] bg-[var(--terra)] px-4 py-4 text-white">
+      <div className="flex items-center gap-2 mb-1.5">
+        <Sparkles size={14} />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Next step</p>
+      </div>
+      <p className="text-[14px] leading-[1.55] mb-3">{brandInstructions}</p>
+      {brandHandle && (
+        <a href={`https://instagram.com/${brandHandle}`} target="_blank" rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-white text-[var(--terra)] text-[13px] font-semibold hover:opacity-90">
+          <AtSign size={13} />Open Instagram DM
+        </a>
+      )}
+    </div>
+  ) : null;
+
   const ctaContent = (
     <>
       {!application && !showPitchModal && (
         <div>
+          {PreApplyCallout}
           <button onClick={() => setShowPitchModal(true)}
             className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
             I'm Interested
@@ -269,15 +314,24 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         </div>
       )}
       {application?.status === 'selected' && (
-        <button onClick={handleConfirm} disabled={submitting}
-          className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
-          {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
-        </button>
+        <div>
+          {PreConfirmCallout}
+          <button onClick={handleConfirm} disabled={submitting}
+            className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
+            {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
+          </button>
+          {applyError && (
+            <p className="text-[13px] text-[var(--terra)] text-center mt-2">{applyError}</p>
+          )}
+        </div>
       )}
       {application?.status === 'confirmed' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
-          <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-          You're confirmed
+        <div>
+          {PostConfirmCallout}
+          <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
+            <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+            You're confirmed
+          </div>
         </div>
       )}
       {application?.status === 'declined' && (

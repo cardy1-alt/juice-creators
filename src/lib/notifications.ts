@@ -169,6 +169,8 @@ export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
   brand_name: string;
   perk_description: string;
   brand_address?: string;
+  brand_instructions?: string;
+  brand_instagram?: string;
 }): Promise<void> {
   await insertNotification({
     userId: creatorId,
@@ -180,6 +182,8 @@ export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
       brand_name: meta.brand_name,
       perk_description: meta.perk_description,
       brand_address: meta.brand_address || '',
+      brand_instructions: meta.brand_instructions || '',
+      brand_instagram: meta.brand_instagram || '',
     },
   });
 }

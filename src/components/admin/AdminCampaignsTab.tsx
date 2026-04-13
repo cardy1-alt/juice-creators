@@ -15,6 +15,7 @@ interface Campaign {
   id: string; brand_id: string; title: string; headline: string | null; about_brand: string | null;
   perk_description: string | null; perk_value: number | null; perk_type: string | null;
   target_city: string | null; target_county: string | null; content_requirements: string | null;
+  brand_instructions: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   creator_target: number; open_date: string | null; expression_deadline: string | null;
   content_deadline: string | null; campaign_type: 'brand' | 'community'; campaign_image: string | null;
@@ -107,6 +108,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     campaign_image: campaign?.campaign_image || '',
     min_level: campaign?.min_level?.toString() || '1',
     content_requirements: campaign?.content_requirements || '',
+    brand_instructions: campaign?.brand_instructions || '',
     required_tags: campaign?.required_tags?.join(', ') || '',
     tp1: campaign?.talking_points?.[0] || '', tp2: campaign?.talking_points?.[1] || '', tp3: campaign?.talking_points?.[2] || '',
     insp: campaign?.inspiration || [{ title: '', description: '' }, { title: '', description: '' }],
@@ -178,6 +180,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       target_city: form.target_city || null, target_county: form.target_county || null,
       creator_target: creatorTarget, min_level: parseInt(form.min_level as any) || 1,
       content_requirements: form.content_requirements || null,
+      brand_instructions: form.brand_instructions || null,
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
       deliverables: { reel: form.reel, story: form.story },
@@ -263,6 +266,11 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
                     <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
+                    <div className="md:col-span-2">
+                      <label className={labelCls}>Brand Requirements for Creators <span className="text-[var(--ink-35)] normal-case">(optional)</span></label>
+                      <textarea value={form.brand_instructions} onChange={e => set('brand_instructions', e.target.value)} className={`${taCls} min-h-[60px]`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us on Instagram." />
+                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Shown to creators before applying, when they confirm, and in their confirmation email.</p>
+                    </div>
                     <div className="md:col-span-2">
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}

@@ -736,7 +736,16 @@ Deno.serve(async (req: Request) => {
           `),
         };
         break;
-      case 'creator_confirmed':
+      case 'creator_confirmed': {
+        const brandIg = (meta.brand_instagram || '').replace('@', '');
+        const hasInstructions = !!(meta.brand_instructions && meta.brand_instructions.trim().length > 0);
+        // When brand has set custom instructions, replace the generic "visit
+        // anytime" step with the brand's own first action (e.g. book in
+        // advance via DM). Keep the brand IG handle inline if present so
+        // creators have a one-tap channel.
+        const firstStep = hasInstructions
+          ? `<strong>${escapeHtml(meta.brand_instructions!)}</strong>${brandIg ? ` (DM <a href="https://instagram.com/${brandIg}" style="color:${TERRA};font-weight:600;">@${brandIg}</a>)` : ''}`
+          : 'Visit the brand whenever suits you';
         email = {
           subject: `You're confirmed for ${meta.brand_name} — here's what happens next`,
           html: wrapEmail(`
@@ -752,14 +761,15 @@ Deno.serve(async (req: Request) => {
             `)}
             ${p('<strong>What happens next:</strong>')}
             ${stepList([
-              'Visit the brand whenever suits you',
-              'When you arrive, mention you\'re with Nayba or show your Instagram',
+              firstStep,
+              "When you arrive, mention you're with Nayba or show your Instagram",
               'After your visit, film a short Reel and submit the link in the app',
             ])}
             ${btn('View Campaign', APP_URL)}
           `),
         };
         break;
+      }
       case 'business_creator_confirmed':
         email = {
           subject: `${meta.creator_name} is confirmed for your campaign`,
