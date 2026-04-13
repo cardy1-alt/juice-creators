@@ -582,7 +582,7 @@ export default function Auth() {
                 </form>
 
                 <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] text-center mt-6 leading-[1.5]">
-                  By signing up you agree to our terms and privacy policy.
+                  By signing up you agree to our <a href="/?page=terms" target="_blank" rel="noopener noreferrer" className="text-[var(--terra)] hover:underline font-medium">Terms</a> and <a href="/?page=privacy" target="_blank" rel="noopener noreferrer" className="text-[var(--terra)] hover:underline font-medium">Privacy Policy</a>.
                 </p>
               </div>
             )}

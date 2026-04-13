@@ -7,6 +7,8 @@ const CreatorApp = React.lazy(() => import('./components/CreatorApp'));
 const BusinessPortal = React.lazy(() => import('./components/BusinessPortal'));
 const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 const CampaignDetail = React.lazy(() => import('./components/CampaignDetail'));
+const TermsPage = React.lazy(() => import('./components/pages/TermsPage'));
+const PrivacyPage = React.lazy(() => import('./components/pages/PrivacyPage'));
 import { AlertCircle, RefreshCw, LogOut, Eye, EyeOff, Lock, CheckCircle, Clock } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
@@ -306,6 +308,15 @@ function App() {
   const { user, userRole, userProfile, loading, signOut, viewAsRole, viewAsProfile } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
   const campaignId = getCampaignIdFromUrl();
+
+  // Public legal pages — accessible without auth
+  const pageParam = new URLSearchParams(window.location.search).get('page');
+  if (pageParam === 'terms') {
+    return <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[var(--chalk)]"><div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /></div>}><TermsPage /></React.Suspense>;
+  }
+  if (pageParam === 'privacy') {
+    return <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[var(--chalk)]"><div className="w-8 h-8 border-[3px] border-[var(--terra)] border-t-transparent rounded-full animate-spin" /></div>}><PrivacyPage /></React.Suspense>;
+  }
 
   // Password recovery route — must be checked before auth gate
   if (isPasswordRecovery()) {
