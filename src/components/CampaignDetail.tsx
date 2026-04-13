@@ -241,16 +241,16 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
   // Next-step callout shown after confirming.
   const PostConfirmCallout = brandInstructions ? (
-    <div className="mb-3 rounded-[12px] bg-[var(--terra)] px-4 py-4 text-white">
-      <div className="flex items-center gap-2 mb-1.5">
-        <Sparkles size={14} />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.06em]">Next step</p>
+    <div className="mt-3 rounded-[12px] border border-[rgba(217,95,59,0.20)] bg-[rgba(249,232,225,0.50)] px-4 py-4">
+      <div className="flex items-center gap-1.5 mb-2">
+        <Sparkles size={13} className="text-[var(--terra)]" />
+        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--terra)]">Next step</p>
       </div>
-      <p className="text-[14px] leading-[1.55] mb-3">{brandInstructions}</p>
+      <p className="text-[14px] leading-[1.55] text-[var(--ink)] mb-3">{brandInstructions}</p>
       {brandHandle && (
         <a href={`https://instagram.com/${brandHandle}`} target="_blank" rel="noopener noreferrer"
-          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-white text-[var(--terra)] text-[13px] font-semibold hover:opacity-90">
-          <AtSign size={13} />Open Instagram DM
+          className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-[0.85] transition-opacity">
+          <AtSign size={13} />DM @{brandHandle}
         </a>
       )}
     </div>
@@ -327,11 +327,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       )}
       {application?.status === 'confirmed' && (
         <div>
-          {PostConfirmCallout}
-          <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
+          <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(122,148,120,0.10)] text-center text-[#0F6E56] font-medium text-[14px]">
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
             You're confirmed
           </div>
+          {PostConfirmCallout}
         </div>
       )}
       {application?.status === 'declined' && (
