@@ -169,12 +169,15 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   const categories = ['All', 'Food & Drink', 'Beauty', 'Wellness', 'Experience', 'Retail'];
 
-  // Map display categories to business categories for filtering
+  // Map display categories to business categories for filtering. Each filter
+  // includes both the canonical short name (what admin-created brands are
+  // saved with — see CATEGORIES in AdminBrandsTab/CreateBrandModal) and any
+  // legacy long-form variants that may exist in older data.
   const categoryMap: Record<string, string[]> = {
-    'Food & Drink': ['Food & Drink', 'Cafe & Coffee'],
-    'Beauty': ['Hair & Beauty'],
-    'Wellness': ['Wellness & Spa', 'Health & Fitness'],
-    'Experience': ['Arts & Entertainment', 'Education'],
+    'Food & Drink': ['Food & Drink', 'Food', 'Cafe & Coffee'],
+    'Beauty': ['Beauty', 'Hair & Beauty'],
+    'Wellness': ['Wellness', 'Wellness & Spa', 'Health & Fitness'],
+    'Experience': ['Experience', 'Arts & Entertainment', 'Education'],
     'Retail': ['Retail', 'Services'],
   };
 
