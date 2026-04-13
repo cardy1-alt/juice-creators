@@ -21,18 +21,22 @@ type Filter = 'all' | 'signups' | 'approvals' | 'campaigns' | 'content' | 'feedb
 const EVENT_LABELS: Record<string, string> = {
   admin_signup: 'New signup',
   admin_approval_request: 'Awaiting approval',
+  admin_interest_expressed: 'Creator applied',
+  admin_creator_confirmed: 'Creator confirmed spot',
+  admin_content_submitted: 'Reel submitted',
   creator_welcome: 'Creator welcomed',
   business_welcome: 'Brand welcomed',
   creator_approved: 'Creator approved',
   business_approved: 'Brand approved',
   creator_denied: 'Creator denied',
   business_denied: 'Brand denied',
+  business_campaign_live: 'Campaign published',
+  business_creator_confirmed: 'Brand: creator confirmed',
   creator_selected: 'Creator selected for campaign',
   creator_confirmed: 'Spot confirmed',
   creator_deadline_reminder: 'Deadline reminder',
   creator_content_received: 'Content received',
   creator_campaign_complete: 'Campaign complete',
-  admin_content_submitted: 'Reel submitted',
   content_overdue: 'Content overdue',
   weekly_digest: 'Weekly digest',
   feedback: 'Feedback submitted',
@@ -51,10 +55,14 @@ const FAMILY: Record<string, Filter> = {
   business_approved: 'approvals',
   creator_denied: 'approvals',
   business_denied: 'approvals',
+  business_campaign_live: 'campaigns',
   creator_selected: 'campaigns',
   creator_confirmed: 'campaigns',
   creator_deadline_reminder: 'campaigns',
   creator_campaign_complete: 'campaigns',
+  business_creator_confirmed: 'campaigns',
+  admin_interest_expressed: 'campaigns',
+  admin_creator_confirmed: 'campaigns',
   creator_content_received: 'content',
   admin_content_submitted: 'content',
   content_overdue: 'content',
@@ -90,47 +98,66 @@ function fmtAbs(iso: string): string {
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+const PAGE_SIZE = 50;
+
 // ─── Tab ───────────────────────────────────────────────────────────────
 export default function AdminActivityTab() {
   const [rows, setRows] = useState<NotificationRow[]>([]);
   const [creatorNames, setCreatorNames] = useState<Record<string, string>>({});
   const [businessNames, setBusinessNames] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [filter, setFilter] = useState<Filter>('all');
 
-  const fetchActivity = async () => {
-    setLoading(true);
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(200);
-    const list = (data as NotificationRow[]) || [];
-    setRows(list);
-
-    // Resolve user display names in batch — keeps the feed readable without N+1 queries.
+  // Resolve user display names for a batch of rows. Additive — keeps names
+  // already in state when appending paginated pages.
+  const resolveNamesFor = async (list: NotificationRow[]) => {
     const creatorIds = new Set<string>();
     const businessIds = new Set<string>();
     list.forEach(r => {
       if (r.user_type === 'creator' && r.user_id !== '00000000-0000-0000-0000-000000000000') creatorIds.add(r.user_id);
       if (r.user_type === 'business' && r.user_id !== '00000000-0000-0000-0000-000000000000') businessIds.add(r.user_id);
     });
+    const updates: { creators: Record<string, string>; businesses: Record<string, string> } = { creators: {}, businesses: {} };
     if (creatorIds.size > 0) {
-      const { data: c } = await supabase.from('creators').select('id, display_name, name, email').in('id', Array.from(creatorIds));
-      const map: Record<string, string> = {};
-      (c || []).forEach((row: any) => { map[row.id] = row.display_name || row.name || row.email || row.id.slice(0, 8); });
-      setCreatorNames(map);
+      const { data } = await supabase.from('creators').select('id, display_name, name, email').in('id', Array.from(creatorIds));
+      (data || []).forEach((row: any) => { updates.creators[row.id] = row.display_name || row.name || row.email || 'Unknown'; });
     }
     if (businessIds.size > 0) {
-      const { data: b } = await supabase.from('businesses').select('id, name, owner_email').in('id', Array.from(businessIds));
-      const map: Record<string, string> = {};
-      (b || []).forEach((row: any) => { map[row.id] = row.name || row.owner_email || row.id.slice(0, 8); });
-      setBusinessNames(map);
+      const { data } = await supabase.from('businesses').select('id, name, owner_email').in('id', Array.from(businessIds));
+      (data || []).forEach((row: any) => { updates.businesses[row.id] = row.name || row.owner_email || 'Unknown'; });
     }
-    setLoading(false);
+    if (Object.keys(updates.creators).length) setCreatorNames(prev => ({ ...prev, ...updates.creators }));
+    if (Object.keys(updates.businesses).length) setBusinessNames(prev => ({ ...prev, ...updates.businesses }));
   };
 
-  useEffect(() => { fetchActivity(); }, []);
+  const fetchPage = async (opts: { append: boolean; offset: number }) => {
+    if (opts.append) setLoadingMore(true); else setLoading(true);
+    const { data } = await supabase
+      .from('notifications')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .range(opts.offset, opts.offset + PAGE_SIZE - 1);
+    const list = (data as NotificationRow[]) || [];
+    // Fewer rows than requested → we've hit the end of the feed.
+    setHasMore(list.length === PAGE_SIZE);
+    setRows(prev => opts.append ? [...prev, ...list] : list);
+    await resolveNamesFor(list);
+    if (opts.append) setLoadingMore(false); else setLoading(false);
+  };
+
+  const refresh = () => {
+    setHasMore(true);
+    fetchPage({ append: false, offset: 0 });
+  };
+
+  const loadMore = () => {
+    if (loading || loadingMore || !hasMore) return;
+    fetchPage({ append: true, offset: rows.length });
+  };
+
+  useEffect(() => { refresh(); }, []);
 
   const resolveName = (r: NotificationRow): string => {
     if (r.user_type === 'admin') {
@@ -138,8 +165,10 @@ export default function AdminActivityTab() {
       const meta = r.email_meta || {};
       return meta.display_name || meta.creator_name || 'System';
     }
-    if (r.user_type === 'creator') return creatorNames[r.user_id] || r.user_id.slice(0, 8);
-    if (r.user_type === 'business') return businessNames[r.user_id] || r.user_id.slice(0, 8);
+    // If the referenced creator/brand has been deleted, fall back to a
+    // readable "Deleted creator/brand" instead of showing a raw UUID prefix.
+    if (r.user_type === 'creator') return creatorNames[r.user_id] || 'Deleted creator';
+    if (r.user_type === 'business') return businessNames[r.user_id] || 'Deleted brand';
     return '—';
   };
 
@@ -177,7 +206,7 @@ export default function AdminActivityTab() {
             );
           })}
         </div>
-        <button onClick={fetchActivity} disabled={loading}
+        <button onClick={refresh} disabled={loading || loadingMore}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[8px] border border-[rgba(42,32,24,0.08)] text-[13px] font-semibold text-[var(--ink-60)] hover:bg-white disabled:opacity-50">
           <RefreshCw size={13} className={loading ? 'animate-spin' : ''} /> Refresh
         </button>
@@ -231,8 +260,18 @@ export default function AdminActivityTab() {
         </ul>
       </div>
 
-      {rows.length >= 200 && (
-        <p className="text-[12px] text-[var(--ink-50)] text-center mt-3">Showing the last 200 events</p>
+      {/* Pagination footer — only show when the feed has something to page through */}
+      {rows.length > 0 && (
+        <div className="mt-4 flex flex-col items-center gap-1">
+          {hasMore ? (
+            <button onClick={loadMore} disabled={loadingMore}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[8px] border border-[rgba(42,32,24,0.08)] text-[13px] font-semibold text-[var(--ink-60)] hover:bg-white disabled:opacity-50">
+              {loadingMore ? (<><RefreshCw size={13} className="animate-spin" /> Loading…</>) : `Load more`}
+            </button>
+          ) : (
+            <p className="text-[12px] text-[var(--ink-50)]">End of feed — showing all {rows.length} events</p>
+          )}
+        </div>
       )}
     </div>
   );
