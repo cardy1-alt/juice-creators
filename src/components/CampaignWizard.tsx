@@ -88,15 +88,27 @@ Region: ${county}
 Perk offered: ${perk}
 ${instructions ? `Additional instructions: ${instructions}` : ''}
 
+CRITICAL RULE: Each field below sits in a specific place on the creator's screen and must ADD NEW INFORMATION. Never repeat the same claim, phrase, or anchor word across multiple fields. If a fact goes in about_brand, it must NOT appear in talking_points or content_requirements, and vice versa. Variety matters more than coverage — it is better for a field to be shorter than to paraphrase something already said elsewhere.
+
 Generate a complete campaign as JSON with these exact keys:
-- title: THE PERK itself in 3–5 words. Action-focused. NEVER start with "Experience", "Discover", "Try", "Enjoy", or "Unlock". Do NOT include the brand name (brand is shown separately). Good: "Free reformer class", "£20 gift voucher", "Free day pass", "Free coffee and pastry". Bad: "Experience wellness at The Space", "Discover the magic of...", "Try our premium..."
-- headline: short context line for the detail page, max 10 words, no cliché openers. Good: "45-minute opening-week taster — Saturday 24 May". Bad: "Experience the ultimate..."
-- about_brand: 2-3 sentences about the brand, 50-80 words, warm and inviting
-- content_requirements: specific Reel instructions — what to show, tone, must-mention details, 40-60 words
-- talking_points: array of exactly 3 strings, each a key message for creators, max 15 words each
-- inspiration: array of 2 objects each with "title" (4-6 words) and "description" (one sentence, max 20 words)
-- target_city: the city where this campaign should run, inferred from region. UK city name only.
-- perk_value: estimated monetary value of the perk in GBP as a number
+
+- title: THE PERK in 3–5 words. Product not pitch. NEVER start with "Experience", "Discover", "Try", "Enjoy", or "Unlock". Do NOT include the brand name. Good: "Free reformer class", "£20 gift voucher", "Free day pass", "Free coffee and pastry". Bad: "Experience wellness at The Space".
+
+- headline: a one-line hook about the EXPERIENCE (not the brand), max 10 words. Sets the vibe of the Reel. Good: "45 minutes that reset your Saturday", "Your next favourite lunch spot". Bad: "Suffolk's best pilates studio" (that's brand-boast — belongs in about_brand if anywhere).
+
+- about_brand: THE BACKSTORY ONLY — what makes this place exist, who's behind it, or what they believe. 2 sentences MAX, 40 words or fewer. Do NOT list features or claims that could be talking points (e.g. "personal service", "quality toys", "carefully curated"). Think "origin story", not "marketing blurb". Good: "Opened in 2019 by two sisters who couldn't find a toy shop they loved. Every item is hand-picked by the family." Bad: "Suffolk's beloved independent toy store offering carefully curated toys and games."
+
+- content_requirements: THE PRODUCTION BRIEF ONLY — what the creator must physically show, shot variety, tone of voice. 40–60 words. Do NOT include brand messaging or claims (those belong in talking_points). Think director's notes, not marketing copy. Good: "Film 3–4 short clips: the shopfront, browsing the shelves, one item being unboxed at home. Warm natural light, authentic reaction shots, no voiceover needed." Bad: "Showcase the personal service and magical atmosphere."
+
+- talking_points: array of exactly 3 strings. Each is a DISTINCT message the creator might say or caption — phrased as assertions in the creator's voice, max 15 words. Each point must cover a DIFFERENT angle (e.g. one about who it's for, one about what's unique, one about a specific moment). None may repeat phrases from about_brand or content_requirements. If two points feel similar, rewrite one.
+
+- inspiration: array of 2 objects each with "title" (4-6 words, names a specific Reel concept) and "description" (one sentence, max 20 words, describes the SCENES in the Reel — not the brand claims). Good: {"title":"Morning routine swap","description":"Show a 6am class clip intercut with the creator's usual coffee routine."}. Bad: {"title":"Magical shopping","description":"Highlight the personal service and quality toys."}
+
+- target_city: the UK city this campaign should run in, inferred from region.
+
+- perk_value: estimated monetary value of the perk in GBP as a number.
+
+DO NOT repeat anchor words (e.g. "magical", "premium", "independent") across multiple fields. If you used a word once, pick a different angle for the next field.
 
 Return only valid JSON, no markdown, no code fences.`,
         }),

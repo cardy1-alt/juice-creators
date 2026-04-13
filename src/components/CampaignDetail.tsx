@@ -54,7 +54,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [showPitchModal, setShowPitchModal] = useState(false);
   const [pitch, setPitch] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const [showBrandInfo, setShowBrandInfo] = useState(false);
   const [applyError, setApplyError] = useState<string>('');
   const [confirmedCount, setConfirmedCount] = useState(0);
 
@@ -409,11 +408,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         </div>
 
         <div className="px-6 pb-24 md:pb-8">
-          {/* Brand info */}
+          {/* Brand info. The brand name used to open a modal duplicating
+              the About section below — dropped, as everything that modal
+              showed is now visible on the main page. */}
           <div className="mb-5">
-            <button onClick={() => setShowBrandInfo(true)} className="text-[16px] font-semibold text-[var(--ink)] hover:text-[var(--terra)] transition-colors">
+            <p className="text-[16px] font-semibold text-[var(--ink)]">
               {campaign.businesses?.name}
-            </button>
+            </p>
             <div className="flex items-center gap-2 mt-1.5">
               {campaign.businesses?.category && (
                 <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
@@ -445,11 +446,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
           </div>
 
-          {/* Perk — part of header area */}
+          {/* Perk — part of header area. £value is shown on the feed card
+              and again next to "Apply by" in the meta row, so no need to
+              repeat it here as a subtitle. */}
           {campaign.perk_description && (
             <div className="px-4 py-3 rounded-[10px] bg-[var(--terra-light)]">
               <p className="text-[14px] font-semibold text-[var(--terra)]">{campaign.perk_description?.split('—')[0]?.trim()}</p>
-              {campaign.perk_value && <p className="text-[14px] md:text-[12px] text-[var(--terra)] mt-0.5" style={{}}>Worth £{campaign.perk_value}</p>}
             </div>
           )}
 
@@ -457,7 +459,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="border-t border-[rgba(42,32,24,0.06)] mt-6 pt-5">
             {campaign.about_brand && (
               <div>
-                <p className="text-[14px] font-medium text-[var(--ink-60)] mb-2">About {campaign.businesses?.name}</p>
+                <p className="text-[14px] font-medium text-[var(--ink-60)] mb-2">About</p>
                 <p className="text-[15px] text-[var(--ink)] leading-[1.7]">{campaign.about_brand}</p>
               </div>
             )}
@@ -548,35 +550,6 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {ctaContent}
         </div>
       )}
-
-      {/* Brand info modal */}
-      {showBrandInfo && campaign.businesses && (
-        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4 animate-overlay" onClick={() => setShowBrandInfo(false)}>
-          <div className="bg-white rounded-[12px] max-w-[400px] w-full p-6 animate-slide-up" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[16px] font-semibold text-[var(--ink)]">{campaign.businesses.name}</h3>
-              <button onClick={() => setShowBrandInfo(false)} className="text-[var(--ink-50)] hover:text-[var(--ink)]"><X size={20} /></button>
-            </div>
-            {campaign.businesses.category && (
-              <p className="text-[14px] text-[var(--ink-50)] mb-3">{campaign.businesses.category}</p>
-            )}
-            {(campaign.about_brand || campaign.businesses.bio) && (
-              <p className="text-[15px] text-[var(--ink)] leading-[1.65] mb-4">{campaign.about_brand || campaign.businesses.bio}</p>
-            )}
-            {!campaign.about_brand && !campaign.businesses.bio && (
-              <p className="text-[14px] text-[var(--ink-50)] mb-4">No description available yet.</p>
-            )}
-            {campaign.businesses.instagram_handle && (
-              <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline">
-                <AtSign size={14} /> @{campaign.businesses.instagram_handle.replace('@', '')} <ExternalLink size={12} />
-              </a>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Pitch modal */}
     </div>
   );
 }
