@@ -281,13 +281,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 </div>
                 {/* Content */}
                 <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
-                  <div className="flex items-center gap-2 mb-1.5">
+                  <div className="mb-2">
                     <span className="inline-flex px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                    <span className="text-[11px] text-[var(--ink-35)]">{c.businesses?.name}</span>
                   </div>
+                  <p className="text-[11px] text-[var(--ink-35)] truncate mb-1.5">{c.businesses?.name}</p>
                   <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                   <div className="mt-auto space-y-1">
-                    {perkShort && <p className="text-[12px] font-medium text-[var(--ink-60)]">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
+                    {perkShort && <p className="text-[12px] font-medium text-[var(--ink-60)] line-clamp-2">{perkShort}{c.perk_value ? ` · £${c.perk_value}` : ''}</p>}
                     {c.expression_deadline && (
                       <p className="text-[11px] text-[var(--ink-35)]">Apply by {fmtDate(c.expression_deadline)}</p>
                     )}
