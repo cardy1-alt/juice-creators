@@ -27,7 +27,7 @@ interface Campaign {
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
   brand_instructions: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
-  required_tags: string[] | null;
+  required_tags: string[] | null; creator_target: number | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
   status: string; campaign_image: string | null;
   businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null };
@@ -56,6 +56,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [submitting, setSubmitting] = useState(false);
   const [showBrandInfo, setShowBrandInfo] = useState(false);
   const [applyError, setApplyError] = useState<string>('');
+  const [confirmedCount, setConfirmedCount] = useState(0);
 
   useEffect(() => {
     fetchCampaign();
@@ -70,6 +71,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       .maybeSingle();
     if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
     setCampaign(campData as Campaign);
+
+    // Count confirmed spots so we can show capacity + disable CTA when full.
+    const { count: partCount } = await supabase
+      .from('participations')
+      .select('id', { count: 'exact', head: true })
+      .eq('campaign_id', campaignId);
+    setConfirmedCount(partCount || 0);
 
     // Look up real creator ID by email (creators.id != auth.uid())
     if (user?.email) {
@@ -256,15 +264,34 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     </div>
   ) : null;
 
+  const target = campaign?.creator_target || 0;
+  const remaining = Math.max(0, target - confirmedCount);
+  const isFull = target > 0 && remaining === 0;
+
   const ctaContent = (
     <>
       {!application && !showPitchModal && (
         <div>
-          <button onClick={() => setShowPitchModal(true)}
-            className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
-            I'm Interested
-          </button>
-          <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">This won't commit you — the brand will review and select</p>
+          {isFull ? (
+            <>
+              <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
+                This campaign is full
+              </div>
+              <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">Keep an eye out — new campaigns drop every week.</p>
+            </>
+          ) : (
+            <>
+              <button onClick={() => setShowPitchModal(true)}
+                className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
+                I'm Interested
+              </button>
+              <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">
+                {target > 0 && remaining / target <= 0.5
+                  ? `Only ${remaining} spot${remaining === 1 ? '' : 's'} left — the brand will review and select`
+                  : "This won't commit you — the brand will review and select"}
+              </p>
+            </>
+          )}
         </div>
       )}
       {!application && showPitchModal && (

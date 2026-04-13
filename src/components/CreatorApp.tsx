@@ -137,6 +137,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 }) {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [applications, setApplications] = useState<Record<string, string>>({});
+  const [confirmedCounts, setConfirmedCounts] = useState<Record<string, number>>({});
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
@@ -164,6 +165,22 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
     const { count } = await supabase.from('participations').select('id', { count: 'exact', head: true })
       .eq('creator_id', profile.id).in('status', ['confirmed', 'visited', 'content_submitted']);
     setActiveParticipations(count || 0);
+
+    // Tally confirmed participations per campaign so cards can show
+    // "X spots left" / "Filled" urgency. Counting by campaign_id keeps
+    // the query small (one row per participation, not per creator × campaign).
+    // Denied/overdue still count as "spot taken" — they're not releasing the slot.
+    const { data: partsByCamp } = await supabase
+      .from('participations')
+      .select('campaign_id');
+    if (partsByCamp) {
+      const counts: Record<string, number> = {};
+      (partsByCamp as { campaign_id: string }[]).forEach(p => {
+        if (p.campaign_id) counts[p.campaign_id] = (counts[p.campaign_id] || 0) + 1;
+      });
+      setConfirmedCounts(counts);
+    }
+
     setLoading(false);
   };
 
@@ -259,6 +276,27 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const appStatus = applications[c.id];
             const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             const catPalette = getCategoryPalette(c.businesses?.category);
+            // Adaptive spots badge — only shown when it adds information.
+            // 0 taken → "N spots available" (scarcity signal).
+            // 1 to 50% → nothing (avoid looking either empty or daunting).
+            // >50% → "Only X spots left" (urgency, terra accent).
+            // Full → "Filled" (dead-end, grey).
+            const target = (c as any).creator_target || 0;
+            const taken = confirmedCounts[c.id] || 0;
+            const remaining = Math.max(0, target - taken);
+            let spotsLabel: string | null = null;
+            let spotsClass = 'text-[var(--ink-60)]';
+            if (target > 0) {
+              if (taken === 0) {
+                spotsLabel = `${target} spot${target === 1 ? '' : 's'} available`;
+              } else if (remaining === 0) {
+                spotsLabel = 'Filled';
+                spotsClass = 'text-[var(--ink-35)]';
+              } else if (taken / target > 0.5) {
+                spotsLabel = `Only ${remaining} spot${remaining === 1 ? '' : 's'} left`;
+                spotsClass = 'text-[var(--terra)] font-semibold';
+              }
+            }
             return (
               <button key={c.id} onClick={() => onOpenCampaign(c.id)}
                 className="w-full text-left rounded-[12px] flex flex-col bg-white transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] press-card" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -289,6 +327,9 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{c.businesses?.name}</span>
                   </div>
                   <p className="text-[16px] text-[var(--ink)] leading-[1.25] mb-1.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.title || c.headline}</p>
+                  {spotsLabel && (
+                    <p className={`text-[12px] ${spotsClass}`}>{spotsLabel}</p>
+                  )}
                   <p className="mt-auto pt-2 text-[11px] text-[var(--ink-35)]">
                     {c.perk_value ? <><span className="text-[var(--ink-60)] font-medium">£{c.perk_value} value</span>{c.expression_deadline ? ' · ' : ''}</> : null}
                     {c.expression_deadline && <>Apply by {fmtDate(c.expression_deadline)}</>}
