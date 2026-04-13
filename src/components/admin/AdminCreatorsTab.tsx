@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorApprovedEmail, sendCreatorDeniedEmail } from '../../lib/notifications';
-import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search } from 'lucide-react';
+import { Check, X, Eye, EyeOff, AlertCircle, ChevronRight, ExternalLink, CheckCircle2, XCircle, Search, Trash2 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 
 interface Creator {
   id: string; name: string; display_name: string | null; instagram_handle: string;
-  email: string; approved: boolean; level: number; level_name: string;
+  email: string; approved: boolean; denied_at: string | null; level: number; level_name: string;
   completion_rate: number; total_campaigns: number; completed_campaigns: number;
   instagram_connected: boolean; address: string | null; created_at: string;
   follower_count: string | null;
@@ -280,18 +280,35 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
 
   const handleApprove = async (id: string, approved: boolean) => {
     if (!approved && !window.confirm('Deny this creator?')) return;
-    const { error } = await supabase.from('creators').update({ approved }).eq('id', id);
+    const patch = approved
+      ? { approved: true, denied_at: null }
+      : { approved: false, denied_at: new Date().toISOString() };
+    const { error } = await supabase.from('creators').update(patch).eq('id', id);
     if (error) { showToast('Update failed — try again'); return; }
-    if (approved) sendCreatorApprovedEmail(id).catch(() => {});
-    else sendCreatorDeniedEmail(id).catch(() => {});
+    if (approved) sendCreatorApprovedEmail(id).catch(e => console.warn('[admin] creator approved email enqueue failed', e));
+    else sendCreatorDeniedEmail(id).catch(e => console.warn('[admin] creator denied email enqueue failed', e));
     showToast(`Creator ${approved ? 'approved' : 'denied'}`);
     fetchCreators();
   };
 
-  const pendingCreators = creators.filter(c => !c.approved);
+  const handleDelete = async (ids: string[]) => {
+    if (ids.length === 0) return;
+    const msg = ids.length === 1
+      ? 'Permanently delete this creator? This cannot be undone.'
+      : `Permanently delete ${ids.length} creators? This cannot be undone.`;
+    if (!window.confirm(msg)) return;
+    const { error } = await supabase.from('creators').delete().in('id', ids);
+    if (error) { showToast('Delete failed — try again'); return; }
+    showToast(`Deleted ${ids.length} creator${ids.length > 1 ? 's' : ''}`);
+    setSelectedApproved(new Set());
+    fetchCreators();
+  };
+
+  const pendingCreators = creators.filter(c => !c.approved && !c.denied_at);
   const approvedCreators = creators.filter(c => c.approved);
   const [showApprovalPane, setShowApprovalPane] = useState(false);
   const [selectedPending, setSelectedPending] = useState<Set<string>>(new Set());
+  const [selectedApproved, setSelectedApproved] = useState<Set<string>>(new Set());
 
   const filteredCreators = approvedCreators.filter(c => {
     if (!search) return true;
@@ -321,6 +338,20 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
       await handleApprove(id, approved);
     }
     setSelectedPending(new Set());
+  };
+
+  const toggleSelectApproved = (id: string) => {
+    setSelectedApproved(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllApproved = () => {
+    if (selectedApproved.size === filteredCreators.length) setSelectedApproved(new Set());
+    else setSelectedApproved(new Set(filteredCreators.map(c => c.id)));
   };
 
   return (
@@ -429,10 +460,36 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           className="w-full pl-9 pr-4 py-2.5 rounded-[12px] bg-white border border-[rgba(42,32,24,0.15)] text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)]" />
       </div>
 
+      {/* Bulk action toolbar (shown when approved rows are selected) */}
+      {selectedApproved.size > 0 && (
+        <div className="flex items-center justify-between px-4 py-2.5 mb-2 rounded-[12px] border border-[rgba(42,32,24,0.08)] bg-white">
+          <div className="text-[13px] text-[var(--ink-60)]">
+            <span className="font-semibold text-[var(--ink)]">{selectedApproved.size}</span> creator{selectedApproved.size > 1 ? 's' : ''} selected
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={() => setSelectedApproved(new Set())}
+              className="px-3 py-1.5 rounded-[6px] text-[12px] font-semibold text-[var(--ink-60)] hover:bg-[rgba(42,32,24,0.06)]">
+              Clear
+            </button>
+            <button onClick={() => handleDelete(Array.from(selectedApproved))}
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-[6px] bg-[rgba(220,38,38,0.06)] text-[#DC2626] text-[12px] font-semibold hover:bg-[rgba(220,38,38,0.12)]">
+              <Trash2 size={13} /> Delete {selectedApproved.size}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Creators table */}
       <div className="bg-white border border-[rgba(42,32,24,0.08)] rounded-[12px] overflow-hidden overflow-x-auto">
-        <table className="w-full min-w-[900px]">
+        <table className="w-full min-w-[940px]">
           <thead><tr>
+            <th className={thCls} style={{ width: 40 }}>
+              <button onClick={selectAllApproved}
+                className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center transition-colors ${filteredCreators.length > 0 && selectedApproved.size === filteredCreators.length ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.25)] hover:border-[var(--terra)]'}`}
+                title={selectedApproved.size === filteredCreators.length ? 'Deselect all' : 'Select all'}>
+                {filteredCreators.length > 0 && selectedApproved.size === filteredCreators.length && <Check size={12} className="text-white" />}
+              </button>
+            </th>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
             <th className={thCls}>IG Status</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
@@ -440,7 +497,13 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
           <tbody>
             {filteredCreators.map(c => (
               <tr key={c.id} onClick={() => setPeekCreator(peekCreator?.id === c.id ? null : c)}
-                className={`cursor-pointer transition-colors ${peekCreator?.id === c.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                className={`cursor-pointer transition-colors ${selectedApproved.has(c.id) ? 'bg-[rgba(196,103,74,0.04)]' : peekCreator?.id === c.id ? 'bg-[rgba(42,32,24,0.04)]' : 'hover:bg-[rgba(42,32,24,0.03)]'}`} style={{ height: 44 }}>
+                <td className={tdCls} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => toggleSelectApproved(c.id)}
+                    className={`w-5 h-5 rounded-[4px] border-2 flex items-center justify-center transition-colors ${selectedApproved.has(c.id) ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.15)] hover:border-[var(--terra)]'}`}>
+                    {selectedApproved.has(c.id) && <Check size={12} className="text-white" />}
+                  </button>
+                </td>
                 <td className={tdCls}>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
                   <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
@@ -486,7 +549,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal }: { showModa
               </tr>
             ))}
             {filteredCreators.length === 0 && (
-              <tr><td colSpan={9} className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
+              <tr><td colSpan={10} className="py-12 text-center text-[14px] text-[var(--ink-35)]">{search ? 'No creators match your search' : 'No approved creators yet'}</td></tr>
             )}
           </tbody>
         </table>

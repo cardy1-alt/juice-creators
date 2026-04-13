@@ -341,8 +341,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Fire welcome email + admin approval request (non-blocking)
         if (creatorId) {
-          sendCreatorWelcomeEmail(creatorId).catch(() => {});
-          sendAdminApprovalRequest({ userType: 'creator', userId: creatorId, displayName: additionalData.name, email: normEmail }).catch(() => {});
+          sendCreatorWelcomeEmail(creatorId).catch(e => console.warn('[auth] creator welcome email enqueue failed', e));
+          sendAdminApprovalRequest({ userType: 'creator', userId: creatorId, displayName: additionalData.name, email: normEmail }).catch(e => console.warn('[auth] creator admin approval request enqueue failed', e));
         }
       } else if (role === 'business') {
         const insertPayload = {
@@ -407,8 +407,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // Fire welcome email + admin approval request (non-blocking)
         if (businessId) {
-          sendBusinessWelcomeEmail(businessId).catch(() => {});
-          sendAdminApprovalRequest({ userType: 'business', userId: businessId, displayName: additionalData.name, email: normEmail }).catch(() => {});
+          sendBusinessWelcomeEmail(businessId).catch(e => console.warn('[auth] business welcome email enqueue failed', e));
+          sendAdminApprovalRequest({ userType: 'business', userId: businessId, displayName: additionalData.name, email: normEmail }).catch(e => console.warn('[auth] business admin approval request enqueue failed', e));
         }
       }
     } catch (err) {

@@ -3,15 +3,16 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
-import { Megaphone, Users, Store, BarChart3, Bell, Settings, LogOut, Menu, X, Plus } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Activity, Settings, LogOut, Menu, X, Plus } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
 import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
 import AdminNotificationsTab from './admin/AdminNotificationsTab';
+import AdminActivityTab from './admin/AdminActivityTab';
 import AdminSettingsTab from './admin/AdminSettingsTab';
 
-type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'notifications' | 'settings';
+type Tab = 'campaigns' | 'creators' | 'brands' | 'analytics' | 'activity' | 'broadcasts' | 'settings';
 
 const NAV_SECTIONS = [
   {
@@ -26,12 +27,13 @@ const NAV_SECTIONS = [
     label: 'Insights',
     items: [
       { key: 'analytics' as Tab, label: 'Analytics', icon: BarChart3 },
+      { key: 'activity' as Tab, label: 'Activity', icon: Activity },
     ],
   },
   {
     label: 'Tools',
     items: [
-      { key: 'notifications' as Tab, label: 'Notifications', icon: Bell },
+      { key: 'broadcasts' as Tab, label: 'Broadcasts', icon: Bell },
       { key: 'settings' as Tab, label: 'Settings', icon: Settings },
     ],
   },
@@ -42,7 +44,8 @@ const PAGE_TITLES: Record<Tab, string> = {
   creators: 'Creators',
   brands: 'Brands',
   analytics: 'Analytics',
-  notifications: 'Notifications',
+  activity: 'Activity',
+  broadcasts: 'Broadcasts',
   settings: 'Settings',
 };
 
@@ -51,7 +54,8 @@ const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
   creators: { label: 'Create Creator', show: true },
   brands: { label: 'Create Brand', show: true },
   analytics: { label: '', show: false },
-  notifications: { label: '', show: false },
+  activity: { label: '', show: false },
+  broadcasts: { label: '', show: false },
   settings: { label: '', show: false },
 };
 
@@ -63,7 +67,8 @@ export default function AdminDashboard() {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    supabase.from('creators').select('id', { count: 'exact', head: true }).eq('approved', false)
+    supabase.from('creators').select('id', { count: 'exact', head: true })
+      .eq('approved', false).is('denied_at', null)
       .then(({ count }) => setPendingCount(count || 0));
   }, []);
 
@@ -190,7 +195,8 @@ export default function AdminDashboard() {
           {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
           {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
-          {activeTab === 'notifications' && <AdminNotificationsTab />}
+          {activeTab === 'activity' && <AdminActivityTab />}
+          {activeTab === 'broadcasts' && <AdminNotificationsTab />}
           {activeTab === 'settings' && <AdminSettingsTab />}
         </main>
       </div>
