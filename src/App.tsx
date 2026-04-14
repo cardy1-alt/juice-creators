@@ -99,7 +99,10 @@ function DemoBanner() {
 function isPasswordRecovery(): boolean {
   if (window.location.pathname === '/reset-password') return true;
   const hash = window.location.hash;
-  if (hash.includes('type=recovery')) return true;
+  // Supabase invite emails land with #type=invite in the hash — treat the
+  // first sign-in after an invite the same as a password reset so the user
+  // can set their initial password via the ResetPassword UI.
+  if (hash.includes('type=recovery') || hash.includes('type=invite')) return true;
   return false;
 }
 

@@ -43,10 +43,16 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Invite user — sends a "Set your password" email
+    // Invite user — sends a "Set your password" email.
+    // redirectTo must be a URL that is also in the Supabase dashboard's
+    // allowed-redirect-URL list (Auth → URL Configuration → Redirect URLs).
+    // APP_URL should be set as a secret on this function (production:
+    // https://app.nayba.app). Stale fallback removed — we'd rather fail
+    // than send invites to a URL that doesn't match the real app.
+    const appUrl = Deno.env.get('APP_URL') || 'https://app.nayba.app';
     const { data, error } = await supabase.auth.admin.inviteUserByEmail(email, {
       data: { role: role || 'business', brand_name: brandName || undefined },
-      redirectTo: Deno.env.get('APP_URL') || 'https://nayba.vercel.app',
+      redirectTo: `${appUrl}/reset-password`,
     });
 
     if (error) {
