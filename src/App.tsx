@@ -322,11 +322,19 @@ function App() {
 
   // Backstop: if Supabase fires PASSWORD_RECOVERY after our initial snapshot
   // somehow missed it (e.g. timing edge case), flip the recovery flag and
-  // re-render so the ResetPassword UI takes over.
+  // re-render so the ResetPassword UI takes over. Also clear the flag on
+  // SIGNED_OUT — without this, signing out after a recovery-driven session
+  // re-routes the user to the ResetPassword screen (no session, no recovery
+  // in progress, just an indefinite "Verifying..." spinner) instead of the
+  // Auth/sign-in screen.
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY' && !recoveryDetected) {
         recoveryDetected = true;
+        forceRender(n => n + 1);
+      }
+      if (event === 'SIGNED_OUT' && recoveryDetected) {
+        recoveryDetected = false;
         forceRender(n => n + 1);
       }
     });
