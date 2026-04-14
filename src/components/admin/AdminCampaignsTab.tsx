@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
+import { toStartOfDayISO, toEndOfDayISO } from '../../lib/dates';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getCategoryPalette } from '../../lib/categories';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid, Trash2 } from 'lucide-react';
@@ -186,9 +187,9 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
       deliverables: { reel: form.reel, story: form.story },
       campaign_type: form.campaign_type,
       campaign_image: form.campaign_image || null,
-      open_date: form.open_date ? new Date(form.open_date).toISOString() : null,
-      expression_deadline: form.expression_deadline ? new Date(form.expression_deadline).toISOString() : null,
-      content_deadline: form.content_deadline ? new Date(form.content_deadline).toISOString() : null,
+      open_date: form.open_date ? toStartOfDayISO(form.open_date) : null,
+      expression_deadline: form.expression_deadline ? toEndOfDayISO(form.expression_deadline) : null,
+      content_deadline: form.content_deadline ? toEndOfDayISO(form.content_deadline) : null,
     };
     // When editing, preserve the existing status; when creating, use the chosen status
     if (!campaign) {

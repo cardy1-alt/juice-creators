@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
 import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, AlertCircle, Sparkles } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
+import { fmtDeadline } from '../lib/dates';
 
 function CampaignFallbackImage({ category, name }: { category?: string | null; name?: string | null }) {
   const cp = getCategoryPalette(category);
@@ -34,12 +35,14 @@ interface Campaign {
 }
 
 interface Application {
-  id: string; status: string;
+  id: string; status: string; selected_at: string | null;
 }
 
-function fmtDate(d: string | null) {
-  if (!d) return '—';
-  return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+/** Hours remaining until `selected_at` + 48h. Negative if already past. */
+function hoursUntilConfirmDeadline(selectedAt: string | null): number | null {
+  if (!selectedAt) return null;
+  const deadline = new Date(selectedAt).getTime() + 48 * 60 * 60 * 1000;
+  return (deadline - Date.now()) / (60 * 60 * 1000);
 }
 
 export default function CampaignDetail({ campaignId, onBack, hideActions }: CampaignDetailProps) {
@@ -52,7 +55,10 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [showPitchModal, setShowPitchModal] = useState(false);
-  const [pitch, setPitch] = useState('');
+  const [pitchFit, setPitchFit] = useState('');
+  const [pitchIdea, setPitchIdea] = useState('');
+  const [pitchBrief, setPitchBrief] = useState('');
+  const [showPitchExample, setShowPitchExample] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [applyError, setApplyError] = useState<string>('');
   const [confirmedCount, setConfirmedCount] = useState(0);
@@ -92,7 +98,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         // Check if creator already applied (0 or 1 row expected)
         const { data: appData } = await supabase
           .from('applications')
-          .select('id, status')
+          .select('id, status, selected_at')
           .eq('campaign_id', campaignId)
           .eq('creator_id', creatorData.id)
           .maybeSingle();
@@ -134,9 +140,22 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
       brand_name: campaign.businesses?.name || '',
     }).catch(() => {});
     setShowPitchModal(false);
-    setPitch('');
+    setPitchFit('');
+    setPitchIdea('');
+    setPitchBrief('');
     setSubmitting(false);
   };
+
+  // Combine the three prompted fields into a single pitch string,
+  // labelled so the admin/brand can read the answers in context.
+  const composePitch = (): string => {
+    const parts: string[] = [];
+    if (pitchFit.trim()) parts.push(`Why I'm a fit: ${pitchFit.trim()}`);
+    if (pitchIdea.trim()) parts.push(`My content idea: ${pitchIdea.trim()}`);
+    if (pitchBrief.trim()) parts.push(`What caught my eye: ${pitchBrief.trim()}`);
+    return parts.join('\n\n');
+  };
+  const pitchHasContent = !!(pitchFit.trim() || pitchIdea.trim() || pitchBrief.trim());
 
   const handleConfirm = async () => {
     if (!application || !creatorId || !campaign || submitting) return;
@@ -298,19 +317,52 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <div className="flex items-center justify-between mb-3">
             <div>
               <p className="text-[15px] font-semibold text-[var(--ink)]">Tell them why you</p>
-              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">Optional — a short pitch helps you stand out</p>
+              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">Short answers help the brand pick you — all optional</p>
             </div>
-            <button onClick={() => { setShowPitchModal(false); setPitch(''); setApplyError(''); }}
+            <button onClick={() => { setShowPitchModal(false); setPitchFit(''); setPitchIdea(''); setPitchBrief(''); setApplyError(''); }}
               className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
           </div>
+
+          <button type="button"
+            onClick={() => setShowPitchExample(s => !s)}
+            className="text-[12px] text-[var(--terra)] font-medium mb-3 hover:underline">
+            {showPitchExample ? 'Hide example' : 'See a great pitch →'}
+          </button>
+          {showPitchExample && (
+            <div className="mb-3 px-3 py-2.5 rounded-[10px] bg-white border border-[rgba(42,32,24,0.08)] text-[13px] text-[var(--ink-60)] leading-[1.6] space-y-1.5">
+              <p><span className="font-semibold text-[var(--ink)]">Fit:</span> I already walk past every weekend with my toddler — we've been meaning to try the brunch.</p>
+              <p><span className="font-semibold text-[var(--ink)]">Idea:</span> A 15-sec "morning in the café" Reel cut to a local indie track, close-ups on the pastries.</p>
+              <p><span className="font-semibold text-[var(--ink)]">Brief:</span> Loved the "warm, not cheesy" talking point — that's exactly my tone.</p>
+            </div>
+          )}
+
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">How does {campaign?.businesses?.name || 'this brand'} fit into your life?</label>
           <textarea
-            value={pitch}
-            onChange={e => setPitch(e.target.value)}
-            placeholder="I'd love to be part of this because..."
-            maxLength={500}
-            className="w-full px-3 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-20 resize-none focus:outline-none focus:border-[var(--terra)]"
+            value={pitchFit}
+            onChange={e => setPitchFit(e.target.value)}
+            placeholder="Already a regular, bumped into it recently, been meaning to try..."
+            maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
           />
-          <p className="text-[12px] text-[var(--ink-50)] text-right mt-1 mb-2">{pitch.length}/500</p>
+
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">One content idea you'd shoot</label>
+          <textarea
+            value={pitchIdea}
+            onChange={e => setPitchIdea(e.target.value)}
+            placeholder="The specific Reel or shot you'd film — the more concrete, the better"
+            maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
+          />
+
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">What caught your eye in the brief?</label>
+          <textarea
+            value={pitchBrief}
+            onChange={e => setPitchBrief(e.target.value)}
+            placeholder="A talking point, the inspiration, the perk — something specific"
+            maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
+          />
+
           {applyError && (
             <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>
           )}
@@ -323,8 +375,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               Skip pitch
             </button>
             <button
-              onClick={() => handleApply(pitch)}
-              disabled={submitting}
+              onClick={() => handleApply(composePitch())}
+              disabled={submitting || !pitchHasContent}
               className="flex-1 min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
             >
               {submitting ? 'Submitting...' : 'Submit interest'}
@@ -338,17 +390,33 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           Interest registered — we'll be in touch
         </div>
       )}
-      {application?.status === 'selected' && (
-        <div>
-          <button onClick={handleConfirm} disabled={submitting}
-            className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
-            {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
-          </button>
-          {applyError && (
-            <p className="text-[13px] text-[var(--terra)] text-center mt-2">{applyError}</p>
-          )}
-        </div>
-      )}
+      {application?.status === 'selected' && (() => {
+        const hoursLeft = hoursUntilConfirmDeadline(application.selected_at);
+        const isExpired = hoursLeft !== null && hoursLeft <= 0;
+        const isUrgent = hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 12;
+        const countdownLabel =
+          hoursLeft === null ? null
+          : isExpired ? 'Your 48-hour window has passed — please confirm as soon as you can'
+          : hoursLeft < 1 ? `Less than an hour left to confirm your spot`
+          : hoursLeft < 2 ? `About 1 hour left to confirm your spot`
+          : `${Math.floor(hoursLeft)} hours left to confirm your spot`;
+        return (
+          <div>
+            {countdownLabel && (
+              <p className={`text-[13px] text-center mb-2 ${isExpired || isUrgent ? 'text-[var(--terra)] font-medium' : 'text-[var(--ink-60)]'}`}>
+                {countdownLabel}
+              </p>
+            )}
+            <button onClick={handleConfirm} disabled={submitting}
+              className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity disabled:opacity-50">
+              {submitting ? 'Confirming...' : "You've been selected — confirm your spot"}
+            </button>
+            {applyError && (
+              <p className="text-[13px] text-[var(--terra)] text-center mt-2">{applyError}</p>
+            )}
+          </div>
+        );
+      })()}
       {application?.status === 'confirmed' && (
         <div>
           <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(122,148,120,0.10)] text-center text-[#0F6E56] font-medium text-[14px]">
@@ -441,9 +509,9 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
           {/* Dates — inline under title */}
           <div className="flex items-center gap-1.5 text-[14px] text-[var(--ink-60)] mb-3">
-            {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDate(campaign.expression_deadline)}</span></span>}
+            {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDeadline(campaign.expression_deadline)}</span></span>}
             {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
-            {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDate(campaign.content_deadline)}</span></span>}
+            {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDeadline(campaign.content_deadline)}</span></span>}
           </div>
 
           {/* Perk — part of header area. £value is shown on the feed card

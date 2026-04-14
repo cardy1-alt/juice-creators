@@ -230,11 +230,11 @@ function creatorSelectedEmail(name: string, meta: Record<string, string>): { sub
       `)}
       ${p("<strong>What happens next:</strong>")}
       ${stepList([
-        'Confirm your spot in the app',
+        'Confirm your spot in the app <strong>within 48 hours</strong>',
         "You'll receive your perk from the brand",
         'Post an Instagram Reel about your experience',
       ])}
-      ${p("Don't keep them waiting — confirm now!")}
+      ${p("You've got <strong>48 hours</strong> to confirm before the spot opens back up for another creator — don't keep them waiting!")}
       ${btn('Confirm Your Spot', `${APP_URL}?campaign=${campaignId}`)}
     `),
   };
@@ -817,6 +817,21 @@ Deno.serve(async (req: Request) => {
         break;
       case 'creator_selected':
         email = creatorSelectedEmail(recipientName, meta);
+        break;
+      case 'selection_expired':
+        email = {
+          subject: `Your ${meta.brand_name || 'campaign'} spot has expired`,
+          html: wrapEmail(`
+            ${heading('Selection expired')}
+            ${subtext(`Hey ${escapeHtml(recipientName)}, the 48-hour window to confirm your spot for ${escapeHtml(meta.brand_name || 'the campaign')} has passed.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${escapeHtml(meta.brand_name || '')}</p>
+            `)}
+            ${p("We've opened your spot back up so another creator can take it. Plenty more campaigns land every week — next time, try to confirm as soon as you see the selection email.")}
+            ${btn('Browse campaigns', APP_URL)}
+          `),
+        };
         break;
       case 'content_deadline_reminder':
       case 'creator_deadline_reminder':

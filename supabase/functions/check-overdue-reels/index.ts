@@ -1,7 +1,9 @@
 // Supabase Edge Function: check-overdue-reels
-// Run periodically via cron. Checks participations table for:
+// Run periodically via cron. Checks for:
 // 1. Content deadline approaching (48 hours) — sends reminder
 // 2. Content deadline passed — marks participation as overdue
+// 3. Selection confirmation window expired (48 hours since selected_at) —
+//    auto-declines the application so the spot can be offered elsewhere
 //
 // Required env vars (auto-set by Supabase):
 //   SUPABASE_URL
@@ -17,9 +19,11 @@ Deno.serve(async (_req: Request) => {
 
   const now = new Date();
   const fortyEightHoursFromNow = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+  const fortyEightHoursAgo = new Date(now.getTime() - 48 * 60 * 60 * 1000);
 
   let remindersSent = 0;
   let markedOverdue = 0;
+  let selectionsExpired = 0;
 
   // 1. Send 48-hour content deadline reminder
   // Find participations where content_deadline is within 48 hours and reel not submitted
@@ -103,10 +107,45 @@ Deno.serve(async (_req: Request) => {
     }
   }
 
+  // 3. Auto-decline selections that the creator didn't confirm within 48 hours.
+  // This frees the spot back up for another creator and keeps the pipeline moving.
+  const { data: staleSelections } = await supabase
+    .from('applications')
+    .select('id, creator_id, campaign_id, campaigns(title, businesses(name))')
+    .eq('status', 'selected')
+    .lt('selected_at', fortyEightHoursAgo.toISOString());
+
+  if (staleSelections && staleSelections.length > 0) {
+    for (const app of staleSelections) {
+      const { error: updErr } = await supabase
+        .from('applications')
+        .update({ status: 'declined' })
+        .eq('id', app.id);
+      if (updErr) continue;
+
+      const brandName = (app as any).campaigns?.businesses?.name || 'the brand';
+      const campaignTitle = (app as any).campaigns?.title || '';
+      await supabase.from('notifications').insert({
+        user_id: app.creator_id,
+        user_type: 'creator',
+        message: `Your selection for ${brandName} expired — the 48-hour confirmation window passed.`,
+        email_type: 'selection_expired',
+        campaign_id: app.campaign_id,
+        email_meta: {
+          brand_name: brandName,
+          campaign_id: app.campaign_id,
+          campaign_title: campaignTitle,
+        },
+      });
+      selectionsExpired++;
+    }
+  }
+
   return new Response(
     JSON.stringify({
       reminders_sent: remindersSent,
       marked_overdue: markedOverdue,
+      selections_expired: selectionsExpired,
     }),
     { status: 200 }
   );

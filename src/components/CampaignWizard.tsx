@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { sendBusinessCampaignLiveEmail } from '../lib/notifications';
+import { toStartOfDayISO, toEndOfDayISO } from '../lib/dates';
 import { X, ChevronDown, ChevronUp } from 'lucide-react';
 import ImageUpload from './ImageUpload';
 import Select from './ui/Select';
@@ -178,9 +179,9 @@ Return only valid JSON, no markdown, no code fences.`,
       deliverables: { reel: true, story: false },
       campaign_type: 'brand',
       campaign_image: gen.campaign_image || null,
-      open_date: gen.open_date ? new Date(gen.open_date).toISOString() : null,
-      expression_deadline: gen.expression_deadline ? new Date(gen.expression_deadline).toISOString() : null,
-      content_deadline: gen.content_deadline ? new Date(gen.content_deadline).toISOString() : null,
+      open_date: gen.open_date ? toStartOfDayISO(gen.open_date) : null,
+      expression_deadline: gen.expression_deadline ? toEndOfDayISO(gen.expression_deadline) : null,
+      content_deadline: gen.content_deadline ? toEndOfDayISO(gen.content_deadline) : null,
       status,
     };
     const { error } = await supabase.from('campaigns').insert(payload);
