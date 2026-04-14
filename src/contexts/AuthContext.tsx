@@ -312,6 +312,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           }
           throw new Error(`Failed to create creator profile: ${insertError.message}`);
         }
+        // Defensive: self-signups must always land in awaiting-approval state.
+        // In production we've seen newly-inserted rows end up with approved=true
+        // (suspected DB-side trigger or column-default override). Force-write
+        // approved=false + denied_at=null so the CreatorApp's approval gate
+        // ALWAYS catches new signups, regardless of what DB-side config does.
+        const { error: forceUnapproveError } = await supabase
+          .from('creators')
+          .update({ approved: false, denied_at: null })
+          .eq('id', data.user.id);
+        if (forceUnapproveError) {
+          console.warn('[nayba] Could not force approved=false after signup:', forceUnapproveError.message);
+        }
         // Best-effort fetch to get the generated id — if RLS blocks the
         // read (e.g. email case mismatch with JWT), fall back gracefully
         let creatorId: string | undefined;
