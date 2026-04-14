@@ -1,6 +1,6 @@
 import React, { Component, ReactNode, useState, useEffect } from 'react';
 import { useAuth } from './contexts/AuthContext';
-import { supabase } from './lib/supabase';
+import { supabase, initialAuthHash } from './lib/supabase';
 import Auth from './components/Auth';
 
 const CreatorApp = React.lazy(() => import('./components/CreatorApp'));
@@ -96,14 +96,21 @@ function DemoBanner() {
   );
 }
 
+// Module-level flag set as soon as we detect a recovery/invite token in the
+// URL hash. Captured from initialAuthHash (snapshot taken before Supabase
+// strips the hash) and also flipped to true if Supabase later fires a
+// PASSWORD_RECOVERY event (handled inside the App component).
+let recoveryDetected =
+  initialAuthHash.includes('type=recovery') || initialAuthHash.includes('type=invite');
+
 function isPasswordRecovery(): boolean {
   if (window.location.pathname === '/reset-password') return true;
+  // Live hash check is kept as a third fallback — covers the very narrow
+  // window where the user navigates here manually with a token in the URL
+  // before Supabase has had a chance to process it.
   const hash = window.location.hash;
-  // Supabase invite emails land with #type=invite in the hash — treat the
-  // first sign-in after an invite the same as a password reset so the user
-  // can set their initial password via the ResetPassword UI.
   if (hash.includes('type=recovery') || hash.includes('type=invite')) return true;
-  return false;
+  return recoveryDetected;
 }
 
 function getCampaignIdFromUrl(): string | null {
@@ -311,6 +318,20 @@ function App() {
   const { user, userRole, userProfile, loading, signOut, viewAsRole, viewAsProfile } = useAuth();
   const isDemo = import.meta.env.VITE_ENABLE_DEMO === 'true' && new URLSearchParams(window.location.search).has('demo');
   const campaignId = getCampaignIdFromUrl();
+  const [, forceRender] = useState(0);
+
+  // Backstop: if Supabase fires PASSWORD_RECOVERY after our initial snapshot
+  // somehow missed it (e.g. timing edge case), flip the recovery flag and
+  // re-render so the ResetPassword UI takes over.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+      if (event === 'PASSWORD_RECOVERY' && !recoveryDetected) {
+        recoveryDetected = true;
+        forceRender(n => n + 1);
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   // Public legal pages — accessible without auth
   const pageParam = new URLSearchParams(window.location.search).get('page');
