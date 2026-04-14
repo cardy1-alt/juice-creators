@@ -94,7 +94,7 @@ Generate a complete campaign as JSON with these exact keys:
 
 - title: THE PERK in 3–5 words. Product not pitch. NEVER start with "Experience", "Discover", "Try", "Enjoy", or "Unlock". Do NOT include the brand name. Good: "Free reformer class", "£20 gift voucher", "Free day pass", "Free coffee and pastry". Bad: "Experience wellness at The Space".
 
-- headline: a one-line hook about the EXPERIENCE (not the brand), max 10 words. Sets the vibe of the Reel. Good: "45 minutes that reset your Saturday", "Your next favourite lunch spot". Bad: "Suffolk's best pilates studio" (that's brand-boast — belongs in about_brand if anywhere).
+- headline: A one-line description of THIS campaign experience — format, length, what's included, what to expect. Concrete, not abstract. Max 10 words. Good: "60-minute group session, all levels welcome", "Drop in any weekday between 11am and 3pm", "45-minute opening class, hang-out time after". Bad: "Strength training that fits your real life" (brand vibe), "Where wellness meets community" (slogan), "The home of premium fitness" (boast).
 
 - about_brand: THE BACKSTORY ONLY — what makes this place exist, who's behind it, or what they believe. 2 sentences MAX, 40 words or fewer. Do NOT list features or claims that could be talking points (e.g. "personal service", "quality toys", "carefully curated"). Think "origin story", not "marketing blurb". Good: "Opened in 2019 by two sisters who couldn't find a toy shop they loved. Every item is hand-picked by the family." Bad: "Suffolk's beloved independent toy store offering carefully curated toys and games."
 
