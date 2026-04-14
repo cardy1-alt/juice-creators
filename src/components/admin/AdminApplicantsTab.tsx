@@ -5,6 +5,7 @@ import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
 import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film } from 'lucide-react';
 import Select from '../ui/Select';
+import InstagramEmbed from '../InstagramEmbed';
 
 interface Applicant {
   id: string;
@@ -563,6 +564,30 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
 
+  // Past reels — fetch lazily on peek open. Helps reviewers judge content
+  // quality at a glance instead of clicking out to Instagram per candidate.
+  const [pastReels, setPastReels] = useState<{ reel_url: string; campaign_title: string; brand_name: string }[]>([]);
+  useEffect(() => {
+    if (!applicant.creator_id) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('participations')
+        .select('reel_url, reel_submitted_at, campaigns(title, businesses(name))')
+        .eq('creator_id', applicant.creator_id)
+        .not('reel_url', 'is', null)
+        .order('reel_submitted_at', { ascending: false })
+        .limit(3);
+      if (cancelled) return;
+      setPastReels(((data || []) as any[]).map(r => ({
+        reel_url: r.reel_url,
+        campaign_title: r.campaigns?.title || 'Untitled',
+        brand_name: r.campaigns?.businesses?.name || '—',
+      })));
+    })();
+    return () => { cancelled = true; };
+  }, [applicant.creator_id]);
+
   const c = applicant.creators;
   const name = c?.display_name || c?.name || 'Unknown';
   const handle = (c?.instagram_handle || '').replace('@', '');
@@ -701,6 +726,24 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
                         {h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
                       </p>
                     </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Past reels — embedded so reviewers can judge content quality
+              without leaving the panel. Hidden when there are none. */}
+          {pastReels.length > 0 && (
+            <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mt-4">
+              <p className={`${label} mb-3`}>Past reels</p>
+              <div className="space-y-3">
+                {pastReels.map((r, i) => (
+                  <div key={i}>
+                    <p className="text-[12px] text-[var(--ink-50)] mb-1.5 truncate">
+                      Submitted for <span className="text-[var(--ink-60)] font-medium">{r.campaign_title}</span> · {r.brand_name}
+                    </p>
+                    <InstagramEmbed url={r.reel_url} height={420} />
                   </div>
                 ))}
               </div>

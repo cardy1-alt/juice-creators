@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useEffectiveAuth } from '../contexts/AuthContext';
+import InstagramEmbed from './InstagramEmbed';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import {
@@ -209,6 +210,11 @@ export default function BusinessPortal() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
+  // Past reels per applicant creator — keyed by creator_id. Fetched once
+  // alongside applications so reviewers can expand a card and see actual
+  // content samples without click-throughs to Instagram.
+  const [pastReelsByCreator, setPastReelsByCreator] = useState<Record<string, { reel_url: string; campaign_title: string; brand_name: string }[]>>({});
+  const [expandedReels, setExpandedReels] = useState<Set<string>>(new Set());
   const [participations, setParticipations] = useState<Participation[]>([]);
   const [activeTab, setActiveTab] = useState<TopTab>('dashboard');
   const [campaignSubTab, setCampaignSubTab] = useState<CampaignSubTab>('summary');
@@ -260,6 +266,39 @@ export default function BusinessPortal() {
     ]);
     if (appRes.data) setApplications(appRes.data as Application[]);
     if (partRes.data) setParticipations(partRes.data as Participation[]);
+
+    // Pull past reels for every applicant in one batched query so the
+    // Selection cards can show "View past reels" inline. Limit per creator
+    // is enforced client-side after grouping (cheap at pilot scale).
+    const applicantCreatorIds = (appRes.data || []).map((a: any) => a.creator_id).filter(Boolean);
+    if (applicantCreatorIds.length > 0) {
+      const { data: reelsData } = await supabase
+        .from('participations')
+        .select('creator_id, reel_url, reel_submitted_at, campaigns(title, businesses(name))')
+        .in('creator_id', applicantCreatorIds)
+        .not('reel_url', 'is', null)
+        .order('reel_submitted_at', { ascending: false });
+      const grouped: Record<string, { reel_url: string; campaign_title: string; brand_name: string }[]> = {};
+      ((reelsData || []) as any[]).forEach(r => {
+        if (!grouped[r.creator_id]) grouped[r.creator_id] = [];
+        if (grouped[r.creator_id].length >= 3) return;
+        grouped[r.creator_id].push({
+          reel_url: r.reel_url,
+          campaign_title: r.campaigns?.title || 'Untitled',
+          brand_name: r.campaigns?.businesses?.name || '—',
+        });
+      });
+      setPastReelsByCreator(grouped);
+    }
+  };
+
+  const toggleReelsExpansion = (appId: string) => {
+    setExpandedReels(prev => {
+      const next = new Set(prev);
+      if (next.has(appId)) next.delete(appId);
+      else next.add(appId);
+      return next;
+    });
   };
 
   if (loading) {
@@ -894,6 +933,35 @@ export default function BusinessPortal() {
                         <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
                       </div>
                     )}
+
+                    {/* Past reels — toggleable. Only renders the button if
+                        this creator has at least one previous submitted reel. */}
+                    {(() => {
+                      const reels = pastReelsByCreator[a.creator_id] || [];
+                      if (reels.length === 0) return null;
+                      const isExpanded = expandedReels.has(a.id);
+                      return (
+                        <div className="mb-3">
+                          <button onClick={() => toggleReelsExpansion(a.id)}
+                            className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[var(--terra)] hover:underline">
+                            <Film size={13} />
+                            {isExpanded ? 'Hide past reels' : `View past reels (${reels.length})`}
+                          </button>
+                          {isExpanded && (
+                            <div className="space-y-3 mt-3">
+                              {reels.map((r, i) => (
+                                <div key={i}>
+                                  <p className="text-[12px] text-[var(--ink-50)] mb-1.5 truncate">
+                                    Submitted for <span className="text-[var(--ink-60)] font-medium">{r.campaign_title}</span> · {r.brand_name}
+                                  </p>
+                                  <InstagramEmbed url={r.reel_url} height={420} />
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     {/* Actions */}
                     <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
