@@ -1122,6 +1122,7 @@ export default function CreatorApp() {
   const closeCampaignDetail = () => { setViewingCampaign(null); setDiscoverRefresh(r => r + 1); };
   const [toast, setToast] = useState<string | null>(null);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -1274,16 +1275,22 @@ export default function CreatorApp() {
           })}
         </nav>
 
-        {/* Creator info */}
-        <div className="px-4 py-4" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
-          <div className="flex items-center gap-3 px-1">
+        {/* Creator info — click anywhere on the row to sign out (matches
+            AdminDashboard / BusinessPortal behaviour). */}
+        <div className="px-2 py-3" style={{ borderTop: '1px solid rgba(42,32,24,0.08)' }}>
+          <div
+            className="flex items-center gap-3 px-2 py-2 rounded-[10px] hover:bg-[rgba(42,32,24,0.04)] transition-colors group cursor-pointer"
+            onClick={() => setShowSignOutModal(true)}
+            title={`${profile.display_name || profile.name} — Sign out`}
+          >
             <div className="w-[28px] h-[28px] rounded-full flex items-center justify-center flex-shrink-0" style={{ background: 'var(--terra-15)' }}>
               <span className="text-[11px] text-[var(--terra)]" style={{ fontWeight: 700 }}>{initial}</span>
             </div>
-            <div className="min-w-0">
+            <div className="flex-1 min-w-0">
               <p className="text-[13px] font-medium text-[var(--ink)] truncate">{profile.display_name || profile.name}</p>
               <p className="text-[11px] text-[var(--ink-35)] truncate">{profile.instagram_handle}</p>
             </div>
+            <LogOut size={14} className="text-[var(--ink-35)] group-hover:text-[var(--ink-60)] transition-colors flex-shrink-0" />
           </div>
         </div>
       </aside>
@@ -1346,6 +1353,20 @@ export default function CreatorApp() {
         <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}
          >
           {toast}
+        </div>
+      )}
+
+      {/* Sign-out confirmation modal — matches AdminDashboard / BusinessPortal */}
+      {showSignOutModal && (
+        <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-[70] flex items-center justify-center animate-overlay" onClick={() => setShowSignOutModal(false)}>
+          <div className="bg-white rounded-[12px] max-w-[340px] w-full mx-4 p-6 text-center animate-slide-up" onClick={e => e.stopPropagation()}>
+            <h3 className="nayba-h3">Sign out?</h3>
+            <p className="text-[14px] text-[var(--ink-50)] mt-2 mb-5">You'll need to sign in again to access your account.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setShowSignOutModal(false)} className="flex-1 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px]">Cancel</button>
+              <button onClick={signOut} className="flex-1 py-2.5 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px]">Sign out</button>
+            </div>
+          </div>
         </div>
       )}
     </div>
