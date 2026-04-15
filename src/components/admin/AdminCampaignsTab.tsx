@@ -448,6 +448,10 @@ function PickWinnersModal({ campaign, onClose, onRefresh }: {
     const now = new Date().toISOString();
     const winnerIds = Array.from(picked);
     const loserIds = entries.filter(e => !picked.has(e.id)).map(e => e.id);
+    // Stats only fire on the *first* announcement. On a re-pick (admin
+    // adjusting winners) statuses still swap but creator stats don't move
+    // — otherwise every adjustment would double-count entries.
+    const isFirstAnnouncement = !campaign.winner_announced_at;
 
     // Mark winners — also set perk_sent so tracking matches the brand-flow
     // intent (admin will physically send the gift card next, then can clear
@@ -469,6 +473,47 @@ function PickWinnersModal({ campaign, onClose, onRefresh }: {
     await supabase.from('campaigns')
       .update({ winner_announced_at: now, status: 'completed' })
       .eq('id', campaign.id);
+
+    // ── Update creator completion-rate stats (Hummingbirds Bible §5) ──
+    // Per the Bible: "Ghost a campaign = lower completion rate = fewer
+    // future selections." For community campaigns we treat the act of
+    // submitting a Reel as completion (whether they won or not — they did
+    // the work). Entering without submitting is the ghost case.
+    //
+    // Mirrors the brand-side stat update in markComplete (line ~640) so
+    // the level-promotion thresholds stay consistent across both flows.
+    if (isFirstAnnouncement) {
+      const completedCreatorIds = entries.filter(e => !!e.reel_url).map(e => e.creator_id);
+      const ghostedCreatorIds = entries.filter(e => !e.reel_url).map(e => e.creator_id);
+      const allCreatorIds = Array.from(new Set([...completedCreatorIds, ...ghostedCreatorIds]));
+
+      if (allCreatorIds.length > 0) {
+        const { data: creatorRows } = await supabase.from('creators')
+          .select('id, total_campaigns, completed_campaigns')
+          .in('id', allCreatorIds);
+
+        const completedSet = new Set(completedCreatorIds);
+        await Promise.all((creatorRows || []).map(async (cr: any) => {
+          const newTotal = (cr.total_campaigns || 0) + 1;
+          const newCompleted = (cr.completed_campaigns || 0) + (completedSet.has(cr.id) ? 1 : 0);
+          const rate = Math.round((newCompleted / newTotal) * 100);
+          // Auto-promote level — same thresholds as brand markComplete.
+          let newLevel = 1, newLevelName = 'Newcomer';
+          if (newCompleted >= 21 && rate >= 95) { newLevel = 6; newLevelName = 'Nayba ✦'; }
+          else if (newCompleted >= 11) { newLevel = 5; newLevelName = 'Trusted'; }
+          else if (newCompleted >= 6) { newLevel = 4; newLevelName = 'Local'; }
+          else if (newCompleted >= 3) { newLevel = 3; newLevelName = 'Regular'; }
+          else if (newCompleted >= 1) { newLevel = 2; newLevelName = 'Explorer'; }
+          await supabase.from('creators').update({
+            total_campaigns: newTotal,
+            completed_campaigns: newCompleted,
+            completion_rate: rate,
+            level: newLevel,
+            level_name: newLevelName,
+          }).eq('id', cr.id);
+        }));
+      }
+    }
 
     // Fan out emails. Best-effort — don't block UI on failures.
     const winnerEntries = entries.filter(e => picked.has(e.id));
