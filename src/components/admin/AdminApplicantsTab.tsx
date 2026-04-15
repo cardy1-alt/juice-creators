@@ -95,7 +95,16 @@ export default function AdminApplicantsTab() {
       .from('applications')
       .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, campaign_type, businesses(name, category))')
       .order('applied_at', { ascending: false });
-    if (data) setApplicants(data as Applicant[]);
+    // Community campaigns auto-confirm at apply time and have no
+    // Select/Decline decision to make here — their participation is
+    // managed via the Pick Winners flow in AdminCampaignsTab, not this
+    // tab. Filter them out so an admin can't accidentally Decline an
+    // auto-confirmed community entry (which would desync the app status
+    // from the already-created participation row).
+    if (data) {
+      const brandOnly = (data as Applicant[]).filter(a => a.campaigns?.campaign_type !== 'community');
+      setApplicants(brandOnly);
+    }
     setLoading(false);
   };
 
