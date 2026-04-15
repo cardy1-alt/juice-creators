@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail } from '../../lib/notifications';
+import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail, sendCreatorWonCommunityEmail, sendCreatorNotSelectedCommunityEmail, sendAdminCommunityWinnersPickedEmail } from '../../lib/notifications';
 import { toStartOfDayISO, toEndOfDayISO } from '../../lib/dates';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getCategoryPalette } from '../../lib/categories';
-import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid, Trash2 } from 'lucide-react';
+import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid, Trash2, Trophy } from 'lucide-react';
 import CampaignDetail from '../CampaignDetail';
 import CampaignWizard from '../CampaignWizard';
 import ImageUpload from '../ImageUpload';
@@ -13,15 +13,17 @@ import Select from '../ui/Select';
 // ─── Types ───
 interface Brand { id: string; name: string; }
 interface Campaign {
-  id: string; brand_id: string; title: string; headline: string | null; about_brand: string | null;
+  id: string; brand_id: string | null; title: string; headline: string | null; about_brand: string | null;
   perk_description: string | null; perk_value: number | null; perk_type: string | null;
   target_city: string | null; target_county: string | null; content_requirements: string | null;
   brand_instructions: string | null;
   talking_points: string[] | null; inspiration: any[] | null; deliverables: any;
   creator_target: number; open_date: string | null; expression_deadline: string | null;
   content_deadline: string | null; campaign_type: 'brand' | 'community'; campaign_image: string | null;
-  status: string; min_level: number; required_tags: string[] | null; created_at: string;
-  businesses?: { name: string; category?: string };
+  status: string; min_level: number; required_tags: string[] | null;
+  num_winners: number | null; winner_announced_at: string | null;
+  created_at: string;
+  businesses?: { name: string; category?: string } | null;
 }
 interface Application {
   id: string; campaign_id: string; creator_id: string; pitch: string | null;
@@ -161,7 +163,9 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   };
 
   const handleSave = async (asStatus: string) => {
-    if (!form.brand_id || !form.title) { setFormError('Brand and title are required'); return; }
+    const isCommunity = form.campaign_type === 'community';
+    if (!form.title) { setFormError('Title is required'); return; }
+    if (!isCommunity && !form.brand_id) { setFormError('Brand is required for brand campaigns'); return; }
     setFormError(''); setSaveError('');
     // Validate perk_value
     const perkVal = form.perk_value ? parseFloat(form.perk_value) : null;
@@ -175,13 +179,14 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
     }
     setSaving(true);
     const payload: any = {
-      brand_id: form.brand_id, title: form.title, headline: form.headline || null,
+      brand_id: isCommunity ? null : form.brand_id,
+      title: form.title, headline: form.headline || null,
       about_brand: form.about_brand || null, perk_description: form.perk_description || null,
       perk_value: perkVal, perk_type: form.perk_type,
       target_city: form.target_city || null, target_county: form.target_county || null,
       creator_target: creatorTarget, min_level: parseInt(form.min_level as any) || 1,
       content_requirements: form.content_requirements || null,
-      brand_instructions: form.brand_instructions || null,
+      brand_instructions: isCommunity ? null : (form.brand_instructions || null),
       talking_points: [form.tp1, form.tp2, form.tp3].filter(Boolean),
       inspiration: form.insp.filter((i: any) => i.title),
       deliverables: { reel: form.reel, story: form.story },
@@ -230,7 +235,11 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           {/* STEP 1 — Basics */}
           {step === 1 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div><label className={labelCls}>Brand *</label><Select value={form.brand_id} onChange={val => set('brand_id', val)} placeholder="Select brand..." options={[{ value: '', label: 'Select brand...' }, ...brands.map(b => ({ value: b.id, label: b.name }))]} /></div>
+              {/* Campaign type leads — every other field downstream depends on it. */}
+              <div className="md:col-span-2"><label className={labelCls}>Campaign Type</label><Select value={form.campaign_type} onChange={val => set('campaign_type', val)} options={[{ value: 'brand', label: 'Brand Campaign' }, { value: 'community', label: 'Community Campaign (Nayba — prize draw)' }]} /></div>
+              {form.campaign_type !== 'community' && (
+                <div><label className={labelCls}>Brand *</label><Select value={form.brand_id} onChange={val => set('brand_id', val)} placeholder="Select brand..." options={[{ value: '', label: 'Select brand...' }, ...brands.map(b => ({ value: b.id, label: b.name }))]} /></div>
+              )}
               <div><label className={labelCls}>Title *</label><input value={form.title} onChange={e => set('title', e.target.value)} className={inputCls} placeholder="Campaign title" /></div>
               <div className="md:col-span-2">
                 <div className="flex items-center justify-between mb-1.5">
@@ -251,7 +260,6 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div><label className={labelCls}>Target County</label><Select value={form.target_county} onChange={val => set('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} /></div>
               <div><label className={labelCls}>Creator Target</label><input type="number" min="1" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
               <div><label className={labelCls}>Min Creator Level</label><Select value={form.min_level} onChange={val => set('min_level', val)} options={[{ value: '1', label: 'Any (Level 1+)' }, { value: '3', label: 'Regular+ (Level 3+)' }, { value: '5', label: 'Trusted+ (Level 5+)' }]} /></div>
-              <div><label className={labelCls}>Campaign Type</label><Select value={form.campaign_type} onChange={val => set('campaign_type', val)} options={[{ value: 'brand', label: 'Brand Campaign' }, { value: 'community', label: 'Community Campaign' }]} /></div>
               <div className="md:col-span-2"><ImageUpload value={form.campaign_image} onChange={url => set('campaign_image', url)} folder="campaigns" label="Campaign Image" /></div>
             </div>
           )}
@@ -267,11 +275,13 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="md:col-span-2"><label className={labelCls}>About the Brand</label><textarea value={form.about_brand} onChange={e => set('about_brand', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
                     <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
-                    <div className="md:col-span-2">
-                      <label className={labelCls}>Brand Requirements for Creators <span className="text-[var(--ink-35)] normal-case">(optional)</span></label>
-                      <textarea value={form.brand_instructions} onChange={e => set('brand_instructions', e.target.value)} className={`${taCls} min-h-[60px]`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us on Instagram." />
-                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Shown to creators before applying, when they confirm, and in their confirmation email.</p>
-                    </div>
+                    {form.campaign_type !== 'community' && (
+                      <div className="md:col-span-2">
+                        <label className={labelCls}>Brand Requirements for Creators <span className="text-[var(--ink-35)] normal-case">(optional)</span></label>
+                        <textarea value={form.brand_instructions} onChange={e => set('brand_instructions', e.target.value)} className={`${taCls} min-h-[60px]`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us on Instagram." />
+                        <p className="text-[12px] text-[var(--ink-35)] mt-1">Shown to creators before applying, when they confirm, and in their confirmation email.</p>
+                      </div>
+                    )}
                     <div className="md:col-span-2">
                       <label className={labelCls}>Required Tags / Hashtags</label>
                       <input value={form.required_tags} onChange={e => set('required_tags', e.target.value)}
@@ -332,7 +342,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div className="bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] rounded-[10px] p-5">
                 <p style={{ fontSize: 12, fontWeight: 600, letterSpacing: '0.5px', color: 'var(--ink-60)', textTransform: 'uppercase' as const, marginBottom: 12 }}>Campaign Summary</p>
                 <div className="space-y-2 text-[14px]">
-                  <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Brand</span><span className="text-[var(--ink)] font-medium">{brandName || '—'}</span></div>
+                  <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">{form.campaign_type === 'community' ? 'Owner' : 'Brand'}</span><span className="text-[var(--ink)] font-medium">{form.campaign_type === 'community' ? 'Nayba Community' : (brandName || '—')}</span></div>
                   <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Title</span><span className="text-[var(--ink)] font-medium">{form.title || '—'}</span></div>
                   {form.perk_description && <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">Perk</span><span className="text-[var(--ink)]">{form.perk_description.slice(0, 60)}{form.perk_description.length > 60 ? '...' : ''}</span></div>}
                   {form.target_city && <div className="flex gap-2"><span className="text-[var(--ink-60)] w-24 flex-shrink-0">City</span><span className="text-[var(--ink)]">{form.target_city}</span></div>}
@@ -348,7 +358,7 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
           {step === 1 && (
             <>
               <button onClick={onClose} className={ghostBtn}>Cancel</button>
-              <button onClick={() => setStep(2)} disabled={!form.brand_id || !form.title} className={primaryBtn} style={{ fontWeight: 700 }}>Next: Brief →</button>
+              <button onClick={() => setStep(2)} disabled={(form.campaign_type !== 'community' && !form.brand_id) || !form.title} className={primaryBtn} style={{ fontWeight: 700 }}>Next: Brief →</button>
             </>
           )}
           {step === 2 && (
@@ -374,6 +384,187 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               )}
             </>
           )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pick Winners Modal (community / prize-draw campaigns) ───
+function PickWinnersModal({ campaign, onClose, onRefresh }: {
+  campaign: Campaign; onClose: () => void; onRefresh: () => void;
+}) {
+  useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
+
+  type Entry = {
+    id: string; creator_id: string; reel_url: string | null; status: string;
+    creators?: { name: string; display_name: string | null; instagram_handle: string };
+  };
+  const [entries, setEntries] = useState<Entry[]>([]);
+  const [picked, setPicked] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const { data, error: fetchErr } = await supabase
+        .from('participations')
+        .select('id, creator_id, reel_url, status, creators(name, display_name, instagram_handle)')
+        .eq('campaign_id', campaign.id);
+      if (fetchErr) { setError('Failed to load entries — ' + fetchErr.message); setLoading(false); return; }
+      // Supabase types joined relations as arrays even when the FK is unique;
+      // collapse to the single creator object the rest of the modal expects.
+      const rows = (data || []) as unknown as Array<Omit<Entry, 'creators'> & { creators: Entry['creators'] | Entry['creators'][] | null }>;
+      setEntries(rows.map(r => ({
+        ...r,
+        creators: Array.isArray(r.creators) ? r.creators[0] : (r.creators ?? undefined),
+      })));
+      // Pre-select existing winners so the admin can see / adjust prior picks.
+      const existingWinners = (data || []).filter((e: any) => e.status === 'winner').map((e: any) => e.id);
+      setPicked(new Set(existingWinners));
+      setLoading(false);
+    })();
+  }, [campaign.id]);
+
+  const target = campaign.num_winners || 1;
+  const submitted = entries.filter(e => !!e.reel_url);
+  const noReel = entries.filter(e => !e.reel_url);
+
+  const togglePick = (id: string) => {
+    setPicked(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else if (next.size < target) next.add(id);
+      return next;
+    });
+  };
+
+  const handleConfirm = async () => {
+    if (picked.size === 0) { setError('Pick at least one winner.'); return; }
+    setError(''); setSaving(true);
+
+    const now = new Date().toISOString();
+    const winnerIds = Array.from(picked);
+    const loserIds = entries.filter(e => !picked.has(e.id)).map(e => e.id);
+
+    // Mark winners — also set perk_sent so tracking matches the brand-flow
+    // intent (admin will physically send the gift card next, then can clear
+    // the tick box if needed).
+    const { error: winErr } = await supabase.from('participations')
+      .update({ status: 'winner', perk_sent: true, perk_sent_at: now })
+      .in('id', winnerIds);
+    if (winErr) { setError('Failed to save winners — ' + winErr.message); setSaving(false); return; }
+
+    if (loserIds.length > 0) {
+      const { error: loseErr } = await supabase.from('participations')
+        .update({ status: 'not_selected' })
+        .in('id', loserIds);
+      if (loseErr) { setError('Saved winners but failed to mark others — ' + loseErr.message); setSaving(false); return; }
+    }
+
+    // Stamp the campaign so the creator-side "Awaiting winner pick" state
+    // flips to "Winners picked".
+    await supabase.from('campaigns')
+      .update({ winner_announced_at: now, status: 'completed' })
+      .eq('id', campaign.id);
+
+    // Fan out emails. Best-effort — don't block UI on failures.
+    const winnerEntries = entries.filter(e => picked.has(e.id));
+    const loserEntries = entries.filter(e => !picked.has(e.id));
+    await Promise.all([
+      ...winnerEntries.map(w => sendCreatorWonCommunityEmail(w.creator_id, {
+        campaign_title: campaign.title,
+        perk_description: campaign.perk_description || '',
+      }).catch(() => {})),
+      ...loserEntries.map(l => sendCreatorNotSelectedCommunityEmail(l.creator_id, {
+        campaign_title: campaign.title,
+      }).catch(() => {})),
+      sendAdminCommunityWinnersPickedEmail({
+        campaign_title: campaign.title,
+        num_winners: winnerEntries.length,
+        num_entries: entries.length,
+      }).catch(() => {}),
+    ]);
+
+    setSaving(false);
+    onRefresh();
+    onClose();
+  };
+
+  const initial = (s: string) => (s[0] || '?').toUpperCase();
+
+  return (
+    <div className={modalOverlay}>
+      <div className={modalBackdrop} onClick={onClose} />
+      <div className="relative bg-white rounded-[10px] w-full max-w-[640px] mx-4 flex flex-col overflow-hidden animate-slide-up" style={{ maxHeight: '88vh' }}>
+        <div className={modalHeader}>
+          <div>
+            <h2 className="text-[20px] font-semibold text-[var(--ink)]">Pick winner{target === 1 ? '' : 's'}</h2>
+            <p className="text-[12px] text-[var(--ink-50)] mt-0.5">{campaign.title} · choose {target} of {submitted.length} submitted Reel{submitted.length === 1 ? '' : 's'}</p>
+          </div>
+          <button onClick={onClose} className={modalClose}><X size={15} /></button>
+        </div>
+        <div className={modalBody}>
+          {error && (
+            <div className="mb-4 px-3.5 py-2.5 rounded-[10px]" style={{ background: 'rgba(220,38,38,0.06)', color: '#DC2626' }}>
+              <span className="text-[14px] font-medium">{error}</span>
+            </div>
+          )}
+          {loading ? (
+            <div className="py-12 text-center text-[14px] text-[var(--ink-50)]">Loading entries…</div>
+          ) : submitted.length === 0 ? (
+            <div className="py-12 text-center">
+              <p className="text-[14px] text-[var(--ink-50)]">No Reels submitted yet — wait for the content deadline.</p>
+            </div>
+          ) : (
+            <>
+              <p className="text-[12px] text-[var(--ink-50)] mb-3">{picked.size}/{target} picked</p>
+              <div className="space-y-2">
+                {submitted.map(e => {
+                  const name = e.creators?.display_name || e.creators?.name || 'Unknown';
+                  const handle = (e.creators?.instagram_handle || '').replace('@', '');
+                  const isPicked = picked.has(e.id);
+                  const disabled = !isPicked && picked.size >= target;
+                  return (
+                    <div key={e.id} className={`flex items-center gap-3 px-3 py-2.5 rounded-[10px] border ${isPicked ? 'border-[var(--terra)] bg-[rgba(196,103,74,0.04)]' : 'border-[rgba(42,32,24,0.10)]'}`}>
+                      <button onClick={() => togglePick(e.id)} disabled={disabled}
+                        className={`w-[20px] h-[20px] rounded-[6px] border-[1.5px] flex items-center justify-center transition-colors flex-shrink-0 ${isPicked ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.25)] hover:border-[var(--terra)]'} ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}>
+                        {isPicked && <Check size={12} className="text-white" />}
+                      </button>
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(initial(name)).bg }}>
+                        <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(initial(name)).text }}>{initial(name)}</span>
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[14px] font-medium text-[var(--ink)] truncate">{name}</p>
+                        {handle && <p className="text-[12px] text-[var(--ink-50)]">@{handle}</p>}
+                      </div>
+                      {e.reel_url && (
+                        <a href={e.reel_url} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--terra)] hover:underline flex-shrink-0">
+                          View Reel <ExternalLink size={11} />
+                        </a>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+              {noReel.length > 0 && (
+                <p className="text-[12px] text-[var(--ink-35)] mt-4">
+                  {noReel.length} entr{noReel.length === 1 ? 'y' : 'ies'} without a Reel — they'll be marked as not selected.
+                </p>
+              )}
+            </>
+          )}
+        </div>
+        <div className={modalFooterCls}>
+          <button onClick={onClose} className={ghostBtn}>Cancel</button>
+          <button onClick={handleConfirm} disabled={saving || picked.size === 0}
+            className={primaryBtn} style={{ fontWeight: 700 }}>
+            <Trophy size={13} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+            {saving ? 'Announcing…' : `Announce ${picked.size} winner${picked.size === 1 ? '' : 's'}`}
+          </button>
         </div>
       </div>
     </div>
@@ -623,8 +814,8 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 }
 
 // ─── Campaign Peek Panel (right side) ───
-function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onDelete }: {
-  campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void; onDelete: () => void;
+function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onDelete, onPickWinners }: {
+  campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void; onDelete: () => void; onPickWinners: () => void;
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
   const [showAddApplicant, setShowAddApplicant] = useState(false);
@@ -655,12 +846,15 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
     // Transition to 'selected' — the creator still needs to confirm their spot
     // before a participation is created. This triggers the selection email
     // and unlocks the "Confirm your spot" CTA in the creator app.
+    // Community campaigns don't have a manual "select" step — entries are
+    // already auto-confirmed at apply-time and judged later via the
+    // winner-pick flow — so this CTA shouldn't be reachable for them.
     const { error: appErr } = await supabase.from('applications').update({
       status: 'selected', selected_at: new Date().toISOString(),
     }).eq('campaign_id', campaign.id).eq('creator_id', creatorId);
     if (appErr) { showToast('Failed to select creator'); return; }
-    const { data: campData } = await supabase.from('campaigns').select('title, businesses(name)').eq('id', campaign.id).maybeSingle();
-    if (campData) {
+    const { data: campData } = await supabase.from('campaigns').select('title, campaign_type, businesses(name)').eq('id', campaign.id).maybeSingle();
+    if (campData && (campData as any).campaign_type !== 'community') {
       sendCreatorSelectedEmail(creatorId, {
         campaign_title: campData.title,
         brand_name: (campData as any).businesses?.name || '',
@@ -680,7 +874,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="min-w-0 flex-1">
             <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{campaign.title}</p>
-            <p className="text-[14px] text-[var(--ink-50)] mt-0.5">{campaign.businesses?.name || '—'}</p>
+            <p className="text-[14px] text-[var(--ink-50)] mt-0.5">{campaign.campaign_type === 'community' ? 'Nayba Community' : (campaign.businesses?.name || '—')}</p>
           </div>
           <button onClick={onClose} className="w-7 h-7 rounded-[10px] flex items-center justify-center text-[var(--ink-50)] hover:bg-[rgba(42,32,24,0.06)] transition-colors flex-shrink-0 ml-3">
             <X size={16} />
@@ -754,6 +948,12 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 
         {/* Actions */}
         <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0">
+          {campaign.campaign_type === 'community' && (
+            <button onClick={onPickWinners} className="w-full px-4 py-2.5 rounded-[10px] mb-2 text-[14px] flex items-center justify-center gap-1.5 transition-colors"
+              style={{ background: campaign.winner_announced_at ? 'rgba(42,32,24,0.06)' : 'rgba(196,103,74,0.10)', color: campaign.winner_announced_at ? 'var(--ink-60)' : 'var(--terra)', fontWeight: 700 }}>
+              <Trophy size={13} /> {campaign.winner_announced_at ? 'Adjust winners' : `Pick winner${(campaign.num_winners || 1) === 1 ? '' : 's'}`}
+            </button>
+          )}
           <button onClick={onEdit} className="w-full px-4 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] hover:opacity-[0.85] mb-3" style={{ fontWeight: 700 }}>Edit Campaign</button>
           <div className="flex items-center justify-center gap-1 flex-wrap">
             <button onClick={onViewParticipation}
@@ -767,11 +967,11 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
             </button>
             <span className="text-[var(--ink-15)]">·</span>
             <button onClick={async () => {
-              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, talking_points, inspiration, deliverables, campaign_type, campaign_image } = campaign;
+              const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, brand_instructions, talking_points, inspiration, deliverables, campaign_type, campaign_image, num_winners } = campaign;
               const { error } = await supabase.from('campaigns').insert({
                 brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
-                target_city, target_county, creator_target, min_level, content_requirements,
-                talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
+                target_city, target_county, creator_target, min_level, content_requirements, brand_instructions,
+                talking_points, inspiration, deliverables, campaign_type, campaign_image, num_winners, status: 'draft',
               });
               if (error) showToast('Failed to duplicate');
               else { showToast('Campaign duplicated as draft'); onEdit(); }
@@ -798,6 +998,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [peekCampaign, setPeekCampaign] = useState<Campaign | null>(null);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
   const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
+  const [pickWinnersCampaign, setPickWinnersCampaign] = useState<Campaign | null>(null);
   const [showWizard, setShowWizard] = useState(false);
   const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
@@ -914,7 +1115,8 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       if (statusFilter !== 'all' && c.status !== statusFilter) return false;
       if (search) {
         const q = search.toLowerCase();
-        return c.title.toLowerCase().includes(q) || (c.businesses?.name || '').toLowerCase().includes(q);
+        const ownerName = c.campaign_type === 'community' ? 'nayba community' : (c.businesses?.name || '').toLowerCase();
+        return c.title.toLowerCase().includes(q) || ownerName.includes(q);
       }
       return true;
     })
@@ -1034,7 +1236,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 <div className="flex items-center justify-between mb-2">
                   <div>
                     <p className="text-[14px] font-semibold text-[var(--ink)]">{c.title}</p>
-                    <p className="text-[12px] text-[var(--ink-60)]">{c.businesses?.name}</p>
+                    <p className="text-[12px] text-[var(--ink-60)]">{c.campaign_type === 'community' ? 'Nayba Community' : c.businesses?.name}</p>
                   </div>
                   <StatusBadge status={c.status} />
                 </div>
@@ -1080,12 +1282,22 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         </button>
                       </td>
                       <td className={tdCls}>
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors((c.businesses?.name || '?')[0]).bg }}>
-                            <span className="text-[12px] font-semibold" style={{ color: getAvatarColors((c.businesses?.name || '?')[0]).text }}>{(c.businesses?.name || '?')[0]}</span>
-                          </div>
-                          <span className="font-medium text-[14px]">{c.businesses?.name || '—'}</span>
-                        </div>
+                        {(() => {
+                          const isCommunity = c.campaign_type === 'community';
+                          const displayName = isCommunity ? 'Nayba Community' : (c.businesses?.name || '—');
+                          const initial = (displayName === '—' ? '?' : displayName[0]);
+                          const ac = isCommunity
+                            ? { bg: 'rgba(59,130,246,0.10)', text: '#3B82F6' }
+                            : getAvatarColors(initial);
+                          return (
+                            <div className="flex items-center gap-2.5">
+                              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
+                                <span className="text-[12px] font-semibold" style={{ color: ac.text }}>{initial}</span>
+                              </div>
+                              <span className="font-medium text-[14px]">{displayName}</span>
+                            </div>
+                          );
+                        })()}
                       </td>
                       <td className={`${tdCls} font-medium`}>{c.title}</td>
                       <td className={tdCls}>
@@ -1142,12 +1354,22 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         className={`bg-white rounded-[12px] p-3.5 cursor-pointer transition-all ${selected ? 'ring-2 ring-[var(--terra)]' : 'hover:shadow-md'}`}
                         style={{ boxShadow: selected ? undefined : '0 1px 4px rgba(42,32,24,0.04)' }}>
                         {/* Brand row */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors((c.businesses?.name || '?')[0]).bg }}>
-                            <span className="text-[9px] font-bold" style={{ color: getAvatarColors((c.businesses?.name || '?')[0]).text }}>{(c.businesses?.name || '?')[0]}</span>
-                          </div>
-                          <span className="text-[12px] text-[var(--ink-50)] truncate">{c.businesses?.name || '—'}</span>
-                        </div>
+                        {(() => {
+                          const isCommunity = c.campaign_type === 'community';
+                          const displayName = isCommunity ? 'Nayba Community' : (c.businesses?.name || '—');
+                          const initial = (displayName === '—' ? '?' : displayName[0]);
+                          const ac = isCommunity
+                            ? { bg: 'rgba(59,130,246,0.10)', text: '#3B82F6' }
+                            : getAvatarColors(initial);
+                          return (
+                            <div className="flex items-center gap-2 mb-2">
+                              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
+                                <span className="text-[9px] font-bold" style={{ color: ac.text }}>{initial}</span>
+                              </div>
+                              <span className="text-[12px] text-[var(--ink-50)] truncate">{displayName}</span>
+                            </div>
+                          );
+                        })()}
 
                         {/* Title */}
                         <p className="text-[13px] font-semibold text-[var(--ink)] leading-snug mb-2.5">{c.title}</p>
@@ -1213,7 +1435,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                     </div>
                   </div>
                   <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
-                    <span className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{c.businesses?.name}</span>
+                    <span className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{c.campaign_type === 'community' ? 'Nayba Community' : c.businesses?.name}</span>
                     <p className="text-[15px] text-[var(--ink)] leading-[1.3] mb-2 line-clamp-2" style={{ fontWeight: 600 }}>{c.headline || c.title}</p>
                     <div className="mt-auto space-y-1.5">
                       <div className="flex items-center gap-2">
@@ -1252,6 +1474,16 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
           onViewParticipation={() => { setParticipationCampaign(peekCampaign); setPeekCampaign(null); }}
           onEdit={() => { setEditingCampaign(peekCampaign); onOpenModal(); setPeekCampaign(null); }}
           onDelete={() => setDeletingCampaign(peekCampaign.id)}
+          onPickWinners={() => { setPickWinnersCampaign(peekCampaign); setPeekCampaign(null); }}
+        />
+      )}
+
+      {/* Pick Winners Modal (community campaigns) */}
+      {pickWinnersCampaign && (
+        <PickWinnersModal
+          campaign={pickWinnersCampaign}
+          onClose={() => setPickWinnersCampaign(null)}
+          onRefresh={fetchCampaigns}
         />
       )}
 

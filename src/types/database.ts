@@ -63,7 +63,7 @@ export type Database = {
       campaigns: {
         Row: {
           id: string;
-          brand_id: string;
+          brand_id: string | null;
           title: string;
           headline: string | null;
           about_brand: string | null;
@@ -73,6 +73,7 @@ export type Database = {
           target_city: string | null;
           target_county: string | null;
           content_requirements: string | null;
+          brand_instructions: string | null;
           talking_points: string[] | null;
           inspiration: Record<string, unknown>[] | null;
           deliverables: Record<string, boolean> | null;
@@ -85,12 +86,14 @@ export type Database = {
           status: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level: number;
           required_tags: string[] | null;
+          num_winners: number;
+          winner_announced_at: string | null;
           created_at: string;
           created_by: string | null;
         };
         Insert: {
           id?: string;
-          brand_id: string;
+          brand_id?: string | null;
           title: string;
           headline?: string | null;
           about_brand?: string | null;
@@ -100,6 +103,7 @@ export type Database = {
           target_city?: string | null;
           target_county?: string | null;
           content_requirements?: string | null;
+          brand_instructions?: string | null;
           talking_points?: string[] | null;
           inspiration?: Record<string, unknown>[] | null;
           deliverables?: Record<string, boolean> | null;
@@ -112,12 +116,14 @@ export type Database = {
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
           required_tags?: string[] | null;
+          num_winners?: number;
+          winner_announced_at?: string | null;
           created_at?: string;
           created_by?: string | null;
         };
         Update: {
           id?: string;
-          brand_id?: string;
+          brand_id?: string | null;
           title?: string;
           headline?: string | null;
           about_brand?: string | null;
@@ -127,6 +133,7 @@ export type Database = {
           target_city?: string | null;
           target_county?: string | null;
           content_requirements?: string | null;
+          brand_instructions?: string | null;
           talking_points?: string[] | null;
           inspiration?: Record<string, unknown>[] | null;
           deliverables?: Record<string, boolean> | null;
@@ -139,6 +146,8 @@ export type Database = {
           status?: 'draft' | 'active' | 'selecting' | 'live' | 'completed';
           min_level?: number;
           required_tags?: string[] | null;
+          num_winners?: number;
+          winner_announced_at?: string | null;
           created_at?: string;
           created_by?: string | null;
         };
@@ -189,7 +198,7 @@ export type Database = {
           likes: number | null;
           comments: number | null;
           views: number | null;
-          status: 'confirmed' | 'visited' | 'content_submitted' | 'completed' | 'overdue';
+          status: 'confirmed' | 'visited' | 'content_submitted' | 'completed' | 'overdue' | 'winner' | 'not_selected';
           completion_rate_snapshot: number | null;
           completed_at: string | null;
           created_at: string;

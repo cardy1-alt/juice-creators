@@ -15,6 +15,7 @@ import {
 import NaybaLogo from '../assets/logomark.svg';
 import { Logo } from './Logo';
 import { getCategoryPalette, getFilterChipColor, CategoryIcon } from '../lib/categories';
+import { getCampaignBrandDisplay } from '../lib/campaignDisplay';
 
 // ─── Constants ───
 const SUPPORT_EMAIL = 'hello@nayba.app';
@@ -56,17 +57,18 @@ interface Campaign {
   id: string; title: string; headline: string | null; perk_description: string | null;
   perk_value: number | null; target_city: string | null; expression_deadline: string | null;
   status: string; campaign_type: 'brand' | 'community'; campaign_image: string | null;
-  about_brand: string | null; min_level: number;
-  businesses?: { name: string; category: string; bio: string | null; instagram_handle: string | null; logo_url: string | null };
+  about_brand: string | null; min_level: number; brand_id: string | null;
+  num_winners: number | null; winner_announced_at: string | null;
+  businesses?: { name: string; category: string; bio: string | null; instagram_handle: string | null; logo_url: string | null } | null;
 }
 interface Application {
   id: string; campaign_id: string; status: string; applied_at: string;
-  campaigns?: Campaign & { businesses?: { name: string } };
+  campaigns?: Partial<Campaign> & { campaign_type?: 'brand' | 'community' | null; businesses?: { name: string } | null };
 }
 interface Participation {
   id: string; campaign_id: string; application_id: string; perk_sent: boolean;
   reel_url: string | null; status: string; created_at: string;
-  campaigns?: { title: string; headline: string | null; content_deadline: string | null; perk_description?: string | null; perk_value?: number | null; businesses?: { name: string } };
+  campaigns?: { title: string; headline: string | null; content_deadline: string | null; perk_description?: string | null; perk_value?: number | null; campaign_type?: 'brand' | 'community' | null; winner_announced_at?: string | null; businesses?: { name: string } | null };
 }
 
 type Tab = 'discover' | 'campaigns' | 'naybahood' | 'profile' | 'more';
@@ -201,9 +203,12 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const filtered = campaigns.filter(c => {
     if (search) {
       const q = search.toLowerCase();
-      if (!c.title.toLowerCase().includes(q) && !c.businesses?.name?.toLowerCase().includes(q)) return false;
+      const owner = c.campaign_type === 'community' ? 'nayba community' : (c.businesses?.name || '').toLowerCase();
+      if (!c.title.toLowerCase().includes(q) && !owner.includes(q)) return false;
     }
     if (category !== 'All') {
+      // Community campaigns aren't tied to a category — exclude when filtering.
+      if (c.campaign_type === 'community') return false;
       const allowedCats = categoryMap[category] || [];
       if (!allowedCats.some(cat => c.businesses?.category?.includes(cat))) return false;
     }
@@ -275,7 +280,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           {rest.map(c => {
             const appStatus = applications[c.id];
             const perkShort = c.perk_description?.split('—')[0]?.split(',')[0]?.trim();
-            const catPalette = getCategoryPalette(c.businesses?.category);
+            const display = getCampaignBrandDisplay(c, getCategoryPalette);
+            const catPalette = display.palette;
             // Adaptive spots badge — only shown when it adds information.
             // 0 taken → "N spots available" (scarcity signal).
             // 1 to 50% → nothing (avoid looking either empty or daunting).
@@ -307,15 +313,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                       <img src={c.campaign_image} alt={c.title} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
-                        <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
+                        {display.isCommunity ? (
+                          <Megaphone className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
+                        ) : (
+                          <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
+                        )}
                       </div>
                     )}
                   {appStatus && (
                     <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                      {appStatus === 'interested' ? 'Applied' : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? 'Confirmed' : appStatus}
+                      {appStatus === 'interested' ? (display.isCommunity ? 'Entered' : 'Applied') : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? (display.isCommunity ? 'Entered' : 'Confirmed') : appStatus}
                     </span>
                   )}
-                  {c.campaign_type === 'community' && (
+                  {display.isCommunity && (
                     <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
                   )}
                   </div>
@@ -323,8 +333,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 {/* Content */}
                 <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
                   <div className="flex items-center gap-2 mb-2 min-w-0">
-                    <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
-                    <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{c.businesses?.name}</span>
+                    <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.isCommunity ? 'Community' : (c.businesses?.category?.split(' & ')[0] || 'Local')}</span>
+                    <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{display.name}</span>
                   </div>
                   <p className="text-[16px] text-[var(--ink)] leading-[1.25] mb-1.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.title || c.headline}</p>
                   {spotsLabel && (
@@ -377,12 +387,12 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   const fetchCampaigns = async () => {
     setLoading(true);
     const { data: parts } = await supabase.from('participations')
-      .select('*, campaigns(title, headline, content_deadline, perk_description, perk_value, businesses(name))')
+      .select('*, campaigns(title, headline, content_deadline, perk_description, perk_value, campaign_type, winner_announced_at, businesses(name))')
       .eq('creator_id', profile.id).order('created_at', { ascending: false });
     if (parts) setParticipations(parts as Participation[]);
 
     const { data: apps } = await supabase.from('applications')
-      .select('*, campaigns(title, headline, businesses(name))')
+      .select('*, campaigns(title, headline, campaign_type, businesses(name))')
       .eq('creator_id', profile.id).in('status', ['declined']).order('applied_at', { ascending: false });
     if (apps) setPastApps(apps as Application[]);
     setLoading(false);
@@ -411,10 +421,11 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     }
     // Notify admin of content submission
     const { data: partData } = await supabase.from('participations')
-      .select('campaigns(title, businesses(name))').eq('id', showReelModal).maybeSingle();
+      .select('campaigns(title, campaign_type, businesses(name))').eq('id', showReelModal).maybeSingle();
     if (partData) {
       const campaignTitle = (partData as any).campaigns?.title || '';
-      const brandName = (partData as any).campaigns?.businesses?.name || '';
+      const isCommunity = (partData as any).campaigns?.campaign_type === 'community';
+      const brandName = isCommunity ? 'Nayba Community' : ((partData as any).campaigns?.businesses?.name || '');
       sendAdminContentSubmittedEmail({
         creator_name: profile.display_name || profile.name,
         campaign_title: campaignTitle,
@@ -434,18 +445,29 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
     fetchCampaigns();
   };
 
-  const activeParts = participations.filter(p => p.status !== 'completed');
-  const completedParts = participations.filter(p => p.status === 'completed');
+  // Community participations are "past" once they're not_selected or won
+  // (the prize draw has run); brand participations finish at 'completed'.
+  const isPast = (p: Participation) => p.status === 'completed' || p.status === 'winner' || p.status === 'not_selected';
+  const activeParts = participations.filter(p => !isPast(p));
+  const completedParts = participations.filter(isPast);
 
   const getTodos = (p: Participation) => {
-    const todos = [
+    const isCommunity = p.campaigns?.campaign_type === 'community';
+    if (isCommunity) {
+      // Community / prize-draw flow.
+      return [
+        { label: 'Entered the draw', done: true },
+        { label: 'Submit your Reel', done: !!p.reel_url, action: !p.reel_url ? () => setShowReelModal(p.id) : undefined },
+        { label: !!p.campaigns?.winner_announced_at ? 'Winners picked' : 'Awaiting winner pick', done: !!p.campaigns?.winner_announced_at },
+      ];
+    }
+    return [
       { label: 'Selected by brand', done: true },
       { label: 'Confirm your spot', done: true },
       { label: 'Receive your perk', done: p.perk_sent },
       { label: 'Share your experience', done: !!p.reel_url, action: !p.reel_url && p.perk_sent ? () => setShowReelModal(p.id) : undefined },
       { label: 'Done — nice work!', done: p.status === 'content_submitted' || p.status === 'completed' },
     ];
-    return todos;
   };
 
   return (
@@ -473,7 +495,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
               <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.businesses?.name}</p>
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.campaign_type === 'community' ? 'Nayba Community' : p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
                   <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[999px] bg-[var(--terra-light)] mb-3">
@@ -531,19 +553,27 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
       {!loading && subTab === 'past' && (
         <div className="space-y-2">
-          {completedParts.map(p => (
-            <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-              <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{p.campaigns?.businesses?.name}</p>
-                <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
+          {completedParts.map(p => {
+            const ownerName = p.campaigns?.campaign_type === 'community' ? 'Nayba Community' : p.campaigns?.businesses?.name;
+            const badge = p.status === 'winner'
+              ? { cls: 'bg-[rgba(196,103,74,0.12)] text-[var(--terra)]', label: 'Won' }
+              : p.status === 'not_selected'
+                ? { cls: 'bg-[#F1EFE8] text-[#5F5E5A]', label: 'Not picked' }
+                : { cls: 'bg-[#E1F5EE] text-[#0F6E56]', label: 'Completed' };
+            return (
+              <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div>
+                  <p className="text-[13px] text-[var(--ink-60)]">{ownerName}</p>
+                  <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
+                </div>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${badge.cls}`}>{badge.label}</span>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#E1F5EE] text-[#0F6E56]">Completed</span>
-            </div>
-          ))}
+            );
+          })}
           {pastApps.map(a => (
             <div key={a.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <div>
-                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.businesses?.name}</p>
+                <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.campaign_type === 'community' ? 'Nayba Community' : a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
               </div>
               <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>

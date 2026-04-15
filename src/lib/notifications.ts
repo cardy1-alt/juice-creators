@@ -310,6 +310,82 @@ export async function sendCreatorCampaignCompleteEmail(creatorId: string, meta: 
   });
 }
 
+// ─── Community Campaigns (Prize Draw) ───────────────────────────────────
+
+/**
+ * Sent when a creator enters a community/prize-draw campaign. Replaces
+ * sendCreatorConfirmedEmail for the community flow — there's no brand to
+ * promise a perk from, just confirmation that the entry is in.
+ */
+export async function sendCreatorEnteredCommunityEmail(creatorId: string, meta: {
+  campaign_title: string;
+  perk_description: string;
+  content_deadline: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `You're entered into "${meta.campaign_title}" — submit your Reel to be in the draw`,
+    emailType: 'creator_entered_community',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      perk_description: meta.perk_description,
+      content_deadline: meta.content_deadline,
+    },
+  });
+}
+
+/** Sent to each winning creator after admin picks winners. */
+export async function sendCreatorWonCommunityEmail(creatorId: string, meta: {
+  campaign_title: string;
+  perk_description: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `You won "${meta.campaign_title}"! We'll be in touch with your prize.`,
+    emailType: 'creator_won_community',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      perk_description: meta.perk_description,
+    },
+  });
+}
+
+/** Sent to non-winning creators after admin picks winners. */
+export async function sendCreatorNotSelectedCommunityEmail(creatorId: string, meta: {
+  campaign_title: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `"${meta.campaign_title}" — the winners are picked. Thanks for entering!`,
+    emailType: 'creator_not_selected_community',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+    },
+  });
+}
+
+/** Admin summary after winners are picked. */
+export async function sendAdminCommunityWinnersPickedEmail(meta: {
+  campaign_title: string;
+  num_winners: number;
+  num_entries: number;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `${meta.num_winners} winner${meta.num_winners === 1 ? '' : 's'} picked for "${meta.campaign_title}" (${meta.num_entries} entries)`,
+    emailType: 'admin_community_winners_picked',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      num_winners: meta.num_winners.toString(),
+      num_entries: meta.num_entries.toString(),
+    },
+  });
+}
+
 // ─── Weekly Digest ──────────────────────────────────────────────────────
 
 export async function sendWeeklyDigestEmail(creatorId: string, meta: {

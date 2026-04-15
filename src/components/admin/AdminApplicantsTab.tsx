@@ -36,7 +36,8 @@ interface Applicant {
     title: string;
     status: string;
     creator_target: number;
-    businesses?: { name: string; category?: string };
+    campaign_type?: 'brand' | 'community' | null;
+    businesses?: { name: string; category?: string } | null;
   };
 }
 
@@ -44,7 +45,7 @@ interface CampaignHistoryItem {
   campaign_id: string;
   status: string;
   applied_at: string;
-  campaigns?: { title: string; businesses?: { name: string } };
+  campaigns?: { title: string; campaign_type?: 'brand' | 'community' | null; businesses?: { name: string } | null };
 }
 
 const LEVEL_NAMES: Record<number, string> = { 1: 'Newcomer', 2: 'Explorer', 3: 'Regular', 4: 'Local', 5: 'Trusted' };
@@ -92,7 +93,7 @@ export default function AdminApplicantsTab() {
     setLoading(true);
     const { data } = await supabase
       .from('applications')
-      .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, businesses(name, category))')
+      .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, campaign_type, businesses(name, category))')
       .order('applied_at', { ascending: false });
     if (data) setApplicants(data as Applicant[]);
     setLoading(false);
@@ -105,7 +106,9 @@ export default function AdminApplicantsTab() {
       selected_at: new Date().toISOString(),
     }).eq('id', applicant.id);
     if (error) { showToast('Failed to select'); setActingOn(null); return; }
-    if (applicant.creators && applicant.campaigns) {
+    // Community campaigns auto-confirm at apply time and don't have a brand
+    // selecting/perk to promise — skip the brand-flavoured selection email.
+    if (applicant.creators && applicant.campaigns && applicant.campaigns.campaign_type !== 'community') {
       sendCreatorSelectedEmail(applicant.creators.id, {
         campaign_title: applicant.campaigns.title,
         brand_name: applicant.campaigns.businesses?.name || '',
@@ -138,9 +141,9 @@ export default function AdminApplicantsTab() {
       .update({ status: 'selected', selected_at: now })
       .in('id', targets.map(t => t.id));
     if (error) { showToast('Bulk select failed'); setBulkActing(false); return; }
-    // Fire selection emails in parallel
+    // Fire selection emails in parallel — skip for community campaigns.
     await Promise.all(targets.map(t => {
-      if (t.creators && t.campaigns) {
+      if (t.creators && t.campaigns && t.campaigns.campaign_type !== 'community') {
         return sendCreatorSelectedEmail(t.creators.id, {
           campaign_title: t.campaigns.title,
           brand_name: t.campaigns.businesses?.name || '',
@@ -176,7 +179,7 @@ export default function AdminApplicantsTab() {
     if (a.creators?.id) {
       const { data } = await supabase
         .from('applications')
-        .select('campaign_id, status, applied_at, campaigns(title, businesses(name))')
+        .select('campaign_id, status, applied_at, campaigns(title, campaign_type, businesses(name))')
         .eq('creator_id', a.creators.id)
         .neq('id', a.id)
         .order('applied_at', { ascending: false })
@@ -192,7 +195,7 @@ export default function AdminApplicantsTab() {
     const name = (a.creators?.display_name || a.creators?.name || '').toLowerCase();
     const insta = (a.creators?.instagram_handle || '').toLowerCase();
     const title = (a.campaigns?.title || '').toLowerCase();
-    const brand = (a.campaigns?.businesses?.name || '').toLowerCase();
+    const brand = (a.campaigns?.campaign_type === 'community' ? 'nayba community' : (a.campaigns?.businesses?.name || '').toLowerCase());
     return name.includes(q) || insta.includes(q) || title.includes(q) || brand.includes(q);
   });
 
@@ -418,7 +421,9 @@ export default function AdminApplicantsTab() {
             </div>
             <div className="max-h-[560px] overflow-y-auto">
               {campaignList.map(([campaignId, group]) => {
-                const brandName = group.campaign?.businesses?.name || '—';
+                const brandName = group.campaign?.campaign_type === 'community'
+                  ? 'Nayba Community'
+                  : (group.campaign?.businesses?.name || '—');
                 const isActive = campaignId === currentCampaignId;
                 return (
                   <button
@@ -464,7 +469,7 @@ export default function AdminApplicantsTab() {
                   <div className="min-w-0 flex-1">
                     <h2 className="text-[18px] font-semibold text-[var(--ink)] truncate">{activeCampaign.campaign?.title}</h2>
                     <p className="text-[13px] text-[var(--ink-50)] mt-0.5">
-                      {activeCampaign.campaign?.businesses?.name} · Target: {activeCampaign.campaign?.creator_target || 0} creators
+                      {activeCampaign.campaign?.campaign_type === 'community' ? 'Nayba Community' : activeCampaign.campaign?.businesses?.name} · Target: {activeCampaign.campaign?.creator_target || 0} creators
                     </p>
                   </div>
                   <div className="flex items-center gap-3 flex-shrink-0 ml-4">
@@ -573,7 +578,7 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
     (async () => {
       const { data } = await supabase
         .from('participations')
-        .select('reel_url, reel_submitted_at, campaigns(title, businesses(name))')
+        .select('reel_url, reel_submitted_at, campaigns(title, campaign_type, businesses(name))')
         .eq('creator_id', applicant.creator_id)
         .not('reel_url', 'is', null)
         .order('reel_submitted_at', { ascending: false })
@@ -582,7 +587,9 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
       setPastReels(((data || []) as any[]).map(r => ({
         reel_url: r.reel_url,
         campaign_title: r.campaigns?.title || 'Untitled',
-        brand_name: r.campaigns?.businesses?.name || '—',
+        brand_name: r.campaigns?.campaign_type === 'community'
+          ? 'Nayba Community'
+          : (r.campaigns?.businesses?.name || '—'),
       })));
     })();
     return () => { cancelled = true; };
@@ -649,7 +656,7 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
           <div className="bg-[var(--stone)] rounded-[10px] p-3 mb-5">
             <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-1">Applying to</p>
             <p className="text-[14px] font-semibold text-[var(--ink)]">{applicant.campaigns?.title}</p>
-            <p className="text-[13px] text-[var(--ink-60)]">{applicant.campaigns?.businesses?.name}</p>
+            <p className="text-[13px] text-[var(--ink-60)]">{applicant.campaigns?.campaign_type === 'community' ? 'Nayba Community' : applicant.campaigns?.businesses?.name}</p>
           </div>
 
           {/* Pitch */}
@@ -723,7 +730,7 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
                     <div className="flex-1 min-w-0">
                       <p className="text-[13px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
                       <p className="text-[11px] text-[var(--ink-50)]">
-                        {h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
+                        {h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
                       </p>
                     </div>
                   </div>

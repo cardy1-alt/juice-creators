@@ -44,6 +44,11 @@ export default function CampaignWizard({ brands, fixedBrandId, onSave, onClose }
   const [perk, setPerk] = useState('');
   const [instructions, setInstructions] = useState('');
   const [mode, setMode] = useState<'ai' | 'manual'>('ai');
+  // Community campaigns are admin-run with no brand. The brand portal
+  // (fixedBrandId set) can never create one — only the admin surface offers
+  // the toggle.
+  const [campaignType, setCampaignType] = useState<'brand' | 'community'>('brand');
+  const isCommunity = campaignType === 'community';
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState('');
   const [saving, setSaving] = useState(false);
@@ -60,6 +65,7 @@ export default function CampaignWizard({ brands, fixedBrandId, onSave, onClose }
     perk_value: '',
     creator_target: '5',
     brand_instructions: '',
+    num_winners: '1',
     open_date: addDays(new Date(), 1),
     expression_deadline: addDays(new Date(), 15),
     content_deadline: addDays(new Date(), 29),
@@ -161,7 +167,9 @@ Return only valid JSON, no markdown, no code fences.`,
     setSaveError('');
     setSaving(true);
     const payload: any = {
-      brand_id: brandId,
+      // Community campaigns have no owning business — leave brand_id null so
+      // the new DB CHECK constraint still passes.
+      brand_id: isCommunity ? null : brandId,
       title: gen.title,
       headline: gen.headline || null,
       about_brand: gen.about_brand || null,
@@ -173,12 +181,15 @@ Return only valid JSON, no markdown, no code fences.`,
       creator_target: parseInt(gen.creator_target) || 5,
       min_level: 1,
       content_requirements: gen.content_requirements || null,
-      brand_instructions: gen.brand_instructions || null,
+      // brand_instructions doesn't apply to community campaigns (no brand to
+      // give booking-style requirements). Keep it null.
+      brand_instructions: isCommunity ? null : (gen.brand_instructions || null),
       talking_points: gen.talking_points.filter(Boolean),
       inspiration: gen.inspiration.filter((i: any) => i.title),
       deliverables: { reel: true, story: false },
-      campaign_type: 'brand',
+      campaign_type: campaignType,
       campaign_image: gen.campaign_image || null,
+      num_winners: isCommunity ? Math.max(1, parseInt(gen.num_winners) || 1) : 1,
       open_date: gen.open_date ? toStartOfDayISO(gen.open_date) : null,
       expression_deadline: gen.expression_deadline ? toEndOfDayISO(gen.expression_deadline) : null,
       content_deadline: gen.content_deadline ? toEndOfDayISO(gen.content_deadline) : null,
@@ -187,8 +198,8 @@ Return only valid JSON, no markdown, no code fences.`,
     const { error } = await supabase.from('campaigns').insert(payload);
     setSaving(false);
     if (error) { setSaveError('Failed to save: ' + error.message); return; }
-    // Send campaign live email to brand when publishing
-    if (status === 'active' && brandId) {
+    // Send campaign live email to brand when publishing — brand campaigns only.
+    if (status === 'active' && brandId && !isCommunity) {
       sendBusinessCampaignLiveEmail(brandId, {
         campaign_title: gen.title,
         headline: gen.headline || '',
@@ -232,22 +243,56 @@ Return only valid JSON, no markdown, no code fences.`,
           {/* ─── STEP 1 ─── */}
           {step === 1 && (
             <div className="space-y-4">
-              {/* Mode toggle */}
-              <div className="flex gap-1 border-b border-[rgba(42,32,24,0.08)]">
-                <button type="button" onClick={() => setMode('ai')}
-                  className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'ai' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
-                  ✦ AI Assist
-                </button>
-                <button type="button" onClick={() => setMode('manual')}
-                  className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'manual' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
-                  Create manually
-                </button>
-              </div>
-
+              {/* Campaign type — admin only. Brand-portal uses fixedBrandId
+                  and can never create community campaigns. */}
               {!fixedBrandId && (
+                <div>
+                  <label className={labelCls}>Campaign type</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button type="button"
+                      onClick={() => { setCampaignType('brand'); setMode('ai'); }}
+                      className={`px-3.5 py-2.5 rounded-[10px] border text-left transition-colors ${campaignType === 'brand' ? 'border-[var(--terra)] bg-[rgba(196,103,74,0.04)]' : 'border-[rgba(42,32,24,0.10)] hover:bg-[rgba(42,32,24,0.02)]'}`}>
+                      <p className="text-[13px] font-semibold text-[var(--ink)]">Brand campaign</p>
+                      <p className="text-[12px] text-[var(--ink-50)] mt-0.5">A business gives a perk to every selected creator.</p>
+                    </button>
+                    <button type="button"
+                      onClick={() => { setCampaignType('community'); setMode('manual'); }}
+                      className={`px-3.5 py-2.5 rounded-[10px] border text-left transition-colors ${campaignType === 'community' ? 'border-[#3B82F6] bg-[rgba(59,130,246,0.06)]' : 'border-[rgba(42,32,24,0.10)] hover:bg-[rgba(42,32,24,0.02)]'}`}>
+                      <p className="text-[13px] font-semibold text-[var(--ink)]">Community campaign</p>
+                      <p className="text-[12px] text-[var(--ink-50)] mt-0.5">Run by Nayba — prize draw, no brand.</p>
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Mode toggle — AI assist only useful when there's a brand. */}
+              {!isCommunity && (
+                <div className="flex gap-1 border-b border-[rgba(42,32,24,0.08)]">
+                  <button type="button" onClick={() => setMode('ai')}
+                    className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'ai' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
+                    ✦ AI Assist
+                  </button>
+                  <button type="button" onClick={() => setMode('manual')}
+                    className={`px-4 py-2.5 text-[14px] font-medium border-b-2 -mb-px transition-colors ${mode === 'manual' ? 'border-[var(--terra)] text-[var(--terra)]' : 'border-transparent text-[var(--ink-35)]'}`}>
+                    Create manually
+                  </button>
+                </div>
+              )}
+
+              {!fixedBrandId && !isCommunity && (
                 <div>
                   <label className={labelCls}>Brand *</label>
                   <Select value={brandId} onChange={setBrandId} placeholder="Select brand..." options={[{ value: '', label: 'Select brand...' }, ...brands.map(b => ({ value: b.id, label: b.name }))]} />
+                </div>
+              )}
+
+              {isCommunity && (
+                <div>
+                  <label className={labelCls}>Number of winners</label>
+                  <input type="number" min="1" value={gen.num_winners}
+                    onChange={e => setG('num_winners', e.target.value)}
+                    className={`${inputCls} max-w-[160px]`} />
+                  <p className="text-[12px] text-[var(--ink-35)] mt-1">How many creators will win the prize after the content deadline.</p>
                 </div>
               )}
 
@@ -308,11 +353,13 @@ Return only valid JSON, no markdown, no code fences.`,
                     <label className={labelCls}>Content Requirements</label>
                     <textarea value={gen.content_requirements} onChange={e => setG('content_requirements', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder="What should the Reel include?" />
                   </div>
-                  <div>
-                    <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
-                    <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)} className={`${inputCls} min-h-[60px] resize-y`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram." />
-                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email.</p>
-                  </div>
+                  {!isCommunity && (
+                    <div>
+                      <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                      <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)} className={`${inputCls} min-h-[60px] resize-y`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram." />
+                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email.</p>
+                    </div>
+                  )}
                   <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="Campaign Image" />
                 </>
               )}
@@ -353,7 +400,7 @@ Return only valid JSON, no markdown, no code fences.`,
               <div className="rounded-[12px] overflow-hidden" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.06)' }}>
                 <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="" shape="square" />
                 <div className="p-4">
-                  <p className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{brandName}</p>
+                  <p className="text-[11px] font-medium text-[var(--ink-50)] mb-1">{isCommunity ? 'Nayba Community' : brandName}</p>
                   <input value={gen.title} onChange={e => setG('title', e.target.value)}
                     className="w-full text-[18px] font-semibold text-[var(--ink)] bg-transparent border-none outline-none p-0 mb-1 placeholder:text-[var(--ink-35)]"
                     placeholder="Campaign title" />
@@ -412,14 +459,14 @@ Return only valid JSON, no markdown, no code fences.`,
           {step === 1 ? (
             <>
               <button onClick={onClose} className="text-[14px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">Cancel</button>
-              {mode === 'ai' ? (
+              {mode === 'ai' && !isCommunity ? (
                 <button onClick={handleGenerate} disabled={aiLoading || !brandId || !perk}
                   className="inline-flex items-center gap-2.5 px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
                   {aiLoading ? <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" /> : <span>✦</span>}
                   <span>{aiLoading ? 'Generating...' : 'Generate campaign'}</span>
                 </button>
               ) : (
-                <button onClick={() => setStep(2)} disabled={!brandId || !gen.title || !perk}
+                <button onClick={() => setStep(2)} disabled={(!isCommunity && !brandId) || !gen.title || !perk}
                   className="px-6 py-2.5 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85] disabled:opacity-40 min-h-[40px]">
                   Next →
                 </button>

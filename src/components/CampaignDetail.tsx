@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail } from '../lib/notifications';
-import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, AlertCircle, Sparkles } from 'lucide-react';
+import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail, sendCreatorEnteredCommunityEmail } from '../lib/notifications';
+import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, AlertCircle, Sparkles, Megaphone, Trophy } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
+import { getCampaignBrandDisplay } from '../lib/campaignDisplay';
 import { fmtDeadline } from '../lib/dates';
 
-function CampaignFallbackImage({ category, name }: { category?: string | null; name?: string | null }) {
+function CampaignFallbackImage({ category, name, isCommunity }: { category?: string | null; name?: string | null; isCommunity?: boolean }) {
+  if (isCommunity) {
+    return (
+      <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: 'rgba(59,130,246,0.08)' }}>
+        <Megaphone className="w-14 h-14 mb-2" style={{ color: '#3B82F6', opacity: 0.7 }} />
+        {name && <span className="text-[14px] font-medium" style={{ color: '#3B82F6', opacity: 0.7 }}>{name}</span>}
+      </div>
+    );
+  }
   const cp = getCategoryPalette(category);
   return (
     <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: cp.tint }}>
@@ -23,7 +32,7 @@ interface CampaignDetailProps {
 }
 
 interface Campaign {
-  id: string; brand_id: string; title: string; headline: string | null;
+  id: string; brand_id: string | null; title: string; headline: string | null;
   about_brand: string | null; perk_description: string | null; perk_value: number | null;
   perk_type: string | null; target_city: string | null; content_requirements: string | null;
   brand_instructions: string | null;
@@ -31,11 +40,17 @@ interface Campaign {
   required_tags: string[] | null; creator_target: number | null;
   open_date: string | null; expression_deadline: string | null; content_deadline: string | null;
   status: string; campaign_image: string | null;
-  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null };
+  campaign_type: 'brand' | 'community';
+  num_winners: number | null; winner_announced_at: string | null;
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null } | null;
 }
 
 interface Application {
   id: string; status: string; selected_at: string | null;
+}
+
+interface ParticipationLite {
+  id: string; status: string; reel_url: string | null;
 }
 
 /** Hours remaining until `selected_at` + 48h. Negative if already past. */
@@ -49,6 +64,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const { user } = useAuth();
   const [campaign, setCampaign] = useState<Campaign | null>(null);
   const [application, setApplication] = useState<Application | null>(null);
+  const [participation, setParticipation] = useState<ParticipationLite | null>(null);
   const [creatorId, setCreatorId] = useState<string | null>(null);
   const [creatorName, setCreatorName] = useState<string>('');
   const [creatorInstagram, setCreatorInstagram] = useState<string>('');
@@ -103,6 +119,18 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           .eq('creator_id', creatorData.id)
           .maybeSingle();
         if (appData) setApplication(appData as Application);
+
+        // Community campaigns expose a Reel-submission CTA inline on detail
+        // (because they auto-confirm at apply time and the brand-only "active
+        // campaigns" tab won't surface them). Pull the participation row so
+        // we know whether the creator has already submitted.
+        const { data: partData } = await supabase
+          .from('participations')
+          .select('id, status, reel_url')
+          .eq('campaign_id', campaignId)
+          .eq('creator_id', creatorData.id)
+          .maybeSingle();
+        if (partData) setParticipation(partData as ParticipationLite);
       }
     }
     setLoading(false);
@@ -112,32 +140,74 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     if (!creatorId || !campaign || submitting) return;
     setApplyError('');
     setSubmitting(true);
+    const isCommunity = campaign.campaign_type === 'community';
+
+    // Community campaigns auto-confirm at apply time — there's no manual
+    // "select" step from a brand. The application row is created confirmed
+    // and a participation row is created immediately so the creator can
+    // submit a Reel right away. perk_sent stays false until the admin picks
+    // a winner.
+    const initialStatus = isCommunity ? 'confirmed' : 'interested';
+    const nowIso = new Date().toISOString();
+
     const { data, error } = await supabase.from('applications').insert({
       campaign_id: campaign.id,
       creator_id: creatorId,
       pitch: withPitch || null,
-      status: 'interested',
+      status: initialStatus,
+      ...(isCommunity ? { selected_at: nowIso, confirmed_at: nowIso } : {}),
     }).select('id, status').single();
     if (error) {
       console.error('[CampaignDetail] Failed to apply:', error);
       const msg = error.message.toLowerCase();
       setApplyError(
         msg.includes('duplicate')
-          ? "You've already registered interest for this campaign."
+          ? (isCommunity ? "You've already entered this draw." : "You've already registered interest for this campaign.")
           : msg.includes('row-level security') || msg.includes('policy')
           ? "Permission denied — please make sure your account is approved."
-          : "Couldn't register your interest — please try again."
+          : (isCommunity ? "Couldn't enter the draw — please try again." : "Couldn't register your interest — please try again.")
       );
       setSubmitting(false);
       return;
     }
     // Optimistically update application state so CTA changes immediately
     if (data) setApplication(data as Application);
-    // Notify admin
+
+    // Community: create the participation row now so the Reel submission CTA
+    // unlocks. We deliberately roll back the application if this fails.
+    if (isCommunity && data) {
+      const { data: partData, error: partErr } = await supabase.from('participations').insert({
+        application_id: data.id,
+        campaign_id: campaign.id,
+        creator_id: creatorId,
+        perk_sent: false,
+        status: 'confirmed',
+      }).select('id, status, reel_url').single();
+      if (partErr) {
+        console.error('[CampaignDetail] Failed to create community participation:', partErr);
+        await supabase.from('applications').delete().eq('id', data.id);
+        setApplication(null);
+        setApplyError("Couldn't enter the draw — please try again.");
+        setSubmitting(false);
+        return;
+      }
+      if (partData) setParticipation(partData as ParticipationLite);
+
+      // Community-specific creator email — there's no brand to promise a
+      // perk from; just confirm entry and remind about the Reel deadline.
+      sendCreatorEnteredCommunityEmail(creatorId, {
+        campaign_title: campaign.title,
+        perk_description: campaign.perk_description || '',
+        content_deadline: campaign.content_deadline || '',
+      }).catch(() => {});
+    }
+
+    // Notify admin (for both flows). Use "Nayba Community" as the brand
+    // label for community campaigns so the email body still reads cleanly.
     sendAdminInterestExpressedEmail({
       creator_name: creatorName,
       campaign_title: campaign.title,
-      brand_name: campaign.businesses?.name || '',
+      brand_name: isCommunity ? 'Nayba Community' : (campaign.businesses?.name || ''),
     }).catch(() => {});
     setShowPitchModal(false);
     setPitchFit('');
@@ -197,7 +267,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
     // Only now — both DB writes succeeded — update UI and fire emails.
     setApplication({ ...application, status: 'confirmed' });
-    if (campaign.businesses?.name) {
+    // Brand confirmation emails. Community campaigns reach this path only
+    // when something has gone wrong (their flow auto-confirms in handleApply
+    // and never surfaces the "selected → confirm" step); skip the
+    // brand-specific notifications and only ping the admin.
+    if (campaign.campaign_type !== 'community' && campaign.brand_id && campaign.businesses?.name) {
       sendCreatorConfirmedEmail(creatorId, {
         campaign_title: campaign.title,
         brand_name: campaign.businesses.name,
@@ -241,8 +315,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
 
   const sectionGap = 'mt-6';
 
-  const brandInstructions = campaign?.brand_instructions?.trim() || '';
-  const brandHandle = (campaign?.businesses?.instagram_handle || '').replace('@', '');
+  const display = getCampaignBrandDisplay(campaign, getCategoryPalette);
+  const isCommunity = display.isCommunity;
+  // Community campaigns don't have brand instructions — the helper already
+  // returns ''; this preserves the brand path unchanged.
+  const brandInstructions = display.instructions;
+  const brandHandle = display.instagramHandle;
 
   // Brand requirements callout shown before applying.
   const PreApplyCallout = brandInstructions ? (
@@ -286,27 +364,35 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const remaining = Math.max(0, target - confirmedCount);
   const isFull = target > 0 && remaining === 0;
 
+  const winnersAnnounced = !!campaign?.winner_announced_at;
+
   const ctaContent = (
     <>
       {!application && !showPitchModal && (
         <div>
-          {isFull ? (
+          {isFull && !isCommunity ? (
             <>
               <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
                 This campaign is full
               </div>
               <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">Keep an eye out — new campaigns drop every week.</p>
             </>
+          ) : isCommunity && winnersAnnounced ? (
+            <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
+              The winners have been picked — entries are closed
+            </div>
           ) : (
             <>
               <button onClick={() => setShowPitchModal(true)}
                 className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
-                I'm Interested
+                {isCommunity ? 'Enter the draw' : "I'm Interested"}
               </button>
               <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">
-                {target > 0 && remaining / target <= 0.5
-                  ? `Only ${remaining} spot${remaining === 1 ? '' : 's'} left — the brand will review and select`
-                  : "This won't commit you — the brand will review and select"}
+                {isCommunity
+                  ? `Submit a Reel by the deadline — winner${(campaign?.num_winners || 1) === 1 ? '' : 's'} picked by the Nayba team.`
+                  : target > 0 && remaining / target <= 0.5
+                    ? `Only ${remaining} spot${remaining === 1 ? '' : 's'} left — the brand will review and select`
+                    : "This won't commit you — the brand will review and select"}
               </p>
             </>
           )}
@@ -316,8 +402,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         <div className="bg-[var(--stone)] rounded-[12px] p-4 animate-fade-in">
           <div className="flex items-center justify-between mb-3">
             <div>
-              <p className="text-[15px] font-semibold text-[var(--ink)]">Tell them why you</p>
-              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">Short answers help the brand pick you — all optional</p>
+              <p className="text-[15px] font-semibold text-[var(--ink)]">{isCommunity ? 'Tell us about your idea' : 'Tell them why you'}</p>
+              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">{isCommunity ? "Optional — context for the Nayba team picking the winner" : 'Short answers help the brand pick you — all optional'}</p>
             </div>
             <button onClick={() => { setShowPitchModal(false); setPitchFit(''); setPitchIdea(''); setPitchBrief(''); setApplyError(''); }}
               className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
@@ -336,7 +422,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             </div>
           )}
 
-          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">How does {campaign?.businesses?.name || 'this brand'} fit into your life?</label>
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">{isCommunity ? 'Why is this Suffolk experience worth shouting about?' : `How does ${campaign?.businesses?.name || 'this brand'} fit into your life?`}</label>
           <textarea
             value={pitchFit}
             onChange={e => setPitchFit(e.target.value)}
@@ -390,7 +476,34 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           Interest registered — we'll be in touch
         </div>
       )}
-      {application?.status === 'selected' && (() => {
+      {/* Community campaigns: applied → auto-confirmed → submission /
+          winner / not_selected. The brand "selected → confirm" path
+          doesn't apply to community. */}
+      {isCommunity && application?.status === 'confirmed' && participation?.status !== 'winner' && participation?.status !== 'not_selected' && (
+        <div>
+          <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(59,130,246,0.08)] text-center text-[#3B82F6] font-medium text-[14px]">
+            <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+            {participation?.reel_url ? 'Reel submitted — winners announced after the deadline' : "You're entered — submit your Reel below"}
+          </div>
+          {!participation?.reel_url && campaign.content_deadline && (
+            <p className="text-[13px] text-[var(--ink-60)] text-center mt-2">
+              Reel due by <span className="font-semibold">{fmtDeadline(campaign.content_deadline)}</span>
+            </p>
+          )}
+        </div>
+      )}
+      {isCommunity && participation?.status === 'winner' && (
+        <div className="w-full min-h-[44px] py-3 rounded-[10px] text-center text-[14px]" style={{ background: 'rgba(196,103,74,0.12)', color: 'var(--terra)', fontWeight: 700 }}>
+          <Trophy size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+          You won! We'll be in touch with your prize.
+        </div>
+      )}
+      {isCommunity && participation?.status === 'not_selected' && (
+        <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-60)] font-medium text-[14px]">
+          The winners are picked — thanks for entering!
+        </div>
+      )}
+      {!isCommunity && application?.status === 'selected' && (() => {
         const hoursLeft = hoursUntilConfirmDeadline(application.selected_at);
         const isExpired = hoursLeft !== null && hoursLeft <= 0;
         const isUrgent = hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 12;
@@ -417,7 +530,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           </div>
         );
       })()}
-      {application?.status === 'confirmed' && (
+      {!isCommunity && application?.status === 'confirmed' && (
         <div>
           <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(122,148,120,0.10)] text-center text-[#0F6E56] font-medium text-[14px]">
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
@@ -445,7 +558,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         ? PostConfirmCallout
         : null;
 
-  const catPalette = getCategoryPalette(campaign.businesses?.category);
+  const catPalette = display.palette;
   const deliverablesList = [campaign.deliverables?.reel && 'Reel', campaign.deliverables?.story && 'Story'].filter(Boolean);
 
   return (
@@ -456,7 +569,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {campaign.campaign_image ? (
             <img src={campaign.campaign_image} alt={campaign.title} className="w-full h-full object-cover" />
           ) : (
-            <CampaignFallbackImage category={campaign.businesses?.category} />
+            <CampaignFallbackImage category={campaign.businesses?.category} isCommunity={isCommunity} />
           )}
           {onBack && (
             <button onClick={onBack} className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center text-[var(--ink-60)] hover:bg-white transition-colors z-10">
@@ -465,39 +578,45 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           )}
           {/* Logo overlapping bottom edge */}
           <div className="absolute -bottom-9 left-6">
-            {campaign.businesses?.logo_url ? (
-              <img src={campaign.businesses.logo_url} alt="" className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
+            {display.logoUrl ? (
+              <img src={display.logoUrl} alt="" className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
             ) : (
               <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white" style={{ background: catPalette.tint, boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
-                <CategoryIcon category={campaign.businesses?.category} className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.6 }} />
+                {isCommunity ? (
+                  <Megaphone className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.7 }} />
+                ) : (
+                  <CategoryIcon category={campaign.businesses?.category} className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.6 }} />
+                )}
               </div>
             )}
           </div>
         </div>
 
         <div className="px-6 pb-24 md:pb-8">
-          {/* Brand info. The brand name used to open a modal duplicating
-              the About section below — dropped, as everything that modal
-              showed is now visible on the main page. */}
+          {/* Brand info — for community campaigns this becomes a "Run by
+              Nayba" pill since there's no brand to link to. */}
           <div className="mb-5">
             <p className="text-[16px] font-semibold text-[var(--ink)]">
-              {campaign.businesses?.name}
+              {display.name}
             </p>
             <div className="flex items-center gap-2 mt-1.5">
-              {campaign.businesses?.category && (
-                <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{campaign.businesses.category}</span>
+              {display.category && (
+                <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.category}</span>
               )}
-              {campaign.businesses?.instagram_handle && (
-                <a href={`https://instagram.com/${campaign.businesses.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
+              {brandHandle && (
+                <a href={`https://instagram.com/${brandHandle}`} target="_blank" rel="noopener noreferrer"
                   className="text-[14px] md:text-[12px] text-[var(--ink-50)] hover:text-[var(--terra)] flex items-center gap-0.5">
-                  <AtSign size={10} />{campaign.businesses.instagram_handle.replace('@', '')}
+                  <AtSign size={10} />{brandHandle}
                 </a>
               )}
+              {isCommunity && (
+                <span className="text-[12px] text-[var(--ink-50)]">Run by Nayba — prize draw</span>
+              )}
             </div>
-            {campaign.businesses?.address && (
+            {display.address && (
               <div className="flex items-center gap-1.5 mt-2">
                 <MapPin size={12} className="text-[var(--ink-50)]" />
-                <span className="text-[14px] text-[var(--ink-60)]">{campaign.businesses.address}</span>
+                <span className="text-[14px] text-[var(--ink-60)]">{display.address}</span>
               </div>
             )}
           </div>

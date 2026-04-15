@@ -72,7 +72,7 @@ export default function CommandPalette({ open, onClose, onNavigate }: Props) {
       supabase.from('businesses').select('id, name, owner_email, category')
         .or(`name.ilike.%${q}%,owner_email.ilike.%${q}%`)
         .limit(5),
-      supabase.from('campaigns').select('id, title, status, businesses(name)')
+      supabase.from('campaigns').select('id, title, status, campaign_type, businesses(name)')
         .ilike('title', `%${q}%`)
         .limit(5),
     ]);
@@ -88,11 +88,16 @@ export default function CommandPalette({ open, onClose, onNavigate }: Props) {
       title: b.name,
       subtitle: `${b.category} · ${b.owner_email}`,
     }));
-    campaignsRes.data?.forEach(c => items.push({
-      id: c.id, type: 'campaign', tab: 'campaigns',
-      title: c.title,
-      subtitle: `${(c as any).businesses?.name || '—'} · ${c.status}`,
-    }));
+    campaignsRes.data?.forEach(c => {
+      const owner = (c as any).campaign_type === 'community'
+        ? 'Nayba Community'
+        : ((c as any).businesses?.name || '—');
+      items.push({
+        id: c.id, type: 'campaign', tab: 'campaigns',
+        title: c.title,
+        subtitle: `${owner} · ${c.status}`,
+      });
+    });
 
     setResults(items);
     setActiveIdx(0);
