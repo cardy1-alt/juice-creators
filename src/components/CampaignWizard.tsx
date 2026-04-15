@@ -189,12 +189,17 @@ Return only valid JSON, no markdown, no code fences.`,
       deliverables: { reel: true, story: false },
       campaign_type: campaignType,
       campaign_image: gen.campaign_image || null,
-      num_winners: isCommunity ? Math.max(1, parseInt(gen.num_winners) || 1) : 1,
       open_date: gen.open_date ? toStartOfDayISO(gen.open_date) : null,
       expression_deadline: gen.expression_deadline ? toEndOfDayISO(gen.expression_deadline) : null,
       content_deadline: gen.content_deadline ? toEndOfDayISO(gen.content_deadline) : null,
       status,
     };
+    // num_winners only matters for community campaigns — don't force brand
+    // inserts to touch the column. Keeps brand-side saves working even if
+    // the 20260415100000 migration hasn't been applied yet.
+    if (isCommunity) {
+      payload.num_winners = Math.max(1, parseInt(gen.num_winners) || 1);
+    }
     const { error } = await supabase.from('campaigns').insert(payload);
     setSaving(false);
     if (error) { setSaveError('Failed to save: ' + error.message); return; }

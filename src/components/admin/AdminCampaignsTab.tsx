@@ -1013,11 +1013,16 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
             <span className="text-[var(--ink-15)]">·</span>
             <button onClick={async () => {
               const { brand_id, title, headline, about_brand, perk_description, perk_value, perk_type, target_city, target_county, creator_target, min_level, content_requirements, brand_instructions, talking_points, inspiration, deliverables, campaign_type, campaign_image, num_winners } = campaign;
-              const { error } = await supabase.from('campaigns').insert({
+              const dupPayload: any = {
                 brand_id, title: `Copy of ${title}`, headline, about_brand, perk_description, perk_value, perk_type,
                 target_city, target_county, creator_target, min_level, content_requirements, brand_instructions,
-                talking_points, inspiration, deliverables, campaign_type, campaign_image, num_winners, status: 'draft',
-              });
+                talking_points, inspiration, deliverables, campaign_type, campaign_image, status: 'draft',
+              };
+              // Only carry num_winners over for community dupes — avoids
+              // referencing the column for brand campaigns when the migration
+              // hasn't landed.
+              if (campaign_type === 'community') dupPayload.num_winners = num_winners;
+              const { error } = await supabase.from('campaigns').insert(dupPayload);
               if (error) showToast('Failed to duplicate');
               else { showToast('Campaign duplicated as draft'); onEdit(); }
             }} className="text-[12px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] transition-colors px-1 py-0.5">
