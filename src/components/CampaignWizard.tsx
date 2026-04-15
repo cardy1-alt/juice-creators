@@ -337,7 +337,7 @@ Return only valid JSON, no markdown, no code fences.`,
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={gen.perk_value} onChange={e => setG('perk_value', e.target.value)} className={inputCls} /></div>
-                    <div><label className={labelCls}>Creator Target</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
+                    <div><label className={labelCls}>{isCommunity ? 'Max entries' : 'Creator Target'}</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={labelCls}>Target City</label><input value={gen.target_city} onChange={e => setG('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
@@ -346,8 +346,8 @@ Return only valid JSON, no markdown, no code fences.`,
                     </div>
                   </div>
                   <div>
-                    <label className={labelCls}>About the Brand</label>
-                    <textarea value={gen.about_brand} onChange={e => setG('about_brand', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder="2-3 sentences about the brand" />
+                    <label className={labelCls}>{isCommunity ? 'About this campaign' : 'About the Brand'}</label>
+                    <textarea value={gen.about_brand} onChange={e => setG('about_brand', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} placeholder={isCommunity ? "What's the campaign about? Why are we running it?" : '2-3 sentences about the brand'} />
                   </div>
                   <div>
                     <label className={labelCls}>Content Requirements</label>
@@ -421,7 +421,7 @@ Return only valid JSON, no markdown, no code fences.`,
               {showDetails && (
                 <div className="space-y-4 pt-2">
                   <div>
-                    <label className={labelCls}>About the Brand</label>
+                    <label className={labelCls}>{isCommunity ? 'About this campaign' : 'About the Brand'}</label>
                     <textarea value={gen.about_brand} onChange={e => setG('about_brand', e.target.value)} className={`${inputCls} min-h-[72px] resize-y`} />
                   </div>
                   <div>
@@ -437,7 +437,7 @@ Return only valid JSON, no markdown, no code fences.`,
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div><label className={labelCls}>Target City</label><input value={gen.target_city} onChange={e => setG('target_city', e.target.value)} className={inputCls} /></div>
-                    <div><label className={labelCls}>Creator Target</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
+                    <div><label className={labelCls}>{isCommunity ? 'Max entries' : 'Creator Target'}</label><input type="number" value={gen.creator_target} onChange={e => setG('creator_target', e.target.value)} className={inputCls} /></div>
                     <div><label className={labelCls}>Perk Value (£)</label><input type="number" value={gen.perk_value} onChange={e => setG('perk_value', e.target.value)} className={inputCls} /></div>
                     <div><label className={labelCls}>County</label>
                       <Select value={gen.target_county} onChange={val => setG('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} />
