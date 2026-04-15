@@ -6,6 +6,7 @@ import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, A
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 import { getCampaignBrandDisplay } from '../lib/campaignDisplay';
 import { fmtDeadline } from '../lib/dates';
+import NaybaLogo from '../assets/logomark.svg';
 
 function CampaignFallbackImage({ category, name, isCommunity }: { category?: string | null; name?: string | null; isCommunity?: boolean }) {
   if (isCommunity) {
@@ -42,7 +43,7 @@ interface Campaign {
   status: string; campaign_image: string | null;
   campaign_type: 'brand' | 'community';
   num_winners: number | null; winner_announced_at: string | null;
-  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null } | null;
+  businesses?: { name: string; category?: string; bio?: string | null; instagram_handle?: string | null; logo_url?: string | null; address?: string | null; approved?: boolean } | null;
 }
 
 interface Application {
@@ -87,7 +88,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     setLoading(true);
     const { data: campData, error: campErr } = await supabase
       .from('campaigns')
-      .select('*, businesses(name, category, bio, instagram_handle, logo_url, address)')
+      .select('*, businesses(name, category, bio, instagram_handle, logo_url, address, approved)')
       .eq('id', campaignId)
       .maybeSingle();
     if (campErr || !campData) { setNotFound(true); setLoading(false); return; }
@@ -596,9 +597,24 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* Brand info — for community campaigns this becomes a "Run by
               Nayba" pill since there's no brand to link to. */}
           <div className="mb-5">
-            <p className="text-[16px] font-semibold text-[var(--ink)]">
-              {display.name}
-            </p>
+            <div className="flex items-center gap-2 flex-wrap">
+              <p className="text-[16px] font-semibold text-[var(--ink)]">
+                {display.name}
+              </p>
+              {/* Verified-by-Nayba signal — additive only (no unverified
+                  state is ever shown to creators). Hidden for community
+                  campaigns because there's no business to verify. */}
+              {!isCommunity && campaign.businesses?.approved && (
+                <span
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+                  style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}
+                  title="This brand has been verified by the Nayba team"
+                >
+                  <img src={NaybaLogo} alt="" className="w-3 h-3" />
+                  Verified by Nayba
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-2 mt-1.5">
               {display.category && (
                 <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.category}</span>

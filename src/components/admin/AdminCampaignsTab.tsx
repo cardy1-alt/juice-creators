@@ -122,6 +122,12 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState('');
   const [formError, setFormError] = useState('');
+  // Advanced options (currently just Min Creator Level) — collapsed by
+  // default. Level-gating works against small-creator fairness, so we keep
+  // the lever available but discourage brands from reaching for it. Open
+  // automatically if the campaign we're editing already has a non-default
+  // min_level set.
+  const [showAdvanced, setShowAdvanced] = useState((campaign?.min_level || 1) > 1);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRan, setAiRan] = useState(!!campaign?.about_brand);
   const [aiError, setAiError] = useState('');
@@ -259,8 +265,22 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
               <div><label className={labelCls}>Target City</label><input value={form.target_city} onChange={e => set('target_city', e.target.value)} className={inputCls} placeholder="e.g. Bury St Edmunds" /></div>
               <div><label className={labelCls}>Target County</label><Select value={form.target_county} onChange={val => set('target_county', val)} options={[{ value: 'Suffolk', label: 'Suffolk' }, { value: 'Norfolk', label: 'Norfolk' }, { value: 'Cambridgeshire', label: 'Cambridgeshire' }, { value: 'Essex', label: 'Essex' }]} /></div>
               <div><label className={labelCls}>{form.campaign_type === 'community' ? 'Max entries' : 'Creator Target'}</label><input type="number" min="1" value={form.creator_target} onChange={e => set('creator_target', e.target.value)} className={inputCls} /></div>
-              <div><label className={labelCls}>Min Creator Level</label><Select value={form.min_level} onChange={val => set('min_level', val)} options={[{ value: '1', label: 'Any (Level 1+)' }, { value: '3', label: 'Regular+ (Level 3+)' }, { value: '5', label: 'Trusted+ (Level 5+)' }]} /></div>
               <div className="md:col-span-2"><ImageUpload value={form.campaign_image} onChange={url => set('campaign_image', url)} folder="campaigns" label="Campaign Image" /></div>
+              {/* Advanced options — collapsed by default. Min Creator Level
+                  lives here so brands don't default to excluding newcomers. */}
+              <div className="md:col-span-2 pt-1">
+                <button type="button" onClick={() => setShowAdvanced(s => !s)}
+                  className="inline-flex items-center gap-1 text-[12px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)] transition-colors">
+                  {showAdvanced ? '▾' : '▸'} Advanced options
+                </button>
+                {showAdvanced && (
+                  <div className="mt-3 pt-3 border-t border-[rgba(42,32,24,0.06)]">
+                    <label className={labelCls}>Min Creator Level</label>
+                    <Select value={form.min_level} onChange={val => set('min_level', val)} options={[{ value: '1', label: 'Any (Level 1+) — recommended' }, { value: '3', label: 'Regular+ (Level 3+)' }, { value: '5', label: 'Trusted+ (Level 5+)' }]} />
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Leave as "Any" unless the campaign specifically requires an experienced creator — newer creators deliver strong engagement too.</p>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

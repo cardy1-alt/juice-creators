@@ -226,6 +226,21 @@ export default function AdminApplicantsTab() {
 
   const totalPending = applicants.filter(a => a.status === 'interested').length;
 
+  // First-timer slot — a soft nudge, not enforced selection. For each
+  // campaign we surface one pending applicant who has never completed a
+  // campaign so brands don't routinely overlook new creators. Applicants
+  // are sorted applied_at DESC, so we take the first match (most recent
+  // first-timer). If no pending first-timer exists, the campaign gets no
+  // nudge.
+  const firstTimerIdByCampaign: Record<string, string> = {};
+  for (const a of filtered) {
+    if (a.status !== 'interested') continue;
+    if ((a.creators?.completed_campaigns || 0) > 0) continue;
+    if (!firstTimerIdByCampaign[a.campaign_id]) {
+      firstTimerIdByCampaign[a.campaign_id] = a.id;
+    }
+  }
+
   // Card component used in both grid and list views
   const ApplicantCard = ({ a, variant }: { a: Applicant; variant: 'grid' | 'list' }) => {
     const name = a.creators?.display_name || a.creators?.name || 'Unknown';
@@ -237,6 +252,14 @@ export default function AdminApplicantsTab() {
     const isActing = actingOn === a.id;
     const isSelected = peekApplicant?.id === a.id;
     const isChecked = selectedIds.has(a.id);
+    const isFirstTimerSlot = isPending && firstTimerIdByCampaign[a.campaign_id] === a.id;
+
+    const firstTimerTag = isFirstTimerSlot ? (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}
+        title="No completed campaigns yet — reserving a slot for a first-timer helps the creator community grow">
+        ✦ First-timer pick
+      </span>
+    ) : null;
 
     const Checkbox = isPending ? (
       <span
@@ -268,7 +291,10 @@ export default function AdminApplicantsTab() {
         <button
           onClick={() => openPeek(a)}
           className={`group relative text-left bg-white rounded-[12px] p-4 transition-all hover:shadow-[0_4px_12px_rgba(42,32,24,0.08)] ${isSelected ? 'ring-2 ring-[var(--terra)]' : isChecked ? 'ring-2 ring-[var(--terra)] ring-opacity-50' : ''} ${!isPending ? 'opacity-70' : ''}`}
-          style={{ boxShadow: isSelected || isChecked ? undefined : '0 1px 4px rgba(42,32,24,0.04)' }}
+          style={{
+            boxShadow: isSelected || isChecked ? undefined : '0 1px 4px rgba(42,32,24,0.04)',
+            borderLeft: isFirstTimerSlot ? '3px solid var(--terra)' : undefined,
+          }}
         >
           {Checkbox && <div className="absolute top-3 right-3">{Checkbox}</div>}
           <div className="flex items-start gap-3 mb-3">
@@ -288,6 +314,7 @@ export default function AdminApplicantsTab() {
             <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
               L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
             </span>
+            {firstTimerTag}
             {statusPill}
           </div>
           {a.pitch ? (
@@ -321,6 +348,7 @@ export default function AdminApplicantsTab() {
       <button
         onClick={() => openPeek(a)}
         className={`w-full text-left bg-white transition-colors hover:bg-[rgba(42,32,24,0.02)] ${isSelected ? 'bg-[rgba(196,103,74,0.04)]' : isChecked ? 'bg-[rgba(196,103,74,0.03)]' : ''} ${!isPending ? 'opacity-70' : ''}`}
+        style={{ borderLeft: isFirstTimerSlot ? '3px solid var(--terra)' : undefined }}
       >
         <div className="px-4 py-4">
           <div className="flex items-start gap-3">
@@ -338,6 +366,7 @@ export default function AdminApplicantsTab() {
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
                   L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
                 </span>
+                {firstTimerTag}
                 {statusPill}
               </div>
               {handle && (
