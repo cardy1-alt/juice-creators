@@ -328,7 +328,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     </span>
                   )}
                   {display.isCommunity && (
-                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[#F9E8E1] text-[var(--terra)]">
                       <img src={NaybaLogo} alt="" className="w-3 h-3" /> Community
                     </span>
                   )}
