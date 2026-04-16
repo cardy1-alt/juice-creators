@@ -328,14 +328,22 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     </span>
                   )}
                   {display.isCommunity && (
-                    <span className="absolute top-2 left-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                    <span className="absolute top-2 left-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[10px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
+                      <img src={NaybaLogo} alt="" className="w-3 h-3" /> Community
+                    </span>
                   )}
                   </div>
                 </div>
                 {/* Content */}
                 <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
                   <div className="flex items-center gap-2 mb-2 min-w-0">
-                    <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.isCommunity ? 'Community' : (c.businesses?.category?.split(' & ')[0] || 'Local')}</span>
+                    {display.isCommunity ? (
+                      <span className="inline-flex flex-shrink-0 items-center gap-1 px-2 py-0.5 rounded-[999px] text-[10px] bg-[var(--terra-light)] text-[var(--terra)]" style={{ fontWeight: 600 }}>
+                        <img src={NaybaLogo} alt="" className="w-2.5 h-2.5" /> Community
+                      </span>
+                    ) : (
+                      <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                    )}
                     <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{display.name}</span>
                   </div>
                   <p className="text-[16px] text-[var(--ink)] leading-[1.25] mb-1.5 line-clamp-2" style={{ fontWeight: 700 }}>{c.title || c.headline}</p>
