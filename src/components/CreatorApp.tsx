@@ -916,6 +916,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
 function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorProfile; onBack: () => void; showToast: (msg: string) => void }) {
   const [displayName, setDisplayName] = useState(profile.display_name || profile.name || '');
   const [instagram, setInstagram] = useState(profile.instagram_handle || '');
+  const [bio, setBio] = useState(profile.bio || '');
   const [city, setCity] = useState(profile.address || '');
   const [saving, setSaving] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
@@ -931,6 +932,7 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
     const { error } = await supabase.from('creators').update({
       display_name: displayName,
       instagram_handle: instagram,
+      bio: bio || null,
       address: city,
     }).eq('id', profile.id);
     setSaving(false);
@@ -974,6 +976,13 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
             <input value={instagram} onChange={e => setInstagram(e.target.value)}
               className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] min-h-[48px]" />
+          </div>
+          <div>
+            <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Bio</label>
+            <textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3}
+              placeholder="A short intro — what you're about, your content style, where you're based"
+              className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] resize-none" />
+            <p className="text-[12px] text-[var(--ink-35)] mt-1">Brands see this when reviewing your application</p>
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>
