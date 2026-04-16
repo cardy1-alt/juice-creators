@@ -729,11 +729,22 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               {ctaContent}
             </div>
           )}
+
+          {/* Pitch form — inline on mobile so the creator can scroll
+              through it with the keyboard open. The fixed bottom bar
+              can't hold 3 textareas + buttons without overflowing on
+              iPhone, so we render the form here instead. */}
+          {!hideActions && showPitchModal && (
+            <div className="md:hidden mt-6 pt-6 border-t border-[rgba(42,32,24,0.06)] pb-24">
+              {ctaContent}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* CTA — fixed bottom bar on mobile */}
-      {!hideActions && (
+      {/* CTA — fixed bottom bar on mobile. Hidden when pitch form is
+          open (it renders inline above instead). */}
+      {!hideActions && !showPitchModal && (
         <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white px-4 py-3 z-40 border-t border-[rgba(42,32,24,0.06)]" style={{ paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))' }}>
           {ctaContent}
         </div>
