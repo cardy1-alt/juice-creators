@@ -510,32 +510,43 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {applyError && (
             <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>
           )}
-          <div className="flex gap-2">
+          {pitchHasContent ? (
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleApply()}
+                disabled={submitting}
+                className="flex-1 min-h-[40px] py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-white disabled:opacity-50"
+              >
+                Submit without pitch
+              </button>
+              <button
+                onClick={() => handleApply(composePitch())}
+                disabled={submitting}
+                className="flex-1 min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
+              >
+                {submitting ? 'Submitting...' : 'Submit with pitch'}
+              </button>
+            </div>
+          ) : (
             <button
               onClick={() => handleApply()}
               disabled={submitting}
-              className="flex-1 min-h-[40px] py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] font-medium text-[14px] hover:bg-white disabled:opacity-50"
-            >
-              Skip pitch
-            </button>
-            <button
-              onClick={() => handleApply(composePitch())}
-              disabled={submitting || !pitchHasContent}
-              className="flex-1 min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
+              className="w-full min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50"
             >
               {submitting ? 'Submitting...' : 'Submit interest'}
             </button>
-          </div>
+          )}
         </div>
       )}
       {application?.status === 'interested' && !showPitchModal && (
         <div>
-          <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
+          <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[#E1F5EE] text-center text-[#0F6E56] font-medium text-[14px]">
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
             Interest registered — we'll be in touch
           </div>
+          <p className="text-[12px] text-[var(--ink-35)] text-center mt-2">You can see all your applications in the Campaigns tab</p>
           <button onClick={openEditPitch}
-            className="w-full mt-2 text-[13px] font-medium text-[var(--terra)] hover:underline text-center py-1">
+            className="w-full mt-1 text-[13px] font-medium text-[var(--terra)] hover:underline text-center py-1">
             {application.pitch ? 'Edit your pitch' : 'Add a pitch to strengthen your application'}
           </button>
         </div>
