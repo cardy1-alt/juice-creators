@@ -723,6 +723,19 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 // ─── Profile Tab ───
 function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
+  const [editingBio, setEditingBio] = useState(false);
+  const [bio, setBio] = useState(profile.bio || '');
+  const [savingBio, setSavingBio] = useState(false);
+
+  const handleSaveBio = async () => {
+    setSavingBio(true);
+    const { error } = await supabase.from('creators').update({ bio: bio || null }).eq('id', profile.id);
+    setSavingBio(false);
+    if (error) { showToast('Failed to save — please try again'); return; }
+    profile.bio = bio || null;
+    setEditingBio(false);
+    showToast('Bio updated');
+  };
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-6 animate-fade-in">
 
@@ -744,6 +757,30 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
         {profile.address && (
           <span className="text-[14px] text-[var(--ink-50)] flex items-center gap-1 mt-1.5"><MapPin size={12} />{profile.address}</span>
         )}
+        {/* Bio — editable inline */}
+        <div className="mt-3 w-full max-w-[380px]">
+          {editingBio ? (
+            <div>
+              <textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3}
+                placeholder="A short intro — what you're about, your content style, where you're based"
+                className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] resize-none" autoFocus />
+              <div className="flex gap-2 mt-2 justify-center">
+                <button onClick={() => { setEditingBio(false); setBio(profile.bio || ''); }}
+                  className="px-3 py-1.5 rounded-[8px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
+                <button onClick={handleSaveBio} disabled={savingBio}
+                  className="px-4 py-1.5 rounded-[8px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-85 disabled:opacity-50">
+                  {savingBio ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button onClick={() => setEditingBio(true)}
+              className="text-center w-full text-[14px] leading-[1.6] hover:bg-[rgba(42,32,24,0.02)] rounded-[8px] px-3 py-1.5 transition-colors"
+              style={{ color: profile.bio ? 'var(--ink-60)' : 'var(--terra)' }}>
+              {profile.bio || 'Add a bio — brands see this when reviewing your application'}
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Stats row — 4 columns */}
