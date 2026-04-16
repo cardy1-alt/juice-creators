@@ -47,7 +47,7 @@ interface Campaign {
 }
 
 interface Application {
-  id: string; status: string; selected_at: string | null;
+  id: string; status: string; selected_at: string | null; pitch: string | null;
 }
 
 interface ParticipationLite {
@@ -149,7 +149,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         // Check if creator already applied (0 or 1 row expected)
         const { data: appData } = await supabase
           .from('applications')
-          .select('id, status, selected_at')
+          .select('id, status, selected_at, pitch')
           .eq('campaign_id', campaignId)
           .eq('creator_id', creatorData.id)
           .maybeSingle();
@@ -262,6 +262,43 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     return parts.join('\n\n');
   };
   const pitchHasContent = !!(pitchFit.trim() || pitchIdea.trim() || pitchBrief.trim());
+
+  // Parse a composed pitch string back into the three form fields.
+  const parsePitchIntoFields = (pitch: string) => {
+    const fitMatch = pitch.match(/Why I'm a fit:\s*([\s\S]*?)(?=\n\nMy content idea:|\n\nWhat caught my eye:|$)/);
+    const ideaMatch = pitch.match(/My content idea:\s*([\s\S]*?)(?=\n\nWhat caught my eye:|$)/);
+    const briefMatch = pitch.match(/What caught my eye:\s*([\s\S]*?)$/);
+    updatePitchFit(fitMatch?.[1]?.trim() || '');
+    updatePitchIdea(ideaMatch?.[1]?.trim() || '');
+    updatePitchBrief(briefMatch?.[1]?.trim() || '');
+  };
+
+  const openEditPitch = () => {
+    if (application?.pitch) parsePitchIntoFields(application.pitch);
+    setShowPitchModal(true);
+  };
+
+  const handleUpdatePitch = async () => {
+    if (!application || !campaign || submitting) return;
+    setSubmitting(true);
+    setApplyError('');
+    const newPitch = composePitch() || null;
+    const { error } = await supabase.from('applications')
+      .update({ pitch: newPitch })
+      .eq('id', application.id);
+    if (error) {
+      setApplyError("Couldn't update pitch — please try again.");
+      setSubmitting(false);
+      return;
+    }
+    setApplication({ ...application, pitch: newPitch });
+    setShowPitchModal(false);
+    setPitchFit('');
+    setPitchIdea('');
+    setPitchBrief('');
+    clearPitchDraft();
+    setSubmitting(false);
+  };
 
   const handleConfirm = async () => {
     if (!application || !creatorId || !campaign || submitting) return;
@@ -491,10 +528,42 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           </div>
         </div>
       )}
-      {application?.status === 'interested' && (
-        <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
-          <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-          Interest registered — we'll be in touch
+      {application?.status === 'interested' && !showPitchModal && (
+        <div>
+          <div className="w-full min-h-[44px] py-3 rounded-[6px] bg-[rgba(42,32,24,0.04)] text-center text-[#0F6E56] font-medium text-[14px]">
+            <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
+            Interest registered — we'll be in touch
+          </div>
+          <button onClick={openEditPitch}
+            className="w-full mt-2 text-[13px] font-medium text-[var(--terra)] hover:underline text-center py-1">
+            {application.pitch ? 'Edit your pitch' : 'Add a pitch to strengthen your application'}
+          </button>
+        </div>
+      )}
+      {application?.status === 'interested' && showPitchModal && (
+        <div className="bg-[var(--stone)] rounded-[12px] p-4 animate-fade-in">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <p className="text-[15px] font-semibold text-[var(--ink)]">Update your pitch</p>
+              <p className="text-[13px] text-[var(--ink-60)] mt-0.5">Edit your answers — the brand will see the latest version</p>
+            </div>
+            <button onClick={() => { setShowPitchModal(false); setPitchFit(''); setPitchIdea(''); setPitchBrief(''); clearPitchDraft(); }}
+              className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
+          </div>
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">{isCommunity ? 'Why is this Suffolk experience worth shouting about?' : `How does ${campaign?.businesses?.name || 'this brand'} fit into your life?`}</label>
+          <textarea value={pitchFit} onChange={e => updatePitchFit(e.target.value)} placeholder="Already a regular, bumped into it recently, been meaning to try..." maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">One content idea you'd shoot</label>
+          <textarea value={pitchIdea} onChange={e => updatePitchIdea(e.target.value)} placeholder="The specific Reel or shot you'd film — the more concrete, the better" maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">What caught your eye in the brief?</label>
+          <textarea value={pitchBrief} onChange={e => updatePitchBrief(e.target.value)} placeholder="A talking point, the inspiration, the perk — something specific" maxLength={300}
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          {applyError && <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>}
+          <button onClick={handleUpdatePitch} disabled={submitting || !pitchHasContent}
+            className="w-full min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50">
+            {submitting ? 'Saving...' : 'Save pitch'}
+          </button>
         </div>
       )}
       {/* Community campaigns: applied → auto-confirmed → submission /
