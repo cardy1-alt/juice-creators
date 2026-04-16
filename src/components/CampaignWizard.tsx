@@ -316,11 +316,11 @@ Return only valid JSON, no markdown, no code fences.`,
                       placeholder="e.g. Film a Reel showing the gym, mention the free pass, tag @revampgym" />
                   </div>
                   <div>
-                    <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
+                    <label className={labelCls}>Booking instructions <span className="text-[var(--ink-35)]">(optional — only shown after confirmation)</span></label>
                     <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)}
                       className={`${inputCls} min-h-[60px] resize-y`}
-                      placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram. We'll meet you at reception." />
-                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email. Be specific and actionable.</p>
+                      placeholder="e.g. Book on the Fresha app using code NAYBA. DM @theskinstudiosuffolk to confirm your slot." />
+                    <p className="text-[12px] text-[var(--ink-35)] mt-1">Only revealed to creators after they're confirmed — safe for coupon codes, booking links, and access instructions.</p>
                   </div>
                   {aiError && <p className="text-[13px] text-[var(--terra)]">{aiError}</p>}
                 </>
@@ -360,9 +360,9 @@ Return only valid JSON, no markdown, no code fences.`,
                   </div>
                   {!isCommunity && (
                     <div>
-                      <label className={labelCls}>Anything specific creators must do? <span className="text-[var(--ink-35)]">(optional)</span></label>
-                      <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)} className={`${inputCls} min-h-[60px] resize-y`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us @yourhandle on Instagram." />
-                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Creators see this before applying, when they confirm, and in their confirmation email.</p>
+                      <label className={labelCls}>Booking instructions <span className="text-[var(--ink-35)]">(optional — only shown after confirmation)</span></label>
+                      <textarea value={gen.brand_instructions} onChange={e => setG('brand_instructions', e.target.value)} className={`${inputCls} min-h-[60px] resize-y`} placeholder="e.g. Book on the Fresha app using code NAYBA. DM @theskinstudiosuffolk to confirm your slot." />
+                      <p className="text-[12px] text-[var(--ink-35)] mt-1">Only revealed to creators after they're confirmed — safe for coupon codes, booking links, and access instructions.</p>
                     </div>
                   )}
                   <ImageUpload value={gen.campaign_image} onChange={url => setG('campaign_image', url)} folder="campaigns" label="Campaign Image" />

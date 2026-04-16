@@ -297,9 +297,9 @@ function CampaignModal({ brands, campaign, onSave, onClose }: {
                     <div className="md:col-span-2"><label className={labelCls}>Content Requirements</label><textarea value={form.content_requirements} onChange={e => set('content_requirements', e.target.value)} className={`${taCls} min-h-[80px]`} /></div>
                     {form.campaign_type !== 'community' && (
                       <div className="md:col-span-2">
-                        <label className={labelCls}>Brand Requirements for Creators <span className="text-[var(--ink-35)] normal-case">(optional)</span></label>
-                        <textarea value={form.brand_instructions} onChange={e => set('brand_instructions', e.target.value)} className={`${taCls} min-h-[60px]`} placeholder="e.g. Please book your visit at least 24h ahead by DMing us on Instagram." />
-                        <p className="text-[12px] text-[var(--ink-35)] mt-1">Shown to creators before applying, when they confirm, and in their confirmation email.</p>
+                        <label className={labelCls}>Booking Instructions <span className="text-[var(--ink-35)] normal-case">(optional — only shown after confirmation)</span></label>
+                        <textarea value={form.brand_instructions} onChange={e => set('brand_instructions', e.target.value)} className={`${taCls} min-h-[60px]`} placeholder="e.g. Book on the Fresha app using code NAYBA. DM @theskinstudiosuffolk to confirm your slot." />
+                        <p className="text-[12px] text-[var(--ink-35)] mt-1">Only revealed to confirmed creators — safe for coupon codes, booking links, and access instructions. Also included in their confirmation email.</p>
                       </div>
                     )}
                     <div className="md:col-span-2">

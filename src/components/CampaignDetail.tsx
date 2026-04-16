@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdminInterestExpressedEmail, sendAdminCreatorConfirmedEmail, sendCreatorEnteredCommunityEmail } from '../lib/notifications';
-import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, AlertCircle, Sparkles, Megaphone, Trophy } from 'lucide-react';
+import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, Sparkles, Megaphone, Trophy } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 import { getCampaignBrandDisplay } from '../lib/campaignDisplay';
 import { fmtDeadline } from '../lib/dates';
@@ -323,33 +323,18 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const brandInstructions = display.instructions;
   const brandHandle = display.instagramHandle;
 
-  // Brand requirements callout shown before applying.
-  const PreApplyCallout = brandInstructions ? (
-    <div className="mb-3 rounded-[12px] border border-[rgba(217,95,59,0.20)] bg-[rgba(249,232,225,0.50)] px-4 py-3">
-      <div className="flex items-start gap-2.5">
-        <AlertCircle size={16} className="text-[var(--terra)] mt-0.5 flex-shrink-0" />
-        <div className="min-w-0">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--terra)] mb-1">Brand requirements</p>
-          <p className="text-[14px] text-[var(--ink)] leading-[1.5]">{brandInstructions}</p>
-        </div>
-      </div>
-    </div>
-  ) : null;
-
-  // Acceptance callout shown before confirming.
-  const PreConfirmCallout = brandInstructions ? (
-    <div className="mb-3 rounded-[12px] border border-[rgba(42,32,24,0.10)] bg-[var(--stone)] px-4 py-3">
-      <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1.5">By confirming, you agree to:</p>
-      <p className="text-[14px] text-[var(--ink)] leading-[1.5]">{brandInstructions}</p>
-    </div>
-  ) : null;
+  // Booking instructions are only revealed AFTER the creator is confirmed.
+  // This protects coupon codes / booking links from being visible to
+  // creators who are just browsing or haven't been selected yet.
+  const PreApplyCallout = null;
+  const PreConfirmCallout = null;
 
   // Next-step callout shown after confirming.
   const PostConfirmCallout = brandInstructions ? (
     <div className="mt-3 rounded-[12px] border border-[rgba(217,95,59,0.20)] bg-[rgba(249,232,225,0.50)] px-4 py-4">
       <div className="flex items-center gap-1.5 mb-2">
         <Sparkles size={13} className="text-[var(--terra)]" />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--terra)]">Next step</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--terra)]">How to book</p>
       </div>
       <p className="text-[14px] leading-[1.55] text-[var(--ink)] mb-3">{brandInstructions}</p>
       {brandHandle && (
