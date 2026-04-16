@@ -895,6 +895,64 @@ Deno.serve(async (req: Request) => {
           `),
         };
         break;
+      // ─── Community Campaign (Prize Draw) ─────────────────────────
+      case 'creator_entered_community':
+        email = {
+          subject: `You're entered — ${meta.campaign_title || 'community draw'}`,
+          html: wrapEmail(`
+            ${heading("You're in the draw!")}
+            ${subtext(`Nice one, ${escapeHtml(recipientName)}. You've entered the community campaign.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">Nayba Community</p>
+            `)}
+            ${meta.perk_description ? p(`<strong>Prize:</strong> ${escapeHtml(meta.perk_description)}`) : ''}
+            ${p('Now film and upload your Reel before the deadline. The Nayba team will pick the winner from all submitted entries.')}
+            ${meta.content_deadline ? p(`<strong>Content deadline:</strong> ${escapeHtml(meta.content_deadline)}`) : ''}
+            ${btn('Submit your Reel', APP_URL)}
+          `),
+        };
+        break;
+      case 'creator_won_community':
+        email = {
+          subject: `You won! 🎉 ${meta.campaign_title || 'Community draw'}`,
+          html: wrapEmail(`
+            ${heading('You won!')}
+            ${subtext(`Congratulations, ${escapeHtml(recipientName)}! The Nayba team picked your Reel as the winner.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">Nayba Community</p>
+            `)}
+            ${meta.perk_description ? p(`<strong>Your prize:</strong> ${escapeHtml(meta.perk_description)}`) : ''}
+            ${p("We'll be in touch shortly to arrange delivery. Thanks for being part of the community!")}
+          `),
+        };
+        break;
+      case 'creator_not_selected_community':
+        email = {
+          subject: `${meta.campaign_title || 'Community draw'} — winners announced`,
+          html: wrapEmail(`
+            ${heading('Winners are in')}
+            ${subtext(`Hey ${escapeHtml(recipientName)}, the winners for this community draw have been picked.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">Nayba Community</p>
+            `)}
+            ${p("You weren't picked this time — but thanks for entering and sharing your content. Keep an eye on the Discover feed for the next one.")}
+            ${btn('Browse campaigns', APP_URL)}
+          `),
+        };
+        break;
+      case 'admin_community_winners_picked':
+        email = {
+          subject: `Winners picked — ${meta.campaign_title || 'community campaign'}`,
+          html: wrapEmail(`
+            ${heading('Winners announced')}
+            ${p(`${escapeHtml(meta.num_winners || '1')} winner${(meta.num_winners || '1') === '1' ? '' : 's'} picked for <strong>${escapeHtml(meta.campaign_title || '')}</strong> from ${escapeHtml(meta.num_entries || '0')} entries.`)}
+            ${p('Winner and not-selected emails have been sent. The campaign is now marked as completed.')}
+          `),
+        };
+        break;
       default:
         email = genericNotificationEmail(recipientName, notification.message);
     }
