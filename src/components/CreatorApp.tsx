@@ -808,9 +808,10 @@ function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorPro
         <div className="mt-3 w-full max-w-[380px]">
           {editingBio ? (
             <div>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3}
+              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
                 placeholder="A short intro — what you're about, your content style, where you're based"
                 className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] resize-none" autoFocus />
+              <p className={`text-[11px] text-right mt-1 ${bio.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/300</p>
               <div className="flex gap-2 mt-2 justify-center">
                 <button onClick={() => { setEditingBio(false); setBio(profile.bio || ''); }}
                   className="px-3 py-1.5 rounded-[8px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
@@ -1070,10 +1071,13 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">Bio</label>
-            <textarea value={bio} onChange={e => setBio(e.target.value)} maxLength={300} rows={3}
+            <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
               placeholder="A short intro — what you're about, your content style, where you're based"
               className="w-full px-4 py-2.5 rounded-[12px] border border-[rgba(42,32,24,0.12)] bg-white text-[15px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] resize-none" />
-            <p className="text-[12px] text-[var(--ink-35)] mt-1">Brands see this when reviewing your application</p>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-[12px] text-[var(--ink-35)]">Brands see this when reviewing your application</p>
+              <p className={`text-[11px] ${bio.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/300</p>
+            </div>
           </div>
           <div>
             <label className="block text-[13px] font-medium text-[var(--ink-60)] mb-1.5">County</label>

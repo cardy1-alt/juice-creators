@@ -485,27 +485,27 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             value={pitchFit}
             onChange={e => updatePitchFit(e.target.value)}
             placeholder="Already a regular, bumped into it recently, been meaning to try..."
-            maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]"
           />
+          <p className={`text-[11px] text-right mb-2 ${pitchFit.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchFit.length}/300</p>
 
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">One content idea you'd shoot</label>
           <textarea
             value={pitchIdea}
             onChange={e => updatePitchIdea(e.target.value)}
             placeholder="The specific Reel or shot you'd film — the more concrete, the better"
-            maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]"
           />
+          <p className={`text-[11px] text-right mb-2 ${pitchIdea.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchIdea.length}/300</p>
 
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">What caught your eye in the brief?</label>
           <textarea
             value={pitchBrief}
             onChange={e => updatePitchBrief(e.target.value)}
             placeholder="A talking point, the inspiration, the perk — something specific"
-            maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]"
           />
+          <p className={`text-[11px] text-right mb-2 ${pitchBrief.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchBrief.length}/300</p>
 
           {applyError && (
             <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>
@@ -562,14 +562,17 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
           </div>
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">{isCommunity ? 'Why is this Suffolk experience worth shouting about?' : `How does ${campaign?.businesses?.name || 'this brand'} fit into your life?`}</label>
-          <textarea value={pitchFit} onChange={e => updatePitchFit(e.target.value)} placeholder="Already a regular, bumped into it recently, been meaning to try..." maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          <textarea value={pitchFit} onChange={e => updatePitchFit(e.target.value)} placeholder="Already a regular, bumped into it recently, been meaning to try..."
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]" />
+          <p className={`text-[11px] text-right mb-2 ${pitchFit.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchFit.length}/300</p>
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">One content idea you'd shoot</label>
-          <textarea value={pitchIdea} onChange={e => updatePitchIdea(e.target.value)} placeholder="The specific Reel or shot you'd film — the more concrete, the better" maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          <textarea value={pitchIdea} onChange={e => updatePitchIdea(e.target.value)} placeholder="The specific Reel or shot you'd film — the more concrete, the better"
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]" />
+          <p className={`text-[11px] text-right mb-2 ${pitchIdea.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchIdea.length}/300</p>
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">What caught your eye in the brief?</label>
-          <textarea value={pitchBrief} onChange={e => updatePitchBrief(e.target.value)} placeholder="A talking point, the inspiration, the perk — something specific" maxLength={300}
-            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2" />
+          <textarea value={pitchBrief} onChange={e => updatePitchBrief(e.target.value)} placeholder="A talking point, the inspiration, the perk — something specific"
+            className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)]" />
+          <p className={`text-[11px] text-right mb-2 ${pitchBrief.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{pitchBrief.length}/300</p>
           {applyError && <p className="text-[13px] text-[var(--terra)] mb-2">{applyError}</p>}
           <button onClick={handleUpdatePitch} disabled={submitting || !pitchHasContent}
             className="w-full min-h-[40px] py-2 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 disabled:opacity-50">
