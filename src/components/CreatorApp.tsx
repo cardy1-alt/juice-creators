@@ -386,6 +386,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   const [subTab, setSubTab] = useState<'active' | 'past'>('active');
   const [participations, setParticipations] = useState<Participation[]>([]);
+  const [pendingApps, setPendingApps] = useState<Application[]>([]);
   const [pastApps, setPastApps] = useState<Application[]>([]);
   const [showReelModal, setShowReelModal] = useState<string | null>(null);
   const [reelUrl, setReelUrl] = useState('');
@@ -401,6 +402,13 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
       .select('*, campaigns(title, headline, content_deadline, perk_description, perk_value, campaign_type, winner_announced_at, businesses(name))')
       .eq('creator_id', profile.id).order('created_at', { ascending: false });
     if (parts) setParticipations(parts as Participation[]);
+
+    // Pending applications (interested / selected) — these don't have
+    // participations yet so they'd otherwise be invisible in this tab.
+    const { data: pendingData } = await supabase.from('applications')
+      .select('*, campaigns(title, headline, campaign_type, businesses(name))')
+      .eq('creator_id', profile.id).in('status', ['interested', 'selected']).order('applied_at', { ascending: false });
+    if (pendingData) setPendingApps(pendingData as Application[]);
 
     const { data: apps } = await supabase.from('applications')
       .select('*, campaigns(title, headline, campaign_type, businesses(name))')
@@ -500,6 +508,21 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
 
       {!loading && subTab === 'active' && (
         <div className="space-y-3">
+          {/* Pending applications — interested or selected, no participation yet */}
+          {pendingApps.map(a => {
+            const ownerName = a.campaigns?.campaign_type === 'community' ? 'Nayba' : (a.campaigns?.businesses?.name || '');
+            const statusLabel = a.status === 'selected' ? 'Selected — confirm your spot' : 'Applied — awaiting review';
+            const statusCls = a.status === 'selected' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#FAEEDA] text-[#854F0B]';
+            return (
+              <div key={a.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{ownerName}</p>
+                <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-2">{a.campaigns?.headline || a.campaigns?.title}</p>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${statusCls}`}>
+                  {statusLabel}
+                </span>
+              </div>
+            );
+          })}
           {activeParts.map(p => {
             const todos = getTodos(p);
             const days = daysUntil(p.campaigns?.content_deadline || null);
@@ -552,7 +575,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
               </div>
             );
           })}
-          {activeParts.length === 0 && (
+          {activeParts.length === 0 && pendingApps.length === 0 && (
             <div className="py-12 text-center">
               <Megaphone size={48} className="text-[var(--ink-15)] mx-auto mb-3" />
               <p className="text-[15px] font-medium text-[var(--ink)] mb-1">No active campaigns yet</p>
@@ -721,11 +744,29 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
 }
 
 // ─── Profile Tab ───
-function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast: (msg: string) => void }) {
+function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorProfile; showToast: (msg: string) => void; onEditProfile: () => void }) {
   const initial = (profile.display_name || profile.name || '?')[0].toUpperCase();
   const [editingBio, setEditingBio] = useState(false);
   const [bio, setBio] = useState(profile.bio || '');
   const [savingBio, setSavingBio] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const { uploadImage } = await import('../lib/upload');
+      const url = await uploadImage(file, 'avatars');
+      const { error } = await supabase.from('creators').update({ avatar_url: url }).eq('id', profile.id);
+      if (error) throw error;
+      profile.avatar_url = url;
+      showToast('Photo updated');
+    } catch {
+      showToast('Upload failed — please try again');
+    }
+    setUploadingAvatar(false);
+  };
 
   const handleSaveBio = async () => {
     setSavingBio(true);
@@ -741,13 +782,19 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
 
       {/* Avatar + identity hero */}
       <div className="flex flex-col items-center mb-6">
-        {profile.avatar_url ? (
-          <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[80px] h-[80px] rounded-full object-cover mb-3" />
-        ) : (
-          <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center mb-3" style={{ background: 'var(--terra)' }}>
-            <span className="text-[28px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
+        <label className="relative cursor-pointer mb-3 group">
+          <input type="file" accept="image/*" onChange={handleAvatarUpload} className="hidden" />
+          {profile.avatar_url ? (
+            <img src={profile.avatar_url} alt={profile.display_name || profile.name} className="w-[80px] h-[80px] rounded-full object-cover" />
+          ) : (
+            <div className="w-[80px] h-[80px] rounded-full flex items-center justify-center" style={{ background: 'var(--terra)' }}>
+              <span className="text-[28px] text-white" style={{ fontWeight: 700 }}>{initial}</span>
+            </div>
+          )}
+          <div className="absolute inset-0 rounded-full bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-white text-[11px] font-medium">{uploadingAvatar ? '...' : 'Edit'}</span>
           </div>
-        )}
+        </label>
         <p className="text-[20px] font-semibold text-[var(--ink)]">{profile.display_name || profile.name}</p>
         <a href={`https://instagram.com/${profile.instagram_handle.replace('@', '')}`} target="_blank" rel="noopener noreferrer"
           className="text-[14px] text-[var(--ink-50)] hover:underline mt-0.5">@{profile.instagram_handle.replace('@', '')}</a>
@@ -781,6 +828,13 @@ function ProfileTab({ profile, showToast }: { profile: CreatorProfile; showToast
             </button>
           )}
         </div>
+      </div>
+
+      {/* Edit profile link */}
+      <div className="flex justify-center mb-4">
+        <button onClick={onEditProfile} className="inline-flex items-center gap-1.5 px-4 py-2 rounded-[10px] border border-[rgba(42,32,24,0.12)] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.02)] transition-colors min-h-[40px]">
+          <Settings size={14} /> Edit profile
+        </button>
       </div>
 
       {/* Stats row — 4 columns */}
@@ -1100,9 +1154,13 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
 }
 
 // ─── More Tab ───
-function MoreTab({ onSignOut, showToast, creatorId, profile }: { onSignOut: () => void; showToast: (msg: string) => void; creatorId?: string; profile: CreatorProfile }) {
+function MoreTab({ onSignOut, showToast, creatorId, profile, startInSettings, onSettingsHandled }: { onSignOut: () => void; showToast: (msg: string) => void; creatorId?: string; profile: CreatorProfile; startInSettings?: boolean; onSettingsHandled?: () => void }) {
   const [showSignOutConfirm, setShowSignOutConfirm] = useState(false);
-  const [subView, setSubView] = useState<'menu' | 'history' | 'settings'>('menu');
+  const [subView, setSubView] = useState<'menu' | 'history' | 'settings'>(startInSettings ? 'settings' : 'menu');
+
+  useEffect(() => {
+    if (startInSettings) { setSubView('settings'); onSettingsHandled?.(); }
+  }, [startInSettings]);
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://app.nayba.app';
   const referralLink = creatorId ? `${baseUrl}?ref=${creatorId}` : baseUrl;
@@ -1201,6 +1259,7 @@ function HowItWorksOverlay({ onDismiss }: { onDismiss: () => void }) {
 export default function CreatorApp() {
   const { user, userProfile, signOut } = useEffectiveAuth();
   const [tab, setTab] = useState<Tab>('discover');
+  const [openSettings, setOpenSettings] = useState(false);
   const [profile, setProfile] = useState<CreatorProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [profileError, setProfileError] = useState(false);
@@ -1389,8 +1448,8 @@ export default function CreatorApp() {
             {tab === 'discover' && <DiscoverTab profile={profile} onOpenCampaign={setViewingCampaign} onGoToCampaigns={() => setTab('campaigns')} refreshKey={discoverRefresh} />}
             {tab === 'campaigns' && <CampaignsTab profile={profile} />}
             {tab === 'naybahood' && <NaybahoodTab profile={profile} showToast={showToast} />}
-            {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} />}
-            {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} />}
+            {tab === 'profile' && <ProfileTab profile={profile} showToast={showToast} onEditProfile={() => { setTab('more'); setOpenSettings(true); }} />}
+            {tab === 'more' && <MoreTab onSignOut={signOut} showToast={showToast} creatorId={profile.id} profile={profile} startInSettings={openSettings} onSettingsHandled={() => setOpenSettings(false)} />}
           </div>
         </div>
       </div>
