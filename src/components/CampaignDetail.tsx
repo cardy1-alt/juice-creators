@@ -80,6 +80,40 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   const [applyError, setApplyError] = useState<string>('');
   const [confirmedCount, setConfirmedCount] = useState(0);
 
+  // ── Pitch draft persistence ──────────────────────────────
+  // iOS Safari aggressively reloads background tabs, so switching to
+  // Notes to draft text and coming back would wipe everything. Auto-save
+  // to localStorage on every change; restore on mount.
+  const draftKey = `pitch_draft_${campaignId}`;
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (saved) {
+        const d = JSON.parse(saved);
+        if (d.fit) setPitchFit(d.fit);
+        if (d.idea) setPitchIdea(d.idea);
+        if (d.brief) setPitchBrief(d.brief);
+        setShowPitchModal(true);
+      }
+    } catch { /* ignore corrupt data */ }
+  }, [campaignId]);
+
+  const savePitchDraft = (fit: string, idea: string, brief: string) => {
+    if (fit || idea || brief) {
+      try { localStorage.setItem(draftKey, JSON.stringify({ fit, idea, brief })); } catch {}
+    } else {
+      try { localStorage.removeItem(draftKey); } catch {}
+    }
+  };
+
+  const clearPitchDraft = () => {
+    try { localStorage.removeItem(draftKey); } catch {}
+  };
+
+  const updatePitchFit = (v: string) => { setPitchFit(v); savePitchDraft(v, pitchIdea, pitchBrief); };
+  const updatePitchIdea = (v: string) => { setPitchIdea(v); savePitchDraft(pitchFit, v, pitchBrief); };
+  const updatePitchBrief = (v: string) => { setPitchBrief(v); savePitchDraft(pitchFit, pitchIdea, v); };
+
   useEffect(() => {
     fetchCampaign();
   }, [campaignId]);
@@ -214,6 +248,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     setPitchFit('');
     setPitchIdea('');
     setPitchBrief('');
+    clearPitchDraft();
     setSubmitting(false);
   };
 
@@ -391,7 +426,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
               <p className="text-[15px] font-semibold text-[var(--ink)]">{isCommunity ? 'Tell us about your idea' : 'Tell them why you'}</p>
               <p className="text-[13px] text-[var(--ink-60)] mt-0.5">{isCommunity ? "Optional — context for the Nayba team picking the winner" : 'Short answers help the brand pick you — all optional'}</p>
             </div>
-            <button onClick={() => { setShowPitchModal(false); setPitchFit(''); setPitchIdea(''); setPitchBrief(''); setApplyError(''); }}
+            <button onClick={() => { setShowPitchModal(false); setPitchFit(''); setPitchIdea(''); setPitchBrief(''); clearPitchDraft(); setApplyError(''); }}
               className="text-[var(--ink-50)] hover:text-[var(--ink)] flex-shrink-0 ml-2"><X size={18} /></button>
           </div>
 
@@ -411,7 +446,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">{isCommunity ? 'Why is this Suffolk experience worth shouting about?' : `How does ${campaign?.businesses?.name || 'this brand'} fit into your life?`}</label>
           <textarea
             value={pitchFit}
-            onChange={e => setPitchFit(e.target.value)}
+            onChange={e => updatePitchFit(e.target.value)}
             placeholder="Already a regular, bumped into it recently, been meaning to try..."
             maxLength={300}
             className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
@@ -420,7 +455,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">One content idea you'd shoot</label>
           <textarea
             value={pitchIdea}
-            onChange={e => setPitchIdea(e.target.value)}
+            onChange={e => updatePitchIdea(e.target.value)}
             placeholder="The specific Reel or shot you'd film — the more concrete, the better"
             maxLength={300}
             className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
@@ -429,7 +464,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           <label className="block text-[12px] font-semibold text-[var(--ink)] mb-1">What caught your eye in the brief?</label>
           <textarea
             value={pitchBrief}
-            onChange={e => setPitchBrief(e.target.value)}
+            onChange={e => updatePitchBrief(e.target.value)}
             placeholder="A talking point, the inspiration, the perk — something specific"
             maxLength={300}
             className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[var(--ink)] text-[14px] h-16 resize-none focus:outline-none focus:border-[var(--terra)] mb-2"
