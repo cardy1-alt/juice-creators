@@ -338,7 +338,10 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">
                   <div className="flex items-center gap-2 mb-2 min-w-0">
                     {display.isCommunity ? (
-                      <span className="text-[12px] font-medium text-[var(--terra)] truncate min-w-0">{display.name}</span>
+                      <>
+                        <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: 'var(--terra-light)', color: 'var(--terra)' }}>Community</span>
+                        <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{display.name}</span>
+                      </>
                     ) : (
                       <>
                         <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
@@ -351,7 +354,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     <p className={`text-[12px] ${spotsClass}`}>{spotsLabel}</p>
                   )}
                   {display.isCommunity && (
-                    <p className="text-[12px] text-[var(--ink-50)]">Prize draw · {c.num_winners || 1} winner{(c.num_winners || 1) === 1 ? '' : 's'}</p>
+                    <p className="text-[12px] text-[var(--ink-60)]">Prize draw · {c.num_winners || 1} winner{(c.num_winners || 1) === 1 ? '' : 's'}</p>
                   )}
                   <p className="mt-auto pt-2 text-[11px] text-[var(--ink-35)]">
                     {c.perk_value ? <><span className="text-[var(--ink-60)] font-medium">£{c.perk_value} value</span>{c.expression_deadline ? ' · ' : ''}</> : null}
