@@ -9,7 +9,7 @@
  * we add a community campaign, every surface picks up the correct fallback.
  */
 
-export const NAYBA_COMMUNITY_NAME = 'Nayba Community';
+export const NAYBA_COMMUNITY_NAME = 'Nayba';
 export const NAYBA_COMMUNITY_CATEGORY = 'Community';
 
 // Matches the blue used by the existing community badge (CreatorApp.tsx:319).
