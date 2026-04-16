@@ -45,15 +45,8 @@ export function toEndOfDayISO(dateStr: string): string {
   return atLondonTime(dateStr, 23, 59, 59);
 }
 
-/**
- * Format a deadline timestamp for display. Returns "19 Apr" by default,
- * or "19 Apr · 11:59pm" when the time component signals an end-of-day
- * deadline (hours >= 23 in London time).
- */
+/** Format a deadline timestamp for display — date only, no time. */
 export function fmtDeadline(iso: string | null): string {
   if (!iso) return '—';
-  const d = new Date(iso);
-  const dateLabel = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
-  const hourLondon = parseInt(d.toLocaleString('en-GB', { hour: '2-digit', hour12: false, timeZone: 'Europe/London' }), 10);
-  return hourLondon >= 23 ? `${dateLabel} · 11:59pm` : dateLabel;
+  return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
 }

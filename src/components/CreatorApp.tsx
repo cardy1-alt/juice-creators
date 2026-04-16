@@ -292,7 +292,9 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const remaining = Math.max(0, target - taken);
             let spotsLabel: string | null = null;
             let spotsClass = 'text-[var(--ink-60)]';
-            if (target > 0) {
+            // Community campaigns are a draw — "spots" implies guaranteed
+            // selection which doesn't apply. Skip the label entirely.
+            if (target > 0 && !display.isCommunity) {
               if (taken === 0) {
                 spotsLabel = `${target} spot${target === 1 ? '' : 's'} available`;
               } else if (remaining === 0) {
@@ -314,7 +316,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center" style={{ background: catPalette.tint }}>
                         {display.isCommunity ? (
-                          <Megaphone className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
+                          <img src={NaybaLogo} alt="Nayba" className="w-10 h-10" style={{ opacity: 0.7 }} />
                         ) : (
                           <CategoryIcon category={c.businesses?.category} className="w-10 h-10" style={{ color: catPalette.color, opacity: 0.7 }} />
                         )}

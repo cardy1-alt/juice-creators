@@ -579,15 +579,15 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           )}
           {/* Logo overlapping bottom edge */}
           <div className="absolute -bottom-9 left-6">
-            {display.logoUrl ? (
+            {isCommunity ? (
+              <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white bg-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
+                <img src={NaybaLogo} alt="Nayba" className="w-8 h-8" />
+              </div>
+            ) : display.logoUrl ? (
               <img src={display.logoUrl} alt="" className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
             ) : (
               <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white" style={{ background: catPalette.tint, boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
-                {isCommunity ? (
-                  <Megaphone className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.7 }} />
-                ) : (
-                  <CategoryIcon category={campaign.businesses?.category} className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.6 }} />
-                )}
+                <CategoryIcon category={campaign.businesses?.category} className="w-7 h-7" style={{ color: catPalette.color, opacity: 0.6 }} />
               </div>
             )}
           </div>
