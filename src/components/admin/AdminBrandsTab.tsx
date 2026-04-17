@@ -158,9 +158,13 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
       <div className="fixed top-0 right-0 bottom-0 z-50 w-full sm:w-[380px] bg-white border-l border-[rgba(42,32,24,0.08)] flex flex-col animate-slide-in-right" style={{ boxShadow: '-4px 0 24px rgba(42,32,24,0.10)' }}>
         <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
           <div className="flex items-center gap-3 min-w-0 flex-1">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(brand.name[0]).bg }}>
-              <span className="text-[15px] font-semibold" style={{ color: getAvatarColors(brand.name[0]).text }}>{brand.name[0]}</span>
-            </div>
+            {brand.logo_url ? (
+              <img src={brand.logo_url} alt={brand.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+            ) : (
+              <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(brand.name[0]).bg }}>
+                <span className="text-[15px] font-semibold" style={{ color: getAvatarColors(brand.name[0]).text }}>{brand.name[0]}</span>
+              </div>
+            )}
             <div className="min-w-0">
               <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{brand.name}</p>
               <p className="text-[14px] text-[var(--ink-50)]">{brand.category}</p>
@@ -472,9 +476,13 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
             className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: getAvatarColors(b.name[0]).bg }}>
-                  <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
-                </div>
+                {b.logo_url ? (
+                  <img src={b.logo_url} alt={b.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                ) : (
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(b.name[0]).bg }}>
+                    <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
+                  </div>
+                )}
                 <div>
                   <p className="text-[14px] font-semibold text-[var(--ink)]">{b.name}</p>
                   <p className="text-[12px] text-[var(--ink-60)]">{b.category}</p>
@@ -522,9 +530,13 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
                 </td>
                 <td className={tdCls}>
                   <div className="flex items-center gap-2.5">
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(b.name[0]).bg }}>
-                      <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
-                    </div>
+                    {b.logo_url ? (
+                      <img src={b.logo_url} alt={b.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(b.name[0]).bg }}>
+                        <span className="text-[12px] font-semibold" style={{ color: getAvatarColors(b.name[0]).text }}>{b.name[0]}</span>
+                      </div>
+                    )}
                     <span className="font-medium">{b.name}</span>
                   </div>
                 </td>

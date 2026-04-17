@@ -144,6 +144,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
+  const [sortBy, setSortBy] = useState<'recent' | 'popular' | 'ending'>('recent');
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
   const [brandModal, setBrandModal] = useState<{ name: string; category?: string; bio?: string | null; instagram_handle?: string | null } | null>(null);
@@ -233,7 +234,19 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
 
   const firstName = (profile.display_name || profile.name || '').split(' ')[0];
   const county = profile.address || 'your area';
-  const rest = filtered;
+
+  const sorted = [...filtered].sort((a, b) => {
+    if (sortBy === 'popular') {
+      return (applicationCounts[b.id] || 0) - (applicationCounts[a.id] || 0);
+    }
+    if (sortBy === 'ending') {
+      const da = a.expression_deadline ? new Date(a.expression_deadline).getTime() : Infinity;
+      const db = b.expression_deadline ? new Date(b.expression_deadline).getTime() : Infinity;
+      return da - db;
+    }
+    return 0; // 'recent' — already sorted by created_at DESC from the query
+  });
+  const rest = sorted;
 
   return (
     <div className="px-4 md:px-6 lg:px-8 pb-8 pt-4 animate-fade-in">
@@ -278,6 +291,20 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         })}
       </div>
 
+      {/* Sort */}
+      <div className="flex items-center gap-1.5 mb-4">
+        {([
+          { key: 'recent' as const, label: 'Recently added' },
+          { key: 'popular' as const, label: 'Most popular' },
+          { key: 'ending' as const, label: 'Ending soon' },
+        ]).map(s => (
+          <button key={s.key} onClick={() => setSortBy(s.key)}
+            className={`px-3 py-1.5 rounded-[999px] text-[12px] font-medium transition-colors ${sortBy === s.key ? 'bg-[var(--ink)] text-white' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
       {/* Campaign cards */}
       {loading && <SkeletonList count={6} />}
       {!loading && fetchError && (
@@ -316,18 +343,13 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                 spotsLabel = 'Filled';
                 spotsClass = 'text-[var(--ink-35)]';
               } else if (appCount >= target) {
-                // More applications than spots — brand is actively choosing.
-                // Strongest urgency signal.
-                spotsLabel = `🔥 Popular · ${appCount} applied for ${target} spots`;
+                spotsLabel = 'Popular';
                 spotsClass = 'text-[var(--terra)] font-semibold';
-              } else if (taken === 0 && appCount === 0) {
-                spotsLabel = `${target} spot${target === 1 ? '' : 's'} available`;
-              } else if (appCount > 0 && appCount < target) {
-                // Early signal — a few people have applied but still room.
-                spotsLabel = `${appCount} applied · ${remaining} spot${remaining === 1 ? '' : 's'} left`;
-              } else if (taken / target > 0.5) {
-                spotsLabel = `Only ${remaining} spot${remaining === 1 ? '' : 's'} left`;
-                spotsClass = 'text-[var(--terra)] font-semibold';
+              } else if (remaining <= Math.ceil(target * 0.5) && remaining > 0) {
+                spotsLabel = 'Filling up';
+                spotsClass = 'text-[var(--terra)]';
+              } else {
+                spotsLabel = 'Spots available';
               }
             }
             return (

@@ -95,16 +95,7 @@ export default function AdminApplicantsTab() {
       .from('applications')
       .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, campaign_type, businesses(name, category))')
       .order('applied_at', { ascending: false });
-    // Community campaigns auto-confirm at apply time and have no
-    // Select/Decline decision to make here — their participation is
-    // managed via the Pick Winners flow in AdminCampaignsTab, not this
-    // tab. Filter them out so an admin can't accidentally Decline an
-    // auto-confirmed community entry (which would desync the app status
-    // from the already-created participation row).
-    if (data) {
-      const brandOnly = (data as Applicant[]).filter(a => a.campaigns?.campaign_type !== 'community');
-      setApplicants(brandOnly);
-    }
+    if (data) setApplicants(data as Applicant[]);
     setLoading(false);
   };
 
@@ -248,7 +239,8 @@ export default function AdminApplicantsTab() {
     const initial = (name[0] || '?').toUpperCase();
     const colors = getAvatarColors(initial);
     const levelColor = getLevelColour(a.creators?.level || 1);
-    const isPending = a.status === 'interested';
+    const isCommunityEntry = a.campaigns?.campaign_type === 'community';
+    const isPending = a.status === 'interested' && !isCommunityEntry;
     const isActing = actingOn === a.id;
     const isSelected = peekApplicant?.id === a.id;
     const isChecked = selectedIds.has(a.id);
@@ -272,7 +264,11 @@ export default function AdminApplicantsTab() {
       </span>
     ) : null;
 
-    const statusPill = a.status === 'selected' ? (
+    const statusPill = isCommunityEntry ? (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
+        <Check size={11} /> Entered
+      </span>
+    ) : a.status === 'selected' ? (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
         <Check size={11} /> Selected
       </span>
@@ -489,7 +485,7 @@ export default function AdminApplicantsTab() {
           {/* Main pane: active campaign's applicants */}
           <section className="min-w-0">
             {activeCampaign && currentCampaignId && (() => {
-              const pendingInCampaign = activeCampaign.items.filter(i => i.status === 'interested');
+              const pendingInCampaign = activeCampaign.items.filter(i => i.status === 'interested' && i.campaigns?.campaign_type !== 'community');
               const selectedInCampaign = pendingInCampaign.filter(i => selectedIds.has(i.id));
               const allPendingSelected = pendingInCampaign.length > 0 && selectedInCampaign.length === pendingInCampaign.length;
               const anySelected = selectedInCampaign.length > 0;

@@ -23,6 +23,7 @@ function StatCardsSkeleton({ count = 4 }: { count?: number }) {
 interface Stats {
   totalCampaigns: number; totalCreators: number; totalReels: number; totalReach: number;
   completionRate: number; avgFillRate: number; avgProfileComplete: number;
+  activeCampaigns: number; approvedCreators: number; campaignCreatorRatio: number;
   creatorsByCity: { city: string; count: number }[];
   creatorsByMonth: { month: string; count: number }[];
   campaignPerformance: { title: string; reach: number }[];
@@ -74,6 +75,7 @@ export default function AdminAnalyticsTab() {
   const [stats, setStats] = useState<Stats>({
     totalCampaigns: 0, totalCreators: 0, totalReels: 0, totalReach: 0,
     completionRate: 0, avgFillRate: 0, avgProfileComplete: 0,
+    activeCampaigns: 0, approvedCreators: 0, campaignCreatorRatio: 0,
     creatorsByCity: [], creatorsByMonth: [], campaignPerformance: [],
   });
   const [loading, setLoading] = useState(true);
@@ -123,9 +125,14 @@ export default function AdminAnalyticsTab() {
     participations.forEach((p: any) => { if (campReach[p.campaign_id]) campReach[p.campaign_id].reach += (p.reach || 0); });
     const campaignPerformance = Object.values(campReach).filter(c => c.reach > 0).sort((a, b) => b.reach - a.reach);
 
+    const activeCampaigns = campaigns.filter((c: any) => c.status === 'active' || c.status === 'live').length;
+    const approvedCreators = creators.length;
+    const campaignCreatorRatio = approvedCreators > 0 ? approvedCreators / Math.max(activeCampaigns, 1) : 0;
+
     setStats({
       totalCampaigns: campaigns.length, totalCreators: creators.length, totalReels: reels.length, totalReach,
       completionRate, avgFillRate, avgProfileComplete, creatorsByCity, creatorsByMonth, campaignPerformance,
+      activeCampaigns, approvedCreators, campaignCreatorRatio,
     });
     setLoading(false);
   };
@@ -193,6 +200,23 @@ export default function AdminAnalyticsTab() {
         </div>
         <div className="bg-white rounded-[12px] p-5">
           <p className={chartLabel}>Platform Health</p>
+          {/* Campaign : Creator ratio */}
+          <div className="mb-5 p-3 rounded-[10px]" style={{
+            background: stats.campaignCreatorRatio <= 3 ? 'rgba(122,148,120,0.08)' : stats.campaignCreatorRatio <= 5 ? 'rgba(196,168,74,0.08)' : 'rgba(220,38,38,0.06)',
+          }}>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.05em]" style={{
+                color: stats.campaignCreatorRatio <= 3 ? 'var(--sage)' : stats.campaignCreatorRatio <= 5 ? 'var(--golden-mist)' : '#DC2626',
+              }}>Campaign : Creator Ratio</span>
+              <span className="text-[11px] font-medium text-[var(--ink-50)]">{stats.activeCampaigns} active / {stats.approvedCreators} creators</span>
+            </div>
+            <p className="text-[22px] font-semibold text-[var(--ink)]" style={{ letterSpacing: '-0.5px' }}>
+              1 : {stats.campaignCreatorRatio > 0 ? Math.round(stats.campaignCreatorRatio) : '—'}
+            </p>
+            <p className="text-[11px] text-[var(--ink-50)] mt-1">
+              {stats.campaignCreatorRatio <= 3 ? 'Healthy — enough campaigns for the creator base' : stats.campaignCreatorRatio <= 5 ? 'Monitor — creators may need more opportunities' : 'Low — add more campaigns to keep creators engaged'}
+            </p>
+          </div>
           <ProgressMetric label="Avg Completion Rate" value={stats.completionRate} />
           <ProgressMetric label="Campaign Fill Rate" value={stats.avgFillRate} />
           <ProgressMetric label="Profile Completeness" value={stats.avgProfileComplete} />
