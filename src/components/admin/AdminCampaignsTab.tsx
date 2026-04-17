@@ -23,7 +23,7 @@ interface Campaign {
   status: string; min_level: number; required_tags: string[] | null;
   num_winners: number | null; winner_announced_at: string | null;
   created_at: string;
-  businesses?: { name: string; category?: string } | null;
+  businesses?: { name: string; category?: string; logo_url?: string | null } | null;
 }
 interface Application {
   id: string; campaign_id: string; creator_id: string; pitch: string | null;
@@ -1079,6 +1079,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [viewMode, setViewMode] = useState<'table' | 'kanban' | 'gallery'>('table');
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
   const [sortBy, setSortBy] = useState<'newest' | 'oldest' | 'deadline'>('newest');
 
   const showToast = (msg: string) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -1139,7 +1140,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
 
   const fetchCampaigns = async () => {
     const [campRes, brandRes] = await Promise.all([
-      supabase.from('campaigns').select('*, businesses(name, category)').order('created_at', { ascending: false }),
+      supabase.from('campaigns').select('*, businesses(name, category, logo_url)').order('created_at', { ascending: false }),
       supabase.from('businesses').select('id, name').eq('approved', true).order('name'),
     ]);
     if (campRes.data) {
@@ -1183,6 +1184,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const filteredCampaigns = campaigns
     .filter(c => {
       if (statusFilter !== 'all' && c.status !== statusFilter) return false;
+      if (typeFilter !== 'all' && c.campaign_type !== typeFilter) return false;
       if (search) {
         const q = search.toLowerCase();
         const ownerName = c.campaign_type === 'community' ? 'nayba community' : (c.businesses?.name || '').toLowerCase();
@@ -1264,6 +1266,11 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             { value: 'selecting', label: 'Selecting' },
             { value: 'live', label: 'Live' },
             { value: 'completed', label: 'Completed' },
+          ]} />
+          <Select value={typeFilter} onChange={setTypeFilter} options={[
+            { value: 'all', label: 'All types' },
+            { value: 'brand', label: 'Brand only' },
+            { value: 'community', label: 'Community only' },
           ]} />
           <Select value={sortBy} onChange={val => setSortBy(val as any)} options={[
             { value: 'newest', label: 'Newest first' },
@@ -1356,14 +1363,19 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           const isCommunity = c.campaign_type === 'community';
                           const displayName = isCommunity ? 'Nayba Community' : (c.businesses?.name || '—');
                           const initial = (displayName === '—' ? '?' : displayName[0]);
+                          const logoUrl = c.businesses?.logo_url;
                           const ac = isCommunity
-                            ? { bg: 'rgba(59,130,246,0.10)', text: '#3B82F6' }
+                            ? { bg: '#F9E8E1', text: 'var(--terra)' }
                             : getAvatarColors(initial);
                           return (
                             <div className="flex items-center gap-2.5">
-                              <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
-                                <span className="text-[12px] font-semibold" style={{ color: ac.text }}>{initial}</span>
-                              </div>
+                              {!isCommunity && logoUrl ? (
+                                <img src={logoUrl} alt={displayName} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                              ) : (
+                                <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
+                                  <span className="text-[12px] font-semibold" style={{ color: ac.text }}>{initial}</span>
+                                </div>
+                              )}
                               <span className="font-medium text-[14px]">{displayName}</span>
                             </div>
                           );
@@ -1374,7 +1386,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         <div className="flex items-center gap-1.5">
                           <StatusBadge status={c.status} />
                           {c.campaign_type === 'community' && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold bg-[rgba(59,130,246,0.08)] text-[#3B82F6]">Community</span>
+                            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold bg-[var(--terra-light)] text-[var(--terra)]">Community</span>
                           )}
                         </div>
                       </td>
@@ -1428,14 +1440,19 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           const isCommunity = c.campaign_type === 'community';
                           const displayName = isCommunity ? 'Nayba Community' : (c.businesses?.name || '—');
                           const initial = (displayName === '—' ? '?' : displayName[0]);
+                          const logoUrl = c.businesses?.logo_url;
                           const ac = isCommunity
-                            ? { bg: 'rgba(59,130,246,0.10)', text: '#3B82F6' }
+                            ? { bg: '#F9E8E1', text: 'var(--terra)' }
                             : getAvatarColors(initial);
                           return (
                             <div className="flex items-center gap-2 mb-2">
-                              <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
-                                <span className="text-[9px] font-bold" style={{ color: ac.text }}>{initial}</span>
-                              </div>
+                              {!isCommunity && logoUrl ? (
+                                <img src={logoUrl} alt={displayName} className="w-5 h-5 rounded-full object-cover flex-shrink-0" />
+                              ) : (
+                                <div className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: ac.bg }}>
+                                  <span className="text-[9px] font-bold" style={{ color: ac.text }}>{initial}</span>
+                                </div>
+                              )}
                               <span className="text-[12px] text-[var(--ink-50)] truncate">{displayName}</span>
                             </div>
                           );

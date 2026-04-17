@@ -140,6 +140,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [applications, setApplications] = useState<Record<string, string>>({});
   const [confirmedCounts, setConfirmedCounts] = useState<Record<string, number>>({});
+  const [applicationCounts, setApplicationCounts] = useState<Record<string, number>>({});
   const [activeParticipations, setActiveParticipations] = useState(0);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('All');
@@ -181,6 +182,21 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         if (p.campaign_id) counts[p.campaign_id] = (counts[p.campaign_id] || 0) + 1;
       });
       setConfirmedCounts(counts);
+    }
+
+    // Also tally applications per campaign so we can show a popularity
+    // signal BEFORE any selections happen. When applications > creator_target
+    // the card shows a "Popular" badge to convey urgency.
+    const { data: appsByCamp } = await supabase
+      .from('applications')
+      .select('campaign_id')
+      .in('status', ['interested', 'selected', 'confirmed']);
+    if (appsByCamp) {
+      const counts: Record<string, number> = {};
+      (appsByCamp as { campaign_id: string }[]).forEach(a => {
+        if (a.campaign_id) counts[a.campaign_id] = (counts[a.campaign_id] || 0) + 1;
+      });
+      setApplicationCounts(counts);
     }
 
     setLoading(false);
@@ -290,16 +306,25 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             const target = (c as any).creator_target || 0;
             const taken = confirmedCounts[c.id] || 0;
             const remaining = Math.max(0, target - taken);
+            const appCount = applicationCounts[c.id] || 0;
             let spotsLabel: string | null = null;
             let spotsClass = 'text-[var(--ink-60)]';
             // Community campaigns are a draw — "spots" implies guaranteed
             // selection which doesn't apply. Skip the label entirely.
             if (target > 0 && !display.isCommunity) {
-              if (taken === 0) {
-                spotsLabel = `${target} spot${target === 1 ? '' : 's'} available`;
-              } else if (remaining === 0) {
+              if (remaining === 0) {
                 spotsLabel = 'Filled';
                 spotsClass = 'text-[var(--ink-35)]';
+              } else if (appCount >= target) {
+                // More applications than spots — brand is actively choosing.
+                // Strongest urgency signal.
+                spotsLabel = `🔥 Popular · ${appCount} applied for ${target} spots`;
+                spotsClass = 'text-[var(--terra)] font-semibold';
+              } else if (taken === 0 && appCount === 0) {
+                spotsLabel = `${target} spot${target === 1 ? '' : 's'} available`;
+              } else if (appCount > 0 && appCount < target) {
+                // Early signal — a few people have applied but still room.
+                spotsLabel = `${appCount} applied · ${remaining} spot${remaining === 1 ? '' : 's'} left`;
               } else if (taken / target > 0.5) {
                 spotsLabel = `Only ${remaining} spot${remaining === 1 ? '' : 's'} left`;
                 spotsClass = 'text-[var(--terra)] font-semibold';

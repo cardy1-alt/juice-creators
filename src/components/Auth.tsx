@@ -128,7 +128,21 @@ export default function Auth() {
           const age = Math.floor((Date.now() - birthDate.getTime()) / (365.25 * 24 * 60 * 60 * 1000));
           if (age < 18) { setError('You must be 18 or over to use Nayba'); setLoading(false); return; }
         }
-        const additionalData = { name, instagramHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null, dateOfBirth: dob || null };
+        // Normalise Instagram handle: strip @ and whitespace; if the creator
+        // typed multiple handles or extra text ("tik tok is X"), take only
+        // the first token. Only letters, numbers, dots, and underscores are
+        // valid in real IG handles — reject anything else so garbage
+        // doesn't end up in the DB.
+        const normalisedHandle = instagramHandle
+          .trim()
+          .split(/\s+/)[0]        // first whitespace-delimited token
+          .replace(/^@+/, '')     // strip leading @
+          .replace(/\/$/, '');    // strip trailing slash
+        if (!/^[A-Za-z0-9._]+$/.test(normalisedHandle)) {
+          setError('Instagram handle should only contain letters, numbers, dots, and underscores (no spaces or symbols).');
+          setLoading(false); return;
+        }
+        const additionalData = { name, instagramHandle: normalisedHandle, followerCount, code: generateCreatorCode(name), address: address || null, latitude, longitude, phone: phone || null, referred_by: referredBy || null, dateOfBirth: dob || null };
         await signUp(email, password, 'creator', additionalData);
       }
     } catch (err: any) {
@@ -537,15 +551,21 @@ export default function Auth() {
 
                   <div>
                     <label className="block text-[14px] font-medium text-[var(--ink-60)] mb-1.5">Instagram handle</label>
-                    <input
-                      type="text"
-                      value={instagramHandle}
-                      onChange={e => setInstagramHandle(e.target.value)}
-                      placeholder="@yourhandle"
-                      required
-                      className="w-full px-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
-                    />
-                    <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">So we can check out your content</p>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[15px] text-[var(--ink-50)] pointer-events-none">@</span>
+                      <input
+                        type="text"
+                        value={instagramHandle}
+                        onChange={e => setInstagramHandle(e.target.value.replace(/^@+/, '').replace(/\s/g, ''))}
+                        placeholder="yourhandle"
+                        required
+                        autoCapitalize="none"
+                        autoCorrect="off"
+                        spellCheck={false}
+                        className="w-full pl-8 pr-3.5 py-3 rounded-[10px] border border-[rgba(42,32,24,0.12)] bg-white min-h-[44px] text-[15px] text-[var(--ink)] placeholder:text-[var(--ink-50)] focus:outline-none focus:border-[var(--terra)]"
+                      />
+                    </div>
+                    <p className="text-[14px] md:text-[12px] text-[var(--ink-50)] mt-1.5">Just your Instagram handle — no @, no spaces</p>
                   </div>
 
                   <div>

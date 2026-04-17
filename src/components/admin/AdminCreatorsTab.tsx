@@ -389,6 +389,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh, onDelete }: {
 export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekId, onPeekHandled }: { showModal: boolean; onCloseModal: () => void; initialPeekId?: string; onPeekHandled?: () => void }) {
   const authCtx = useAuth();
   const [creators, setCreators] = useState<Creator[]>([]);
+  const [appliedCounts, setAppliedCounts] = useState<Record<string, number>>({});
   const [toast, setToast] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [peekCreator, setPeekCreator] = useState<Creator | null>(null);
@@ -411,6 +412,17 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
   const fetchCreators = async () => {
     const { data } = await supabase.from('creators').select('*').order('created_at', { ascending: false });
     if (data) setCreators(data as Creator[]);
+
+    // Pull application counts per creator so the table can show
+    // "Campaigns applied" alongside completion stats.
+    const { data: appsData } = await supabase.from('applications').select('creator_id');
+    if (appsData) {
+      const counts: Record<string, number> = {};
+      (appsData as { creator_id: string }[]).forEach(a => {
+        if (a.creator_id) counts[a.creator_id] = (counts[a.creator_id] || 0) + 1;
+      });
+      setAppliedCounts(counts);
+    }
   };
 
   const handleApprove = async (id: string, approved: boolean) => {
@@ -580,9 +592,13 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
                         className={`w-[18px] h-[18px] rounded-[4px] border-[1.5px] flex items-center justify-center flex-shrink-0 transition-colors ${selected ? 'bg-[var(--terra)] border-[var(--terra)]' : 'border-[rgba(42,32,24,0.20)] hover:border-[var(--terra)]'}`}>
                         {selected && <Check size={10} className="text-white" />}
                       </button>
-                      <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
-                        <span className="text-[14px] font-semibold" style={{ color: colors.text }}>{initial}</span>
-                      </div>
+                      {c.avatar_url ? (
+                        <img src={c.avatar_url} alt={c.display_name || c.name} className="w-10 h-10 rounded-full object-cover flex-shrink-0" />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                          <span className="text-[14px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                        </div>
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="text-[15px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
                         {handle && (
@@ -688,9 +704,13 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
               className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: colors.bg }}>
-                    <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
-                  </div>
+                  {c.avatar_url ? (
+                    <img src={c.avatar_url} alt={c.display_name || c.name} className="w-8 h-8 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                      <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                    </div>
+                  )}
                   <div>
                     <p className="text-[14px] font-semibold text-[var(--ink)]">{c.display_name || c.name}</p>
                     <p className="text-[12px] text-[var(--ink-60)]">{c.instagram_handle}</p>
@@ -722,7 +742,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
             </th>
             <th className={thCls}>Creator</th><th className={thCls}>Instagram</th><th className={thCls}>County</th>
             <th className={thCls}>Level</th><th className={thCls}>Completion</th><th className={thCls}>Campaigns</th>
-            <th className={thCls}>IG Status</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
+            <th className={thCls}>Applied</th><th className={thCls}>IG Status</th><th className={thCls}>Status</th><th className={thCls}>Joined</th>
           </tr></thead>
           <tbody>
             {filteredCreators.map(c => (
@@ -737,9 +757,13 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
                 <td className={tdCls}>
                   {(() => { const initial = (c.display_name || c.name || '?')[0].toUpperCase(); const colors = getAvatarColors(initial); return (
                   <div className="flex items-center gap-2.5" style={{ minWidth: 160 }}>
-                    <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
-                      <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
-                    </div>
+                    {c.avatar_url ? (
+                      <img src={c.avatar_url} alt={c.display_name || c.name} className="w-7 h-7 rounded-full object-cover flex-shrink-0" />
+                    ) : (
+                      <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: colors.bg }}>
+                        <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                      </div>
+                    )}
                     <span className="font-medium" style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.display_name || c.name}</span>
                   </div>
                   ); })()}
@@ -764,6 +788,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
                   )}
                 </td>
                 <td className={`${tdCls} text-[var(--ink-60)]`}>{c.completed_campaigns}/{c.total_campaigns}</td>
+                <td className={`${tdCls} text-[var(--ink-60)]`}>{appliedCounts[c.id] || 0}</td>
                 <td className={tdCls}>
                   {c.instagram_connected
                     ? <span className="text-[12px] text-[#2D7A4F] font-medium">Connected</span>
