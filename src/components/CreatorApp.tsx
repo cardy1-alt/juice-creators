@@ -7,7 +7,7 @@ import LevelBadge from './LevelBadge';
 import {
   Compass, Megaphone, Users, User, MoreHorizontal,
   Search, Clock, Gift, Film, Check, Lock, LogOut,
-  ChevronRight, Settings, History, Link2, HelpCircle,
+  ChevronRight, ChevronDown, Settings, History, Link2, HelpCircle,
   AtSign, ExternalLink, X, ArrowLeft,
   Eye, EyeOff, Mail, MapPin, Save, Star, Award,
   AlertCircle, RefreshCw, CheckCircle
@@ -291,18 +291,23 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
         })}
       </div>
 
-      {/* Sort */}
-      <div className="flex items-center gap-1.5 mb-4">
-        {([
-          { key: 'recent' as const, label: 'Recently added' },
-          { key: 'popular' as const, label: 'Most popular' },
-          { key: 'ending' as const, label: 'Ending soon' },
-        ]).map(s => (
-          <button key={s.key} onClick={() => setSortBy(s.key)}
-            className={`px-3 py-1.5 rounded-[999px] text-[12px] font-medium transition-colors ${sortBy === s.key ? 'bg-[var(--ink)] text-white' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}>
-            {s.label}
-          </button>
-        ))}
+      {/* Results count + sort */}
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-[12px] text-[var(--ink-35)]">
+          {loading ? '' : `${rest.length} campaign${rest.length === 1 ? '' : 's'}`}
+        </p>
+        <div className="relative">
+          <select
+            value={sortBy}
+            onChange={e => setSortBy(e.target.value as 'recent' | 'popular' | 'ending')}
+            className="appearance-none bg-transparent pr-5 pl-0 py-1 text-[12px] font-medium text-[var(--ink-60)] cursor-pointer focus:outline-none"
+          >
+            <option value="recent">Recently added</option>
+            <option value="popular">Most popular</option>
+            <option value="ending">Ending soon</option>
+          </select>
+          <ChevronDown size={12} className="absolute right-0 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--ink-50)]" />
+        </div>
       </div>
 
       {/* Campaign cards */}
