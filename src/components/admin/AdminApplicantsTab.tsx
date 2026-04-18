@@ -77,6 +77,12 @@ export default function AdminApplicantsTab() {
   const [peekHistory, setPeekHistory] = useState<CampaignHistoryItem[]>([]);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkActing, setBulkActing] = useState(false);
+  // Per-creator list of active commitments: every application where they're
+  // currently selected or confirmed on a campaign that isn't completed.
+  // Used to surface "already picked elsewhere" signals so admins can spread
+  // opportunity fairly across the creator pool during selection.
+  const [commitmentsByCreator, setCommitmentsByCreator] = useState<Record<string, { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[]>>({});
+  const [sortMode, setSortMode] = useState<'applied' | 'unpicked'>('applied');
 
   const toggleSelected = (id: string) => {
     setSelectedIds(prev => {
@@ -98,7 +104,43 @@ export default function AdminApplicantsTab() {
       .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, expression_deadline, campaign_type, businesses(name, category))')
       .order('applied_at', { ascending: false });
     if (data) setApplicants(data as Applicant[]);
+
+    // Also fetch active commitments across the full applications table so
+    // each card can show how many other live campaigns a creator is already
+    // picked on. Filter to non-completed campaigns client-side so a single
+    // creator isn't counted for campaigns that have already wrapped.
+    const creatorIds = Array.from(new Set((data || []).map((a: any) => a.creator_id).filter(Boolean)));
+    if (creatorIds.length > 0) {
+      const { data: cData } = await supabase
+        .from('applications')
+        .select('id, creator_id, status, campaigns(id, title, status, campaign_type, businesses(name))')
+        .in('creator_id', creatorIds)
+        .in('status', ['selected', 'confirmed']);
+      const next: Record<string, { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[]> = {};
+      ((cData || []) as any[]).forEach(row => {
+        if (row.campaigns?.status === 'completed') return;
+        if (!next[row.creator_id]) next[row.creator_id] = [];
+        next[row.creator_id].push({
+          application_id: row.id,
+          campaign_id: row.campaigns?.id,
+          campaign_title: row.campaigns?.title || 'Untitled',
+          brand_name: row.campaigns?.campaign_type === 'community'
+            ? 'Nayba Community'
+            : (row.campaigns?.businesses?.name || '—'),
+        });
+      });
+      setCommitmentsByCreator(next);
+    } else {
+      setCommitmentsByCreator({});
+    }
     setLoading(false);
+  };
+
+  // Active commitments on OTHER campaigns (exclude the current application so
+  // a creator who's pending here doesn't count against themselves).
+  const getOtherCommitments = (a: Applicant) => {
+    const all = commitmentsByCreator[a.creator_id] || [];
+    return all.filter(c => c.application_id !== a.id);
   };
 
   const handleSelect = async (applicant: Applicant) => {
@@ -264,6 +306,22 @@ export default function AdminApplicantsTab() {
       </span>
     ) : null;
 
+    // Active-commitment tag: shows how many OTHER live campaigns the creator
+    // is already on the hook for. Helps admins spread selections fairly.
+    // Silent at 0 (nothing to flag). Subtle ink colour at 1-2. Terra at 3+
+    // so it reads as "heavy load — consider someone else".
+    const otherCommitments = getOtherCommitments(a);
+    const commitCount = otherCommitments.length;
+    const commitmentTag = commitCount > 0 ? (
+      <span className={`inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold ${commitCount >= 3 ? '' : ''}`}
+        style={commitCount >= 3
+          ? { background: 'var(--terra-10)', color: 'var(--terra)' }
+          : { background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}
+        title={`Currently selected or confirmed on ${commitCount} other live campaign${commitCount === 1 ? '' : 's'}`}>
+        On {commitCount} active
+      </span>
+    ) : null;
+
     const Checkbox = isPending ? (
       <span
         onClick={(e) => { e.stopPropagation(); toggleSelected(a.id); }}
@@ -322,6 +380,7 @@ export default function AdminApplicantsTab() {
               L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
             </span>
             {firstTimerTag}
+            {commitmentTag}
             {statusPill}
           </div>
           {a.pitch ? (
@@ -374,6 +433,7 @@ export default function AdminApplicantsTab() {
                   L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
                 </span>
                 {firstTimerTag}
+                {commitmentTag}
                 {statusPill}
               </div>
               {handle && (
@@ -437,6 +497,12 @@ export default function AdminApplicantsTab() {
             { value: 'confirmed', label: 'Confirmed' },
             { value: 'declined', label: 'Declined' },
             { value: 'all', label: 'All applicants' },
+          ]} />
+        </div>
+        <div className="w-[200px]">
+          <Select value={sortMode} onChange={(v) => setSortMode(v as 'applied' | 'unpicked')} options={[
+            { value: 'applied', label: 'Newest first' },
+            { value: 'unpicked', label: 'Prioritize unpicked' },
           ]} />
         </div>
       </div>
@@ -598,20 +664,34 @@ export default function AdminApplicantsTab() {
                   </div>
                 )}
 
-                {/* Applicants */}
-                {activeCampaign.items.length === 0 ? (
-                  <div className="bg-white rounded-[12px] p-8 text-center">
-                    <p className="text-[14px] text-[var(--ink-50)]">No applicants match the current filter</p>
-                  </div>
-                ) : viewMode === 'grid' ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {activeCampaign.items.map(a => <ApplicantCard key={a.id} a={a} variant="grid" />)}
-                  </div>
-                ) : (
-                  <div className="bg-white rounded-[12px] overflow-hidden divide-y divide-[rgba(42,32,24,0.06)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                    {activeCampaign.items.map(a => <ApplicantCard key={a.id} a={a} variant="list" />)}
-                  </div>
-                )}
+                {/* Applicants — sorted either by applied time (default) or
+                    by "least already picked" to help spread opportunities
+                    across the creator pool. Sort is stable by applied_at
+                    within equal commitment counts. */}
+                {(() => {
+                  const sorted = sortMode === 'unpicked'
+                    ? activeCampaign.items.slice().sort((x, y) => {
+                        const cx = getOtherCommitments(x).length;
+                        const cy = getOtherCommitments(y).length;
+                        if (cx !== cy) return cx - cy;
+                        return new Date(y.applied_at).getTime() - new Date(x.applied_at).getTime();
+                      })
+                    : activeCampaign.items;
+                  if (sorted.length === 0) return (
+                    <div className="bg-white rounded-[12px] p-8 text-center">
+                      <p className="text-[14px] text-[var(--ink-50)]">No applicants match the current filter</p>
+                    </div>
+                  );
+                  return viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {sorted.map(a => <ApplicantCard key={a.id} a={a} variant="grid" />)}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-[12px] overflow-hidden divide-y divide-[rgba(42,32,24,0.06)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                      {sorted.map(a => <ApplicantCard key={a.id} a={a} variant="list" />)}
+                    </div>
+                  );
+                })()}
               </div>
               );
             })()}
@@ -623,6 +703,7 @@ export default function AdminApplicantsTab() {
       {peekApplicant && <ApplicantPeekPanel
         applicant={peekApplicant}
         history={peekHistory}
+        activeCommitments={getOtherCommitments(peekApplicant)}
         onClose={() => setPeekApplicant(null)}
         onSelect={() => handleSelect(peekApplicant)}
         onDecline={() => handleDecline(peekApplicant)}
@@ -634,9 +715,10 @@ export default function AdminApplicantsTab() {
 
 // ─── Applicant Peek Panel ─────────────────────────────────────────────────
 
-function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, acting }: {
+function ApplicantPeekPanel({ applicant, history, activeCommitments, onClose, onSelect, onDecline, acting }: {
   applicant: Applicant;
   history: CampaignHistoryItem[];
+  activeCommitments: { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[];
   onClose: () => void;
   onSelect: () => void;
   onDecline: () => void;
@@ -793,6 +875,32 @@ function ApplicantPeekPanel({ applicant, history, onClose, onSelect, onDecline, 
               </div>
             )}
           </div>
+
+          {/* Active commitments — which live campaigns is this creator
+              already on the hook for. Makes it easy to see whether they're
+              getting picked across multiple campaigns at once. */}
+          {activeCommitments.length > 0 && (
+            <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
+              <p className={`${label} mb-2 flex items-center gap-2`}>
+                Active on
+                <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[10px] font-bold"
+                  style={{ background: activeCommitments.length >= 3 ? 'var(--terra)' : 'var(--terra-10)', color: activeCommitments.length >= 3 ? 'white' : 'var(--terra)', minWidth: 18 }}>
+                  {activeCommitments.length}
+                </span>
+              </p>
+              <div className="space-y-1.5">
+                {activeCommitments.map(c => (
+                  <div key={c.application_id} className="flex items-start gap-2">
+                    <span className="w-1 h-1 rounded-full bg-[var(--terra)] mt-[7px] flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-[var(--ink)] truncate">{c.campaign_title}</p>
+                      <p className="text-[11px] text-[var(--ink-50)]">{c.brand_name}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {/* Campaign history */}
           {history.length > 0 && (
