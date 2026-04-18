@@ -3,9 +3,10 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
-import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film } from 'lucide-react';
+import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock } from 'lucide-react';
 import Select from '../ui/Select';
 import InstagramEmbed from '../InstagramEmbed';
+import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../../lib/dates';
 
 interface Applicant {
   id: string;
@@ -36,6 +37,7 @@ interface Applicant {
     title: string;
     status: string;
     creator_target: number;
+    expression_deadline: string | null;
     campaign_type?: 'brand' | 'community' | null;
     businesses?: { name: string; category?: string } | null;
   };
@@ -93,7 +95,7 @@ export default function AdminApplicantsTab() {
     setLoading(true);
     const { data } = await supabase
       .from('applications')
-      .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, campaign_type, businesses(name, category))')
+      .select('*, creators(id, name, display_name, instagram_handle, email, level, level_name, avatar_url, follower_count, address, total_campaigns, completed_campaigns, completion_rate, instagram_connected), campaigns(id, title, status, creator_target, expression_deadline, campaign_type, businesses(name, category))')
       .order('applied_at', { ascending: false });
     if (data) setApplicants(data as Applicant[]);
     setLoading(false);
@@ -211,7 +213,16 @@ export default function AdminApplicantsTab() {
     return acc;
   }, {});
 
-  const campaignList = Object.entries(grouped).sort((a, b) => b[1].pending - a[1].pending);
+  // Sort campaigns in the sidebar by selection urgency first, then pending
+  // count. A campaign with one pending applicant at an overdue deadline
+  // should surface above a campaign with ten pending but weeks to decide.
+  const urgencyRank: Record<DeadlineUrgency, number> = { overdue: 0, today: 1, urgent: 2, soon: 3, none: 4 };
+  const campaignList = Object.entries(grouped).sort((a, b) => {
+    const ua = a[1].pending > 0 ? urgencyRank[deadlineUrgency(a[1].campaign?.expression_deadline || null)] : 5;
+    const ub = b[1].pending > 0 ? urgencyRank[deadlineUrgency(b[1].campaign?.expression_deadline || null)] : 5;
+    if (ua !== ub) return ua - ub;
+    return b[1].pending - a[1].pending;
+  });
   const activeCampaign = activeCampaignId ? grouped[activeCampaignId] : (campaignList[0]?.[1] || null);
   const currentCampaignId = activeCampaignId || campaignList[0]?.[0] || null;
 
@@ -459,6 +470,8 @@ export default function AdminApplicantsTab() {
                   ? 'Nayba Community'
                   : (group.campaign?.businesses?.name || '—');
                 const isActive = campaignId === currentCampaignId;
+                const u = group.pending > 0 ? deadlineUrgency(group.campaign?.expression_deadline || null) : 'none';
+                const isLoud = u === 'overdue' || u === 'today';
                 return (
                   <button
                     key={campaignId}
@@ -469,9 +482,15 @@ export default function AdminApplicantsTab() {
                       <div className="min-w-0 flex-1">
                         <p className={`text-[13px] truncate ${isActive ? 'font-semibold text-[var(--ink)]' : 'font-medium text-[var(--ink-60)]'}`}>{group.campaign?.title || 'Untitled'}</p>
                         <p className="text-[11px] text-[var(--ink-50)] truncate">{brandName}</p>
+                        {u !== 'none' && group.campaign?.expression_deadline && (
+                          <p className="text-[11px] font-semibold mt-0.5 inline-flex items-center gap-1" style={{ color: 'var(--terra)' }}>
+                            <Clock size={10} /> {fmtCountdown(group.campaign.expression_deadline)}
+                          </p>
+                        )}
                       </div>
                       {group.pending > 0 && (
-                        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[11px] font-bold flex-shrink-0" style={{ background: 'var(--terra-10)', color: 'var(--terra)', minWidth: 20 }}>
+                        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[11px] font-bold flex-shrink-0"
+                          style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)', minWidth: 20 }}>
                           {group.pending}
                         </span>
                       )}
@@ -498,36 +517,58 @@ export default function AdminApplicantsTab() {
               };
               return (
               <div>
-                {/* Campaign header */}
-                <div className="bg-white rounded-[12px] px-5 py-4 mb-3 flex items-center justify-between" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-[18px] font-semibold text-[var(--ink)] truncate">{activeCampaign.campaign?.title}</h2>
-                    <p className="text-[13px] text-[var(--ink-50)] mt-0.5">
-                      {activeCampaign.campaign?.campaign_type === 'community' ? 'Nayba Community' : activeCampaign.campaign?.businesses?.name} · Target: {activeCampaign.campaign?.creator_target || 0} creators
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 flex-shrink-0 ml-4">
-                    {activeCampaign.pending > 0 && (
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-[999px] text-[12px] font-semibold" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
-                        {activeCampaign.pending} pending
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => setViewMode('grid')}
-                        title="Grid view"
-                        className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
-                        style={{ background: viewMode === 'grid' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'grid' ? 'var(--ink)' : 'var(--ink-35)' }}>
-                        <LayoutGrid size={14} />
-                      </button>
-                      <button onClick={() => setViewMode('list')}
-                        title="List view"
-                        className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
-                        style={{ background: viewMode === 'list' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'list' ? 'var(--ink)' : 'var(--ink-35)' }}>
-                        <LayoutList size={14} />
-                      </button>
+                {/* Campaign header — surfaces slots-filled and deadline so
+                    admins can see at a glance whether a campaign still
+                    needs picks and how much runway is left. */}
+                {(() => {
+                  const target = activeCampaign.campaign?.creator_target || 0;
+                  const selectedSoFar = activeCampaign.items.filter(i =>
+                    i.status === 'selected' || i.status === 'confirmed'
+                  ).length;
+                  const deadline = activeCampaign.campaign?.expression_deadline || null;
+                  const u = deadlineUrgency(deadline);
+                  const isLoud = u === 'overdue' || u === 'today' || u === 'urgent';
+                  return (
+                  <div className="bg-white rounded-[12px] px-5 py-4 mb-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h2 className="text-[18px] font-semibold text-[var(--ink)] truncate">{activeCampaign.campaign?.title}</h2>
+                        <p className="text-[13px] text-[var(--ink-50)] mt-0.5">
+                          {activeCampaign.campaign?.campaign_type === 'community' ? 'Nayba Community' : activeCampaign.campaign?.businesses?.name}
+                          {target > 0 && <> · <span className="font-medium text-[var(--ink)]">{selectedSoFar}/{target}</span> slots filled</>}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2 flex-shrink-0 ml-4 flex-wrap justify-end">
+                        {deadline && u !== 'none' && (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] text-[12px] font-semibold"
+                            style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)' }}>
+                            <Clock size={11} /> {fmtCountdown(deadline)}
+                          </span>
+                        )}
+                        {activeCampaign.pending > 0 && (
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-[999px] text-[12px] font-semibold" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
+                            {activeCampaign.pending} pending
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => setViewMode('grid')}
+                            title="Grid view"
+                            className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                            style={{ background: viewMode === 'grid' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'grid' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                            <LayoutGrid size={14} />
+                          </button>
+                          <button onClick={() => setViewMode('list')}
+                            title="List view"
+                            className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                            style={{ background: viewMode === 'list' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'list' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                            <LayoutList size={14} />
+                          </button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                  );
+                })()}
 
                 {/* Bulk action bar — appears when any pending applicant selected */}
                 {anySelected && (

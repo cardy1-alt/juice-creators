@@ -50,3 +50,34 @@ export function fmtDeadline(iso: string | null): string {
   if (!iso) return '—';
   return new Date(iso).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'Europe/London' });
 }
+
+export type DeadlineUrgency = 'none' | 'soon' | 'urgent' | 'today' | 'overdue';
+
+/** Classify how pressing a deadline is relative to now. */
+export function deadlineUrgency(iso: string | null): DeadlineUrgency {
+  if (!iso) return 'none';
+  const ms = new Date(iso).getTime() - Date.now();
+  if (ms < 0) return 'overdue';
+  const days = ms / 86_400_000;
+  if (days < 1) return 'today';
+  if (days < 3) return 'urgent';
+  if (days < 7) return 'soon';
+  return 'none';
+}
+
+/** Whole days remaining until a deadline (negative if past). */
+export function daysUntilDeadline(iso: string | null): number | null {
+  if (!iso) return null;
+  const ms = new Date(iso).getTime() - Date.now();
+  return Math.ceil(ms / 86_400_000);
+}
+
+/** Short human phrase for a deadline — "Closes today", "2 days left", "3 days overdue". */
+export function fmtCountdown(iso: string | null): string {
+  if (!iso) return '';
+  const days = daysUntilDeadline(iso)!;
+  if (days < 0) return `${Math.abs(days)} day${Math.abs(days) === 1 ? '' : 's'} overdue`;
+  if (days === 0) return 'Closes today';
+  if (days === 1) return '1 day left';
+  return `${days} days left`;
+}

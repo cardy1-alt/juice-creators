@@ -10,6 +10,7 @@ import {
 import CampaignDetail from './CampaignDetail';
 import CampaignWizard from './CampaignWizard';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
+import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../lib/dates';
 
 // ─── Avatar colors by initial ───
 function getAvatarColors(letter: string): { bg: string; text: string } {
@@ -93,6 +94,35 @@ function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`inline-flex items-center rounded-[999px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '4px 10px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
+    </span>
+  );
+}
+
+// Decide whether a campaign should call for attention: pending applicants
+// combined with a deadline that's not weeks away. The visual weight scales
+// with urgency — a whisper at 'soon', a shout once overdue.
+function selectionUrgency(status: string, pending: number, deadline: string | null): DeadlineUrgency {
+  if (pending <= 0) return 'none';
+  if (status !== 'active' && status !== 'selecting') return 'none';
+  return deadlineUrgency(deadline);
+}
+
+function urgencyStyle(u: DeadlineUrgency): { bg: string; color: string; label: (c: string) => string } | null {
+  if (u === 'none' || u === 'soon') return null;
+  if (u === 'urgent') return { bg: 'var(--terra-10)', color: 'var(--terra)', label: c => c };
+  // today / overdue — solid terra for stronger pull
+  return { bg: 'var(--terra)', color: 'white', label: c => c };
+}
+
+function UrgencyPill({ deadline, pending, status }: { deadline: string | null; pending: number; status: string }) {
+  const u = selectionUrgency(status, pending, deadline);
+  const style = urgencyStyle(u);
+  if (!style) return null;
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+      style={{ background: style.bg, color: style.color }}>
+      <Clock size={10} />
+      {style.label(fmtCountdown(deadline))}
     </span>
   );
 }
@@ -208,6 +238,9 @@ export default function BusinessPortal() {
   const { user, signOut } = useEffectiveAuth();
   const [brand, setBrand] = useState<Brand | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  // Per-campaign pending applicant counts, used to decorate list/dashboard
+  // cards with urgency signals without loading all applications upfront.
+  const [pendingByCampaign, setPendingByCampaign] = useState<Record<string, number>>({});
   const [selectedCampaignId, setSelectedCampaignId] = useState<string | null>(null);
   const [applications, setApplications] = useState<Application[]>([]);
   // Past reels per applicant creator — keyed by creator_id. Fetched once
@@ -250,6 +283,20 @@ export default function BusinessPortal() {
         // Don't auto-select — show campaign list as landing page
         // If only one campaign, go straight to it
         if (cData.length === 1) setSelectedCampaignId(cData[0].id);
+        // Pull pending applicant counts across this brand's campaigns so
+        // urgency pills can render on the list/dashboard without fetching
+        // full application rows.
+        const ids = cData.map(c => c.id);
+        const { data: pendingData } = await supabase
+          .from('applications')
+          .select('campaign_id')
+          .eq('status', 'interested')
+          .in('campaign_id', ids);
+        const counts: Record<string, number> = {};
+        (pendingData || []).forEach((a: any) => {
+          counts[a.campaign_id] = (counts[a.campaign_id] || 0) + 1;
+        });
+        setPendingByCampaign(counts);
       }
     }
     setLoading(false);
@@ -264,7 +311,13 @@ export default function BusinessPortal() {
       supabase.from('applications').select('*, creators(name, display_name, instagram_handle, completion_rate, level, follower_count)').eq('campaign_id', selectedCampaignId!).order('applied_at', { ascending: false }),
       supabase.from('participations').select('*, creators(name, display_name, instagram_handle)').eq('campaign_id', selectedCampaignId!).order('created_at', { ascending: false }),
     ]);
-    if (appRes.data) setApplications(appRes.data as Application[]);
+    if (appRes.data) {
+      setApplications(appRes.data as Application[]);
+      // Keep the per-campaign pending count in sync after any select/decline
+      // so the list/dashboard urgency pills reflect the fresh state.
+      const pending = (appRes.data as Application[]).filter(a => a.status === 'interested').length;
+      setPendingByCampaign(prev => ({ ...prev, [selectedCampaignId!]: pending }));
+    }
     if (partRes.data) setParticipations(partRes.data as Participation[]);
 
     // Pull past reels for every applicant in one batched query so the
@@ -517,33 +570,55 @@ export default function BusinessPortal() {
               ))}
             </div>
 
-            {/* Active campaigns quick view */}
+            {/* Active campaigns quick view — sorted by selection urgency so
+                campaigns closest to their deadline with pending applicants
+                surface first. */}
             <div className="mb-6">
               <div className="flex items-center justify-between mb-3">
                 <p className="text-[14px] font-medium text-[var(--ink-60)]">Active campaigns</p>
                 <button onClick={() => setActiveTab('campaigns')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
               </div>
               <div className="space-y-2">
-                {campaigns.filter(c => c.status === 'active' || c.status === 'live' || c.status === 'selecting').slice(0, 3).map(c => (
-                  <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('campaigns'); setCampaignSubTab('summary'); }}
-                    className="w-full flex items-center justify-between bg-white rounded-[12px] p-4 text-left transition-shadow hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
-                    style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                    <div className="flex items-center gap-3 min-w-0">
-                      {c.campaign_image ? (
-                        <img src={c.campaign_image} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />
-                      ) : (
-                        <div className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: getCategoryPalette(brand.category).tint }}>
-                          <CategoryIcon category={brand.category} className="w-5 h-5" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.7 }} />
-                        </div>
-                      )}
-                      <div className="min-w-0">
-                        <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{c.title}</p>
-                        <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">{c.creator_target} creators</p>
-                      </div>
-                    </div>
-                    <StatusBadge status={c.status} />
-                  </button>
-                ))}
+                {(() => {
+                  const urgencyRank: Record<DeadlineUrgency, number> = { overdue: 0, today: 1, urgent: 2, soon: 3, none: 4 };
+                  return campaigns
+                    .filter(c => c.status === 'active' || c.status === 'live' || c.status === 'selecting')
+                    .slice()
+                    .sort((a, b) => {
+                      const ra = urgencyRank[selectionUrgency(a.status, pendingByCampaign[a.id] || 0, a.expression_deadline)];
+                      const rb = urgencyRank[selectionUrgency(b.status, pendingByCampaign[b.id] || 0, b.expression_deadline)];
+                      return ra - rb;
+                    })
+                    .slice(0, 3)
+                    .map(c => {
+                      const pending = pendingByCampaign[c.id] || 0;
+                      return (
+                        <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setActiveTab('campaigns'); setCampaignSubTab('summary'); }}
+                          className="w-full flex items-center justify-between bg-white rounded-[12px] p-4 text-left transition-shadow hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
+                          style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                          <div className="flex items-center gap-3 min-w-0">
+                            {c.campaign_image ? (
+                              <img src={c.campaign_image} alt="" className="w-10 h-10 rounded-[8px] object-cover flex-shrink-0" />
+                            ) : (
+                              <div className="w-10 h-10 rounded-[8px] flex items-center justify-center flex-shrink-0" style={{ background: getCategoryPalette(brand.category).tint }}>
+                                <CategoryIcon category={brand.category} className="w-5 h-5" style={{ color: getCategoryPalette(brand.category).color, opacity: 0.7 }} />
+                              </div>
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{c.title}</p>
+                              <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">
+                                {pending > 0 ? `${pending} awaiting · ${c.creator_target} slots` : `${c.creator_target} creators`}
+                              </p>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <UrgencyPill deadline={c.expression_deadline} pending={pending} status={c.status} />
+                            <StatusBadge status={c.status} />
+                          </div>
+                        </button>
+                      );
+                    });
+                })()}
               </div>
             </div>
 
@@ -560,9 +635,16 @@ export default function BusinessPortal() {
 
         {/* ─── Campaigns page — list ─── */}
         {activeTab === 'campaigns' && !selectedCampaignId && campaigns.length > 0 && (() => {
+          const urgencyRank: Record<DeadlineUrgency, number> = { overdue: 0, today: 1, urgent: 2, soon: 3, none: 4 };
           const filteredCampaigns = campaigns
             .filter(c => campaignFilter === 'all' || c.status === campaignFilter || (campaignFilter === 'active' && (c.status === 'active' || c.status === 'live' || c.status === 'selecting')))
-            .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()));
+            .filter(c => !campaignSearch || c.title.toLowerCase().includes(campaignSearch.toLowerCase()))
+            .slice()
+            .sort((a, b) => {
+              const ra = urgencyRank[selectionUrgency(a.status, pendingByCampaign[a.id] || 0, a.expression_deadline)];
+              const rb = urgencyRank[selectionUrgency(b.status, pendingByCampaign[b.id] || 0, b.expression_deadline)];
+              return ra - rb;
+            });
           return (
           <div className="animate-fade-in">
             <div className="flex items-center justify-between mb-5">
@@ -598,7 +680,9 @@ export default function BusinessPortal() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredCampaigns.map(c => (
+              {filteredCampaigns.map(c => {
+                const pending = pendingByCampaign[c.id] || 0;
+                return (
                 <button key={c.id} onClick={() => { setSelectedCampaignId(c.id); setCampaignSubTab('summary'); }}
                   className="w-full text-left bg-white rounded-[12px] overflow-hidden transition-shadow duration-200 hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)]"
                   style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -613,18 +697,23 @@ export default function BusinessPortal() {
                     )}
                   </div>
                   <div className="p-4">
-                    <div className="flex items-center justify-between mb-1">
-                      <h3 className="text-[16px] font-semibold text-[var(--ink)]">{c.title}</h3>
-                      <StatusBadge status={c.status} />
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <h3 className="text-[16px] font-semibold text-[var(--ink)] truncate">{c.title}</h3>
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <UrgencyPill deadline={c.expression_deadline} pending={pending} status={c.status} />
+                        <StatusBadge status={c.status} />
+                      </div>
                     </div>
                     {c.headline && <p className="text-[14px] text-[var(--ink-60)] mb-2 line-clamp-1">{c.headline}</p>}
                     <div className="flex items-center gap-3 text-[14px] md:text-[12px] text-[var(--ink-50)]">
                       {c.expression_deadline && <span>Deadline {fmtDate(c.expression_deadline)}</span>}
                       <span>{c.creator_target} creators</span>
+                      {pending > 0 && <span className="text-[var(--terra)] font-semibold">{pending} awaiting</span>}
                     </div>
                   </div>
                 </button>
-              ))}
+                );
+              })}
               {filteredCampaigns.length === 0 && (
                 <p className="py-8 text-center text-[14px] text-[var(--ink-60)]">No campaigns match your search</p>
               )}
@@ -659,22 +748,42 @@ export default function BusinessPortal() {
               </div>
             </div>
 
-            {/* Action prompts — what needs attention */}
+            {/* Action prompts — what needs attention. When the applicant
+                deadline is looming (urgent/today/overdue), this prompt
+                flips to a terra scheme to pull the eye; otherwise it
+                stays neutral so routine pending counts don't cry wolf. */}
             {(pendingApplicants > 0 || awaitingContent > 0) && (
               <div className="space-y-2 mb-6">
-                {pendingApplicants > 0 && (
-                  <button onClick={() => setActiveTab('selection')}
-                    className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-left transition-colors hover:bg-[rgba(42,32,24,0.02)]"
-                    style={{ background: 'rgba(122,160,184,0.08)', border: '1px solid rgba(122,160,184,0.12)' }}>
-                    <div className="flex items-center gap-3">
-                      <Users size={16} style={{ color: 'var(--baltic)' }} />
-                      <span className="text-[14px] font-medium" style={{ color: 'var(--baltic)' }}>{pendingApplicants} creator{pendingApplicants !== 1 ? 's' : ''} awaiting selection</span>
-                    </div>
-                    <ChevronRight size={16} style={{ color: 'var(--baltic)' }} />
-                  </button>
-                )}
+                {pendingApplicants > 0 && (() => {
+                  const u = selectionUrgency(campaign.status, pendingApplicants, campaign.expression_deadline);
+                  const urgent = u === 'urgent' || u === 'today' || u === 'overdue';
+                  const bg = urgent ? 'var(--terra-10)' : 'rgba(122,160,184,0.08)';
+                  const border = urgent ? 'rgba(196,103,74,0.25)' : 'rgba(122,160,184,0.12)';
+                  const fg = urgent ? 'var(--terra)' : 'var(--baltic)';
+                  const countdown = campaign.expression_deadline ? fmtCountdown(campaign.expression_deadline) : '';
+                  return (
+                    <button onClick={() => setCampaignSubTab('selection')}
+                      className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-left transition-colors hover:bg-[rgba(42,32,24,0.02)]"
+                      style={{ background: bg, border: `1px solid ${border}` }}>
+                      <div className="flex items-center gap-3">
+                        <Users size={16} style={{ color: fg }} />
+                        <div className="flex flex-col">
+                          <span className="text-[14px] font-medium" style={{ color: fg }}>
+                            {pendingApplicants} creator{pendingApplicants !== 1 ? 's' : ''} awaiting selection
+                          </span>
+                          {urgent && countdown && (
+                            <span className="text-[12px] font-semibold" style={{ color: fg }}>
+                              Applications {countdown.toLowerCase()} — time to pick
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <ChevronRight size={16} style={{ color: fg }} />
+                    </button>
+                  );
+                })()}
                 {awaitingContent > 0 && (
-                  <button onClick={() => setActiveTab('participation')}
+                  <button onClick={() => setCampaignSubTab('participation')}
                     className="w-full flex items-center justify-between px-4 py-3 rounded-[12px] text-left transition-colors hover:bg-[rgba(42,32,24,0.02)]"
                     style={{ background: 'rgba(140,122,170,0.08)', border: '1px solid rgba(140,122,170,0.12)' }}>
                     <div className="flex items-center gap-3">
@@ -756,7 +865,7 @@ export default function BusinessPortal() {
               <div className="bg-white rounded-[12px] p-4 md:p-5 mb-6" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <div className="flex items-center justify-between mb-3">
                   <p className="text-[14px] font-medium text-[var(--ink-50)]">Recent applicants</p>
-                  <button onClick={() => setActiveTab('selection')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
+                  <button onClick={() => setCampaignSubTab('selection')} className="text-[14px] md:text-[12px] text-[var(--terra)] font-medium hover:underline">View all</button>
                 </div>
                 <div className="space-y-2.5">
                   {recentApps.map(a => (
@@ -848,11 +957,64 @@ export default function BusinessPortal() {
             fetchCampaignData();
             showToast(`${ids.length} creator${ids.length !== 1 ? 's' : ''} declined`);
           };
+          const target = campaign?.creator_target || 0;
+          const slotsFilled = selectedCount;
+          const slotsLeft = Math.max(0, target - slotsFilled);
+          const fillPct = target > 0 ? Math.min(100, (slotsFilled / target) * 100) : 0;
+          const isFull = target > 0 && slotsFilled >= target;
+          const pendingReview = applications.filter(a => a.status === 'interested').length;
+          const deadline = campaign?.expression_deadline || null;
+          const u = deadlineUrgency(deadline);
+          const deadlineFg = u === 'overdue' || u === 'today' ? 'var(--terra)' : u === 'urgent' ? 'var(--terra)' : 'var(--ink-60)';
+          const deadlineBg = u === 'overdue' || u === 'today' ? 'var(--terra-10)' : 'rgba(42,32,24,0.04)';
+          const appsOpen = u !== 'overdue';
           return (
           <div>
-            <div className="flex items-center justify-between mb-5">
-              <h1 className="text-[20px] font-semibold text-[var(--ink)]">Selection</h1>
-              <span className="text-[14px] text-[var(--ink-50)]">{filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}</span>
+            {/* Selection header — slots + deadline context. Makes it clear
+                how many confirmed picks are left and whether applications
+                are still open, so brands selecting early don't over-fill. */}
+            <div className="bg-white rounded-[12px] p-4 md:p-5 mb-5" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div className="min-w-0">
+                  <h1 className="text-[20px] font-semibold text-[var(--ink)] mb-0.5">Selection</h1>
+                  <p className="text-[14px] text-[var(--ink-60)]">
+                    {filteredApps.length} applicant{filteredApps.length !== 1 ? 's' : ''}
+                    {target > 0 && <> · <span className="font-semibold text-[var(--ink)]">{slotsFilled}/{target}</span> slots filled</>}
+                  </p>
+                </div>
+                {deadline && (
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[999px]"
+                    style={{ background: deadlineBg }}>
+                    <Clock size={13} style={{ color: deadlineFg }} />
+                    <span className="text-[12px] font-semibold" style={{ color: deadlineFg }}>
+                      {appsOpen ? `Applications ${fmtCountdown(deadline).toLowerCase()}` : `Applications closed ${fmtCountdown(deadline).toLowerCase()}`}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {target > 0 && (
+                <div className="mt-3">
+                  <div className="h-[6px] rounded-[999px] overflow-hidden" style={{ background: 'rgba(42,32,24,0.06)' }}>
+                    <div className="h-full transition-[width] duration-300 ease-out" style={{ width: `${fillPct}%`, background: isFull ? 'var(--sage)' : 'var(--terra)' }} />
+                  </div>
+                  <p className="text-[12px] text-[var(--ink-50)] mt-1.5">
+                    {isFull ? (
+                      <span className="font-semibold text-[var(--sage)]">All slots filled — you can still decline or swap in reserves.</span>
+                    ) : slotsLeft === 1 ? (
+                      <span className="font-semibold text-[var(--terra)]">1 slot left to fill.</span>
+                    ) : (
+                      <>{slotsLeft} slot{slotsLeft !== 1 ? 's' : ''} left to fill.</>
+                    )}
+                    {!appsOpen && pendingReview > 0 && (
+                      <> Applications have closed — review and decide on the remaining {pendingReview}.</>
+                    )}
+                    {appsOpen && u !== 'none' && pendingReview === 0 && slotsLeft > 0 && (
+                      <> No one to review right now — new applications may still come in.</>
+                    )}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Filters + bulk actions */}
