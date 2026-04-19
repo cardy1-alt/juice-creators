@@ -683,8 +683,8 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* Logo overlapping bottom edge */}
           <div className="absolute -bottom-9 left-6">
             {isCommunity ? (
-              <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white bg-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
-                <img src={NaybaLogo} alt="Nayba" className="w-8 h-8" />
+              <div className="w-[72px] h-[72px] rounded-full flex items-center justify-center border-[3px] border-white overflow-hidden" style={{ background: 'var(--terra-light)', boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }}>
+                <img src={NaybaLogo} alt="Nayba" className="w-[58px] h-[58px]" />
               </div>
             ) : display.logoUrl ? (
               <img src={display.logoUrl} alt="" className="w-[72px] h-[72px] rounded-full object-cover border-[3px] border-white" style={{ boxShadow: '0 2px 8px rgba(42,32,24,0.10)' }} />
