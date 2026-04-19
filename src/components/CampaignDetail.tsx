@@ -709,7 +709,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
                   campaigns because there's no business to verify. */}
               {!isCommunity && campaign.businesses?.approved && (
                 <span
-                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+                  className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-semibold"
                   style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}
                   title="This brand has been verified by the Nayba team"
                 >
@@ -720,7 +720,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             </div>
             <div className="flex items-center gap-2 mt-1.5">
               {display.category && (
-                <span className="text-[14px] md:text-[12px] rounded-[999px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.category}</span>
+                <span className="text-[14px] md:text-[12px] rounded-[6px] px-2 py-0.5" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{display.category}</span>
               )}
               {brandHandle && (
                 <a href={`https://instagram.com/${brandHandle}`} target="_blank" rel="noopener noreferrer"

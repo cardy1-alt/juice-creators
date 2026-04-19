@@ -184,7 +184,7 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
         </div>
 
         {toast && (
-          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
         )}
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
@@ -232,8 +232,8 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
                 <div>
                   <p className={peekLabel}>Status</p>
                   {brand.approved
-                    ? <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
-                    : <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
+                    ? <span className="inline-flex items-center rounded-[6px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>Approved</span>
+                    : <span className="inline-flex items-center rounded-[6px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#FAEEDA', color: '#854F0B' }}>Pending</span>
                   }
                 </div>
                 <div>
@@ -428,7 +428,7 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
   return (
     <div>
       {toast && (
-        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Search & filter toolbar */}
@@ -489,8 +489,8 @@ export default function AdminBrandsTab({ showModal, onCloseModal, initialPeekId,
                 </div>
               </div>
               {b.approved
-                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
-                : <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
+                ? <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[12px] font-semibold" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>Approved</span>
+                : <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>Pending</span>
               }
             </div>
             <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">

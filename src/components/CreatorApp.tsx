@@ -116,7 +116,7 @@ function BrandInfoModal({ brand, onClose }: {
           <button onClick={onClose} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
         </div>
         {brand.category && (
-          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[var(--terra-light)] text-[var(--terra)] mb-3">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium bg-[var(--terra-light)] text-[var(--terra)] mb-3">
             {brand.category}
           </span>
         )}
@@ -280,7 +280,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
           const chipColor = c === 'All' ? null : getFilterChipColor(c);
           return (
             <button key={c} onClick={() => setCategory(c)}
-              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[999px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
+              className={`flex-shrink-0 px-[16px] py-[7px] rounded-[6px] text-[13px] transition-colors ${isActive ? 'text-white border border-transparent' : 'bg-white border border-[rgba(42,32,24,0.10)] text-[var(--ink-60)]'}`}
               style={{
                 fontWeight: isActive ? 700 : 600,
                 background: isActive ? (chipColor?.bg || 'var(--terra)') : undefined,
@@ -375,7 +375,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                       </div>
                     )}
                   {appStatus && (
-                    <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[999px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
+                    <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
                       {appStatus === 'interested' ? (display.isCommunity ? 'Entered' : 'Applied') : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? (display.isCommunity ? 'Entered' : 'Confirmed') : appStatus}
                     </span>
                   )}
@@ -386,12 +386,12 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                   <div className="flex items-center gap-2 mb-2 min-w-0">
                     {display.isCommunity ? (
                       <>
-                        <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: 'var(--terra-light)', color: 'var(--terra)' }}>Community</span>
+                        <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[6px] text-[10px]" style={{ fontWeight: 600, background: 'var(--terra-light)', color: 'var(--terra)' }}>Community</span>
                         <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{display.name}</span>
                       </>
                     ) : (
                       <>
-                        <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[999px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
+                        <span className="inline-flex flex-shrink-0 px-2 py-0.5 rounded-[6px] text-[10px]" style={{ fontWeight: 600, background: catPalette.tint, color: catPalette.color }}>{c.businesses?.category?.split(' & ')[0] || 'Local'}</span>
                         <span className="text-[12px] font-medium text-[var(--ink-60)] truncate min-w-0">{display.name}</span>
                       </>
                     )}
@@ -569,7 +569,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
               <div key={a.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{ownerName}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-2">{a.campaigns?.headline || a.campaigns?.title}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${statusCls}`}>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${statusCls}`}>
                   {statusLabel}
                 </span>
               </div>
@@ -584,7 +584,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{p.campaigns?.campaign_type === 'community' ? 'Nayba Community' : p.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-1">{p.campaigns?.headline || p.campaigns?.title}</p>
                 {perkText && (
-                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[999px] bg-[var(--terra-light)] mb-3">
+                  <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-[6px] bg-[var(--terra-light)] mb-3">
                     <Gift size={12} className="text-[var(--terra)]" />
                     <span className="text-[12px] font-medium text-[var(--terra)]">{perkText}{p.campaigns?.perk_value ? ` — £${p.campaigns.perk_value}` : ''}</span>
                   </div>
@@ -615,7 +615,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <div className="flex items-center justify-between pt-2 border-t border-[rgba(42,32,24,0.08)]">
                   <div className="flex gap-3 text-[12px] text-[var(--ink-35)]">
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
-                    {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[999px] text-[12px] font-medium">Content overdue</span>}
+                    {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[6px] text-[12px] font-medium">Content overdue</span>}
                   </div>
                   {p.reel_url && (
                     <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
@@ -652,7 +652,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                   <p className="text-[13px] text-[var(--ink-60)]">{ownerName}</p>
                   <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${badge.cls}`}>{badge.label}</span>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${badge.cls}`}>{badge.label}</span>
               </div>
             );
           })}
@@ -662,7 +662,7 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 <p className="text-[13px] text-[var(--ink-60)]">{a.campaigns?.campaign_type === 'community' ? 'Nayba Community' : a.campaigns?.businesses?.name}</p>
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.title}</p>
               </div>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium bg-[#F1EFE8] text-[#5F5E5A]">Not selected</span>
             </div>
           ))}
           {completedParts.length === 0 && pastApps.length === 0 && (
@@ -723,7 +723,7 @@ function NaybahoodTab({ profile, showToast }: { profile: CreatorProfile; showToa
           <p className="text-[14px] text-[var(--ink-60)] leading-[1.65] max-w-sm mx-auto mb-4">
             Complete your first campaign to unlock The Naybahood — our community of active local creators with exclusive events, brand connections, and the creator WhatsApp group.
           </p>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[999px] bg-[var(--terra-light)]">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-[6px] bg-[var(--terra-light)]">
             <Megaphone size={14} className="text-[var(--terra)]" />
             <span className="text-[13px] font-medium text-[var(--terra)]">Browse campaigns to get started</span>
           </div>
@@ -937,11 +937,11 @@ function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorPro
             </div>
           </div>
           {profile.instagram_connected ? (
-            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56] whitespace-nowrap shrink-0">
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] bg-[#E1F5EE] text-[12px] font-medium text-[#0F6E56] whitespace-nowrap shrink-0">
               <Check size={12} /> Connected
             </span>
           ) : (
-            <span className="px-2.5 py-1 rounded-[999px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)] whitespace-nowrap shrink-0">
+            <span className="px-2.5 py-1 rounded-[6px] bg-[var(--shell)] text-[12px] font-medium text-[var(--ink-35)] whitespace-nowrap shrink-0">
               Coming soon
             </span>
           )}
@@ -1018,7 +1018,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
                 <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.headline || p.campaigns?.title}</p>
                 <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(p.created_at)}</p>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${
                 p.status === 'completed' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 p.status === 'content_submitted' ? 'bg-[#FAEEDA] text-[#854F0B]' :
                 p.status === 'overdue' ? 'bg-[#FCEBEB] text-[#A32D2D]' :
@@ -1036,7 +1036,7 @@ function CampaignHistoryView({ profile, onBack }: { profile: CreatorProfile; onB
                 <p className="text-[15px] font-medium text-[var(--ink)]">{a.campaigns?.headline || a.campaigns?.title}</p>
                 <p className="text-[12px] text-[var(--ink-35)] mt-1">{fmtDate(a.applied_at)}</p>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[999px] text-[12px] font-medium ${
+              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${
                 a.status === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' :
                 a.status === 'selected' ? 'bg-[#E1F5EE] text-[#0F6E56]' :
                 'bg-[#F1EFE8] text-[#5F5E5A]'
@@ -1552,7 +1552,7 @@ export default function CreatorApp() {
 
       {/* Toast */}
       {toast && (
-        <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}
+        <div className="toast-enter fixed bottom-20 md:bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}
          >
           {toast}
         </div>

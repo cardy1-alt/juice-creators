@@ -187,7 +187,7 @@ export default function AdminDashboard() {
                       if (badgeCount === 0) return null;
                       if (collapsed) return <span className="absolute top-0.5 right-0.5 w-2 h-2 rounded-full" style={{ background: 'var(--terra)' }} />;
                       return (
-                        <span className="flex items-center justify-center text-[12px] font-bold rounded-[999px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
+                        <span className="flex items-center justify-center text-[12px] font-bold rounded-[6px]" style={{ background: 'var(--badge-bg)', color: 'var(--badge-text)', padding: '2px 6px', minWidth: 20 }}>
                           {badgeCount}
                         </span>
                       );

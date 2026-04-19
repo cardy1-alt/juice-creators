@@ -240,7 +240,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh, onDelete }: {
         </div>
 
         {toast && (
-          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
         )}
 
         <div className="flex-1 overflow-y-auto px-5 py-4">
@@ -298,7 +298,7 @@ function CreatorPeekPanel({ creator, onClose, onViewAs, onRefresh, onDelete }: {
                 </div>
                 <div>
                   <p className={peekLabel}>Status</p>
-                  <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: creator.approved ? '#E1F5EE' : '#FAEEDA', color: creator.approved ? '#0F6E56' : '#854F0B' }}>
+                  <span className="inline-flex items-center rounded-[6px] text-[12px] font-medium" style={{ padding: '3px 9px', background: creator.approved ? '#E1F5EE' : '#FAEEDA', color: creator.approved ? '#0F6E56' : '#854F0B' }}>
                     {creator.approved ? 'Approved' : 'Pending'}
                   </span>
                 </div>
@@ -522,7 +522,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
   return (
     <div>
       {toast && (
-        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>
           {toast}
         </div>
       )}
@@ -716,7 +716,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
                     <p className="text-[12px] text-[var(--ink-60)]">{c.instagram_handle}</p>
                   </div>
                 </div>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: getLevelColour(c.level).bg, color: getLevelColour(c.level).text }}>L{c.level}</span>
+                <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[12px] font-semibold" style={{ background: getLevelColour(c.level).bg, color: getLevelColour(c.level).text }}>L{c.level}</span>
               </div>
               <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
                 <span>{c.address || '—'}</span>
@@ -796,7 +796,7 @@ export default function AdminCreatorsTab({ showModal, onCloseModal, initialPeekI
                   }
                 </td>
                 <td className={tdCls}>
-                  <span className="inline-flex items-center rounded-[999px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>
+                  <span className="inline-flex items-center rounded-[6px] text-[12px] font-medium" style={{ padding: '3px 9px', background: '#E1F5EE', color: '#0F6E56' }}>
                     Approved
                   </span>
                 </td>

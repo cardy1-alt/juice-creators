@@ -194,7 +194,7 @@ export default function AdminActivityTab() {
             const active = filter === chip.key;
             return (
               <button key={chip.key} onClick={() => setFilter(chip.key)}
-                className="px-3 py-1.5 rounded-[999px] text-[12px] transition-colors"
+                className="px-3 py-1.5 rounded-[6px] text-[12px] transition-colors"
                 style={{
                   fontWeight: active ? 700 : 500,
                   background: active ? 'var(--terra)' : 'white',
@@ -237,12 +237,12 @@ export default function AdminActivityTab() {
                     <span className="text-[14px] font-semibold text-[var(--ink)]">{label}</span>
                     <span className="text-[13px] text-[var(--ink-60)]">· {who}</span>
                     {r.email_sent === false && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[999px] text-[10px] font-semibold" style={{ background: 'rgba(220,38,38,0.08)', color: '#DC2626' }}>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[10px] font-semibold" style={{ background: 'rgba(220,38,38,0.08)', color: '#DC2626' }}>
                         <AlertCircle size={10} /> email not sent
                       </span>
                     )}
                     {r.email_sent === true && (
-                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[999px] text-[10px] font-medium" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[10px] font-medium" style={{ background: 'rgba(45,122,79,0.08)', color: '#2D7A4F' }}>
                         <Mail size={10} /> sent
                       </span>
                     )}

@@ -92,7 +92,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '4px 10px', fontWeight: 500 }}>
+    <span className={`inline-flex items-center rounded-[6px] text-[14px] md:text-[12px] font-medium ${styles[status] || styles.draft}`} style={{ padding: '4px 10px', fontWeight: 500 }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -119,7 +119,7 @@ function UrgencyPill({ deadline, pending, status }: { deadline: string | null; p
   const style = urgencyStyle(u);
   if (!style) return null;
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-semibold"
       style={{ background: style.bg, color: style.color }}>
       <Clock size={10} />
       {style.label(fmtCountdown(deadline))}
@@ -460,7 +460,7 @@ export default function BusinessPortal() {
   return (
     <div className="flex min-h-screen bg-[var(--shell)]">
       {toast && (
-        <div className="fixed top-4 right-4 z-50 text-white px-5 py-3 rounded-[999px] text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        <div className="fixed top-4 right-4 z-50 text-white px-5 py-3 rounded-[6px] text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* ─── Desktop sidebar ─── */}
@@ -524,7 +524,7 @@ export default function BusinessPortal() {
               const active = campaignSubTab === tab.key;
               return (
                 <button key={tab.key} onClick={() => setCampaignSubTab(tab.key)}
-                  className="flex-shrink-0 px-3 py-1.5 rounded-[999px] text-[14px] transition-colors"
+                  className="flex-shrink-0 px-3 py-1.5 rounded-[6px] text-[14px] transition-colors"
                   style={{
                     fontWeight: active ? 600 : 500,
                     background: active ? 'var(--terra-10)' : 'transparent',
@@ -667,7 +667,7 @@ export default function BusinessPortal() {
             <div className="flex gap-1.5 mb-5">
               {(['all', 'active', 'draft', 'completed'] as const).map(f => (
                 <button key={f} onClick={() => setCampaignFilter(f)}
-                  className="px-3 py-1.5 rounded-[999px] text-[14px] md:text-[12px] transition-colors"
+                  className="px-3 py-1.5 rounded-[6px] text-[14px] md:text-[12px] transition-colors"
                   style={{
                     fontWeight: campaignFilter === f ? 600 : 500,
                     background: campaignFilter === f ? 'var(--terra)' : 'white',
@@ -983,7 +983,7 @@ export default function BusinessPortal() {
                   </p>
                 </div>
                 {deadline && (
-                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[999px]"
+                  <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px]"
                     style={{ background: deadlineBg }}>
                     <Clock size={13} style={{ color: deadlineFg }} />
                     <span className="text-[12px] font-semibold" style={{ color: deadlineFg }}>
@@ -995,7 +995,7 @@ export default function BusinessPortal() {
 
               {target > 0 && (
                 <div className="mt-3">
-                  <div className="h-[6px] rounded-[999px] overflow-hidden" style={{ background: 'rgba(42,32,24,0.06)' }}>
+                  <div className="h-[6px] rounded-[6px] overflow-hidden" style={{ background: 'rgba(42,32,24,0.06)' }}>
                     <div className="h-full transition-[width] duration-300 ease-out" style={{ width: `${fillPct}%`, background: isFull ? 'var(--sage)' : 'var(--terra)' }} />
                   </div>
                   <p className="text-[12px] text-[var(--ink-50)] mt-1.5">

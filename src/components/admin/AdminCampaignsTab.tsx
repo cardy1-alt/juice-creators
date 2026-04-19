@@ -70,7 +70,7 @@ function StatusBadge({ status }: { status: string }) {
     overdue: 'bg-[#FCEBEB] text-[#A32D2D]',
   };
   return (
-    <span className={`inline-flex items-center rounded-[999px] text-[12px] font-medium ${cls[status] || cls.draft}`} style={{ padding: '3px 9px' }}>
+    <span className={`inline-flex items-center rounded-[6px] text-[12px] font-medium ${cls[status] || cls.draft}`} style={{ padding: '3px 9px' }}>
       {status.replace('_', ' ')}
     </span>
   );
@@ -760,7 +760,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 
         {/* Toast */}
         {toast && (
-          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>
             {toast}
           </div>
         )}
@@ -947,7 +947,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
         </div>
 
         {toast && (
-          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+          <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
         )}
 
         {/* Scrollable body — reuses CampaignDetail from creator app */}
@@ -973,7 +973,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
                   if (error) showToast('Failed to update status');
                   else { showToast(`Status → ${s.value}`); onEdit(); }
                 }}
-                  className="px-3 py-1.5 rounded-[999px] text-[12px] transition-all"
+                  className="px-3 py-1.5 rounded-[6px] text-[12px] transition-all"
                   style={{
                     fontWeight: campaign.status === s.value ? 700 : 500,
                     background: campaign.status === s.value ? s.bg : 'transparent',
@@ -1211,7 +1211,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   return (
     <div>
       {toast && (
-        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Bulk action toolbar (desktop) */}
@@ -1518,7 +1518,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           <Megaphone size={32} style={{ color: getCategoryPalette(c.businesses?.category).color, opacity: 0.5 }} />
                         </div>
                       )}
-                      <span className="absolute top-2 right-2 bg-white rounded-[999px] shadow-sm"><StatusBadge status={c.status} /></span>
+                      <span className="absolute top-2 right-2 bg-white rounded-[6px] shadow-sm"><StatusBadge status={c.status} /></span>
                     </div>
                   </div>
                   <div className="flex-1 px-3.5 pb-3.5 pt-3 flex flex-col">

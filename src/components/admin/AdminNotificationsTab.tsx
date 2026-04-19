@@ -105,7 +105,7 @@ export default function AdminNotificationsTab() {
   return (
     <div>
       {toast && (
-        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Send notification card */}
@@ -161,7 +161,7 @@ export default function AdminNotificationsTab() {
           <div key={n.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="flex items-center justify-between mb-1.5">
               <span className="text-[12px] text-[var(--ink-50)]">{fmtDate(n.created_at)}</span>
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
+              <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[12px] font-semibold" style={{ background: 'rgba(196,103,74,0.08)', color: 'var(--terra)' }}>
                 {n.email_type?.replace(/_/g, ' ') || 'notification'}
               </span>
             </div>

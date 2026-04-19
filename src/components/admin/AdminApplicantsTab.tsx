@@ -414,19 +414,19 @@ export default function AdminApplicantsTab() {
     ) : null;
 
     const statusPill = isCommunityEntry ? (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
         <Check size={11} /> Entered
       </span>
     ) : a.status === 'selected' ? (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
         <Check size={11} /> Selected
       </span>
     ) : a.status === 'confirmed' ? (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
         <Check size={11} /> Confirmed
       </span>
     ) : a.status === 'declined' ? (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
         Declined
       </span>
     ) : null;
@@ -553,7 +553,7 @@ export default function AdminApplicantsTab() {
   return (
     <div>
       {toast && (
-        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[999px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
+        <div className="toast-enter fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] px-6 py-3.5 rounded-[6px] text-white text-[14px]" style={{ background: 'var(--ink)', fontWeight: 600, boxShadow: '0 4px 16px rgba(42,32,24,0.20)' }}>{toast}</div>
       )}
 
       {/* Header: pending summary + search + filter */}
@@ -665,7 +665,7 @@ export default function AdminApplicantsTab() {
                             )}
                           </div>
                           {group.pending > 0 && (
-                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-[999px] text-[12px] font-bold flex-shrink-0"
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-[6px] text-[12px] font-bold flex-shrink-0"
                               style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)', minWidth: 24 }}>
                               {group.pending}
                             </span>
@@ -709,7 +709,7 @@ export default function AdminApplicantsTab() {
                         )}
                       </div>
                       {group.pending > 0 && (
-                        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[11px] font-bold flex-shrink-0"
+                        <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-bold flex-shrink-0"
                           style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)', minWidth: 20 }}>
                           {group.pending}
                         </span>
@@ -763,13 +763,13 @@ export default function AdminApplicantsTab() {
                       </div>
                       <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                         {deadline && u !== 'none' && (
-                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] text-[12px] font-semibold"
+                          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[6px] text-[12px] font-semibold"
                             style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)' }}>
                             <Clock size={11} /> {fmtCountdown(deadline)}
                           </span>
                         )}
                         {activeCampaign.pending > 0 && (
-                          <span className="inline-flex items-center px-2.5 py-1 rounded-[999px] text-[12px] font-semibold" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
+                          <span className="inline-flex items-center px-2.5 py-1 rounded-[6px] text-[12px] font-semibold" style={{ background: 'var(--terra-10)', color: 'var(--terra)' }}>
                             {activeCampaign.pending} pending
                           </span>
                         )}
@@ -807,7 +807,7 @@ export default function AdminApplicantsTab() {
                           </span>
                         )}
                         {deadline && u !== 'none' && (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-semibold"
                             style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)' }}>
                             <Clock size={10} /> {fmtCountdown(deadline)}
                           </span>
@@ -1022,17 +1022,17 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
           L{c?.level || 1} — {c?.level_name || LEVEL_NAMES[c?.level || 1]}
         </span>
         {applicant.status === 'selected' && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[12px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
             <Check size={12} /> Selected
           </span>
         )}
         {applicant.status === 'confirmed' && (
-          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[12px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
             <Check size={12} /> {applicant.campaigns?.campaign_type === 'community' ? 'Entered' : 'Confirmed'}
           </span>
         )}
         {applicant.status === 'declined' && (
-          <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
+          <span className="inline-flex items-center px-2 py-0.5 rounded-[6px] text-[12px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
             Declined
           </span>
         )}
@@ -1128,7 +1128,7 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
         <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
           <p className="text-[13px] font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
             Active on
-            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[11px] font-bold"
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-bold"
               style={{ background: activeCommitments.length >= 3 ? 'var(--terra)' : 'var(--terra-10)', color: activeCommitments.length >= 3 ? 'white' : 'var(--terra)', minWidth: 18 }}>
               {activeCommitments.length}
             </span>
