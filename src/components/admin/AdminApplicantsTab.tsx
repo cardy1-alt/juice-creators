@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
-import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock, Columns2 } from 'lucide-react';
+import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock, Columns2, ChevronDown, ChevronLeft } from 'lucide-react';
 import Select from '../ui/Select';
 import InstagramEmbed from '../InstagramEmbed';
 import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../../lib/dates';
@@ -76,6 +76,9 @@ export default function AdminApplicantsTab() {
   // active campaign changes so the right pane never shows a stale row.
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
   const [highlightedHistory, setHighlightedHistory] = useState<CampaignHistoryItem[]>([]);
+  // Mobile campaign picker sheet. On mobile the campaigns sidebar would eat
+  // the whole screen, so we collapse it into a button that opens this sheet.
+  const [mobileCampaignSheet, setMobileCampaignSheet] = useState(false);
   const [toast, setToast] = useState('');
   const [actingOn, setActingOn] = useState<string | null>(null);
   const [peekApplicant, setPeekApplicant] = useState<Applicant | null>(null);
@@ -606,8 +609,78 @@ export default function AdminApplicantsTab() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-[240px_1fr] gap-4">
-          {/* Campaign sidebar */}
-          <aside className="bg-white rounded-[12px] overflow-hidden self-start" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+          {/* Mobile campaign picker — compact chip that opens a bottom-sheet.
+              Saves the whole top of the page from being eaten by a
+              full campaign list on small screens. */}
+          {activeCampaign && currentCampaignId && (
+            <button
+              onClick={() => setMobileCampaignSheet(true)}
+              className="md:hidden flex items-center justify-between gap-3 bg-white rounded-[12px] px-4 py-3 text-left"
+              style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}
+            >
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.06em] text-[var(--ink-50)]">Campaign</p>
+                <p className="text-[15px] font-semibold text-[var(--ink)] truncate">{activeCampaign.campaign?.title || 'Untitled'}</p>
+                <p className="text-[12px] text-[var(--ink-60)] truncate">
+                  {activeCampaign.campaign?.campaign_type === 'community' ? 'Nayba Community' : activeCampaign.campaign?.businesses?.name}
+                  {activeCampaign.pending > 0 && <> · <span className="font-semibold text-[var(--terra)]">{activeCampaign.pending} pending</span></>}
+                </p>
+              </div>
+              <ChevronDown size={16} className="text-[var(--ink-50)] flex-shrink-0" />
+            </button>
+          )}
+
+          {/* Mobile bottom-sheet picker */}
+          {mobileCampaignSheet && (
+            <div className="md:hidden fixed inset-0 z-50 bg-[rgba(42,32,24,0.40)] flex items-end animate-overlay" onClick={() => setMobileCampaignSheet(false)}>
+              <div className="bg-white w-full rounded-t-[20px] max-h-[75vh] flex flex-col animate-slide-up" onClick={e => e.stopPropagation()}>
+                <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
+                  <p className="text-[15px] font-semibold text-[var(--ink)]">Campaigns</p>
+                  <button onClick={() => setMobileCampaignSheet(false)} className="w-8 h-8 rounded-[10px] flex items-center justify-center text-[var(--ink-50)]">
+                    <X size={18} />
+                  </button>
+                </div>
+                <div className="overflow-y-auto flex-1">
+                  {campaignList.map(([campaignId, group]) => {
+                    const brandName = group.campaign?.campaign_type === 'community'
+                      ? 'Nayba Community'
+                      : (group.campaign?.businesses?.name || '—');
+                    const isActive = campaignId === currentCampaignId;
+                    const u = group.pending > 0 ? deadlineUrgency(group.campaign?.expression_deadline || null) : 'none';
+                    const isLoud = u === 'overdue' || u === 'today';
+                    return (
+                      <button
+                        key={campaignId}
+                        onClick={() => { setActiveCampaignId(campaignId); setMobileCampaignSheet(false); }}
+                        className={`w-full text-left px-5 py-3.5 transition-colors border-b border-[rgba(42,32,24,0.06)] last:border-b-0 ${isActive ? 'bg-[rgba(196,103,74,0.06)]' : 'hover:bg-[rgba(42,32,24,0.02)]'}`}
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className={`text-[15px] ${isActive ? 'font-semibold text-[var(--ink)]' : 'font-medium text-[var(--ink)]'} truncate`}>{group.campaign?.title || 'Untitled'}</p>
+                            <p className="text-[13px] text-[var(--ink-60)] truncate">{brandName}</p>
+                            {u !== 'none' && group.campaign?.expression_deadline && (
+                              <p className="text-[12px] font-semibold mt-0.5 inline-flex items-center gap-1" style={{ color: 'var(--terra)' }}>
+                                <Clock size={11} /> {fmtCountdown(group.campaign.expression_deadline)}
+                              </p>
+                            )}
+                          </div>
+                          {group.pending > 0 && (
+                            <span className="inline-flex items-center justify-center px-2 py-0.5 rounded-[999px] text-[12px] font-bold flex-shrink-0"
+                              style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)', minWidth: 24 }}>
+                              {group.pending}
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Desktop campaign sidebar — hidden on mobile */}
+          <aside className="hidden md:block bg-white rounded-[12px] overflow-hidden self-start" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
             <div className="px-3 py-2.5 border-b border-[rgba(42,32,24,0.06)]">
               <p style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.07em', color: 'var(--ink-60)', textTransform: 'uppercase' }}>Campaigns</p>
             </div>
@@ -676,16 +749,19 @@ export default function AdminApplicantsTab() {
                   const u = deadlineUrgency(deadline);
                   const isLoud = u === 'overdue' || u === 'today' || u === 'urgent';
                   return (
-                  <div className="bg-white rounded-[12px] px-5 py-4 mb-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                    <div className="flex items-center justify-between gap-3">
+                  <div className="bg-white rounded-[12px] px-4 md:px-5 py-3.5 md:py-4 mb-3" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                    {/* Title block — stacks on mobile, rows on desktop. Hidden
+                        on mobile when the mobile campaign picker already shows
+                        the same info above. */}
+                    <div className="hidden md:flex items-start justify-between gap-3 flex-wrap">
                       <div className="min-w-0 flex-1">
-                        <h2 className="text-[18px] font-semibold text-[var(--ink)] truncate">{activeCampaign.campaign?.title}</h2>
+                        <h2 className="text-[18px] font-semibold text-[var(--ink)]">{activeCampaign.campaign?.title}</h2>
                         <p className="text-[13px] text-[var(--ink-50)] mt-0.5">
                           {activeCampaign.campaign?.campaign_type === 'community' ? 'Nayba Community' : activeCampaign.campaign?.businesses?.name}
                           {target > 0 && <> · <span className="font-medium text-[var(--ink)]">{selectedSoFar}/{target}</span> slots filled</>}
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0 ml-4 flex-wrap justify-end">
+                      <div className="flex items-center gap-2 flex-shrink-0 flex-wrap justify-end">
                         {deadline && u !== 'none' && (
                           <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-[999px] text-[12px] font-semibold"
                             style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)' }}>
@@ -717,6 +793,42 @@ export default function AdminApplicantsTab() {
                             <LayoutList size={14} />
                           </button>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* Mobile compact header — just the urgency + view toggle.
+                        Campaign title already lives in the mobile picker chip
+                        above, so we don't repeat it here. */}
+                    <div className="md:hidden flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        {target > 0 && (
+                          <span className="text-[13px] text-[var(--ink-60)]">
+                            <span className="font-semibold text-[var(--ink)]">{selectedSoFar}/{target}</span> slots
+                          </span>
+                        )}
+                        {deadline && u !== 'none' && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[11px] font-semibold"
+                            style={{ background: isLoud ? 'var(--terra)' : 'var(--terra-10)', color: isLoud ? 'white' : 'var(--terra)' }}>
+                            <Clock size={10} /> {fmtCountdown(deadline)}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1 flex-shrink-0">
+                        <button onClick={() => setViewMode('review')}
+                          className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                          style={{ background: viewMode === 'review' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'review' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                          <Columns2 size={14} />
+                        </button>
+                        <button onClick={() => setViewMode('grid')}
+                          className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                          style={{ background: viewMode === 'grid' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'grid' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                          <LayoutGrid size={14} />
+                        </button>
+                        <button onClick={() => setViewMode('list')}
+                          className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                          style={{ background: viewMode === 'list' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'list' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                          <LayoutList size={14} />
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1124,10 +1236,23 @@ function ReviewLayout({
     return () => document.removeEventListener('keydown', handler);
   }, [sorted, highlighted, actingOn, onSelect, onDecline, setHighlightedId]);
 
+  const highlightedIdx = highlighted ? sorted.findIndex(a => a.id === highlighted.id) : -1;
+  const goPrev = () => {
+    if (sorted.length === 0) return;
+    const prev = sorted[Math.max(0, highlightedIdx - 1)];
+    if (prev) setHighlightedId(prev.id);
+  };
+  const goNext = () => {
+    if (sorted.length === 0) return;
+    const next = sorted[Math.min(sorted.length - 1, highlightedIdx + 1)];
+    if (next) setHighlightedId(next.id);
+  };
+
   return (
-    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(300px, 380px) 1fr' }}>
-      {/* Master list */}
-      <div className="bg-white rounded-[12px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)', maxHeight: 'calc(100vh - 240px)' }}>
+    <div className="grid gap-3 md:grid-cols-[minmax(300px,380px)_1fr] pb-24 md:pb-0">
+      {/* Master list — hidden on mobile where the detail pane takes over.
+          Mobile gets prev/next buttons in the detail header instead. */}
+      <div className="hidden md:flex bg-white rounded-[12px] overflow-hidden flex-col md:max-h-[calc(100vh-200px)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         <div className="overflow-y-auto hide-scrollbar">
           {sorted.map(a => {
             const isHighlighted = a.id === resolvedId;
@@ -1195,8 +1320,11 @@ function ReviewLayout({
         </div>
       </div>
 
-      {/* Detail pane */}
-      <div className="bg-white rounded-[12px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)', maxHeight: 'calc(100vh - 240px)' }}>
+      {/* Detail pane — on desktop it sits alongside the master list; on
+          mobile it fills the full column and gets a prev/next pager at
+          the top so the user can move through applicants without the
+          master column. */}
+      <div className="bg-white rounded-[12px] overflow-hidden flex flex-col md:max-h-[calc(100vh-200px)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
         {highlighted ? (() => {
           const c = highlighted.creators;
           const name = c?.display_name || c?.name || 'Unknown';
@@ -1205,8 +1333,25 @@ function ReviewLayout({
           const colors = getAvatarColors(initial);
           const isPending = highlighted.status === 'interested';
           const isActing = actingOn === highlighted.id;
+          const atFirst = highlightedIdx <= 0;
+          const atLast = highlightedIdx >= sorted.length - 1;
           return (
             <>
+              {/* Mobile prev/next pager */}
+              <div className="md:hidden flex items-center justify-between px-3 py-2.5 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0 bg-[var(--stone)]">
+                <button onClick={goPrev} disabled={atFirst}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-[14px] font-medium text-[var(--ink)] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(42,32,24,0.04)] transition-colors">
+                  <ChevronLeft size={16} /> Prev
+                </button>
+                <span className="text-[13px] font-semibold text-[var(--ink-60)]">
+                  {highlightedIdx + 1} of {sorted.length}
+                </span>
+                <button onClick={goNext} disabled={atLast}
+                  className="flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-[14px] font-medium text-[var(--ink)] disabled:opacity-30 disabled:cursor-not-allowed hover:bg-[rgba(42,32,24,0.04)] transition-colors">
+                  Next <ChevronRight size={16} />
+                </button>
+              </div>
+
               {/* Header */}
               <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
                 <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -1239,18 +1384,32 @@ function ReviewLayout({
                 />
               </div>
 
-              {/* Sticky action footer */}
+              {/* Action footer — lives inside the pane on desktop (sticks
+                  to the bottom of the scroll container), pinned to the
+                  viewport on mobile so it's always within thumb reach. */}
               {isPending && (
-                <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 flex gap-2">
-                  <button onClick={() => onDecline(highlighted)} disabled={isActing}
-                    className="flex-1 px-4 py-3 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[15px] font-semibold hover:bg-[rgba(42,32,24,0.02)] disabled:opacity-40">
-                    Decline
-                  </button>
-                  <button onClick={() => onSelect(highlighted)} disabled={isActing}
-                    className="flex-1 px-4 py-3 rounded-[10px] bg-[var(--terra)] text-white text-[15px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
-                    {isActing ? 'Saving...' : 'Select creator'}
-                  </button>
-                </div>
+                <>
+                  <div className="hidden md:flex px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 gap-2">
+                    <button onClick={() => onDecline(highlighted)} disabled={isActing}
+                      className="flex-1 px-4 py-3 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[15px] font-semibold hover:bg-[rgba(42,32,24,0.02)] disabled:opacity-40">
+                      Decline
+                    </button>
+                    <button onClick={() => onSelect(highlighted)} disabled={isActing}
+                      className="flex-1 px-4 py-3 rounded-[10px] bg-[var(--terra)] text-white text-[15px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+                      {isActing ? 'Saving...' : 'Select creator'}
+                    </button>
+                  </div>
+                  <div className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[rgba(42,32,24,0.08)] px-4 pt-3 pb-[max(12px,env(safe-area-inset-bottom))] flex gap-2" style={{ boxShadow: '0 -4px 12px rgba(42,32,24,0.05)' }}>
+                    <button onClick={() => onDecline(highlighted)} disabled={isActing}
+                      className="flex-1 min-h-[48px] rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[15px] font-semibold hover:bg-[rgba(42,32,24,0.02)] disabled:opacity-40">
+                      Decline
+                    </button>
+                    <button onClick={() => onSelect(highlighted)} disabled={isActing}
+                      className="flex-1 min-h-[48px] rounded-[10px] bg-[var(--terra)] text-white text-[15px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+                      {isActing ? 'Saving...' : 'Select creator'}
+                    </button>
+                  </div>
+                </>
               )}
             </>
           );
