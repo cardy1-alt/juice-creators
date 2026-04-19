@@ -897,10 +897,13 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
   const c = applicant.creators;
   const handle = (c?.instagram_handle || '').replace('@', '');
   const levelColor = getLevelColour(c?.level || 1);
-  const label = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
+  // Section labels: title-case, not uppercase. Bigger and darker so they
+  // read as headings rather than faint eyebrow tags. The previous 12px
+  // grey uppercase pattern was elegant but unreadable in practice.
+  const label = "text-[13px] font-semibold text-[var(--ink)] mb-2";
 
   return (
-    <div className="px-5 py-4">
+    <div className="px-5 py-5">
       {/* Level + status */}
       <div className="flex items-center gap-2 mb-5 flex-wrap">
         <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
@@ -924,34 +927,33 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
       </div>
 
       {/* Applying to */}
-      <div className="bg-[var(--stone)] rounded-[10px] p-3 mb-5">
-        <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-1">Applying to</p>
-        <p className="text-[14px] font-semibold text-[var(--ink)]">{applicant.campaigns?.title}</p>
+      <div className="bg-[var(--stone)] rounded-[10px] p-3.5 mb-5">
+        <p className="text-[12px] font-semibold text-[var(--ink-60)] mb-1">Applying to</p>
+        <p className="text-[15px] font-semibold text-[var(--ink)]">{applicant.campaigns?.title}</p>
         <p className="text-[13px] text-[var(--ink-60)]">{applicant.campaigns?.campaign_type === 'community' ? 'Nayba Community' : applicant.campaigns?.businesses?.name}</p>
       </div>
 
-      {/* Pitch — hero content of the panel. Full ink contrast, no italics,
-          larger size so reviewers can actually read it without squinting. */}
+      {/* Pitch — hero content of the panel. */}
       <div className="mb-5">
         <p className={label}>Pitch</p>
         {applicant.pitch ? (
-          <p className="text-[15px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{applicant.pitch}</p>
+          <p className="text-[15px] text-[var(--ink)] leading-[1.65] whitespace-pre-wrap">{applicant.pitch}</p>
         ) : (
-          <p className="text-[14px] text-[var(--ink-35)]">No pitch provided</p>
+          <p className="text-[14px] text-[var(--ink-50)]">No pitch provided</p>
         )}
-        <p className="text-[12px] text-[var(--ink-35)] mt-2">Applied {timeAgo(applicant.applied_at)}</p>
+        <p className="text-[13px] text-[var(--ink-50)] mt-3">Applied {timeAgo(applicant.applied_at)}</p>
       </div>
 
       {/* Past reels — embedded so reviewers can judge content quality
           without leaving the panel. Hidden when there are none. */}
       {pastReels.length > 0 && (
         <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
-          <p className={`${label} mb-3`}>Past reels</p>
+          <p className={label}>Past reels</p>
           <div className="space-y-3">
             {pastReels.map((r, i) => (
               <div key={i}>
-                <p className="text-[12px] text-[var(--ink-50)] mb-1.5 truncate">
-                  Submitted for <span className="text-[var(--ink-60)] font-medium">{r.campaign_title}</span> · {r.brand_name}
+                <p className="text-[13px] text-[var(--ink-60)] mb-1.5 truncate">
+                  Submitted for <span className="text-[var(--ink)] font-medium">{r.campaign_title}</span> · {r.brand_name}
                 </p>
                 <InstagramEmbed url={r.reel_url} height={420} />
               </div>
@@ -962,15 +964,15 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
 
       {/* Performance stats */}
       <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
-        <p className={`${label} mb-3`}>Performance</p>
+        <p className={label}>Performance</p>
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+          <div className="bg-[rgba(42,32,24,0.03)] rounded-[10px] px-3.5 py-3">
             <p className="text-[20px] font-semibold text-[var(--ink)]">{c?.completed_campaigns || 0}/{c?.total_campaigns || 0}</p>
-            <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
+            <p className="text-[13px] text-[var(--ink-60)] font-medium mt-0.5">Campaigns</p>
           </div>
-          <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+          <div className="bg-[rgba(42,32,24,0.03)] rounded-[10px] px-3.5 py-3">
             <p className="text-[20px] font-semibold text-[var(--ink)]">{(c?.total_campaigns || 0) > 0 ? `${c?.completion_rate || 0}%` : '—'}</p>
-            <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
+            <p className="text-[13px] text-[var(--ink-60)] font-medium mt-0.5">Completion</p>
           </div>
         </div>
       </div>
@@ -979,32 +981,32 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
       <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5 space-y-3">
         {c?.email && (
           <div className="flex items-center gap-2">
-            <Mail size={14} className="text-[var(--ink-35)] flex-shrink-0" />
-            <a href={`mailto:${c.email}`} className="text-[13px] text-[var(--ink-60)] hover:text-[var(--terra)] truncate">{c.email}</a>
+            <Mail size={14} className="text-[var(--ink-50)] flex-shrink-0" />
+            <a href={`mailto:${c.email}`} className="text-[14px] text-[var(--ink)] hover:text-[var(--terra)] truncate">{c.email}</a>
           </div>
         )}
         {handle && (
           <div className="flex items-center gap-2">
-            <AtSign size={14} className="text-[var(--ink-35)] flex-shrink-0" />
+            <AtSign size={14} className="text-[var(--ink-50)] flex-shrink-0" />
             <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+              className="inline-flex items-center gap-1 text-[14px] text-[var(--terra)] font-medium hover:underline">
               {handle} <ExternalLink size={11} />
             </a>
             {c?.follower_count && (
-              <span className="text-[13px] text-[var(--ink-50)]">· {c.follower_count} followers</span>
+              <span className="text-[13px] text-[var(--ink-60)]">· {c.follower_count} followers</span>
             )}
           </div>
         )}
         {c?.address && (
           <div className="flex items-center gap-2">
-            <MapPin size={14} className="text-[var(--ink-35)] flex-shrink-0" />
-            <span className="text-[13px] text-[var(--ink-60)]">{c.address}</span>
+            <MapPin size={14} className="text-[var(--ink-50)] flex-shrink-0" />
+            <span className="text-[14px] text-[var(--ink)]">{c.address}</span>
           </div>
         )}
         {c?.instagram_connected && (
           <div className="flex items-center gap-2">
             <Award size={14} className="text-[var(--sage)] flex-shrink-0" />
-            <span className="text-[13px] text-[var(--ink-60)]">Instagram connected</span>
+            <span className="text-[14px] text-[var(--ink)]">Instagram connected</span>
           </div>
         )}
       </div>
@@ -1012,20 +1014,20 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
       {/* Active commitments */}
       {activeCommitments.length > 0 && (
         <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
-          <p className={`${label} mb-2 flex items-center gap-2`}>
+          <p className="text-[13px] font-semibold text-[var(--ink)] mb-2 flex items-center gap-2">
             Active on
-            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[10px] font-bold"
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[11px] font-bold"
               style={{ background: activeCommitments.length >= 3 ? 'var(--terra)' : 'var(--terra-10)', color: activeCommitments.length >= 3 ? 'white' : 'var(--terra)', minWidth: 18 }}>
               {activeCommitments.length}
             </span>
           </p>
-          <div className="space-y-1.5">
+          <div className="space-y-2">
             {activeCommitments.map(ac => (
               <div key={ac.application_id} className="flex items-start gap-2">
-                <span className="w-1 h-1 rounded-full bg-[var(--terra)] mt-[7px] flex-shrink-0" />
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--terra)] mt-[7px] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[var(--ink)] truncate">{ac.campaign_title}</p>
-                  <p className="text-[11px] text-[var(--ink-50)]">{ac.brand_name}</p>
+                  <p className="text-[14px] text-[var(--ink)] truncate">{ac.campaign_title}</p>
+                  <p className="text-[12px] text-[var(--ink-60)]">{ac.brand_name}</p>
                 </div>
               </div>
             ))}
@@ -1036,14 +1038,14 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
       {/* Campaign history */}
       {history.length > 0 && (
         <div className="border-t border-[rgba(42,32,24,0.08)] pt-4">
-          <p className={`${label} mb-3`}>Recent campaigns</p>
+          <p className={label}>Recent campaigns</p>
           <div className="space-y-2">
             {history.map(h => (
               <div key={h.campaign_id} className="flex items-start gap-2">
-                <Film size={12} className="text-[var(--ink-35)] flex-shrink-0 mt-1" />
+                <Film size={12} className="text-[var(--ink-50)] flex-shrink-0 mt-1.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-[13px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
-                  <p className="text-[11px] text-[var(--ink-50)]">
+                  <p className="text-[14px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
+                  <p className="text-[12px] text-[var(--ink-60)]">
                     {h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
                   </p>
                 </div>
@@ -1123,10 +1125,10 @@ function ReviewLayout({
   }, [sorted, highlighted, actingOn, onSelect, onDecline, setHighlightedId]);
 
   return (
-    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(280px, 360px) 1fr' }}>
+    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(300px, 380px) 1fr' }}>
       {/* Master list */}
       <div className="bg-white rounded-[12px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)', maxHeight: 'calc(100vh - 240px)' }}>
-        <div className="overflow-y-auto">
+        <div className="overflow-y-auto hide-scrollbar">
           {sorted.map(a => {
             const isHighlighted = a.id === resolvedId;
             const name = a.creators?.display_name || a.creators?.name || 'Unknown';
@@ -1141,47 +1143,47 @@ function ReviewLayout({
               : 'No pitch provided';
             return (
               <button key={a.id} onClick={() => setHighlightedId(a.id)}
-                className={`w-full text-left px-3 py-3 transition-colors border-l-2 border-b border-b-[rgba(42,32,24,0.04)] last:border-b-0 ${isHighlighted ? 'bg-[rgba(196,103,74,0.06)] border-l-[var(--terra)]' : 'border-l-transparent hover:bg-[rgba(42,32,24,0.02)]'}`}>
-                <div className="flex items-start gap-2.5">
-                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
+                className={`w-full text-left px-4 py-3.5 transition-colors border-l-2 border-b border-b-[rgba(42,32,24,0.06)] last:border-b-0 ${isHighlighted ? 'bg-[rgba(196,103,74,0.06)] border-l-[var(--terra)]' : 'border-l-transparent hover:bg-[rgba(42,32,24,0.03)]'}`}>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
                     {a.creators?.avatar_url ? (
                       <img src={a.creators.avatar_url} alt={name} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                      <span className="text-[13px] font-semibold" style={{ color: colors.text }}>{initial}</span>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center justify-between gap-2 mb-0.5">
-                      <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
-                      <span className="text-[11px] text-[var(--ink-35)] flex-shrink-0">{timeAgo(a.applied_at)}</span>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                      <span className="text-[12px] text-[var(--ink-50)] flex-shrink-0">{timeAgo(a.applied_at)}</span>
                     </div>
-                    <p className={`text-[12px] leading-[1.45] line-clamp-2 ${a.pitch ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'}`}>{pitchSnippet}</p>
+                    <p className={`text-[13px] leading-[1.5] line-clamp-2 ${a.pitch ? 'text-[var(--ink-60)]' : 'text-[var(--ink-50)]'}`}>{pitchSnippet}</p>
                     {(isFirstTimer || others.length > 0 || reels.length > 0 || a.status !== 'interested') && (
-                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                      <div className="flex items-center gap-1.5 mt-2 flex-wrap">
                         {isFirstTimer && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}>✦ First-timer</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}>✦ First-timer</span>
                         )}
                         {reels.length > 0 && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}>
-                            <Film size={9} /> {reels.length}
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold" style={{ background: 'rgba(42,32,24,0.07)', color: 'var(--ink)' }}>
+                            <Film size={10} /> {reels.length}
                           </span>
                         )}
                         {others.length > 0 && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold"
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold"
                             style={others.length >= 3
                               ? { background: 'var(--terra-10)', color: 'var(--terra)' }
-                              : { background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}>
+                              : { background: 'rgba(42,32,24,0.07)', color: 'var(--ink)' }}>
                             On {others.length}
                           </span>
                         )}
                         {a.status === 'selected' && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>Selected</span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold" style={{ background: 'rgba(122,148,120,0.15)', color: 'var(--sage)' }}>Selected</span>
                         )}
                         {a.status === 'confirmed' && (
-                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>{isCommunity ? 'Entered' : 'Confirmed'}</span>
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold" style={{ background: 'rgba(140,122,170,0.15)', color: 'var(--violet)' }}>{isCommunity ? 'Entered' : 'Confirmed'}</span>
                         )}
                         {a.status === 'declined' && (
-                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">Declined</span>
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold bg-[rgba(42,32,24,0.07)] text-[var(--ink-60)]">Declined</span>
                         )}
                       </div>
                     )}
@@ -1220,15 +1222,15 @@ function ReviewLayout({
                     {handle && <p className="text-[13px] text-[var(--ink-50)]">@{handle}</p>}
                   </div>
                 </div>
-                <div className="hidden md:flex items-center gap-1 text-[11px] text-[var(--ink-35)] flex-shrink-0 ml-3">
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">↑↓</kbd>
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">S</kbd>
-                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">D</kbd>
+                <div className="hidden md:flex items-center gap-1 text-[11px] text-[var(--ink-60)] flex-shrink-0 ml-3">
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.08)] font-mono text-[11px] font-semibold">↑↓</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.08)] font-mono text-[11px] font-semibold">S</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.08)] font-mono text-[11px] font-semibold">D</kbd>
                 </div>
               </div>
 
               {/* Body */}
-              <div className="flex-1 overflow-y-auto">
+              <div className="flex-1 overflow-y-auto hide-scrollbar">
                 <ApplicantDetailBody
                   applicant={highlighted}
                   history={highlightedHistory}
