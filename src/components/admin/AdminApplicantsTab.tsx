@@ -3,7 +3,7 @@ import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
-import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock } from 'lucide-react';
+import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock, Columns2 } from 'lucide-react';
 import Select from '../ui/Select';
 import InstagramEmbed from '../InstagramEmbed';
 import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../../lib/dates';
@@ -70,7 +70,12 @@ export default function AdminApplicantsTab() {
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('interested');
   const [activeCampaignId, setActiveCampaignId] = useState<string | null>(null);
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  const [viewMode, setViewMode] = useState<'review' | 'grid' | 'list'>('review');
+  // Currently-highlighted applicant in review mode. Drives the persistent
+  // right pane and is moved by keyboard (j/k) or click. Reset whenever the
+  // active campaign changes so the right pane never shows a stale row.
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [highlightedHistory, setHighlightedHistory] = useState<CampaignHistoryItem[]>([]);
   const [toast, setToast] = useState('');
   const [actingOn, setActingOn] = useState<string | null>(null);
   const [peekApplicant, setPeekApplicant] = useState<Applicant | null>(null);
@@ -258,6 +263,28 @@ export default function AdminApplicantsTab() {
       if (data) setPeekHistory(data as any);
     }
   };
+
+  // Fetch history for the highlighted applicant in review mode. Same query
+  // shape as openPeek; we just feed a different state slot so the two views
+  // can coexist without trampling each other.
+  useEffect(() => {
+    if (!highlightedId) { setHighlightedHistory([]); return; }
+    const a = applicants.find(x => x.id === highlightedId);
+    const creatorId = a?.creators?.id;
+    if (!creatorId) { setHighlightedHistory([]); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('applications')
+        .select('campaign_id, status, applied_at, campaigns(title, campaign_type, businesses(name))')
+        .eq('creator_id', creatorId)
+        .neq('id', a.id)
+        .order('applied_at', { ascending: false })
+        .limit(5);
+      if (!cancelled && data) setHighlightedHistory(data as any);
+    })();
+    return () => { cancelled = true; };
+  }, [highlightedId, applicants]);
 
   // Apply search across all applicants
   const searched = applicants.filter(a => {
@@ -671,6 +698,12 @@ export default function AdminApplicantsTab() {
                           </span>
                         )}
                         <div className="flex items-center gap-1">
+                          <button onClick={() => setViewMode('review')}
+                            title="Review (one at a time)"
+                            className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
+                            style={{ background: viewMode === 'review' ? 'rgba(42,32,24,0.06)' : 'transparent', color: viewMode === 'review' ? 'var(--ink)' : 'var(--ink-35)' }}>
+                            <Columns2 size={14} />
+                          </button>
                           <button onClick={() => setViewMode('grid')}
                             title="Grid view"
                             className="flex items-center justify-center w-8 h-8 rounded-[8px] transition-colors"
@@ -690,8 +723,10 @@ export default function AdminApplicantsTab() {
                   );
                 })()}
 
-                {/* Bulk action bar — appears when any pending applicant selected */}
-                {anySelected && (
+                {/* Bulk action bar — appears when any pending applicant
+                    selected. Hidden in review mode where decisions are
+                    one-at-a-time and bulk doesn't fit the flow. */}
+                {anySelected && viewMode !== 'review' && (
                   <div className="bg-[var(--ink)] rounded-[12px] px-4 py-3 mb-3 flex items-center justify-between flex-wrap gap-3 animate-slide-up">
                     <div className="flex items-center gap-3 text-white">
                       <span className="inline-flex items-center justify-center w-6 h-6 rounded-[6px] bg-white/10 text-[13px] font-semibold">{selectedInCampaign.length}</span>
@@ -736,6 +771,19 @@ export default function AdminApplicantsTab() {
                       <p className="text-[14px] text-[var(--ink-50)]">No applicants match the current filter</p>
                     </div>
                   );
+                  if (viewMode === 'review') {
+                    return <ReviewLayout
+                      sorted={sorted}
+                      highlightedId={highlightedId}
+                      setHighlightedId={setHighlightedId}
+                      highlightedHistory={highlightedHistory}
+                      reelsByCreator={reelsByCreator}
+                      getOtherCommitments={getOtherCommitments}
+                      onSelect={handleSelect}
+                      onDecline={handleDecline}
+                      actingOn={actingOn}
+                    />;
+                  }
                   return viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {sorted.map(a => <ApplicantCard key={a.id} a={a} variant="grid" />)}
@@ -758,6 +806,7 @@ export default function AdminApplicantsTab() {
         applicant={peekApplicant}
         history={peekHistory}
         activeCommitments={getOtherCommitments(peekApplicant)}
+        pastReels={reelsByCreator[peekApplicant.creator_id] || []}
         onClose={() => setPeekApplicant(null)}
         onSelect={() => handleSelect(peekApplicant)}
         onDecline={() => handleDecline(peekApplicant)}
@@ -769,10 +818,11 @@ export default function AdminApplicantsTab() {
 
 // ─── Applicant Peek Panel ─────────────────────────────────────────────────
 
-function ApplicantPeekPanel({ applicant, history, activeCommitments, onClose, onSelect, onDecline, acting }: {
+function ApplicantPeekPanel({ applicant, history, activeCommitments, pastReels, onClose, onSelect, onDecline, acting }: {
   applicant: Applicant;
   history: CampaignHistoryItem[];
   activeCommitments: { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[];
+  pastReels: { reel_url: string; campaign_title: string; brand_name: string }[];
   onClose: () => void;
   onSelect: () => void;
   onDecline: () => void;
@@ -780,39 +830,11 @@ function ApplicantPeekPanel({ applicant, history, activeCommitments, onClose, on
 }) {
   useEffect(() => { const h = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); }; document.addEventListener('keydown', h); return () => document.removeEventListener('keydown', h); }, [onClose]);
 
-  // Past reels — fetch lazily on peek open. Helps reviewers judge content
-  // quality at a glance instead of clicking out to Instagram per candidate.
-  const [pastReels, setPastReels] = useState<{ reel_url: string; campaign_title: string; brand_name: string }[]>([]);
-  useEffect(() => {
-    if (!applicant.creator_id) return;
-    let cancelled = false;
-    (async () => {
-      const { data } = await supabase
-        .from('participations')
-        .select('reel_url, reel_submitted_at, campaigns(title, campaign_type, businesses(name))')
-        .eq('creator_id', applicant.creator_id)
-        .not('reel_url', 'is', null)
-        .order('reel_submitted_at', { ascending: false })
-        .limit(3);
-      if (cancelled) return;
-      setPastReels(((data || []) as any[]).map(r => ({
-        reel_url: r.reel_url,
-        campaign_title: r.campaigns?.title || 'Untitled',
-        brand_name: r.campaigns?.campaign_type === 'community'
-          ? 'Nayba Community'
-          : (r.campaigns?.businesses?.name || '—'),
-      })));
-    })();
-    return () => { cancelled = true; };
-  }, [applicant.creator_id]);
-
   const c = applicant.creators;
   const name = c?.display_name || c?.name || 'Unknown';
   const handle = (c?.instagram_handle || '').replace('@', '');
   const initial = (name[0] || '?').toUpperCase();
   const colors = getAvatarColors(initial);
-  const levelColor = getLevelColour(c?.level || 1);
-  const label = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
   const isPending = applicant.status === 'interested';
 
   return (
@@ -840,159 +862,8 @@ function ApplicantPeekPanel({ applicant, history, activeCommitments, onClose, on
         </div>
 
         {/* Scrollable content */}
-        <div className="flex-1 overflow-y-auto px-5 py-4">
-          {/* Level + status */}
-          <div className="flex items-center gap-2 mb-5 flex-wrap">
-            <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
-              L{c?.level || 1} — {c?.level_name || LEVEL_NAMES[c?.level || 1]}
-            </span>
-            {applicant.status === 'selected' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
-                <Check size={12} /> Selected
-              </span>
-            )}
-            {applicant.status === 'confirmed' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
-                <Check size={12} /> Confirmed
-              </span>
-            )}
-            {applicant.status === 'declined' && (
-              <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
-                Declined
-              </span>
-            )}
-          </div>
-
-          {/* Applying to */}
-          <div className="bg-[var(--stone)] rounded-[10px] p-3 mb-5">
-            <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-1">Applying to</p>
-            <p className="text-[14px] font-semibold text-[var(--ink)]">{applicant.campaigns?.title}</p>
-            <p className="text-[13px] text-[var(--ink-60)]">{applicant.campaigns?.campaign_type === 'community' ? 'Nayba Community' : applicant.campaigns?.businesses?.name}</p>
-          </div>
-
-          {/* Pitch */}
-          <div className="mb-5">
-            <p className={label}>Pitch</p>
-            {applicant.pitch ? (
-              <p className="text-[14px] text-[var(--ink)] italic leading-[1.6]">"{applicant.pitch}"</p>
-            ) : (
-              <p className="text-[14px] text-[var(--ink-35)] italic">No pitch provided</p>
-            )}
-            <p className="text-[12px] text-[var(--ink-35)] mt-2">Applied {timeAgo(applicant.applied_at)}</p>
-          </div>
-
-          {/* Performance stats */}
-          <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
-            <p className={`${label} mb-3`}>Performance</p>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[var(--ink)]">{c?.completed_campaigns || 0}/{c?.total_campaigns || 0}</p>
-                <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
-              </div>
-              <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
-                <p className="text-[20px] font-semibold text-[var(--ink)]">{(c?.total_campaigns || 0) > 0 ? `${c?.completion_rate || 0}%` : '—'}</p>
-                <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Contact + location */}
-          <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5 space-y-3">
-            {c?.email && (
-              <div className="flex items-center gap-2">
-                <Mail size={14} className="text-[var(--ink-35)] flex-shrink-0" />
-                <a href={`mailto:${c.email}`} className="text-[13px] text-[var(--ink-60)] hover:text-[var(--terra)] truncate">{c.email}</a>
-              </div>
-            )}
-            {handle && (
-              <div className="flex items-center gap-2">
-                <AtSign size={14} className="text-[var(--ink-35)] flex-shrink-0" />
-                <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
-                  {handle} <ExternalLink size={11} />
-                </a>
-                {c?.follower_count && (
-                  <span className="text-[13px] text-[var(--ink-50)]">· {c.follower_count} followers</span>
-                )}
-              </div>
-            )}
-            {c?.address && (
-              <div className="flex items-center gap-2">
-                <MapPin size={14} className="text-[var(--ink-35)] flex-shrink-0" />
-                <span className="text-[13px] text-[var(--ink-60)]">{c.address}</span>
-              </div>
-            )}
-            {c?.instagram_connected && (
-              <div className="flex items-center gap-2">
-                <Award size={14} className="text-[var(--sage)] flex-shrink-0" />
-                <span className="text-[13px] text-[var(--ink-60)]">Instagram connected</span>
-              </div>
-            )}
-          </div>
-
-          {/* Active commitments — which live campaigns is this creator
-              already on the hook for. Makes it easy to see whether they're
-              getting picked across multiple campaigns at once. */}
-          {activeCommitments.length > 0 && (
-            <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
-              <p className={`${label} mb-2 flex items-center gap-2`}>
-                Active on
-                <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[10px] font-bold"
-                  style={{ background: activeCommitments.length >= 3 ? 'var(--terra)' : 'var(--terra-10)', color: activeCommitments.length >= 3 ? 'white' : 'var(--terra)', minWidth: 18 }}>
-                  {activeCommitments.length}
-                </span>
-              </p>
-              <div className="space-y-1.5">
-                {activeCommitments.map(c => (
-                  <div key={c.application_id} className="flex items-start gap-2">
-                    <span className="w-1 h-1 rounded-full bg-[var(--terra)] mt-[7px] flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] text-[var(--ink)] truncate">{c.campaign_title}</p>
-                      <p className="text-[11px] text-[var(--ink-50)]">{c.brand_name}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Campaign history */}
-          {history.length > 0 && (
-            <div className="border-t border-[rgba(42,32,24,0.08)] pt-4">
-              <p className={`${label} mb-3`}>Recent campaigns</p>
-              <div className="space-y-2">
-                {history.map(h => (
-                  <div key={h.campaign_id} className="flex items-start gap-2">
-                    <Film size={12} className="text-[var(--ink-35)] flex-shrink-0 mt-1" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
-                      <p className="text-[11px] text-[var(--ink-50)]">
-                        {h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Past reels — embedded so reviewers can judge content quality
-              without leaving the panel. Hidden when there are none. */}
-          {pastReels.length > 0 && (
-            <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mt-4">
-              <p className={`${label} mb-3`}>Past reels</p>
-              <div className="space-y-3">
-                {pastReels.map((r, i) => (
-                  <div key={i}>
-                    <p className="text-[12px] text-[var(--ink-50)] mb-1.5 truncate">
-                      Submitted for <span className="text-[var(--ink-60)] font-medium">{r.campaign_title}</span> · {r.brand_name}
-                    </p>
-                    <InstagramEmbed url={r.reel_url} height={420} />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
+        <div className="flex-1 overflow-y-auto">
+          <ApplicantDetailBody applicant={applicant} history={history} activeCommitments={activeCommitments} pastReels={pastReels} />
         </div>
 
         {/* Footer actions */}
@@ -1010,5 +881,387 @@ function ApplicantPeekPanel({ applicant, history, activeCommitments, onClose, on
         )}
       </div>
     </>
+  );
+}
+
+// ─── Applicant Detail Body ────────────────────────────────────────────────
+// Pure render of the applicant detail content. Used by both the slide-in
+// peek panel (grid/list views) and the persistent right pane (review view).
+
+function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels }: {
+  applicant: Applicant;
+  history: CampaignHistoryItem[];
+  activeCommitments: { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[];
+  pastReels: { reel_url: string; campaign_title: string; brand_name: string }[];
+}) {
+  const c = applicant.creators;
+  const handle = (c?.instagram_handle || '').replace('@', '');
+  const levelColor = getLevelColour(c?.level || 1);
+  const label = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
+
+  return (
+    <div className="px-5 py-4">
+      {/* Level + status */}
+      <div className="flex items-center gap-2 mb-5 flex-wrap">
+        <span className="inline-flex items-center px-2 py-0.5 rounded-[10px] text-[12px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
+          L{c?.level || 1} — {c?.level_name || LEVEL_NAMES[c?.level || 1]}
+        </span>
+        {applicant.status === 'selected' && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
+            <Check size={12} /> Selected
+          </span>
+        )}
+        {applicant.status === 'confirmed' && (
+          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[999px] text-[12px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
+            <Check size={12} /> {applicant.campaigns?.campaign_type === 'community' ? 'Entered' : 'Confirmed'}
+          </span>
+        )}
+        {applicant.status === 'declined' && (
+          <span className="inline-flex items-center px-2 py-0.5 rounded-[999px] text-[12px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
+            Declined
+          </span>
+        )}
+      </div>
+
+      {/* Applying to */}
+      <div className="bg-[var(--stone)] rounded-[10px] p-3 mb-5">
+        <p className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)] mb-1">Applying to</p>
+        <p className="text-[14px] font-semibold text-[var(--ink)]">{applicant.campaigns?.title}</p>
+        <p className="text-[13px] text-[var(--ink-60)]">{applicant.campaigns?.campaign_type === 'community' ? 'Nayba Community' : applicant.campaigns?.businesses?.name}</p>
+      </div>
+
+      {/* Pitch — hero content of the panel. Full ink contrast, no italics,
+          larger size so reviewers can actually read it without squinting. */}
+      <div className="mb-5">
+        <p className={label}>Pitch</p>
+        {applicant.pitch ? (
+          <p className="text-[15px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{applicant.pitch}</p>
+        ) : (
+          <p className="text-[14px] text-[var(--ink-35)]">No pitch provided</p>
+        )}
+        <p className="text-[12px] text-[var(--ink-35)] mt-2">Applied {timeAgo(applicant.applied_at)}</p>
+      </div>
+
+      {/* Past reels — embedded so reviewers can judge content quality
+          without leaving the panel. Hidden when there are none. */}
+      {pastReels.length > 0 && (
+        <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
+          <p className={`${label} mb-3`}>Past reels</p>
+          <div className="space-y-3">
+            {pastReels.map((r, i) => (
+              <div key={i}>
+                <p className="text-[12px] text-[var(--ink-50)] mb-1.5 truncate">
+                  Submitted for <span className="text-[var(--ink-60)] font-medium">{r.campaign_title}</span> · {r.brand_name}
+                </p>
+                <InstagramEmbed url={r.reel_url} height={420} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Performance stats */}
+      <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
+        <p className={`${label} mb-3`}>Performance</p>
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+            <p className="text-[20px] font-semibold text-[var(--ink)]">{c?.completed_campaigns || 0}/{c?.total_campaigns || 0}</p>
+            <p className="text-[12px] text-[var(--ink-50)] font-medium">Campaigns</p>
+          </div>
+          <div className="bg-[rgba(42,32,24,0.02)] rounded-[10px] px-3 py-2.5">
+            <p className="text-[20px] font-semibold text-[var(--ink)]">{(c?.total_campaigns || 0) > 0 ? `${c?.completion_rate || 0}%` : '—'}</p>
+            <p className="text-[12px] text-[var(--ink-50)] font-medium">Completion</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Contact + location */}
+      <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5 space-y-3">
+        {c?.email && (
+          <div className="flex items-center gap-2">
+            <Mail size={14} className="text-[var(--ink-35)] flex-shrink-0" />
+            <a href={`mailto:${c.email}`} className="text-[13px] text-[var(--ink-60)] hover:text-[var(--terra)] truncate">{c.email}</a>
+          </div>
+        )}
+        {handle && (
+          <div className="flex items-center gap-2">
+            <AtSign size={14} className="text-[var(--ink-35)] flex-shrink-0" />
+            <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+              {handle} <ExternalLink size={11} />
+            </a>
+            {c?.follower_count && (
+              <span className="text-[13px] text-[var(--ink-50)]">· {c.follower_count} followers</span>
+            )}
+          </div>
+        )}
+        {c?.address && (
+          <div className="flex items-center gap-2">
+            <MapPin size={14} className="text-[var(--ink-35)] flex-shrink-0" />
+            <span className="text-[13px] text-[var(--ink-60)]">{c.address}</span>
+          </div>
+        )}
+        {c?.instagram_connected && (
+          <div className="flex items-center gap-2">
+            <Award size={14} className="text-[var(--sage)] flex-shrink-0" />
+            <span className="text-[13px] text-[var(--ink-60)]">Instagram connected</span>
+          </div>
+        )}
+      </div>
+
+      {/* Active commitments */}
+      {activeCommitments.length > 0 && (
+        <div className="border-t border-[rgba(42,32,24,0.08)] pt-4 mb-5">
+          <p className={`${label} mb-2 flex items-center gap-2`}>
+            Active on
+            <span className="inline-flex items-center justify-center px-1.5 py-0.5 rounded-[999px] text-[10px] font-bold"
+              style={{ background: activeCommitments.length >= 3 ? 'var(--terra)' : 'var(--terra-10)', color: activeCommitments.length >= 3 ? 'white' : 'var(--terra)', minWidth: 18 }}>
+              {activeCommitments.length}
+            </span>
+          </p>
+          <div className="space-y-1.5">
+            {activeCommitments.map(ac => (
+              <div key={ac.application_id} className="flex items-start gap-2">
+                <span className="w-1 h-1 rounded-full bg-[var(--terra)] mt-[7px] flex-shrink-0" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] text-[var(--ink)] truncate">{ac.campaign_title}</p>
+                  <p className="text-[11px] text-[var(--ink-50)]">{ac.brand_name}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Campaign history */}
+      {history.length > 0 && (
+        <div className="border-t border-[rgba(42,32,24,0.08)] pt-4">
+          <p className={`${label} mb-3`}>Recent campaigns</p>
+          <div className="space-y-2">
+            {history.map(h => (
+              <div key={h.campaign_id} className="flex items-start gap-2">
+                <Film size={12} className="text-[var(--ink-35)] flex-shrink-0 mt-1" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
+                  <p className="text-[11px] text-[var(--ink-50)]">
+                    {h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Review Layout ─────────────────────────────────────────────────────────
+// Master-detail layout for the "review one at a time" flow. Left column is
+// a compact applicant list with the pitch snippet inline; right column is
+// the persistent detail pane with sticky action footer. Keyboard nav: j/k
+// or arrow up/down to move, S/D to act on the highlighted applicant.
+
+function ReviewLayout({
+  sorted, highlightedId, setHighlightedId, highlightedHistory,
+  reelsByCreator, getOtherCommitments, onSelect, onDecline, actingOn,
+}: {
+  sorted: Applicant[];
+  highlightedId: string | null;
+  setHighlightedId: (id: string | null) => void;
+  highlightedHistory: CampaignHistoryItem[];
+  reelsByCreator: Record<string, { reel_url: string; campaign_title: string; brand_name: string }[]>;
+  getOtherCommitments: (a: Applicant) => { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[];
+  onSelect: (a: Applicant) => void | Promise<void>;
+  onDecline: (a: Applicant) => void | Promise<void>;
+  actingOn: string | null;
+}) {
+  // Resolve the highlighted applicant from the current sorted list. If the
+  // stored highlightedId no longer matches a row (e.g. campaign switched
+  // or the row was just acted on), fall back to the first item so the
+  // detail pane is never blank when there's content available.
+  const resolvedId = sorted.some(a => a.id === highlightedId) ? highlightedId : (sorted[0]?.id || null);
+  const highlighted = resolvedId ? (sorted.find(a => a.id === resolvedId) || null) : null;
+
+  // Sync state to the resolved id once on mount / when sorted changes, so
+  // keyboard nav and clicks work from a consistent baseline.
+  useEffect(() => {
+    if (resolvedId !== highlightedId) setHighlightedId(resolvedId);
+  }, [resolvedId, highlightedId, setHighlightedId]);
+
+  // Auto-advance after an action: when the previously-highlighted applicant
+  // is acted on (status flips), the resolved id naturally lands on the
+  // next item because of the fallback above. We just need to wire keyboard
+  // shortcuts and button clicks; no extra advance logic required.
+
+  // Keyboard nav. Bound to document so users don't have to focus anything.
+  // Skips when typing in an input or textarea so search/typeahead still work.
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) return;
+      const idx = highlighted ? sorted.findIndex(a => a.id === highlighted.id) : -1;
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        const next = sorted[Math.min(sorted.length - 1, idx + 1)] || sorted[0];
+        if (next) setHighlightedId(next.id);
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        const prev = sorted[Math.max(0, idx - 1)] || sorted[sorted.length - 1];
+        if (prev) setHighlightedId(prev.id);
+      } else if ((e.key === 's' || e.key === 'S') && highlighted && highlighted.status === 'interested' && actingOn !== highlighted.id) {
+        e.preventDefault();
+        onSelect(highlighted);
+      } else if ((e.key === 'd' || e.key === 'D') && highlighted && highlighted.status === 'interested' && actingOn !== highlighted.id) {
+        e.preventDefault();
+        onDecline(highlighted);
+      }
+    };
+    document.addEventListener('keydown', handler);
+    return () => document.removeEventListener('keydown', handler);
+  }, [sorted, highlighted, actingOn, onSelect, onDecline, setHighlightedId]);
+
+  return (
+    <div className="grid gap-3" style={{ gridTemplateColumns: 'minmax(280px, 360px) 1fr' }}>
+      {/* Master list */}
+      <div className="bg-white rounded-[12px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)', maxHeight: 'calc(100vh - 240px)' }}>
+        <div className="overflow-y-auto">
+          {sorted.map(a => {
+            const isHighlighted = a.id === resolvedId;
+            const name = a.creators?.display_name || a.creators?.name || 'Unknown';
+            const initial = (name[0] || '?').toUpperCase();
+            const colors = getAvatarColors(initial);
+            const isCommunity = a.campaigns?.campaign_type === 'community';
+            const isFirstTimer = (a.creators?.completed_campaigns || 0) === 0 && (a.status === 'interested' || isCommunity);
+            const others = getOtherCommitments(a);
+            const reels = reelsByCreator[a.creator_id] || [];
+            const pitchSnippet = a.pitch
+              ? a.pitch.replace(/\s+/g, ' ').trim()
+              : 'No pitch provided';
+            return (
+              <button key={a.id} onClick={() => setHighlightedId(a.id)}
+                className={`w-full text-left px-3 py-3 transition-colors border-l-2 border-b border-b-[rgba(42,32,24,0.04)] last:border-b-0 ${isHighlighted ? 'bg-[rgba(196,103,74,0.06)] border-l-[var(--terra)]' : 'border-l-transparent hover:bg-[rgba(42,32,24,0.02)]'}`}>
+                <div className="flex items-start gap-2.5">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
+                    {a.creators?.avatar_url ? (
+                      <img src={a.creators.avatar_url} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[12px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2 mb-0.5">
+                      <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                      <span className="text-[11px] text-[var(--ink-35)] flex-shrink-0">{timeAgo(a.applied_at)}</span>
+                    </div>
+                    <p className={`text-[12px] leading-[1.45] line-clamp-2 ${a.pitch ? 'text-[var(--ink-60)]' : 'text-[var(--ink-35)]'}`}>{pitchSnippet}</p>
+                    {(isFirstTimer || others.length > 0 || reels.length > 0 || a.status !== 'interested') && (
+                      <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
+                        {isFirstTimer && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}>✦ First-timer</span>
+                        )}
+                        {reels.length > 0 && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}>
+                            <Film size={9} /> {reels.length}
+                          </span>
+                        )}
+                        {others.length > 0 && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold"
+                            style={others.length >= 3
+                              ? { background: 'var(--terra-10)', color: 'var(--terra)' }
+                              : { background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}>
+                            On {others.length}
+                          </span>
+                        )}
+                        {a.status === 'selected' && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>Selected</span>
+                        )}
+                        {a.status === 'confirmed' && (
+                          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>{isCommunity ? 'Entered' : 'Confirmed'}</span>
+                        )}
+                        {a.status === 'declined' && (
+                          <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[10px] font-semibold bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">Declined</span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Detail pane */}
+      <div className="bg-white rounded-[12px] overflow-hidden flex flex-col" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)', maxHeight: 'calc(100vh - 240px)' }}>
+        {highlighted ? (() => {
+          const c = highlighted.creators;
+          const name = c?.display_name || c?.name || 'Unknown';
+          const handle = (c?.instagram_handle || '').replace('@', '');
+          const initial = (name[0] || '?').toUpperCase();
+          const colors = getAvatarColors(initial);
+          const isPending = highlighted.status === 'interested';
+          const isActing = actingOn === highlighted.id;
+          return (
+            <>
+              {/* Header */}
+              <div className="flex items-center justify-between px-5 py-4 border-b border-[rgba(42,32,24,0.08)] flex-shrink-0">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-11 h-11 rounded-full flex items-center justify-center flex-shrink-0 overflow-hidden" style={{ background: colors.bg }}>
+                    {c?.avatar_url ? (
+                      <img src={c.avatar_url} alt={name} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-[15px] font-semibold" style={{ color: colors.text }}>{initial}</span>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-[16px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                    {handle && <p className="text-[13px] text-[var(--ink-50)]">@{handle}</p>}
+                  </div>
+                </div>
+                <div className="hidden md:flex items-center gap-1 text-[11px] text-[var(--ink-35)] flex-shrink-0 ml-3">
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">↑↓</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">S</kbd>
+                  <kbd className="px-1.5 py-0.5 rounded-[4px] bg-[rgba(42,32,24,0.06)] font-mono text-[10px]">D</kbd>
+                </div>
+              </div>
+
+              {/* Body */}
+              <div className="flex-1 overflow-y-auto">
+                <ApplicantDetailBody
+                  applicant={highlighted}
+                  history={highlightedHistory}
+                  activeCommitments={getOtherCommitments(highlighted)}
+                  pastReels={reelsByCreator[highlighted.creator_id] || []}
+                />
+              </div>
+
+              {/* Sticky action footer */}
+              {isPending && (
+                <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] flex-shrink-0 flex gap-2">
+                  <button onClick={() => onDecline(highlighted)} disabled={isActing}
+                    className="flex-1 px-4 py-3 rounded-[10px] border border-[rgba(42,32,24,0.15)] text-[var(--ink)] text-[15px] font-semibold hover:bg-[rgba(42,32,24,0.02)] disabled:opacity-40">
+                    Decline
+                  </button>
+                  <button onClick={() => onSelect(highlighted)} disabled={isActing}
+                    className="flex-1 px-4 py-3 rounded-[10px] bg-[var(--terra)] text-white text-[15px] font-semibold hover:opacity-[0.85] disabled:opacity-40">
+                    {isActing ? 'Saving...' : 'Select creator'}
+                  </button>
+                </div>
+              )}
+            </>
+          );
+        })() : (
+          <div className="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <div className="w-12 h-12 rounded-[12px] flex items-center justify-center mb-3" style={{ background: 'rgba(42,32,24,0.04)' }}>
+              <Inbox size={20} className="text-[var(--ink-35)]" />
+            </div>
+            <p className="text-[15px] font-semibold text-[var(--ink)] mb-1">All caught up</p>
+            <p className="text-[13px] text-[var(--ink-50)]">No applicants to review for this campaign</p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
