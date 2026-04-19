@@ -1147,22 +1147,43 @@ function ApplicantDetailBody({ applicant, history, activeCommitments, pastReels 
         </div>
       )}
 
-      {/* Campaign history */}
+      {/* Campaign history — each row shows the application outcome as a
+          coloured pill so reviewers can tell at a glance whether the
+          creator was picked, turned down, or is still awaiting a
+          decision. Plain "Interested" text reads the same as
+          "Confirmed" at a glance, which misrepresents the data. */}
       {history.length > 0 && (
         <div className="border-t border-[rgba(42,32,24,0.08)] pt-4">
           <p className={label}>Recent campaigns</p>
-          <div className="space-y-2">
-            {history.map(h => (
-              <div key={h.campaign_id} className="flex items-start gap-2">
-                <Film size={12} className="text-[var(--ink-50)] flex-shrink-0 mt-1.5" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[14px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
-                  <p className="text-[12px] text-[var(--ink-60)]">
-                    {h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name} · <span className="capitalize">{h.status}</span>
-                  </p>
+          <div className="space-y-2.5">
+            {history.map(h => {
+              const brandName = h.campaigns?.campaign_type === 'community' ? 'Nayba Community' : h.campaigns?.businesses?.name;
+              // Application status → label + colour. Keeps parlance aligned
+              // with what admins use elsewhere (Applied reads clearer than
+              // "Interested" once divorced from the applicant's own POV).
+              const statusStyle: Record<string, { label: string; bg: string; color: string }> = {
+                interested: { label: 'Applied · awaiting', bg: 'rgba(232,160,32,0.12)', color: '#9A6A14' },
+                selected:   { label: 'Selected',            bg: 'rgba(122,148,120,0.14)', color: 'var(--sage)' },
+                confirmed:  { label: 'Confirmed',           bg: 'rgba(140,122,170,0.14)', color: 'var(--violet)' },
+                declined:   { label: 'Declined',            bg: 'rgba(42,32,24,0.08)',    color: 'var(--ink-60)' },
+              };
+              const s = statusStyle[h.status] || { label: h.status, bg: 'rgba(42,32,24,0.08)', color: 'var(--ink-60)' };
+              return (
+                <div key={h.campaign_id} className="flex items-start gap-2">
+                  <Film size={12} className="text-[var(--ink-50)] flex-shrink-0 mt-1.5" />
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[14px] text-[var(--ink)] truncate">{h.campaigns?.title || 'Untitled'}</p>
+                    <div className="flex items-center gap-1.5 mt-1 flex-wrap">
+                      <span className="text-[12px] text-[var(--ink-60)]">{brandName}</span>
+                      <span className="inline-flex items-center px-1.5 py-0.5 rounded-[5px] text-[11px] font-semibold"
+                        style={{ background: s.bg, color: s.color }}>
+                        {s.label}
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}
