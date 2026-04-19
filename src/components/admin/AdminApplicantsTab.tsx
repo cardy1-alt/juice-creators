@@ -82,6 +82,10 @@ export default function AdminApplicantsTab() {
   // Used to surface "already picked elsewhere" signals so admins can spread
   // opportunity fairly across the creator pool during selection.
   const [commitmentsByCreator, setCommitmentsByCreator] = useState<Record<string, { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[]>>({});
+  // Per-creator recent reels — up to 2 per creator so the cards can flag
+  // content history at a glance without loading iframes on the applicant
+  // list. The peek panel is where the full reels get rendered.
+  const [reelsByCreator, setReelsByCreator] = useState<Record<string, { reel_url: string; campaign_title: string; brand_name: string }[]>>({});
   const [sortMode, setSortMode] = useState<'applied' | 'unpicked'>('applied');
 
   const toggleSelected = (id: string) => {
@@ -105,22 +109,30 @@ export default function AdminApplicantsTab() {
       .order('applied_at', { ascending: false });
     if (data) setApplicants(data as Applicant[]);
 
-    // Also fetch active commitments across the full applications table so
-    // each card can show how many other live campaigns a creator is already
-    // picked on. Filter to non-completed campaigns client-side so a single
-    // creator isn't counted for campaigns that have already wrapped.
+    // Also fetch active commitments and past reels across the applicant
+    // pool. Commitments flag "already picked elsewhere" on cards; reels
+    // flag content history. Two batched queries, parallelised.
     const creatorIds = Array.from(new Set((data || []).map((a: any) => a.creator_id).filter(Boolean)));
     if (creatorIds.length > 0) {
-      const { data: cData } = await supabase
-        .from('applications')
-        .select('id, creator_id, status, campaigns(id, title, status, campaign_type, businesses(name))')
-        .in('creator_id', creatorIds)
-        .in('status', ['selected', 'confirmed']);
-      const next: Record<string, { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[]> = {};
-      ((cData || []) as any[]).forEach(row => {
+      const [commitmentsRes, reelsRes] = await Promise.all([
+        supabase
+          .from('applications')
+          .select('id, creator_id, status, campaigns(id, title, status, campaign_type, businesses(name))')
+          .in('creator_id', creatorIds)
+          .in('status', ['selected', 'confirmed']),
+        supabase
+          .from('participations')
+          .select('creator_id, reel_url, reel_submitted_at, campaigns(title, campaign_type, businesses(name))')
+          .in('creator_id', creatorIds)
+          .not('reel_url', 'is', null)
+          .order('reel_submitted_at', { ascending: false }),
+      ]);
+
+      const commitments: Record<string, { application_id: string; campaign_id: string; campaign_title: string; brand_name: string }[]> = {};
+      ((commitmentsRes.data || []) as any[]).forEach(row => {
         if (row.campaigns?.status === 'completed') return;
-        if (!next[row.creator_id]) next[row.creator_id] = [];
-        next[row.creator_id].push({
+        if (!commitments[row.creator_id]) commitments[row.creator_id] = [];
+        commitments[row.creator_id].push({
           application_id: row.id,
           campaign_id: row.campaigns?.id,
           campaign_title: row.campaigns?.title || 'Untitled',
@@ -129,9 +141,24 @@ export default function AdminApplicantsTab() {
             : (row.campaigns?.businesses?.name || '—'),
         });
       });
-      setCommitmentsByCreator(next);
+      setCommitmentsByCreator(commitments);
+
+      const reels: Record<string, { reel_url: string; campaign_title: string; brand_name: string }[]> = {};
+      ((reelsRes.data || []) as any[]).forEach(row => {
+        if (!reels[row.creator_id]) reels[row.creator_id] = [];
+        if (reels[row.creator_id].length >= 2) return;
+        reels[row.creator_id].push({
+          reel_url: row.reel_url,
+          campaign_title: row.campaigns?.title || 'Untitled',
+          brand_name: row.campaigns?.campaign_type === 'community'
+            ? 'Nayba Community'
+            : (row.campaigns?.businesses?.name || '—'),
+        });
+      });
+      setReelsByCreator(reels);
     } else {
       setCommitmentsByCreator({});
+      setReelsByCreator({});
     }
     setLoading(false);
   };
@@ -243,15 +270,31 @@ export default function AdminApplicantsTab() {
     return name.includes(q) || insta.includes(q) || title.includes(q) || brand.includes(q);
   });
 
-  // Apply status filter
-  const filtered = searched.filter(a => statusFilter === 'all' || a.status === statusFilter);
+  // Apply status filter. The default "Pending review" filter intentionally
+  // widens to include community campaign entries (which auto-confirm at
+  // apply time, so `status='interested'` would hide them entirely).
+  // Admins still need community entries visible because picking winners /
+  // tracking engagement happens from this same screen.
+  const filtered = searched.filter(a => {
+    if (statusFilter === 'all') return true;
+    if (statusFilter === 'interested') {
+      if (a.status === 'interested') return true;
+      if (a.campaigns?.campaign_type === 'community' && a.status === 'confirmed') return true;
+      return false;
+    }
+    return a.status === statusFilter;
+  });
 
   // Group by campaign
   const grouped = filtered.reduce<Record<string, { campaign: Applicant['campaigns']; items: Applicant[]; pending: number }>>((acc, a) => {
     const key = a.campaign_id;
     if (!acc[key]) acc[key] = { campaign: a.campaigns, items: [], pending: 0 };
     acc[key].items.push(a);
+    // "Pending" here means "needs admin attention" — brand applications
+    // awaiting review, plus community entries (which are always on-screen
+    // for admin to monitor/pick winners).
     if (a.status === 'interested') acc[key].pending += 1;
+    else if (a.campaigns?.campaign_type === 'community' && a.status === 'confirmed') acc[key].pending += 1;
     return acc;
   }, {});
 
@@ -268,22 +311,11 @@ export default function AdminApplicantsTab() {
   const activeCampaign = activeCampaignId ? grouped[activeCampaignId] : (campaignList[0]?.[1] || null);
   const currentCampaignId = activeCampaignId || campaignList[0]?.[0] || null;
 
-  const totalPending = applicants.filter(a => a.status === 'interested').length;
-
-  // First-timer slot — a soft nudge, not enforced selection. For each
-  // campaign we surface one pending applicant who has never completed a
-  // campaign so brands don't routinely overlook new creators. Applicants
-  // are sorted applied_at DESC, so we take the first match (most recent
-  // first-timer). If no pending first-timer exists, the campaign gets no
-  // nudge.
-  const firstTimerIdByCampaign: Record<string, string> = {};
-  for (const a of filtered) {
-    if (a.status !== 'interested') continue;
-    if ((a.creators?.completed_campaigns || 0) > 0) continue;
-    if (!firstTimerIdByCampaign[a.campaign_id]) {
-      firstTimerIdByCampaign[a.campaign_id] = a.id;
-    }
-  }
+  const totalPending = applicants.filter(a => {
+    if (a.status === 'interested') return true;
+    if (a.campaigns?.campaign_type === 'community' && a.status === 'confirmed') return true;
+    return false;
+  }).length;
 
   // Card component used in both grid and list views
   const ApplicantCard = ({ a, variant }: { a: Applicant; variant: 'grid' | 'list' }) => {
@@ -297,14 +329,32 @@ export default function AdminApplicantsTab() {
     const isActing = actingOn === a.id;
     const isSelected = peekApplicant?.id === a.id;
     const isChecked = selectedIds.has(a.id);
-    const isFirstTimerSlot = isPending && firstTimerIdByCampaign[a.campaign_id] === a.id;
+    // Flag every creator who has zero completed campaigns, not just one per
+    // campaign. In a pilot most applicants will be first-timers, which is
+    // the signal the admin actually wants — if they're all fresh, they all
+    // deserve the badge; if a seasoned creator appears, they'll stand out.
+    const isFirstTimer = (a.creators?.completed_campaigns || 0) === 0 && (a.status === 'interested' || isCommunityEntry);
 
-    const firstTimerTag = isFirstTimerSlot ? (
+    const firstTimerTag = isFirstTimer ? (
       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: 'var(--terra-light)', color: 'var(--terra)' }}
-        title="No completed campaigns yet — reserving a slot for a first-timer helps the creator community grow">
-        ✦ First-timer pick
+        title="No completed campaigns yet">
+        ✦ First-timer
       </span>
     ) : null;
+
+    const pastReels = reelsByCreator[a.creator_id] || [];
+    const pastReelsTag = pastReels.length > 0 ? (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold"
+        style={{ background: 'rgba(42,32,24,0.06)', color: 'var(--ink-60)' }}
+        title="Past reels appear in the peek panel">
+        <Film size={10} /> {pastReels.length} past reel{pastReels.length === 1 ? '' : 's'}
+      </span>
+    ) : null;
+
+    // Hide the level badge for L1 — in a pilot every creator is L1, so the
+    // pill adds noise to every card. We'll render the level badge only when
+    // it's a positive signal (L2+), so experienced creators stand out.
+    const showLevelBadge = (a.creators?.level || 1) >= 2;
 
     // Active-commitment tag: shows how many OTHER live campaigns the creator
     // is already on the hook for. Helps admins spread selections fairly.
@@ -358,7 +408,7 @@ export default function AdminApplicantsTab() {
           className={`group relative text-left bg-white rounded-[12px] p-4 transition-all hover:shadow-[0_4px_12px_rgba(42,32,24,0.08)] ${isSelected ? 'ring-2 ring-[var(--terra)]' : isChecked ? 'ring-2 ring-[var(--terra)] ring-opacity-50' : ''} ${!isPending ? 'opacity-70' : ''}`}
           style={{
             boxShadow: isSelected || isChecked ? undefined : '0 1px 4px rgba(42,32,24,0.04)',
-            borderLeft: isFirstTimerSlot ? '3px solid var(--terra)' : undefined,
+            borderLeft: isFirstTimer ? '3px solid var(--terra)' : undefined,
           }}
         >
           {Checkbox && <div className="absolute top-3 right-3">{Checkbox}</div>}
@@ -376,17 +426,20 @@ export default function AdminApplicantsTab() {
             </div>
           </div>
           <div className="flex items-center gap-2 mb-3 flex-wrap">
-            <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
-              L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
-            </span>
+            {showLevelBadge && (
+              <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
+                L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
+              </span>
+            )}
             {firstTimerTag}
+            {pastReelsTag}
             {commitmentTag}
             {statusPill}
           </div>
           {a.pitch ? (
-            <p className="text-[12px] text-[var(--ink-60)] italic leading-[1.5] line-clamp-3 mb-3 min-h-[54px]">"{a.pitch}"</p>
+            <p className="text-[14px] text-[var(--ink)] leading-[1.55] line-clamp-4 mb-3 min-h-[86px]">{a.pitch}</p>
           ) : (
-            <p className="text-[12px] text-[var(--ink-35)] italic mb-3 min-h-[54px]">No pitch provided</p>
+            <p className="text-[13px] text-[var(--ink-35)] mb-3 min-h-[86px]">No pitch provided</p>
           )}
           <div className="flex items-center justify-between pt-3 border-t border-[rgba(42,32,24,0.06)]">
             <span className="text-[11px] text-[var(--ink-35)]">{timeAgo(a.applied_at)}</span>
@@ -414,7 +467,7 @@ export default function AdminApplicantsTab() {
       <button
         onClick={() => openPeek(a)}
         className={`w-full text-left bg-white transition-colors hover:bg-[rgba(42,32,24,0.02)] ${isSelected ? 'bg-[rgba(196,103,74,0.04)]' : isChecked ? 'bg-[rgba(196,103,74,0.03)]' : ''} ${!isPending ? 'opacity-70' : ''}`}
-        style={{ borderLeft: isFirstTimerSlot ? '3px solid var(--terra)' : undefined }}
+        style={{ borderLeft: isFirstTimer ? '3px solid var(--terra)' : undefined }}
       >
         <div className="px-4 py-4">
           <div className="flex items-start gap-3">
@@ -429,10 +482,13 @@ export default function AdminApplicantsTab() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1 flex-wrap">
                 <span className="text-[14px] font-semibold text-[var(--ink)]">{name}</span>
-                <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
-                  L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
-                </span>
+                {showLevelBadge && (
+                  <span className="inline-flex items-center px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold" style={{ background: levelColor.bg, color: levelColor.text }}>
+                    L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
+                  </span>
+                )}
                 {firstTimerTag}
+                {pastReelsTag}
                 {commitmentTag}
                 {statusPill}
               </div>
@@ -442,9 +498,7 @@ export default function AdminApplicantsTab() {
                 </span>
               )}
               {a.pitch && (
-                <div className="bg-[var(--stone)] rounded-[10px] px-3 py-2.5 mt-1 mb-2">
-                  <p className="text-[13px] text-[var(--ink)] leading-[1.5] italic">"{a.pitch}"</p>
-                </div>
+                <p className="text-[14px] text-[var(--ink)] leading-[1.55] mt-1 mb-2">{a.pitch}</p>
               )}
               <p className="text-[12px] text-[var(--ink-35)]">Applied {timeAgo(a.applied_at)}</p>
             </div>
