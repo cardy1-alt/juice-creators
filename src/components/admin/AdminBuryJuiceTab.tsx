@@ -9,7 +9,7 @@ import {
 import { generateMarkdownForBooking } from '../../lib/bury-juice/beehiiv-markdown.js';
 import { nextNThursdays, parseISODate } from '../../lib/bury-juice/availability.js';
 import type { BjBooking } from '../../lib/bury-juice/types.js';
-import { Copy, Check, Calendar, Table as TableIcon, Plus, Pencil, Trash2, X } from 'lucide-react';
+import { Copy, Check, Calendar, Table as TableIcon, Plus, Pencil, Trash2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface BusinessRow {
   id: string;
@@ -20,7 +20,6 @@ interface BusinessRow {
 type ViewMode = 'calendar' | 'table';
 
 const TIER_ORDER: BjTier[] = ['primary', 'feature', 'classified'];
-const WEEKS_AHEAD = 12;
 
 // ─────────────────────────────────────────────────────────────────
 // AdminBuryJuiceTab — calendar + table views over bj_bookings, plus
@@ -191,6 +190,8 @@ function ViewToggleButton({ active, onClick, icon, label }: { active: boolean; o
 }
 
 // ─── Calendar view ────────────────────────────────────────────────
+// A real month grid (Mon–Sun). Non-Thursday cells are dimmed; Thursday
+// cells show per-tier fill chips and open a detail panel on click.
 function CalendarView({
   bookings,
   businessMap,
@@ -200,7 +201,12 @@ function CalendarView({
   businessMap: Record<string, BusinessRow>;
   onEdit: (b: BjBooking) => void;
 }) {
-  const upcoming = useMemo(() => nextNThursdays(WEEKS_AHEAD), []);
+  const [monthStart, setMonthStart] = useState(() => {
+    const d = new Date();
+    return new Date(d.getFullYear(), d.getMonth(), 1);
+  });
+  const [selectedIso, setSelectedIso] = useState<string | null>(null);
+
   const byDate = useMemo(() => {
     const m = new Map<string, BjBooking[]>();
     for (const b of bookings) {
@@ -211,99 +217,263 @@ function CalendarView({
     return m;
   }, [bookings]);
 
+  // Grid cells — starts on the Monday on/before the first of the
+  // month, runs 6 weeks (42 cells) so every month fits without
+  // height changes.
+  const cells = useMemo(() => {
+    const start = new Date(monthStart);
+    // Move back to the preceding Monday (getDay() 0=Sun,1=Mon)
+    const dow = start.getDay();
+    const offset = dow === 0 ? 6 : dow - 1;
+    start.setDate(start.getDate() - offset);
+    const out: Date[] = [];
+    for (let i = 0; i < 42; i++) {
+      const d = new Date(start);
+      d.setDate(start.getDate() + i);
+      out.push(d);
+    }
+    return out;
+  }, [monthStart]);
+
+  const monthLabel = monthStart.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+  const today = useMemo(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return d.getTime();
+  }, []);
+  const monthIndex = monthStart.getMonth();
+
+  function shiftMonth(delta: number) {
+    setMonthStart((prev) => new Date(prev.getFullYear(), prev.getMonth() + delta, 1));
+  }
+
+  function isoFor(d: Date): string {
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
+  const selectedBookings = selectedIso ? byDate.get(selectedIso) ?? [] : [];
+
   return (
-    <div style={{ display: 'grid', gap: 10 }}>
-      {upcoming.map((iso) => (
-        <IssueCard
-          key={iso}
-          iso={iso}
-          bookings={byDate.get(iso) ?? []}
-          businessMap={businessMap}
-          onEdit={onEdit}
-        />
-      ))}
+    <div>
+      <div
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          marginBottom: 12, gap: 12,
+        }}
+      >
+        <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>{monthLabel}</h3>
+        <div style={{ display: 'flex', gap: 6 }}>
+          <CalendarNavButton onClick={() => shiftMonth(-1)}><ChevronLeft size={16} /></CalendarNavButton>
+          <CalendarNavButton onClick={() => setMonthStart(new Date(new Date().getFullYear(), new Date().getMonth(), 1))}>Today</CalendarNavButton>
+          <CalendarNavButton onClick={() => shiftMonth(1)}><ChevronRight size={16} /></CalendarNavButton>
+        </div>
+      </div>
+
+      <div
+        style={{
+          background: 'var(--card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 12,
+          overflow: 'hidden',
+        }}
+      >
+        {/* Day labels */}
+        <div
+          style={{
+            display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)',
+            borderBottom: '1px solid var(--border-color)',
+            background: 'var(--shell)',
+          }}
+        >
+          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
+            <div
+              key={d}
+              style={{
+                padding: '8px 10px', fontSize: 11, fontWeight: 600,
+                textTransform: 'uppercase', letterSpacing: '0.04em',
+                color: d === 'Thu' ? 'var(--terra)' : 'var(--ink-60)',
+              }}
+            >
+              {d}
+            </div>
+          ))}
+        </div>
+
+        {/* Cells */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)' }}>
+          {cells.map((d, i) => {
+            const iso = isoFor(d);
+            const isThursday = d.getDay() === 4;
+            const inMonth = d.getMonth() === monthIndex;
+            const isToday = d.getTime() === today;
+            const isSelected = selectedIso === iso;
+            const dayBookings = isThursday ? byDate.get(iso) ?? [] : [];
+            const inRowOfSevenLastRow = i >= 35;
+            const bg = isSelected
+              ? 'var(--terra-light)'
+              : isThursday
+              ? 'var(--card)'
+              : 'var(--shell)';
+            const color = inMonth ? 'var(--ink)' : 'var(--ink-35)';
+
+            return (
+              <div
+                key={iso}
+                onClick={isThursday ? () => setSelectedIso(iso === selectedIso ? null : iso) : undefined}
+                role={isThursday ? 'button' : undefined}
+                tabIndex={isThursday ? 0 : undefined}
+                onKeyDown={
+                  isThursday
+                    ? (e) => {
+                        if (e.key === 'Enter' || e.key === ' ')
+                          setSelectedIso(iso === selectedIso ? null : iso);
+                      }
+                    : undefined
+                }
+                style={{
+                  borderTop: i >= 7 ? '1px solid var(--border-color)' : 'none',
+                  borderLeft: i % 7 !== 0 ? '1px solid var(--border-color)' : 'none',
+                  minHeight: 96,
+                  padding: 8,
+                  background: bg,
+                  color,
+                  cursor: isThursday ? 'pointer' : 'default',
+                  opacity: !inMonth ? 0.55 : 1,
+                  borderRadius: 0,
+                  // round only the corners of the last row
+                  borderBottomLeftRadius: inRowOfSevenLastRow && i === 35 ? 12 : 0,
+                  borderBottomRightRadius: inRowOfSevenLastRow && i === 41 ? 12 : 0,
+                  display: 'flex', flexDirection: 'column', gap: 4,
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                    fontSize: 13,
+                    fontWeight: isToday ? 700 : 500,
+                    color: isToday ? 'var(--terra)' : isThursday && inMonth ? 'var(--ink)' : color,
+                  }}
+                >
+                  <span>{d.getDate()}</span>
+                  {isThursday && inMonth && (
+                    <span style={{ fontSize: 9, fontWeight: 600, color: 'var(--terra)', letterSpacing: '0.04em' }}>
+                      ISSUE
+                    </span>
+                  )}
+                </div>
+                {isThursday && inMonth && (
+                  <div style={{ display: 'grid', gap: 3, marginTop: 2 }}>
+                    {TIER_ORDER.map((tier) => {
+                      const filled = dayBookings.filter((b) => b.tier === tier).length;
+                      const cap = TIER_CAPACITY[tier];
+                      const active = filled > 0;
+                      return (
+                        <div
+                          key={tier}
+                          style={{
+                            display: 'flex', alignItems: 'center', gap: 4,
+                            fontSize: 10, fontWeight: 500,
+                            color: active ? 'var(--terra)' : 'var(--ink-35)',
+                          }}
+                        >
+                          <span
+                            style={{
+                              width: 6, height: 6, borderRadius: '50%',
+                              background: active ? 'var(--terra)' : 'var(--ink-08)',
+                              flexShrink: 0,
+                            }}
+                          />
+                          <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {BJ_PRICING[tier].name.charAt(0)} {filled}/{cap}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Selected-day detail panel */}
+      {selectedIso && (
+        <div
+          style={{
+            marginTop: 16,
+            background: 'var(--card)',
+            border: '1px solid var(--border-color)',
+            borderRadius: 12,
+            padding: 16,
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+            <div>
+              <div style={{ fontWeight: 600, fontSize: 16 }}>
+                {parseISODate(selectedIso).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+              </div>
+              <div style={{ fontSize: 12, color: 'var(--ink-60)' }}>{selectedIso}</div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedIso(null)}
+              style={{ background: 'transparent', border: 'none', color: 'var(--ink-60)', cursor: 'pointer', padding: 4 }}
+              aria-label="Close"
+            >
+              <X size={16} />
+            </button>
+          </div>
+          <div style={{ display: 'grid', gap: 12 }}>
+            {TIER_ORDER.map((tier) => {
+              const tierBookings = selectedBookings.filter((b) => b.tier === tier);
+              return (
+                <TierGroup
+                  key={tier}
+                  tier={tier}
+                  bookings={tierBookings}
+                  capacity={TIER_CAPACITY[tier]}
+                  businessMap={businessMap}
+                  onEdit={onEdit}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
-function IssueCard({
-  iso,
-  bookings,
-  businessMap,
-  onEdit,
+function CalendarNavButton({
+  onClick,
+  children,
 }: {
-  iso: string;
-  bookings: BjBooking[];
-  businessMap: Record<string, BusinessRow>;
-  onEdit: (b: BjBooking) => void;
+  onClick: () => void;
+  children: React.ReactNode;
 }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const byTier: Record<BjTier, BjBooking[]> = {
-    primary: bookings.filter((b) => b.tier === 'primary'),
-    feature: bookings.filter((b) => b.tier === 'feature'),
-    classified: bookings.filter((b) => b.tier === 'classified'),
-  };
-
   return (
-    <div style={{ background: 'var(--card)', border: '1px solid var(--border-color)', borderRadius: 12, overflow: 'hidden' }}>
-      <button
-        type="button"
-        onClick={() => setExpanded((v) => !v)}
-        style={{
-          width: '100%', textAlign: 'left', padding: 14,
-          background: 'transparent', border: 'none', cursor: 'pointer',
-          fontFamily: 'inherit', color: 'inherit',
-          display: 'grid', gridTemplateColumns: 'auto 1fr', gap: 16, alignItems: 'center',
-        }}
-      >
-        <div>
-          <div style={{ fontWeight: 600, fontSize: 15 }}>
-            {parseISODate(iso).toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
-          </div>
-          <div style={{ fontSize: 12, color: 'var(--ink-60)', marginTop: 2 }}>{iso}</div>
-        </div>
-        <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          {TIER_ORDER.map((tier) => {
-            const filled = byTier[tier].length;
-            const cap = TIER_CAPACITY[tier];
-            const full = filled >= cap;
-            return (
-              <span
-                key={tier}
-                style={{
-                  fontSize: 11, fontWeight: 600, padding: '3px 10px', borderRadius: 999,
-                  background: filled > 0 ? 'var(--terra-light)' : 'var(--ink-08)',
-                  color: filled > 0 ? 'var(--terra)' : 'var(--ink-35)',
-                  opacity: full ? 1 : filled > 0 ? 0.95 : 0.75,
-                }}
-              >
-                {BJ_PRICING[tier].name} {filled}/{cap}
-              </span>
-            );
-          })}
-        </div>
-      </button>
-
-      {expanded && (
-        <div style={{ borderTop: '1px solid var(--border-color)', padding: 14, display: 'grid', gap: 12 }}>
-          {TIER_ORDER.map((tier) => {
-            const tierBookings = byTier[tier];
-            const cap = TIER_CAPACITY[tier];
-            return (
-              <TierGroup
-                key={tier}
-                tier={tier}
-                bookings={tierBookings}
-                capacity={cap}
-                businessMap={businessMap}
-                onEdit={onEdit}
-              />
-            );
-          })}
-        </div>
-      )}
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      style={{
+        padding: '6px 10px',
+        borderRadius: 8,
+        border: '1px solid var(--border-color)',
+        background: 'var(--card)',
+        color: 'var(--ink-60)',
+        cursor: 'pointer',
+        fontSize: 12,
+        fontFamily: 'inherit',
+        display: 'inline-flex',
+        alignItems: 'center',
+      }}
+    >
+      {children}
+    </button>
   );
 }
 
