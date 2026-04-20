@@ -191,3 +191,13 @@
   background: var(--terra-light);
   color: var(--ink);
 }
+
+/* ── Admin side-peek animations ───────────────────────────── */
+@keyframes bjPeekOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bjPeekSlide {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
