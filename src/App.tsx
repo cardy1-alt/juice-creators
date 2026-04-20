@@ -9,6 +9,8 @@ const AdminDashboard = React.lazy(() => import('./components/AdminDashboard'));
 const CampaignDetail = React.lazy(() => import('./components/CampaignDetail'));
 const TermsPage = React.lazy(() => import('./components/pages/TermsPage'));
 const PrivacyPage = React.lazy(() => import('./components/pages/PrivacyPage'));
+const BuryJuiceApp = React.lazy(() => import('./components/bury-juice/BuryJuiceApp'));
+import { isBuryJuiceSurface } from './lib/bury-juice/surface';
 import { AlertCircle, RefreshCw, LogOut, Eye, EyeOff, Lock, CheckCircle, Clock } from 'lucide-react';
 
 // ─── Error Boundary ──────────────────────────────────────────────────────
@@ -340,6 +342,18 @@ function App() {
     });
     return () => subscription.unsubscribe();
   }, []);
+
+  // Bury Juice surface — a separate brand on the same deploy. Routed
+  // via hostname (sponsor.buryjuice.com) or path (/sponsor, /admin/
+  // sponsors), and rendered BEFORE the Nayba auth gate so the
+  // storefront is public.
+  if (isBuryJuiceSurface()) {
+    return (
+      <React.Suspense fallback={<div className="min-h-screen" />}>
+        <BuryJuiceApp />
+      </React.Suspense>
+    );
+  }
 
   // Public legal pages — accessible without auth
   const pageParam = new URLSearchParams(window.location.search).get('page');
