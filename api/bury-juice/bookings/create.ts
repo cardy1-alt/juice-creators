@@ -10,6 +10,7 @@ import {
 import {
   BJ_PRICING,
   PACK_EXPIRY_MONTHS,
+  TIER_CAPACITY,
   priceForTierAndSize,
   type BjPackSize,
   type BjTier,
@@ -65,6 +66,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   let step = 'pre-validation';
   try {
+    // 0. Capacity check — refuse the booking if any requested date
+    //    would exceed TIER_CAPACITY for this tier. Not a race-proof
+    //    guard (the storefront's availability refresh catches 99%
+    //    of clashes) but stops the double-booking edge case when
+    //    two sponsors hit checkout simultaneously.
+    step = 'capacity-check';
+    const datesList = dates.map((d) => `"${d}"`).join(',');
+    const existingCounts = await supabaseFetch<{ issue_date: string }[]>(
+      `bj_bookings?select=issue_date&tier=eq.${tier}&status=neq.cancelled&issue_date=in.(${datesList})`,
+    );
+    const countByDate = new Map<string, number>();
+    for (const b of existingCounts) {
+      countByDate.set(b.issue_date, (countByDate.get(b.issue_date) ?? 0) + 1);
+    }
+    const cap = TIER_CAPACITY[tier];
+    for (const d of dates) {
+      if ((countByDate.get(d) ?? 0) >= cap) {
+        return jsonError(res, 409, `${d} is already full for ${tier}`);
+      }
+    }
+
     // 1. Find or create the business row. The Nayba `businesses` table
     step = 'lookup-business';
     //    pre-dates Bury Juice and has `owner_email` (NOT NULL UNIQUE)

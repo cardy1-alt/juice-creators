@@ -63,6 +63,14 @@ export const ISSUE_DAY_OF_WEEK = 4;
 export const BOOKING_CUTOFF_HOURS = 48;
 export const PACK_EXPIRY_MONTHS = 6;
 
+// Inventory capacity per issue. Primary and Feature are scarce
+// (one each); Classified is a four-up block at the bottom.
+export const TIER_CAPACITY: Record<BjTier, number> = {
+  primary: 1,
+  feature: 1,
+  classified: 4,
+};
+
 // Helpers ----------------------------------------------------------
 
 export function priceForTierAndSize(tier: BjTier, size: BjPackSize): number {

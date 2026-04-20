@@ -20,9 +20,7 @@ interface Props {
 const SIZES: BjPackSize[] = [1, 4, 12];
 const WEEKS_TO_SHOW = 26;
 
-async function fetchAvailability(
-  tier: BjTier,
-): Promise<Map<string, BjAvailabilityEntry['status']>> {
+async function fetchAvailability(tier: BjTier): Promise<Map<string, BjAvailabilityEntry>> {
   const dates = nextNThursdays(WEEKS_TO_SHOW);
   const from = dates[0];
   const to = dates[dates.length - 1];
@@ -32,10 +30,12 @@ async function fetchAvailability(
     );
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const body = (await res.json()) as { entries: BjAvailabilityEntry[] };
-    return new Map(body.entries.map((e) => [e.date, e.status]));
+    return new Map(body.entries.map((e) => [e.date, e]));
   } catch {
     // Dev fallback: assume everything is available.
-    return new Map(dates.map((d) => [d, 'available']));
+    return new Map(
+      dates.map((d) => [d, { date: d, status: 'available' as const, filled: 0, capacity: 1 }]),
+    );
   }
 }
 
@@ -50,7 +50,7 @@ function formatDateLong(iso: string): string {
 
 export function BookingFlow(props: Props) {
   const { tier, size, onSizeChange, selectedDates, onSelectedDatesChange } = props;
-  const [availability, setAvailability] = useState<Map<string, BjAvailabilityEntry['status']> | null>(null);
+  const [availability, setAvailability] = useState<Map<string, BjAvailabilityEntry> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export function BookingFlow(props: Props) {
 
   useEffect(() => {
     if (!availability) return;
-    const pruned = selectedDates.filter((d) => availability.get(d) === 'available');
+    const pruned = selectedDates.filter((d) => availability.get(d)?.status === 'available');
     if (pruned.length !== selectedDates.length) {
       onSelectedDatesChange(pruned);
     }
@@ -85,7 +85,7 @@ export function BookingFlow(props: Props) {
 
   function toggleDate(iso: string) {
     if (!availability) return;
-    if (availability.get(iso) !== 'available') return;
+    if (availability.get(iso)?.status !== 'available') return;
     const has = selectedDates.includes(iso);
     if (has) {
       onSelectedDatesChange(selectedDates.filter((d) => d !== iso));
@@ -145,16 +145,22 @@ export function BookingFlow(props: Props) {
               }}
             >
               {allDates.map((iso) => {
-                const status = availability?.get(iso) ?? 'available';
+                const entry = availability?.get(iso);
+                const status = entry?.status ?? 'available';
                 const selected = selectedDates.includes(iso);
                 const disabled = status !== 'available';
+                const capacity = entry?.capacity ?? 1;
+                const filled = entry?.filled ?? 0;
+                const remaining = capacity - filled;
                 const hint =
                   status === 'taken'
-                    ? 'Booked'
+                    ? capacity > 1 ? 'Full' : 'Booked'
                     : status === 'too_soon'
                     ? '<48h notice'
                     : selected
                     ? 'Selected'
+                    : capacity > 1
+                    ? `${remaining} of ${capacity} left`
                     : 'Available';
                 return (
                   <button

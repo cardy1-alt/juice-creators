@@ -1,16 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { jsonError, supabaseFetch } from '../_lib.js';
-import {
-  adminNotificationHTML,
-  buildICS,
-  sponsorConfirmationHTML,
-} from '../../../src/lib/bury-juice/email-templates.js';
+import { adminNotificationHTML } from '../../../src/lib/bury-juice/email-templates.js';
 
 // POST /api/bury-juice/stripe/webhook
-// Handles checkout.session.completed — flips bookings to 'confirmed',
-// triggers confirmation email to the sponsor, notifies Jacob, and
-// writes to Notion if configured. Other Stripe events are ignored.
+// Handles checkout.session.completed — flips bookings to 'confirmed'
+// and emails Jacob that a booking landed. Stripe's own receipt covers
+// the sponsor-side confirmation, so we don't duplicate it.
+// Notion sync runs best-effort if NOTION_* env vars are set.
 
 // Vercel gives us the raw body via a config export; see below.
 export const config = { api: { bodyParser: false } };
@@ -41,26 +38,20 @@ function verifySignature(payload: Buffer, header: string, secret: string): boole
   }
 }
 
-async function sendResendEmail(to: string, subject: string, html: string, icsAttachment?: string) {
+async function sendResendEmail(to: string, subject: string, html: string) {
   const key = process.env.RESEND_API_KEY;
   if (!key) return;
-  const body: Record<string, unknown> = {
-    // nayba.app is the verified sending domain; "Bury Juice" sets the
-    // display name the sponsor sees.
-    from: 'Bury Juice <hello@nayba.app>',
-    to,
-    subject,
-    html,
-  };
-  if (icsAttachment) {
-    body.attachments = [
-      { filename: 'bury-juice-placements.ics', content: Buffer.from(icsAttachment).toString('base64') },
-    ];
-  }
   await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
+    body: JSON.stringify({
+      // nayba.app is the verified sending domain; Bury Juice is the
+      // display name in the recipient's inbox.
+      from: 'Bury Juice <hello@nayba.app>',
+      to,
+      subject,
+      html,
+    }),
   }).catch((e) => console.error('[bj/webhook] resend failed', e));
 }
 
@@ -149,7 +140,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       }),
     });
 
-    // 3. Fetch pack + business for the emails.
+    // 3. Fetch pack + business — admin notification only; Stripe's
+    //    own receipt covers the sponsor-side confirmation.
     const packs = await supabaseFetch<
       {
         id: string;
@@ -161,27 +153,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     >(`bj_packs?id=eq.${packId}&limit=1`);
     const pack = packs[0];
     const businesses = await supabaseFetch<
-      { id: string; name: string; contact_email: string }[]
-    >(`businesses?select=id,name,contact_email&id=eq.${pack.business_id}&limit=1`);
+      { id: string; name: string }[]
+    >(`businesses?select=id,name&id=eq.${pack.business_id}&limit=1`);
     const business = businesses[0];
-    const bookings = await supabaseFetch<
-      { id: string; issue_date: string; headline: string | null }[]
-    >(`bj_bookings?select=id,issue_date,headline&pack_id=eq.${packId}`);
-
-    const ics = buildICS(
-      bookings.map((b) => b.issue_date),
-      business.name,
-      pack.tier,
-    );
-
-    const confirmationHtml = sponsorConfirmationHTML({
-      businessName: business.name,
-      tier: pack.tier,
-      size: pack.size as 1 | 4 | 12,
-      amountPaidGbp: pack.amount_paid_gbp,
-      bookedDates: bookings.map((b) => b.issue_date),
-    });
-    await sendResendEmail(business.contact_email, "Your Bury Juice sponsorship is confirmed", confirmationHtml, ics);
 
     const adminEmail = process.env.ADMIN_EMAIL || 'hello@nayba.app';
     const adminUrl = `https://${req.headers.host}/`;
@@ -198,14 +172,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     );
 
     // 4. Notion sync (best-effort, one row per booking).
-    for (const b of bookings) {
-      await writeToNotion({
-        businessName: business.name,
-        tier: pack.tier,
-        issueDate: b.issue_date,
-        amountPaidGbp: Math.round(pack.amount_paid_gbp / Math.max(1, size)),
-        source: 'paid_storefront',
-      });
+    if (process.env.NOTION_TOKEN && process.env.NOTION_BURY_JUICE_BOOKINGS_DB_ID) {
+      const bookings = await supabaseFetch<{ id: string; issue_date: string }[]>(
+        `bj_bookings?select=id,issue_date&pack_id=eq.${packId}`,
+      );
+      for (const b of bookings) {
+        await writeToNotion({
+          businessName: business.name,
+          tier: pack.tier,
+          issueDate: b.issue_date,
+          amountPaidGbp: Math.round(pack.amount_paid_gbp / Math.max(1, size)),
+          source: 'paid_storefront',
+        });
+      }
     }
 
     res.status(200).json({ received: true });

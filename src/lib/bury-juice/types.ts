@@ -48,6 +48,8 @@ export interface BjBusiness {
 export interface BjAvailabilityEntry {
   date: string;
   status: BjAvailabilityStatus;
+  filled: number;
+  capacity: number;
 }
 
 export interface BjCreative {
