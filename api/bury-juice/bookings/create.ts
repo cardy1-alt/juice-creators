@@ -71,11 +71,22 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     //    may still be NULL on Nayba rows. We match on either so a
     //    returning sponsor who already has a Nayba account keeps the
     //    same business_id and we don't collide on the UNIQUE key.
+    //
+    //    Two sequential lookups (by contact_email, then owner_email)
+    //    avoid PostgREST's OR-filter quoting rules — dots and @ in
+    //    email addresses need special escaping inside or=(...) groups,
+    //    and getting that wrong silently 400s. Two cheap round-trips
+    //    is the safer read.
     const email = creative.contact_email;
-    const emailParam = `eq.${encodeURIComponent(email)}`;
-    const existing = await supabaseFetch<{ id: string; contact_email: string | null }[]>(
-      `businesses?select=id,contact_email&or=(contact_email.${emailParam},owner_email.${emailParam})&limit=1`,
+    const emailEq = `eq.${encodeURIComponent(email)}`;
+    let existing = await supabaseFetch<{ id: string; contact_email: string | null }[]>(
+      `businesses?select=id,contact_email&contact_email=${emailEq}&limit=1`,
     );
+    if (existing.length === 0) {
+      existing = await supabaseFetch<{ id: string; contact_email: string | null }[]>(
+        `businesses?select=id,contact_email&owner_email=${emailEq}&limit=1`,
+      );
+    }
     let businessId: string;
     if (existing.length > 0) {
       businessId = existing[0].id;

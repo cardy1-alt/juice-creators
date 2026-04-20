@@ -16,13 +16,12 @@ export function Hero() {
         style={{
           fontSize: 'clamp(32px, 6vw, 52px)',
           lineHeight: 1.1,
-          fontWeight: 600,
           letterSpacing: '-0.02em',
           color: 'var(--ink)',
           maxWidth: 680,
         }}
       >
-        Put your business in front of 7,331 readers in Bury St Edmunds.
+        Put your business in front of Bury St Edmunds.
       </h1>
       <p
         style={{

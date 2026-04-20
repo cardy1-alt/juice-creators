@@ -30,8 +30,8 @@
 .bj-surface h2,
 .bj-surface h3,
 .bj-surface h4 {
-  font-family: var(--font-sans);
-  font-weight: var(--weight-semibold);
+  font-family: 'Hornbill', var(--font-sans);
+  font-weight: 700;
   letter-spacing: -0.02em;
   text-transform: none;
   color: var(--ink);
