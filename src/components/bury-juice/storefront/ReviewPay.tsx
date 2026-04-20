@@ -9,10 +9,11 @@ interface Props {
   onCheckout: () => void;
   submitting: boolean;
   submitError: string | null;
+  uploadStatus: string | null;
 }
 
 export function ReviewPay(props: Props) {
-  const { tier, size, selectedDates, pickLater, total, onCheckout, submitting, submitError } = props;
+  const { tier, size, selectedDates, pickLater, total, onCheckout, submitting, submitError, uploadStatus } = props;
   const t = BJ_PRICING[tier];
   return (
     <section className="bj-section">
@@ -64,11 +65,14 @@ export function ReviewPay(props: Props) {
         {submitError && (
           <div style={{ color: 'var(--bj-crimson)', fontSize: 14 }}>{submitError}</div>
         )}
+        {uploadStatus && (
+          <div style={{ color: 'var(--bj-mid)', fontSize: 14 }}>{uploadStatus}</div>
+        )}
         <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting}>
-          {submitting ? 'Sending you to Stripe…' : 'Pay via Stripe'}
+          {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Continue to payment'}
         </button>
         <p style={{ fontSize: 12, color: 'var(--bj-mid)', margin: 0 }}>
-          You'll be redirected to Stripe to complete payment. A confirmation email and dashboard link arrive on success.
+          Pay securely below without leaving the page. A confirmation email and dashboard link arrive on success.
         </p>
       </div>
     </section>

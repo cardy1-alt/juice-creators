@@ -22,8 +22,11 @@ interface CreativePayload {
   headline: string;
   body_copy: string;
   cta_url: string;
-  image_filename: string | null;
-  logo_filename: string | null;
+  // Public URLs from the Supabase Storage upload step — null if the
+  // tier doesn't need them (Classified has no image, Feature has no
+  // logo).
+  image_url: string | null;
+  logo_url: string | null;
 }
 
 interface RequestBody {
@@ -35,8 +38,9 @@ interface RequestBody {
 }
 
 // POST /api/bury-juice/bookings/create
-// Creates the businesses/packs/bookings rows (pending_creative until the
-// webhook confirms payment) and returns a Stripe Checkout URL.
+// Creates the businesses/packs/bookings rows (pending_creative until
+// the webhook confirms payment) and returns a Stripe Checkout
+// client_secret for mounting an embedded checkout on the storefront.
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') return jsonError(res, 405, 'Method not allowed');
 
@@ -118,10 +122,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         headline: creative.headline,
         body_copy: creative.body_copy,
         cta_url: creative.cta_url,
-        // image_url / logo_url are written by the upload step — for
-        // v1 we store the filename hint so Jacob knows what to expect.
-        image_url: creative.image_filename,
-        logo_url: creative.logo_filename,
+        image_url: creative.image_url,
+        logo_url: creative.logo_url,
       }));
       await supabaseFetch('bj_bookings', {
         method: 'POST',
@@ -129,14 +131,15 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 4. Stripe Checkout session.
+    // 4. Stripe Checkout session — embedded mode so the user stays
+    //    on buryjuice.com. Stripe redirects to return_url once the
+    //    iframe-driven checkout completes.
     const origin = `https://${req.headers.host}`;
-    const successUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${origin}/sponsor?cancelled=1`;
-    const session = await stripeCall<{ id: string; url: string }>('checkout/sessions', {
+    const returnUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
+    const session = await stripeCall<{ id: string; client_secret: string }>('checkout/sessions', {
       mode: 'payment',
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      ui_mode: 'embedded',
+      return_url: returnUrl,
       'line_items[0][price]': priceIdFor(tier, size),
       'line_items[0][quantity]': 1,
       'customer_email': creative.contact_email,
@@ -147,7 +150,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'metadata[dashboard_token]': token,
     });
 
-    res.status(200).json({ checkoutUrl: session.url, packId, dashboardToken: token });
+    res.status(200).json({
+      clientSecret: session.client_secret,
+      packId,
+      dashboardToken: token,
+    });
   } catch (err) {
     console.error('[bj/bookings/create]', err);
     jsonError(res, 500, err instanceof Error ? err.message : 'Internal error');
