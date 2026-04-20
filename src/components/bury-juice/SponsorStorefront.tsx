@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import {
   priceForTierAndSize,
   type BjPackSize,
   type BjTier,
-} from '../../lib/bury-juice/pricing';
-import { uploadCreativeFile } from '../../lib/bury-juice/upload';
+} from '../../lib/bury-juice/pricing.js';
+import { uploadCreativeFile } from '../../lib/bury-juice/upload.js';
 import { Hero } from './storefront/Hero';
 import { StatsBand } from './storefront/StatsBand';
 import { HowItWorks } from './storefront/HowItWorks';
@@ -14,7 +14,6 @@ import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } 
 import { ReviewPay } from './storefront/ReviewPay';
 import { FAQ } from './storefront/FAQ';
 import { Footer } from './storefront/Footer';
-import { EmbeddedCheckout } from './EmbeddedCheckout';
 
 const EMPTY_CREATIVE: CreativeFormValue = {
   businessName: '',
@@ -36,10 +35,8 @@ export default function SponsorStorefront() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const bookingRef = useRef<HTMLDivElement | null>(null);
-  const checkoutRef = useRef<HTMLDivElement | null>(null);
 
   const total = useMemo(
     () => (tier ? priceForTierAndSize(tier, size) : 0),
@@ -53,7 +50,6 @@ export default function SponsorStorefront() {
   function handleTierSelect(t: BjTier) {
     setTier(t);
     setSelectedDates([]);
-    setClientSecret(null);
     setSubmitError(null);
     setTimeout(() => {
       bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -73,8 +69,8 @@ export default function SponsorStorefront() {
     }
     setSubmitting(true);
     try {
-      // Stage 1 — upload the creative assets in parallel so the API
-      // call receives public URLs rather than filename hints.
+      // Stage 1 — upload creative assets in parallel so the API
+      // call receives public URLs, not filename hints.
       let imageUrl: string | null = null;
       let logoUrl: string | null = null;
       const tasks: Promise<void>[] = [];
@@ -97,9 +93,10 @@ export default function SponsorStorefront() {
       if (tasks.length > 0) {
         await Promise.all(tasks);
       }
-      setUploadStatus(null);
+      setUploadStatus('Sending you to Stripe…');
 
-      // Stage 2 — create booking rows + Stripe embedded session.
+      // Stage 2 — create booking rows + hosted Stripe session; the
+      // API returns a checkout.stripe.com URL we redirect to.
       const res = await fetch('/api/bury-juice/bookings/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,34 +121,18 @@ export default function SponsorStorefront() {
         const body = await res.json().catch(() => ({ error: `HTTP ${res.status}` }));
         throw new Error(body.error ?? `HTTP ${res.status}`);
       }
-      const body = (await res.json()) as { clientSecret?: string; error?: string };
-      if (!body.clientSecret) {
-        throw new Error(body.error ?? 'No client secret returned');
+      const body = (await res.json()) as { checkoutUrl?: string; error?: string };
+      if (!body.checkoutUrl) {
+        throw new Error(body.error ?? 'No checkout URL returned');
       }
-      setClientSecret(body.clientSecret);
+      window.location.href = body.checkoutUrl;
     } catch (err) {
       setUploadStatus(null);
       const msg = err instanceof Error ? err.message : String(err);
       setSubmitError(`Couldn't start checkout — ${msg}`);
-    } finally {
       setSubmitting(false);
     }
   }
-
-  // Scroll the embedded checkout into view once Stripe hands us a
-  // client secret and the iframe has had a paint.
-  useEffect(() => {
-    if (!clientSecret) return;
-    const id = setTimeout(() => {
-      checkoutRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 80);
-    return () => clearTimeout(id);
-  }, [clientSecret]);
-
-  const onCheckoutError = useCallback((msg: string) => {
-    setSubmitError(msg);
-    setClientSecret(null);
-  }, []);
 
   return (
     <div className="bj-surface">
@@ -171,34 +152,17 @@ export default function SponsorStorefront() {
             onPickLaterChange={setPickLater}
           />
           <CreativeForm tier={tier} value={creative} onChange={setCreative} errors={errors} />
-          {!clientSecret && (
-            <ReviewPay
-              tier={tier}
-              size={size}
-              selectedDates={selectedDates}
-              pickLater={pickLater}
-              total={total}
-              onCheckout={handleCheckout}
-              submitting={submitting}
-              submitError={submitError}
-              uploadStatus={uploadStatus}
-            />
-          )}
-          {clientSecret && (
-            <section className="bj-section" ref={checkoutRef} style={{ paddingTop: 32 }}>
-              <h2 style={{ fontSize: 22, marginBottom: 16 }}>Secure payment</h2>
-              <div
-                style={{
-                  background: 'var(--card)',
-                  border: '1px solid var(--border-color)',
-                  borderRadius: 'var(--r-card)',
-                  padding: 16,
-                }}
-              >
-                <EmbeddedCheckout clientSecret={clientSecret} onError={onCheckoutError} />
-              </div>
-            </section>
-          )}
+          <ReviewPay
+            tier={tier}
+            size={size}
+            selectedDates={selectedDates}
+            pickLater={pickLater}
+            total={total}
+            onCheckout={handleCheckout}
+            submitting={submitting}
+            submitError={submitError}
+            uploadStatus={uploadStatus}
+          />
         </div>
       )}
       <FAQ />

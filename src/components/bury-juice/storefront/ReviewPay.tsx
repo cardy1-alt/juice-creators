@@ -57,10 +57,10 @@ export function ReviewPay(props: Props) {
           <div style={{ color: 'var(--ink-60)', fontSize: 14, marginTop: 4 }}>{uploadStatus}</div>
         )}
         <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting} style={{ marginTop: 4 }}>
-          {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Continue to payment'}
+          {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Pay securely with Stripe'}
         </button>
         <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
-          Pay securely below — no leaving the page. Confirmation and dashboard link email straight to you.
+          You'll pop over to Stripe to pay, then come straight back. Confirmation and dashboard link email to you on success.
         </p>
       </div>
     </section>

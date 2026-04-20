@@ -172,16 +172,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       });
     }
 
-    // 4. Stripe Checkout session — embedded mode so the user stays
-    //    on buryjuice.com. Stripe redirects to return_url once the
-    //    iframe-driven checkout completes.
+    // 4. Stripe Checkout session — hosted (redirect) mode. Keeps
+    //    the client surface Stripe-free, which means no publishable
+    //    key baked into the build, no Stripe.js load, no CSP fiddling.
+    //    One brief redirect to checkout.stripe.com and back; Stripe's
+    //    hosted page is fast enough that the UX cost is marginal.
     step = 'stripe-session';
     const origin = `https://${req.headers.host}`;
-    const returnUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
-    const session = await stripeCall<{ id: string; client_secret: string }>('checkout/sessions', {
+    const successUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/sponsor?cancelled=1`;
+    const session = await stripeCall<{ id: string; url: string }>('checkout/sessions', {
       mode: 'payment',
-      ui_mode: 'embedded',
-      return_url: returnUrl,
+      success_url: successUrl,
+      cancel_url: cancelUrl,
       'line_items[0][price]': priceIdFor(tier, size),
       'line_items[0][quantity]': 1,
       'customer_email': creative.contact_email,
@@ -193,7 +196,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     });
 
     res.status(200).json({
-      clientSecret: session.client_secret,
+      checkoutUrl: session.url,
       packId,
       dashboardToken: token,
     });
