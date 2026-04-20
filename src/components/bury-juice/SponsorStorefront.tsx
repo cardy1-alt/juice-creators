@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BJ_PRICING,
   BJ_STATS,
@@ -8,16 +8,22 @@ import {
   type BjPackSize,
   type BjTier,
 } from '../../lib/bury-juice/pricing.js';
+import {
+  nextNThursdays,
+  parseISODate,
+} from '../../lib/bury-juice/availability.js';
+import type { BjAvailabilityEntry } from '../../lib/bury-juice/types.js';
+import { LEGACY_SPONSORS } from '../../lib/bury-juice/legacy-sponsors.js';
 import { uploadCreativeFile } from '../../lib/bury-juice/upload.js';
 import { BookingFlow } from './storefront/BookingFlow';
 import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } from './storefront/CreativeForm';
 import { ReviewPay } from './storefront/ReviewPay';
 import { Footer } from './storefront/Footer';
 
-// One-screen landing for the sponsor storefront. Inspired by the
-// beehiiv direct-sponsorship page: wordmark → short description →
-// tags → stats → a row per placement with price + book button.
-// Clicking a row inline-expands into the booking flow for that tier.
+// One-screen landing for the sponsor storefront. Beehiiv-style:
+// wordmark → tags → stats → social proof → a row per placement
+// (with pack ladder, next-available hint, and mini preview) →
+// booking flow expands below when a tier is chosen.
 
 const EMPTY_CREATIVE: CreativeFormValue = {
   businessName: '',
@@ -32,6 +38,9 @@ const EMPTY_CREATIVE: CreativeFormValue = {
 
 const TIERS: BjTier[] = ['primary', 'feature', 'classified'];
 const TAGS = ['Bury St Edmunds', 'Weekly', 'Local'];
+const WEEKS_AHEAD = 12;
+
+type NextAvailability = Partial<Record<BjTier, string | null>>;
 
 export default function SponsorStorefront() {
   const [tier, setTier] = useState<BjTier | null>(null);
@@ -41,8 +50,56 @@ export default function SponsorStorefront() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [nextAvailable, setNextAvailable] = useState<NextAvailability>({});
+  const [showSticky, setShowSticky] = useState(false);
 
   const bookingRef = useRef<HTMLDivElement | null>(null);
+  const placementsRef = useRef<HTMLDivElement | null>(null);
+
+  // Fetch next-available Thursday per tier so the rows can surface a
+  // "Next available: …" hint. Three parallel calls; errors silently
+  // fall back to "Available" without a date.
+  useEffect(() => {
+    let cancelled = false;
+    const range = nextNThursdays(WEEKS_AHEAD);
+    const from = range[0];
+    const to = range[range.length - 1];
+    Promise.all(
+      TIERS.map((t) =>
+        fetch(`/api/bury-juice/availability?tier=${t}&from=${from}&to=${to}`)
+          .then((r) => (r.ok ? r.json() : null))
+          .then((body: { entries: BjAvailabilityEntry[] } | null) => {
+            const entries = body?.entries ?? [];
+            const firstAvail = entries.find((e) => e.status === 'available');
+            return [t, firstAvail?.date ?? null] as const;
+          })
+          .catch(() => [t, null] as const),
+      ),
+    ).then((pairs) => {
+      if (cancelled) return;
+      const next: NextAvailability = {};
+      for (const [t, d] of pairs) next[t] = d;
+      setNextAvailable(next);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Show the sticky mobile CTA once the user scrolls past the
+  // placement rows. IntersectionObserver keeps the work on the GPU.
+  useEffect(() => {
+    if (!placementsRef.current) return;
+    const el = placementsRef.current;
+    const obs = new IntersectionObserver(
+      ([entry]) => {
+        setShowSticky(!entry.isIntersecting && entry.boundingClientRect.top < 0);
+      },
+      { threshold: 0 },
+    );
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
 
   const total = useMemo(
     () => (tier ? priceForTierAndSize(tier, size) : 0),
@@ -131,6 +188,10 @@ export default function SponsorStorefront() {
     }
   }
 
+  function scrollToPlacements() {
+    placementsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
   return (
     <div className="bj-surface">
       {/* ── Header ─────────────────────────────────────────────── */}
@@ -203,36 +264,28 @@ export default function SponsorStorefront() {
 
       {/* ── Stats ──────────────────────────────────────────────── */}
       <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 0' }}>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(3, 1fr)',
-            gap: 12,
-          }}
-        >
-          <StatCard
-            label="Subscribers"
-            value={BJ_STATS.subscribers.toLocaleString('en-GB')}
-          />
-          <StatCard
-            label="Open rate"
-            value={`${Math.round(BJ_STATS.open_rate * 100)}%`}
-          />
-          <StatCard
-            label="Click-through"
-            value={`${(BJ_STATS.ctr * 100).toFixed(1)}%`}
-          />
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+          <StatCard label="Subscribers" value={BJ_STATS.subscribers.toLocaleString('en-GB')} />
+          <StatCard label="Open rate" value={`${Math.round(BJ_STATS.open_rate * 100)}%`} />
+          <StatCard label="Click-through" value={`${(BJ_STATS.ctr * 100).toFixed(1)}%`} />
         </div>
       </section>
 
+      {/* ── Social proof strip ─────────────────────────────────── */}
+      <SocialProof />
+
       {/* ── Placement options ──────────────────────────────────── */}
-      <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 0' }}>
-        <div style={{ display: 'grid', gap: 10 }}>
+      <section
+        ref={placementsRef}
+        style={{ maxWidth: 680, margin: '0 auto', padding: '28px 24px 0' }}
+      >
+        <div style={{ display: 'grid', gap: 12 }}>
           {TIERS.map((t) => (
             <PlacementRow
               key={t}
               tier={t}
               selected={tier === t}
+              nextAvailable={nextAvailable[t] ?? undefined}
               onBook={() => handleTierSelect(t)}
             />
           ))}
@@ -302,6 +355,9 @@ export default function SponsorStorefront() {
       )}
 
       <Footer />
+
+      {/* ── Sticky mobile CTA ──────────────────────────────────── */}
+      {showSticky && !tier && <StickyCta onClick={scrollToPlacements} />}
     </div>
   );
 }
@@ -332,17 +388,52 @@ function StatCard({ label, value }: { label: string; value: string }) {
   );
 }
 
+// ── Social proof ─────────────────────────────────────────────────
+function SocialProof() {
+  // Hardcoded from the legacy sponsors already in the DB. If this list
+  // gets stale we can swap to a live query later.
+  const names = LEGACY_SPONSORS.map((s) => s.name);
+  return (
+    <section style={{ maxWidth: 680, margin: '0 auto', padding: '20px 24px 0' }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          flexWrap: 'wrap',
+          fontSize: 12,
+          color: 'var(--ink-35)',
+          textAlign: 'center',
+        }}
+      >
+        <span style={{ fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: 10 }}>
+          Trusted by
+        </span>
+        {names.map((n, i) => (
+          <span key={n} style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            <span style={{ color: 'var(--ink-60)', fontWeight: 500, fontSize: 12 }}>{n}</span>
+            {i < names.length - 1 && <span style={{ color: 'var(--ink-35)' }}>·</span>}
+          </span>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// ── Placement row ────────────────────────────────────────────────
 function PlacementRow({
   tier,
   selected,
+  nextAvailable,
   onBook,
 }: {
   tier: BjTier;
   selected: boolean;
+  nextAvailable?: string | null;
   onBook: () => void;
 }) {
   const t = BJ_PRICING[tier];
-  const packSave = packSavingsPct(tier, 12);
   return (
     <div
       style={{
@@ -351,46 +442,201 @@ function PlacementRow({
         boxShadow: selected ? '0 0 0 3px var(--terra-10)' : 'none',
         borderRadius: 'var(--r-card)',
         padding: 18,
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        gap: 14,
-        flexWrap: 'wrap',
+        display: 'grid',
+        gridTemplateColumns: 'auto 1fr',
+        gap: 16,
+        alignItems: 'start',
       }}
     >
-      <div style={{ flex: 1, minWidth: 200 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 2 }}>
-          <h3 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{t.name}</h3>
-          <span style={{ fontSize: 12, color: 'var(--ink-60)' }}>· {t.position.toLowerCase()}</span>
+      <PlacementPreview tier={tier} />
+
+      <div style={{ minWidth: 0, display: 'grid', gap: 12 }}>
+        {/* Title + description + next-available */}
+        <div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
+            <h3 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{t.name}</h3>
+            <span style={{ fontSize: 12, color: 'var(--ink-60)' }}>· {t.position.toLowerCase()}</span>
+          </div>
+          <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: '4px 0 0', lineHeight: 1.5 }}>
+            {t.description}
+          </p>
+          {nextAvailable !== undefined && (
+            <div
+              style={{
+                fontSize: 12,
+                color: nextAvailable ? 'var(--terra)' : 'var(--ink-35)',
+                marginTop: 6,
+                fontWeight: 500,
+              }}
+            >
+              {nextAvailable
+                ? `Next available: ${formatShortDate(nextAvailable)}`
+                : 'No slots in the next 12 weeks'}
+            </div>
+          )}
         </div>
-        <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: 0, lineHeight: 1.5 }}>
-          {t.description}
-          <span style={{ color: 'var(--ink-35)' }}> · Packs from {formatGBP(t.pack_12 / 12)}/issue (save {packSave}%)</span>
-        </p>
-      </div>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <div style={{ fontWeight: 700, fontSize: 18, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
-          {formatGBP(t.single)}
-        </div>
-        <button
-          type="button"
-          onClick={onBook}
+
+        {/* Pack-price ladder */}
+        <div
           style={{
-            padding: '9px 16px',
-            borderRadius: 'var(--r-button)',
-            border: `1px solid ${selected ? 'var(--terra)' : 'var(--ink)'}`,
-            background: selected ? 'var(--terra)' : 'var(--ink)',
-            color: '#fff',
-            cursor: 'pointer',
-            fontSize: 13,
-            fontWeight: 600,
-            fontFamily: 'inherit',
-            whiteSpace: 'nowrap',
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))',
+            gap: 8,
           }}
         >
-          {selected ? 'Selected' : 'Book now'}
-        </button>
+          <PriceStep label="Single issue" sublabel="" price={formatGBP(t.single)} />
+          <PriceStep
+            label="4-pack"
+            sublabel={`save ${packSavingsPct(tier, 4)}%`}
+            price={formatGBP(t.pack_4)}
+          />
+          <PriceStep
+            label="12-pack"
+            sublabel={`save ${packSavingsPct(tier, 12)}%`}
+            price={formatGBP(t.pack_12)}
+          />
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            onClick={onBook}
+            style={{
+              padding: '9px 18px',
+              borderRadius: 'var(--r-button)',
+              border: `1px solid ${selected ? 'var(--terra)' : 'var(--ink)'}`,
+              background: selected ? 'var(--terra)' : 'var(--ink)',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: 'inherit',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {selected ? 'Selected' : 'Book now'}
+          </button>
+        </div>
       </div>
+    </div>
+  );
+}
+
+// Miniature representation of the newsletter layout with the relevant
+// slot tinted terra. Non-photorealistic — just communicates position.
+function PlacementPreview({ tier }: { tier: BjTier }) {
+  const isPrimary = tier === 'primary';
+  const isFeature = tier === 'feature';
+  const isClassified = tier === 'classified';
+  const block = (highlighted: boolean, height: number) => (
+    <div
+      style={{
+        background: highlighted ? 'var(--terra)' : 'var(--ink-08)',
+        height,
+        borderRadius: 3,
+      }}
+    />
+  );
+  return (
+    <div
+      aria-hidden
+      style={{
+        width: 48,
+        padding: 6,
+        background: 'var(--shell)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 8,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 3,
+        flexShrink: 0,
+      }}
+    >
+      {block(isPrimary, 18)}
+      {block(false, 4)}
+      {block(isFeature, 14)}
+      {block(false, 4)}
+      {block(isClassified, 8)}
+    </div>
+  );
+}
+
+function PriceStep({ label, sublabel, price }: { label: string; sublabel: string; price: string }) {
+  return (
+    <div
+      style={{
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--r-input)',
+        padding: '8px 10px',
+        background: 'var(--shell)',
+        minWidth: 0,
+      }}
+    >
+      <div style={{ fontSize: 11, color: 'var(--ink-60)', fontWeight: 500 }}>{label}</div>
+      <div
+        style={{
+          fontSize: 15,
+          fontWeight: 700,
+          color: 'var(--ink)',
+          letterSpacing: '-0.01em',
+          marginTop: 2,
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {price}
+      </div>
+      {sublabel && (
+        <div style={{ fontSize: 10, color: 'var(--terra)', fontWeight: 600, marginTop: 2 }}>
+          {sublabel}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function formatShortDate(iso: string): string {
+  const d = parseISODate(iso);
+  return d.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' });
+}
+
+// ── Sticky mobile CTA ────────────────────────────────────────────
+function StickyCta({ onClick }: { onClick: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 12,
+        background: 'rgba(255,255,255,0.96)',
+        borderTop: '1px solid var(--border-color)',
+        backdropFilter: 'saturate(140%) blur(8px)',
+        WebkitBackdropFilter: 'saturate(140%) blur(8px)',
+        zIndex: 50,
+        animation: 'bjStickyUp 0.2s ease-out',
+      }}
+      className="bj-sticky-mobile"
+    >
+      <button
+        type="button"
+        onClick={onClick}
+        style={{
+          display: 'block',
+          width: '100%',
+          padding: '12px 16px',
+          borderRadius: 'var(--r-button)',
+          border: 'none',
+          background: 'var(--terra)',
+          color: '#fff',
+          cursor: 'pointer',
+          fontSize: 14,
+          fontWeight: 600,
+          fontFamily: 'inherit',
+        }}
+      >
+        Book a placement
+      </button>
     </div>
   );
 }

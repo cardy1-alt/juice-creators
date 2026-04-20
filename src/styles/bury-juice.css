@@ -201,3 +201,16 @@
   from { transform: translateX(100%); }
   to   { transform: translateX(0); }
 }
+
+/* ── Sticky mobile CTA on the storefront ──────────────────── */
+@keyframes bjStickyUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+/* Only surface on narrow viewports — desktop has room for the
+   rows themselves to do the work. */
+@media (min-width: 768px) {
+  .bj-sticky-mobile {
+    display: none !important;
+  }
+}
