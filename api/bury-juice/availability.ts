@@ -1,7 +1,7 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { jsonError, supabaseFetch } from './_lib';
-import { buildAvailability } from '../../src/lib/bury-juice/availability';
-import type { BjTier } from '../../src/lib/bury-juice/pricing';
+import { jsonError, supabaseFetch } from './_lib.js';
+import { buildAvailability } from '../../src/lib/bury-juice/availability.js';
+import type { BjTier } from '../../src/lib/bury-juice/pricing.js';
 
 // GET /api/bury-juice/availability?tier=primary&from=2026-04-23&to=2026-10-22
 export default async function handler(req: VercelRequest, res: VercelResponse) {

@@ -1,5 +1,5 @@
-import type { BjAvailabilityEntry, BjAvailabilityStatus, BjBooking } from './types';
-import { BOOKING_CUTOFF_HOURS, ISSUE_DAY_OF_WEEK, type BjTier } from './pricing';
+import type { BjAvailabilityEntry, BjAvailabilityStatus, BjBooking } from './types.js';
+import { BOOKING_CUTOFF_HOURS, ISSUE_DAY_OF_WEEK, type BjTier } from './pricing.js';
 
 // Yield every Thursday-like ISSUE_DAY_OF_WEEK date between `from` and
 // `to` inclusive, in YYYY-MM-DD form.

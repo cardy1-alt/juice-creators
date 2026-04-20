@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib';
+import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib.js';
 
 // GET /api/bury-juice/admin/overview
 // Returns bookings, businesses map, revenue totals, active packs.

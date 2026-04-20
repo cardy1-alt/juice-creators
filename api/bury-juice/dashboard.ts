@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { jsonError, supabaseFetch } from './_lib';
+import { jsonError, supabaseFetch } from './_lib.js';
 
 // GET /api/bury-juice/dashboard?token=xxx
 export default async function handler(req: VercelRequest, res: VercelResponse) {

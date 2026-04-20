@@ -6,14 +6,14 @@ import {
   priceIdFor,
   stripeCall,
   supabaseFetch,
-} from '../_lib';
+} from '../_lib.js';
 import {
   BJ_PRICING,
   PACK_EXPIRY_MONTHS,
   priceForTierAndSize,
   type BjPackSize,
   type BjTier,
-} from '../../../src/lib/bury-juice/pricing';
+} from '../../../src/lib/bury-juice/pricing.js';
 
 interface CreativePayload {
   business_name: string;

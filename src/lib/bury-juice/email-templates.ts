@@ -2,8 +2,8 @@
 // strings so the serverless routes can POST them to Resend (or any
 // provider) without a templating dependency.
 
-import type { BjTier, BjPackSize } from './pricing';
-import { BJ_PRICING, formatGBP } from './pricing';
+import type { BjTier, BjPackSize } from './pricing.js';
+import { BJ_PRICING, formatGBP } from './pricing.js';
 
 interface ConfirmationArgs {
   businessName: string;

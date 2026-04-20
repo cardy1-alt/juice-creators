@@ -2,8 +2,8 @@
 // output into the three-dot menu → "Edit HTML" on a beehiiv content
 // block, so we emit inline styles only and keep the markup minimal.
 
-import type { BjBooking } from './types';
-import type { BjTier } from './pricing';
+import type { BjBooking } from './types.js';
+import type { BjTier } from './pricing.js';
 
 const CRIMSON = '#A3185A';
 const CHARCOAL = '#181818';

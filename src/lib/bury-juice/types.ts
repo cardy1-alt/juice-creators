@@ -1,4 +1,4 @@
-import type { BjTier } from './pricing';
+import type { BjTier } from './pricing.js';
 
 export type BjBookingStatus = 'confirmed' | 'pending_creative' | 'cancelled';
 export type BjBookingSource = 'paid_storefront' | 'paid_legacy' | 'comp';

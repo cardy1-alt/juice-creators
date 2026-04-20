@@ -1,11 +1,11 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { createHmac, timingSafeEqual } from 'crypto';
-import { jsonError, supabaseFetch } from '../_lib';
+import { jsonError, supabaseFetch } from '../_lib.js';
 import {
   adminNotificationHTML,
   buildICS,
   sponsorConfirmationHTML,
-} from '../../../src/lib/bury-juice/email-templates';
+} from '../../../src/lib/bury-juice/email-templates.js';
 
 // POST /api/bury-juice/stripe/webhook
 // Handles checkout.session.completed — flips bookings to 'confirmed',

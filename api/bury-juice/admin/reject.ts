@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib';
-import { rejectionEmailHTML } from '../../../src/lib/bury-juice/email-templates';
+import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib.js';
+import { rejectionEmailHTML } from '../../../src/lib/bury-juice/email-templates.js';
 
 // POST /api/bury-juice/admin/reject
 // Flip a booking back to pending_creative and email the sponsor.

@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib';
-import type { BjBooking } from '../../../src/lib/bury-juice/types';
+import { adminPasswordOk, jsonError, supabaseFetch } from '../_lib.js';
+import type { BjBooking } from '../../../src/lib/bury-juice/types.js';
 
 // GET /api/bury-juice/admin/issue?date=2026-05-07
 // Returns all three tier slots for that Thursday, including the

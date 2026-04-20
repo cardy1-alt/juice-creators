@@ -4,7 +4,7 @@
 // only useful for admin-side UI that needs a readable description of
 // who each legacy row represents.
 
-import type { BjTier } from './pricing';
+import type { BjTier } from './pricing.js';
 
 export interface LegacySponsor {
   name: string;

@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { jsonError, supabaseFetch } from '../_lib';
+import { jsonError, supabaseFetch } from '../_lib.js';
 
 // GET /api/bury-juice/bookings/confirm?session_id=cs_xxx
 // Cheap lookup from the post-Stripe redirect so the success page can
