@@ -28,10 +28,10 @@ export function Footer() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <a
-            href="mailto:jacob@buryjuice.com"
+            href="mailto:hello@theburyjuice.com"
             style={{ color: 'var(--ink-60)', textDecoration: 'none' }}
           >
-            jacob@buryjuice.com
+            hello@theburyjuice.com
           </a>
           <span style={{ color: 'var(--ink-35)' }}>·</span>
           <span style={{ color: 'var(--ink-35)' }}>Powered by Nayba</span>

@@ -29,7 +29,7 @@ export default function SponsorSuccess() {
           Your Bury Juice sponsorship is locked in. A confirmation email — with calendar invites for every booked Thursday — is on its way.
         </p>
         <p style={{ fontSize: 13, color: 'var(--ink-35)', marginTop: 24 }}>
-          Need to change anything? Just reply to the confirmation email or write to jacob@buryjuice.com.
+          Need to change anything? Just reply to the confirmation email or write to hello@theburyjuice.com.
         </p>
       </section>
       <Footer />

@@ -258,7 +258,7 @@ export default function SponsorStorefront() {
             Looking for something custom?
           </div>
           <a
-            href="mailto:jacob@buryjuice.com"
+            href="mailto:hello@theburyjuice.com"
             style={{
               padding: '8px 14px',
               borderRadius: 'var(--r-button)',
