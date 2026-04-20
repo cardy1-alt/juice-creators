@@ -1,49 +1,41 @@
 export function Hero() {
   return (
-    <section className="bj-section" style={{ paddingTop: 72, paddingBottom: 72 }}>
+    <section className="bj-section" style={{ paddingTop: 72, paddingBottom: 24 }}>
       <div
         style={{
-          display: 'grid',
-          gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)',
-          gap: 48,
-          alignItems: 'end',
+          fontSize: 12,
+          letterSpacing: 0,
+          fontWeight: 600,
+          color: 'var(--terra)',
+          marginBottom: 12,
         }}
       >
-        <div>
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: '0.18em',
-              textTransform: 'uppercase',
-              color: 'var(--bj-crimson)',
-              fontWeight: 700,
-              marginBottom: 18,
-            }}
-          >
-            Self-serve sponsorships
-          </div>
-          <h1
-            style={{
-              fontSize: 'clamp(56px, 9vw, 128px)',
-              lineHeight: 0.9,
-              color: 'var(--bj-crimson)',
-            }}
-          >
-            Sponsor<br />Bury Juice
-          </h1>
-        </div>
-        <div style={{ textAlign: 'right' }}>
-          <div
-            className="bj-wordmark"
-            style={{ fontSize: 'clamp(32px, 5vw, 56px)', lineHeight: 1 }}
-          >
-            BURY<br />JUICE
-          </div>
-        </div>
+        Bury Juice · Sponsorships
       </div>
-      <div className="bj-rule" style={{ marginTop: 40, marginBottom: 24 }} />
-      <p style={{ fontSize: 20, maxWidth: 720, margin: 0 }}>
-        The weekly newsletter read by 7,331 people in Bury St Edmunds.
+      <h1
+        style={{
+          fontSize: 'clamp(32px, 6vw, 52px)',
+          lineHeight: 1.1,
+          fontWeight: 600,
+          letterSpacing: '-0.02em',
+          color: 'var(--ink)',
+          maxWidth: 680,
+        }}
+      >
+        Put your business in front of 7,331 readers in Bury St Edmunds.
+      </h1>
+      <p
+        style={{
+          fontSize: 17,
+          lineHeight: 1.55,
+          color: 'var(--ink-60)',
+          maxWidth: 620,
+          marginTop: 14,
+          marginBottom: 0,
+        }}
+      >
+        Bury Juice is the weekly local newsletter — pick a placement, pick your Thursdays,
+        and be in the next issue.
       </p>
     </section>
   );

@@ -1,5 +1,5 @@
-import type { ChangeEvent } from 'react';
 import { BJ_PRICING, type BjTier } from '../../../lib/bury-juice/pricing';
+import { DropZone } from './DropZone';
 
 export interface CreativeFormValue {
   businessName: string;
@@ -30,34 +30,18 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
     onChange({ ...value, [key]: v });
   }
 
-  function handleFile(key: 'imageFile' | 'logoFile', e: ChangeEvent<HTMLInputElement>) {
-    const f = e.target.files?.[0] ?? null;
-    set(key, f);
-  }
-
   return (
-    <section className="bj-section">
-      <div
-        style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
-        }}
-      >
-        Your creative
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 32 }}>
-        Tell us what to run.
-      </h2>
+    <section className="bj-section" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 4 }}>Your creative</h2>
+      <p style={{ color: 'var(--ink-60)', margin: 0, marginBottom: 20, fontSize: 15 }}>
+        This is what Bury Juice readers see on the day. You can change it up to 48h before send.
+      </p>
 
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-          gap: 20,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+          gap: 16,
         }}
       >
         <Field
@@ -102,22 +86,23 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
           )}
         />
         <Field
-          label="CTA link"
+          label="Link for the CTA"
+          helper="We'll add https:// automatically."
           error={errors.ctaUrl}
           render={(id) => (
             <input
               id={id}
-              type="url"
+              type="text"
               className="bj-input"
               value={value.ctaUrl}
               onChange={(e) => set('ctaUrl', e.target.value)}
-              placeholder="https://yourbusiness.co.uk/offer"
+              placeholder="yourbusiness.co.uk/offer"
             />
           )}
         />
       </div>
 
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 16 }}>
         <Field
           label={`Headline (${value.headline.length}/${HEADLINE_MAX})`}
           error={errors.headline}
@@ -134,7 +119,7 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
         />
       </div>
 
-      <div style={{ marginTop: 20 }}>
+      <div style={{ marginTop: 16 }}>
         <Field
           label={`Body copy (${value.bodyCopy.length}/${bodyMax})`}
           error={errors.bodyCopy}
@@ -142,7 +127,7 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
             <textarea
               id={id}
               className="bj-textarea"
-              rows={5}
+              rows={4}
               maxLength={bodyMax}
               value={value.bodyCopy}
               onChange={(e) => set('bodyCopy', e.target.value)}
@@ -156,39 +141,31 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: needsLogo ? 'repeat(auto-fit, minmax(240px, 1fr))' : '1fr',
-            gap: 20,
-            marginTop: 20,
+            gridTemplateColumns: needsLogo ? 'repeat(auto-fit, minmax(260px, 1fr))' : '1fr',
+            gap: 16,
+            marginTop: 16,
           }}
         >
           {needsImage && (
-            <Field
-              label="Photo (min 1200px wide, max 5MB)"
+            <DropZone
+              id="bj-photo"
+              label="Photo"
+              helper="JPEG or PNG · min 1200px wide · max 5 MB"
+              accept="image/jpeg,image/png,image/webp"
+              file={value.imageFile}
               error={errors.imageFile}
-              render={(id) => (
-                <input
-                  id={id}
-                  type="file"
-                  accept="image/*"
-                  className="bj-input"
-                  onChange={(e) => handleFile('imageFile', e)}
-                />
-              )}
+              onChange={(f) => set('imageFile', f)}
             />
           )}
           {needsLogo && (
-            <Field
-              label="Logo (transparent PNG preferred)"
+            <DropZone
+              id="bj-logo"
+              label="Logo"
+              helper="Transparent PNG preferred · max 5 MB"
+              accept="image/png,image/svg+xml,image/webp"
+              file={value.logoFile}
               error={errors.logoFile}
-              render={(id) => (
-                <input
-                  id={id}
-                  type="file"
-                  accept="image/png,image/svg+xml"
-                  className="bj-input"
-                  onChange={(e) => handleFile('logoFile', e)}
-                />
-              )}
+              onChange={(f) => set('logoFile', f)}
             />
           )}
         </div>
@@ -199,10 +176,12 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
 
 function Field({
   label,
+  helper,
   error,
   render,
 }: {
   label: string;
+  helper?: string;
   error?: string;
   render: (id: string) => React.ReactNode;
 }) {
@@ -213,11 +192,22 @@ function Field({
         {label}
       </label>
       {render(id)}
+      {helper && !error && (
+        <div style={{ color: 'var(--ink-35)', fontSize: 12, marginTop: 6 }}>{helper}</div>
+      )}
       {error && (
-        <div style={{ color: 'var(--bj-crimson)', fontSize: 12, marginTop: 6 }}>{error}</div>
+        <div style={{ color: 'var(--destructive)', fontSize: 12, marginTop: 6 }}>{error}</div>
       )}
     </div>
   );
+}
+
+// Normalises a raw URL input — prepends https:// if the user skipped
+// the scheme so `testbusiness.com` parses cleanly as a URL.
+function normaliseUrl(raw: string): string {
+  const trimmed = raw.trim();
+  if (!trimmed) return trimmed;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
 }
 
 export function validateCreative(
@@ -235,11 +225,18 @@ export function validateCreative(
   else if (value.bodyCopy.length > bodyMax) errors.bodyCopy = `Max ${bodyMax} chars`;
   try {
     if (!value.ctaUrl.trim()) throw new Error('missing');
-    new URL(value.ctaUrl);
+    const normalised = normaliseUrl(value.ctaUrl);
+    const parsed = new URL(normalised);
+    // Reject obviously broken inputs (no host, missing dot in hostname).
+    if (!parsed.hostname || !parsed.hostname.includes('.')) throw new Error('bad host');
   } catch {
-    errors.ctaUrl = 'Valid URL required';
+    errors.ctaUrl = 'Enter a web address, e.g. yourbusiness.co.uk';
   }
   if ((tier === 'feature' || tier === 'primary') && !value.imageFile) errors.imageFile = 'Photo required';
   if (tier === 'primary' && !value.logoFile) errors.logoFile = 'Logo required';
   return errors;
 }
+
+// Exported so the SponsorStorefront can send a cleaned-up URL to the
+// API (with https:// prepended when necessary).
+export { normaliseUrl };

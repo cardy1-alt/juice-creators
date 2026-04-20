@@ -16,40 +16,30 @@ export function ReviewPay(props: Props) {
   const { tier, size, selectedDates, pickLater, total, onCheckout, submitting, submitError, uploadStatus } = props;
   const t = BJ_PRICING[tier];
   return (
-    <section className="bj-section">
+    <section className="bj-section" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 16 }}>Review &amp; pay</h2>
       <div
         style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
-        }}
-      >
-        Review
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 32 }}>Check and pay.</h2>
-      <div
-        style={{
-          border: '2px solid var(--bj-charcoal)',
-          padding: 24,
-          maxWidth: 640,
+          background: 'var(--card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--r-card)',
+          padding: 20,
+          maxWidth: 560,
           display: 'grid',
-          gap: 16,
+          gap: 10,
         }}
       >
         <Row label="Placement" value={`${t.name} — ${t.position.toLowerCase()}`} />
-        <Row label="Quantity" value={size === 1 ? 'Single placement' : `${size}-pack`} />
+        <Row label="Quantity" value={size === 1 ? 'Single issue' : `${size}-pack`} />
         <Row
           label="Dates"
           value={
             pickLater || selectedDates.length === 0
-              ? 'To be selected via dashboard'
+              ? 'Pick later via dashboard'
               : selectedDates.join(', ')
           }
         />
-        <div className="bj-rule" />
+        <div className="bj-rule" style={{ marginTop: 4, marginBottom: 4 }} />
         <div
           style={{
             display: 'flex',
@@ -57,22 +47,20 @@ export function ReviewPay(props: Props) {
             alignItems: 'baseline',
           }}
         >
-          <span style={{ fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: 12 }}>
-            Total
-          </span>
-          <span style={{ fontWeight: 900, fontSize: 32 }}>{formatGBP(total)}</span>
+          <span style={{ color: 'var(--ink-60)', fontSize: 14 }}>Total</span>
+          <span style={{ fontWeight: 600, fontSize: 22, letterSpacing: '-0.02em' }}>{formatGBP(total)}</span>
         </div>
         {submitError && (
-          <div style={{ color: 'var(--bj-crimson)', fontSize: 14 }}>{submitError}</div>
+          <div style={{ color: 'var(--destructive)', fontSize: 14, marginTop: 4 }}>{submitError}</div>
         )}
         {uploadStatus && (
-          <div style={{ color: 'var(--bj-mid)', fontSize: 14 }}>{uploadStatus}</div>
+          <div style={{ color: 'var(--ink-60)', fontSize: 14, marginTop: 4 }}>{uploadStatus}</div>
         )}
-        <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting}>
+        <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting} style={{ marginTop: 4 }}>
           {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Continue to payment'}
         </button>
-        <p style={{ fontSize: 12, color: 'var(--bj-mid)', margin: 0 }}>
-          Pay securely below without leaving the page. A confirmation email and dashboard link arrive on success.
+        <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
+          Pay securely below — no leaving the page. Confirmation and dashboard link email straight to you.
         </p>
       </div>
     </section>
@@ -81,20 +69,9 @@ export function ReviewPay(props: Props) {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ display: 'flex', gap: 24, justifyContent: 'space-between', fontSize: 14 }}>
-      <span
-        style={{
-          textTransform: 'uppercase',
-          letterSpacing: '0.1em',
-          fontSize: 11,
-          fontWeight: 700,
-          color: 'var(--bj-mid)',
-          flexShrink: 0,
-        }}
-      >
-        {label}
-      </span>
-      <span style={{ textAlign: 'right', fontWeight: 600 }}>{value}</span>
+    <div style={{ display: 'flex', gap: 16, justifyContent: 'space-between', fontSize: 14 }}>
+      <span style={{ color: 'var(--ink-60)', flexShrink: 0 }}>{label}</span>
+      <span style={{ textAlign: 'right', color: 'var(--ink)', fontWeight: 500 }}>{value}</span>
     </div>
   );
 }

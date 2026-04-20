@@ -1,33 +1,40 @@
 export function Footer() {
   const year = new Date().getFullYear();
   return (
-    <footer style={{ background: 'var(--bj-crimson)', color: 'var(--bj-white)', padding: '40px 32px' }}>
+    <footer
+      style={{
+        borderTop: '1px solid var(--border-color)',
+        padding: '32px 32px',
+        marginTop: 48,
+      }}
+    >
       <div
         style={{
-          maxWidth: 1200,
+          maxWidth: 1040,
           margin: '0 auto',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
           flexWrap: 'wrap',
-          gap: 16,
+          gap: 12,
+          color: 'var(--ink-60)',
+          fontSize: 13,
         }}
       >
-        <div
-          style={{
-            fontWeight: 900,
-            fontSize: 22,
-            textTransform: 'uppercase',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          Bury Juice
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span style={{ color: 'var(--ink)', fontWeight: 500 }}>Bury Juice</span>
+          <span style={{ color: 'var(--ink-35)' }}>·</span>
+          <span>Bury St Edmunds · © {year}</span>
         </div>
-        <div style={{ fontSize: 13, opacity: 0.85 }}>© {year} Bury Juice · Bury St Edmunds</div>
-        <div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
-          <a href="mailto:jacob@buryjuice.com" style={{ color: 'var(--bj-white)', textDecoration: 'underline' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <a
+            href="mailto:jacob@buryjuice.com"
+            style={{ color: 'var(--ink-60)', textDecoration: 'none' }}
+          >
             jacob@buryjuice.com
           </a>
+          <span style={{ color: 'var(--ink-35)' }}>·</span>
+          <span style={{ color: 'var(--ink-35)' }}>Powered by Nayba</span>
         </div>
       </div>
     </footer>

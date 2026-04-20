@@ -1,44 +1,48 @@
 const STEPS = [
-  { n: '01', title: 'Pick your placement', body: 'Classified, Feature, or Primary — three formats, one per newsletter.' },
-  { n: '02', title: 'Choose your dates', body: 'Book a single issue or grab a 4- or 12-pack at a discount.' },
-  { n: '03', title: 'Upload, pay, done', body: 'Drop in your creative and pay. Jacob takes it from there.' },
+  { n: '1', title: 'Pick your placement', body: 'Classified, Feature, or Primary — three formats, one per issue.' },
+  { n: '2', title: 'Choose your Thursdays', body: 'Book a single issue, or a 4- or 12-pack at a discount.' },
+  { n: '3', title: 'Upload and pay', body: "Drop in your creative, pay securely — Jacob handles the rest." },
 ];
 
 export function HowItWorks() {
   return (
-    <section className="bj-section">
-      <div
-        style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
-        }}
-      >
-        How it works
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', maxWidth: 720, marginBottom: 40 }}>
-        Three steps. No back-and-forth. No calendar wrangling.
-      </h2>
+    <section className="bj-section" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 20 }}>How it works</h2>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
-          gap: 32,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+          gap: 16,
         }}
       >
         {STEPS.map((s) => (
           <div
             key={s.n}
-            style={{ borderTop: '1px solid var(--bj-charcoal)', paddingTop: 18 }}
+            style={{
+              background: 'var(--card)',
+              border: '1px solid var(--border-color)',
+              borderRadius: 'var(--r-card)',
+              padding: 20,
+            }}
           >
-            <div style={{ fontWeight: 900, fontSize: 22, color: 'var(--bj-crimson)' }}>
+            <div
+              style={{
+                width: 28,
+                height: 28,
+                borderRadius: 999,
+                background: 'var(--terra-light)',
+                color: 'var(--terra)',
+                fontWeight: 600,
+                fontSize: 14,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               {s.n}
             </div>
-            <h3 style={{ fontSize: 20, marginTop: 10, marginBottom: 8 }}>{s.title}</h3>
-            <p style={{ color: 'var(--bj-mid)', lineHeight: 1.55, margin: 0 }}>{s.body}</p>
+            <h3 style={{ fontSize: 17, marginTop: 12, marginBottom: 4 }}>{s.title}</h3>
+            <p style={{ color: 'var(--ink-60)', lineHeight: 1.5, margin: 0, fontSize: 14 }}>{s.body}</p>
           </div>
         ))}
       </div>

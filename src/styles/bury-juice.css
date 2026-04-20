@@ -1,21 +1,28 @@
 /* ──────────────────────────────────────────────────────────
-   BURY JUICE — brand surface
-   Scoped to `.bj-surface` so Nayba styles stay untouched.
+   BURY JUICE — Nayba-styled sponsor surface
+
+   The sponsor storefront is a Nayba-hosted page, not a separate
+   brand. We alias the old --bj-* variables to Nayba tokens so
+   every component picks up the Nayba palette, typography and
+   shape language automatically.
    ────────────────────────────────────────────────────────── */
 
 .bj-surface {
-  --bj-crimson: #A3185A;
-  --bj-gold: #F5C96A;
-  --bj-cream: #FAF7F2;
-  --bj-charcoal: #181818;
-  --bj-white: #FFFFFF;
-  --bj-mid: rgba(24, 24, 24, 0.6);
-  --bj-soft: rgba(24, 24, 24, 0.3);
-  --bj-faint: rgba(24, 24, 24, 0.1);
+  /* Nayba tokens exposed under the bj-* names the components use.
+     This is the entire reskin lever — swapping any value here
+     flows through every Bury Juice component without edits. */
+  --bj-crimson:  var(--terra);
+  --bj-gold:     var(--golden-mist);
+  --bj-cream:    var(--shell);
+  --bj-charcoal: var(--ink);
+  --bj-white:    var(--card);
+  --bj-mid:      var(--ink-60);
+  --bj-soft:     var(--ink-35);
+  --bj-faint:    var(--border);
 
-  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
-  background: var(--bj-cream);
-  color: var(--bj-charcoal);
+  font-family: var(--font-sans);
+  background: var(--shell);
+  color: var(--ink);
   min-height: 100vh;
 }
 
@@ -23,11 +30,11 @@
 .bj-surface h2,
 .bj-surface h3,
 .bj-surface h4 {
-  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
-  font-weight: 900;
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
   letter-spacing: -0.02em;
-  text-transform: uppercase;
-  color: var(--bj-charcoal);
+  text-transform: none;
+  color: var(--ink);
   margin: 0;
 }
 
@@ -37,32 +44,33 @@
 .bj-surface input,
 .bj-surface textarea,
 .bj-surface select,
-.bj-surface button {
-  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
-  color: var(--bj-charcoal);
+.bj-surface button,
+.bj-surface a {
+  font-family: var(--font-sans);
+  color: var(--ink);
 }
 
+/* ── Buttons ── */
 .bj-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 14px 22px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  font-size: 13px;
-  border: 2px solid var(--bj-crimson);
-  background: var(--bj-crimson);
-  color: var(--bj-white);
+  gap: 8px;
+  padding: 10px 18px;
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-button);
+  letter-spacing: 0;
+  text-transform: none;
+  border: 1px solid var(--terra);
+  background: var(--terra);
+  color: #fff;
   cursor: pointer;
-  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
-  border-radius: 0;
+  border-radius: var(--r-button);
   text-decoration: none;
+  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
 }
 .bj-btn:hover {
-  background: var(--bj-charcoal);
-  border-color: var(--bj-charcoal);
-  color: var(--bj-white);
+  opacity: 0.85;
 }
 .bj-btn:disabled {
   opacity: 0.4;
@@ -70,64 +78,106 @@
 }
 .bj-btn--ghost {
   background: transparent;
-  color: var(--bj-crimson);
+  color: var(--terra);
 }
 .bj-btn--ghost:hover {
-  background: var(--bj-crimson);
-  color: var(--bj-white);
+  background: var(--terra-light);
+  opacity: 1;
 }
 
+/* ── Inputs ── */
 .bj-input,
 .bj-textarea,
 .bj-select {
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid var(--bj-faint);
-  background: var(--bj-white);
-  font-size: 15px;
-  color: var(--bj-charcoal);
-  border-radius: 2px;
+  border: 1px solid var(--border-color-input);
+  background: var(--card);
+  font-size: var(--text-body);
+  color: var(--ink);
+  border-radius: var(--r-input);
   font-family: inherit;
 }
 .bj-input:focus,
 .bj-textarea:focus,
 .bj-select:focus {
   outline: none;
-  border-color: var(--bj-crimson);
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px var(--terra-10);
 }
 
+/* ── Labels ── */
 .bj-label {
   display: block;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  margin-bottom: 6px;
-  color: var(--bj-mid);
+  font-size: var(--text-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: 8px;
+  color: var(--ink-60);
 }
 
+/* ── Sections ── */
 .bj-section {
-  padding: 80px 32px;
-  max-width: 1200px;
+  padding: 64px 32px;
+  max-width: 1040px;
   margin: 0 auto;
 }
 @media (max-width: 680px) {
   .bj-section {
-    padding: 48px 20px;
+    padding: 40px 20px;
   }
 }
 
 .bj-rule {
   height: 1px;
-  background: var(--bj-charcoal);
+  background: var(--border-color);
   width: 100%;
   margin: 0;
 }
 
+/* ── Wordmark (uses Instrument Serif like Nayba's header) ── */
 .bj-wordmark {
-  font-weight: 900;
-  text-transform: uppercase;
-  letter-spacing: -0.02em;
-  color: var(--bj-crimson);
-  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* ── Cards ── */
+.bj-card {
+  background: var(--card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-card);
+  padding: 24px;
+}
+
+/* ── Drag-and-drop zone ── */
+.bj-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  padding: 20px;
+  border: 1.5px dashed var(--border-color-hover);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink-60);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.bj-dropzone:hover,
+.bj-dropzone--active {
+  border-color: var(--terra);
+  background: var(--terra-light);
+  color: var(--ink);
+}
+.bj-dropzone--filled {
+  border-style: solid;
+  border-color: var(--terra);
+  background: var(--terra-light);
+  color: var(--ink);
 }

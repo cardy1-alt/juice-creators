@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 const ITEMS = [
   {
-    q: 'What size/format are the ads?',
-    a: 'Classified is a plain block at the bottom (headline + copy + link). Feature is a middle-of-newsletter slot with a 600px-wide photo. Primary is the top-of-newsletter placement — logo, photo, headline, copy, link. Examples are in the media kit linked from the footer.',
+    q: 'What size and format are the ads?',
+    a: 'Classified is a block at the bottom with headline, copy and a link. Feature is a middle-of-newsletter slot with a 600px-wide photo. Primary is the top-of-newsletter placement with a logo, photo, headline, copy and a link.',
   },
   {
     q: 'When do I submit my creative?',
@@ -11,47 +11,46 @@ const ITEMS = [
   },
   {
     q: 'Can I change my creative between placements?',
-    a: 'Yes. Your sponsor dashboard link is emailed after checkout. You can upload a new headline, copy, photo, or link for each booked Thursday up to the 48-hour cutoff.',
+    a: 'Yes. Your dashboard link is emailed after checkout. Update headline, copy, photo or link for each booked Thursday any time before the 48-hour cutoff.',
   },
   {
     q: 'What is the refund policy?',
-    a: 'Pack credits stay on file for six months from purchase. We do not issue cash refunds once a pack has been purchased, but you can reassign credits to any available Thursday during that window.',
+    a: 'Pack credits stay on file for six months from purchase. We don’t issue cash refunds, but you can reassign credits to any available Thursday during that window.',
   },
   {
     q: 'Who do I contact for bespoke deals?',
-    a: 'Email jacob@buryjuice.com. Anything custom — video features, exclusive category sponsorships, long-horizon buys — is a conversation, not a storefront transaction.',
+    a: 'Email jacob@buryjuice.com. Anything custom — video features, category sponsorship, long-horizon buys — is a conversation, not a storefront transaction.',
   },
 ];
 
 export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <section className="bj-section">
+    <section className="bj-section" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 16 }}>Questions</h2>
       <div
         style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
+          background: 'var(--card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--r-card)',
+          overflow: 'hidden',
         }}
       >
-        Good questions
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 32 }}>FAQ</h2>
-      <div style={{ borderTop: '1px solid var(--bj-charcoal)' }}>
         {ITEMS.map((item, i) => {
           const isOpen = open === i;
+          const isLast = i === ITEMS.length - 1;
           return (
-            <div key={item.q} style={{ borderBottom: '1px solid var(--bj-charcoal)' }}>
+            <div
+              key={item.q}
+              style={{ borderBottom: isLast ? 'none' : '1px solid var(--border-color)' }}
+            >
               <button
                 type="button"
                 onClick={() => setOpen(isOpen ? null : i)}
                 style={{
                   width: '100%',
                   textAlign: 'left',
-                  padding: '18px 0',
+                  padding: '16px 20px',
                   background: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
@@ -59,16 +58,18 @@ export function FAQ() {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   fontFamily: 'inherit',
+                  color: 'var(--ink)',
                 }}
               >
-                <span style={{ fontSize: 18, fontWeight: 700 }}>{item.q}</span>
+                <span style={{ fontSize: 15, fontWeight: 500 }}>{item.q}</span>
                 <span
                   style={{
-                    fontSize: 22,
-                    fontWeight: 900,
-                    color: 'var(--bj-crimson)',
+                    fontSize: 18,
+                    color: 'var(--terra)',
                     transform: isOpen ? 'rotate(45deg)' : 'none',
                     transition: 'transform 0.15s ease',
+                    flexShrink: 0,
+                    marginLeft: 12,
                   }}
                   aria-hidden
                 >
@@ -76,7 +77,15 @@ export function FAQ() {
                 </span>
               </button>
               {isOpen && (
-                <div style={{ paddingBottom: 20, maxWidth: 720, lineHeight: 1.6, color: 'var(--bj-mid)' }}>
+                <div
+                  style={{
+                    padding: '0 20px 18px',
+                    lineHeight: 1.55,
+                    color: 'var(--ink-60)',
+                    fontSize: 14,
+                    maxWidth: 720,
+                  }}
+                >
                   {item.a}
                 </div>
               )}

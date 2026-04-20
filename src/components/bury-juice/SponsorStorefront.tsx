@@ -10,7 +10,7 @@ import { StatsBand } from './storefront/StatsBand';
 import { HowItWorks } from './storefront/HowItWorks';
 import { TierCards } from './storefront/TierCards';
 import { BookingFlow } from './storefront/BookingFlow';
-import { CreativeForm, validateCreative, type CreativeFormValue } from './storefront/CreativeForm';
+import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } from './storefront/CreativeForm';
 import { ReviewPay } from './storefront/ReviewPay';
 import { FAQ } from './storefront/FAQ';
 import { Footer } from './storefront/Footer';
@@ -114,7 +114,7 @@ export default function SponsorStorefront() {
             contact_phone: creative.contactPhone,
             headline: creative.headline,
             body_copy: creative.bodyCopy,
-            cta_url: creative.ctaUrl,
+            cta_url: normaliseUrl(creative.ctaUrl),
             image_url: imageUrl,
             logo_url: logoUrl,
           },
@@ -185,21 +185,18 @@ export default function SponsorStorefront() {
             />
           )}
           {clientSecret && (
-            <section className="bj-section" ref={checkoutRef}>
+            <section className="bj-section" ref={checkoutRef} style={{ paddingTop: 32 }}>
+              <h2 style={{ fontSize: 22, marginBottom: 16 }}>Secure payment</h2>
               <div
                 style={{
-                  fontSize: 10,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  color: 'var(--bj-crimson)',
-                  fontWeight: 700,
-                  marginBottom: 16,
+                  background: 'var(--card)',
+                  border: '1px solid var(--border-color)',
+                  borderRadius: 'var(--r-card)',
+                  padding: 16,
                 }}
               >
-                Secure payment
+                <EmbeddedCheckout clientSecret={clientSecret} onError={onCheckoutError} />
               </div>
-              <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 24 }}>Pay &amp; finish.</h2>
-              <EmbeddedCheckout clientSecret={clientSecret} onError={onCheckoutError} />
             </section>
           )}
         </div>

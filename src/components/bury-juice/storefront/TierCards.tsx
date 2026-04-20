@@ -13,8 +13,7 @@ interface Props {
 const TIERS: BjTier[] = ['classified', 'feature', 'primary'];
 
 function TierPreview({ tier }: { tier: BjTier }) {
-  // A stylised representation of where the ad sits in the newsletter.
-  // Simple SVG-free blocks; crimson marks the sponsor slot.
+  // Stylised representation of where the ad sits in the newsletter.
   const block = {
     classified: { top: false, middle: false, bottom: true },
     feature:    { top: false, middle: true,  bottom: false },
@@ -23,13 +22,14 @@ function TierPreview({ tier }: { tier: BjTier }) {
   return (
     <div
       style={{
-        border: '1px solid var(--bj-faint)',
-        background: 'var(--bj-white)',
-        padding: 10,
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--r-input)',
+        background: 'var(--shell)',
+        padding: 8,
         display: 'flex',
         flexDirection: 'column',
-        gap: 6,
-        marginBottom: 18,
+        gap: 4,
+        marginBottom: 16,
       }}
       aria-hidden
     >
@@ -43,14 +43,13 @@ function TierPreview({ tier }: { tier: BjTier }) {
           <div
             key={row.key}
             style={{
-              background: isSponsor ? 'var(--bj-crimson)' : 'var(--bj-faint)',
-              color: isSponsor ? '#fff' : 'var(--bj-soft)',
-              padding: '10px 8px',
-              fontSize: 10,
-              letterSpacing: '0.12em',
-              textTransform: 'uppercase',
-              fontWeight: 700,
-              height: row.key === 'top' ? 48 : row.key === 'middle' ? 38 : 28,
+              background: isSponsor ? 'var(--terra)' : 'var(--ink-08)',
+              color: isSponsor ? '#fff' : 'var(--ink-35)',
+              padding: '8px 10px',
+              fontSize: 11,
+              fontWeight: 600,
+              borderRadius: 6,
+              height: row.key === 'top' ? 40 : row.key === 'middle' ? 32 : 24,
               display: 'flex',
               alignItems: 'center',
             }}
@@ -65,25 +64,16 @@ function TierPreview({ tier }: { tier: BjTier }) {
 
 export function TierCards({ onSelect, selected }: Props) {
   return (
-    <section className="bj-section">
-      <div
-        style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
-        }}
-      >
-        Tiers
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 40 }}>Pick your placement.</h2>
+    <section className="bj-section" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 6 }}>Pick your placement</h2>
+      <p style={{ color: 'var(--ink-60)', margin: 0, marginBottom: 20, fontSize: 15 }}>
+        Three formats — one of each goes out in every Thursday issue.
+      </p>
       <div
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
-          gap: 24,
+          gap: 16,
         }}
       >
         {TIERS.map((tier) => {
@@ -93,78 +83,71 @@ export function TierCards({ onSelect, selected }: Props) {
             <div
               key={tier}
               style={{
-                background: isSelected ? 'var(--bj-crimson)' : 'var(--bj-white)',
-                color: isSelected ? 'var(--bj-white)' : 'var(--bj-charcoal)',
-                border: '2px solid var(--bj-crimson)',
-                padding: 24,
+                background: 'var(--card)',
+                color: 'var(--ink)',
+                border: `1px solid ${isSelected ? 'var(--terra)' : 'var(--border-color)'}`,
+                borderRadius: 'var(--r-card)',
+                padding: 20,
                 display: 'flex',
                 flexDirection: 'column',
+                boxShadow: isSelected ? '0 0 0 3px var(--terra-10)' : 'none',
+                transition: 'box-shadow 0.15s ease, border-color 0.15s ease',
               }}
             >
               <div
                 style={{
-                  fontSize: 10,
-                  letterSpacing: '0.18em',
-                  textTransform: 'uppercase',
-                  fontWeight: 700,
-                  opacity: 0.75,
-                  marginBottom: 8,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: 'var(--terra)',
+                  marginBottom: 4,
                 }}
               >
                 {t.position}
               </div>
-              <h3 style={{ fontSize: 36, color: 'inherit', marginBottom: 12 }}>{t.name}</h3>
-              <p style={{ marginBottom: 18, lineHeight: 1.5, color: 'inherit', opacity: 0.85 }}>
+              <h3 style={{ fontSize: 22, marginBottom: 8 }}>{t.name}</h3>
+              <p style={{ color: 'var(--ink-60)', lineHeight: 1.5, fontSize: 14, margin: 0, marginBottom: 16 }}>
                 {t.description}
               </p>
 
               <TierPreview tier={tier} />
 
-              <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 22px 0' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 16 }}>
                 {t.format.map((f) => (
-                  <li
+                  <span
                     key={f}
                     style={{
-                      fontSize: 13,
-                      fontWeight: 700,
-                      letterSpacing: '0.06em',
-                      textTransform: 'uppercase',
-                      padding: '6px 0',
-                      borderBottom: '1px solid currentColor',
-                      opacity: 0.9,
+                      fontSize: 12,
+                      fontWeight: 500,
+                      padding: '4px 10px',
+                      borderRadius: 999,
+                      background: 'var(--ink-08)',
+                      color: 'var(--ink-60)',
                     }}
                   >
                     {f}
-                  </li>
+                  </span>
                 ))}
-              </ul>
+              </div>
 
-              <div style={{ display: 'grid', gap: 8, marginBottom: 22 }}>
-                <PriceRow label="Single" price={formatGBP(t.single)} badge={null} inverted={isSelected} />
+              <div style={{ display: 'grid', gap: 6, marginBottom: 18 }}>
+                <PriceRow label="Single issue" price={formatGBP(t.single)} badge={null} />
                 <PriceRow
                   label="4-pack"
                   price={formatGBP(t.pack_4)}
                   badge={`Save ${packSavingsPct(tier, 4)}%`}
-                  inverted={isSelected}
                 />
                 <PriceRow
                   label="12-pack"
                   price={formatGBP(t.pack_12)}
                   badge={`Save ${packSavingsPct(tier, 12)}%`}
-                  inverted={isSelected}
                 />
               </div>
 
               <button
                 type="button"
                 onClick={() => onSelect(tier)}
-                className="bj-btn"
-                style={{
-                  marginTop: 'auto',
-                  background: isSelected ? 'var(--bj-white)' : 'var(--bj-crimson)',
-                  color: isSelected ? 'var(--bj-crimson)' : 'var(--bj-white)',
-                  borderColor: isSelected ? 'var(--bj-white)' : 'var(--bj-crimson)',
-                }}
+                className={`bj-btn${isSelected ? '' : ' bj-btn--ghost'}`}
+                style={{ marginTop: 'auto' }}
               >
                 {isSelected ? `${t.name} selected` : `Choose ${t.name}`}
               </button>
@@ -180,40 +163,37 @@ function PriceRow({
   label,
   price,
   badge,
-  inverted,
 }: {
   label: string;
   price: string;
   badge: string | null;
-  inverted: boolean;
 }) {
   return (
     <div
       style={{
         display: 'flex',
         justifyContent: 'space-between',
-        alignItems: 'baseline',
+        alignItems: 'center',
         fontSize: 14,
       }}
     >
-      <span style={{ opacity: 0.75 }}>{label}</span>
-      <span style={{ display: 'inline-flex', gap: 10, alignItems: 'baseline' }}>
+      <span style={{ color: 'var(--ink-60)' }}>{label}</span>
+      <span style={{ display: 'inline-flex', gap: 8, alignItems: 'center' }}>
         {badge && (
           <span
             style={{
-              fontSize: 10,
-              fontWeight: 700,
-              letterSpacing: '0.1em',
-              textTransform: 'uppercase',
-              background: inverted ? 'var(--bj-gold)' : 'var(--bj-gold)',
-              color: 'var(--bj-charcoal)',
-              padding: '3px 6px',
+              fontSize: 11,
+              fontWeight: 600,
+              background: 'var(--terra-light)',
+              color: 'var(--terra)',
+              padding: '2px 8px',
+              borderRadius: 999,
             }}
           >
             {badge}
           </span>
         )}
-        <span style={{ fontWeight: 900, fontSize: 18 }}>{price}</span>
+        <span style={{ fontWeight: 600, fontSize: 15, color: 'var(--ink)' }}>{price}</span>
       </span>
     </div>
   );

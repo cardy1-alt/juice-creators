@@ -6,45 +6,44 @@ interface Stat {
 }
 
 const STATS: Stat[] = [
-  { value: BJ_STATS.subscribers.toLocaleString('en-GB'), label: 'Active subscribers' },
-  { value: `${Math.round(BJ_STATS.open_rate * 100)}%`, label: 'Average open rate' },
-  { value: `${(BJ_STATS.ctr * 100).toFixed(1)}%`, label: 'Click-through rate' },
-  { value: `${Math.round(BJ_STATS.effective_reach / 1000)}k+`, label: 'Combined reach' },
+  { value: BJ_STATS.subscribers.toLocaleString('en-GB'), label: 'Subscribers' },
+  { value: `${Math.round(BJ_STATS.open_rate * 100)}%`, label: 'Open rate' },
+  { value: `${(BJ_STATS.ctr * 100).toFixed(1)}%`, label: 'Click-through' },
+  { value: `${Math.round(BJ_STATS.effective_reach / 1000)}k+`, label: 'Weekly reach' },
 ];
 
 export function StatsBand() {
   return (
-    <section style={{ background: 'var(--bj-charcoal)', color: 'var(--bj-white)', padding: '56px 32px' }}>
+    <section className="bj-section" style={{ paddingTop: 0 }}>
       <div
         style={{
-          maxWidth: 1200,
-          margin: '0 auto',
+          background: 'var(--card)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--r-card)',
+          padding: 24,
           display: 'grid',
-          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          gap: 24,
+          gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))',
+          gap: 16,
         }}
       >
         {STATS.map((s) => (
           <div key={s.label}>
             <div
               style={{
-                fontWeight: 900,
-                fontSize: 'clamp(36px, 5vw, 72px)',
-                lineHeight: 1,
-                color: 'var(--bj-gold)',
-                letterSpacing: '-0.03em',
+                fontWeight: 600,
+                fontSize: 28,
+                lineHeight: 1.1,
+                color: 'var(--ink)',
+                letterSpacing: '-0.02em',
               }}
             >
               {s.value}
             </div>
             <div
               style={{
-                fontSize: 10,
-                letterSpacing: '0.14em',
-                textTransform: 'uppercase',
-                marginTop: 10,
-                color: 'rgba(255,255,255,0.7)',
-                fontWeight: 700,
+                fontSize: 13,
+                marginTop: 4,
+                color: 'var(--ink-60)',
               }}
             >
               {s.label}

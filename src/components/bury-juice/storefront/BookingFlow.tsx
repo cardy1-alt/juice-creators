@@ -69,7 +69,6 @@ export function BookingFlow(props: Props) {
     };
   }, [tier]);
 
-  // When tier or size changes, drop selected dates no longer eligible.
   useEffect(() => {
     if (!availability) return;
     const pruned = selectedDates.filter((d) => availability.get(d) === 'available');
@@ -102,40 +101,33 @@ export function BookingFlow(props: Props) {
   const t = BJ_PRICING[tier];
 
   return (
-    <section className="bj-section" id="booking-flow">
-      <div
-        style={{
-          fontSize: 10,
-          letterSpacing: '0.18em',
-          textTransform: 'uppercase',
-          color: 'var(--bj-crimson)',
-          fontWeight: 700,
-          marginBottom: 16,
-        }}
-      >
-        Pick your run
-      </div>
-      <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 32 }}>
-        {t.name} · {t.position.toLowerCase()}
-      </h2>
+    <section className="bj-section" id="booking-flow" style={{ paddingTop: 32 }}>
+      <h2 style={{ fontSize: 22, marginBottom: 4 }}>Book your Thursdays</h2>
+      <p style={{ color: 'var(--ink-60)', margin: 0, marginBottom: 20, fontSize: 15 }}>
+        {t.name} placement · {t.position.toLowerCase()}
+      </p>
 
-      <div style={{ marginBottom: 32 }}>
-        <div className="bj-label">Quantity</div>
+      <div style={{ marginBottom: 24 }}>
+        <div className="bj-label">How many?</div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          {SIZES.map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => onSizeChange(s)}
-              className="bj-btn"
-              style={{
-                background: size === s ? 'var(--bj-crimson)' : 'transparent',
-                color: size === s ? 'var(--bj-white)' : 'var(--bj-crimson)',
-              }}
-            >
-              {s === 1 ? 'Single' : `${s}-pack`} · {formatGBP(priceForTierAndSize(tier, s))}
-            </button>
-          ))}
+          {SIZES.map((s) => {
+            const isSelected = size === s;
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => onSizeChange(s)}
+                className={`bj-btn${isSelected ? '' : ' bj-btn--ghost'}`}
+                style={{
+                  borderColor: isSelected ? 'var(--terra)' : 'var(--border-color)',
+                  color: isSelected ? '#fff' : 'var(--ink)',
+                  fontWeight: 500,
+                }}
+              >
+                {s === 1 ? 'Single' : `${s}-pack`} · {formatGBP(priceForTierAndSize(tier, s))}
+              </button>
+            );
+          })}
         </div>
       </div>
 
@@ -145,10 +137,11 @@ export function BookingFlow(props: Props) {
             display: 'flex',
             gap: 10,
             alignItems: 'center',
-            padding: 12,
-            border: '1px solid var(--bj-faint)',
-            background: 'var(--bj-white)',
-            marginBottom: 24,
+            padding: 14,
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--r-input)',
+            background: 'var(--card)',
+            marginBottom: 20,
             cursor: 'pointer',
           }}
         >
@@ -157,23 +150,25 @@ export function BookingFlow(props: Props) {
             checked={pickLater}
             onChange={(e) => onPickLaterChange(e.target.checked)}
           />
-          <span style={{ fontSize: 14 }}>I'll pick my dates later (credits stay on file for 6 months)</span>
+          <span style={{ fontSize: 14, color: 'var(--ink-60)' }}>
+            I'll pick my Thursdays later (credits stay on file for 6 months)
+          </span>
         </label>
       )}
 
       {!pickLater && (
         <div>
-          <div className="bj-label" style={{ marginBottom: 12 }}>
-            Choose {size} Thursday{size === 1 ? '' : 's'}
+          <div className="bj-label" style={{ marginBottom: 10 }}>
+            Pick {size} Thursday{size === 1 ? '' : 's'}
             {remainingSlots > 0 && ` — ${remainingSlots} to go`}
           </div>
           {loading ? (
-            <div style={{ padding: 24, color: 'var(--bj-mid)' }}>Loading availability…</div>
+            <div style={{ padding: 20, color: 'var(--ink-60)' }}>Loading availability…</div>
           ) : (
             <div
               style={{
                 display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(160px, 1fr))',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
                 gap: 8,
               }}
             >
@@ -185,7 +180,7 @@ export function BookingFlow(props: Props) {
                   status === 'taken'
                     ? 'Booked'
                     : status === 'too_soon'
-                    ? '<48h notice required'
+                    ? '<48h notice'
                     : selected
                     ? 'Selected'
                     : 'Available';
@@ -200,29 +195,25 @@ export function BookingFlow(props: Props) {
                       padding: 12,
                       textAlign: 'left',
                       border: '1px solid',
-                      borderColor: selected ? 'var(--bj-crimson)' : 'var(--bj-faint)',
-                      background: selected
-                        ? 'var(--bj-crimson)'
-                        : disabled
-                        ? 'var(--bj-faint)'
-                        : 'var(--bj-white)',
+                      borderRadius: 'var(--r-input)',
+                      borderColor: selected ? 'var(--terra)' : 'var(--border-color)',
+                      background: selected ? 'var(--terra)' : 'var(--card)',
                       color: selected
-                        ? 'var(--bj-white)'
+                        ? '#fff'
                         : disabled
-                        ? 'var(--bj-soft)'
-                        : 'var(--bj-charcoal)',
+                        ? 'var(--ink-35)'
+                        : 'var(--ink)',
                       cursor: disabled ? 'not-allowed' : 'pointer',
                       fontFamily: 'inherit',
+                      transition: 'border-color 0.12s ease, background-color 0.12s ease',
                     }}
                   >
-                    <div style={{ fontWeight: 900, fontSize: 16 }}>{formatDateLong(iso)}</div>
+                    <div style={{ fontWeight: 600, fontSize: 15 }}>{formatDateLong(iso)}</div>
                     <div
                       style={{
-                        fontSize: 10,
-                        letterSpacing: '0.12em',
-                        textTransform: 'uppercase',
-                        marginTop: 4,
-                        opacity: 0.75,
+                        fontSize: 12,
+                        marginTop: 2,
+                        opacity: selected ? 0.9 : 0.6,
                       }}
                     >
                       {hint}
@@ -237,32 +228,28 @@ export function BookingFlow(props: Props) {
 
       <div
         style={{
-          marginTop: 32,
-          padding: 20,
-          border: '2px solid var(--bj-charcoal)',
+          marginTop: 28,
+          padding: 16,
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--r-card)',
+          background: 'var(--card)',
           display: 'flex',
           justifyContent: 'space-between',
-          alignItems: 'baseline',
+          alignItems: 'center',
+          gap: 16,
+          flexWrap: 'wrap',
         }}
       >
         <div>
-          <div
-            style={{
-              fontSize: 10,
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: 'var(--bj-mid)',
-              fontWeight: 700,
-            }}
-          >
-            Running total
-          </div>
-          <div style={{ fontSize: 14, color: 'var(--bj-mid)', marginTop: 4 }}>
-            {t.name} · {size === 1 ? 'single' : `${size}-pack`} ·{' '}
-            {pickLater ? 'dates TBC' : `${selectedDates.length} date${selectedDates.length === 1 ? '' : 's'} picked`}
+          <div style={{ fontSize: 13, color: 'var(--ink-60)' }}>Running total</div>
+          <div style={{ fontSize: 13, color: 'var(--ink-60)', marginTop: 2 }}>
+            {t.name} · {size === 1 ? 'single issue' : `${size}-pack`} ·{' '}
+            {pickLater
+              ? 'dates TBC'
+              : `${selectedDates.length}/${size} picked`}
           </div>
         </div>
-        <div style={{ fontWeight: 900, fontSize: 40, letterSpacing: '-0.02em' }}>
+        <div style={{ fontWeight: 600, fontSize: 26, letterSpacing: '-0.02em' }}>
           {formatGBP(total)}
         </div>
       </div>
