@@ -99,9 +99,3 @@ export function priceIdFor(
   return required(key);
 }
 
-export function adminPasswordOk(req: { headers: Record<string, string | string[] | undefined> }): boolean {
-  const expected = process.env.BJ_ADMIN_PASSWORD;
-  if (!expected) return false;
-  const got = req.headers['x-bj-admin-password'];
-  return typeof got === 'string' && got === expected;
-}

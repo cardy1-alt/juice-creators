@@ -8,7 +8,6 @@ export function isBuryJuiceSurface(): boolean {
 
   const path = window.location.pathname;
   if (path === '/sponsor' || path.startsWith('/sponsor/')) return true;
-  if (path === '/admin/sponsors' || path.startsWith('/admin/sponsors/')) return true;
 
   return false;
 }

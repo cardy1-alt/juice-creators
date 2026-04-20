@@ -45,7 +45,9 @@ async function sendResendEmail(to: string, subject: string, html: string, icsAtt
   const key = process.env.RESEND_API_KEY;
   if (!key) return;
   const body: Record<string, unknown> = {
-    from: 'Bury Juice <hello@buryjuice.com>',
+    // nayba.app is the verified sending domain; "Bury Juice" sets the
+    // display name the sponsor sees.
+    from: 'Bury Juice <hello@nayba.app>',
     to,
     subject,
     html,

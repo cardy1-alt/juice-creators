@@ -3,7 +3,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
 import NaybaLogo from '../assets/logomark.svg';
-import { Megaphone, Users, Store, BarChart3, Bell, Activity, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen, UserCheck } from 'lucide-react';
+import { Megaphone, Users, Store, BarChart3, Bell, Activity, Settings, LogOut, Menu, X, Plus, PanelLeftClose, PanelLeftOpen, UserCheck, Newspaper } from 'lucide-react';
 import AdminCampaignsTab from './admin/AdminCampaignsTab';
 import AdminCreatorsTab from './admin/AdminCreatorsTab';
 import AdminBrandsTab from './admin/AdminBrandsTab';
@@ -12,9 +12,10 @@ import AdminAnalyticsTab from './admin/AdminAnalyticsTab';
 import AdminActivityTab from './admin/AdminActivityTab';
 import AdminNotificationsTab from './admin/AdminNotificationsTab';
 import AdminSettingsTab from './admin/AdminSettingsTab';
+import AdminBuryJuiceTab from './admin/AdminBuryJuiceTab';
 import CommandPalette from './admin/CommandPalette';
 
-type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'analytics' | 'activity' | 'broadcasts' | 'settings';
+type Tab = 'campaigns' | 'applicants' | 'creators' | 'brands' | 'bury-juice' | 'analytics' | 'activity' | 'broadcasts' | 'settings';
 
 const NAV_SECTIONS = [
   {
@@ -24,6 +25,7 @@ const NAV_SECTIONS = [
       { key: 'applicants' as Tab, label: 'Applicants', icon: UserCheck },
       { key: 'creators' as Tab, label: 'Creators', icon: Users },
       { key: 'brands' as Tab, label: 'Brands', icon: Store },
+      { key: 'bury-juice' as Tab, label: 'Bury Juice', icon: Newspaper },
     ],
   },
   {
@@ -47,6 +49,7 @@ const PAGE_TITLES: Record<Tab, string> = {
   applicants: 'Applicants',
   creators: 'Creators',
   brands: 'Brands',
+  'bury-juice': 'Bury Juice',
   analytics: 'Analytics',
   activity: 'Activity',
   broadcasts: 'Broadcasts',
@@ -58,6 +61,7 @@ const CTA_CONFIG: Record<Tab, { label: string; show: boolean }> = {
   applicants: { label: '', show: false },
   creators: { label: 'Create Creator', show: true },
   brands: { label: 'Create Brand', show: true },
+  'bury-juice': { label: '', show: false },
   analytics: { label: '', show: false },
   activity: { label: '', show: false },
   broadcasts: { label: '', show: false },
@@ -273,6 +277,7 @@ export default function AdminDashboard() {
           {activeTab === 'applicants' && <AdminApplicantsTab />}
           {activeTab === 'creators' && <AdminCreatorsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'creators' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
           {activeTab === 'brands' && <AdminBrandsTab showModal={showModal} onCloseModal={() => setShowModal(false)} initialPeekId={peekTarget?.tab === 'brands' ? peekTarget.entityId : undefined} onPeekHandled={() => setPeekTarget(null)} />}
+          {activeTab === 'bury-juice' && <AdminBuryJuiceTab />}
           {activeTab === 'analytics' && <AdminAnalyticsTab />}
           {activeTab === 'activity' && <AdminActivityTab />}
           {activeTab === 'broadcasts' && <AdminNotificationsTab />}
