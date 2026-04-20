@@ -17,6 +17,7 @@ import { LEGACY_SPONSORS } from '../../lib/bury-juice/legacy-sponsors.js';
 import { uploadCreativeFile } from '../../lib/bury-juice/upload.js';
 import { BookingFlow } from './storefront/BookingFlow';
 import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } from './storefront/CreativeForm';
+import { PlacementPreview } from './storefront/PlacementPreview';
 import { ReviewPay } from './storefront/ReviewPay';
 import { Footer } from './storefront/Footer';
 
@@ -340,6 +341,7 @@ export default function SponsorStorefront() {
               onSelectedDatesChange={setSelectedDates}
             />
             <CreativeForm tier={tier} value={creative} onChange={setCreative} errors={errors} />
+            <PlacementPreview tier={tier} value={creative} />
             <ReviewPay
               tier={tier}
               size={size}
@@ -448,7 +450,7 @@ function PlacementRow({
         alignItems: 'start',
       }}
     >
-      <PlacementPreview tier={tier} />
+      <PlacementPreviewMini tier={tier} />
 
       <div style={{ minWidth: 0, display: 'grid', gap: 12 }}>
         {/* Title + description + next-available */}
@@ -524,7 +526,7 @@ function PlacementRow({
 
 // Miniature representation of the newsletter layout with the relevant
 // slot tinted terra. Non-photorealistic — just communicates position.
-function PlacementPreview({ tier }: { tier: BjTier }) {
+function PlacementPreviewMini({ tier }: { tier: BjTier }) {
   const isPrimary = tier === 'primary';
   const isFeature = tier === 'feature';
   const isClassified = tier === 'classified';
