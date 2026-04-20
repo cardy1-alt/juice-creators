@@ -65,19 +65,45 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    // 1. Find or create the business row. We match by contact_email.
-    const existing = await supabaseFetch<{ id: string }[]>(
-      `businesses?select=id&contact_email=eq.${encodeURIComponent(creative.contact_email)}&limit=1`,
+    // 1. Find or create the business row. The Nayba `businesses` table
+    //    pre-dates Bury Juice and has `owner_email` (NOT NULL UNIQUE)
+    //    as the primary identity; `contact_email` was added later and
+    //    may still be NULL on Nayba rows. We match on either so a
+    //    returning sponsor who already has a Nayba account keeps the
+    //    same business_id and we don't collide on the UNIQUE key.
+    const email = creative.contact_email;
+    const emailParam = `eq.${encodeURIComponent(email)}`;
+    const existing = await supabaseFetch<{ id: string; contact_email: string | null }[]>(
+      `businesses?select=id,contact_email&or=(contact_email.${emailParam},owner_email.${emailParam})&limit=1`,
     );
     let businessId: string;
     if (existing.length > 0) {
       businessId = existing[0].id;
+      // Backfill contact_email if the matched row was a pure Nayba
+      // business without one — keeps the Bury Juice admin view clean.
+      if (!existing[0].contact_email) {
+        await supabaseFetch(`businesses?id=eq.${businessId}`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            contact_email: email,
+            contact_phone: creative.contact_phone,
+          }),
+        });
+      }
     } else {
+      const slugBase = creative.business_name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .slice(0, 40) || 'business';
+      const slug = `bj-${slugBase}-${Date.now().toString(36)}`;
       const inserted = await supabaseFetch<{ id: string }[]>('businesses', {
         method: 'POST',
         body: JSON.stringify({
           name: creative.business_name,
-          contact_email: creative.contact_email,
+          slug,
+          owner_email: email,
+          contact_email: email,
           contact_phone: creative.contact_phone,
         }),
       });
