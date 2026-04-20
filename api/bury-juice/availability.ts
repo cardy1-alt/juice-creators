@@ -3,13 +3,13 @@ import { jsonError, supabaseFetch } from './_lib';
 import { buildAvailability } from '../../src/lib/bury-juice/availability';
 import type { BjTier } from '../../src/lib/bury-juice/pricing';
 
-// GET /api/bury-juice/availability?tier=gold&from=2026-04-23&to=2026-10-22
+// GET /api/bury-juice/availability?tier=primary&from=2026-04-23&to=2026-10-22
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'GET') return jsonError(res, 405, 'Method not allowed');
 
   const { tier, from, to } = req.query as { tier?: BjTier; from?: string; to?: string };
   if (!tier || !from || !to) return jsonError(res, 400, 'tier, from, and to are required');
-  if (!['bronze', 'silver', 'gold'].includes(tier)) return jsonError(res, 400, 'invalid tier');
+  if (!['classified', 'feature', 'primary'].includes(tier)) return jsonError(res, 400, 'invalid tier');
 
   try {
     const bookings = await supabaseFetch<{ tier: BjTier; issue_date: string; status: string }[]>(

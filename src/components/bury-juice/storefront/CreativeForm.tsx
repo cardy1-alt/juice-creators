@@ -23,8 +23,8 @@ const HEADLINE_MAX = 60;
 
 export function CreativeForm({ tier, value, onChange, errors }: Props) {
   const bodyMax = BJ_PRICING[tier].bodyCharLimit;
-  const needsImage = tier === 'silver' || tier === 'gold';
-  const needsLogo = tier === 'gold';
+  const needsImage = tier === 'feature' || tier === 'primary';
+  const needsLogo = tier === 'primary';
 
   function set<K extends keyof CreativeFormValue>(key: K, v: CreativeFormValue[K]) {
     onChange({ ...value, [key]: v });
@@ -239,7 +239,7 @@ export function validateCreative(
   } catch {
     errors.ctaUrl = 'Valid URL required';
   }
-  if ((tier === 'silver' || tier === 'gold') && !value.imageFile) errors.imageFile = 'Photo required';
-  if (tier === 'gold' && !value.logoFile) errors.logoFile = 'Logo required';
+  if ((tier === 'feature' || tier === 'primary') && !value.imageFile) errors.imageFile = 'Photo required';
+  if (tier === 'primary' && !value.logoFile) errors.logoFile = 'Logo required';
   return errors;
 }

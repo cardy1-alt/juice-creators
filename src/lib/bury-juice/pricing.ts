@@ -2,12 +2,14 @@
 // Prices are in pence (integer) so they match the Stripe amount format
 // and avoid floating-point rounding anywhere.
 
-export type BjTier = 'bronze' | 'silver' | 'gold';
+// Tier names describe the *kind* of placement rather than ranking it,
+// so no one placement is implicitly a consolation prize.
+export type BjTier = 'classified' | 'feature' | 'primary';
 export type BjPackSize = 1 | 4 | 12;
 
 export interface BjTierConfig {
   name: string;
-  placement: string;
+  position: string; // Where in the newsletter: Top / Middle / Bottom
   description: string;
   format: string[];
   single: number;
@@ -17,9 +19,9 @@ export interface BjTierConfig {
 }
 
 export const BJ_PRICING: Record<BjTier, BjTierConfig> = {
-  bronze: {
-    name: 'Bronze',
-    placement: 'Classified',
+  classified: {
+    name: 'Classified',
+    position: 'Bottom of newsletter',
     description: 'Content block at the bottom of the newsletter.',
     format: ['Headline', 'Copy', 'Link'],
     single: 4000,
@@ -27,9 +29,9 @@ export const BJ_PRICING: Record<BjTier, BjTierConfig> = {
     pack_12: 38400,
     bodyCharLimit: 400,
   },
-  silver: {
-    name: 'Silver',
-    placement: 'Feature',
+  feature: {
+    name: 'Feature',
+    position: 'Middle of newsletter',
     description: 'Photo + copy placement in the middle of the newsletter.',
     format: ['Headline', 'Photo', 'Copy', 'Link'],
     single: 9500,
@@ -37,10 +39,10 @@ export const BJ_PRICING: Record<BjTier, BjTierConfig> = {
     pack_12: 91200,
     bodyCharLimit: 600,
   },
-  gold: {
-    name: 'Gold',
-    placement: 'Primary',
-    description: 'Logo + photo + copy at the top of the newsletter — the ultimate flex.',
+  primary: {
+    name: 'Primary',
+    position: 'Top of newsletter',
+    description: 'Logo + photo + copy at the top of the newsletter — full-attention slot.',
     format: ['Logo', 'Headline', 'Photo', 'Copy', 'Link'],
     single: 15000,
     pack_4: 54000,

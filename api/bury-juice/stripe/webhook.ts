@@ -120,7 +120,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     metadata?: {
       pack_id?: string;
       business_id?: string;
-      tier?: 'bronze' | 'silver' | 'gold';
+      tier?: 'classified' | 'feature' | 'primary';
       size?: string;
       dashboard_token?: string;
     };
@@ -155,7 +155,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         business_id: string;
         dashboard_token: string;
         amount_paid_gbp: number;
-        tier: 'bronze' | 'silver' | 'gold';
+        tier: 'classified' | 'feature' | 'primary';
         size: number;
       }[]
     >(`bj_packs?id=eq.${packId}&limit=1`);

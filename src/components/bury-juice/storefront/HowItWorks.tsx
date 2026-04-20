@@ -1,5 +1,5 @@
 const STEPS = [
-  { n: '01', title: 'Pick your placement', body: 'Bronze, Silver, or Gold — three formats, one per newsletter.' },
+  { n: '01', title: 'Pick your placement', body: 'Classified, Feature, or Primary — three formats, one per newsletter.' },
   { n: '02', title: 'Choose your dates', body: 'Book a single issue or grab a 4- or 12-pack at a discount.' },
   { n: '03', title: 'Upload, pay, done', body: 'Drop in your creative and pay. Jacob takes it from there.' },
 ];

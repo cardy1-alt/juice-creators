@@ -3,7 +3,7 @@ import { useState } from 'react';
 const ITEMS = [
   {
     q: 'What size/format are the ads?',
-    a: 'Bronze is a classified-style block at the bottom (headline + copy + link). Silver is a feature block with a 600px-wide photo. Gold is the primary placement at the top — logo, photo, headline, copy, link. Examples are in the media kit linked from the footer.',
+    a: 'Classified is a plain block at the bottom (headline + copy + link). Feature is a middle-of-newsletter slot with a 600px-wide photo. Primary is the top-of-newsletter placement — logo, photo, headline, copy, link. Examples are in the media kit linked from the footer.',
   },
   {
     q: 'When do I submit my creative?',

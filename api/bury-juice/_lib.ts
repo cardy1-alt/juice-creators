@@ -89,7 +89,7 @@ export async function stripeCall<T = unknown>(
 }
 
 export function priceIdFor(
-  tier: 'bronze' | 'silver' | 'gold',
+  tier: 'classified' | 'feature' | 'primary',
   size: 1 | 4 | 12,
 ): string {
   const key =

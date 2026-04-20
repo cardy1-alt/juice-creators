@@ -12,7 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         id: string;
         business_id: string;
-        tier: 'bronze' | 'silver' | 'gold';
+        tier: 'classified' | 'feature' | 'primary';
         issue_date: string;
         status: string;
         source: string;
@@ -53,7 +53,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         id: string;
         business_id: string;
-        tier: 'bronze' | 'silver' | 'gold';
+        tier: 'classified' | 'feature' | 'primary';
         size: number;
         credits_remaining: number;
       }[]

@@ -1,8 +1,8 @@
 // Reference list of legacy sponsors. The canonical source of truth
 // lives in the DB (bj_legacy_rates), seeded by the migration
-// 20260420100100_bury_juice_legacy_seed.sql. This module is only
-// useful for admin-side UI that needs a readable description of who
-// each legacy row represents.
+// 20260420120000_bury_juice_legacy_sponsor_seed.sql. This module is
+// only useful for admin-side UI that needs a readable description of
+// who each legacy row represents.
 
 import type { BjTier } from './pricing';
 
@@ -18,48 +18,48 @@ export interface LegacySponsor {
 
 export const LEGACY_SPONSORS: LegacySponsor[] = [
   {
-    name: 'David Lloyd Bury St Edmunds',
+    name: 'David Lloyd Clubs',
     email: 'legacy+davidlloyd@buryjuice.com',
-    tier: 'gold',
+    tier: 'primary',
     monthlyRateGbp: 0,
     cadence: 'weekly',
     isComp: true,
-    notes: 'Comp — rotates gold/silver/bronze across the month',
+    notes: 'Comp placement — membership exchange. Rotates tier weekly.',
   },
   {
     name: 'Snappy Shopper',
-    email: 'legacy+snappy@buryjuice.com',
-    tier: 'silver',
-    monthlyRateGbp: 8000,
+    email: 'legacy+snappyshopper@buryjuice.com',
+    tier: 'primary',
+    monthlyRateGbp: 9500,
     cadence: 'monthly',
     isComp: false,
-    notes: 'Rolling monthly commitment',
+    notes: 'Rolling monthly commitment — 2nd Thursday of each month',
   },
   {
-    name: 'Loyal Wolf',
+    name: 'Loyal Wolf Barbershop',
     email: 'legacy+loyalwolf@buryjuice.com',
-    tier: 'bronze',
-    monthlyRateGbp: 3500,
+    tier: 'classified',
+    monthlyRateGbp: 2500,
     cadence: 'monthly',
     isComp: false,
-    notes: 'Rolling monthly commitment',
+    notes: 'Rolling monthly commitment — 1st Thursday of each month',
   },
   {
     name: 'Midgar',
     email: 'legacy+midgar@buryjuice.com',
-    tier: 'silver',
-    monthlyRateGbp: 8500,
+    tier: 'feature',
+    monthlyRateGbp: 6500,
     cadence: 'monthly',
     isComp: false,
-    notes: 'Rolling monthly commitment',
+    notes: 'Rolling monthly commitment — 3rd Thursday of each month',
   },
   {
     name: 'Yes You Can Fitness',
-    email: 'legacy+yycfitness@buryjuice.com',
-    tier: 'bronze',
-    monthlyRateGbp: 3500,
+    email: 'legacy+yesyoucanfitness@buryjuice.com',
+    tier: 'feature',
+    monthlyRateGbp: 6500,
     cadence: 'monthly',
     isComp: false,
-    notes: 'Rolling monthly commitment',
+    notes: 'Rolling monthly commitment — 1st Thursday of each month',
   },
 ];

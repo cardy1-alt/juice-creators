@@ -97,7 +97,7 @@ export default function AdminIssueView({ adminPassword, issueDate, onBack }: Pro
         </p>
 
         <div style={{ display: 'grid', gap: 32 }}>
-          {(['gold', 'silver', 'bronze'] as const).map((tier) => {
+          {(['primary', 'feature', 'classified'] as const).map((tier) => {
             const slot = data.slots.find((s) => s.tier === tier);
             return (
               <SlotBlock

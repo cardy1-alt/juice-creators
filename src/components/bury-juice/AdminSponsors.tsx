@@ -284,7 +284,7 @@ function IssueRow({
             {iso}
           </div>
         </div>
-        {(['gold', 'silver', 'bronze'] as const).map((tier) => {
+        {(['primary', 'feature', 'classified'] as const).map((tier) => {
           const slot = slotFor(tier);
           const businessName = slot ? businesses[slot.business_id]?.name ?? '(unknown)' : null;
           return (

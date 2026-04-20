@@ -48,7 +48,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { tier, size, dates, pickLater, creative } = body;
-  if (!['bronze', 'silver', 'gold'].includes(tier)) return jsonError(res, 400, 'invalid tier');
+  if (!['classified', 'feature', 'primary'].includes(tier)) return jsonError(res, 400, 'invalid tier');
   if (![1, 4, 12].includes(size)) return jsonError(res, 400, 'invalid size');
   if (!pickLater && dates.length !== size) {
     return jsonError(res, 400, `expected ${size} dates, got ${dates.length}`);

@@ -116,7 +116,7 @@ export function BookingFlow(props: Props) {
         Pick your run
       </div>
       <h2 style={{ fontSize: 'clamp(32px, 4vw, 48px)', marginBottom: 32 }}>
-        {t.name} — {t.placement.toLowerCase()} slot
+        {t.name} · {t.position.toLowerCase()}
       </h2>
 
       <div style={{ marginBottom: 32 }}>

@@ -38,7 +38,7 @@ export function ReviewPay(props: Props) {
           gap: 16,
         }}
       >
-        <Row label="Tier" value={`${t.name} — ${t.placement}`} />
+        <Row label="Placement" value={`${t.name} — ${t.position.toLowerCase()}`} />
         <Row label="Quantity" value={size === 1 ? 'Single placement' : `${size}-pack`} />
         <Row
           label="Dates"

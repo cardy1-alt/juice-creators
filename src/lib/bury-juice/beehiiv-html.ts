@@ -31,9 +31,9 @@ function esc(value: string | null | undefined): string {
     .replace(/'/g, '&#39;');
 }
 
-export function generateBronzeHTML(b: Pick<BjBooking,
+export function generateClassifiedHTML(b: Pick<BjBooking,
   'tier' | 'issue_date' | 'headline' | 'body_copy' | 'cta_url'>): string {
-  const href = withUtm('bronze', b.issue_date, b.cta_url || '#');
+  const href = withUtm('classified', b.issue_date, b.cta_url || '#');
   return [
     `<div style="border-top:1px solid ${CHARCOAL};padding-top:14px;margin-top:18px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${CHARCOAL};">`,
     `<div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${CRIMSON};font-weight:700;margin-bottom:6px;">Classified</div>`,
@@ -44,9 +44,9 @@ export function generateBronzeHTML(b: Pick<BjBooking,
   ].join('');
 }
 
-export function generateSilverHTML(b: Pick<BjBooking,
+export function generateFeatureHTML(b: Pick<BjBooking,
   'tier' | 'issue_date' | 'headline' | 'body_copy' | 'cta_url' | 'image_url'>): string {
-  const href = withUtm('silver', b.issue_date, b.cta_url || '#');
+  const href = withUtm('feature', b.issue_date, b.cta_url || '#');
   return [
     `<div style="border-top:2px solid ${CRIMSON};padding-top:18px;margin-top:22px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${CHARCOAL};">`,
     `<div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${CRIMSON};font-weight:700;margin-bottom:10px;">Feature</div>`,
@@ -60,9 +60,9 @@ export function generateSilverHTML(b: Pick<BjBooking,
   ].join('');
 }
 
-export function generateGoldHTML(b: Pick<BjBooking,
+export function generatePrimaryHTML(b: Pick<BjBooking,
   'tier' | 'issue_date' | 'headline' | 'body_copy' | 'cta_url' | 'image_url' | 'logo_url'>): string {
-  const href = withUtm('gold', b.issue_date, b.cta_url || '#');
+  const href = withUtm('primary', b.issue_date, b.cta_url || '#');
   return [
     `<div style="background:#FAF7F2;padding:24px;margin-bottom:22px;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:${CHARCOAL};">`,
     `<div style="font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:${CRIMSON};font-weight:700;margin-bottom:12px;">This week's primary sponsor</div>`,
@@ -81,7 +81,7 @@ export function generateGoldHTML(b: Pick<BjBooking,
 
 export function generateHTMLForBooking(b: Pick<BjBooking,
   'tier' | 'issue_date' | 'headline' | 'body_copy' | 'cta_url' | 'image_url' | 'logo_url'>): string {
-  if (b.tier === 'gold') return generateGoldHTML(b);
-  if (b.tier === 'silver') return generateSilverHTML(b);
-  return generateBronzeHTML(b);
+  if (b.tier === 'primary') return generatePrimaryHTML(b);
+  if (b.tier === 'feature') return generateFeatureHTML(b);
+  return generateClassifiedHTML(b);
 }

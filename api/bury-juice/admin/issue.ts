@@ -27,7 +27,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const byId: Record<string, { id: string; name: string; contact_email: string }> = {};
     for (const b of businesses) byId[b.id] = b;
 
-    const slots = (['gold', 'silver', 'bronze'] as const).map((tier) => {
+    const slots = (['primary', 'feature', 'classified'] as const).map((tier) => {
       const booking = bookings.find((b) => b.tier === tier) ?? null;
       const business = booking ? byId[booking.business_id] ?? null : null;
       return { tier, booking, business };

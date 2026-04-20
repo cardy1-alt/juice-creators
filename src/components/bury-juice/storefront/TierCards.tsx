@@ -10,15 +10,15 @@ interface Props {
   selected?: BjTier | null;
 }
 
-const TIERS: BjTier[] = ['bronze', 'silver', 'gold'];
+const TIERS: BjTier[] = ['classified', 'feature', 'primary'];
 
 function TierPreview({ tier }: { tier: BjTier }) {
   // A stylised representation of where the ad sits in the newsletter.
   // Simple SVG-free blocks; crimson marks the sponsor slot.
   const block = {
-    bronze: { top: false, middle: false, bottom: true },
-    silver: { top: false, middle: true, bottom: false },
-    gold: { top: true, middle: false, bottom: false },
+    classified: { top: false, middle: false, bottom: true },
+    feature:    { top: false, middle: true,  bottom: false },
+    primary:    { top: true,  middle: false, bottom: false },
   }[tier];
   return (
     <div
@@ -111,7 +111,7 @@ export function TierCards({ onSelect, selected }: Props) {
                   marginBottom: 8,
                 }}
               >
-                {t.placement}
+                {t.position}
               </div>
               <h3 style={{ fontSize: 36, color: 'inherit', marginBottom: 12 }}>{t.name}</h3>
               <p style={{ marginBottom: 18, lineHeight: 1.5, color: 'inherit', opacity: 0.85 }}>
