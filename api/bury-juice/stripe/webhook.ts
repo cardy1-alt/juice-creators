@@ -128,10 +128,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     };
   };
   const packId = session.metadata?.pack_id;
-  const token = session.metadata?.dashboard_token;
   const tier = session.metadata?.tier;
   const size = session.metadata?.size ? Number(session.metadata.size) : 1;
-  if (!packId || !token || !tier) {
+  if (!packId || !tier) {
     return jsonError(res, 400, 'Missing metadata on checkout session');
   }
 
@@ -155,7 +154,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       {
         id: string;
         business_id: string;
-        dashboard_token: string;
         amount_paid_gbp: number;
         tier: 'classified' | 'feature' | 'primary';
         size: number;
@@ -170,9 +168,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       { id: string; issue_date: string; headline: string | null }[]
     >(`bj_bookings?select=id,issue_date,headline&pack_id=eq.${packId}`);
 
-    const origin = `https://${req.headers.host}`;
-    const dashboardUrl = `${origin}/sponsor/dashboard/${pack.dashboard_token}`;
-
     const ics = buildICS(
       bookings.map((b) => b.issue_date),
       business.name,
@@ -185,12 +180,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       size: pack.size as 1 | 4 | 12,
       amountPaidGbp: pack.amount_paid_gbp,
       bookedDates: bookings.map((b) => b.issue_date),
-      dashboardUrl,
-      hasCreative: bookings.some((b) => b.headline),
     });
     await sendResendEmail(business.contact_email, "Your Bury Juice sponsorship is confirmed", confirmationHtml, ics);
 
-    const adminEmail = process.env.ADMIN_EMAIL || 'jacob@buryjuice.com';
+    const adminEmail = process.env.ADMIN_EMAIL || 'hello@nayba.app';
+    const adminUrl = `https://${req.headers.host}/`;
     await sendResendEmail(
       adminEmail,
       `New Bury Juice booking: ${business.name} — ${tier.toUpperCase()} — £${(pack.amount_paid_gbp / 100).toFixed(0)}`,
@@ -199,7 +193,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         tier: pack.tier,
         size: pack.size as 1 | 4 | 12,
         amountPaidGbp: pack.amount_paid_gbp,
-        adminUrl: `${origin}/admin/sponsors`,
+        adminUrl,
       }),
     );
 

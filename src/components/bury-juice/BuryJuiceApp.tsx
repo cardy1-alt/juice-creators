@@ -2,23 +2,17 @@ import React, { useEffect, useState } from 'react';
 
 const SponsorStorefront = React.lazy(() => import('./SponsorStorefront'));
 const SponsorSuccess = React.lazy(() => import('./SponsorSuccess'));
-const SponsorDashboard = React.lazy(() => import('./SponsorDashboard'));
 
 // The Bury Juice surface is a public storefront rendered on the same
-// SPA. Admin management lives inside the Nayba AdminDashboard (new
-// "Bury Juice" tab) — no separate /admin/sponsors path anymore.
+// SPA. Admin management lives inside the Nayba AdminDashboard
+// ("Bury Juice" tab). Only two public routes: the storefront itself
+// and the post-payment success screen.
 
-type Route =
-  | { kind: 'storefront' }
-  | { kind: 'success' }
-  | { kind: 'dashboard'; token: string };
+type Route = { kind: 'storefront' } | { kind: 'success' };
 
 function parseRoute(pathname: string): Route {
   const path = pathname.replace(/\/+$/, '') || '/';
-  if (path === '/sponsor' || path === '/') return { kind: 'storefront' };
   if (path === '/sponsor/success') return { kind: 'success' };
-  const dashMatch = path.match(/^\/sponsor\/dashboard\/([^/]+)$/);
-  if (dashMatch) return { kind: 'dashboard', token: decodeURIComponent(dashMatch[1]) };
   return { kind: 'storefront' };
 }
 
@@ -43,7 +37,6 @@ export default function BuryJuiceApp() {
     >
       {route.kind === 'storefront' && <SponsorStorefront />}
       {route.kind === 'success' && <SponsorSuccess />}
-      {route.kind === 'dashboard' && <SponsorDashboard token={route.token} />}
     </React.Suspense>
   );
 }

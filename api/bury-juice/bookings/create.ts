@@ -33,7 +33,6 @@ interface RequestBody {
   tier: BjTier;
   size: BjPackSize;
   dates: string[];
-  pickLater: boolean;
   creative: CreativePayload;
 }
 
@@ -51,10 +50,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return jsonError(res, 400, 'Invalid JSON');
   }
 
-  const { tier, size, dates, pickLater, creative } = body;
+  const { tier, size, dates, creative } = body;
   if (!['classified', 'feature', 'primary'].includes(tier)) return jsonError(res, 400, 'invalid tier');
   if (![1, 4, 12].includes(size)) return jsonError(res, 400, 'invalid size');
-  if (!pickLater && dates.length !== size) {
+  if (dates.length !== size) {
     return jsonError(res, 400, `expected ${size} dates, got ${dates.length}`);
   }
   if (!creative?.contact_email || !creative.business_name || !creative.headline) {
@@ -123,22 +122,25 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       businessId = inserted[0].id;
     }
 
-    // 2. Create the pack row — credits_remaining decremented below as
-    //    we insert bookings. Dashboard token returned in the email.
+    // 2. Create the pack row — one pack groups N (1, 4, or 12)
+    //    bookings under a single Stripe payment. credits_remaining
+    //    is always 0 post-checkout because every date is chosen
+    //    upfront; the column lingers for backwards compat with older
+    //    rows. dashboard_token is still generated (the column is
+    //    NOT NULL UNIQUE from the original schema) but never
+    //    surfaced — there's no sponsor-side dashboard anymore.
     step = 'create-pack';
     const token = generateDashboardToken();
     const expiresAt = addMonths(new Date(), PACK_EXPIRY_MONTHS).toISOString();
     const amountPaid = priceForTierAndSize(tier, size);
 
-    const pack = await supabaseFetch<
-      { id: string; dashboard_token: string }[]
-    >('bj_packs', {
+    const pack = await supabaseFetch<{ id: string }[]>('bj_packs', {
       method: 'POST',
       body: JSON.stringify({
         business_id: businessId,
         tier,
         size,
-        credits_remaining: size - (pickLater ? 0 : dates.length),
+        credits_remaining: 0,
         amount_paid_gbp: amountPaid,
         stripe_payment_intent: 'pending',
         dashboard_token: token,
@@ -151,26 +153,24 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     //    'pending_creative' — webhook flips to 'confirmed'). Each
     //    row gets the creative fields attached.
     step = 'create-bookings';
-    if (!pickLater && dates.length > 0) {
-      const rows = dates.map((d) => ({
-        business_id: businessId,
-        tier,
-        issue_date: d,
-        source: 'paid_storefront',
-        status: 'pending_creative',
-        pack_id: packId,
-        amount_paid_gbp: Math.round(amountPaid / size),
-        headline: creative.headline,
-        body_copy: creative.body_copy,
-        cta_url: creative.cta_url,
-        image_url: creative.image_url,
-        logo_url: creative.logo_url,
-      }));
-      await supabaseFetch('bj_bookings', {
-        method: 'POST',
-        body: JSON.stringify(rows),
-      });
-    }
+    const rows = dates.map((d) => ({
+      business_id: businessId,
+      tier,
+      issue_date: d,
+      source: 'paid_storefront',
+      status: 'pending_creative',
+      pack_id: packId,
+      amount_paid_gbp: Math.round(amountPaid / size),
+      headline: creative.headline,
+      body_copy: creative.body_copy,
+      cta_url: creative.cta_url,
+      image_url: creative.image_url,
+      logo_url: creative.logo_url,
+    }));
+    await supabaseFetch('bj_bookings', {
+      method: 'POST',
+      body: JSON.stringify(rows),
+    });
 
     // 4. Stripe Checkout session — hosted (redirect) mode. Keeps
     //    the client surface Stripe-free, which means no publishable
@@ -192,14 +192,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       'metadata[business_id]': businessId,
       'metadata[tier]': tier,
       'metadata[size]': String(size),
-      'metadata[dashboard_token]': token,
     });
 
-    res.status(200).json({
-      checkoutUrl: session.url,
-      packId,
-      dashboardToken: token,
-    });
+    res.status(200).json({ checkoutUrl: session.url, packId });
   } catch (err) {
     // Log with the step so Vercel Function Logs make it obvious
     // which phase failed — otherwise it's just "supabaseFetch threw".

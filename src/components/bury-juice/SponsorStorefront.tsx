@@ -30,7 +30,6 @@ export default function SponsorStorefront() {
   const [tier, setTier] = useState<BjTier | null>(null);
   const [size, setSize] = useState<BjPackSize>(1);
   const [selectedDates, setSelectedDates] = useState<string[]>([]);
-  const [pickLater, setPickLater] = useState(false);
   const [creative, setCreative] = useState<CreativeFormValue>(EMPTY_CREATIVE);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -45,7 +44,7 @@ export default function SponsorStorefront() {
 
   const errors = tier ? validateCreative(creative, tier) : {};
   const creativeValid = tier ? Object.keys(errors).length === 0 : false;
-  const datesValid = pickLater || selectedDates.length === size;
+  const datesValid = selectedDates.length === size;
 
   function handleTierSelect(t: BjTier) {
     setTier(t);
@@ -103,8 +102,7 @@ export default function SponsorStorefront() {
         body: JSON.stringify({
           tier,
           size,
-          dates: pickLater ? [] : selectedDates,
-          pickLater,
+          dates: selectedDates,
           creative: {
             business_name: creative.businessName,
             contact_email: creative.contactEmail,
@@ -148,15 +146,12 @@ export default function SponsorStorefront() {
             onSizeChange={setSize}
             selectedDates={selectedDates}
             onSelectedDatesChange={setSelectedDates}
-            pickLater={pickLater}
-            onPickLaterChange={setPickLater}
           />
           <CreativeForm tier={tier} value={creative} onChange={setCreative} errors={errors} />
           <ReviewPay
             tier={tier}
             size={size}
             selectedDates={selectedDates}
-            pickLater={pickLater}
             total={total}
             onCheckout={handleCheckout}
             submitting={submitting}

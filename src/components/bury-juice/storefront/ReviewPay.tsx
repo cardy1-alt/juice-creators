@@ -4,7 +4,6 @@ interface Props {
   tier: BjTier;
   size: BjPackSize;
   selectedDates: string[];
-  pickLater: boolean;
   total: number;
   onCheckout: () => void;
   submitting: boolean;
@@ -13,7 +12,7 @@ interface Props {
 }
 
 export function ReviewPay(props: Props) {
-  const { tier, size, selectedDates, pickLater, total, onCheckout, submitting, submitError, uploadStatus } = props;
+  const { tier, size, selectedDates, total, onCheckout, submitting, submitError, uploadStatus } = props;
   const t = BJ_PRICING[tier];
   return (
     <section className="bj-section" style={{ paddingTop: 32 }}>
@@ -33,11 +32,7 @@ export function ReviewPay(props: Props) {
         <Row label="Quantity" value={size === 1 ? 'Single issue' : `${size}-pack`} />
         <Row
           label="Dates"
-          value={
-            pickLater || selectedDates.length === 0
-              ? 'Pick later via dashboard'
-              : selectedDates.join(', ')
-          }
+          value={selectedDates.length > 0 ? selectedDates.join(', ') : '—'}
         />
         <div className="bj-rule" style={{ marginTop: 4, marginBottom: 4 }} />
         <div

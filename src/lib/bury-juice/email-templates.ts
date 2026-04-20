@@ -132,19 +132,14 @@ interface ConfirmationArgs {
   size: BjPackSize;
   amountPaidGbp: number;
   bookedDates: string[];
-  dashboardUrl: string;
-  hasCreative: boolean;
 }
 
 export function sponsorConfirmationHTML(a: ConfirmationArgs): string {
   const tierLabel = BJ_PRICING[a.tier].name;
   const posn = BJ_PRICING[a.tier].position.toLowerCase();
-  const datesBlock = a.bookedDates.length > 0
-    ? a.bookedDates.map((d) => `<li style="margin:0 0 4px 0;padding:0;">${esc(formatDateLong(d))}</li>`).join('')
-    : '';
-  const nextStep = a.hasCreative
-    ? p("Your creative is locked in — we'll drop it into the newsletter on each of your booked Thursdays.")
-    : p("<strong>Next step:</strong> upload your creative via your dashboard at least 48 hours before the issue sends.");
+  const datesBlock = a.bookedDates
+    .map((d) => `<li style="margin:0 0 4px 0;padding:0;">${esc(formatDateLong(d))}</li>`)
+    .join('');
 
   const body = `
     ${heading("You're in.")}
@@ -154,15 +149,13 @@ export function sponsorConfirmationHTML(a: ConfirmationArgs): string {
       ${rowPair('Quantity', a.size === 1 ? 'Single issue' : `${a.size}-pack`)}
       ${rowPair('Amount paid', formatGBP(a.amountPaidGbp))}
     `)}
-    ${a.bookedDates.length > 0 ? `
-      <p style="font-family:${FONT_STACK};font-size:13px;color:${INK_60};margin:0 0 6px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;">Booked Thursdays</p>
-      <ul style="margin:0 0 16px;padding:0 0 0 18px;font-family:${FONT_STACK};font-size:14px;color:${INK};line-height:1.6;">${datesBlock}</ul>
-    ` : p("No dates picked yet — head to your dashboard when you're ready.")}
-    ${nextStep}
-    ${btn('Open your dashboard', a.dashboardUrl)}
+    <p style="font-family:${FONT_STACK};font-size:13px;color:${INK_60};margin:0 0 6px;text-transform:uppercase;letter-spacing:0.04em;font-weight:600;">Booked Thursdays</p>
+    <ul style="margin:0 0 16px;padding:0 0 0 18px;font-family:${FONT_STACK};font-size:14px;color:${INK};line-height:1.6;">${datesBlock}</ul>
+    ${p("Your creative is locked in — we'll drop it into the newsletter on each of your booked Thursdays.")}
     ${divider()}
     <p style="font-family:${FONT_STACK};font-size:13px;color:${INK_60};margin:0;line-height:1.6;">
-      Attached: calendar invites (.ics) for each booked Thursday so you know when you're live.
+      Attached: calendar invites (.ics) for each booked Thursday so you know when you're live. Need to change anything?
+      Just reply to this email.
     </p>
   `;
   return wrap(body);
@@ -188,26 +181,6 @@ export function adminNotificationHTML(a: AdminNotificationArgs): string {
       ${rowPair('Amount', formatGBP(a.amountPaidGbp))}
     `)}
     ${btn('Open admin view', a.adminUrl)}
-  `;
-  return wrap(body);
-}
-
-// ── Creative rework / rejection ──────────────────────────────────
-interface RejectionArgs {
-  businessName: string;
-  notes: string;
-  dashboardUrl: string;
-}
-
-export function rejectionEmailHTML(a: RejectionArgs): string {
-  const body = `
-    ${heading('Quick tweak needed')}
-    ${subtext(`Hi ${esc(a.businessName)}, thanks for sending through your Bury Juice creative — a small change before it goes out:`)}
-    ${infoBox(`
-      <p style="font-family:${FONT_STACK};font-size:14px;color:${INK};margin:0;line-height:1.6;">${esc(a.notes)}</p>
-    `)}
-    ${p('Head back to your dashboard to re-upload. Easy to sort.')}
-    ${btn('Open your dashboard', a.dashboardUrl)}
   `;
   return wrap(body);
 }
