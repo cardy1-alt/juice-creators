@@ -63,12 +63,14 @@ interface Campaign {
 }
 interface Application {
   id: string; campaign_id: string; status: string; applied_at: string;
+  pitch?: string | null;
   campaigns?: Partial<Campaign> & { campaign_type?: 'brand' | 'community' | null; businesses?: { name: string } | null };
 }
 interface Participation {
   id: string; campaign_id: string; application_id: string; perk_sent: boolean;
   reel_url: string | null; status: string; created_at: string;
   campaigns?: { title: string; headline: string | null; content_deadline: string | null; perk_description?: string | null; perk_value?: number | null; campaign_type?: 'brand' | 'community' | null; winner_announced_at?: string | null; businesses?: { name: string } | null };
+  applications?: { pitch: string | null } | null;
 }
 
 type Tab = 'discover' | 'campaigns' | 'naybahood' | 'profile' | 'more';
@@ -82,6 +84,19 @@ function daysUntil(d: string | null) {
   if (!d) return null;
   const diff = Math.ceil((new Date(d).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
   return diff;
+}
+
+// Mirrors the composer in CampaignDetail.tsx. If these labels change there,
+// update them here too — otherwise the sections won't split out on display.
+function parsePitchSections(pitch: string): { fit?: string; idea?: string; brief?: string } {
+  const fitMatch = pitch.match(/Why I'm a fit:\s*([\s\S]*?)(?=\n\nMy content idea:|\n\nWhat caught my eye:|$)/);
+  const ideaMatch = pitch.match(/My content idea:\s*([\s\S]*?)(?=\n\nWhat caught my eye:|$)/);
+  const briefMatch = pitch.match(/What caught my eye:\s*([\s\S]*?)$/);
+  return {
+    fit: fitMatch?.[1]?.trim() || undefined,
+    idea: ideaMatch?.[1]?.trim() || undefined,
+    brief: briefMatch?.[1]?.trim() || undefined,
+  };
 }
 
 // ─── Nav Items ───
@@ -127,6 +142,46 @@ function BrandInfoModal({ brand, onClose }: {
             className="inline-flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline">
             <AtSign size={14} /> @{handle} <ExternalLink size={12} />
           </a>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Pitch Modal ───
+function PitchModal({ pitch, onClose }: { pitch: string; onClose: () => void }) {
+  const sections = parsePitchSections(pitch);
+  const hasSections = !!(sections.fit || sections.idea || sections.brief);
+  return (
+    <div className="fixed inset-0 bg-[rgba(42,32,24,0.40)] z-50 flex items-center justify-center px-4 animate-overlay" onClick={onClose}>
+      <div className="bg-white rounded-[12px] max-w-[500px] w-full max-h-[85vh] overflow-y-auto p-6 animate-slide-up" style={{ boxShadow: '0 4px 16px rgba(42,32,24,0.12)' }} onClick={e => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-[18px] font-semibold text-[var(--ink)]">Your pitch</h3>
+          <button onClick={onClose} className="text-[var(--ink-35)] hover:text-[var(--ink)]"><X size={20} /></button>
+        </div>
+        {hasSections ? (
+          <div className="space-y-4">
+            {sections.fit && (
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)] mb-1">Why I'm a fit</p>
+                <p className="text-[14px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{sections.fit}</p>
+              </div>
+            )}
+            {sections.idea && (
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)] mb-1">My content idea</p>
+                <p className="text-[14px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{sections.idea}</p>
+              </div>
+            )}
+            {sections.brief && (
+              <div>
+                <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)] mb-1">What caught my eye</p>
+                <p className="text-[14px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{sections.brief}</p>
+              </div>
+            )}
+          </div>
+        ) : (
+          <p className="text-[14px] text-[var(--ink)] leading-[1.6] whitespace-pre-wrap">{pitch}</p>
         )}
       </div>
     </div>
@@ -445,13 +500,14 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
   const [reelUrlError, setReelUrlError] = useState('');
   const [submittingReel, setSubmittingReel] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [viewPitch, setViewPitch] = useState<string | null>(null);
 
   useEffect(() => { fetchCampaigns(); }, []);
 
   const fetchCampaigns = async () => {
     setLoading(true);
     const { data: parts } = await supabase.from('participations')
-      .select('*, campaigns(title, headline, content_deadline, perk_description, perk_value, campaign_type, winner_announced_at, businesses(name))')
+      .select('*, campaigns(title, headline, content_deadline, perk_description, perk_value, campaign_type, winner_announced_at, businesses(name)), applications(pitch)')
       .eq('creator_id', profile.id).order('created_at', { ascending: false });
     if (parts) setParticipations(parts as Participation[]);
 
@@ -569,9 +625,17 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
               <div key={a.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
                 <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-35)]">{ownerName}</p>
                 <p className="text-[15px] font-semibold text-[var(--ink)] leading-[1.3] mb-2">{a.campaigns?.headline || a.campaigns?.title}</p>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${statusCls}`}>
-                  {statusLabel}
-                </span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${statusCls}`}>
+                    {statusLabel}
+                  </span>
+                  {a.pitch && (
+                    <button onClick={() => setViewPitch(a.pitch!)}
+                      className="inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                      <Eye size={14} /> View your pitch
+                    </button>
+                  )}
+                </div>
               </div>
             );
           })}
@@ -617,12 +681,20 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                     {days !== null && days > 0 && <span className="flex items-center gap-1"><Clock size={12} /> {days} days to share</span>}
                     {days !== null && days <= 0 && <span className="bg-[#FCEBEB] text-[#A32D2D] px-2.5 py-1 rounded-[6px] text-[12px] font-medium">Content overdue</span>}
                   </div>
-                  {p.reel_url && (
-                    <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
-                      <Film size={14} /> View Reel <ExternalLink size={12} />
-                    </a>
-                  )}
+                  <div className="flex items-center gap-3">
+                    {p.applications?.pitch && (
+                      <button onClick={() => setViewPitch(p.applications!.pitch!)}
+                        className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                        <Eye size={14} /> View your pitch
+                      </button>
+                    )}
+                    {p.reel_url && (
+                      <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
+                        className="flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium">
+                        <Film size={14} /> View Reel <ExternalLink size={12} />
+                      </a>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -647,12 +719,20 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
                 ? { cls: 'bg-[#F1EFE8] text-[#5F5E5A]', label: 'Not picked' }
                 : { cls: 'bg-[#E1F5EE] text-[#0F6E56]', label: 'Completed' };
             return (
-              <div key={p.id} className="flex items-center justify-between bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
-                <div>
-                  <p className="text-[13px] text-[var(--ink-60)]">{ownerName}</p>
-                  <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
+              <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-[13px] text-[var(--ink-60)]">{ownerName}</p>
+                    <p className="text-[15px] font-medium text-[var(--ink)]">{p.campaigns?.title}</p>
+                  </div>
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${badge.cls}`}>{badge.label}</span>
                 </div>
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[6px] text-[12px] font-medium ${badge.cls}`}>{badge.label}</span>
+                {p.applications?.pitch && (
+                  <button onClick={() => setViewPitch(p.applications!.pitch!)}
+                    className="mt-2 inline-flex items-center gap-1 text-[13px] text-[var(--terra)] font-medium hover:underline">
+                    <Eye size={14} /> View your pitch
+                  </button>
+                )}
               </div>
             );
           })}
@@ -694,6 +774,9 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           </div>
         </div>
       )}
+
+      {/* Pitch view modal */}
+      {viewPitch && <PitchModal pitch={viewPitch} onClose={() => setViewPitch(null)} />}
     </div>
   );
 }
