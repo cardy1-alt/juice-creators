@@ -1,0 +1,133 @@
+/* ──────────────────────────────────────────────────────────
+   BURY JUICE — brand surface
+   Scoped to `.bj-surface` so Nayba styles stay untouched.
+   ────────────────────────────────────────────────────────── */
+
+.bj-surface {
+  --bj-crimson: #A3185A;
+  --bj-gold: #F5C96A;
+  --bj-cream: #FAF7F2;
+  --bj-charcoal: #181818;
+  --bj-white: #FFFFFF;
+  --bj-mid: rgba(24, 24, 24, 0.6);
+  --bj-soft: rgba(24, 24, 24, 0.3);
+  --bj-faint: rgba(24, 24, 24, 0.1);
+
+  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+  background: var(--bj-cream);
+  color: var(--bj-charcoal);
+  min-height: 100vh;
+}
+
+.bj-surface h1,
+.bj-surface h2,
+.bj-surface h3,
+.bj-surface h4 {
+  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  color: var(--bj-charcoal);
+  margin: 0;
+}
+
+.bj-surface p,
+.bj-surface li,
+.bj-surface label,
+.bj-surface input,
+.bj-surface textarea,
+.bj-surface select,
+.bj-surface button {
+  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+  color: var(--bj-charcoal);
+}
+
+.bj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 13px;
+  border: 2px solid var(--bj-crimson);
+  background: var(--bj-crimson);
+  color: var(--bj-white);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  border-radius: 0;
+  text-decoration: none;
+}
+.bj-btn:hover {
+  background: var(--bj-charcoal);
+  border-color: var(--bj-charcoal);
+  color: var(--bj-white);
+}
+.bj-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.bj-btn--ghost {
+  background: transparent;
+  color: var(--bj-crimson);
+}
+.bj-btn--ghost:hover {
+  background: var(--bj-crimson);
+  color: var(--bj-white);
+}
+
+.bj-input,
+.bj-textarea,
+.bj-select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--bj-faint);
+  background: var(--bj-white);
+  font-size: 15px;
+  color: var(--bj-charcoal);
+  border-radius: 2px;
+  font-family: inherit;
+}
+.bj-input:focus,
+.bj-textarea:focus,
+.bj-select:focus {
+  outline: none;
+  border-color: var(--bj-crimson);
+}
+
+.bj-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  color: var(--bj-mid);
+}
+
+.bj-section {
+  padding: 80px 32px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+@media (max-width: 680px) {
+  .bj-section {
+    padding: 48px 20px;
+  }
+}
+
+.bj-rule {
+  height: 1px;
+  background: var(--bj-charcoal);
+  width: 100%;
+  margin: 0;
+}
+
+.bj-wordmark {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: -0.02em;
+  color: var(--bj-crimson);
+  font-family: "Helvetica Neue", "HelveticaNeue", Helvetica, Arial, sans-serif;
+}
