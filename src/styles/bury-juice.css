@@ -26,13 +26,23 @@
   min-height: 100vh;
 }
 
-.bj-surface h1,
-.bj-surface h2,
-.bj-surface h3,
-.bj-surface h4 {
+/* h1 — the main page title — is the only element that uses Hornbill.
+   h2/h3/h4 stay on Instrument Sans, matching the rest of Nayba. */
+.bj-surface h1 {
   font-family: 'Hornbill', var(--font-sans);
   font-weight: 700;
   letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0;
+}
+
+.bj-surface h2,
+.bj-surface h3,
+.bj-surface h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
   text-transform: none;
   color: var(--ink);
   margin: 0;

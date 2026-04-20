@@ -64,8 +64,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     return jsonError(res, 400, 'body copy exceeds char limit');
   }
 
+  let step = 'pre-validation';
   try {
     // 1. Find or create the business row. The Nayba `businesses` table
+    step = 'lookup-business';
     //    pre-dates Bury Juice and has `owner_email` (NOT NULL UNIQUE)
     //    as the primary identity; `contact_email` was added later and
     //    may still be NULL on Nayba rows. We match on either so a
@@ -123,6 +125,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // 2. Create the pack row — credits_remaining decremented below as
     //    we insert bookings. Dashboard token returned in the email.
+    step = 'create-pack';
     const token = generateDashboardToken();
     const expiresAt = addMonths(new Date(), PACK_EXPIRY_MONTHS).toISOString();
     const amountPaid = priceForTierAndSize(tier, size);
@@ -147,6 +150,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 3. Create bookings for each chosen date (status starts as
     //    'pending_creative' — webhook flips to 'confirmed'). Each
     //    row gets the creative fields attached.
+    step = 'create-bookings';
     if (!pickLater && dates.length > 0) {
       const rows = dates.map((d) => ({
         business_id: businessId,
@@ -171,6 +175,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     // 4. Stripe Checkout session — embedded mode so the user stays
     //    on buryjuice.com. Stripe redirects to return_url once the
     //    iframe-driven checkout completes.
+    step = 'stripe-session';
     const origin = `https://${req.headers.host}`;
     const returnUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
     const session = await stripeCall<{ id: string; client_secret: string }>('checkout/sessions', {
@@ -193,7 +198,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       dashboardToken: token,
     });
   } catch (err) {
-    console.error('[bj/bookings/create]', err);
-    jsonError(res, 500, err instanceof Error ? err.message : 'Internal error');
+    // Log with the step so Vercel Function Logs make it obvious
+    // which phase failed — otherwise it's just "supabaseFetch threw".
+    console.error(`[bj/bookings/create] failed at step=${step}`, err);
+    const msg = err instanceof Error ? err.message : String(err);
+    jsonError(res, 500, `${step}: ${msg}`);
   }
 }
