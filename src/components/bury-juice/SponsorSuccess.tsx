@@ -23,13 +23,13 @@ export default function SponsorSuccess() {
           ✓
         </div>
         <h1 style={{ fontSize: 'clamp(28px, 5vw, 40px)', marginBottom: 12 }}>
-          Payment confirmed
+          You're in.
         </h1>
         <p style={{ fontSize: 16, maxWidth: 560, color: 'var(--ink-60)', marginBottom: 20, lineHeight: 1.6 }}>
-          Your Bury Juice sponsorship is locked in. A confirmation email — with calendar invites for every booked Thursday — is on its way.
+          Your Bury Juice sponsorship is locked in. Stripe will email you a receipt in a moment. On each Thursday you've booked, your placement goes live in the newsletter — no further action needed.
         </p>
         <p style={{ fontSize: 13, color: 'var(--ink-35)', marginTop: 24 }}>
-          Need to change anything? Just reply to the confirmation email or write to hello@theburyjuice.com.
+          Need to change your creative, swap a date, or ask anything else? Just write to hello@theburyjuice.com.
         </p>
       </section>
       <Footer />
