@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendBusinessApprovedEmail, sendBusinessDeniedEmail, sendBusinessWelcomeEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
-import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search, Trash2 } from 'lucide-react';
+import { Check, X, AlertCircle, ExternalLink, Eye, Pencil, Search, Trash2, KeyRound } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import ImageUpload from '../ImageUpload';
 import Select from '../ui/Select';
@@ -150,6 +150,14 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
     showToast('Brand updated');
     setEditing(false);
     onRefresh();
+  };
+
+  const handlePasswordReset = async () => {
+    const { error } = await supabase.auth.resetPasswordForEmail(brand.owner_email, {
+      redirectTo: `${window.location.origin}/`,
+    });
+    if (error) showToast('Failed to send reset email');
+    else showToast('Password reset email sent');
   };
 
   return (
@@ -310,6 +318,10 @@ function BrandPeekPanel({ brand, campaignCount, onClose, onApprove, onViewAs, on
               <button onClick={() => { onViewAs(brand); onClose(); }}
                 className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[10px] border border-[rgba(42,32,24,0.08)] text-[var(--ink)] text-[14px] font-semibold hover:bg-[rgba(42,32,24,0.02)] transition-colors">
                 <Eye size={14} /> View as Brand
+              </button>
+              <button onClick={handlePasswordReset}
+                className="w-full inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-[10px] text-[var(--ink-50)] text-[13px] font-medium hover:text-[var(--ink)] hover:bg-[rgba(42,32,24,0.02)] transition-colors">
+                <KeyRound size={13} /> Send password reset
               </button>
               <div className="flex justify-center mt-2">
                 <button onClick={onDelete} className="text-[14px] text-[var(--destructive)] font-medium hover:underline">Delete brand</button>

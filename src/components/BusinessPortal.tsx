@@ -12,6 +12,36 @@ import CampaignWizard from './CampaignWizard';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../lib/dates';
 
+// ─── Creator avatar — image when uploaded, initial fallback otherwise.
+// `className` should set width/height (e.g. "w-10 h-10"); fallback styling
+// is optional so the kanban/dashboard patterns can keep their existing
+// palettes.
+function CreatorAvatar({
+  url,
+  name,
+  className,
+  fallbackBg = 'var(--sage-tint)',
+  fallbackTextClassName = 'text-[15px] font-semibold text-white',
+  fallbackTextColor,
+}: {
+  url?: string | null;
+  name: string;
+  className: string;
+  fallbackBg?: string;
+  fallbackTextClassName?: string;
+  fallbackTextColor?: string;
+}) {
+  const initial = (name?.[0] || '?').toUpperCase();
+  if (url) {
+    return <img src={url} alt={name} className={`${className} rounded-full object-cover flex-shrink-0`} />;
+  }
+  return (
+    <div className={`${className} rounded-full flex items-center justify-center flex-shrink-0`} style={{ background: fallbackBg }}>
+      <span className={fallbackTextClassName} style={fallbackTextColor ? { color: fallbackTextColor } : undefined}>{initial}</span>
+    </div>
+  );
+}
+
 // ─── Avatar colors by initial ───
 function getAvatarColors(letter: string): { bg: string; text: string } {
   const ch = letter.toUpperCase();
@@ -58,14 +88,14 @@ interface Campaign {
 interface Application {
   id: string; campaign_id: string; creator_id: string; pitch: string | null;
   status: string; applied_at: string;
-  creators?: { name: string; display_name: string | null; instagram_handle: string; completion_rate: number; level: number; follower_count: string | null; };
+  creators?: { name: string; display_name: string | null; instagram_handle: string; completion_rate: number; level: number; follower_count: string | null; avatar_url: string | null; };
 }
 interface Participation {
   id: string; campaign_id: string; creator_id: string; perk_redeemed: boolean;
   reel_url: string | null; reel_submitted_at: string | null;
   reach: number | null; likes: number | null; comments: number | null; views: number | null;
   status: string; completed_at: string | null;
-  creators?: { name: string; display_name: string | null; instagram_handle: string; };
+  creators?: { name: string; display_name: string | null; instagram_handle: string; avatar_url: string | null; };
 }
 
 type TopTab = 'dashboard' | 'campaigns';
@@ -316,8 +346,8 @@ export default function BusinessPortal() {
 
   const fetchCampaignData = async () => {
     const [appRes, partRes] = await Promise.all([
-      supabase.from('applications').select('*, creators(name, display_name, instagram_handle, completion_rate, level, follower_count)').eq('campaign_id', selectedCampaignId!).order('applied_at', { ascending: false }),
-      supabase.from('participations').select('*, creators(name, display_name, instagram_handle)').eq('campaign_id', selectedCampaignId!).order('created_at', { ascending: false }),
+      supabase.from('applications').select('*, creators(name, display_name, instagram_handle, completion_rate, level, follower_count, avatar_url)').eq('campaign_id', selectedCampaignId!).order('applied_at', { ascending: false }),
+      supabase.from('participations').select('*, creators(name, display_name, instagram_handle, avatar_url)').eq('campaign_id', selectedCampaignId!).order('created_at', { ascending: false }),
     ]);
     if (appRes.data) {
       setApplications(appRes.data as Application[]);
@@ -879,9 +909,12 @@ export default function BusinessPortal() {
                   {recentApps.map(a => (
                     <div key={a.id} className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-[var(--sage-tint)] flex items-center justify-center flex-shrink-0">
-                          <span className="text-[14px] md:text-[12px] font-semibold text-white">{(a.creators?.display_name || a.creators?.name || '?')[0].toUpperCase()}</span>
-                        </div>
+                        <CreatorAvatar
+                          url={a.creators?.avatar_url}
+                          name={a.creators?.display_name || a.creators?.name || '?'}
+                          className="w-7 h-7"
+                          fallbackTextClassName="text-[14px] md:text-[12px] font-semibold text-white"
+                        />
                         <div>
                           <p className="text-[14px] font-medium text-[var(--ink)]">{a.creators?.display_name || a.creators?.name}</p>
                           <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">{a.creators?.instagram_handle}</p>
@@ -1103,9 +1136,11 @@ export default function BusinessPortal() {
                           <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
                             className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
                         )}
-                        <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "var(--sage-tint)" }}>
-                          <span className="text-[15px] font-semibold text-white">{initial}</span>
-                        </div>
+                        <CreatorAvatar
+                          url={a.creators?.avatar_url}
+                          name={name}
+                          className="w-10 h-10"
+                        />
                         <div>
                           <p className="text-[15px] font-semibold text-[var(--ink)]">{name}</p>
                           <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
@@ -1317,9 +1352,14 @@ export default function BusinessPortal() {
                         return (
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: avatarColors.bg }}>
-                                <span className="text-[14px] md:text-[12px] font-semibold" style={{ color: avatarColors.text }}>{initial}</span>
-                              </div>
+                              <CreatorAvatar
+                                url={p.creators?.avatar_url}
+                                name={name}
+                                className="w-8 h-8"
+                                fallbackBg={avatarColors.bg}
+                                fallbackTextColor={avatarColors.text}
+                                fallbackTextClassName="text-[14px] md:text-[12px] font-semibold"
+                              />
                               <div className="flex-1 min-w-0">
                                 <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
                                 <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">@{handle}</p>
@@ -1359,9 +1399,14 @@ export default function BusinessPortal() {
                         return (
                           <div key={p.id} className="bg-white rounded-[10px] p-3.5 cursor-pointer hover:shadow-[0_4px_12px_rgba(42,32,24,0.10)] transition-shadow" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }} onClick={() => setPeekCreator(p)}>
                             <div className="flex items-center gap-2.5 mb-2">
-                              <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: getAvatarColors(initial).bg }}>
-                                <span className="text-[14px] md:text-[12px] font-semibold" style={{ color: getAvatarColors(initial).text }}>{initial}</span>
-                              </div>
+                              <CreatorAvatar
+                                url={p.creators?.avatar_url}
+                                name={name}
+                                className="w-8 h-8"
+                                fallbackBg={getAvatarColors(initial).bg}
+                                fallbackTextColor={getAvatarColors(initial).text}
+                                fallbackTextClassName="text-[14px] md:text-[12px] font-semibold"
+                              />
                               <div className="min-w-0">
                                 <p className="text-[14px] font-semibold text-[var(--ink)] truncate">{name}</p>
                                 <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
@@ -1436,9 +1481,12 @@ export default function BusinessPortal() {
                 </div>
                 <div className="flex-1 overflow-y-auto px-5 py-5">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full  flex items-center justify-center">
-                      <span className="text-[18px] font-semibold text-white">{name[0].toUpperCase()}</span>
-                    </div>
+                    <CreatorAvatar
+                      url={p.creators?.avatar_url}
+                      name={name}
+                      className="w-12 h-12"
+                      fallbackTextClassName="text-[18px] font-semibold text-white"
+                    />
                     <div>
                       <a href={`https://instagram.com/${handle}`} target="_blank" rel="noopener noreferrer"
                         className="text-[14px] text-[var(--terra)] font-medium hover:underline flex items-center gap-1">
