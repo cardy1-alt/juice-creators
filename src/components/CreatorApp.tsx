@@ -886,6 +886,33 @@ function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorPro
   const [savingBio, setSavingBio] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
+  // iOS Safari drops background tabs and remounts this component with
+  // fresh state, wiping an in-progress bio edit. Mirror the pitch-draft
+  // pattern in CampaignDetail: save typing to localStorage, restore on
+  // mount if it differs from the saved bio, and clear on save/cancel.
+  const bioDraftKey = `bio_draft_${profile.id}`;
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(bioDraftKey);
+      if (saved !== null && saved !== (profile.bio || '')) {
+        setBio(saved);
+        setEditingBio(true);
+      }
+    } catch { /* ignore corrupt data */ }
+  }, [profile.id]);
+
+  const updateBio = (v: string) => {
+    setBio(v);
+    try {
+      if (v === (profile.bio || '')) localStorage.removeItem(bioDraftKey);
+      else localStorage.setItem(bioDraftKey, v);
+    } catch { /* ignore */ }
+  };
+
+  const clearBioDraft = () => {
+    try { localStorage.removeItem(bioDraftKey); } catch { /* ignore */ }
+  };
+
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -910,6 +937,7 @@ function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorPro
     if (error) { showToast('Failed to save — please try again'); return; }
     profile.bio = bio || null;
     setEditingBio(false);
+    clearBioDraft();
     showToast('Bio updated');
   };
   return (
@@ -943,12 +971,12 @@ function ProfileTab({ profile, showToast, onEditProfile }: { profile: CreatorPro
         <div className="mt-3 w-full max-w-[380px]">
           {editingBio ? (
             <div>
-              <textarea value={bio} onChange={e => setBio(e.target.value)} rows={3}
+              <textarea value={bio} onChange={e => updateBio(e.target.value)} rows={3}
                 placeholder="A short intro — what you're about, your content style, where you're based"
                 className="w-full px-3 py-2 rounded-[10px] border border-[rgba(42,32,24,0.15)] bg-white text-[14px] text-[var(--ink)] focus:outline-none focus:border-[var(--terra)] resize-none" autoFocus />
               <p className={`text-[11px] text-right mt-1 ${bio.length > 280 ? 'text-[var(--terra)]' : 'text-[var(--ink-35)]'}`}>{bio.length}/300</p>
               <div className="flex gap-2 mt-2 justify-center">
-                <button onClick={() => { setEditingBio(false); setBio(profile.bio || ''); }}
+                <button onClick={() => { setEditingBio(false); setBio(profile.bio || ''); clearBioDraft(); }}
                   className="px-3 py-1.5 rounded-[8px] text-[13px] font-medium text-[var(--ink-60)] hover:text-[var(--ink)]">Cancel</button>
                 <button onClick={handleSaveBio} disabled={savingBio}
                   className="px-4 py-1.5 rounded-[8px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-85 disabled:opacity-50">
@@ -1154,6 +1182,33 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
   const [passwordSaving, setPasswordSaving] = useState(false);
   const [passwordError, setPasswordError] = useState('');
 
+  // Persist unsaved edits across iOS Safari tab reloads so switching
+  // apps to grab a detail doesn't wipe the form.
+  const accountDraftKey = `account_draft_${profile.id}`;
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(accountDraftKey);
+      if (!raw) return;
+      const d = JSON.parse(raw);
+      if (typeof d.displayName === 'string') setDisplayName(d.displayName);
+      if (typeof d.instagram === 'string') setInstagram(d.instagram);
+      if (typeof d.bio === 'string') setBio(d.bio);
+      if (typeof d.city === 'string') setCity(d.city);
+    } catch { /* ignore corrupt data */ }
+  }, [profile.id]);
+
+  useEffect(() => {
+    try {
+      const allMatch =
+        displayName === (profile.display_name || profile.name || '') &&
+        instagram === (profile.instagram_handle || '') &&
+        bio === (profile.bio || '') &&
+        city === (profile.address || '');
+      if (allMatch) localStorage.removeItem(accountDraftKey);
+      else localStorage.setItem(accountDraftKey, JSON.stringify({ displayName, instagram, bio, city }));
+    } catch { /* ignore */ }
+  }, [displayName, instagram, bio, city]);
+
   const handleSaveProfile = async () => {
     setSaving(true);
     const { error } = await supabase.from('creators').update({
@@ -1163,7 +1218,15 @@ function AccountSettingsView({ profile, onBack, showToast }: { profile: CreatorP
       address: city,
     }).eq('id', profile.id);
     setSaving(false);
-    showToast(error ? 'Failed to save — please try again' : 'Profile updated');
+    if (error) { showToast('Failed to save — please try again'); return; }
+    // Mirror the save into the in-memory profile so the draft-match
+    // check above clears the localStorage entry on next render.
+    profile.display_name = displayName;
+    profile.instagram_handle = instagram;
+    profile.bio = bio || null;
+    profile.address = city;
+    try { localStorage.removeItem(accountDraftKey); } catch { /* ignore */ }
+    showToast('Profile updated');
   };
 
   const handleChangePassword = async () => {
