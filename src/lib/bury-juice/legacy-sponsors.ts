@@ -8,7 +8,10 @@ import type { BjTier } from './pricing.js';
 
 export interface LegacySponsor {
   name: string;
-  email: string;
+  // Optional: only set for sponsors whose primary relationship is with
+  // Bury Juice. Sponsors that are also Nayba brands (e.g. David Lloyd)
+  // are contacted through their Nayba identity — no BJ email on file.
+  email?: string;
   tier: BjTier;
   monthlyRateGbp: number;
   cadence: 'monthly' | 'weekly';
@@ -19,12 +22,11 @@ export interface LegacySponsor {
 export const LEGACY_SPONSORS: LegacySponsor[] = [
   {
     name: 'David Lloyd Clubs',
-    email: 'sales.burystedmunds@davidlloyd.co.uk',
     tier: 'primary',
     monthlyRateGbp: 0,
     cadence: 'weekly',
     isComp: true,
-    notes: 'Comp placement — membership exchange. Rotates tier weekly.',
+    notes: 'Comp placement — membership exchange. Rotates tier weekly. Contact handled via Nayba brand account; no email stored on the Bury Juice side.',
   },
   {
     name: 'Snappy Shopper',

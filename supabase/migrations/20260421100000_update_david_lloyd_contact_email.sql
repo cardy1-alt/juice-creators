@@ -1,12 +1,16 @@
 -- ═══════════════════════════════════════════════════════════════
--- BURY JUICE — update David Lloyd Clubs contact email
+-- BURY JUICE — clear David Lloyd Clubs contact email
 --
--- The legacy seed (20260420120000) only set contact_email via
--- COALESCE, so it never overwrote an existing value. The canonical
--- contact is now the David Lloyd Bury St Edmunds sales mailbox.
--- This migration force-updates the row to match.
+-- David Lloyd is primarily a Nayba brand; the BJ comp placement is a
+-- membership-exchange on the side and the contact should never be
+-- routed through Bury Juice. An earlier legacy seed attempted to set
+-- `contact_email` on her row via COALESCE. This migration NULLs that
+-- value so Bury Juice holds no email on file for her.
+--
+-- Safe to apply multiple times. The WHERE clause only touches the
+-- specific David Lloyd row; Nayba login (`owner_email`) is untouched.
 -- ═══════════════════════════════════════════════════════════════
 
 UPDATE businesses
-   SET contact_email = 'sales.burystedmunds@davidlloyd.co.uk'
- WHERE name = 'David Lloyd Clubs';
+   SET contact_email = NULL
+ WHERE id = 'c1a6cafa-dd51-433b-86ce-defe8c678ea6';

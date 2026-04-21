@@ -19,17 +19,16 @@
 BEGIN;
 
 -- ── Step 1 — Rename existing Nayba brands to Bury Juice conventions
--- Both rows are still live Nayba brands referenced by campaigns, so
--- we only rename + backfill contact_email. owner_email / slug / any
--- other existing columns are untouched.
+-- Both rows are still live Nayba brands referenced by campaigns. We
+-- only rename and leave owner_email / slug untouched. David Lloyd's
+-- relationship is with Nayba — no Bury Juice contact email is stored
+-- on her row so the BJ side can't email her or surface her address.
 UPDATE businesses
-   SET name = 'David Lloyd Clubs',
-       contact_email = COALESCE(contact_email, 'sales.burystedmunds@davidlloyd.co.uk')
+   SET name = 'David Lloyd Clubs'
  WHERE id = 'c1a6cafa-dd51-433b-86ce-defe8c678ea6';
 
 UPDATE businesses
-   SET name = 'Midgar',
-       contact_email = COALESCE(contact_email, 'legacy+midgar@buryjuice.com')
+   SET name = 'Midgar'
  WHERE id = 'cf637e24-57e6-4625-b588-e5a833d87334';
 
 -- ── Step 2 — Insert the three new sponsor rows (by name, not email)
