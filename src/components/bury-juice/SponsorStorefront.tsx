@@ -204,25 +204,7 @@ export default function SponsorStorefront() {
           textAlign: 'center',
         }}
       >
-        <div
-          style={{
-            width: 72,
-            height: 72,
-            borderRadius: 16,
-            background: 'var(--terra)',
-            color: '#fff',
-            margin: '0 auto 20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 28,
-            fontWeight: 700,
-            letterSpacing: '-0.03em',
-          }}
-          aria-hidden
-        >
-          BJ
-        </div>
+        <Avatar />
         <h1
           style={{
             fontSize: 'clamp(28px, 5vw, 40px)',
@@ -360,6 +342,52 @@ export default function SponsorStorefront() {
 
       {/* ── Sticky mobile CTA ──────────────────────────────────── */}
       {showSticky && !tier && <StickyCta onClick={scrollToPlacements} />}
+    </div>
+  );
+}
+
+// Loads the Bury Juice profile picture from /public — drop a file at
+// `public/bury-juice-avatar.jpg` (or .png) and it picks up on deploy.
+// Falls back to a terra-on-cream "BJ" monogram if the image is
+// missing so the page never looks broken before the asset lands.
+function Avatar() {
+  const [failed, setFailed] = useState(false);
+  const base: React.CSSProperties = {
+    width: 88,
+    height: 88,
+    borderRadius: 20,
+    margin: '0 auto 20px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    boxShadow: '0 2px 8px rgba(42,32,24,0.08)',
+  };
+  if (failed) {
+    return (
+      <div
+        aria-hidden
+        style={{
+          ...base,
+          background: 'var(--terra)',
+          color: '#fff',
+          fontSize: 34,
+          fontWeight: 700,
+          letterSpacing: '-0.03em',
+        }}
+      >
+        BJ
+      </div>
+    );
+  }
+  return (
+    <div style={{ ...base, background: 'var(--card)' }}>
+      <img
+        src="/bury-juice-avatar.jpg"
+        alt="Bury Juice"
+        onError={() => setFailed(true)}
+        style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+      />
     </div>
   );
 }
