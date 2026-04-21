@@ -12,7 +12,10 @@ type Route = { kind: 'storefront' } | { kind: 'success' };
 
 function parseRoute(pathname: string): Route {
   const path = pathname.replace(/\/+$/, '') || '/';
-  if (path === '/sponsor/success') return { kind: 'success' };
+  // `/success` is the clean-URL success route used on the
+  // sponsor.theburyjuice.com subdomain; `/sponsor/success` is the
+  // Nayba-path equivalent. Accept both.
+  if (path === '/sponsor/success' || path === '/success') return { kind: 'success' };
   return { kind: 'storefront' };
 }
 

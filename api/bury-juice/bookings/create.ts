@@ -200,9 +200,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     //    One brief redirect to checkout.stripe.com and back; Stripe's
     //    hosted page is fast enough that the UX cost is marginal.
     step = 'stripe-session';
-    const origin = `https://${req.headers.host}`;
-    const successUrl = `${origin}/sponsor/success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${origin}/sponsor?cancelled=1`;
+    const host = req.headers.host ?? '';
+    const origin = `https://${host}`;
+    // On the sponsor.*.theburyjuice.com/buryjuice.com subdomains the
+    // storefront lives at root, so the return URL drops the `/sponsor`
+    // prefix. On app.nayba.app it stays under `/sponsor`.
+    const onSponsorSubdomain = /^sponsor\.(the)?buryjuice\.com$/i.test(host);
+    const successUrl = `${origin}${onSponsorSubdomain ? '/success' : '/sponsor/success'}?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}${onSponsorSubdomain ? '/?cancelled=1' : '/sponsor?cancelled=1'}`;
     const session = await stripeCall<{ id: string; url: string }>('checkout/sessions', {
       mode: 'payment',
       success_url: successUrl,
