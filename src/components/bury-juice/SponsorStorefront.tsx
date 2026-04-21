@@ -234,7 +234,7 @@ export default function SponsorStorefront() {
                 fontSize: 12,
                 fontWeight: 500,
                 padding: '4px 10px',
-                borderRadius: 999,
+                borderRadius: 8,
                 background: 'var(--ink-08)',
                 color: 'var(--ink-60)',
               }}

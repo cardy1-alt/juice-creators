@@ -64,7 +64,7 @@ export function PlacementPreview({ tier, value }: Props) {
             color: 'var(--terra)',
             background: 'var(--terra-light)',
             padding: '3px 10px',
-            borderRadius: 999,
+            borderRadius: 8,
             textTransform: 'uppercase',
             letterSpacing: '0.06em',
           }}
