@@ -24,7 +24,7 @@ BEGIN;
 -- other existing columns are untouched.
 UPDATE businesses
    SET name = 'David Lloyd Clubs',
-       contact_email = COALESCE(contact_email, 'legacy+davidlloyd@buryjuice.com')
+       contact_email = COALESCE(contact_email, 'sales.burystedmunds@davidlloyd.co.uk')
  WHERE id = 'c1a6cafa-dd51-433b-86ce-defe8c678ea6';
 
 UPDATE businesses

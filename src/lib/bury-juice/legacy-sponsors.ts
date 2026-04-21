@@ -19,7 +19,7 @@ export interface LegacySponsor {
 export const LEGACY_SPONSORS: LegacySponsor[] = [
   {
     name: 'David Lloyd Clubs',
-    email: 'legacy+davidlloyd@buryjuice.com',
+    email: 'sales.burystedmunds@davidlloyd.co.uk',
     tier: 'primary',
     monthlyRateGbp: 0,
     cadence: 'weekly',

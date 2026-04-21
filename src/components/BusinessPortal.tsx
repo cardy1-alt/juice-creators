@@ -904,6 +904,15 @@ export default function BusinessPortal() {
             if (filterLevel !== 'all' && a.creators?.level && a.creators.level < parseInt(filterLevel)) return false;
             return true;
           });
+          // Split the pool so the UI can group Selected / Reserves / Declined
+          // distinctly. Reserves (status: 'interested') are kept available
+          // while any selected creators still haven't confirmed, so the
+          // business has a fallback pool if someone backs out.
+          const selectedApps = filteredApps.filter(a => a.status === 'selected' || a.status === 'confirmed');
+          const reserveApps = filteredApps.filter(a => a.status === 'interested');
+          const declinedApps = filteredApps.filter(a => a.status === 'declined');
+          const unconfirmedSelectedCount = selectedApps.filter(a => a.status === 'selected').length;
+          const hasUnconfirmedSelected = unconfirmedSelectedCount > 0;
           const toggleCreator = (id: string) => {
             setSelectedCreators(prev => {
               const next = new Set(prev);
@@ -912,19 +921,38 @@ export default function BusinessPortal() {
             });
           };
           const toggleAll = () => {
-            if (selectedCreators.size === filteredApps.length) setSelectedCreators(new Set());
-            else setSelectedCreators(new Set(filteredApps.map(a => a.id)));
+            // Only reserves (interested applicants) are selectable via checkbox.
+            if (selectedCreators.size === reserveApps.length) setSelectedCreators(new Set());
+            else setSelectedCreators(new Set(reserveApps.map(a => a.id)));
           };
           const handleSelect = async (appId: string) => {
             await supabase.from('applications').update({ status: 'selected', selected_at: new Date().toISOString() }).eq('id', appId);
             fetchCampaignData();
             showToast('Creator selected');
           };
-          const handleDecline = async (appId: string) => {
-            if (!window.confirm('Decline this creator?')) return;
+          const handleDecline = async (appId: string, fromStatus: string) => {
+            // Warn the business before burning a reserve while selected
+            // creators haven't confirmed yet — they might still need a swap.
+            let msg = 'Decline this creator?';
+            if (fromStatus === 'interested' && hasUnconfirmedSelected) {
+              msg = `${unconfirmedSelectedCount} selected creator${unconfirmedSelectedCount === 1 ? " hasn't" : "s haven't"} confirmed yet. Keeping this creator as a reserve lets you swap in if someone backs out. Decline anyway?`;
+            }
+            if (!window.confirm(msg)) return;
             await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
             fetchCampaignData();
-            showToast('Creator declined');
+            // If a selected (unconfirmed) creator was just declined, nudge
+            // the business toward the reserves pool so the slot gets filled.
+            if (fromStatus === 'selected' && reserveApps.length > 0) {
+              showToast(`Spot opened — ${reserveApps.length} reserve${reserveApps.length !== 1 ? 's' : ''} available to promote`);
+            } else {
+              showToast('Creator declined');
+            }
+          };
+          const handleReturnToReserves = async (appId: string) => {
+            if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
+            await supabase.from('applications').update({ status: 'interested', selected_at: null }).eq('id', appId);
+            fetchCampaignData();
+            showToast('Creator moved to reserves — pick a replacement');
           };
           const handleBulkSelect = async () => {
             const ids = Array.from(selectedCreators);
@@ -944,7 +972,11 @@ export default function BusinessPortal() {
           const handleBulkDecline = async () => {
             const ids = Array.from(selectedCreators);
             if (ids.length === 0) return;
-            if (!window.confirm(`Decline ${ids.length} creator${ids.length > 1 ? 's' : ''}?`)) return;
+            let msg = `Decline ${ids.length} creator${ids.length > 1 ? 's' : ''}?`;
+            if (hasUnconfirmedSelected) {
+              msg = `${unconfirmedSelectedCount} selected creator${unconfirmedSelectedCount === 1 ? " hasn't" : "s haven't"} confirmed yet — reserves let you swap in if someone backs out. Decline ${ids.length} anyway?`;
+            }
+            if (!window.confirm(msg)) return;
             const { error } = await supabase.from('applications')
               .update({ status: 'declined' })
               .in('id', ids);
@@ -1024,9 +1056,9 @@ export default function BusinessPortal() {
                 <option value="all">All levels</option>
                 {[1,2,3,4,5,6].map(l => <option key={l} value={l}>Level {l}+</option>)}
               </select>
-              <button onClick={toggleAll}
-                className="px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink-60)] hover:bg-[var(--shell)]" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
-                {selectedCreators.size === filteredApps.length && filteredApps.length > 0 ? 'Deselect all' : 'Select all'}
+              <button onClick={toggleAll} disabled={reserveApps.length === 0}
+                className="px-3 py-2 rounded-[10px] bg-white text-[14px] text-[var(--ink-60)] hover:bg-[var(--shell)] disabled:opacity-40 disabled:cursor-not-allowed" style={{ border: '1px solid rgba(42,32,24,0.12)' }}>
+                {selectedCreators.size === reserveApps.length && reserveApps.length > 0 ? 'Deselect all' : 'Select all reserves'}
               </button>
               {selectedCreators.size > 0 && (
                 <>
@@ -1043,20 +1075,26 @@ export default function BusinessPortal() {
               )}
             </div>
 
-            {/* Creator cards grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 mb-6">
-              {filteredApps.map(a => {
+            {/* Creator card — rendered in every section so Selected, Reserves
+                and Declined stay visually consistent. Actions vary by status. */}
+            {(() => {
+              const renderCard = (a: typeof filteredApps[number]) => {
                 const name = a.creators?.display_name || a.creators?.name || 'Creator';
                 const initial = name[0].toUpperCase();
                 const handle = a.creators?.instagram_handle?.replace('@', '') || '';
                 const isLowCompletion = a.creators?.completion_rate !== undefined && a.creators.completion_rate < 60;
+                const isReserve = a.status === 'interested';
+                const isSelected = a.status === 'selected';
+                const isConfirmed = a.status === 'confirmed';
+                const isDeclined = a.status === 'declined';
                 return (
-                  <div key={a.id} className={`bg-white rounded-[12px] p-5 transition-shadow ${selectedCreators.has(a.id) ? '' : ''}`} style={{ border: selectedCreators.has(a.id) ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.08)' }}>
-                    {/* Header: checkbox + avatar + name + status */}
+                  <div key={a.id} className="bg-white rounded-[12px] p-5 transition-shadow" style={{ border: isReserve && selectedCreators.has(a.id) ? '1.5px solid var(--terra)' : '1px solid rgba(42,32,24,0.08)' }}>
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
-                          className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
+                        {isReserve && (
+                          <input type="checkbox" checked={selectedCreators.has(a.id)} onChange={() => toggleCreator(a.id)}
+                            className="accent-[var(--terra)] w-4 h-4 flex-shrink-0 mt-0.5" />
+                        )}
                         <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0" style={{ background: "var(--sage-tint)" }}>
                           <span className="text-[15px] font-semibold text-white">{initial}</span>
                         </div>
@@ -1071,7 +1109,6 @@ export default function BusinessPortal() {
                       <StatusBadge status={a.status} />
                     </div>
 
-                    {/* Stats row */}
                     <div className="flex items-center gap-4 mb-3">
                       <div className="flex items-center gap-1.5">
                         <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">Level</span>
@@ -1089,15 +1126,12 @@ export default function BusinessPortal() {
                       )}
                     </div>
 
-                    {/* Pitch */}
                     {a.pitch && (
                       <div className="bg-[var(--shell)] rounded-[10px] px-3 py-2 mb-3">
                         <p className="text-[14px] text-[var(--ink-60)] leading-[1.5] line-clamp-2">{a.pitch}</p>
                       </div>
                     )}
 
-                    {/* Past reels — toggleable. Only renders the button if
-                        this creator has at least one previous submitted reel. */}
                     {(() => {
                       const reels = pastReelsByCreator[a.creator_id] || [];
                       if (reels.length === 0) return null;
@@ -1125,32 +1159,113 @@ export default function BusinessPortal() {
                       );
                     })()}
 
-                    {/* Actions */}
                     <div className="flex items-center justify-between mt-3 pt-3" style={{ borderTop: '1px solid rgba(42,32,24,0.06)' }}>
                       <p className="text-[14px] md:text-[12px] text-[var(--ink-50)]">Applied {fmtDate(a.applied_at)}</p>
-                      {a.status === 'interested' && (
+                      {isReserve && (
                         <div className="flex items-center gap-2">
                           <button onClick={() => handleSelect(a.id)}
                             className="min-h-[44px] px-4 py-2 rounded-[10px] bg-[var(--terra)] text-white text-[14px] font-semibold hover:opacity-[0.85]">
                             Select
                           </button>
-                          <button onClick={() => handleDecline(a.id)}
+                          <button onClick={() => handleDecline(a.id, 'interested')}
                             className="min-h-[44px] flex items-center text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
                             Decline
                           </button>
                         </div>
                       )}
+                      {isSelected && (
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => handleReturnToReserves(a.id)}
+                            className="min-h-[44px] flex items-center text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
+                            Return to reserves
+                          </button>
+                          <button onClick={() => handleDecline(a.id, 'selected')}
+                            className="min-h-[44px] flex items-center text-[14px] md:text-[12px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
+                            Decline
+                          </button>
+                        </div>
+                      )}
+                      {isConfirmed && (
+                        <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[#0F6E56]">
+                          <Check size={12} /> Confirmed
+                        </span>
+                      )}
+                      {isDeclined && (
+                        <span className="text-[12px] font-medium text-[var(--ink-50)]">Declined</span>
+                      )}
                     </div>
                   </div>
                 );
-              })}
-              {filteredApps.length === 0 && (
-                <div className="col-span-3 py-12 text-center">
-                  <p className="text-[20px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
-                  <p className="text-[14px] text-[var(--ink-50)]">Creators will appear here once they express interest</p>
-                </div>
-              )}
-            </div>
+              };
+
+              // Contextual hint for the Reserves section. Nudges the business
+              // to keep reserves around until picks confirm, then lets them go.
+              const reservesHint = (() => {
+                if (reserveApps.length === 0) return null;
+                if (hasUnconfirmedSelected) {
+                  return `Keep these on hand — ${unconfirmedSelectedCount} selected creator${unconfirmedSelectedCount === 1 ? " hasn't" : "s haven't"} confirmed yet.`;
+                }
+                if (isFull) return 'All selected creators confirmed — safe to decline the rest.';
+                return null;
+              })();
+
+              if (filteredApps.length === 0) {
+                return (
+                  <div className="py-12 text-center">
+                    <p className="text-[20px] font-semibold text-[var(--ink)] mb-1">No applicants yet</p>
+                    <p className="text-[14px] text-[var(--ink-50)]">Creators will appear here once they express interest</p>
+                  </div>
+                );
+              }
+
+              return (
+                <>
+                  {selectedApps.length > 0 && (
+                    <section className="mb-6">
+                      <div className="flex items-center gap-2 mb-3 flex-wrap">
+                        <h2 className="text-[15px] font-semibold text-[var(--ink)]">Selected</h2>
+                        <span className="text-[13px] text-[var(--ink-50)]">{selectedApps.length}{target > 0 ? ` / ${target}` : ''}</span>
+                        {hasUnconfirmedSelected && (
+                          <span className="inline-flex items-center gap-1 text-[12px] font-semibold text-[var(--terra)]">
+                            <Clock size={11} /> {unconfirmedSelectedCount} awaiting confirmation
+                          </span>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {selectedApps.map(renderCard)}
+                      </div>
+                    </section>
+                  )}
+
+                  {reserveApps.length > 0 && (
+                    <section className="mb-6">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h2 className="text-[15px] font-semibold text-[var(--ink)]">{selectedApps.length > 0 ? 'Reserves' : 'Applicants'}</h2>
+                        <span className="text-[13px] text-[var(--ink-50)]">{reserveApps.length}</span>
+                      </div>
+                      {reservesHint && (
+                        <p className="text-[13px] text-[var(--ink-50)] mb-3">{reservesHint}</p>
+                      )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                        {reserveApps.map(renderCard)}
+                      </div>
+                    </section>
+                  )}
+
+                  {declinedApps.length > 0 && (
+                    <section className="mb-6">
+                      <div className="flex items-center gap-2 mb-3">
+                        <h2 className="text-[15px] font-semibold text-[var(--ink-50)]">Declined</h2>
+                        <span className="text-[13px] text-[var(--ink-50)]">{declinedApps.length}</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 opacity-60">
+                        {declinedApps.map(renderCard)}
+                      </div>
+                    </section>
+                  )}
+                </>
+              );
+            })()}
           </div>
           );
         })()}
