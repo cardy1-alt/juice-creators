@@ -235,7 +235,7 @@ function BrandProfileSetup({ email, onCreated }: { email: string; onCreated: () 
 }
 
 export default function BusinessPortal() {
-  const { user, signOut } = useEffectiveAuth();
+  const { user, userProfile, signOut } = useEffectiveAuth();
   const [brand, setBrand] = useState<Brand | null>(null);
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   // Per-campaign pending applicant counts, used to decorate list/dashboard
@@ -271,12 +271,20 @@ export default function BusinessPortal() {
     setSidebarOpen(false);
   };
 
-  useEffect(() => { if (user) fetchBrand(); }, [user]);
+  useEffect(() => { if (user || userProfile) fetchBrand(); }, [user, userProfile]);
 
   const fetchBrand = async () => {
-    const { data: bData } = await supabase.from('businesses').select('*').eq('owner_email', user!.email).maybeSingle();
+    // In both real auth and admin "view as brand" mode, userProfile is the
+    // brand row itself (set by AuthContext on sign-in, overridden by
+    // setViewAs when an admin peeks). Prefer it over an email lookup so
+    // view-as works — `user.email` stays the admin's address in that mode.
+    let bData: Brand | null = (userProfile && userProfile.id) ? userProfile as Brand : null;
+    if (!bData && user?.email) {
+      const { data } = await supabase.from('businesses').select('*').eq('owner_email', user.email).maybeSingle();
+      bData = (data as Brand) || null;
+    }
     if (bData) {
-      setBrand(bData as Brand);
+      setBrand(bData);
       const { data: cData } = await supabase.from('campaigns').select('*').eq('brand_id', bData.id).order('created_at', { ascending: false });
       if (cData && cData.length > 0) {
         setCampaigns(cData as Campaign[]);
