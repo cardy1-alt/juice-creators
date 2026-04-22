@@ -54,11 +54,64 @@ export function ReviewPay(props: Props) {
         <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting} style={{ marginTop: 4 }}>
           {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Pay securely with Stripe'}
         </button>
-        <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: 0, marginTop: 4 }}>
-          You'll pop over to Stripe to pay, then come straight back. Confirmation and dashboard link email to you on success.
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 6 }}>
+          <LockIcon />
+          <span style={{ fontSize: 12, color: 'var(--ink-35)' }}>Secure payment by Stripe</span>
+        </div>
+        <div
+          style={{
+            borderTop: '1px solid var(--border-color)',
+            marginTop: 10,
+            paddingTop: 12,
+            display: 'grid',
+            gap: 8,
+            fontSize: 13,
+            color: 'var(--ink-60)',
+            lineHeight: 1.5,
+          }}
+        >
+          <Reassurance>You'll pop over to Stripe to pay, then come straight back.</Reassurance>
+          <Reassurance>Change your creative any time up to Tuesday 8pm before the issue sends.</Reassurance>
+          <Reassurance>Need to swap a date or ask something? Just reply to the Stripe receipt or email hello@theburyjuice.com.</Reassurance>
+        </div>
       </div>
     </section>
+  );
+}
+
+function Reassurance({ children }: { children: React.ReactNode }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+      <span
+        aria-hidden
+        style={{
+          flexShrink: 0,
+          width: 14,
+          height: 14,
+          borderRadius: 999,
+          background: 'var(--terra-light)',
+          color: 'var(--terra)',
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 9,
+          fontWeight: 700,
+          marginTop: 3,
+        }}
+      >
+        ✓
+      </span>
+      <span>{children}</span>
+    </div>
+  );
+}
+
+function LockIcon() {
+  return (
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--ink-35)' }} aria-hidden>
+      <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+      <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+    </svg>
   );
 }
 

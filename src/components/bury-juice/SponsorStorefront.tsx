@@ -19,6 +19,7 @@ import { BookingFlow } from './storefront/BookingFlow';
 import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } from './storefront/CreativeForm';
 import { PlacementPreview } from './storefront/PlacementPreview';
 import { ReviewPay } from './storefront/ReviewPay';
+import { Testimonials } from './storefront/Testimonials';
 import { Footer } from './storefront/Footer';
 
 // One-screen landing for the sponsor storefront. Beehiiv-style:
@@ -249,13 +250,20 @@ export default function SponsorStorefront() {
       <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
           <StatCard label="Subscribers" value={BJ_STATS.subscribers.toLocaleString('en-GB')} />
-          <StatCard label="Open rate" value={`${Math.round(BJ_STATS.open_rate * 100)}%`} />
+          <StatCard
+            label="Open rate"
+            value={`${Math.round(BJ_STATS.open_rate * 100)}%`}
+            sublabel="2.5× industry avg"
+          />
           <StatCard label="Click-through" value={`${(BJ_STATS.ctr * 100).toFixed(1)}%`} />
         </div>
       </section>
 
       {/* ── Social proof strip ─────────────────────────────────── */}
       <SocialProof />
+
+      {/* ── Testimonials ───────────────────────────────────────── */}
+      <Testimonials />
 
       {/* ── Placement options ──────────────────────────────────── */}
       <section
@@ -392,7 +400,15 @@ function Avatar() {
   );
 }
 
-function StatCard({ label, value }: { label: string; value: string }) {
+function StatCard({
+  label,
+  value,
+  sublabel,
+}: {
+  label: string;
+  value: string;
+  sublabel?: string;
+}) {
   return (
     <div
       style={{
@@ -414,6 +430,11 @@ function StatCard({ label, value }: { label: string; value: string }) {
       >
         {value}
       </div>
+      {sublabel && (
+        <div style={{ fontSize: 11, color: 'var(--terra)', fontWeight: 600, marginTop: 4 }}>
+          {sublabel}
+        </div>
+      )}
     </div>
   );
 }
@@ -464,6 +485,14 @@ function PlacementRow({
   onBook: () => void;
 }) {
   const t = BJ_PRICING[tier];
+  // Cost-per-reader framing: single-issue price divided by the
+  // average opened-count (subscribers × open rate). Rounds to the
+  // nearest penny and shows as "From ~Np per reader" so the sticker
+  // price feels tractable once you divide it out.
+  const perReaderPence = t.single / (BJ_STATS.subscribers * BJ_STATS.open_rate);
+  const perReaderLabel = perReaderPence < 1
+    ? `${Math.max(1, Math.round(perReaderPence * 10) / 10)}p`
+    : `${Math.round(perReaderPence)}p`;
   return (
     <div
       style={{
@@ -490,6 +519,9 @@ function PlacementRow({
           <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: '4px 0 0', lineHeight: 1.5 }}>
             {t.description}
           </p>
+          <div style={{ fontSize: 12, color: 'var(--ink-35)', marginTop: 4 }}>
+            ≈ {perReaderLabel} per reader opened
+          </div>
           {nextAvailable !== undefined && (
             <div
               style={{
@@ -652,7 +684,7 @@ function StickyCta({ onClick }: { onClick: () => void }) {
         type="button"
         onClick={onClick}
         style={{
-          display: 'block',
+          display: 'flex',
           width: '100%',
           padding: '12px 16px',
           borderRadius: 'var(--r-button)',
@@ -663,9 +695,15 @@ function StickyCta({ onClick }: { onClick: () => void }) {
           fontSize: 14,
           fontWeight: 600,
           fontFamily: 'inherit',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          gap: 8,
         }}
       >
-        Book a placement
+        <span>Book a placement</span>
+        <span style={{ fontWeight: 500, opacity: 0.85, fontSize: 13 }}>
+          from {formatGBP(BJ_PRICING.classified.single)}
+        </span>
       </button>
     </div>
   );

@@ -64,6 +64,8 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
             <input
               id={id}
               type="email"
+              inputMode="email"
+              autoComplete="email"
               className="bj-input"
               value={value.contactEmail}
               onChange={(e) => set('contactEmail', e.target.value)}
@@ -78,6 +80,8 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
             <input
               id={id}
               type="tel"
+              inputMode="tel"
+              autoComplete="tel"
               className="bj-input"
               value={value.contactPhone}
               onChange={(e) => set('contactPhone', e.target.value)}
@@ -93,6 +97,10 @@ export function CreativeForm({ tier, value, onChange, errors }: Props) {
             <input
               id={id}
               type="text"
+              inputMode="url"
+              autoComplete="url"
+              autoCapitalize="none"
+              spellCheck={false}
               className="bj-input"
               value={value.ctaUrl}
               onChange={(e) => set('ctaUrl', e.target.value)}
