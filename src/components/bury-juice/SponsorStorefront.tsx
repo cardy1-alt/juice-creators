@@ -15,6 +15,7 @@ import {
 import type { BjAvailabilityEntry } from '../../lib/bury-juice/types.js';
 import { LEGACY_SPONSORS } from '../../lib/bury-juice/legacy-sponsors.js';
 import { uploadCreativeFile } from '../../lib/bury-juice/upload.js';
+import { loadDraft, saveDraft, clearDraft } from '../../lib/bury-juice/draft.js';
 import { BookingFlow } from './storefront/BookingFlow';
 import { CreativeForm, validateCreative, normaliseUrl, type CreativeFormValue } from './storefront/CreativeForm';
 import { PlacementPreview } from './storefront/PlacementPreview';
@@ -45,10 +46,19 @@ const WEEKS_AHEAD = 12;
 type NextAvailability = Partial<Record<BjTier, string | null>>;
 
 export default function SponsorStorefront() {
-  const [tier, setTier] = useState<BjTier | null>(null);
-  const [size, setSize] = useState<BjPackSize>(1);
-  const [selectedDates, setSelectedDates] = useState<string[]>([]);
-  const [creative, setCreative] = useState<CreativeFormValue>(EMPTY_CREATIVE);
+  // Lazy init from localStorage so a sponsor who gets interrupted
+  // (tab kill, accidental navigation) returns to the same text they
+  // typed. Files don't round-trip through JSON — photo/logo will
+  // still need to be re-attached.
+  const initialDraft = typeof window === 'undefined' ? null : loadDraft();
+  const [tier, setTier] = useState<BjTier | null>(initialDraft?.tier ?? null);
+  const [size, setSize] = useState<BjPackSize>(initialDraft?.size ?? 1);
+  const [selectedDates, setSelectedDates] = useState<string[]>(initialDraft?.selectedDates ?? []);
+  const [creative, setCreative] = useState<CreativeFormValue>(
+    initialDraft
+      ? { ...EMPTY_CREATIVE, ...initialDraft.creative, imageFile: null, logoFile: null }
+      : EMPTY_CREATIVE,
+  );
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
@@ -57,6 +67,18 @@ export default function SponsorStorefront() {
 
   const bookingRef = useRef<HTMLDivElement | null>(null);
   const placementsRef = useRef<HTMLDivElement | null>(null);
+
+  // Persist text state to localStorage whenever it changes. Debounced
+  // lightly via requestIdleCallback so we're not writing on every
+  // keystroke.
+  useEffect(() => {
+    const idle = (cb: () => void) => {
+      const w = window as unknown as { requestIdleCallback?: (cb: () => void) => number };
+      if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(cb);
+      else setTimeout(cb, 200);
+    };
+    idle(() => saveDraft(tier, size, selectedDates, creative));
+  }, [tier, size, selectedDates, creative]);
 
   // Fetch next-available Thursday per tier so the rows can surface a
   // "Next available: …" hint. Three parallel calls; errors silently
@@ -182,6 +204,10 @@ export default function SponsorStorefront() {
       }
       const body = (await res.json()) as { checkoutUrl?: string; error?: string };
       if (!body.checkoutUrl) throw new Error(body.error ?? 'No checkout URL');
+      // Checkout session created — the sponsor is leaving for Stripe.
+      // Clear the local draft so they don't see the old form text if
+      // they cancel the payment and return.
+      clearDraft();
       window.location.href = body.checkoutUrl;
     } catch (err) {
       setUploadStatus(null);
@@ -201,24 +227,24 @@ export default function SponsorStorefront() {
         style={{
           maxWidth: 680,
           margin: '0 auto',
-          padding: '64px 24px 0',
+          padding: 'clamp(28px, 6vw, 64px) clamp(18px, 4vw, 24px) 0',
           textAlign: 'center',
         }}
       >
         <Avatar />
         <h1
           style={{
-            fontSize: 'clamp(32px, 8vw, 44px)',
+            fontSize: 'clamp(28px, 7vw, 44px)',
             lineHeight: 1.1,
             margin: 0,
-            marginBottom: 12,
+            marginBottom: 10,
           }}
         >
           Bury Juice
         </h1>
         <p
           style={{
-            fontSize: 17,
+            fontSize: 'clamp(15px, 3.6vw, 17px)',
             lineHeight: 1.5,
             color: 'var(--ink-60)',
             margin: '0 auto',
@@ -227,7 +253,7 @@ export default function SponsorStorefront() {
         >
           The weekly newsletter for Bury St Edmunds. Pick a placement, pick your Thursdays, and be in the next issue.
         </p>
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap', marginTop: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', gap: 6, flexWrap: 'wrap', marginTop: 14 }}>
           {TAGS.map((t) => (
             <span
               key={t}
@@ -361,10 +387,13 @@ export default function SponsorStorefront() {
 function Avatar() {
   const [failed, setFailed] = useState(false);
   const base: React.CSSProperties = {
-    width: 88,
-    height: 88,
-    borderRadius: 20,
-    margin: '0 auto 20px',
+    // Scales from 64px on narrow phones to 88px on desktop —
+    // keeps the hero short on mobile without losing the identity
+    // on bigger screens.
+    width: 'clamp(64px, 14vw, 88px)',
+    height: 'clamp(64px, 14vw, 88px)',
+    borderRadius: 'clamp(14px, 2.5vw, 20px)',
+    margin: '0 auto clamp(14px, 3vw, 20px)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',

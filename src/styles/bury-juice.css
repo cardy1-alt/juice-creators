@@ -259,6 +259,12 @@
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
+/* Sticky bar sits above the iOS home-bar safe area. env(safe-area-
+   inset-bottom) resolves to 0 on browsers that don't need it, so
+   one rule covers both notched and non-notched devices. */
+.bj-sticky-mobile {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
 @media (min-width: 768px) {
   .bj-sticky-mobile {
     display: none !important;
@@ -268,6 +274,6 @@
    bar is present so it doesn't cover the footer text. */
 @media (max-width: 767px) {
   .bj-surface.bj-has-sticky footer {
-    padding-bottom: 96px;
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
   }
 }
