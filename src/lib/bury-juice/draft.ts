@@ -23,6 +23,7 @@ export interface BookingDraft {
   tier: BjTier | null;
   size: BjPackSize;
   selectedDates: string[];
+  pickLater: boolean;
   creative: SerializableCreative;
   savedAt: number;
 }
@@ -51,11 +52,10 @@ export function saveDraft(
   tier: BjTier | null,
   size: BjPackSize,
   selectedDates: string[],
+  pickLater: boolean,
   creative: CreativeFormValue,
 ): void {
   if (!isBrowser()) return;
-  // Only persist if the user has actually typed something — avoids
-  // littering storage with empty drafts on every page load.
   const hasContent =
     !!creative.businessName.trim() ||
     !!creative.contactEmail.trim() ||
@@ -63,7 +63,8 @@ export function saveDraft(
     !!creative.headline.trim() ||
     !!creative.bodyCopy.trim() ||
     !!creative.ctaUrl.trim() ||
-    selectedDates.length > 0;
+    selectedDates.length > 0 ||
+    pickLater;
   if (!hasContent) {
     window.localStorage.removeItem(STORAGE_KEY);
     return;
@@ -73,6 +74,7 @@ export function saveDraft(
       tier,
       size,
       selectedDates,
+      pickLater,
       creative: {
         businessName: creative.businessName,
         contactEmail: creative.contactEmail,

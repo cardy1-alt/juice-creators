@@ -4,6 +4,7 @@ interface Props {
   tier: BjTier;
   size: BjPackSize;
   selectedDates: string[];
+  pickLater: boolean;
   total: number;
   onCheckout: () => void;
   submitting: boolean;
@@ -12,7 +13,7 @@ interface Props {
 }
 
 export function ReviewPay(props: Props) {
-  const { tier, size, selectedDates, total, onCheckout, submitting, submitError, uploadStatus } = props;
+  const { tier, size, selectedDates, pickLater, total, onCheckout, submitting, submitError, uploadStatus } = props;
   const t = BJ_PRICING[tier];
   return (
     <section className="bj-section" style={{ paddingTop: 32 }}>
@@ -32,7 +33,13 @@ export function ReviewPay(props: Props) {
         <Row label="Quantity" value={size === 1 ? 'Single issue' : `${size}-pack`} />
         <Row
           label="Dates"
-          value={selectedDates.length > 0 ? selectedDates.join(', ') : '—'}
+          value={
+            pickLater
+              ? 'Pick later — email your Thursdays'
+              : selectedDates.length > 0
+              ? selectedDates.join(', ')
+              : '—'
+          }
         />
         <div className="bj-rule" style={{ marginTop: 4, marginBottom: 4 }} />
         <div
@@ -58,7 +65,11 @@ export function ReviewPay(props: Props) {
           disabled={submitting}
           style={{ marginTop: 4 }}
         >
-          {submitting ? (uploadStatus ?? 'Preparing checkout…') : `Pay ${formatGBP(total)} with Stripe`}
+          {submitting
+            ? (uploadStatus ?? 'Preparing checkout…')
+            : pickLater
+            ? `Pay ${formatGBP(total)} — book dates later`
+            : `Pay ${formatGBP(total)} with Stripe`}
         </button>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 6 }}>
           <LockIcon />

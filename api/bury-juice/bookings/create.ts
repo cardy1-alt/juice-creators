@@ -34,6 +34,10 @@ interface RequestBody {
   tier: BjTier;
   size: BjPackSize;
   dates: string[];
+  // For packs only: the sponsor paid now but will email their dates
+  // later. bj_packs stores `size` credits; no bj_bookings rows are
+  // written until Jacob manually redeems one via the admin tab.
+  pickLater?: boolean;
   creative: CreativePayload;
 }
 
@@ -52,10 +56,14 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   const { tier, size, dates, creative } = body;
+  const pickLater = body.pickLater === true && size > 1;
   if (!['classified', 'feature', 'primary'].includes(tier)) return jsonError(res, 400, 'invalid tier');
   if (![1, 4, 12].includes(size)) return jsonError(res, 400, 'invalid size');
-  if (dates.length !== size) {
+  if (!pickLater && dates.length !== size) {
     return jsonError(res, 400, `expected ${size} dates, got ${dates.length}`);
+  }
+  if (pickLater && dates.length > 0) {
+    return jsonError(res, 400, 'pickLater must be sent without dates');
   }
   if (!creative?.contact_email || !creative.business_name || !creative.headline) {
     return jsonError(res, 400, 'creative is incomplete');
@@ -67,11 +75,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   let step = 'pre-validation';
   try {
     // 0. Capacity check — refuse the booking if any requested date
-    //    would exceed TIER_CAPACITY for this tier. Not a race-proof
-    //    guard (the storefront's availability refresh catches 99%
-    //    of clashes) but stops the double-booking edge case when
-    //    two sponsors hit checkout simultaneously.
+    //    would exceed TIER_CAPACITY for this tier. Skipped entirely
+    //    when pickLater is on because there are no dates to check.
     step = 'capacity-check';
+    if (!pickLater && dates.length > 0) {
     const datesList = dates.map((d) => `"${d}"`).join(',');
     const existingCounts = await supabaseFetch<{ issue_date: string }[]>(
       `bj_bookings?select=issue_date&tier=eq.${tier}&status=neq.cancelled&issue_date=in.(${datesList})`,
@@ -85,6 +92,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
       if ((countByDate.get(d) ?? 0) >= cap) {
         return jsonError(res, 409, `${d} is already full for ${tier}`);
       }
+    }
     }
 
     // 1. Find or create the business row. The Nayba `businesses` table
@@ -162,7 +170,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         business_id: businessId,
         tier,
         size,
-        credits_remaining: 0,
+        credits_remaining: pickLater ? size : 0,
         amount_paid_gbp: amountPaid,
         stripe_payment_intent: 'pending',
         dashboard_token: token,
@@ -172,27 +180,30 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const packId = pack[0].id;
 
     // 3. Create bookings for each chosen date (status starts as
-    //    'pending_creative' — webhook flips to 'confirmed'). Each
-    //    row gets the creative fields attached.
+    //    'pending_creative' — webhook flips to 'confirmed'). On
+    //    pickLater we skip this step entirely — the pack carries
+    //    the credits, and Jacob redeems them from the admin tab.
     step = 'create-bookings';
-    const rows = dates.map((d) => ({
-      business_id: businessId,
-      tier,
-      issue_date: d,
-      source: 'paid_storefront',
-      status: 'pending_creative',
-      pack_id: packId,
-      amount_paid_gbp: Math.round(amountPaid / size),
-      headline: creative.headline,
-      body_copy: creative.body_copy,
-      cta_url: creative.cta_url,
-      image_url: creative.image_url,
-      logo_url: creative.logo_url,
-    }));
-    await supabaseFetch('bj_bookings', {
-      method: 'POST',
-      body: JSON.stringify(rows),
-    });
+    if (!pickLater && dates.length > 0) {
+      const rows = dates.map((d) => ({
+        business_id: businessId,
+        tier,
+        issue_date: d,
+        source: 'paid_storefront',
+        status: 'pending_creative',
+        pack_id: packId,
+        amount_paid_gbp: Math.round(amountPaid / size),
+        headline: creative.headline,
+        body_copy: creative.body_copy,
+        cta_url: creative.cta_url,
+        image_url: creative.image_url,
+        logo_url: creative.logo_url,
+      }));
+      await supabaseFetch('bj_bookings', {
+        method: 'POST',
+        body: JSON.stringify(rows),
+      });
+    }
 
     // 4. Stripe Checkout session — hosted (redirect) mode. Keeps
     //    the client surface Stripe-free, which means no publishable

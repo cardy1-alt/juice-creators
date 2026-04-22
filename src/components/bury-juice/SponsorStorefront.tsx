@@ -54,6 +54,7 @@ export default function SponsorStorefront() {
   const [tier, setTier] = useState<BjTier | null>(initialDraft?.tier ?? null);
   const [size, setSize] = useState<BjPackSize>(initialDraft?.size ?? 1);
   const [selectedDates, setSelectedDates] = useState<string[]>(initialDraft?.selectedDates ?? []);
+  const [pickLater, setPickLater] = useState<boolean>(initialDraft?.pickLater ?? false);
   const [creative, setCreative] = useState<CreativeFormValue>(
     initialDraft
       ? { ...EMPTY_CREATIVE, ...initialDraft.creative, imageFile: null, logoFile: null }
@@ -77,8 +78,8 @@ export default function SponsorStorefront() {
       if (typeof w.requestIdleCallback === 'function') w.requestIdleCallback(cb);
       else setTimeout(cb, 200);
     };
-    idle(() => saveDraft(tier, size, selectedDates, creative));
-  }, [tier, size, selectedDates, creative]);
+    idle(() => saveDraft(tier, size, selectedDates, pickLater, creative));
+  }, [tier, size, selectedDates, pickLater, creative]);
 
   // Fetch next-available Thursday per tier so the rows can surface a
   // "Next available: …" hint. Three parallel calls; errors silently
@@ -132,12 +133,15 @@ export default function SponsorStorefront() {
 
   const errors = tier ? validateCreative(creative, tier) : {};
   const creativeValid = tier ? Object.keys(errors).length === 0 : false;
-  const datesValid = selectedDates.length === size;
+  // pickLater only applies to 4/12-packs; singles always require a
+  // date. Relax the check when the checkbox is on for a pack.
+  const datesValid = pickLater && size > 1 ? true : selectedDates.length === size;
 
   function handleTierSelect(t: BjTier) {
     setTier(t);
     setSize(1);
     setSelectedDates([]);
+    setPickLater(false);
     setSubmitError(null);
     setTimeout(() => {
       bookingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -152,7 +156,7 @@ export default function SponsorStorefront() {
       return;
     }
     if (!datesValid) {
-      setSubmitError(`Please pick ${size} date${size === 1 ? '' : 's'}.`);
+      setSubmitError(`Please pick ${size} date${size === 1 ? '' : 's'} — or tick "I'll pick later".`);
       return;
     }
     setSubmitting(true);
@@ -185,7 +189,8 @@ export default function SponsorStorefront() {
         body: JSON.stringify({
           tier,
           size,
-          dates: selectedDates,
+          dates: pickLater && size > 1 ? [] : selectedDates,
+          pickLater: pickLater && size > 1,
           creative: {
             business_name: creative.businessName,
             contact_email: creative.contactEmail,
@@ -355,6 +360,8 @@ export default function SponsorStorefront() {
               onSizeChange={setSize}
               selectedDates={selectedDates}
               onSelectedDatesChange={setSelectedDates}
+              pickLater={pickLater}
+              onPickLaterChange={setPickLater}
             />
             <CreativeForm tier={tier} value={creative} onChange={setCreative} errors={errors} />
             <PlacementPreview tier={tier} value={creative} />
@@ -362,6 +369,7 @@ export default function SponsorStorefront() {
               tier={tier}
               size={size}
               selectedDates={selectedDates}
+              pickLater={pickLater && size > 1}
               total={total}
               onCheckout={handleCheckout}
               submitting={submitting}

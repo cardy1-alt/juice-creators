@@ -15,6 +15,8 @@ interface Props {
   onSizeChange: (size: BjPackSize) => void;
   selectedDates: string[];
   onSelectedDatesChange: (dates: string[]) => void;
+  pickLater: boolean;
+  onPickLaterChange: (v: boolean) => void;
 }
 
 const SIZES: BjPackSize[] = [1, 4, 12];
@@ -49,7 +51,7 @@ function formatDateLong(iso: string): string {
 }
 
 export function BookingFlow(props: Props) {
-  const { tier, size, onSizeChange, selectedDates, onSelectedDatesChange } = props;
+  const { tier, size, onSizeChange, selectedDates, onSelectedDatesChange, pickLater, onPickLaterChange } = props;
   const [availability, setAvailability] = useState<Map<string, BjAvailabilityEntry> | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -128,11 +130,43 @@ export function BookingFlow(props: Props) {
         </div>
       </div>
 
-      <div>
-        <div className="bj-label" style={{ marginBottom: 10 }}>
-          Pick {size} Thursday{size === 1 ? '' : 's'}
-          {remainingSlots > 0 && ` — ${remainingSlots} to go`}
-        </div>
+      {size > 1 && (
+        <label
+          style={{
+            display: 'flex',
+            gap: 12,
+            alignItems: 'flex-start',
+            padding: 14,
+            border: '1px solid var(--border-color)',
+            borderRadius: 'var(--r-card)',
+            background: pickLater ? 'var(--terra-light)' : 'var(--card)',
+            marginBottom: 16,
+            cursor: 'pointer',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={pickLater}
+            onChange={(e) => onPickLaterChange(e.target.checked)}
+            style={{ marginTop: 2, width: 18, height: 18, accentColor: 'var(--terra)' }}
+          />
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--ink)' }}>
+              I'll pick my Thursdays later
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--ink-60)', marginTop: 2, lineHeight: 1.45 }}>
+              Reserve your {size} credits now, email us your chosen dates any time in the next 6 months.
+            </div>
+          </div>
+        </label>
+      )}
+
+      {!pickLater && (
+        <div>
+          <div className="bj-label" style={{ marginBottom: 10 }}>
+            Pick {size} Thursday{size === 1 ? '' : 's'}
+            {remainingSlots > 0 && ` — ${remainingSlots} to go`}
+          </div>
           {loading ? (
             <div style={{ padding: 20, color: 'var(--ink-60)' }}>Loading availability…</div>
           ) : (
@@ -200,7 +234,8 @@ export function BookingFlow(props: Props) {
               })}
             </div>
           )}
-      </div>
+        </div>
+      )}
 
       <div
         style={{
@@ -220,7 +255,7 @@ export function BookingFlow(props: Props) {
           <div style={{ fontSize: 13, color: 'var(--ink-60)' }}>Running total</div>
           <div style={{ fontSize: 13, color: 'var(--ink-60)', marginTop: 2 }}>
             {t.name} · {size === 1 ? 'single issue' : `${size}-pack`} ·{' '}
-            {selectedDates.length}/{size} picked
+            {pickLater ? 'dates by email' : `${selectedDates.length}/${size} picked`}
           </div>
         </div>
         <div style={{ fontWeight: 600, fontSize: 26, letterSpacing: '-0.02em' }}>

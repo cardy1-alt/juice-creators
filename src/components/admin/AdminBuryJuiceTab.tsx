@@ -29,6 +29,23 @@ interface BusinessRow {
 
 type ViewMode = 'calendar' | 'table';
 
+interface PendingPack {
+  id: string;
+  business_id: string;
+  tier: BjTier;
+  size: number;
+  credits_remaining: number;
+  amount_paid_gbp: number;
+  expires_at: string;
+  created_at: string;
+}
+
+interface AddingContext {
+  business_id: string;
+  tier: BjTier;
+  pack_id: string;
+}
+
 const TIER_ORDER: BjTier[] = ['primary', 'feature', 'classified'];
 const WEEKS_AHEAD = 12;
 
@@ -42,14 +59,16 @@ const WEEKS_AHEAD = 12;
 export default function AdminBuryJuiceTab() {
   const [bookings, setBookings] = useState<BjBooking[] | null>(null);
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
+  const [pendingPacks, setPendingPacks] = useState<PendingPack[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewMode>('calendar');
   const [editing, setEditing] = useState<BjBooking | null>(null);
   const [adding, setAdding] = useState(false);
+  const [addingContext, setAddingContext] = useState<AddingContext | null>(null);
   const [peekIso, setPeekIso] = useState<string | null>(null);
 
   const load = useCallback(async () => {
-    const [bookingsRes, businessesRes] = await Promise.all([
+    const [bookingsRes, businessesRes, packsRes] = await Promise.all([
       supabase
         .from('bj_bookings')
         .select('*')
@@ -59,12 +78,21 @@ export default function AdminBuryJuiceTab() {
         .from('businesses')
         .select('id,name,contact_email')
         .order('name', { ascending: true }),
+      // Packs with credits still owed — the sponsor paid pickLater
+      // and will email their Thursdays, so we show them here so
+      // Jacob can redeem credits as the emails arrive.
+      supabase
+        .from('bj_packs')
+        .select('id,business_id,tier,size,credits_remaining,amount_paid_gbp,expires_at,created_at')
+        .gt('credits_remaining', 0)
+        .order('created_at', { ascending: false }),
     ]);
     if (bookingsRes.error) {
       setError(bookingsRes.error.message);
       return;
     }
     setBookings((bookingsRes.data ?? []) as BjBooking[]);
+    setPendingPacks((packsRes.data ?? []) as PendingPack[]);
     setBusinesses((businessesRes.data ?? []) as BusinessRow[]);
   }, []);
 
@@ -115,6 +143,17 @@ export default function AdminBuryJuiceTab() {
         <RevenueCard label="YTD" amount={revenue.ytd} />
       </div>
 
+      {pendingPacks.length > 0 && (
+        <PendingPacksStrip
+          packs={pendingPacks}
+          businessMap={businessMap}
+          onBookDate={(pack) => {
+            setAddingContext({ business_id: pack.business_id, tier: pack.tier, pack_id: pack.id });
+            setAdding(true);
+          }}
+        />
+      )}
+
       <div
         style={{
           display: 'flex',
@@ -141,7 +180,10 @@ export default function AdminBuryJuiceTab() {
         </div>
         <button
           type="button"
-          onClick={() => setAdding(true)}
+          onClick={() => {
+            setAddingContext(null);
+            setAdding(true);
+          }}
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -184,6 +226,7 @@ export default function AdminBuryJuiceTab() {
           }}
           onAddToIssue={() => {
             setPeekIso(null);
+            setAddingContext(null);
             setAdding(true);
           }}
         />
@@ -193,14 +236,17 @@ export default function AdminBuryJuiceTab() {
         <BookingEditor
           booking={editing}
           adding={adding}
+          addingContext={addingContext}
           businesses={businesses}
           onClose={() => {
             setEditing(null);
             setAdding(false);
+            setAddingContext(null);
           }}
           onSaved={() => {
             setEditing(null);
             setAdding(false);
+            setAddingContext(null);
             load();
           }}
         />
@@ -927,21 +973,26 @@ function Td({ children, style }: { children: React.ReactNode; style?: React.CSSP
 function BookingEditor({
   booking,
   adding,
+  addingContext,
   businesses,
   onClose,
   onSaved,
 }: {
   booking: BjBooking | null;
   adding: boolean;
+  addingContext: AddingContext | null;
   businesses: BusinessRow[];
   onClose: () => void;
   onSaved: () => void;
 }) {
+  // When adding from a pending pack, pre-fill the business + tier +
+  // source so Jacob doesn't re-pick them. pack_id is attached on save
+  // and the pack's credits_remaining decrements by one.
   const [form, setForm] = useState({
-    business_id: booking?.business_id ?? (businesses[0]?.id ?? ''),
-    tier: (booking?.tier ?? 'classified') as BjTier,
+    business_id: booking?.business_id ?? addingContext?.business_id ?? (businesses[0]?.id ?? ''),
+    tier: (booking?.tier ?? addingContext?.tier ?? 'classified') as BjTier,
     issue_date: booking?.issue_date ?? nextNThursdays(1)[0],
-    source: booking?.source ?? 'comp',
+    source: booking?.source ?? (addingContext ? 'paid_storefront' : 'comp'),
     status: booking?.status ?? 'confirmed',
     headline: booking?.headline ?? '',
     body_copy: booking?.body_copy ?? '',
@@ -956,7 +1007,7 @@ function BookingEditor({
   async function save() {
     setSaving(true);
     setErr(null);
-    const payload = {
+    const payload: Record<string, unknown> = {
       business_id: form.business_id,
       tier: form.tier,
       issue_date: form.issue_date,
@@ -969,14 +1020,35 @@ function BookingEditor({
       logo_url: form.logo_url || null,
       amount_paid_gbp: form.amount_paid_gbp,
     };
+    // Attach the pack if we're redeeming a credit from a pending pack.
+    if (!booking && addingContext) {
+      payload.pack_id = addingContext.pack_id;
+    }
     const res = booking
       ? await supabase.from('bj_bookings').update(payload).eq('id', booking.id)
       : await supabase.from('bj_bookings').insert(payload);
-    setSaving(false);
     if (res.error) {
+      setSaving(false);
       setErr(res.error.message);
       return;
     }
+    // Decrement credits_remaining on the pack after a successful
+    // redemption. Postgres can't do `column - 1` through PostgREST's
+    // PATCH without an RPC, so we read-modify-write — cheap enough
+    // for an admin action.
+    if (!booking && addingContext) {
+      const { data: packRow } = await supabase
+        .from('bj_packs')
+        .select('credits_remaining')
+        .eq('id', addingContext.pack_id)
+        .single();
+      const next = Math.max(0, (packRow?.credits_remaining ?? 1) - 1);
+      await supabase
+        .from('bj_packs')
+        .update({ credits_remaining: next })
+        .eq('id', addingContext.pack_id);
+    }
+    setSaving(false);
     onSaved();
   }
 
@@ -1270,3 +1342,94 @@ const inputStyle: React.CSSProperties = {
   color: 'var(--ink)',
 };
 const selectStyle = inputStyle;
+
+// ─── Pending packs strip ──────────────────────────────────────────
+// Packs with credits_remaining > 0 — sponsors who paid but haven't
+// chosen their Thursdays yet. Shows at the top of the admin tab so
+// Jacob sees who owes him a schedule.
+function PendingPacksStrip({
+  packs,
+  businessMap,
+  onBookDate,
+}: {
+  packs: PendingPack[];
+  businessMap: Record<string, BusinessRow>;
+  onBookDate: (pack: PendingPack) => void;
+}) {
+  return (
+    <div
+      style={{
+        background: 'var(--terra-light)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 20,
+        display: 'grid',
+        gap: 10,
+      }}
+    >
+      <div
+        style={{
+          fontSize: 11,
+          fontWeight: 600,
+          textTransform: 'uppercase',
+          letterSpacing: '0.08em',
+          color: 'var(--terra)',
+        }}
+      >
+        Packs awaiting dates · {packs.length}
+      </div>
+      <div style={{ display: 'grid', gap: 8 }}>
+        {packs.map((p) => {
+          const biz = businessMap[p.business_id];
+          const expires = new Date(p.expires_at);
+          const daysLeft = Math.max(0, Math.round((expires.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+          return (
+            <div
+              key={p.id}
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--border-color)',
+                borderRadius: 10,
+                padding: 12,
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: 12,
+                flexWrap: 'wrap',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+                <BusinessPill id={p.business_id} name={biz?.name ?? '—'} />
+                <span style={{ fontSize: 13, color: 'var(--ink-60)' }}>
+                  {BJ_PRICING[p.tier].name} ·{' '}
+                  <strong style={{ color: 'var(--ink)' }}>
+                    {p.credits_remaining}/{p.size}
+                  </strong>{' '}
+                  credits left · expires in {daysLeft}d
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => onBookDate(p)}
+                style={{
+                  padding: '7px 12px',
+                  borderRadius: 8,
+                  border: '1px solid var(--terra)',
+                  background: 'var(--terra)',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  fontSize: 12,
+                  fontWeight: 600,
+                  fontFamily: 'inherit',
+                }}
+              >
+                Book a date
+              </button>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
