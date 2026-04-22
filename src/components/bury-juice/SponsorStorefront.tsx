@@ -247,7 +247,7 @@ export default function SponsorStorefront() {
 
       {/* ── Stats ──────────────────────────────────────────────── */}
       <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 0' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
           <StatCard label="Subscribers" value={BJ_STATS.subscribers.toLocaleString('en-GB')} />
           <StatCard label="Open rate" value={`${Math.round(BJ_STATS.open_rate * 100)}%`} />
           <StatCard label="Click-through" value={`${(BJ_STATS.ctr * 100).toFixed(1)}%`} />
@@ -510,7 +510,7 @@ function PlacementRow({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(96px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(104px, 1fr))',
             gap: 8,
           }}
         >
