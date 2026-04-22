@@ -8,6 +8,20 @@
    ────────────────────────────────────────────────────────── */
 
 .bj-surface {
+  /* Bury Juice brand accent. Overrides Nayba's terra within the
+     storefront funnel only — every inline `var(--terra)` in the
+     Bury Juice components picks up #A20052 here, while the Nayba
+     admin (outside .bj-surface) keeps its own terra. Shade family
+     derived from the base to match Nayba's alpha + tint convention. */
+  --terra:       #A20052;
+  --terra-hover: #8B0046;
+  --terra-light: rgba(162, 0, 82, 0.08);
+  --terra-10:    rgba(162, 0, 82, 0.10);
+  --terra-15:    rgba(162, 0, 82, 0.15);
+  --terra-20:    rgba(162, 0, 82, 0.20);
+  --terra-40:    rgba(162, 0, 82, 0.40);
+  --terra-ring:  rgba(162, 0, 82, 0.30);
+
   /* Nayba tokens exposed under the bj-* names the components use.
      This is the entire reskin lever — swapping any value here
      flows through every Bury Juice component without edits. */
