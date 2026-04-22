@@ -208,8 +208,8 @@ export default function SponsorStorefront() {
         <Avatar />
         <h1
           style={{
-            fontSize: 'clamp(28px, 5vw, 40px)',
-            lineHeight: 1.15,
+            fontSize: 'clamp(32px, 8vw, 44px)',
+            lineHeight: 1.1,
             margin: 0,
             marginBottom: 12,
           }}
@@ -218,8 +218,8 @@ export default function SponsorStorefront() {
         </h1>
         <p
           style={{
-            fontSize: 16,
-            lineHeight: 1.55,
+            fontSize: 17,
+            lineHeight: 1.5,
             color: 'var(--ink-60)',
             margin: '0 auto',
             maxWidth: 520,
@@ -559,26 +559,13 @@ function PlacementRow({
           />
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <button
-            type="button"
-            onClick={onBook}
-            style={{
-              padding: '9px 18px',
-              borderRadius: 'var(--r-button)',
-              border: `1px solid ${selected ? 'var(--terra)' : 'var(--ink)'}`,
-              background: selected ? 'var(--terra)' : 'var(--ink)',
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: 13,
-              fontWeight: 600,
-              fontFamily: 'inherit',
-              whiteSpace: 'nowrap',
-            }}
-          >
-            {selected ? 'Selected' : 'Book now'}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onBook}
+          className="bj-btn bj-btn--block"
+        >
+          {selected ? `${t.name} selected — scroll down` : `Book ${t.name} · from ${formatGBP(t.single)}`}
+        </button>
       </div>
     </div>
   );
@@ -629,15 +616,15 @@ function PriceStep({ label, sublabel, price }: { label: string; sublabel: string
       style={{
         border: '1px solid var(--border-color)',
         borderRadius: 'var(--r-input)',
-        padding: '8px 10px',
+        padding: '10px 12px',
         background: 'var(--shell)',
         minWidth: 0,
       }}
     >
-      <div style={{ fontSize: 11, color: 'var(--ink-60)', fontWeight: 500 }}>{label}</div>
+      <div style={{ fontSize: 12, color: 'var(--ink-60)', fontWeight: 500 }}>{label}</div>
       <div
         style={{
-          fontSize: 15,
+          fontSize: 17,
           fontWeight: 700,
           color: 'var(--ink)',
           letterSpacing: '-0.01em',
@@ -648,7 +635,7 @@ function PriceStep({ label, sublabel, price }: { label: string; sublabel: string
         {price}
       </div>
       {sublabel && (
-        <div style={{ fontSize: 10, color: 'var(--terra)', fontWeight: 600, marginTop: 2 }}>
+        <div style={{ fontSize: 11, color: 'var(--terra)', fontWeight: 600, marginTop: 3 }}>
           {sublabel}
         </div>
       )}
@@ -683,25 +670,11 @@ function StickyCta({ onClick }: { onClick: () => void }) {
       <button
         type="button"
         onClick={onClick}
-        style={{
-          display: 'flex',
-          width: '100%',
-          padding: '12px 16px',
-          borderRadius: 'var(--r-button)',
-          border: 'none',
-          background: 'var(--terra)',
-          color: '#fff',
-          cursor: 'pointer',
-          fontSize: 14,
-          fontWeight: 600,
-          fontFamily: 'inherit',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          gap: 8,
-        }}
+        className="bj-btn bj-btn--block"
+        style={{ justifyContent: 'space-between' }}
       >
         <span>Book a placement</span>
-        <span style={{ fontWeight: 500, opacity: 0.85, fontSize: 13 }}>
+        <span style={{ fontWeight: 500, opacity: 0.9, fontSize: 14 }}>
           from {formatGBP(BJ_PRICING.classified.single)}
         </span>
       </button>

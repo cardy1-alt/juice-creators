@@ -51,8 +51,14 @@ export function ReviewPay(props: Props) {
         {uploadStatus && (
           <div style={{ color: 'var(--ink-60)', fontSize: 14, marginTop: 4 }}>{uploadStatus}</div>
         )}
-        <button type="button" className="bj-btn" onClick={onCheckout} disabled={submitting} style={{ marginTop: 4 }}>
-          {submitting ? (uploadStatus ?? 'Preparing checkout…') : 'Pay securely with Stripe'}
+        <button
+          type="button"
+          className="bj-btn bj-btn--block"
+          onClick={onCheckout}
+          disabled={submitting}
+          style={{ marginTop: 4 }}
+        >
+          {submitting ? (uploadStatus ?? 'Preparing checkout…') : `Pay ${formatGBP(total)} with Stripe`}
         </button>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, marginTop: 6 }}>
           <LockIcon />

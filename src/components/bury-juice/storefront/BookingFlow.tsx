@@ -117,9 +117,8 @@ export function BookingFlow(props: Props) {
                 onClick={() => onSizeChange(s)}
                 className={`bj-btn${isSelected ? '' : ' bj-btn--ghost'}`}
                 style={{
-                  borderColor: isSelected ? 'var(--terra)' : 'var(--border-color)',
-                  color: isSelected ? '#fff' : 'var(--ink)',
-                  fontWeight: 500,
+                  borderColor: isSelected ? 'var(--terra)' : 'var(--border-color-hover)',
+                  flex: '1 1 140px',
                 }}
               >
                 {s === 1 ? 'Single' : `${s}-pack`} · {formatGBP(priceForTierAndSize(tier, s))}

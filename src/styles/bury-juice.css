@@ -1,18 +1,17 @@
 /* ──────────────────────────────────────────────────────────
-   BURY JUICE — Nayba-styled sponsor surface
+   BURY JUICE — sponsor storefront surface
 
-   The sponsor storefront is a Nayba-hosted page, not a separate
-   brand. We alias the old --bj-* variables to Nayba tokens so
-   every component picks up the Nayba palette, typography and
-   shape language automatically.
+   Scoped to `.bj-surface`. The storefront is its own product —
+   we borrow some Nayba tokens (Instrument Sans, shell background,
+   ink text) so it sits comfortably next to the admin, but it is
+   free to diverge on rhythm, weight and CTA treatment.
    ────────────────────────────────────────────────────────── */
 
 .bj-surface {
   /* Bury Juice brand accent. Overrides Nayba's terra within the
      storefront funnel only — every inline `var(--terra)` in the
      Bury Juice components picks up #A20052 here, while the Nayba
-     admin (outside .bj-surface) keeps its own terra. Shade family
-     derived from the base to match Nayba's alpha + tint convention. */
+     admin (outside .bj-surface) keeps its own terra. */
   --terra:       #A20052;
   --terra-hover: #8B0046;
   --terra-light: rgba(162, 0, 82, 0.08);
@@ -22,9 +21,7 @@
   --terra-40:    rgba(162, 0, 82, 0.40);
   --terra-ring:  rgba(162, 0, 82, 0.30);
 
-  /* Nayba tokens exposed under the bj-* names the components use.
-     This is the entire reskin lever — swapping any value here
-     flows through every Bury Juice component without edits. */
+  /* Legacy --bj-* aliases for any component that still uses them. */
   --bj-crimson:  var(--terra);
   --bj-gold:     var(--golden-mist);
   --bj-cream:    var(--shell);
@@ -38,10 +35,13 @@
   background: var(--shell);
   color: var(--ink);
   min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
-/* h1 — the main page title — is the only element that uses Hornbill.
-   h2/h3/h4 stay on Instrument Sans, matching the rest of Nayba. */
+/* h1 — the main page title — uses Hornbill. Everything else stays
+   on Instrument Sans for readability at small sizes. */
 .bj-surface h1 {
   font-family: 'Hornbill', var(--font-sans);
   font-weight: 700;
@@ -62,27 +62,36 @@
   margin: 0;
 }
 
+/* Default text/element colour inside the surface. Button colour is
+   set by the .bj-btn rules further down — .bj-surface .bj-btn has
+   higher specificity so buttons stay white-on-terra. */
 .bj-surface p,
 .bj-surface li,
 .bj-surface label,
 .bj-surface input,
 .bj-surface textarea,
 .bj-surface select,
-.bj-surface button,
 .bj-surface a {
   font-family: var(--font-sans);
   color: var(--ink);
 }
+.bj-surface button {
+  font-family: var(--font-sans);
+}
 
-/* ── Buttons ── */
-.bj-btn {
+/* ── Buttons ─────────────────────────────────────────────────
+   Scoped to .bj-surface so the text colour wins over the
+   generic button rule above without !important. Touch target
+   comfortably clears 44px on every size. */
+.bj-surface .bj-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
-  font-weight: var(--weight-semibold);
-  font-size: var(--text-button);
+  padding: 14px 20px;
+  min-height: 48px;
+  font-weight: 600;
+  font-size: 15px;
   letter-spacing: 0;
   text-transform: none;
   border: 1px solid var(--terra);
@@ -91,22 +100,46 @@
   cursor: pointer;
   border-radius: var(--r-button);
   text-decoration: none;
-  transition: opacity 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.06s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(162, 0, 82, 0.14);
 }
-.bj-btn:hover {
-  opacity: 0.85;
+.bj-surface .bj-btn:hover {
+  background: var(--terra-hover);
+  border-color: var(--terra-hover);
+  box-shadow: 0 4px 12px rgba(162, 0, 82, 0.2);
 }
-.bj-btn:disabled {
-  opacity: 0.4;
+.bj-surface .bj-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(162, 0, 82, 0.14);
+}
+.bj-surface .bj-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
-.bj-btn--ghost {
+
+.bj-surface .bj-btn--ghost {
   background: transparent;
   color: var(--terra);
+  box-shadow: none;
 }
-.bj-btn--ghost:hover {
+.bj-surface .bj-btn--ghost:hover {
   background: var(--terra-light);
-  opacity: 1;
+  color: var(--terra);
+  border-color: var(--terra);
+  box-shadow: none;
+}
+
+/* Block-level primary CTA (full-width, taller) used on the mobile
+   sticky bar and for the main Pay button. */
+.bj-surface .bj-btn--block {
+  display: flex;
+  width: 100%;
+  padding: 16px 20px;
+  min-height: 52px;
+  font-size: 16px;
+  font-weight: 700;
 }
 
 /* ── Inputs ── */
@@ -114,13 +147,18 @@
 .bj-textarea,
 .bj-select {
   width: 100%;
-  padding: 12px 14px;
+  padding: 14px 14px;
+  min-height: 48px;
   border: 1px solid var(--border-color-input);
   background: var(--card);
-  font-size: var(--text-body);
+  font-size: 16px; /* 16px prevents iOS zoom on focus */
   color: var(--ink);
   border-radius: var(--r-input);
   font-family: inherit;
+}
+.bj-textarea {
+  min-height: 96px;
+  padding: 12px 14px;
 }
 .bj-input:focus,
 .bj-textarea:focus,
@@ -133,8 +171,8 @@
 /* ── Labels ── */
 .bj-label {
   display: block;
-  font-size: var(--text-label);
-  font-weight: var(--weight-semibold);
+  font-size: 13px;
+  font-weight: 600;
   letter-spacing: 0;
   text-transform: none;
   margin-bottom: 8px;
@@ -149,7 +187,7 @@
 }
 @media (max-width: 680px) {
   .bj-section {
-    padding: 40px 20px;
+    padding: 36px 18px;
   }
 }
 
@@ -160,7 +198,7 @@
   margin: 0;
 }
 
-/* ── Wordmark (uses Instrument Serif like Nayba's header) ── */
+/* ── Wordmark ── */
 .bj-wordmark {
   font-family: var(--font-serif);
   font-weight: 400;
@@ -206,7 +244,7 @@
   color: var(--ink);
 }
 
-/* ── Admin side-peek animations ───────────────────────────── */
+/* ── Admin side-peek animations ── */
 @keyframes bjPeekOverlay {
   from { opacity: 0; }
   to   { opacity: 1; }
@@ -216,15 +254,20 @@
   to   { transform: translateX(0); }
 }
 
-/* ── Sticky mobile CTA on the storefront ──────────────────── */
+/* ── Sticky mobile CTA on the storefront ── */
 @keyframes bjStickyUp {
   from { transform: translateY(100%); }
   to   { transform: translateY(0); }
 }
-/* Only surface on narrow viewports — desktop has room for the
-   rows themselves to do the work. */
 @media (min-width: 768px) {
   .bj-sticky-mobile {
     display: none !important;
+  }
+}
+/* Extra bottom padding on the last page section when the sticky
+   bar is present so it doesn't cover the footer text. */
+@media (max-width: 767px) {
+  .bj-surface.bj-has-sticky footer {
+    padding-bottom: 96px;
   }
 }
