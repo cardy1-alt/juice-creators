@@ -16,6 +16,7 @@ interface Applicant {
   status: string;
   applied_at: string;
   selected_at: string | null;
+  previously_selected_at: string | null;
   creators?: {
     id: string;
     name: string;
@@ -203,7 +204,12 @@ export default function AdminApplicantsTab() {
   const handleDecline = async (applicant: Applicant) => {
     setActingOn(applicant.id);
     const wasSelected = applicant.status === 'selected';
-    const { error } = await supabase.from('applications').update({ status: 'declined' }).eq('id', applicant.id);
+    const updates: Record<string, any> = { status: 'declined' };
+    // Record the ghost so future lists can flag this creator.
+    if (wasSelected && applicant.selected_at) {
+      updates.previously_selected_at = applicant.selected_at;
+    }
+    const { error } = await supabase.from('applications').update(updates).eq('id', applicant.id);
     if (error) { showToast('Failed to decline'); setActingOn(null); return; }
     // If the creator was mid-selection, send the same selection_expired
     // email the cron would fire on 48h timeout so they're never left in
@@ -383,6 +389,20 @@ export default function AdminApplicantsTab() {
       </span>
     ) : null;
 
+    // Warn the admin if this creator was once selected on this
+    // campaign but never confirmed — avoids accidentally re-picking a
+    // known ghost. Skip when the creator is already selected/confirmed
+    // now (no useful signal in that state).
+    const previouslyGhosted = !!a.previously_selected_at
+      && (a.status === 'interested' || a.status === 'declined');
+    const previouslyGhostedTag = previouslyGhosted ? (
+      <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold"
+        style={{ background: 'rgba(192,57,43,0.10)', color: 'var(--destructive)' }}
+        title="Previously selected on this campaign but didn't confirm within 48h">
+        <Clock size={10} /> Didn't confirm before
+      </span>
+    ) : null;
+
     const pastReels = reelsByCreator[a.creator_id] || [];
     const pastReelsTag = pastReels.length > 0 ? (
       <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-[6px] text-[11px] font-semibold"
@@ -500,6 +520,7 @@ export default function AdminApplicantsTab() {
                 L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
               </span>
             )}
+            {previouslyGhostedTag}
             {firstTimerTag}
             {pastReelsTag}
             {commitmentTag}
@@ -556,6 +577,7 @@ export default function AdminApplicantsTab() {
                     L{a.creators?.level || 1} {a.creators?.level_name || LEVEL_NAMES[a.creators?.level || 1]}
                   </span>
                 )}
+                {previouslyGhostedTag}
                 {firstTimerTag}
                 {pastReelsTag}
                 {commitmentTag}

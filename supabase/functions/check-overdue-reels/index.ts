@@ -164,9 +164,12 @@ Deno.serve(async (_req: Request) => {
   // 4. Auto-decline selections that the creator didn't confirm within 48 hours.
   // This frees the spot back up for another creator and keeps the pipeline moving.
   // Also notifies the brand owner + admin so the reopened slot doesn't sit unnoticed.
+  // Preserve selected_at into previously_selected_at so the UI can flag
+  // these creators as prior ghosts next time they appear in a reserve
+  // pool.
   const { data: staleSelections } = await supabase
     .from('applications')
-    .select('id, creator_id, campaign_id, campaigns(title, brand_id, businesses(id, owner_email, name)), creators(name, display_name)')
+    .select('id, creator_id, campaign_id, selected_at, campaigns(title, brand_id, businesses(id, owner_email, name)), creators(name, display_name)')
     .eq('status', 'selected')
     .lt('selected_at', fortyEightHoursAgo.toISOString());
 
@@ -174,7 +177,10 @@ Deno.serve(async (_req: Request) => {
     for (const app of staleSelections) {
       const { error: updErr } = await supabase
         .from('applications')
-        .update({ status: 'declined' })
+        .update({
+          status: 'declined',
+          previously_selected_at: (app as any).selected_at,
+        })
         .eq('id', app.id);
       if (updErr) continue;
 

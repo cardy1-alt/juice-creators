@@ -102,6 +102,7 @@ interface PeekAppLike {
   creator_id: string;
   status: string;
   selected_at: string | null;
+  previously_selected_at: string | null;
   applied_at: string;
   pitch: string | null;
   creators?: { name: string; display_name: string | null; instagram_handle: string; level: number | null; avatar_url: string | null };
@@ -205,11 +206,20 @@ function SelectionSection({ campaignId: _campaignId, applications, target, onSel
             {reserves.map(a => {
               const name = a.creators?.display_name || a.creators?.name || 'Creator';
               const handle = a.creators?.instagram_handle?.replace('@', '') || '';
+              const ghosted = !!a.previously_selected_at;
               return (
-                <div key={a.id} className="flex items-start justify-between gap-3 py-2 px-3 rounded-[8px] bg-[rgba(42,32,24,0.02)]">
+                <div key={a.id} className="flex items-start justify-between gap-3 py-2 px-3 rounded-[8px]"
+                  style={{ background: ghosted ? 'rgba(192,57,43,0.06)' : 'rgba(42,32,24,0.02)' }}>
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
                     <p className="text-[12px] text-[var(--ink-50)] truncate">@{handle}{a.creators?.level ? ` · L${a.creators.level}` : ''}</p>
+                    {ghosted && (
+                      <span className="inline-flex items-center gap-1 mt-1 px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold"
+                        style={{ background: 'rgba(192,57,43,0.10)', color: 'var(--destructive)' }}
+                        title="Previously selected but didn't confirm within 48h">
+                        Didn't confirm before
+                      </span>
+                    )}
                   </div>
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button onClick={() => onSelect(a.creator_id)}
@@ -1062,6 +1072,7 @@ interface PeekApplication {
   creator_id: string;
   status: string;
   selected_at: string | null;
+  previously_selected_at: string | null;
   applied_at: string;
   pitch: string | null;
   creators?: { name: string; display_name: string | null; instagram_handle: string; level: number | null; avatar_url: string | null };
@@ -1078,7 +1089,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 
   const fetchApplications = async () => {
     const { data } = await supabase.from('applications')
-      .select('id, creator_id, status, selected_at, applied_at, pitch, creators(name, display_name, instagram_handle, level, avatar_url)')
+      .select('id, creator_id, status, selected_at, previously_selected_at, applied_at, pitch, creators(name, display_name, instagram_handle, level, avatar_url)')
       .eq('campaign_id', campaign.id)
       .order('applied_at', { ascending: false });
     if (data) setApplications(data as unknown as PeekApplication[]);
@@ -1153,8 +1164,14 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 
   const handleReturnToReserves = async (appId: string) => {
     if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
+    const prev = applications.find(a => a.id === appId);
     const { error } = await supabase.from('applications')
-      .update({ status: 'interested', selected_at: null })
+      .update({
+        status: 'interested',
+        selected_at: null,
+        // Record the ghost so the UI can flag them next time.
+        previously_selected_at: prev?.selected_at ?? null,
+      })
       .eq('id', appId);
     if (error) { showToast('Failed to update'); return; }
     emailSelectionExpiredForApp(appId);
@@ -1164,14 +1181,19 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
 
   const handleDeclineApp = async (appId: string) => {
     if (!window.confirm('Decline this creator?')) return;
-    // Grab previous status before the update so we only fire the expiry
-    // email when this was a pending selection (not an unpicked reserve).
-    const previous = applications.find(a => a.id === appId)?.status;
+    // Grab previous row before the update so we only fire the expiry
+    // email when this was a pending selection (not an unpicked reserve)
+    // and so we can preserve selected_at on previously_selected_at.
+    const prev = applications.find(a => a.id === appId);
+    const updates: Record<string, any> = { status: 'declined' };
+    if (prev?.status === 'selected' && prev.selected_at) {
+      updates.previously_selected_at = prev.selected_at;
+    }
     const { error } = await supabase.from('applications')
-      .update({ status: 'declined' })
+      .update(updates)
       .eq('id', appId);
     if (error) { showToast('Failed to update'); return; }
-    if (previous === 'selected') emailSelectionExpiredForApp(appId);
+    if (prev?.status === 'selected') emailSelectionExpiredForApp(appId);
     showToast('Creator declined');
     fetchApplications();
   };

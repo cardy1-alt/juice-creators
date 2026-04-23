@@ -173,6 +173,8 @@ interface Campaign {
 interface Application {
   id: string; campaign_id: string; creator_id: string; pitch: string | null;
   status: string; applied_at: string;
+  selected_at: string | null;
+  previously_selected_at: string | null;
   creators?: { name: string; display_name: string | null; instagram_handle: string; completion_rate: number; level: number; follower_count: string | null; avatar_url: string | null; };
 }
 interface Participation {
@@ -1079,7 +1081,14 @@ export default function BusinessPortal() {
               msg = `${unconfirmedSelectedCount} selected creator${unconfirmedSelectedCount === 1 ? " hasn't" : "s haven't"} confirmed yet. Keeping this creator as a reserve lets you swap in if someone backs out. Decline anyway?`;
             }
             if (!window.confirm(msg)) return;
-            await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
+            const prev = applications.find(a => a.id === appId);
+            const updates: Record<string, any> = { status: 'declined' };
+            // Preserve the selected_at timestamp on previously_selected_at
+            // so the UI can flag this creator as a prior ghost next time.
+            if (fromStatus === 'selected' && prev?.selected_at) {
+              updates.previously_selected_at = prev.selected_at;
+            }
+            await supabase.from('applications').update(updates).eq('id', appId);
             if (fromStatus === 'selected') emailSelectionExpired(appId);
             fetchCampaignData();
             // If a selected (unconfirmed) creator was just declined, nudge
@@ -1092,7 +1101,14 @@ export default function BusinessPortal() {
           };
           const handleReturnToReserves = async (appId: string) => {
             if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
-            await supabase.from('applications').update({ status: 'interested', selected_at: null }).eq('id', appId);
+            const prev = applications.find(a => a.id === appId);
+            await supabase.from('applications').update({
+              status: 'interested',
+              selected_at: null,
+              // Leave a trail so this creator shows a "didn't confirm
+              // before" badge when they land back in reserves.
+              previously_selected_at: prev?.selected_at ?? null,
+            }).eq('id', appId);
             emailSelectionExpired(appId);
             fetchCampaignData();
             showToast('Creator moved to reserves — pick a replacement');
@@ -1268,6 +1284,16 @@ export default function BusinessPortal() {
                           <span className="text-[11px] font-medium uppercase tracking-[0.05em] text-[var(--ink-50)]">Followers</span>
                           <span className="text-[14px] font-medium text-[var(--ink-60)]">{a.creators.follower_count}</span>
                         </div>
+                      )}
+                      {/* Flag creators who were once selected on this
+                          campaign but never confirmed so the brand
+                          doesn't re-pick a known ghost. */}
+                      {a.previously_selected_at && (isReserve || isDeclined) && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[4px] text-[12px] font-semibold"
+                          style={{ background: 'rgba(192,57,43,0.10)', color: 'var(--destructive)' }}
+                          title="Previously selected but didn't confirm within 48h">
+                          Didn't confirm before
+                        </span>
                       )}
                     </div>
 
