@@ -186,6 +186,28 @@ export async function sendCreatorSelectionReminderEmail(creatorId: string, meta:
   });
 }
 
+/** Tell a creator their selection was closed out — used by the cron on
+ *  48h expiry AND by UI paths when an admin/brand manually declines or
+ *  returns a pending 'selected' creator to the reserve pool. Matches the
+ *  selection_expired email template already defined in send-email. */
+export async function sendCreatorSelectionExpiredEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  campaign_id: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `Your selection for ${meta.brand_name} expired — the 48-hour confirmation window passed.`,
+    emailType: 'selection_expired',
+    emailMeta: {
+      brand_name: meta.brand_name,
+      campaign_id: meta.campaign_id,
+      campaign_title: meta.campaign_title,
+    },
+  });
+}
+
 /** Brand notification when a creator's 48h selection window closes
  *  without a confirm — their slot reopened and reserves may still be
  *  available to promote. */

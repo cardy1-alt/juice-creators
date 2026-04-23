@@ -3,6 +3,7 @@ import { useEffectiveAuth } from '../contexts/AuthContext';
 import InstagramEmbed from './InstagramEmbed';
 import { supabase } from '../lib/supabase';
 import { Logo } from './Logo';
+import { sendCreatorSelectionExpiredEmail } from '../lib/notifications';
 import {
   LayoutDashboard, Users, ClipboardList, Film, BarChart3,
   LogOut, ExternalLink, Mail, Check, Clock, Eye, Menu, X, ArrowLeft, Search, Megaphone, AlertCircle, ChevronRight
@@ -1056,6 +1057,20 @@ export default function BusinessPortal() {
             fetchCampaignData();
             showToast('Creator selected');
           };
+          // Fires the same selection_expired email the cron would've sent
+          // if the 48h window had actually run out. Used by any UI path
+          // that moves a 'selected' (unconfirmed) creator out of that
+          // state — decline or return-to-reserves — so the creator always
+          // learns their spot was closed out.
+          const emailSelectionExpired = (appId: string) => {
+            const app = applications.find(a => a.id === appId);
+            if (!app?.creator_id || !campaign?.id || !campaign?.title || !brand?.name) return;
+            sendCreatorSelectionExpiredEmail(app.creator_id, {
+              campaign_title: campaign.title,
+              brand_name: brand.name,
+              campaign_id: campaign.id,
+            }).catch(() => {});
+          };
           const handleDecline = async (appId: string, fromStatus: string) => {
             // Warn the business before burning a reserve while selected
             // creators haven't confirmed yet — they might still need a swap.
@@ -1065,6 +1080,7 @@ export default function BusinessPortal() {
             }
             if (!window.confirm(msg)) return;
             await supabase.from('applications').update({ status: 'declined' }).eq('id', appId);
+            if (fromStatus === 'selected') emailSelectionExpired(appId);
             fetchCampaignData();
             // If a selected (unconfirmed) creator was just declined, nudge
             // the business toward the reserves pool so the slot gets filled.
@@ -1077,6 +1093,7 @@ export default function BusinessPortal() {
           const handleReturnToReserves = async (appId: string) => {
             if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
             await supabase.from('applications').update({ status: 'interested', selected_at: null }).eq('id', appId);
+            emailSelectionExpired(appId);
             fetchCampaignData();
             showToast('Creator moved to reserves — pick a replacement');
           };

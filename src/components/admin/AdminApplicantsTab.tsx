@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { sendCreatorSelectedEmail } from '../../lib/notifications';
+import { sendCreatorSelectedEmail, sendCreatorSelectionExpiredEmail } from '../../lib/notifications';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getLevelColour } from '../../lib/levels';
 import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock, Columns2, ChevronDown, ChevronLeft } from 'lucide-react';
@@ -202,8 +202,19 @@ export default function AdminApplicantsTab() {
 
   const handleDecline = async (applicant: Applicant) => {
     setActingOn(applicant.id);
+    const wasSelected = applicant.status === 'selected';
     const { error } = await supabase.from('applications').update({ status: 'declined' }).eq('id', applicant.id);
     if (error) { showToast('Failed to decline'); setActingOn(null); return; }
+    // If the creator was mid-selection, send the same selection_expired
+    // email the cron would fire on 48h timeout so they're never left in
+    // the dark about their spot closing.
+    if (wasSelected && applicant.creator_id && applicant.campaigns?.id) {
+      sendCreatorSelectionExpiredEmail(applicant.creator_id, {
+        campaign_title: applicant.campaigns.title || '',
+        brand_name: applicant.campaigns.businesses?.name || '',
+        campaign_id: applicant.campaigns.id,
+      }).catch(() => {});
+    }
     showToast('Creator declined');
     setActingOn(null);
     if (peekApplicant?.id === applicant.id) setPeekApplicant(null);
@@ -426,17 +437,20 @@ export default function AdminApplicantsTab() {
       const expired = hoursLeft !== null && hoursLeft <= 0;
       const urgent = hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 12;
       const label = hoursLeft === null ? 'Selected'
-        : expired ? 'Expired'
+        : expired ? 'Expired — auto-declining'
         : hoursLeft < 1 ? 'Selected · <1h left'
         : `Selected · ${Math.floor(hoursLeft)}h left`;
+      // Three visual tiers so the admin can scan a list and spot
+      // trouble: sage for "on track", terra for <12h, destructive red
+      // for past the deadline.
       const style = expired
-        ? { background: 'rgba(42,32,24,0.06)', color: 'var(--ink-50)' }
+        ? { background: 'rgba(192,57,43,0.10)', color: 'var(--destructive)' }
         : urgent
           ? { background: 'rgba(196,103,74,0.12)', color: 'var(--terra)' }
           : { background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' };
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={style}>
-          {urgent ? <Clock size={11} /> : <Check size={11} />} {label}
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-semibold" style={style}>
+          {urgent || expired ? <Clock size={11} /> : <Check size={11} />} {label}
         </span>
       );
     })() : a.status === 'confirmed' ? (
@@ -446,6 +460,13 @@ export default function AdminApplicantsTab() {
     ) : a.status === 'declined' ? (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">
         Declined
+      </span>
+    ) : a.status === 'interested' ? (
+      // Always show a pill for pending applicants so every row has the
+      // same visual rhythm. Neutral amber signals "needs review" without
+      // competing with the more urgent selection/confirmed states.
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium bg-[#FAEEDA] text-[#854F0B]">
+        Pending review
       </span>
     ) : null;
 
@@ -913,6 +934,43 @@ export default function AdminApplicantsTab() {
                       onDecline={handleDecline}
                       actingOn={actingOn}
                     />;
+                  }
+                  // When the admin hasn't filtered, group by status so
+                  // the campaign-side peek's visual rhythm is preserved
+                  // (Awaiting / Confirmed / Pending review / Declined).
+                  // For a specific filter the group is redundant, so keep
+                  // the flat list.
+                  const renderCards = (items: typeof sorted) => viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                      {items.map(a => <ApplicantCard key={a.id} a={a} variant="grid" />)}
+                    </div>
+                  ) : (
+                    <div className="bg-white rounded-[12px] overflow-hidden divide-y divide-[rgba(42,32,24,0.06)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
+                      {items.map(a => <ApplicantCard key={a.id} a={a} variant="list" />)}
+                    </div>
+                  );
+                  if (statusFilter === 'all') {
+                    const groups = [
+                      { label: 'Awaiting confirmation', items: sorted.filter(a => a.status === 'selected'), accent: 'var(--sage)' },
+                      { label: 'Confirmed', items: sorted.filter(a => a.status === 'confirmed' && a.campaigns?.campaign_type !== 'community'), accent: 'var(--violet)' },
+                      { label: 'Entered (community)', items: sorted.filter(a => a.status === 'confirmed' && a.campaigns?.campaign_type === 'community'), accent: 'var(--terra)' },
+                      { label: 'Pending review', items: sorted.filter(a => a.status === 'interested'), accent: '#854F0B' },
+                      { label: 'Declined', items: sorted.filter(a => a.status === 'declined'), accent: 'var(--ink-50)' },
+                    ].filter(g => g.items.length > 0);
+                    return (
+                      <div className="space-y-6">
+                        {groups.map(g => (
+                          <div key={g.label}>
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: g.accent }} />
+                              <h3 className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[var(--ink-60)]">{g.label}</h3>
+                              <span className="text-[12px] text-[var(--ink-35)]">{g.items.length}</span>
+                            </div>
+                            {renderCards(g.items)}
+                          </div>
+                        ))}
+                      </div>
+                    );
                   }
                   return viewMode === 'grid' ? (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

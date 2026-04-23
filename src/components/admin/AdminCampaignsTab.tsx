@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail, sendCreatorWonCommunityEmail, sendCreatorNotSelectedCommunityEmail, sendAdminCommunityWinnersPickedEmail } from '../../lib/notifications';
+import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail, sendCreatorWonCommunityEmail, sendCreatorNotSelectedCommunityEmail, sendAdminCommunityWinnersPickedEmail, sendCreatorSelectionExpiredEmail } from '../../lib/notifications';
 import { toStartOfDayISO, toEndOfDayISO, hoursUntilConfirmDeadline } from '../../lib/dates';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getCategoryPalette } from '../../lib/categories';
@@ -1130,22 +1130,48 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
     fetchApplications();
   };
 
+  // Fires the same selection_expired email the cron would've sent if
+  // the 48h window had run out naturally — used when the admin manually
+  // moves a 'selected' creator back to reserves or declines them, so the
+  // creator always hears their spot was closed rather than silently
+  // vanishing.
+  const emailSelectionExpiredForApp = async (appId: string) => {
+    const app = applications.find(a => a.id === appId);
+    if (!app?.creator_id) return;
+    const { data: campData } = await supabase.from('campaigns')
+      .select('id, title, businesses(name)')
+      .eq('id', campaign.id)
+      .maybeSingle();
+    if (!campData?.title) return;
+    const brandName = (campData as any).businesses?.name || '';
+    sendCreatorSelectionExpiredEmail(app.creator_id, {
+      campaign_title: campData.title,
+      brand_name: brandName,
+      campaign_id: campaign.id,
+    }).catch(() => {});
+  };
+
   const handleReturnToReserves = async (appId: string) => {
     if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
     const { error } = await supabase.from('applications')
       .update({ status: 'interested', selected_at: null })
       .eq('id', appId);
     if (error) { showToast('Failed to update'); return; }
+    emailSelectionExpiredForApp(appId);
     showToast('Creator moved to reserves');
     fetchApplications();
   };
 
   const handleDeclineApp = async (appId: string) => {
     if (!window.confirm('Decline this creator?')) return;
+    // Grab previous status before the update so we only fire the expiry
+    // email when this was a pending selection (not an unpicked reserve).
+    const previous = applications.find(a => a.id === appId)?.status;
     const { error } = await supabase.from('applications')
       .update({ status: 'declined' })
       .eq('id', appId);
     if (error) { showToast('Failed to update'); return; }
+    if (previous === 'selected') emailSelectionExpiredForApp(appId);
     showToast('Creator declined');
     fetchApplications();
   };
