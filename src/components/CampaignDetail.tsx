@@ -433,29 +433,27 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
     <>
       {!application && !showPitchModal && (
         <div>
-          {isFull && !isCommunity ? (
-            <>
-              <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
-                This campaign is full
-              </div>
-              <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">Keep an eye out — new campaigns drop every week.</p>
-            </>
-          ) : isCommunity && winnersAnnounced ? (
+          {isCommunity && winnersAnnounced ? (
             <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[rgba(42,32,24,0.04)] text-center text-[var(--ink-50)] font-medium text-[14px]">
               The winners have been picked — entries are closed
             </div>
           ) : (
             <>
+              {/* Full-but-brand-campaign: apps still go through but land in
+                  the reserve pool. Label makes that explicit so creators
+                  aren't surprised when they're not immediately selected. */}
               <button onClick={() => setShowPitchModal(true)}
                 className="w-full min-h-[44px] py-3 rounded-[10px] bg-[var(--terra)] text-white font-semibold text-[14px] hover:opacity-85 transition-opacity">
-                {isCommunity ? 'Enter the draw' : "I'm Interested"}
+                {isCommunity ? 'Enter the draw' : isFull ? 'Add me as a reserve' : "I'm Interested"}
               </button>
               <p className="text-[14px] text-[var(--ink-60)] text-center mt-2">
                 {isCommunity
                   ? `Submit a Reel by the deadline — winner${(campaign?.num_winners || 1) === 1 ? '' : 's'} picked by the Nayba team.`
-                  : target > 0 && remaining / target <= 0.5
-                    ? `Only ${remaining} spot${remaining === 1 ? '' : 's'} left — the brand will review and select`
-                    : "This won't commit you — the brand will review and select"}
+                  : isFull
+                    ? "All slots are filled — the brand will shortlist you if anyone backs out."
+                    : target > 0 && remaining / target <= 0.5
+                      ? `Only ${remaining} spot${remaining === 1 ? '' : 's'} left — the brand will review and select`
+                      : "This won't commit you — the brand will review and select"}
               </p>
             </>
           )}
@@ -547,9 +545,13 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         <div>
           <div className="w-full min-h-[44px] py-3 rounded-[10px] bg-[#E1F5EE] text-center text-[#0F6E56] font-medium text-[14px]">
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
-            Interest registered — we'll be in touch
+            {isFull && !isCommunity ? "You're on the reserve list" : "Interest registered — we'll be in touch"}
           </div>
-          <p className="text-[12px] text-[var(--ink-35)] text-center mt-2">You can see all your applications in the Campaigns tab</p>
+          <p className="text-[12px] text-[var(--ink-35)] text-center mt-2">
+            {isFull && !isCommunity
+              ? "We'll shortlist you if someone backs out. You can edit your pitch anytime."
+              : 'You can see all your applications in the Campaigns tab'}
+          </p>
           <button onClick={openEditPitch}
             className="w-full mt-1 text-[13px] font-medium text-[var(--terra)] hover:underline text-center py-1">
             {application.pitch ? 'Edit your pitch' : 'Add a pitch to strengthen your application'}

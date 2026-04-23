@@ -390,7 +390,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             // 0 taken → "N spots available" (scarcity signal).
             // 1 to 50% → nothing (avoid looking either empty or daunting).
             // >50% → "Only X spots left" (urgency, terra accent).
-            // Full → "Filled" (dead-end, grey).
+            // Full → "Reserves only" — slots are filled but new applications
+            // still join the reserve pool in case someone backs out.
             const target = (c as any).creator_target || 0;
             const taken = confirmedCounts[c.id] || 0;
             const remaining = Math.max(0, target - taken);
@@ -401,8 +402,8 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
             // selection which doesn't apply. Skip the label entirely.
             if (target > 0 && !display.isCommunity) {
               if (remaining === 0) {
-                spotsLabel = 'Filled';
-                spotsClass = 'text-[var(--ink-35)]';
+                spotsLabel = 'Reserves only';
+                spotsClass = 'text-[var(--ink-50)]';
               } else if (appCount >= target) {
                 spotsLabel = 'Popular';
                 spotsClass = 'text-[var(--terra)] font-semibold';
@@ -432,7 +433,7 @@ function DiscoverTab({ profile, onOpenCampaign, onGoToCampaigns, refreshKey }: {
                     )}
                   {appStatus && (
                     <span className={`absolute top-2 right-2 inline-flex items-center px-2 py-0.5 rounded-[6px] text-[10px] font-medium ${appStatus === 'interested' ? 'bg-[#FAEEDA] text-[#854F0B]' : appStatus === 'selected' || appStatus === 'confirmed' ? 'bg-[#E1F5EE] text-[#0F6E56]' : 'bg-[#F1EFE8] text-[#5F5E5A]'}`}>
-                      {appStatus === 'interested' ? (display.isCommunity ? 'Entered' : 'Applied') : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? (display.isCommunity ? 'Entered' : 'Confirmed') : appStatus}
+                      {appStatus === 'interested' ? (display.isCommunity ? 'Entered' : (target > 0 && remaining === 0 ? 'Reserve' : 'Applied')) : appStatus === 'selected' ? 'Selected' : appStatus === 'confirmed' ? (display.isCommunity ? 'Entered' : 'Confirmed') : appStatus}
                     </span>
                   )}
                   </div>
