@@ -12,6 +12,90 @@ import CampaignWizard from './CampaignWizard';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../lib/dates';
 
+// ─── Deadline editor — lets the brand grant an individual creator an
+// extended filming date without moving the campaign-wide deadline. Shows
+// the effective date with an Adjust toggle; editing exposes a date input
+// with Save / Clear override / Cancel. Write goes to
+// participations.content_deadline_override (NULL clears it).
+function DeadlineEditor({
+  participation,
+  campaignDeadline,
+  onSaved,
+  showToast,
+}: {
+  participation: Participation;
+  campaignDeadline: string | null;
+  onSaved: () => void;
+  showToast: (msg: string) => void;
+}) {
+  const effective = participation.content_deadline_override || campaignDeadline;
+  const hasOverride = !!participation.content_deadline_override;
+  const [editing, setEditing] = useState(false);
+  const [value, setValue] = useState(effective ? new Date(effective).toISOString().slice(0, 10) : '');
+  const [saving, setSaving] = useState(false);
+
+  const save = async (iso: string | null) => {
+    setSaving(true);
+    const { error } = await supabase.from('participations')
+      .update({ content_deadline_override: iso })
+      .eq('id', participation.id);
+    setSaving(false);
+    if (error) { showToast("Couldn't save deadline"); return; }
+    showToast(iso ? 'Deadline extended' : 'Deadline reverted to campaign default');
+    setEditing(false);
+    onSaved();
+  };
+
+  const handleSave = () => {
+    if (!value) { save(null); return; }
+    // End-of-day in UTC keeps the creator-facing "by X" read the same
+    // whether they check early morning or late evening.
+    save(new Date(value + 'T23:59:59Z').toISOString());
+  };
+
+  if (editing) {
+    return (
+      <div className="py-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+        <p className="text-[var(--ink-50)] text-[14px] mb-2">Content deadline</p>
+        <input type="date" value={value} onChange={e => setValue(e.target.value)}
+          className="w-full px-3 py-2 rounded-[8px] border border-[rgba(42,32,24,0.15)] bg-white text-[14px] mb-2" />
+        <div className="flex gap-2 justify-end flex-wrap">
+          {hasOverride && (
+            <button onClick={() => save(null)} disabled={saving}
+              className="px-3 py-1.5 rounded-[8px] text-[13px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
+              Clear override
+            </button>
+          )}
+          <button onClick={() => { setEditing(false); setValue(effective ? new Date(effective).toISOString().slice(0, 10) : ''); }}
+            className="px-3 py-1.5 rounded-[8px] text-[13px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)]">
+            Cancel
+          </button>
+          <button onClick={handleSave} disabled={saving}
+            className="px-3 py-1.5 rounded-[8px] bg-[var(--terra)] text-white text-[13px] font-semibold hover:opacity-85 disabled:opacity-50">
+            {saving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex justify-between items-center py-2 gap-2" style={{ borderBottom: '1px solid rgba(42,32,24,0.04)' }}>
+      <span className="text-[var(--ink-50)] text-[14px]">Content deadline</span>
+      <div className="flex items-center gap-2">
+        <span className="text-[var(--ink)] font-medium text-[14px]">
+          {effective ? fmtDate(effective) : 'Not set'}
+          {hasOverride && <span className="ml-1 text-[11px] text-[var(--terra)] font-medium">(extended)</span>}
+        </span>
+        <button onClick={() => setEditing(true)}
+          className="text-[12px] text-[var(--terra)] font-medium hover:underline">
+          Adjust
+        </button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Creator avatar — image when uploaded, initial fallback otherwise.
 // `className` should set width/height (e.g. "w-10 h-10"); fallback styling
 // is optional so the kanban/dashboard patterns can keep their existing
@@ -95,6 +179,7 @@ interface Participation {
   reel_url: string | null; reel_submitted_at: string | null;
   reach: number | null; likes: number | null; comments: number | null; views: number | null;
   status: string; completed_at: string | null;
+  content_deadline_override: string | null;
   creators?: { name: string; display_name: string | null; instagram_handle: string; avatar_url: string | null; };
 }
 
@@ -1505,6 +1590,12 @@ export default function BusinessPortal() {
                       <span className="text-[var(--ink-50)]">Content</span>
                       <span className="text-[var(--ink)] font-medium">{p.reel_url ? 'Submitted' : 'Awaiting'}</span>
                     </div>
+                    <DeadlineEditor
+                      participation={p}
+                      campaignDeadline={campaign?.content_deadline || null}
+                      showToast={showToast}
+                      onSaved={() => { fetchCampaignData(); setPeekCreator(null); }}
+                    />
                     {p.reel_url && (
                       <a href={p.reel_url} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 text-[14px] text-[var(--terra)] font-medium hover:underline py-2">

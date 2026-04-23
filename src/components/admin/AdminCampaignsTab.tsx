@@ -35,6 +35,7 @@ interface Participation {
   perk_sent: boolean; perk_sent_at: string | null; reel_url: string | null;
   reel_submitted_at: string | null; reach: number | null; likes: number | null;
   comments: number | null; views: number | null; status: string; completed_at: string | null;
+  content_deadline_override: string | null;
   creators?: { name: string; display_name: string | null; instagram_handle: string; };
 }
 interface Creator { id: string; name: string; display_name: string | null; instagram_handle: string; level: number; completion_rate: number; }
@@ -774,6 +775,7 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                   <th className={pThCls}>Creator</th>
                   <th className={pThCls}>Status</th>
                   <th className={pThCls}>Perk Sent</th>
+                  <th className={pThCls}>Deadline</th>
                   <th className={pThCls}>Reel URL</th>
                   <th className={pThCls}>Reach</th>
                   <th className={pThCls}>Likes</th>
@@ -805,6 +807,20 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
                         <input type="checkbox" checked={p.perk_sent}
                           onChange={e => updatePerkSent(p.id, e.target.checked)}
                           className="accent-[var(--terra)] w-4 h-4" />
+                      </td>
+                      <td className={pTdCls}>
+                        {/* Per-creator override of campaigns.content_deadline.
+                            Empty input clears the override (falls back to
+                            the campaign-wide date). Stored as end-of-day UTC. */}
+                        <input type="date"
+                          defaultValue={p.content_deadline_override ? new Date(p.content_deadline_override).toISOString().slice(0, 10) : ''}
+                          onBlur={e => {
+                            const v = e.target.value;
+                            const iso = v ? new Date(v + 'T23:59:59Z').toISOString() : null;
+                            updateField(p.id, 'content_deadline_override', iso);
+                          }}
+                          className="px-2 py-1.5 rounded-[10px] bg-[rgba(42,32,24,0.02)] border border-[rgba(42,32,24,0.08)] text-[12px] focus:outline-none focus:border-[var(--terra)]"
+                        />
                       </td>
                       <td className={pTdCls}>
                         <div className="flex items-center gap-1.5">

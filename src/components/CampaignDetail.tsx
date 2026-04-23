@@ -51,7 +51,7 @@ interface Application {
 }
 
 interface ParticipationLite {
-  id: string; status: string; reel_url: string | null;
+  id: string; status: string; reel_url: string | null; content_deadline_override: string | null;
 }
 
 /** Hours remaining until `selected_at` + 48h. Negative if already past. */
@@ -161,7 +161,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         // we know whether the creator has already submitted.
         const { data: partData } = await supabase
           .from('participations')
-          .select('id, status, reel_url')
+          .select('id, status, reel_url, content_deadline_override')
           .eq('campaign_id', campaignId)
           .eq('creator_id', creatorData.id)
           .maybeSingle();
@@ -217,7 +217,7 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
         creator_id: creatorId,
         perk_sent: false,
         status: 'confirmed',
-      }).select('id, status, reel_url').single();
+      }).select('id, status, reel_url, content_deadline_override').single();
       if (partErr) {
         console.error('[CampaignDetail] Failed to create community participation:', partErr);
         await supabase.from('applications').delete().eq('id', data.id);
@@ -394,6 +394,11 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
   // returns ''; this preserves the brand path unchanged.
   const brandInstructions = display.instructions;
   const brandHandle = display.instagramHandle;
+
+  // If the brand has granted this creator an extended deadline, surface it
+  // everywhere the campaign deadline is shown so the creator sees the
+  // personal date rather than the campaign-wide one.
+  const effectiveContentDeadline = participation?.content_deadline_override || campaign.content_deadline;
 
   // Booking instructions are only revealed AFTER the creator is confirmed.
   // This protects coupon codes / booking links from being visible to
@@ -589,9 +594,12 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
             <Check size={15} className="inline mr-1.5" style={{ verticalAlign: '-2px' }} />
             {participation?.reel_url ? 'Reel submitted — winners announced after the deadline' : "You're entered — submit your Reel below"}
           </div>
-          {!participation?.reel_url && campaign.content_deadline && (
+          {!participation?.reel_url && effectiveContentDeadline && (
             <p className="text-[13px] text-[var(--ink-60)] text-center mt-2">
-              Reel due by <span className="font-semibold">{fmtDeadline(campaign.content_deadline)}</span>
+              Reel due by <span className="font-semibold">{fmtDeadline(effectiveContentDeadline)}</span>
+              {participation?.content_deadline_override && (
+                <span className="ml-1 text-[var(--ink-50)]">(extended)</span>
+              )}
             </p>
           )}
         </div>
@@ -751,8 +759,15 @@ export default function CampaignDetail({ campaignId, onBack, hideActions }: Camp
           {/* Dates — inline under title */}
           <div className="flex items-center gap-1.5 text-[14px] text-[var(--ink-60)] mb-3">
             {campaign.expression_deadline && <span>Apply by <span className="font-semibold">{fmtDeadline(campaign.expression_deadline)}</span></span>}
-            {campaign.expression_deadline && campaign.content_deadline && <span className="text-[var(--ink-15)]">·</span>}
-            {campaign.content_deadline && <span>Content due <span className="font-semibold">{fmtDeadline(campaign.content_deadline)}</span></span>}
+            {campaign.expression_deadline && effectiveContentDeadline && <span className="text-[var(--ink-15)]">·</span>}
+            {effectiveContentDeadline && (
+              <span>
+                Content due <span className="font-semibold">{fmtDeadline(effectiveContentDeadline)}</span>
+                {participation?.content_deadline_override && (
+                  <span className="ml-1 text-[var(--ink-50)]">(your extended date)</span>
+                )}
+              </span>
+            )}
           </div>
 
           {/* Perk — part of header area. £value is shown on the feed card

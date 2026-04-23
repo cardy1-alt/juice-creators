@@ -26,17 +26,20 @@ Deno.serve(async (_req: Request) => {
   let selectionsExpired = 0;
 
   // 1. Send 48-hour content deadline reminder
-  // Find participations where content_deadline is within 48 hours and reel not submitted
+  // Find participations where content_deadline is within 48 hours and reel not submitted.
+  // A per-creator content_deadline_override (if set) takes precedence over
+  // the campaign-wide deadline — brands sometimes grant individual extensions
+  // and the cron shouldn't warn/mark-overdue against a stale campaign date.
   const { data: dueSoon } = await supabase
     .from('participations')
-    .select('id, creator_id, campaign_id, campaigns(title, content_deadline, businesses(name))')
+    .select('id, creator_id, campaign_id, content_deadline_override, campaigns(title, content_deadline, businesses(name))')
     .in('status', ['confirmed', 'visited'])
     .is('reel_url', null);
 
   if (dueSoon && dueSoon.length > 0) {
     for (const part of dueSoon) {
       const campaign = (part as any).campaigns;
-      const contentDeadline = campaign?.content_deadline;
+      const contentDeadline = (part as any).content_deadline_override || campaign?.content_deadline;
       if (!contentDeadline) continue;
 
       const deadline = new Date(contentDeadline);
@@ -74,13 +77,13 @@ Deno.serve(async (_req: Request) => {
   // Find participations where content_deadline has passed, reel not submitted, not already overdue/completed
   const { data: allActive } = await supabase
     .from('participations')
-    .select('id, creator_id, campaign_id, campaigns(content_deadline, businesses(name))')
+    .select('id, creator_id, campaign_id, content_deadline_override, campaigns(content_deadline, businesses(name))')
     .in('status', ['confirmed', 'visited'])
     .is('reel_url', null);
 
   if (allActive && allActive.length > 0) {
     for (const part of allActive) {
-      const contentDeadline = (part as any).campaigns?.content_deadline;
+      const contentDeadline = (part as any).content_deadline_override || (part as any).campaigns?.content_deadline;
       if (!contentDeadline) continue;
 
       if (new Date(contentDeadline) <= now) {

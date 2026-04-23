@@ -69,6 +69,7 @@ interface Application {
 interface Participation {
   id: string; campaign_id: string; application_id: string; perk_sent: boolean;
   reel_url: string | null; status: string; created_at: string;
+  content_deadline_override: string | null;
   campaigns?: { title: string; headline: string | null; content_deadline: string | null; perk_description?: string | null; perk_value?: number | null; campaign_type?: 'brand' | 'community' | null; winner_announced_at?: string | null; businesses?: { name: string } | null };
   applications?: { pitch: string | null } | null;
 }
@@ -641,7 +642,11 @@ function CampaignsTab({ profile }: { profile: CreatorProfile }) {
           })}
           {activeParts.map(p => {
             const todos = getTodos(p);
-            const days = daysUntil(p.campaigns?.content_deadline || null);
+            // Prefer per-creator extension over the campaign-wide deadline
+            // so creators who negotiated a later filming date see their
+            // personal countdown.
+            const effectiveDeadline = p.content_deadline_override || p.campaigns?.content_deadline || null;
+            const days = daysUntil(effectiveDeadline);
             const perkText = p.campaigns?.perk_description?.split('—')[0]?.split(',')[0]?.trim();
             return (
               <div key={p.id} className="bg-white rounded-[12px] p-4" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
