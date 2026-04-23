@@ -818,6 +818,47 @@ Deno.serve(async (req: Request) => {
       case 'creator_selected':
         email = creatorSelectedEmail(recipientName, meta);
         break;
+      case 'creator_selection_reminder_24h':
+        email = {
+          subject: `~24h left to confirm ${meta.brand_name || 'your'} spot`,
+          html: wrapEmail(`
+            ${heading('Heads up — your spot closes soon')}
+            ${subtext(`Hey ${escapeHtml(recipientName)}, about a day left to confirm your selection before it opens back up for another creator.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${escapeHtml(meta.brand_name || '')}</p>
+            `)}
+            ${p("Tap confirm in the app to lock it in. If the timing doesn't work for you anymore, let us know so we can offer the spot to a reserve.")}
+            ${btn('Confirm your spot', `${APP_URL}?campaign=${meta.campaign_id || ''}`)}
+          `),
+        };
+        break;
+      case 'business_selection_expired':
+        email = {
+          subject: `${meta.creator_name || 'A creator'} didn't confirm — slot reopened`,
+          html: wrapEmail(`
+            ${heading('A slot just reopened')}
+            ${subtext(`Hey ${escapeHtml(recipientName)}, ${escapeHtml(meta.creator_name || 'the creator')} didn't confirm within the 48-hour window, so their spot on ${escapeHtml(meta.campaign_title || 'your campaign')} is open again.`)}
+            ${infoBox(`
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0 0 4px;font-size:16px;font-weight:700;color:${INK};">${escapeHtml(meta.campaign_title || '')}</p>
+              <p style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;margin:0;font-size:13px;color:${INK_60};">${meta.reserves_remaining && parseInt(meta.reserves_remaining) > 0 ? `${escapeHtml(meta.reserves_remaining)} reserve${parseInt(meta.reserves_remaining) === 1 ? '' : 's'} available to promote` : 'No reserves in the pool — open for new applicants'}</p>
+            `)}
+            ${p("Open the Selection tab to pick a replacement from your reserves.")}
+            ${btn('Open campaign', `${APP_URL}?campaign=${meta.campaign_id || ''}`, INK)}
+          `),
+        };
+        break;
+      case 'admin_selection_expired':
+        email = {
+          subject: `Selection expired — ${meta.brand_name || 'a campaign'} / ${meta.campaign_title || ''}`,
+          html: wrapEmail(`
+            ${heading('Selection expired')}
+            ${p(`<strong>${escapeHtml(meta.creator_name || 'A creator')}</strong> didn't confirm for <strong>${escapeHtml(meta.brand_name || '')}</strong> — ${escapeHtml(meta.campaign_title || '')}.`)}
+            ${p(`Reserves remaining: <strong>${escapeHtml(meta.reserves_remaining || '0')}</strong>.`)}
+            ${btn('Open admin dashboard', APP_URL, INK)}
+          `),
+        };
+        break;
       case 'selection_expired':
         email = {
           subject: `Your ${meta.brand_name || 'campaign'} spot has expired`,

@@ -164,6 +164,74 @@ export async function sendCreatorSelectedEmail(creatorId: string, meta: {
   });
 }
 
+/** T-24h nudge — the creator was selected ~24h ago and still hasn't
+ *  confirmed. Fired by the check-overdue-reels cron so it doesn't
+ *  double-send across runs (the cron guards on a prior notification row). */
+export async function sendCreatorSelectionReminderEmail(creatorId: string, meta: {
+  campaign_title: string;
+  brand_name: string;
+  campaign_id: string;
+}): Promise<void> {
+  await insertNotification({
+    userId: creatorId,
+    userType: 'creator',
+    message: `Heads up — your selection for ${meta.brand_name} closes in about a day.`,
+    emailType: 'creator_selection_reminder_24h',
+    emailMeta: {
+      campaign_title: meta.campaign_title,
+      brand_name: meta.brand_name,
+      campaign_id: meta.campaign_id,
+      cta_url: `https://app.nayba.app?campaign=${meta.campaign_id}`,
+    },
+  });
+}
+
+/** Brand notification when a creator's 48h selection window closes
+ *  without a confirm — their slot reopened and reserves may still be
+ *  available to promote. */
+export async function sendBusinessSelectionExpiredEmail(businessId: string, meta: {
+  creator_name: string;
+  campaign_title: string;
+  campaign_id: string;
+  reserves_remaining: number;
+}): Promise<void> {
+  await insertNotification({
+    userId: businessId,
+    userType: 'business',
+    message: `${meta.creator_name} didn't confirm in time for ${meta.campaign_title} — their slot is open again.`,
+    emailType: 'business_selection_expired',
+    emailMeta: {
+      creator_name: meta.creator_name,
+      campaign_title: meta.campaign_title,
+      campaign_id: meta.campaign_id,
+      reserves_remaining: meta.reserves_remaining.toString(),
+      cta_url: `https://app.nayba.app?campaign=${meta.campaign_id}`,
+    },
+  });
+}
+
+/** Admin mirror for the above — helpful when the admin is the one
+ *  driving selections rather than the brand. */
+export async function sendAdminSelectionExpiredEmail(meta: {
+  creator_name: string;
+  brand_name: string;
+  campaign_title: string;
+  reserves_remaining: number;
+}): Promise<void> {
+  await insertNotification({
+    userId: '00000000-0000-0000-0000-000000000000',
+    userType: 'admin',
+    message: `Selection expired — ${meta.creator_name} didn't confirm for ${meta.brand_name} / ${meta.campaign_title}. ${meta.reserves_remaining} reserve${meta.reserves_remaining === 1 ? '' : 's'} available.`,
+    emailType: 'admin_selection_expired',
+    emailMeta: {
+      creator_name: meta.creator_name,
+      brand_name: meta.brand_name,
+      campaign_title: meta.campaign_title,
+      reserves_remaining: meta.reserves_remaining.toString(),
+    },
+  });
+}
+
 export async function sendCreatorConfirmedEmail(creatorId: string, meta: {
   campaign_title: string;
   brand_name: string;

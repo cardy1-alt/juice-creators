@@ -81,3 +81,12 @@ export function fmtCountdown(iso: string | null): string {
   if (days === 1) return '1 day left';
   return `${days} days left`;
 }
+
+/** Hours remaining until `selected_at` + 48h. Negative if already past.
+ * Shared by the creator confirmation countdown and the admin/brand views
+ * that surface how long a pending selection has left before auto-decline. */
+export function hoursUntilConfirmDeadline(selectedAt: string | null): number | null {
+  if (!selectedAt) return null;
+  const deadline = new Date(selectedAt).getTime() + 48 * 60 * 60 * 1000;
+  return (deadline - Date.now()) / (60 * 60 * 1000);
+}

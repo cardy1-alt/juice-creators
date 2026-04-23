@@ -5,7 +5,7 @@ import { sendCreatorConfirmedEmail, sendBusinessCreatorConfirmedEmail, sendAdmin
 import { ArrowLeft, Check, X, AtSign, ExternalLink, Gift, Clock, Film, MapPin, Sparkles, Megaphone, Trophy } from 'lucide-react';
 import { getCategoryPalette, CategoryIcon } from '../lib/categories';
 import { getCampaignBrandDisplay } from '../lib/campaignDisplay';
-import { fmtDeadline } from '../lib/dates';
+import { fmtDeadline, hoursUntilConfirmDeadline } from '../lib/dates';
 import NaybaLogo from '../assets/logomark.svg';
 
 function CampaignFallbackImage({ category, name, isCommunity }: { category?: string | null; name?: string | null; isCommunity?: boolean }) {
@@ -52,13 +52,6 @@ interface Application {
 
 interface ParticipationLite {
   id: string; status: string; reel_url: string | null; content_deadline_override: string | null;
-}
-
-/** Hours remaining until `selected_at` + 48h. Negative if already past. */
-function hoursUntilConfirmDeadline(selectedAt: string | null): number | null {
-  if (!selectedAt) return null;
-  const deadline = new Date(selectedAt).getTime() + 48 * 60 * 60 * 1000;
-  return (deadline - Date.now()) / (60 * 60 * 1000);
 }
 
 export default function CampaignDetail({ campaignId, onBack, hideActions }: CampaignDetailProps) {

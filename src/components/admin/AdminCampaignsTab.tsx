@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { sendCreatorSelectedEmail, sendCreatorCampaignCompleteEmail, sendCreatorWonCommunityEmail, sendCreatorNotSelectedCommunityEmail, sendAdminCommunityWinnersPickedEmail } from '../../lib/notifications';
-import { toStartOfDayISO, toEndOfDayISO } from '../../lib/dates';
+import { toStartOfDayISO, toEndOfDayISO, hoursUntilConfirmDeadline } from '../../lib/dates';
 import { getAvatarColors } from '../../lib/avatarColors';
 import { getCategoryPalette } from '../../lib/categories';
 import { X, UserPlus, Check, XCircle, ExternalLink, Film, Megaphone, Users, Eye, LayoutList, Kanban, Calendar, Search, LayoutGrid, Trash2, Trophy } from 'lucide-react';
@@ -85,6 +85,168 @@ function fmtDate(d: string | null) {
 function fmtShortDate(d: string | null) {
   if (!d) return '—';
   return new Date(d).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+}
+
+/** Short phrase for hours remaining — "18h left", "2h left", "<1h left",
+ * "Expired — auto-declining soon". Used on pending-confirmation rows in
+ * the admin selection panel so the 48-hour window is never invisible. */
+function fmtHoursLeft(hours: number | null): string {
+  if (hours === null) return '';
+  if (hours <= 0) return 'Expired — auto-declining soon';
+  if (hours < 1) return '<1h left';
+  return `${Math.floor(hours)}h left`;
+}
+
+interface PeekAppLike {
+  id: string;
+  creator_id: string;
+  status: string;
+  selected_at: string | null;
+  applied_at: string;
+  pitch: string | null;
+  creators?: { name: string; display_name: string | null; instagram_handle: string; level: number | null; avatar_url: string | null };
+}
+
+function SelectionSection({ campaignId: _campaignId, applications, target, onSelect, onReturnToReserves, onDecline }: {
+  campaignId: string;
+  applications: PeekAppLike[];
+  target: number;
+  onSelect: (creatorId: string) => void;
+  onReturnToReserves: (appId: string) => void;
+  onDecline: (appId: string) => void;
+}) {
+  const selected = applications.filter(a => a.status === 'selected' || a.status === 'confirmed');
+  const reserves = applications.filter(a => a.status === 'interested');
+  const declined = applications.filter(a => a.status === 'declined');
+  const confirmedCount = selected.filter(a => a.status === 'confirmed').length;
+  const awaitingCount = selected.filter(a => a.status === 'selected').length;
+  const hasUnconfirmed = awaitingCount > 0;
+
+  // Is at least one awaiting selection in its final 12 hours? Used to
+  // flag the whole Selected header as urgent at a glance.
+  const anyUrgent = selected.some(a => {
+    if (a.status !== 'selected') return false;
+    const h = hoursUntilConfirmDeadline(a.selected_at);
+    return h !== null && h <= 12;
+  });
+
+  if (applications.length === 0) {
+    return (
+      <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)]">
+        <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-2">Selection</p>
+        <p className="text-[13px] text-[var(--ink-50)]">No applicants yet.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)] space-y-4">
+      {/* Summary header */}
+      <div>
+        <p className="text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1">Selection</p>
+        <p className="text-[13px] text-[var(--ink-60)]">
+          <span className="text-[var(--ink)] font-semibold">{confirmedCount}{target > 0 ? `/${target}` : ''}</span> confirmed
+          {awaitingCount > 0 && <> · <span className={`font-semibold ${anyUrgent ? 'text-[var(--terra)]' : 'text-[var(--ink)]'}`}>{awaitingCount}</span> awaiting</>}
+          {' · '}
+          <span className="text-[var(--ink)] font-semibold">{reserves.length}</span> reserve{reserves.length === 1 ? '' : 's'}
+        </p>
+      </div>
+
+      {selected.length > 0 && (
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-50)] mb-2">Selected</p>
+          <div className="space-y-1.5">
+            {selected.map(a => {
+              const name = a.creators?.display_name || a.creators?.name || 'Creator';
+              const handle = a.creators?.instagram_handle?.replace('@', '') || '';
+              const isConfirmed = a.status === 'confirmed';
+              const hoursLeft = hoursUntilConfirmDeadline(a.selected_at);
+              const urgent = !isConfirmed && hoursLeft !== null && hoursLeft <= 12;
+              const expired = !isConfirmed && hoursLeft !== null && hoursLeft <= 0;
+              return (
+                <div key={a.id} className="flex items-start justify-between gap-3 py-2 px-3 rounded-[8px] bg-[rgba(42,32,24,0.02)]">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                    <p className="text-[12px] text-[var(--ink-50)] truncate">@{handle}{a.creators?.level ? ` · L${a.creators.level}` : ''}</p>
+                    <div className="mt-1 flex items-center gap-1.5 flex-wrap">
+                      {isConfirmed ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold bg-[#E1F5EE] text-[#0F6E56]">Confirmed</span>
+                      ) : expired ? (
+                        <span className="inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold bg-[rgba(42,32,24,0.06)] text-[var(--ink-50)]">Expired</span>
+                      ) : (
+                        <span className={`inline-flex items-center px-1.5 py-0.5 rounded-[4px] text-[10px] font-semibold ${urgent ? 'bg-[rgba(196,103,74,0.12)] text-[var(--terra)]' : 'bg-[#FAEEDA] text-[#854F0B]'}`}>
+                          {fmtHoursLeft(hoursLeft)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {!isConfirmed && (
+                    <div className="flex items-center gap-1 flex-shrink-0">
+                      <button onClick={() => onReturnToReserves(a.id)}
+                        className="text-[11px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)] px-2 py-1 rounded-[6px] hover:bg-[rgba(42,32,24,0.04)]">
+                        To reserves
+                      </button>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+          {hasUnconfirmed && reserves.length > 0 && (
+            <p className="text-[12px] text-[var(--ink-50)] mt-2">Keep reserves on hand — {awaitingCount} selected creator{awaitingCount === 1 ? " hasn't" : "s haven't"} confirmed yet.</p>
+          )}
+        </div>
+      )}
+
+      {reserves.length > 0 && (
+        <div>
+          <p className="text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-50)] mb-2">Reserves</p>
+          <div className="space-y-1.5">
+            {reserves.map(a => {
+              const name = a.creators?.display_name || a.creators?.name || 'Creator';
+              const handle = a.creators?.instagram_handle?.replace('@', '') || '';
+              return (
+                <div key={a.id} className="flex items-start justify-between gap-3 py-2 px-3 rounded-[8px] bg-[rgba(42,32,24,0.02)]">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[13px] font-semibold text-[var(--ink)] truncate">{name}</p>
+                    <p className="text-[12px] text-[var(--ink-50)] truncate">@{handle}{a.creators?.level ? ` · L${a.creators.level}` : ''}</p>
+                  </div>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <button onClick={() => onSelect(a.creator_id)}
+                      className="text-[11px] font-semibold text-white bg-[var(--terra)] px-2.5 py-1 rounded-[6px] hover:opacity-85">
+                      Select
+                    </button>
+                    <button onClick={() => onDecline(a.id)}
+                      className="text-[11px] font-medium text-[var(--ink-50)] hover:text-[var(--ink)] px-2 py-1 rounded-[6px] hover:bg-[rgba(42,32,24,0.04)]">
+                      Decline
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {declined.length > 0 && (
+        <details className="group">
+          <summary className="cursor-pointer text-[11px] font-medium uppercase tracking-[0.04em] text-[var(--ink-50)] hover:text-[var(--ink)] list-none flex items-center gap-1">
+            <span className="group-open:rotate-90 transition-transform">▸</span> Declined ({declined.length})
+          </summary>
+          <div className="mt-2 space-y-1 opacity-60">
+            {declined.map(a => {
+              const name = a.creators?.display_name || a.creators?.name || 'Creator';
+              return (
+                <div key={a.id} className="py-1.5 px-3 rounded-[8px] bg-[rgba(42,32,24,0.02)] text-[12px] text-[var(--ink-60)] truncate">
+                  {name}
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      )}
+    </div>
+  );
 }
 
 // ─── Kanban column config ───
@@ -895,6 +1057,16 @@ function ParticipationModal({ campaign, onClose, onRefresh }: {
 }
 
 // ─── Campaign Peek Panel (right side) ───
+interface PeekApplication {
+  id: string;
+  creator_id: string;
+  status: string;
+  selected_at: string | null;
+  applied_at: string;
+  pitch: string | null;
+  creators?: { name: string; display_name: string | null; instagram_handle: string; level: number | null; avatar_url: string | null };
+}
+
 function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onDelete, onPickWinners }: {
   campaign: Campaign; onClose: () => void; onViewParticipation: () => void; onEdit: () => void; onDelete: () => void; onPickWinners: () => void;
 }) {
@@ -902,6 +1074,17 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
   const [showAddApplicant, setShowAddApplicant] = useState(false);
   const [allCreators, setAllCreators] = useState<{id:string;name:string;display_name:string|null;instagram_handle:string}[]>([]);
   const [addingCreator, setAddingCreator] = useState<string | null>(null);
+  const [applications, setApplications] = useState<PeekApplication[]>([]);
+
+  const fetchApplications = async () => {
+    const { data } = await supabase.from('applications')
+      .select('id, creator_id, status, selected_at, applied_at, pitch, creators(name, display_name, instagram_handle, level, avatar_url)')
+      .eq('campaign_id', campaign.id)
+      .order('applied_at', { ascending: false });
+    if (data) setApplications(data as unknown as PeekApplication[]);
+  };
+
+  useEffect(() => { fetchApplications(); }, [campaign.id]);
 
   const fetchCreatorsForAdd = async () => {
     const { data } = await supabase.from('creators').select('id, name, display_name, instagram_handle').eq('approved', true).order('name');
@@ -921,6 +1104,7 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
     if (error) { showToast(error.message.includes('duplicate') ? 'Creator already applied' : 'Failed to add applicant'); return; }
     setShowAddApplicant(false);
     showToast('Applicant added');
+    fetchApplications();
   };
 
   const handleSelectCreator = async (creatorId: string) => {
@@ -943,6 +1127,27 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
       });
     }
     showToast('Creator selected — waiting for them to confirm');
+    fetchApplications();
+  };
+
+  const handleReturnToReserves = async (appId: string) => {
+    if (!window.confirm("Return this creator to reserves? They'll no longer be selected.")) return;
+    const { error } = await supabase.from('applications')
+      .update({ status: 'interested', selected_at: null })
+      .eq('id', appId);
+    if (error) { showToast('Failed to update'); return; }
+    showToast('Creator moved to reserves');
+    fetchApplications();
+  };
+
+  const handleDeclineApp = async (appId: string) => {
+    if (!window.confirm('Decline this creator?')) return;
+    const { error } = await supabase.from('applications')
+      .update({ status: 'declined' })
+      .eq('id', appId);
+    if (error) { showToast('Failed to update'); return; }
+    showToast('Creator declined');
+    fetchApplications();
   };
 
   const peekLabel = "text-[12px] font-medium uppercase tracking-[0.05em] text-[var(--ink-60)] mb-1";
@@ -969,6 +1174,21 @@ function CampaignPeekPanel({ campaign, onClose, onViewParticipation, onEdit, onD
         {/* Scrollable body — reuses CampaignDetail from creator app */}
         <div className="flex-1 overflow-y-auto">
           <CampaignDetail campaignId={campaign.id} hideActions />
+
+          {/* Selection — groups applicants by status so admin can see at
+              a glance which selected creators haven't confirmed yet and
+              how long each has left in their 48h window. Mirrors the
+              Selected / Reserves / Declined split on the brand side. */}
+          {campaign.campaign_type !== 'community' && (
+            <SelectionSection
+              campaignId={campaign.id}
+              applications={applications}
+              target={campaign.creator_target || 0}
+              onSelect={handleSelectCreator}
+              onReturnToReserves={handleReturnToReserves}
+              onDecline={handleDeclineApp}
+            />
+          )}
 
           {/* Admin controls */}
           <div className="px-5 py-4 border-t border-[rgba(42,32,24,0.08)]">
@@ -1086,7 +1306,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
   const [participationCampaign, setParticipationCampaign] = useState<Campaign | null>(null);
   const [pickWinnersCampaign, setPickWinnersCampaign] = useState<Campaign | null>(null);
   const [showWizard, setShowWizard] = useState(false);
-  const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; submitted: number; completed: number }>>({});
+  const [appCounts, setAppCounts] = useState<Record<string, { applicants: number; selected: number; confirmed: number; awaiting: number; reserves: number; urgent: boolean; submitted: number; completed: number }>>({});
   const [totalStats, setTotalStats] = useState({ active: 0, applicants: 0, reels: 0, reach: 0 });
   const [deletingCampaign, setDeletingCampaign] = useState<string | null>(null);
   const [selectedCampaigns, setSelectedCampaigns] = useState<Set<string>>(new Set());
@@ -1165,15 +1385,29 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
       let totalApplicants = 0, totalReels = 0, totalReach = 0;
       for (const c of campRes.data) {
         const [appRes, partRes] = await Promise.all([
-          supabase.from('applications').select('status').eq('campaign_id', c.id),
+          supabase.from('applications').select('status, selected_at').eq('campaign_id', c.id),
           supabase.from('participations').select('status, reach, reel_url').eq('campaign_id', c.id),
         ]);
         const a = appRes.data?.length || 0;
         const r = partRes.data?.filter((p: any) => p.reel_url).length || 0;
         const reach = partRes.data?.reduce((s: number, p: any) => s + (p.reach || 0), 0) || 0;
+        const confirmed = appRes.data?.filter((x: any) => x.status === 'confirmed').length || 0;
+        const awaitingRows = appRes.data?.filter((x: any) => x.status === 'selected') || [];
+        const awaiting = awaitingRows.length;
+        const reserves = appRes.data?.filter((x: any) => x.status === 'interested').length || 0;
+        // Any pending selection within 12 hours of expiry — mirrors the
+        // same threshold used inside SelectionSection for consistency.
+        const urgent = awaitingRows.some((x: any) => {
+          const h = hoursUntilConfirmDeadline(x.selected_at);
+          return h !== null && h <= 12;
+        });
         counts[c.id] = {
           applicants: a,
-          selected: appRes.data?.filter((x: any) => x.status === 'selected' || x.status === 'confirmed').length || 0,
+          selected: confirmed + awaiting,
+          confirmed,
+          awaiting,
+          reserves,
+          urgent,
           submitted: partRes.data?.filter((p: any) => p.status === 'content_submitted' || p.status === 'completed').length || 0,
           completed: partRes.data?.filter((p: any) => p.status === 'completed').length || 0,
         };
@@ -1322,7 +1556,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         {/* Mobile card list (always list view on mobile) */}
         <div className="md:hidden space-y-2">
           {filteredCampaigns.map(c => {
-            const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+            const counts = appCounts[c.id] || { applicants: 0, selected: 0, confirmed: 0, awaiting: 0, reserves: 0, urgent: false, submitted: 0, completed: 0 };
             return (
               <div key={c.id} onClick={() => setPeekCampaign(peekCampaign?.id === c.id ? null : c)}
                 className="bg-white rounded-[12px] p-4 active:bg-[rgba(42,32,24,0.02)]" style={{ boxShadow: '0 1px 4px rgba(42,32,24,0.04)' }}>
@@ -1333,9 +1567,14 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                   </div>
                   <StatusBadge status={c.status} />
                 </div>
-                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)]">
+                <div className="flex items-center gap-3 text-[12px] text-[var(--ink-50)] flex-wrap">
                   <span>{counts.applicants}/{c.creator_target} applicants</span>
-                  <span>{counts.selected} selected</span>
+                  {c.campaign_type !== 'community' && (counts.confirmed + counts.awaiting > 0 || counts.reserves > 0) && (
+                    <span className="inline-flex items-center gap-1">
+                      {counts.urgent && <span className="w-1.5 h-1.5 rounded-full bg-[var(--terra)]" title="A pending selection is within 12h of expiry" />}
+                      <span><span className="text-[var(--ink)] font-semibold">{counts.confirmed}</span> confirmed{counts.awaiting > 0 ? ` · ${counts.awaiting} awaiting` : ''}{counts.reserves > 0 ? ` · ${counts.reserves} reserve${counts.reserves === 1 ? '' : 's'}` : ''}</span>
+                    </span>
+                  )}
                   <span>{counts.submitted} reels</span>
                 </div>
               </div>
@@ -1362,7 +1601,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
             </tr></thead>
             <tbody>
               {filteredCampaigns.map(c => {
-                const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+                const counts = appCounts[c.id] || { applicants: 0, selected: 0, confirmed: 0, awaiting: 0, reserves: 0, urgent: false, submitted: 0, completed: 0 };
                 const selected = peekCampaign?.id === c.id;
                 const isChecked = selectedCampaigns.has(c.id);
                 return (
@@ -1416,7 +1655,20 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                           <span className="text-[14px] text-[var(--ink-60)]">{counts.applicants}/{c.creator_target}</span>
                         </div>
                       </td>
-                      <td className={tdCls}>{counts.selected}</td>
+                      <td className={tdCls}>
+                        {c.campaign_type === 'community' ? (
+                          counts.selected
+                        ) : (
+                          <div className="inline-flex items-center gap-1.5 whitespace-nowrap">
+                            {counts.urgent && <span className="w-1.5 h-1.5 rounded-full bg-[var(--terra)]" title="Pending selection <12h from expiry" />}
+                            <span>
+                              <span className="text-[var(--ink)] font-semibold">{counts.confirmed}</span>
+                              {counts.awaiting > 0 && <span className="text-[var(--ink-60)]"> + {counts.awaiting}</span>}
+                              {counts.reserves > 0 && <span className="text-[var(--ink-50)]"> · {counts.reserves}R</span>}
+                            </span>
+                          </div>
+                        )}
+                      </td>
                       <td className={tdCls}>{counts.submitted}</td>
                       <td className={tdCls}>{counts.completed}</td>
                       <td className={`${tdCls} text-[var(--ink-50)]`}>{fmtShortDate(c.expression_deadline)}</td>
@@ -1445,7 +1697,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                 {/* Cards */}
                 <div className="space-y-2.5">
                   {colCampaigns.map(c => {
-                    const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+                    const counts = appCounts[c.id] || { applicants: 0, selected: 0, confirmed: 0, awaiting: 0, reserves: 0, urgent: false, submitted: 0, completed: 0 };
                     const selected = peekCampaign?.id === c.id;
                     return (
                       <div key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
@@ -1488,7 +1740,14 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
                         {/* Footer meta */}
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2 text-[11px] text-[var(--ink-35)]">
-                            {counts.selected > 0 && <span>{counts.selected} selected</span>}
+                            {c.campaign_type !== 'community' && counts.confirmed + counts.awaiting > 0 && (
+                              <span className="inline-flex items-center gap-1">
+                                {counts.urgent && <span className="w-1 h-1 rounded-full bg-[var(--terra)]" title="Pending selection <12h from expiry" />}
+                                <span>{counts.confirmed}{counts.awaiting > 0 ? `+${counts.awaiting}` : ''}</span>
+                              </span>
+                            )}
+                            {c.campaign_type !== 'community' && counts.reserves > 0 && <span>{counts.reserves}R</span>}
+                            {c.campaign_type === 'community' && counts.selected > 0 && <span>{counts.selected} selected</span>}
                             {counts.submitted > 0 && <span>{counts.submitted} reels</span>}
                           </div>
                           {c.expression_deadline && (
@@ -1519,7 +1778,7 @@ export default function AdminCampaignsTab({ showModal, onCloseModal, onOpenModal
         {viewMode === 'gallery' && (
           <div className="hidden md:grid grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in">
             {filteredCampaigns.map(c => {
-              const counts = appCounts[c.id] || { applicants: 0, selected: 0, submitted: 0, completed: 0 };
+              const counts = appCounts[c.id] || { applicants: 0, selected: 0, confirmed: 0, awaiting: 0, reserves: 0, urgent: false, submitted: 0, completed: 0 };
               const selected = peekCampaign?.id === c.id;
               return (
                 <button key={c.id} onClick={() => setPeekCampaign(selected ? null : c)}
