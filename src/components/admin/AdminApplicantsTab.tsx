@@ -6,7 +6,7 @@ import { getLevelColour } from '../../lib/levels';
 import { Check, X, Search, AtSign, ExternalLink, Inbox, LayoutGrid, LayoutList, ChevronRight, Mail, MapPin, Award, Film, Clock, Columns2, ChevronDown, ChevronLeft } from 'lucide-react';
 import Select from '../ui/Select';
 import InstagramEmbed from '../InstagramEmbed';
-import { deadlineUrgency, fmtCountdown, type DeadlineUrgency } from '../../lib/dates';
+import { deadlineUrgency, fmtCountdown, type DeadlineUrgency, hoursUntilConfirmDeadline } from '../../lib/dates';
 
 interface Applicant {
   id: string;
@@ -417,11 +417,29 @@ export default function AdminApplicantsTab() {
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium bg-[var(--terra-light)] text-[var(--terra)]">
         <Check size={11} /> Entered
       </span>
-    ) : a.status === 'selected' ? (
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={{ background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' }}>
-        <Check size={11} /> Selected
-      </span>
-    ) : a.status === 'confirmed' ? (
+    ) : a.status === 'selected' ? (() => {
+      // Surface the 48h confirmation window so the admin can see at a
+      // glance how long a pending selection has left before the cron
+      // auto-declines it. Mirrors the SelectionSection treatment in
+      // AdminCampaignsTab.
+      const hoursLeft = hoursUntilConfirmDeadline(a.selected_at);
+      const expired = hoursLeft !== null && hoursLeft <= 0;
+      const urgent = hoursLeft !== null && hoursLeft > 0 && hoursLeft <= 12;
+      const label = hoursLeft === null ? 'Selected'
+        : expired ? 'Expired'
+        : hoursLeft < 1 ? 'Selected · <1h left'
+        : `Selected · ${Math.floor(hoursLeft)}h left`;
+      const style = expired
+        ? { background: 'rgba(42,32,24,0.06)', color: 'var(--ink-50)' }
+        : urgent
+          ? { background: 'rgba(196,103,74,0.12)', color: 'var(--terra)' }
+          : { background: 'rgba(122,148,120,0.12)', color: 'var(--sage)' };
+      return (
+        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={style}>
+          {urgent ? <Clock size={11} /> : <Check size={11} />} {label}
+        </span>
+      );
+    })() : a.status === 'confirmed' ? (
       <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-[6px] text-[11px] font-medium" style={{ background: 'rgba(140,122,170,0.12)', color: 'var(--violet)' }}>
         <Check size={11} /> Confirmed
       </span>
