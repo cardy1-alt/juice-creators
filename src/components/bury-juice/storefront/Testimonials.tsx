@@ -82,7 +82,7 @@ export function Testimonials() {
             <blockquote
               style={{
                 margin: 0,
-                fontSize: 14,
+                fontSize: 15,
                 lineHeight: 1.55,
                 color: 'var(--ink)',
               }}

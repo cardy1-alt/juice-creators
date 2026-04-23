@@ -468,7 +468,7 @@ function StatCard({
         {value}
       </div>
       {sublabel && (
-        <div style={{ fontSize: 11, color: 'var(--terra)', fontWeight: 600, marginTop: 4 }}>
+        <div style={{ fontSize: 12, color: 'var(--terra)', fontWeight: 600, marginTop: 4 }}>
           {sublabel}
         </div>
       )}
@@ -495,7 +495,7 @@ function SocialProof() {
           textAlign: 'center',
         }}
       >
-        <span style={{ fontWeight: 600, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: 10 }}>
+        <span style={{ fontWeight: 600, letterSpacing: '0.08em', textTransform: 'uppercase', fontSize: 11 }}>
           Trusted by
         </span>
         {names.map((n, i) => (
@@ -522,14 +522,6 @@ function PlacementRow({
   onBook: () => void;
 }) {
   const t = BJ_PRICING[tier];
-  // Cost-per-reader framing: single-issue price divided by the
-  // average opened-count (subscribers × open rate). Rounds to the
-  // nearest penny and shows as "From ~Np per reader" so the sticker
-  // price feels tractable once you divide it out.
-  const perReaderPence = t.single / (BJ_STATS.subscribers * BJ_STATS.open_rate);
-  const perReaderLabel = perReaderPence < 1
-    ? `${Math.max(1, Math.round(perReaderPence * 10) / 10)}p`
-    : `${Math.round(perReaderPence)}p`;
   return (
     <div
       style={{
@@ -550,21 +542,18 @@ function PlacementRow({
         {/* Title + description + next-available */}
         <div>
           <div style={{ display: 'flex', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' }}>
-            <h3 style={{ fontSize: 17, fontWeight: 600, margin: 0 }}>{t.name}</h3>
-            <span style={{ fontSize: 12, color: 'var(--ink-60)' }}>· {t.position.toLowerCase()}</span>
+            <h3 style={{ fontSize: 18, fontWeight: 600, margin: 0 }}>{t.name}</h3>
+            <span style={{ fontSize: 13, color: 'var(--ink-60)' }}>· {t.position.toLowerCase()}</span>
           </div>
-          <p style={{ fontSize: 13, color: 'var(--ink-60)', margin: '4px 0 0', lineHeight: 1.5 }}>
+          <p style={{ fontSize: 14, color: 'var(--ink-60)', margin: '6px 0 0', lineHeight: 1.5 }}>
             {t.description}
           </p>
-          <div style={{ fontSize: 12, color: 'var(--ink-35)', marginTop: 4 }}>
-            ≈ {perReaderLabel} per reader opened
-          </div>
           {nextAvailable !== undefined && (
             <div
               style={{
-                fontSize: 12,
-                color: nextAvailable ? 'var(--terra)' : 'var(--ink-35)',
-                marginTop: 6,
+                fontSize: 13,
+                color: nextAvailable ? 'var(--terra)' : 'var(--ink-60)',
+                marginTop: 8,
                 fontWeight: 500,
               }}
             >
@@ -672,7 +661,7 @@ function PriceStep({ label, sublabel, price }: { label: string; sublabel: string
         {price}
       </div>
       {sublabel && (
-        <div style={{ fontSize: 11, color: 'var(--terra)', fontWeight: 600, marginTop: 3 }}>
+        <div style={{ fontSize: 12, color: 'var(--terra)', fontWeight: 600, marginTop: 3 }}>
           {sublabel}
         </div>
       )}
