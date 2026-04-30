@@ -1,13 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   BJ_PRICING,
-  BJ_STATS,
   formatGBP,
   packSavingsPct,
   priceForTierAndSize,
   type BjPackSize,
   type BjTier,
 } from '../../lib/bury-juice/pricing.js';
+import { useBjStats } from '../../lib/bury-juice/stats.js';
 import {
   nextNThursdays,
   parseISODate,
@@ -46,6 +46,11 @@ const WEEKS_AHEAD = 12;
 type NextAvailability = Partial<Record<BjTier, string | null>>;
 
 export default function SponsorStorefront() {
+  // Live newsletter stats from bj_stats (DB-backed). Falls back to
+  // BJ_STATS constants from pricing.ts until the fetch returns, so
+  // the page never renders without numbers.
+  const stats = useBjStats();
+
   // Lazy init from localStorage so a sponsor who gets interrupted
   // (tab kill, accidental navigation) returns to the same text they
   // typed. Files don't round-trip through JSON — photo/logo will
@@ -280,13 +285,13 @@ export default function SponsorStorefront() {
       {/* ── Stats ──────────────────────────────────────────────── */}
       <section style={{ maxWidth: 680, margin: '0 auto', padding: '32px 24px 0' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: 12 }}>
-          <StatCard label="Subscribers" value={BJ_STATS.subscribers.toLocaleString('en-GB')} />
+          <StatCard label="Subscribers" value={stats.subscribers.toLocaleString('en-GB')} />
           <StatCard
             label="Open rate"
-            value={`${Math.round(BJ_STATS.open_rate * 100)}%`}
+            value={`${Math.round(stats.open_rate * 100)}%`}
             sublabel="2.5× industry avg"
           />
-          <StatCard label="Click-through" value={`${(BJ_STATS.ctr * 100).toFixed(1)}%`} />
+          <StatCard label="Click-through" value={`${(stats.ctr * 100).toFixed(1)}%`} />
         </div>
       </section>
 

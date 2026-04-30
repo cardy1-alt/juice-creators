@@ -130,6 +130,8 @@ export default function AdminBuryJuiceTab() {
 
   return (
     <div style={{ paddingBottom: 32 }}>
+      <StatsEditor />
+
       <div
         style={{
           display: 'grid',
@@ -1431,5 +1433,229 @@ function PendingPacksStrip({
         })}
       </div>
     </div>
+  );
+}
+
+// ─── Public stats editor ──────────────────────────────────────────
+// Surfaces the bj_stats single-row table as a small inline form.
+// Subscribers / open rate / CTR are what the storefront's stat cards
+// show — Jacob updates these whenever beehiiv reports new numbers,
+// no code deploy required.
+function StatsEditor() {
+  const [subscribers, setSubscribers] = useState('');
+  const [openRate, setOpenRate] = useState('');
+  const [ctr, setCtr] = useState('');
+  const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const [dirty, setDirty] = useState(false);
+
+  useEffect(() => {
+    supabase
+      .from('bj_stats')
+      .select('subscribers,open_rate,ctr,updated_at')
+      .eq('id', 1)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (!data) return;
+        setSubscribers(String(data.subscribers));
+        setOpenRate((Number(data.open_rate) * 100).toFixed(2));
+        setCtr((Number(data.ctr) * 100).toFixed(2));
+        setSavedAt(data.updated_at);
+      });
+  }, []);
+
+  async function save() {
+    setSaving(true);
+    setErr(null);
+    const subsN = parseInt(subscribers, 10);
+    const orN = Number(openRate) / 100;
+    const ctrN = Number(ctr) / 100;
+    if (!Number.isFinite(subsN) || subsN <= 0) {
+      setSaving(false);
+      setErr('Subscribers must be a positive integer.');
+      return;
+    }
+    if (!Number.isFinite(orN) || orN < 0 || orN > 1) {
+      setSaving(false);
+      setErr('Open rate must be between 0 and 100%.');
+      return;
+    }
+    if (!Number.isFinite(ctrN) || ctrN < 0 || ctrN > 1) {
+      setSaving(false);
+      setErr('Click-through must be between 0 and 100%.');
+      return;
+    }
+    const { data, error } = await supabase
+      .from('bj_stats')
+      .update({ subscribers: subsN, open_rate: orN, ctr: ctrN })
+      .eq('id', 1)
+      .select('updated_at')
+      .single();
+    setSaving(false);
+    if (error) {
+      setErr(error.message);
+      return;
+    }
+    setSavedAt(data?.updated_at ?? null);
+    setDirty(false);
+  }
+
+  return (
+    <div
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 20,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'baseline',
+          marginBottom: 12,
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <div>
+          <div style={{ fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--ink-60)' }}>
+            Public stats
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--ink-60)', marginTop: 2 }}>
+            Shown on the storefront's stat cards. Updates apply on next page load.
+          </div>
+        </div>
+        {savedAt && (
+          <div style={{ fontSize: 11, color: 'var(--ink-35)' }}>
+            Last updated {new Date(savedAt).toLocaleString('en-GB', { dateStyle: 'medium', timeStyle: 'short' })}
+          </div>
+        )}
+      </div>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(140px, 1fr))',
+          gap: 10,
+          alignItems: 'end',
+        }}
+      >
+        <StatField
+          label="Subscribers"
+          value={subscribers}
+          onChange={(v) => {
+            setSubscribers(v);
+            setDirty(true);
+          }}
+          inputMode="numeric"
+          suffix=""
+        />
+        <StatField
+          label="Open rate"
+          value={openRate}
+          onChange={(v) => {
+            setOpenRate(v);
+            setDirty(true);
+          }}
+          inputMode="decimal"
+          suffix="%"
+        />
+        <StatField
+          label="Click-through"
+          value={ctr}
+          onChange={(v) => {
+            setCtr(v);
+            setDirty(true);
+          }}
+          inputMode="decimal"
+          suffix="%"
+        />
+        <button
+          type="button"
+          onClick={save}
+          disabled={saving || !dirty}
+          style={{
+            padding: '8px 14px',
+            borderRadius: 10,
+            border: 'none',
+            background: dirty ? 'var(--terra)' : 'var(--ink-08)',
+            color: dirty ? '#fff' : 'var(--ink-35)',
+            cursor: dirty && !saving ? 'pointer' : 'not-allowed',
+            fontSize: 13,
+            fontWeight: 600,
+            fontFamily: 'inherit',
+            height: 38,
+          }}
+        >
+          {saving ? 'Saving…' : dirty ? 'Save' : 'Saved'}
+        </button>
+      </div>
+
+      {err && (
+        <div style={{ marginTop: 8, color: 'var(--terra)', fontSize: 12 }}>
+          {err}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function StatField({
+  label,
+  value,
+  onChange,
+  inputMode,
+  suffix,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  inputMode: 'numeric' | 'decimal';
+  suffix: string;
+}) {
+  return (
+    <label style={{ display: 'block' }}>
+      <span style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--ink-60)', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+        {label}
+      </span>
+      <div style={{ position: 'relative' }}>
+        <input
+          type="text"
+          inputMode={inputMode}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: suffix ? '8px 26px 8px 10px' : '8px 10px',
+            fontSize: 14,
+            border: '1px solid var(--border-color-input)',
+            borderRadius: 8,
+            background: 'var(--card)',
+            fontFamily: 'inherit',
+            color: 'var(--ink)',
+            height: 38,
+          }}
+        />
+        {suffix && (
+          <span
+            style={{
+              position: 'absolute',
+              right: 10,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              color: 'var(--ink-35)',
+              fontSize: 13,
+              pointerEvents: 'none',
+            }}
+          >
+            {suffix}
+          </span>
+        )}
+      </div>
+    </label>
   );
 }

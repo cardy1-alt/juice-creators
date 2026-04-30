@@ -52,10 +52,10 @@ export const BJ_PRICING: Record<BjTier, BjTierConfig> = {
 };
 
 export const BJ_STATS = {
-  subscribers: 7346,
+  subscribers: 7404,
   open_rate: 0.5304,
   ctr: 0.148,
-  effective_reach: 3896, // subscribers × open_rate, rounded
+  effective_reach: 3927, // subscribers × open_rate, rounded
 } as const;
 
 // Thursday = 4 when using JS getDay() (Sun=0).
