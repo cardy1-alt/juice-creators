@@ -1,0 +1,279 @@
+/* ──────────────────────────────────────────────────────────
+   BURY JUICE — sponsor storefront surface
+
+   Scoped to `.bj-surface`. The storefront is its own product —
+   we borrow some Nayba tokens (Instrument Sans, shell background,
+   ink text) so it sits comfortably next to the admin, but it is
+   free to diverge on rhythm, weight and CTA treatment.
+   ────────────────────────────────────────────────────────── */
+
+.bj-surface {
+  /* Bury Juice brand accent. Overrides Nayba's terra within the
+     storefront funnel only — every inline `var(--terra)` in the
+     Bury Juice components picks up #A20052 here, while the Nayba
+     admin (outside .bj-surface) keeps its own terra. */
+  --terra:       #A20052;
+  --terra-hover: #8B0046;
+  --terra-light: rgba(162, 0, 82, 0.08);
+  --terra-10:    rgba(162, 0, 82, 0.10);
+  --terra-15:    rgba(162, 0, 82, 0.15);
+  --terra-20:    rgba(162, 0, 82, 0.20);
+  --terra-40:    rgba(162, 0, 82, 0.40);
+  --terra-ring:  rgba(162, 0, 82, 0.30);
+
+  /* Legacy --bj-* aliases for any component that still uses them. */
+  --bj-crimson:  var(--terra);
+  --bj-gold:     var(--golden-mist);
+  --bj-cream:    var(--shell);
+  --bj-charcoal: var(--ink);
+  --bj-white:    var(--card);
+  --bj-mid:      var(--ink-60);
+  --bj-soft:     var(--ink-35);
+  --bj-faint:    var(--border);
+
+  font-family: var(--font-sans);
+  background: var(--shell);
+  color: var(--ink);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* h1 — the main page title — uses Hornbill. Everything else stays
+   on Instrument Sans for readability at small sizes. */
+.bj-surface h1 {
+  font-family: 'Hornbill', var(--font-sans);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0;
+}
+
+.bj-surface h2,
+.bj-surface h3,
+.bj-surface h4 {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-semibold);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--ink);
+  margin: 0;
+}
+
+/* Default text/element colour inside the surface. Button colour is
+   set by the .bj-btn rules further down — .bj-surface .bj-btn has
+   higher specificity so buttons stay white-on-terra. */
+.bj-surface p,
+.bj-surface li,
+.bj-surface label,
+.bj-surface input,
+.bj-surface textarea,
+.bj-surface select,
+.bj-surface a {
+  font-family: var(--font-sans);
+  color: var(--ink);
+}
+.bj-surface button {
+  font-family: var(--font-sans);
+}
+
+/* ── Buttons ─────────────────────────────────────────────────
+   Scoped to .bj-surface so the text colour wins over the
+   generic button rule above without !important. Touch target
+   comfortably clears 44px on every size. */
+.bj-surface .bj-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 20px;
+  min-height: 48px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0;
+  text-transform: none;
+  border: 1px solid var(--terra);
+  background: var(--terra);
+  color: #fff;
+  cursor: pointer;
+  border-radius: var(--r-button);
+  text-decoration: none;
+  transition: background-color 0.15s ease, transform 0.06s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 2px rgba(162, 0, 82, 0.14);
+}
+.bj-surface .bj-btn:hover {
+  background: var(--terra-hover);
+  border-color: var(--terra-hover);
+  box-shadow: 0 4px 12px rgba(162, 0, 82, 0.2);
+}
+.bj-surface .bj-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 2px rgba(162, 0, 82, 0.14);
+}
+.bj-surface .bj-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.bj-surface .bj-btn--ghost {
+  background: transparent;
+  color: var(--terra);
+  box-shadow: none;
+}
+.bj-surface .bj-btn--ghost:hover {
+  background: var(--terra-light);
+  color: var(--terra);
+  border-color: var(--terra);
+  box-shadow: none;
+}
+
+/* Block-level primary CTA (full-width, taller) used on the mobile
+   sticky bar and for the main Pay button. */
+.bj-surface .bj-btn--block {
+  display: flex;
+  width: 100%;
+  padding: 16px 20px;
+  min-height: 52px;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+/* ── Inputs ── */
+.bj-input,
+.bj-textarea,
+.bj-select {
+  width: 100%;
+  padding: 14px 14px;
+  min-height: 48px;
+  border: 1px solid var(--border-color-input);
+  background: var(--card);
+  font-size: 16px; /* 16px prevents iOS zoom on focus */
+  color: var(--ink);
+  border-radius: var(--r-input);
+  font-family: inherit;
+}
+.bj-textarea {
+  min-height: 96px;
+  padding: 12px 14px;
+}
+.bj-input:focus,
+.bj-textarea:focus,
+.bj-select:focus {
+  outline: none;
+  border-color: var(--terra);
+  box-shadow: 0 0 0 3px var(--terra-10);
+}
+
+/* ── Labels ── */
+.bj-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+  margin-bottom: 8px;
+  color: var(--ink-60);
+}
+
+/* ── Sections ── */
+.bj-section {
+  padding: 64px 32px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+@media (max-width: 680px) {
+  .bj-section {
+    padding: 36px 18px;
+  }
+}
+
+.bj-rule {
+  height: 1px;
+  background: var(--border-color);
+  width: 100%;
+  margin: 0;
+}
+
+/* ── Wordmark ── */
+.bj-wordmark {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* ── Cards ── */
+.bj-card {
+  background: var(--card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--r-card);
+  padding: 24px;
+}
+
+/* ── Drag-and-drop zone ── */
+.bj-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 140px;
+  padding: 20px;
+  border: 1.5px dashed var(--border-color-hover);
+  border-radius: var(--r-card);
+  background: var(--card);
+  color: var(--ink-60);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+.bj-dropzone:hover,
+.bj-dropzone--active {
+  border-color: var(--terra);
+  background: var(--terra-light);
+  color: var(--ink);
+}
+.bj-dropzone--filled {
+  border-style: solid;
+  border-color: var(--terra);
+  background: var(--terra-light);
+  color: var(--ink);
+}
+
+/* ── Admin side-peek animations ── */
+@keyframes bjPeekOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes bjPeekSlide {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Sticky mobile CTA on the storefront ── */
+@keyframes bjStickyUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+/* Sticky bar sits above the iOS home-bar safe area. env(safe-area-
+   inset-bottom) resolves to 0 on browsers that don't need it, so
+   one rule covers both notched and non-notched devices. */
+.bj-sticky-mobile {
+  padding-bottom: calc(12px + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .bj-sticky-mobile {
+    display: none !important;
+  }
+}
+/* Extra bottom padding on the last page section when the sticky
+   bar is present so it doesn't cover the footer text. */
+@media (max-width: 767px) {
+  .bj-surface.bj-has-sticky footer {
+    padding-bottom: calc(96px + env(safe-area-inset-bottom));
+  }
+}
