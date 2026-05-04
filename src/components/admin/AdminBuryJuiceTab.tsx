@@ -40,6 +40,22 @@ interface PendingPack {
   created_at: string;
 }
 
+interface LegacyRate {
+  id: string;
+  business_id: string;
+  tier: BjTier;
+  monthly_rate_gbp: number;
+  cadence: string;
+  is_comp: boolean;
+  active: boolean;
+}
+
+interface SponsorSummary {
+  business: BusinessRow;
+  upcomingBookings: number;
+  legacyRate: LegacyRate | null;
+}
+
 interface AddingContext {
   business_id: string;
   tier: BjTier;
@@ -60,15 +76,17 @@ export default function AdminBuryJuiceTab() {
   const [bookings, setBookings] = useState<BjBooking[] | null>(null);
   const [businesses, setBusinesses] = useState<BusinessRow[]>([]);
   const [pendingPacks, setPendingPacks] = useState<PendingPack[]>([]);
+  const [legacyRates, setLegacyRates] = useState<LegacyRate[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [view, setView] = useState<ViewMode>('calendar');
   const [editing, setEditing] = useState<BjBooking | null>(null);
   const [adding, setAdding] = useState(false);
   const [addingContext, setAddingContext] = useState<AddingContext | null>(null);
   const [peekIso, setPeekIso] = useState<string | null>(null);
+  const [removing, setRemoving] = useState<BusinessRow | null>(null);
 
   const load = useCallback(async () => {
-    const [bookingsRes, businessesRes, packsRes] = await Promise.all([
+    const [bookingsRes, businessesRes, packsRes, ratesRes] = await Promise.all([
       supabase
         .from('bj_bookings')
         .select('*')
@@ -86,6 +104,9 @@ export default function AdminBuryJuiceTab() {
         .select('id,business_id,tier,size,credits_remaining,amount_paid_gbp,expires_at,created_at')
         .gt('credits_remaining', 0)
         .order('created_at', { ascending: false }),
+      supabase
+        .from('bj_legacy_rates')
+        .select('id,business_id,tier,monthly_rate_gbp,cadence,is_comp,active'),
     ]);
     if (bookingsRes.error) {
       setError(bookingsRes.error.message);
@@ -94,6 +115,7 @@ export default function AdminBuryJuiceTab() {
     setBookings((bookingsRes.data ?? []) as BjBooking[]);
     setPendingPacks((packsRes.data ?? []) as PendingPack[]);
     setBusinesses((businessesRes.data ?? []) as BusinessRow[]);
+    setLegacyRates((ratesRes.data ?? []) as LegacyRate[]);
   }, []);
 
   useEffect(() => {
@@ -105,6 +127,51 @@ export default function AdminBuryJuiceTab() {
     for (const b of businesses) m[b.id] = b;
     return m;
   }, [businesses]);
+
+  // Sponsor list = every business that has at least one upcoming
+  // booking or a legacy-rate row. This is the manage-able set Jacob
+  // sees in the Sponsors panel; one-off buyers from past issues
+  // disappear from it once their bookings are in the past.
+  const sponsorSummaries = useMemo<SponsorSummary[]>(() => {
+    if (!bookings) return [];
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const upcomingByBiz = new Map<string, number>();
+    for (const b of bookings) {
+      if (b.issue_date < todayIso) continue;
+      upcomingByBiz.set(b.business_id, (upcomingByBiz.get(b.business_id) ?? 0) + 1);
+    }
+    const rateByBiz = new Map<string, LegacyRate>();
+    for (const r of legacyRates) rateByBiz.set(r.business_id, r);
+    const ids = new Set<string>([...upcomingByBiz.keys(), ...rateByBiz.keys()]);
+    return Array.from(ids)
+      .map((id) => ({
+        business: businessMap[id],
+        upcomingBookings: upcomingByBiz.get(id) ?? 0,
+        legacyRate: rateByBiz.get(id) ?? null,
+      }))
+      .filter((s): s is SponsorSummary => !!s.business)
+      .sort((a, b) => a.business.name.localeCompare(b.business.name));
+  }, [bookings, legacyRates, businessMap]);
+
+  async function removeSponsor(business: BusinessRow) {
+    // Cancel every upcoming booking + drop the recurring rate.
+    // The businesses row is left intact (might also be a Nayba
+    // brand) and historical bookings stay so revenue stats hold.
+    const todayIso = new Date().toISOString().slice(0, 10);
+    const cancelRes = await supabase
+      .from('bj_bookings')
+      .update({ status: 'cancelled' })
+      .eq('business_id', business.id)
+      .gte('issue_date', todayIso)
+      .neq('status', 'cancelled');
+    if (cancelRes.error) {
+      setError(cancelRes.error.message);
+      return;
+    }
+    await supabase.from('bj_legacy_rates').delete().eq('business_id', business.id);
+    setRemoving(null);
+    await load();
+  }
 
   const revenue = useMemo(() => {
     if (!bookings) return { month: 0, quarter: 0, ytd: 0 };
@@ -153,6 +220,19 @@ export default function AdminBuryJuiceTab() {
             setAddingContext({ business_id: pack.business_id, tier: pack.tier, pack_id: pack.id });
             setAdding(true);
           }}
+        />
+      )}
+
+      <SponsorsPanel sponsors={sponsorSummaries} onRemove={(b) => setRemoving(b)} />
+
+      {removing && (
+        <RemoveSponsorModal
+          business={removing}
+          upcomingBookings={
+            sponsorSummaries.find((s) => s.business.id === removing.id)?.upcomingBookings ?? 0
+          }
+          onCancel={() => setRemoving(null)}
+          onConfirm={() => removeSponsor(removing)}
         />
       )}
 
@@ -1657,5 +1737,206 @@ function StatField({
         )}
       </div>
     </label>
+  );
+}
+
+// ─── Sponsors panel ───────────────────────────────────────────────
+// One row per business with upcoming bookings or a recurring rate.
+// "Remove from Bury Juice" cancels future bookings + drops the rate
+// row. The businesses row itself is left alone — they may also be a
+// Nayba brand and historical bookings stay so revenue numbers hold.
+function SponsorsPanel({
+  sponsors,
+  onRemove,
+}: {
+  sponsors: SponsorSummary[];
+  onRemove: (b: BusinessRow) => void;
+}) {
+  if (sponsors.length === 0) return null;
+  return (
+    <div
+      style={{
+        background: 'var(--card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 12,
+        padding: 14,
+        marginBottom: 20,
+      }}
+    >
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'baseline',
+          justifyContent: 'space-between',
+          marginBottom: 12,
+          gap: 8,
+        }}
+      >
+        <div
+          style={{
+            fontSize: 11,
+            fontWeight: 600,
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--ink-60)',
+          }}
+        >
+          Sponsors · {sponsors.length}
+        </div>
+        <div style={{ fontSize: 12, color: 'var(--ink-35)' }}>
+          Upcoming bookings + recurring rates
+        </div>
+      </div>
+      <div style={{ display: 'grid', gap: 8 }}>
+        {sponsors.map(({ business, upcomingBookings, legacyRate }) => (
+          <div
+            key={business.id}
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              gap: 12,
+              padding: '10px 12px',
+              borderRadius: 10,
+              background: 'var(--shell)',
+              border: '1px solid var(--border-color)',
+              flexWrap: 'wrap',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap', minWidth: 0 }}>
+              <BusinessPill id={business.id} name={business.name} />
+              <span style={{ fontSize: 13, color: 'var(--ink-60)' }}>
+                {upcomingBookings > 0
+                  ? `${upcomingBookings} upcoming`
+                  : 'No upcoming bookings'}
+                {legacyRate && (
+                  <>
+                    {' · '}
+                    <span style={{ color: 'var(--ink)', fontWeight: 500 }}>
+                      {BJ_PRICING[legacyRate.tier].name}
+                    </span>
+                    {legacyRate.is_comp
+                      ? ' · comp'
+                      : ` · ${formatGBP(legacyRate.monthly_rate_gbp)}/${legacyRate.cadence === 'weekly' ? 'wk' : 'mo'}`}
+                  </>
+                )}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => onRemove(business)}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: 6,
+                padding: '6px 10px',
+                borderRadius: 8,
+                border: '1px solid var(--destructive-border)',
+                background: 'transparent',
+                color: 'var(--destructive)',
+                cursor: 'pointer',
+                fontSize: 12,
+                fontWeight: 500,
+                fontFamily: 'inherit',
+              }}
+            >
+              <Trash2 size={13} /> Remove
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Remove-sponsor confirm modal ────────────────────────────────
+function RemoveSponsorModal({
+  business,
+  upcomingBookings,
+  onCancel,
+  onConfirm,
+}: {
+  business: BusinessRow;
+  upcomingBookings: number;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div
+      role="dialog"
+      aria-modal="true"
+      onClick={onCancel}
+      style={{
+        position: 'fixed',
+        inset: 0,
+        background: 'rgba(42,32,24,0.4)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 16,
+        zIndex: 110,
+      }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        style={{
+          background: 'var(--card)',
+          borderRadius: 12,
+          padding: 24,
+          maxWidth: 440,
+          width: '100%',
+        }}
+      >
+        <h2 style={{ fontSize: 18, fontWeight: 600, margin: 0, marginBottom: 8 }}>
+          Remove {business.name} from Bury Juice?
+        </h2>
+        <p style={{ fontSize: 14, color: 'var(--ink-60)', lineHeight: 1.55, margin: 0, marginBottom: 16 }}>
+          This will cancel{' '}
+          <strong style={{ color: 'var(--ink)' }}>
+            {upcomingBookings} upcoming booking{upcomingBookings === 1 ? '' : 's'}
+          </strong>{' '}
+          and drop their recurring rate. Their account stays intact (it may also be a Nayba brand) and historical bookings
+          aren't touched, so revenue stats hold.
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{
+              padding: '8px 14px',
+              borderRadius: 10,
+              border: '1px solid var(--border-color)',
+              background: 'transparent',
+              color: 'var(--ink-60)',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontFamily: 'inherit',
+            }}
+          >
+            Keep
+          </button>
+          <button
+            type="button"
+            onClick={onConfirm}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 14px',
+              borderRadius: 10,
+              border: 'none',
+              background: 'var(--destructive)',
+              color: '#fff',
+              cursor: 'pointer',
+              fontSize: 13,
+              fontWeight: 600,
+              fontFamily: 'inherit',
+            }}
+          >
+            <Trash2 size={13} /> Remove
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
